@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@fastify/cors": "^10.0.0",
-    "@google/generative-ai": "^0.21.0",
+    "@google/generative-ai": "^0.24.1",
     "@supabase/supabase-js": "^2.47.0",
     "bullmq": "^5.25.0",
     "cheerio": "^1.0.0",
