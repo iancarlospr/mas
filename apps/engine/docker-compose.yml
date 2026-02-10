@@ -1,0 +1,83 @@
+version: '3.8'
+
+services:
+  engine:
+    build:
+      context: ../../
+      dockerfile: apps/engine/Dockerfile
+    container_name: marketing-alpha-engine
+    ports:
+      - '3001:3001'
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - REDIS_URL=redis://redis:6379
+    deploy:
+      resources:
+        limits:
+          memory: 768M
+        reservations:
+          memory: 256M
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'node', '-e', "fetch('http://localhost:3001/engine/health').then(r => r.ok ? process.exit(0) : process.exit(1)).catch(() => process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      start_period: 30s
+      retries: 3
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '3'
+    networks:
+      - alphascan
+
+  redis:
+    image: redis:7-alpine
+    container_name: marketing-alpha-redis
+    command: >
+      redis-server
+      --maxmemory 128mb
+      --maxmemory-policy allkeys-lru
+      --appendonly yes
+      --appendfsync everysec
+      --save 900 1
+      --save 300 10
+      --save 60 10000
+      --loglevel warning
+    deploy:
+      resources:
+        limits:
+          memory: 160M
+        reservations:
+          memory: 128M
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      start_period: 5s
+      retries: 5
+    logging:
+      driver: json-file
+      options:
+        max-size: '5m'
+        max-file: '2'
+    networks:
+      - alphascan
+
+volumes:
+  redis-data:
+    driver: local
+
+networks:
+  alphascan:
+    driver: bridge

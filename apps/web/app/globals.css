@@ -1,0 +1,206 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-heading: 'Plus Jakarta Sans', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-background text-primary font-body;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+  }
+}
+
+@layer utilities {
+  .hero-gradient {
+    background: linear-gradient(135deg, #1A1A2E 0%, #16213E 50%, #0F3460 100%);
+  }
+
+  .glass {
+    @apply bg-white/80 backdrop-blur-lg;
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-accent to-highlight;
+  }
+}
+
+/* Skeleton loading animation */
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 0.4; transform: scale(0.98); }
+  50% { opacity: 1; transform: scale(1); }
+}
+
+.skeleton {
+  animation: skeleton-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* ════════════════════════════════════════════════════════════
+   Print stylesheet — Legal size paper (8.5" × 14")
+   PRD-cont-4 Section 8 + PRD-cont-1 Section 6.1
+   ════════════════════════════════════════════════════════════ */
+@media print {
+  /* Legal-size paper: 8.5" × 14" */
+  @page {
+    size: 8.5in 14in;
+    margin: 20mm 15mm 25mm 15mm;
+  }
+
+  /* Ensure colors print */
+  * {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  /* Hide interactive / web-only elements */
+  .report-sidebar,
+  .report-topbar,
+  .share-button,
+  .download-button,
+  .tooltip,
+  .expand-button,
+  .collapse-button,
+  [data-interactive],
+  .hover-overlay,
+  .recharts-tooltip-wrapper,
+  .chart-expand-button,
+  .chart-filter-controls,
+  .chart-hover-indicator {
+    display: none !important;
+  }
+
+  /* Expand all collapsed sections */
+  [data-expandable] {
+    max-height: none !important;
+    overflow: visible !important;
+  }
+  [data-collapsed] {
+    display: block !important;
+  }
+
+  /* Page breaks */
+  .report-section {
+    break-before: always;
+  }
+  .report-section:first-child {
+    break-before: auto;
+  }
+  .chart-container,
+  .finding-card,
+  .data-table,
+  .report-chart-container,
+  .recharts-wrapper {
+    break-inside: avoid;
+  }
+  .section-header,
+  .report-section-header {
+    break-after: avoid;
+  }
+
+  /* Typography adjustments for print */
+  body {
+    font-size: 10pt;
+    color: #000 !important;
+    background: white !important;
+  }
+  h1 { font-size: 18pt; }
+  h2 { font-size: 14pt; }
+  h3 { font-size: 12pt; }
+
+  /* Chart adjustments */
+  .recharts-cartesian-grid-horizontal line,
+  .recharts-cartesian-grid-vertical line {
+    stroke: #E2E8F0 !important;
+    stroke-dasharray: none !important;
+  }
+  .recharts-text,
+  .recharts-legend-item-text {
+    fill: #1A1A2E !important;
+    font-size: 10px !important;
+  }
+  .recharts-legend-wrapper {
+    display: block !important;
+  }
+  .chart-container {
+    border: 1px solid #E2E8F0;
+  }
+
+  /* Content width — fill available space */
+  .report-content {
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin-left: 0 !important;
+  }
+
+  /* Watermark (subtle) */
+  .print-watermark {
+    display: block !important;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+    font-size: 72pt;
+    color: rgba(0, 0, 0, 0.03);
+    white-space: nowrap;
+    z-index: 9999;
+    pointer-events: none;
+  }
+
+  /* Print header/footer */
+  .print-header {
+    display: block !important;
+    position: running(header);
+  }
+  .print-footer {
+    display: block !important;
+    position: running(footer);
+  }
+}
+
+/* High contrast mode (Section 9.5) */
+@media (prefers-contrast: high) {
+  .bento-card,
+  .bento-card-1x1,
+  .bento-card-2x1,
+  .bento-card-1x2,
+  .bento-card-2x2 {
+    border-width: 2px;
+    border-color: #1A1A2E;
+  }
+
+  .recharts-cartesian-grid line {
+    stroke: #94A3B8 !important;
+  }
+
+  .recharts-text {
+    fill: #1A1A2E !important;
+  }
+
+  .recharts-line .recharts-curve {
+    stroke-width: 3 !important;
+  }
+
+  .recharts-bar-rectangle rect {
+    stroke: #1A1A2E !important;
+    stroke-width: 1 !important;
+  }
+
+  .traffic-light-icon {
+    display: inline-block !important;
+  }
+}

@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  engine:
+    image: ghcr.io/${GHCR_USERNAME:-alphascan}/alphascan-engine:latest
+    container_name: alphascan-engine
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - REDIS_URL=redis://redis:6379
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - DATAFORSEO_LOGIN=${DATAFORSEO_LOGIN}
+      - DATAFORSEO_PASSWORD=${DATAFORSEO_PASSWORD}
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - ENGINE_API_KEY=${ENGINE_API_KEY}
+      - POSTHOG_API_KEY=${POSTHOG_API_KEY}
+    depends_on:
+      redis:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 768M
+        reservations:
+          memory: 512M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - alphascan
+
+  redis:
+    image: redis:7-alpine
+    container_name: alphascan-redis
+    restart: unless-stopped
+    command: >
+      redis-server
+      --maxmemory 128mb
+      --maxmemory-policy allkeys-lru
+      --appendonly yes
+      --appendfsync everysec
+      --save 900 1
+      --save 300 10
+      --save 60 10000
+      --loglevel warning
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 160M
+        reservations:
+          memory: 128M
+    networks:
+      - alphascan
+    # Redis is NOT exposed to the host network. Only engine can reach it.
+
+volumes:
+  redis-data:
+    driver: local
+
+networks:
+  alphascan:
+    driver: bridge

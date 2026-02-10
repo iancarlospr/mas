@@ -1,0 +1,42 @@
+{
+  "name": "@marketing-alpha/engine",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/server.js",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --project engine",
+    "test:unit": "vitest run --project engine",
+    "test:integration": "vitest run --project engine --testPathPattern integration",
+    "test:golden": "RUN_GOLDEN=true vitest run --project engine --testPathPattern golden",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@fastify/cors": "^10.0.0",
+    "@google/generative-ai": "^0.21.0",
+    "@supabase/supabase-js": "^2.47.0",
+    "bullmq": "^5.25.0",
+    "cheerio": "^1.0.0",
+    "fastify": "^5.1.0",
+    "geoip-lite": "^1.4.10",
+    "ioredis": "^5.4.1",
+    "pino": "^9.5.0",
+    "playwright": "^1.49.0",
+    "tldts": "^6.1.0",
+    "zod": "^3.23.0",
+    "@marketing-alpha/types": "*"
+  },
+  "devDependencies": {
+    "@types/geoip-lite": "^1.4.4",
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

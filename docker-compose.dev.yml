@@ -1,0 +1,11 @@
+version: '3.8'
+
+# Local development: Redis only (Supabase runs via CLI, Next.js runs natively)
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: alphascan-redis-dev
+    ports:
+      - "6379:6379"
+    command: redis-server --maxmemory 64mb --maxmemory-policy allkeys-lru
+    # No persistence needed for development

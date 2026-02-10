@@ -1,0 +1,33 @@
+name: Golden Dataset Regression
+
+on:
+  schedule:
+    - cron: '0 6 * * 1' # Every Monday at 6 AM UTC
+  workflow_dispatch: {} # Manual trigger
+
+env:
+  NODE_VERSION: '22'
+
+jobs:
+  golden-dataset:
+    name: AI Golden Dataset Regression
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      - run: npm ci
+      - name: Run golden dataset tests
+        run: npm run test:golden --workspace=apps/engine --if-present
+        env:
+          RUN_GOLDEN: 'true'
+          GOOGLE_AI_API_KEY: ${{ secrets.GOOGLE_AI_API_KEY }}
+      - name: Upload golden results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: golden-dataset-results
+          path: apps/engine/test/golden/results/
+          retention-days: 30

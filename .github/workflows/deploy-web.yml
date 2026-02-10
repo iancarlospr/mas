@@ -1,0 +1,33 @@
+name: Deploy Web
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/web/**'
+      - 'packages/types/**'
+
+jobs:
+  # Vercel handles the actual deployment via its GitHub integration.
+  # This job exists to:
+  # 1. Verify the deployment succeeded
+  # 2. Send notifications
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for Vercel deployment
+        uses: patrickedqvist/wait-for-vercel-preview@v1.3.2
+        id: vercel
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          max_timeout: 300
+          check_interval: 10
+
+      - name: Verify deployment health
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" ${{ steps.vercel.outputs.url }})
+          if [ "$STATUS" != "200" ]; then
+            echo "Deployment health check failed with status $STATUS"
+            exit 1
+          fi
+          echo "Deployment healthy at ${{ steps.vercel.outputs.url }}"

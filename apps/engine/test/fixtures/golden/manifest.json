@@ -1,0 +1,79 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2026-02-09",
+  "updateFrequency": "quarterly",
+  "sites": [
+    {
+      "domain": "hubspot.com",
+      "capturedAt": null,
+      "notes": "Full martech stack. GTM + GA4 + HubSpot Analytics + Hotjar + 6sense.",
+      "expectedMarketingIQ": { "min": 78, "max": 92 },
+      "knownTechnologies": ["HubSpot CMS", "Google Analytics 4", "Google Tag Manager", "Hotjar", "6sense", "Cloudflare"],
+      "knownGaps": ["No DKIM published on root domain"]
+    },
+    {
+      "domain": "shopify.com",
+      "capturedAt": null,
+      "notes": "E-commerce platform. Heavy JS, Shopify analytics + GA4.",
+      "expectedMarketingIQ": { "min": 75, "max": 90 },
+      "knownTechnologies": ["Shopify", "Google Analytics 4", "Google Tag Manager"],
+      "knownGaps": []
+    },
+    {
+      "domain": "stripe.com",
+      "capturedAt": null,
+      "notes": "Developer-focused B2B SaaS. Clean implementation.",
+      "expectedMarketingIQ": { "min": 80, "max": 95 },
+      "knownTechnologies": ["Google Analytics 4", "Segment"],
+      "knownGaps": []
+    },
+    {
+      "domain": "notion.so",
+      "capturedAt": null,
+      "notes": "Productivity SaaS. SPA-heavy.",
+      "expectedMarketingIQ": { "min": 70, "max": 88 },
+      "knownTechnologies": ["Google Analytics 4"],
+      "knownGaps": []
+    },
+    {
+      "domain": "mailchimp.com",
+      "capturedAt": null,
+      "notes": "Email marketing platform.",
+      "expectedMarketingIQ": { "min": 75, "max": 92 },
+      "knownTechnologies": ["Google Analytics 4", "Google Tag Manager"],
+      "knownGaps": []
+    },
+    {
+      "domain": "webflow.com",
+      "capturedAt": null,
+      "notes": "Website builder. Marketing-heavy site.",
+      "expectedMarketingIQ": { "min": 72, "max": 88 },
+      "knownTechnologies": ["Webflow", "Google Analytics 4"],
+      "knownGaps": []
+    },
+    {
+      "domain": "squarespace.com",
+      "capturedAt": null,
+      "notes": "Website builder. Consumer-facing.",
+      "expectedMarketingIQ": { "min": 70, "max": 85 },
+      "knownTechnologies": ["Squarespace", "Google Analytics 4"],
+      "knownGaps": []
+    },
+    {
+      "domain": "nike.com",
+      "capturedAt": null,
+      "notes": "Consumer brand. Heavy ad tech stack.",
+      "expectedMarketingIQ": { "min": 65, "max": 85 },
+      "knownTechnologies": ["Adobe Analytics", "Google Tag Manager"],
+      "knownGaps": []
+    },
+    {
+      "domain": "localsmallbiz.com",
+      "capturedAt": null,
+      "notes": "Small business site (edge case). Minimal tracking.",
+      "expectedMarketingIQ": { "min": 15, "max": 45 },
+      "knownTechnologies": [],
+      "knownGaps": ["No analytics", "No DMARC", "No SPF"]
+    }
+  ]
+}
