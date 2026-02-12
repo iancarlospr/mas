@@ -110,4 +110,5 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
   return { moduleId: 'M34' as ModuleId, status: 'success', data, signals, score: null, checkpoints, duration: 0 };
 };
 
+export { execute };
 registerModuleExecutor('M34' as ModuleId, execute);

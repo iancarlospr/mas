@@ -114,6 +114,49 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
   const bounceRate = m24Data?.['bounceRate'] as number | undefined;
   const trafficSources = m24Data?.['trafficSources'] as Record<string, unknown> | undefined;
 
+  // Structured traffic data from external modules
+  const m25Data = (ctx.previousResults.get('M25' as ModuleId)?.data ?? {}) as Record<string, unknown>;
+  const m28Data = (ctx.previousResults.get('M28' as ModuleId)?.data ?? {}) as Record<string, unknown>;
+  const m31Data = (ctx.previousResults.get('M31' as ModuleId)?.data ?? {}) as Record<string, unknown>;
+  const m26Data = (ctx.previousResults.get('M26' as ModuleId)?.data ?? {}) as Record<string, unknown>;
+
+  const trafficContext = {
+    monthlyVisits: m25Data['monthlyVisits'] ?? monthlyVisits ?? null,
+    paidCost: m28Data['estimatedCost'] ?? null,
+    trafficSources: m31Data['sources'] ?? trafficSources ?? null,
+    topCountries: m26Data['countries'] ?? null,
+  };
+
+  // Tech stack summary from M05/M07
+  const m05Data = (ctx.previousResults.get('M05' as ModuleId)?.data ?? {}) as Record<string, unknown>;
+  const m07Data = (ctx.previousResults.get('M07' as ModuleId)?.data ?? {}) as Record<string, unknown>;
+  const m20Data = (ctx.previousResults.get('M20' as ModuleId)?.data ?? {}) as Record<string, unknown>;
+
+  const tools = (m05Data['tools'] as Array<Record<string, unknown>> | undefined) ?? [];
+  const techStackContext = {
+    analyticsTools: tools.filter(t => t['type'] === 'analytics').map(t => t['name']),
+    adPixels: tools.filter(t => t['type'] === 'advertising').map(t => t['name']),
+    martech: (m07Data['tools'] as Array<Record<string, unknown>> | undefined)?.map(t => t['name']) ?? [],
+    tms: tools.filter(t => t['type'] === 'tag_manager').map(t => t['name']),
+  };
+
+  const ecommerceContext = {
+    isEcommerce: m20Data['isEcommerce'] ?? false,
+    hasCheckout: m20Data['hasCheckout'] ?? false,
+    platform: m20Data['platform'] ?? null,
+  };
+
+  // Checkpoint breakdown per module
+  const checkpointBreakdown: Record<string, Record<string, number>> = {};
+  for (const [id, result] of ctx.previousResults) {
+    if (id === 'M41' || id === 'M42' || !result.checkpoints.length) continue;
+    const breakdown: Record<string, number> = { excellent: 0, good: 0, warning: 0, critical: 0 };
+    for (const cp of result.checkpoints) {
+      if (cp.health in breakdown) breakdown[cp.health]!++;
+    }
+    checkpointBreakdown[id] = breakdown;
+  }
+
   // Build module scores summary
   const moduleScores: Record<string, number | null> = {};
   for (const [id, result] of ctx.previousResults) {
@@ -150,10 +193,17 @@ ${allM41OutputsJson}
 ### Raw Module Scores
 ${JSON.stringify(moduleScores)}
 
-### Traffic Data (from M24, if available)
-Monthly visits: ${monthlyVisits ?? 'unavailable'}
-Bounce rate: ${bounceRate ?? 'unavailable'}
-Traffic sources: ${trafficSources ? JSON.stringify(trafficSources) : 'unavailable'}
+### Traffic & Market Context
+${JSON.stringify(trafficContext)}
+
+### Tech Stack Context
+${JSON.stringify(techStackContext)}
+
+### Ecommerce Context
+${JSON.stringify(ecommerceContext)}
+
+### Checkpoint Health Breakdown (per module)
+${JSON.stringify(checkpointBreakdown)}
 
 ### Category Weights Applied
 ${JSON.stringify(CATEGORY_WEIGHTS)}
@@ -260,4 +310,5 @@ function buildFallbackSynthesis(
   };
 }
 
+export { execute };
 registerModuleExecutor('M42' as ModuleId, execute);

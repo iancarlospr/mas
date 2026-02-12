@@ -4,6 +4,9 @@
  * Captures JavaScript errors, console warnings, network failures,
  * mixed content, and detects error monitoring tools.
  *
+ * Reads from ctx.consoleCollector (attached in runner.ts before navigation)
+ * instead of registering inline page listeners.
+ *
  * Checkpoints:
  *   1. JavaScript errors on load
  *   2. Network errors (4xx/5xx)
@@ -11,18 +14,13 @@
  *   4. Error monitoring tool
  *   5. Mixed content
  *   6. Resource loading failures
+ *   7. SDK Initialization Logging
  */
 
 import { registerModuleExecutor } from '../runner.js';
 import type { ModuleContext } from '../types.js';
 import type { ModuleResult, ModuleId, Signal, Checkpoint, CheckpointHealth } from '@marketing-alpha/types';
 import { createSignal, createCheckpoint, infoCheckpoint } from '../../utils/signals.js';
-
-interface ConsoleEntry {
-  type: string;
-  text: string;
-  url?: string;
-}
 
 const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
   const signals: Signal[] = [];
@@ -34,41 +32,16 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
     return { moduleId: 'M11' as ModuleId, status: 'error', data: {}, signals: [], score: null, checkpoints: [], duration: 0, error: 'No page' };
   }
 
-  // ─── Step 1: Set up listeners ──────────────────────────────────────────
-  const consoleMessages: ConsoleEntry[] = [];
-  const jsErrors: Array<{ message: string; stack?: string }> = [];
-  const failedRequests: Array<{ url: string; failure: string; resourceType: string }> = [];
-
-  const consoleHandler = (msg: { type: () => string; text: () => string; location: () => { url?: string } }) => {
-    consoleMessages.push({
-      type: msg.type(),
-      text: msg.text().slice(0, 200),
-      url: msg.location()?.url,
-    });
-  };
-
-  const pageErrorHandler = (error: Error) => {
-    jsErrors.push({
-      message: error.message?.slice(0, 200) ?? 'Unknown error',
-      stack: error.stack?.slice(0, 300),
-    });
-  };
-
-  const requestFailedHandler = (request: { url: () => string; failure: () => { errorText: string } | null; resourceType: () => string }) => {
-    const failure = request.failure();
-    failedRequests.push({
-      url: request.url().slice(0, 200),
-      failure: failure?.errorText ?? 'Unknown',
-      resourceType: request.resourceType(),
-    });
-  };
-
-  page.on('console', consoleHandler);
-  page.on('pageerror', pageErrorHandler);
-  page.on('requestfailed', requestFailedHandler);
-
   // Wait a moment to catch late-firing errors
   await page.waitForTimeout(3000);
+
+  // ─── Step 1: Read from ConsoleCollector ────────────────────────────────
+  const cc = ctx.consoleCollector;
+
+  const consoleMessages = cc?.getAllMessages() ?? [];
+  const jsErrors = cc?.getPageErrors() ?? [];
+  const failedRequests = cc?.getFailedRequests() ?? [];
+  const sdkInitLogs = cc?.getSDKLogs() ?? [];
 
   // ─── Step 2: Detect error monitoring tools ─────────────────────────────
   const errorTools = await page.evaluate(() => {
@@ -85,6 +58,12 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
     if (w['Honeybadger']) tools.push('Honeybadger');
     if (w['Raygun']) tools.push('Raygun');
     if (w['atatus']) tools.push('Atatus');
+    if (w['Airbrake'] || w['airbrake']) tools.push('Airbrake');
+    if (w['FS'] && (w['FS'] as Record<string, unknown>)['getCurrentSessionURL']) tools.push('FullStory');
+    if (typeof w['clarity'] === 'function') tools.push('Microsoft Clarity');
+    if (w['_elastic_apm_config'] || w['elasticApm']) tools.push('Elastic APM');
+    if (w['ADRUM'] || w['adrum']) tools.push('AppDynamics');
+    if (w['dtrum'] || w['dT_']) tools.push('Dynatrace');
 
     // Also check scripts
     const scripts = Array.from(document.querySelectorAll('script[src]'));
@@ -96,6 +75,8 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
       if (src.includes('newrelic') && !tools.includes('New Relic')) tools.push('New Relic');
       if (src.includes('rollbar') && !tools.includes('Rollbar')) tools.push('Rollbar');
       if (src.includes('logrocket') && !tools.includes('LogRocket')) tools.push('LogRocket');
+      if (src.includes('appdynamics') && !tools.includes('AppDynamics')) tools.push('AppDynamics');
+      if (src.includes('dynatrace') && !tools.includes('Dynatrace')) tools.push('Dynatrace');
     }
 
     return tools;
@@ -137,15 +118,13 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
       .slice(0, 20);
   }
 
-  // Clean up listeners
-  page.removeListener('console', consoleHandler);
-  page.removeListener('pageerror', pageErrorHandler);
-  page.removeListener('requestfailed', requestFailedHandler);
-
   // ─── Classify console messages ─────────────────────────────────────────
   const errors = consoleMessages.filter(m => m.type === 'error');
   const warnings = consoleMessages.filter(m => m.type === 'warning');
   const logs = consoleMessages.filter(m => m.type === 'log');
+
+  // Deduplicate SDK tool names from init logs
+  const sdkToolNames = [...new Set(sdkInitLogs.map(m => m.sdkMatch!))];
 
   data.console = {
     errors: errors.length,
@@ -161,6 +140,49 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
   data.failedRequests = failedRequests.slice(0, 10);
   data.networkErrors = networkErrors.slice(0, 10);
   data.mixedContent = mixedContent;
+  data.sdkInitLogs = sdkInitLogs.slice(0, 30).map(m => ({
+    tool: m.sdkMatch,
+    text: m.text,
+    timestamp: m.timestamp,
+  }));
+  // Network-based error monitoring detection (catches internal/custom services)
+  if (nc) {
+    const allReqs = nc.getAllRequests();
+    const errorNetPatterns: Array<[RegExp, string]> = [
+      [/sentry\.io|sentry-cdn/i, 'Sentry'],
+      [/bugsnag\.com/i, 'Bugsnag'],
+      [/browser-intake-datadoghq/i, 'Datadog RUM'],
+      [/bam\.nr-data\.net|js-agent\.newrelic/i, 'New Relic'],
+      [/rollbar\.com/i, 'Rollbar'],
+      [/r\.lr-in\.com|cdn\.logrocket/i, 'LogRocket'],
+      [/airbrake\.io/i, 'Airbrake'],
+      [/clarity\.ms/i, 'Microsoft Clarity'],
+      [/eum-appdynamics\.com|col\.eum-appdynamics\.com/i, 'AppDynamics'],
+      [/bf\.dynatrace\.com|js-cdn\.dynatrace\.com|dynatracelabs\.com/i, 'Dynatrace'],
+    ];
+    for (const [pattern, name] of errorNetPatterns) {
+      if (!errorTools.includes(name) && allReqs.some(r => pattern.test(r.url))) {
+        errorTools.push(name);
+      }
+    }
+
+    // Detect custom/internal error endpoints (e.g., exceptions.hubspot.com)
+    const errorEndpointPatterns = /\b(exception|error[-_]?report|crash[-_]?report|diagnostic)\b/i;
+    const customErrorEndpoints = allReqs.filter(r =>
+      (r.resourceType === 'xhr' || r.resourceType === 'fetch') &&
+      errorEndpointPatterns.test(r.url)
+    );
+    if (customErrorEndpoints.length > 0 && errorTools.length === 0) {
+      const endpoint = customErrorEndpoints[0]!;
+      try {
+        const host = new URL(endpoint.url).hostname;
+        errorTools.push(`Custom (${host})`);
+      } catch {
+        errorTools.push('Custom error reporting');
+      }
+    }
+  }
+
   data.errorTools = errorTools;
 
   // ─── Signals ───────────────────────────────────────────────────────────
@@ -304,7 +326,23 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
     checkpoints.push(createCheckpoint({ id: 'm11-resource-failures', name: 'Resource Loading', weight: 0.5, health, evidence }));
   }
 
+  // CP7: SDK Initialization Logging
+  {
+    if (sdkInitLogs.length === 0) {
+      checkpoints.push(infoCheckpoint('m11-sdk-init', 'SDK Initialization Logging', 'No SDK initialization messages detected in console'));
+    } else {
+      checkpoints.push(createCheckpoint({
+        id: 'm11-sdk-init',
+        name: 'SDK Initialization Logging',
+        weight: 0.3,
+        health: 'excellent',
+        evidence: `${sdkInitLogs.length} SDK init message(s) — tools confirmed active: ${sdkToolNames.join(', ')}`,
+      }));
+    }
+  }
+
   return { moduleId: 'M11' as ModuleId, status: 'success', data, signals, score: null, checkpoints, duration: 0 };
 };
 
+export { execute };
 registerModuleExecutor('M11' as ModuleId, execute);

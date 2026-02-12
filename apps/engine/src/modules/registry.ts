@@ -378,6 +378,15 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     retries: 5,
     category: 'market_position',
   },
+  {
+    id: 'M40',
+    name: 'Subdomain & Attack Surface',
+    phase: 'external',
+    minimumTier: 'full',
+    timeout: 45_000,
+    retries: 3,
+    category: 'compliance_security',
+  },
 
   // ─── Phase 5: Synthesis ────────────────────────────────────────────────────
   {
@@ -393,7 +402,7 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
       'M09', 'M10', 'M11', 'M12', 'M13', 'M14', 'M15', 'M16', 'M17',
       'M18', 'M19', 'M20', 'M21', 'M22', 'M23', 'M24', 'M25', 'M26',
       'M27', 'M28', 'M29', 'M30', 'M31', 'M32', 'M33', 'M34', 'M35',
-      'M36', 'M37', 'M38', 'M39',
+      'M36', 'M37', 'M38', 'M39', 'M40',
     ],
   },
   {

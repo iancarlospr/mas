@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { enqueueScanJob, getJobState, getQueueDepth } from '../queue/scan-queue.js';
 import { getScanById } from '../services/supabase.js';
 import { normalizeUrl, getRegistrableDomain } from '../utils/url.js';
+import { generateReportPDF, uploadReportPDF } from '../services/pdf-generator.js';
 import type { ModuleTier } from '@marketing-alpha/types';
 
 /**
@@ -202,6 +203,48 @@ export async function scanRoutes(fastify: FastifyInstance): Promise<void> {
 
         reply.code(500).send({
           error: 'Failed to get scan status',
+          message: (error as Error).message,
+        });
+      }
+    },
+  );
+
+  /**
+   * POST /engine/reports/:id/pdf
+   *
+   * Generate a PDF for a completed paid scan.
+   * Uses Playwright to render the report page and upload to Supabase Storage.
+   */
+  fastify.post(
+    '/engine/reports/:id/pdf',
+    async (
+      request: FastifyRequest<{ Params: ScanIdParamsType }>,
+      reply: FastifyReply,
+    ) => {
+      const parseResult = ScanIdParams.safeParse(request.params);
+      if (!parseResult.success) {
+        reply.code(400).send({ error: 'Invalid scan ID' });
+        return;
+      }
+
+      const { id: scanId } = parseResult.data;
+      const reportBaseUrl = process.env['REPORT_BASE_URL']
+        ?? process.env['NEXT_PUBLIC_SITE_URL']
+        ?? 'http://localhost:3000';
+
+      try {
+        request.log.info({ scanId }, 'Generating report PDF');
+        const pdf = await generateReportPDF(scanId, reportBaseUrl);
+        const signedUrl = await uploadReportPDF(scanId, pdf);
+        request.log.info({ scanId }, 'PDF generated and uploaded');
+        reply.send({ signedUrl });
+      } catch (error) {
+        request.log.error(
+          { scanId, error: (error as Error).message },
+          'Failed to generate PDF',
+        );
+        reply.code(500).send({
+          error: 'PDF generation failed',
           message: (error as Error).message,
         });
       }

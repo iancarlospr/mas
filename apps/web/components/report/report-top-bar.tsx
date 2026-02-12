@@ -70,13 +70,14 @@ export function ReportTopBar({ domain, marketingIQ, scanId, isShared }: ReportTo
             {copied ? 'Copied!' : 'Share'}
           </button>
         )}
-        <button
-          onClick={() => window.print()}
+        <a
+          href={`/api/reports/${scanId}/pdf${isShared ? `?share=${new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '').get('share') ?? ''}` : ''}`}
+          download
           className="download-button inline-flex items-center gap-2 bg-[#0F3460] text-white rounded-lg px-4 py-2 text-sm font-heading font-700 hover:bg-[#0F3460]/90 transition-colors"
         >
           <Download size={16} />
           Download PDF
-        </button>
+        </a>
       </div>
     </header>
   );

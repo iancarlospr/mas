@@ -2,7 +2,7 @@
  * Server-side PDF generation using Playwright.
  * PRD-cont-4 Section 8.2 — Legal size paper (8.5" × 14").
  */
-import { chromium } from 'playwright';
+import { chromium } from 'patchright';
 import { getSupabaseAdmin } from './supabase.js';
 
 export async function generateReportPDF(

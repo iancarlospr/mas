@@ -145,6 +145,24 @@ ${JSON.stringify(
 ### Detected Tech Stack
 ${JSON.stringify(techStackSignals.slice(0, 50))}
 
+### Module Dependency Context (for task ordering)
+IMPORTANT: Respect these dependencies when ordering workstream tasks:
+- Consent/Privacy (M12) fixes MUST come before any tracking/analytics implementations
+- Base analytics (M05) must be correct before attribution (M06) or paid media (M06b) optimizations
+- Performance (M03) improvements impact conversion rates for ALL revenue-related recommendations
+- Security headers (M01) and HTTPS setup are prerequisites for cookie compliance
+- Tag governance (M08) improvements should precede individual tool optimizations
+- Accessibility (M10) fixes may be legally required before other UX improvements
+- CMS/infrastructure (M02) changes may be prerequisites for performance and feature work
+
+### ROI Context (from M44, if available)
+${JSON.stringify((() => {
+  const m44 = ctx.previousResults.get('M44' as ModuleId);
+  if (!m44 || m44.status !== 'success') return 'unavailable';
+  const d = m44.data as Record<string, unknown>;
+  return { totalAnnualOpportunity: d['totalAnnualOpportunity'], topOpportunities: (d['opportunities'] as Array<Record<string, unknown>> | undefined)?.slice(0, 5) ?? [] };
+})())}
+
 ### Scan Date
 ${new Date().toISOString().split('T')[0]}
 
@@ -209,4 +227,5 @@ Produce the PRD as valid JSON with these fields:
   return { moduleId: 'M43' as ModuleId, status: 'success', data, signals, score: null, checkpoints, duration: 0 };
 };
 
+export { execute };
 registerModuleExecutor('M43' as ModuleId, execute);

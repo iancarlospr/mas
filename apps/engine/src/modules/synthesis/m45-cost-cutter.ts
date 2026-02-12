@@ -227,4 +227,5 @@ function buildFallbackAnalysis(tools: Array<{ name: string; type: string; catego
   };
 }
 
+export { execute };
 registerModuleExecutor('M45' as ModuleId, execute);

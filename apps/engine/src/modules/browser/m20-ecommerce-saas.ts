@@ -87,7 +87,7 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
     if (doc.querySelector('script[src*="braintreegateway"], script[src*="braintree"]')) {
       paymentProcessors.push('Braintree');
     }
-    if (doc.querySelector('script[src*="square"], [data-locationid]')) {
+    if (doc.querySelector('script[src*="squareup.com"], script[src*="square.site"], [data-locationid][class*="square"]')) {
       paymentProcessors.push('Square');
     }
     if (doc.querySelector('script[src*="adyen"], [class*="adyen"]')) {
@@ -127,8 +127,12 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
       doc.querySelector('[class*="price-card"], [class*="plan-card"]')
     );
     const hasFreeTrial = !!(
-      doc.querySelector('a[href*="free-trial"], a[href*="trial"], [class*="free-trial"]') ||
-      doc.body.textContent?.match(/free\s+trial|start\s+free|try\s+free/i)
+      doc.querySelector('a[href*="free-trial"], a[href*="free_trial"], a[href*="/trial"], a[href*="get-started-free"], a[href*="start-free"], [class*="free-trial"]') ||
+      doc.querySelector('a[href*="signup/free"], a[href*="sign-up/free"], a[href*="/free"]') ||
+      !!Array.from(doc.querySelectorAll('a, button')).find((el) => {
+        const text = (el.textContent || '').trim().toLowerCase();
+        return /\bfree\s*(trial|plan|tier)\b|\bstart\s*free\b|\btry\s*(it\s*)?free\b|\bget\s*started\s*free\b|\bfree\s*sign\s*up\b/.test(text);
+      })
     );
     const hasDemoRequest = !!(
       doc.querySelector('a[href*="/demo"], a[href*="request-demo"], [class*="demo"]') ||
@@ -169,7 +173,136 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
     };
   });
 
+  // ─── Network-based payment processor detection ─────────────────────────
+  const nc = ctx.networkCollector;
+  if (nc) {
+    const allReqs = nc.getAllRequests();
+    const paymentPatterns: Array<{ name: string; pattern: RegExp }> = [
+      { name: 'Stripe', pattern: /js\.stripe\.com|m\.stripe\.com|api\.stripe\.com/ },
+      { name: 'PayPal', pattern: /paypal\.com\/sdk|paypalobjects\.com/ },
+      { name: 'Braintree', pattern: /braintreegateway\.com|braintree-api\.com/ },
+      { name: 'Adyen', pattern: /adyen\.com\/checkoutshopper/ },
+      { name: 'Square', pattern: /squareup\.com\/payments|square\.site/ },
+      { name: 'Paddle', pattern: /paddle\.com\/paddle\.js|cdn\.paddle\.com/ },
+      { name: 'Chargebee', pattern: /js\.chargebee\.com/ },
+      { name: 'Recurly', pattern: /js\.recurly\.com/ },
+      { name: 'FastSpring', pattern: /fastspring\.com\/builder/ },
+    ];
+
+    for (const { name, pattern } of paymentPatterns) {
+      if (!ecomData.paymentProcessors.includes(name)) {
+        if (allReqs.some((r) => pattern.test(r.url))) {
+          ecomData.paymentProcessors.push(name);
+        }
+      }
+    }
+  }
+
   data.ecommerce = ecomData;
+
+  // ─── Auth/SSO + Payment iframe + Form security detection ──────────────────
+  const authPaymentData = await page.evaluate(() => {
+    const doc = document;
+    const w = window as unknown as Record<string, unknown>;
+
+    // --- OAuth / SSO Providers ---
+    const authProviders: string[] = [];
+
+    // Google Sign-In
+    if (doc.querySelector('script[src*="accounts.google.com/gsi"], [data-client_id][data-callback], .g_id_signin, #g_id_onload, meta[name="google-signin-client_id"]')) {
+      authProviders.push('Google Sign-In');
+    }
+    // Facebook Login
+    if (doc.querySelector('[data-onlogin], .fb-login-button, [class*="facebook-login"], [data-scope]') && (w['FB'] || doc.querySelector('script[src*="connect.facebook.net"]'))) {
+      authProviders.push('Facebook Login');
+    }
+    // Apple Sign-In
+    if (doc.querySelector('script[src*="appleid.auth"], [data-color][data-border][data-type="sign-in"], div#appleid-signin')) {
+      authProviders.push('Apple Sign-In');
+    }
+    // Microsoft / Azure AD
+    if (doc.querySelector('script[src*="login.microsoftonline.com"], script[src*="msal"]') || w['msal']) {
+      authProviders.push('Microsoft SSO');
+    }
+    // Auth0
+    if (doc.querySelector('script[src*="auth0.com/js"], script[src*="cdn.auth0.com"]') || w['auth0']) {
+      authProviders.push('Auth0');
+    }
+    // Okta
+    if (doc.querySelector('script[src*="okta.com"], script[src*="okta-signin-widget"]') || w['OktaSignIn']) {
+      authProviders.push('Okta');
+    }
+    // Firebase Auth
+    if (w['firebase'] && typeof (w['firebase'] as Record<string, unknown>)['auth'] === 'function') {
+      authProviders.push('Firebase Auth');
+    }
+    // Clerk
+    if (doc.querySelector('script[src*="clerk.com"], [data-clerk-publishable-key]') || w['Clerk']) {
+      authProviders.push('Clerk');
+    }
+    // Supabase Auth
+    if (w['supabase'] || doc.querySelector('script[src*="supabase"]')) {
+      authProviders.push('Supabase Auth');
+    }
+
+    // --- Payment providers (iframe detection) ---
+    const iframePayment: string[] = [];
+    const iframes = doc.querySelectorAll('iframe');
+    iframes.forEach((iframe) => {
+      const src = (iframe.src || iframe.getAttribute('data-src') || '').toLowerCase();
+      if (src.includes('js.stripe.com') || src.includes('stripe.com/v3')) iframePayment.push('Stripe Elements');
+      if (src.includes('paypal.com/sdk') || src.includes('paypalobjects.com')) iframePayment.push('PayPal');
+      if (src.includes('pay.google.com')) iframePayment.push('Google Pay');
+      if (src.includes('applepay')) iframePayment.push('Apple Pay');
+      if (src.includes('checkout.shopify.com')) iframePayment.push('Shopify Checkout');
+    });
+
+    // --- Form Security ---
+    const passwordFields = doc.querySelectorAll('input[type="password"]').length;
+    const otpFields = doc.querySelectorAll('input[name*="otp"], input[name*="2fa"], input[name*="mfa"], input[name*="verification"], input[autocomplete="one-time-code"], input[inputmode="numeric"][maxlength="6"]').length;
+
+    // CAPTCHA detection
+    let captchaType: string | null = null;
+    if (doc.querySelector('.g-recaptcha, [data-sitekey], script[src*="recaptcha/api.js"]')) {
+      captchaType = doc.querySelector('[data-size="invisible"]') || doc.querySelector('script[src*="recaptcha/api.js?render="]')
+        ? 'reCAPTCHA v3'
+        : 'reCAPTCHA v2';
+    } else if (doc.querySelector('[data-hcaptcha-sitekey], .h-captcha, script[src*="hcaptcha.com"]')) {
+      captchaType = 'hCaptcha';
+    } else if (doc.querySelector('[data-turnstile-sitekey], .cf-turnstile, script[src*="challenges.cloudflare.com/turnstile"]')) {
+      captchaType = 'Cloudflare Turnstile';
+    }
+
+    return {
+      authProviders: [...new Set(authProviders)],
+      iframePayment: [...new Set(iframePayment)],
+      formSecurity: {
+        passwordFields,
+        has2FA: otpFields > 0,
+        captchaType,
+      },
+    };
+  });
+
+  data.authProviders = authPaymentData.authProviders.length > 0 ? authPaymentData.authProviders : null;
+  data.paymentProviders = authPaymentData.iframePayment.length > 0 ? authPaymentData.iframePayment : null;
+  data.formSecurity = authPaymentData.formSecurity;
+
+  // Also enrich from frame snapshot
+  if (ctx.frameSnapshot) {
+    for (const tf of ctx.frameSnapshot.toolFrames) {
+      const tool = tf.tool.toLowerCase();
+      if ((tool.includes('stripe') || tool.includes('paypal') || tool.includes('braintree')) &&
+          !ecomData.paymentProcessors.includes(tf.tool)) {
+        ecomData.paymentProcessors.push(tf.tool);
+      }
+    }
+  }
+
+  // Add auth provider signals
+  for (const ap of authPaymentData.authProviders) {
+    signals.push(createSignal({ type: 'auth_provider', name: ap, confidence: 0.85, evidence: `Auth: ${ap}`, category: 'security' }));
+  }
 
   // ─── Build signals ───────────────────────────────────────────────────────
   if (ecomData.platform) {
@@ -270,6 +403,45 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
     checkpoints.push(createCheckpoint({ id: 'm20-plg', name: 'Product-Led Growth', weight: 0.4, health, evidence }));
   }
 
+  // CP6: Authentication providers
+  if (authPaymentData.authProviders.length > 0) {
+    checkpoints.push(createCheckpoint({
+      id: 'm20-auth',
+      name: 'Authentication & SSO',
+      weight: 0.3,
+      health: authPaymentData.authProviders.length >= 2 ? 'excellent' : 'good',
+      evidence: `Auth providers: ${authPaymentData.authProviders.join(', ')}`,
+    }));
+  }
+
+  // CP7: Form security
+  if (authPaymentData.formSecurity.passwordFields > 0) {
+    const fs = authPaymentData.formSecurity;
+    const securityFeatures: string[] = [];
+    if (fs.has2FA) securityFeatures.push('2FA/MFA');
+    if (fs.captchaType) securityFeatures.push(fs.captchaType);
+
+    checkpoints.push(createCheckpoint({
+      id: 'm20-form-security',
+      name: 'Form Security',
+      weight: 0.4,
+      health: securityFeatures.length >= 2 ? 'excellent' : securityFeatures.length === 1 ? 'good' : 'warning',
+      evidence: securityFeatures.length > 0
+        ? `${fs.passwordFields} password field(s) with: ${securityFeatures.join(', ')}`
+        : `${fs.passwordFields} password field(s) — no CAPTCHA or 2FA detected`,
+      recommendation: securityFeatures.length === 0
+        ? 'Add CAPTCHA protection and consider 2FA/MFA for login forms to prevent credential stuffing.'
+        : undefined,
+    }));
+  } else if (authPaymentData.formSecurity.captchaType) {
+    checkpoints.push(infoCheckpoint({
+      id: 'm20-form-security',
+      name: 'Form Security',
+      weight: 0.4,
+      evidence: `CAPTCHA protection active: ${authPaymentData.formSecurity.captchaType}`,
+    }));
+  }
+
   // Ecommerce dataLayer bonus info
   if (ecomData.ecommerceDataLayer) {
     checkpoints.push(infoCheckpoint({ id: 'm20-ecom-dl', name: 'Ecommerce DataLayer', weight: 0.3, evidence: 'GA4 ecommerce dataLayer events detected — revenue tracking enabled' }));
@@ -278,4 +450,5 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
   return { moduleId: 'M20' as ModuleId, status: 'success', data, signals, score: null, checkpoints, duration: 0 };
 };
 
+export { execute };
 registerModuleExecutor('M20' as ModuleId, execute);

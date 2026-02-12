@@ -7,6 +7,7 @@ export async function GET(
 ) {
   const { id } = await params;
   const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
   // Fetch scan
   const { data: scan, error } = await supabase
@@ -16,6 +17,11 @@ export async function GET(
     .single();
 
   if (error || !scan) {
+    return NextResponse.json({ error: 'Scan not found' }, { status: 404 });
+  }
+
+  // Ownership check: allow owner, or anonymous peek scans (user_id IS NULL)
+  if (scan.user_id && scan.user_id !== user?.id) {
     return NextResponse.json({ error: 'Scan not found' }, { status: 404 });
   }
 
@@ -40,8 +46,6 @@ export async function GET(
     startedAt: scan.started_at,
     completedAt: scan.completed_at,
     createdAt: scan.created_at,
-    ipAddress: scan.ip_address,
-    countryCode: scan.country_code,
     cacheSource: scan.cache_source,
     moduleResults: (moduleResults ?? []).map((r: Record<string, unknown>) => ({
       moduleId: r.module_id,

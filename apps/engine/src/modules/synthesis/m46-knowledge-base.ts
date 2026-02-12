@@ -263,4 +263,5 @@ function buildFallbackKB(
   };
 }
 
+export { execute };
 registerModuleExecutor('M46' as ModuleId, execute);

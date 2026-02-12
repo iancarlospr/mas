@@ -1,4 +1,4 @@
-import type { Page } from 'playwright';
+import type { Page } from 'patchright';
 import type { NetworkCollector, CapturedRequest } from '../utils/network.js';
 import pino from 'pino';
 
@@ -345,5 +345,220 @@ export async function typeText(
       'typeText probe failed',
     );
     return false;
+  }
+}
+
+// ── Human-Like Behavior Functions ────────────────────────────────────────
+// These functions simulate realistic human mouse movement and interaction
+// patterns to avoid behavioral detection by DataDome, Akamai, PerimeterX.
+
+/**
+ * Generate Bezier curve control points for human-like mouse movement.
+ * Real mouse paths are not straight lines — they curve with variable speed
+ * (fast in the middle, slow at endpoints).
+ */
+function bezierPath(
+  x0: number, y0: number,
+  x1: number, y1: number,
+  steps: number,
+): Array<{ x: number; y: number }> {
+  // Two random control points create a natural-looking curve
+  const cp1x = x0 + (x1 - x0) * 0.25 + (Math.random() - 0.5) * 60;
+  const cp1y = y0 + (y1 - y0) * 0.25 + (Math.random() - 0.5) * 60;
+  const cp2x = x0 + (x1 - x0) * 0.75 + (Math.random() - 0.5) * 60;
+  const cp2y = y0 + (y1 - y0) * 0.75 + (Math.random() - 0.5) * 60;
+
+  const points: Array<{ x: number; y: number }> = [];
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps;
+    const u = 1 - t;
+    // Cubic Bezier formula
+    const x = u * u * u * x0 + 3 * u * u * t * cp1x + 3 * u * t * t * cp2x + t * t * t * x1;
+    const y = u * u * u * y0 + 3 * u * u * t * cp1y + 3 * u * t * t * cp2y + t * t * t * y1;
+    points.push({ x: Math.round(x), y: Math.round(y) });
+  }
+  return points;
+}
+
+/**
+ * Move mouse along a Bezier curve path to target coordinates.
+ * Mimics human mouse movement with variable speed.
+ */
+export async function humanMove(
+  page: Page,
+  targetX: number,
+  targetY: number,
+): Promise<void> {
+  try {
+    // Get current mouse position (default to random starting point)
+    const startX = 100 + Math.random() * 200;
+    const startY = 100 + Math.random() * 200;
+
+    const distance = Math.sqrt((targetX - startX) ** 2 + (targetY - startY) ** 2);
+    const steps = Math.max(8, Math.min(25, Math.floor(distance / 30)));
+    const path = bezierPath(startX, startY, targetX, targetY, steps);
+
+    for (let i = 0; i < path.length; i++) {
+      const point = path[i]!;
+      // Variable speed: slow at start and end, fast in middle
+      const progress = i / path.length;
+      const speedFactor = Math.sin(progress * Math.PI); // 0→1→0
+      const delay = Math.max(2, 15 - speedFactor * 12);
+      await page.mouse.move(point.x, point.y);
+      await page.waitForTimeout(delay);
+    }
+  } catch (error) {
+    logger.debug({ error: (error as Error).message }, 'humanMove failed');
+  }
+}
+
+/**
+ * Click an element with human-like behavior:
+ * - Move to a random point within the element's bounding box (not center)
+ * - Brief pause before clicking (50-150ms)
+ * - Natural mouse movement path to the element
+ */
+export async function humanClick(
+  page: Page,
+  selector: string,
+  options: {
+    timeout?: number;
+    waitAfter?: number;
+  } = {},
+): Promise<boolean> {
+  const { timeout = 5_000, waitAfter = 800 } = options;
+
+  try {
+    const element = await page.waitForSelector(selector, { state: 'visible', timeout });
+    if (!element) return false;
+
+    const box = await element.boundingBox();
+    if (!box) return false;
+
+    // Random point within bounding box (not dead center)
+    const clickX = box.x + box.width * (0.2 + Math.random() * 0.6);
+    const clickY = box.y + box.height * (0.2 + Math.random() * 0.6);
+
+    // Move to the element with human-like path
+    await humanMove(page, clickX, clickY);
+
+    // Brief pause before clicking (humans hesitate slightly)
+    await page.waitForTimeout(50 + Math.random() * 100);
+
+    // Click at the position
+    await page.mouse.click(clickX, clickY);
+
+    if (waitAfter > 0) {
+      await page.waitForTimeout(waitAfter);
+    }
+
+    return true;
+  } catch (error) {
+    logger.debug(
+      { selector, error: (error as Error).message },
+      'humanClick failed',
+    );
+    return false;
+  }
+}
+
+/**
+ * Scroll the page with human-like behavior using mouse wheel events.
+ * Real users scroll with variable speed and micro-pauses, not
+ * instantaneous window.scrollTo() calls.
+ *
+ * @param page - Playwright page
+ * @param totalPixels - Total pixels to scroll (positive = down)
+ * @param options - Speed and pause configuration
+ */
+export async function humanScroll(
+  page: Page,
+  totalPixels: number,
+  options: {
+    /** Minimum pixels per wheel event */
+    minDelta?: number;
+    /** Maximum pixels per wheel event */
+    maxDelta?: number;
+    /** Delay range between wheel events (ms) */
+    minDelay?: number;
+    maxDelay?: number;
+  } = {},
+): Promise<void> {
+  const {
+    minDelta = 40,
+    maxDelta = 120,
+    minDelay = 30,
+    maxDelay = 100,
+  } = options;
+
+  try {
+    let scrolled = 0;
+    const direction = totalPixels > 0 ? 1 : -1;
+    const target = Math.abs(totalPixels);
+
+    while (scrolled < target) {
+      const remaining = target - scrolled;
+      const delta = Math.min(
+        remaining,
+        minDelta + Math.random() * (maxDelta - minDelta),
+      );
+
+      await page.mouse.wheel(0, delta * direction);
+      scrolled += delta;
+
+      // Variable delay — slower at start and end
+      const progress = scrolled / target;
+      const speedFactor = Math.sin(progress * Math.PI);
+      const delay = maxDelay - speedFactor * (maxDelay - minDelay);
+      await page.waitForTimeout(delay);
+
+      // Occasional micro-pause (10% chance) — humans naturally pause
+      if (Math.random() < 0.1) {
+        await page.waitForTimeout(200 + Math.random() * 400);
+      }
+    }
+  } catch (error) {
+    logger.debug({ error: (error as Error).message }, 'humanScroll failed');
+  }
+}
+
+/**
+ * Perform a full human-like scroll probe: scroll from top to bottom
+ * using realistic mouse wheel events with variable speed and pauses.
+ */
+export async function humanFullScrollProbe(
+  page: Page,
+  options: {
+    /** Number of scroll segments */
+    segments?: number;
+    /** Pause between segments (ms) */
+    segmentPause?: number;
+  } = {},
+): Promise<void> {
+  const { segments = 4, segmentPause = 500 } = options;
+
+  try {
+    const pageHeight = await page.evaluate(() =>
+      document.documentElement.scrollHeight - window.innerHeight,
+    );
+    if (pageHeight <= 0) return;
+
+    // Start at top
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.waitForTimeout(300);
+
+    const segmentHeight = Math.ceil(pageHeight / segments);
+
+    for (let i = 0; i < segments; i++) {
+      await humanScroll(page, segmentHeight);
+      // Pause between segments (reading time)
+      await page.waitForTimeout(segmentPause + Math.random() * 400);
+    }
+
+    // Scroll back to top
+    await page.waitForTimeout(500);
+    await humanScroll(page, -pageHeight, { minDelta: 80, maxDelta: 200, minDelay: 15, maxDelay: 50 });
+  } catch (error) {
+    logger.debug({ error: (error as Error).message }, 'humanFullScrollProbe failed');
   }
 }

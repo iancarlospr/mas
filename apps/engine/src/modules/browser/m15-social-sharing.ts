@@ -75,7 +75,7 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
       { name: 'Twitter/X', pattern: /(?:twitter|x)\.com\/(?!intent)/ },
       { name: 'LinkedIn', pattern: /linkedin\.com\/(?:company|in)\// },
       { name: 'Instagram', pattern: /instagram\.com\// },
-      { name: 'YouTube', pattern: /youtube\.com\/(channel|c|@)/ },
+      { name: 'YouTube', pattern: /youtube\.com\/(channel|c|user|@|[A-Za-z0-9_-]{2,})/ },
       { name: 'TikTok', pattern: /tiktok\.com\/@/ },
       { name: 'GitHub', pattern: /github\.com\// },
       { name: 'Pinterest', pattern: /pinterest\.com\/(?!pin\/)/ },
@@ -92,11 +92,37 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
       }
     });
 
+    // JSON-LD sameAs detection (stronger social signal)
+    const sameAsLinks: string[] = [];
+    document.querySelectorAll('script[type="application/ld+json"]').forEach((el) => {
+      try {
+        const json = JSON.parse(el.textContent || '');
+        const sameAs = json.sameAs || (Array.isArray(json['@graph']) ? json['@graph'].find((g: Record<string, unknown>) => g.sameAs)?.sameAs : null);
+        if (Array.isArray(sameAs)) {
+          for (const url of sameAs) {
+            if (typeof url === 'string') sameAsLinks.push(url);
+          }
+        } else if (typeof sameAs === 'string') {
+          sameAsLinks.push(sameAs);
+        }
+      } catch { /* invalid JSON-LD */ }
+    });
+
+    // Merge sameAs-detected platforms into profileLinks
+    for (const url of sameAsLinks) {
+      for (const { name, pattern } of socialPlatforms) {
+        if (pattern.test(url) && !profileLinks.includes(name)) {
+          profileLinks.push(name);
+        }
+      }
+    }
+
     return {
       ogTags,
       twitterTags,
       shareButtons,
       profileLinks,
+      sameAsLinks,
       hasShareThis,
       hasAddThis,
       hasNativeShare,
@@ -130,9 +156,16 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
     let evidence: string;
     let recommendation: string | undefined;
 
+    const missingOg: string[] = [];
+    if (!hasTitle) missingOg.push('og:title');
+    if (!hasDesc) missingOg.push('og:description');
+    if (!hasImage) missingOg.push('og:image');
+    if (!hasUrl) missingOg.push('og:url');
+    if (!hasType) missingOg.push('og:type');
+
     if (complete >= 4 && hasImage) {
       health = 'excellent';
-      evidence = `Open Graph complete (${complete}/5): title, description, image${hasUrl ? ', url' : ''}${hasType ? ', type' : ''}`;
+      evidence = `Open Graph complete (${complete}/5): title, description, image${hasUrl ? ', url' : ''}${hasType ? ', type' : ''}${missingOg.length > 0 ? ` (missing: ${missingOg.join(', ')})` : ''}`;
     } else if (complete >= 2) {
       health = 'good';
       evidence = `Open Graph partial (${complete}/5 tags)${!hasImage ? ' — missing og:image' : ''}`;
@@ -159,9 +192,11 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
     let health: CheckpointHealth;
     let evidence: string;
 
+    const hasSite = !!tw['twitter:site'];
+
     if (hasCard && hasTitle && hasImage) {
       health = 'excellent';
-      evidence = `Twitter Card: ${tw['twitter:card']} with title and image`;
+      evidence = `Twitter Card: ${tw['twitter:card']} with title and image${hasSite ? ` (@${tw['twitter:site']!.replace('@', '')})` : ''}`;
     } else if (hasCard || (hasTitle && hasImage)) {
       health = 'good';
       evidence = 'Twitter Card partially configured (falls back to OG tags)';
@@ -216,27 +251,55 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
     checkpoints.push(createCheckpoint({ id: 'm15-profiles', name: 'Social Profile Links', weight: 0.4, health, evidence }));
   }
 
-  // CP5: OG image quality
+  // CP5: OG image quality (with dimension and aspect ratio check)
   {
     const ogImage = og['og:image'];
+    const ogWidth = parseInt(og['og:image:width'] || '0', 10);
+    const ogHeight = parseInt(og['og:image:height'] || '0', 10);
+    const hasAlt = !!og['og:image:alt'];
     let health: CheckpointHealth;
     let evidence: string;
+    let recommendation: string | undefined;
 
-    if (ogImage && (ogImage.startsWith('https://') || ogImage.startsWith('http://'))) {
-      health = 'excellent';
-      evidence = `OG image: absolute URL set (${ogImage.slice(0, 80)}...)`;
+    if (ogImage && ogImage.startsWith('https://')) {
+      // Check dimensions against recommended 1200×630 (1.91:1 for Facebook/LinkedIn)
+      if (ogWidth >= 1200 && ogHeight >= 600) {
+        const ratio = ogWidth / ogHeight;
+        const dimInfo = `${ogWidth}×${ogHeight}${hasAlt ? ', alt text' : ''}`;
+        if (ratio >= 1.7 && ratio <= 2.1) {
+          health = 'excellent';
+          evidence = `OG image: ${dimInfo} — optimal dimensions and ratio for social sharing`;
+        } else {
+          health = 'good';
+          evidence = `OG image: ${dimInfo} — large enough but aspect ratio ${ratio.toFixed(1)}:1 differs from optimal 1.91:1`;
+        }
+      } else if (ogWidth > 0 && ogHeight > 0) {
+        health = 'good';
+        evidence = `OG image: ${ogWidth}×${ogHeight} — below recommended 1200×630 minimum`;
+        recommendation = 'Use at least 1200×630px for optimal social sharing previews on Facebook and LinkedIn.';
+      } else {
+        health = 'excellent';
+        evidence = `OG image: HTTPS absolute URL${hasAlt ? ' with alt text' : ''} (no dimensions specified)`;
+      }
+    } else if (ogImage && ogImage.startsWith('http://')) {
+      health = 'warning';
+      evidence = 'OG image uses HTTP — some platforms may not load it';
+      recommendation = 'Use HTTPS for og:image URL.';
     } else if (ogImage) {
       health = 'warning';
       evidence = 'OG image uses relative URL — may not render on all platforms';
+      recommendation = 'Use an absolute HTTPS URL for og:image.';
     } else {
       health = 'warning';
       evidence = 'No og:image set — social shares will use platform-chosen preview';
+      recommendation = 'Add og:image (1200×630px HTTPS) for rich social sharing previews.';
     }
 
-    checkpoints.push(createCheckpoint({ id: 'm15-og-image', name: 'OG Image Quality', weight: 0.5, health, evidence }));
+    checkpoints.push(createCheckpoint({ id: 'm15-og-image', name: 'OG Image Quality', weight: 0.5, health, evidence, recommendation }));
   }
 
   return { moduleId: 'M15' as ModuleId, status: 'success', data, signals, score: null, checkpoints, duration: 0 };
 };
 
+export { execute };
 registerModuleExecutor('M15' as ModuleId, execute);

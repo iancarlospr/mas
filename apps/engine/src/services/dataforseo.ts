@@ -324,6 +324,38 @@ export async function getBacklinkSummary(
 }
 
 /**
+ * Get backlink referring domains for a domain (for M32 enrichment).
+ * Returns top referring domains sorted by rank.
+ */
+export async function getBacklinkReferringDomains(
+  domain: string,
+  limit: number = 30,
+): Promise<unknown> {
+  const response = await dataForSeoPost(
+    '/backlinks/referring_domains/live',
+    [{ target: domain, limit, order_by: ['rank,asc'] }],
+  );
+
+  return response.tasks?.[0]?.result?.[0] ?? null;
+}
+
+/**
+ * Get backlink anchor text distribution for a domain (for M32 enrichment).
+ * Returns top anchors sorted by backlink count.
+ */
+export async function getBacklinkAnchors(
+  domain: string,
+  limit: number = 20,
+): Promise<unknown> {
+  const response = await dataForSeoPost(
+    '/backlinks/anchors/live',
+    [{ target: domain, limit, order_by: ['backlinks,desc'] }],
+  );
+
+  return response.tasks?.[0]?.result?.[0] ?? null;
+}
+
+/**
  * Get Google Shopping merchants (for M37).
  */
 export async function getGoogleShoppingMerchants(

@@ -145,6 +145,21 @@ export function findSpfRecord(txtRecords: string[][]): string | null {
 }
 
 /**
+ * Return ALL SPF records found in TXT records.
+ * RFC 7208 §3.2: a domain MUST NOT have multiple SPF records.
+ */
+export function findAllSpfRecords(txtRecords: string[][]): string[] {
+  const results: string[] = [];
+  for (const parts of txtRecords) {
+    const full = parts.join('');
+    if (full.startsWith('v=spf1')) {
+      results.push(full);
+    }
+  }
+  return results;
+}
+
+/**
  * Check if a domain has DMARC records by querying _dmarc subdomain.
  */
 export async function resolveDmarc(domain: string): Promise<string | null> {

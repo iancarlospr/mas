@@ -218,4 +218,5 @@ function buildFallbackROI(url: string, monthlyVisits?: number) {
   };
 }
 
+export { execute };
 registerModuleExecutor('M44' as ModuleId, execute);

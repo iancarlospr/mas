@@ -1,5 +1,28 @@
 [
   {
+    "id": "hubspot-cms",
+    "name": "HubSpot CMS",
+    "category": "cms",
+    "rules": {
+      "html": [
+        { "pattern": "/hubfs/", "confidence": 0.9 },
+        { "pattern": "hub_generated/", "confidence": 0.95 },
+        { "pattern": "hsappstatic\\.net", "confidence": 0.85 }
+      ],
+      "headers": [
+        { "name": "x-hs-hub-id", "confidence": 0.99 },
+        { "name": "x-hs-content-id", "confidence": 0.95 },
+        { "name": "x-hs-prerendered", "confidence": 0.9 },
+        { "name": "x-hs-cache-config", "confidence": 0.9 }
+      ],
+      "scripts": [
+        { "pattern": "js\\.hs-scripts\\.com", "confidence": 0.85 },
+        { "pattern": "js\\.hs-analytics\\.net", "confidence": 0.8 },
+        { "pattern": "js\\.hs-banner\\.com", "confidence": 0.8 }
+      ]
+    }
+  },
+  {
     "id": "wordpress",
     "name": "WordPress",
     "category": "cms",
@@ -96,6 +119,78 @@
       ]
     },
     "implies": ["php"]
+  },
+  {
+    "id": "sitecore",
+    "name": "Sitecore",
+    "category": "cms",
+    "rules": {
+      "html": [
+        { "pattern": "/-/media/", "confidence": 0.85 },
+        { "pattern": "/-/speak/", "confidence": 0.9 },
+        { "pattern": "/sitecore/", "confidence": 0.8 }
+      ],
+      "headers": [
+        { "name": "x-powered-by", "pattern": "Sitecore", "confidence": 0.99 }
+      ],
+      "scripts": [
+        { "pattern": "sc_analytics", "confidence": 0.9 },
+        { "pattern": "Sitecore\\.Analytics", "confidence": 0.95 }
+      ],
+      "cookies": [
+        { "namePattern": "SC_ANALYTICS_GLOBAL_COOKIE", "confidence": 0.95 }
+      ]
+    }
+  },
+  {
+    "id": "magento",
+    "name": "Magento / Adobe Commerce",
+    "category": "cms",
+    "rules": {
+      "html": [
+        { "pattern": "/catalog/product/view", "confidence": 0.85 },
+        { "pattern": "/checkout/cart", "confidence": 0.8 }
+      ],
+      "meta": [
+        { "name": "generator", "contentPattern": "Magento", "confidence": 1.0 }
+      ],
+      "scripts": [
+        { "pattern": "Magento_", "confidence": 0.95 },
+        { "pattern": "requirejs/require", "confidence": 0.7 },
+        { "pattern": "mage/cookies", "confidence": 0.9 }
+      ],
+      "cookies": [
+        { "namePattern": "mage-messages", "confidence": 0.9 },
+        { "namePattern": "form_key", "confidence": 0.7 },
+        { "namePattern": "mage-cache-storage", "confidence": 0.9 }
+      ]
+    },
+    "implies": ["php"]
+  },
+  {
+    "id": "aem",
+    "name": "Adobe Experience Manager",
+    "category": "cms",
+    "rules": {
+      "html": [
+        { "pattern": "/content/dam/", "confidence": 0.9 },
+        { "pattern": "/etc/designs/", "confidence": 0.85 },
+        { "pattern": "/etc\\.clientlibs/", "confidence": 0.9 },
+        { "pattern": "data-sly-", "confidence": 0.95 },
+        { "pattern": "cq:include", "confidence": 0.95 }
+      ],
+      "headers": [
+        { "name": "x-dispatcher-info", "confidence": 0.95 },
+        { "name": "x-dispatcher-output", "confidence": 0.95 }
+      ],
+      "scripts": [
+        { "pattern": "/clientlib-", "confidence": 0.85 },
+        { "pattern": "granite\\.ui", "confidence": 0.9 }
+      ],
+      "cookies": [
+        { "namePattern": "cq-authoring-mode", "confidence": 0.95 }
+      ]
+    }
   },
   {
     "id": "nextjs",

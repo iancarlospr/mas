@@ -2,22 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
 import { engineFetch } from '@/lib/engine';
 import { sendPaymentReceiptEmail } from '@/lib/email';
-import { createServerClient } from '@supabase/ssr';
+import { createServiceClient } from '@/lib/supabase/server';
 import Stripe from 'stripe';
-
-// Use service role for webhook (no user session)
-function createAdminClient() {
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, // Replace with service role in production
-    {
-      cookies: {
-        getAll: () => [],
-        setAll: () => {},
-      },
-    },
-  );
-}
 
 export async function POST(request: NextRequest) {
   const body = await request.text();
@@ -46,7 +32,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing metadata' }, { status: 400 });
     }
 
-    const supabase = createAdminClient();
+    const supabase = createServiceClient();
+
+    // Dedup: only process if payment is still pending
+    const { data: existingPayment } = await supabase
+      .from('payments')
+      .select('status')
+      .eq('stripe_session_id', session.id)
+      .single();
+
+    if (existingPayment?.status === 'completed') {
+      // Already processed — skip to prevent double credits
+      return NextResponse.json({ received: true });
+    }
 
     // Update payment status
     await supabase
@@ -108,7 +106,9 @@ export async function POST(request: NextRequest) {
         email,
         product as 'alpha_brief' | 'chat_credits',
         amountCents,
-      ).catch(() => {}); // non-critical, don't fail webhook
+      ).catch((err) => {
+        console.error('[stripe-webhook] Failed to send receipt email:', err);
+      });
     }
 
     // Audit log

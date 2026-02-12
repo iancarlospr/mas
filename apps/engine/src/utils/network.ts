@@ -1,4 +1,4 @@
-import type { Page, Request, Response } from 'playwright';
+import type { Page, Request, Response, WebSocket } from 'patchright';
 import { getRegistrableDomain } from './url.js';
 import pino from 'pino';
 
@@ -21,6 +21,22 @@ export interface CapturedResponse {
   headers: Record<string, string>;
   timestamp: number;
   requestUrl: string;
+}
+
+export interface CapturedWebSocket {
+  url: string;
+  domain: string | null;
+  toolMatch: string | null;
+  framesSent: number;
+  framesReceived: number;
+  timestamp: number;
+  isClosed: boolean;
+}
+
+export interface RedirectChainEntry {
+  from: string;
+  to: string;
+  status: number;
 }
 
 export type RequestCategory =
@@ -55,6 +71,8 @@ const DOMAIN_PATTERNS: Array<{ pattern: RegExp; category: RequestCategory }> = [
   { pattern: /mouseflow\.com/, category: 'analytics' },
   { pattern: /crazyegg\.com/, category: 'analytics' },
   { pattern: /luckyorange\.com/, category: 'analytics' },
+  { pattern: /adobedc\.net|omtrdc\.net|demdex\.net|2o7\.net/, category: 'analytics' },
+  { pattern: /eum-appdynamics\.com/, category: 'analytics' },
 
   // Advertising
   { pattern: /doubleclick\.net|googlesyndication\.com|googleads\.g\.doubleclick\.net/, category: 'advertising' },
@@ -117,6 +135,37 @@ const DOMAIN_PATTERNS: Array<{ pattern: RegExp; category: RequestCategory }> = [
 ];
 
 /**
+ * WebSocket domain → tool mapping for real-time service detection.
+ */
+const WEBSOCKET_TOOL_PATTERNS: Array<{ pattern: RegExp; tool: string }> = [
+  { pattern: /intercom\.io|intercomcdn\.com/, tool: 'Intercom' },
+  { pattern: /pusher\.(com|io)|ws\d*\.pusher/, tool: 'Pusher' },
+  { pattern: /drift\.(com|io)|driftt\.com/, tool: 'Drift' },
+  { pattern: /tawk\.to/, tool: 'Tawk.to' },
+  { pattern: /crisp\.chat/, tool: 'Crisp' },
+  { pattern: /socket\.io/, tool: 'Socket.IO' },
+  { pattern: /firebase(io)?\.com|firebaseapp\.com/, tool: 'Firebase' },
+  { pattern: /supabase\.(com|co|io)/, tool: 'Supabase' },
+  { pattern: /ably\.(io|com)/, tool: 'Ably' },
+  { pattern: /pubnub\.com/, tool: 'PubNub' },
+  { pattern: /onesignal\.com/, tool: 'OneSignal' },
+  { pattern: /livekit\.(io|cloud)/, tool: 'LiveKit' },
+  { pattern: /sendbird\.(com|io)/, tool: 'Sendbird' },
+  { pattern: /zendesk\.com|zopim\.com/, tool: 'Zendesk' },
+  { pattern: /freshchat\.com/, tool: 'Freshchat' },
+  { pattern: /livechat\.com|livechatinc\.com/, tool: 'LiveChat' },
+  { pattern: /olark\.com/, tool: 'Olark' },
+  { pattern: /hotjar\.(com|io)/, tool: 'Hotjar' },
+];
+
+function matchWebSocketTool(url: string): string | null {
+  for (const { pattern, tool } of WEBSOCKET_TOOL_PATTERNS) {
+    if (pattern.test(url)) return tool;
+  }
+  return null;
+}
+
+/**
  * Classify a URL into a request category based on domain patterns.
  */
 function classifyRequest(url: string, scanDomain: string | null): RequestCategory {
@@ -156,6 +205,8 @@ function classifyRequest(url: string, scanDomain: string | null): RequestCategor
 export class NetworkCollector {
   private requests: CapturedRequest[] = [];
   private responses: CapturedResponse[] = [];
+  private websockets: CapturedWebSocket[] = [];
+  private redirectChains: RedirectChainEntry[] = [];
   private scanDomain: string | null;
   private collecting = false;
 
@@ -186,14 +237,55 @@ export class NetworkCollector {
           domain,
           category,
         });
+
+        // Track redirect chains
+        try {
+          const redirectedFrom = request.redirectedFrom();
+          if (redirectedFrom && this.redirectChains.length < 50) {
+            this.redirectChains.push({
+              from: redirectedFrom.url(),
+              to: url,
+              status: 0, // status filled in from response event
+            });
+          }
+        } catch { /* redirectedFrom() may not be available */ }
       } catch (error) {
         logger.debug({ error: (error as Error).message }, 'Failed to capture request');
+      }
+    });
+
+    // WebSocket tracking
+    page.on('websocket', (ws: WebSocket) => {
+      if (this.websockets.length >= 20) return;
+      try {
+        const url = ws.url();
+        const domain = getRegistrableDomain(url);
+        const toolMatch = matchWebSocketTool(url);
+
+        const entry: CapturedWebSocket = {
+          url,
+          domain,
+          toolMatch,
+          framesSent: 0,
+          framesReceived: 0,
+          timestamp: Date.now(),
+          isClosed: false,
+        };
+
+        this.websockets.push(entry);
+
+        ws.on('framesent', () => { entry.framesSent++; });
+        ws.on('framereceived', () => { entry.framesReceived++; });
+        ws.on('close', () => { entry.isClosed = true; });
+      } catch (error) {
+        logger.debug({ error: (error as Error).message }, 'Failed to capture websocket');
       }
     });
 
     page.on('response', (response: Response) => {
       try {
         const url = response.url();
+        const status = response.status();
         const headers: Record<string, string> = {};
         const allHeaders = response.headers();
         for (const [key, value] of Object.entries(allHeaders)) {
@@ -202,11 +294,17 @@ export class NetworkCollector {
 
         this.responses.push({
           url,
-          status: response.status(),
+          status,
           headers,
           timestamp: Date.now(),
           requestUrl: response.request().url(),
         });
+
+        // Fill in redirect chain status codes
+        if (status >= 300 && status < 400) {
+          const chain = this.redirectChains.find((c) => c.from === url && c.status === 0);
+          if (chain) chain.status = status;
+        }
       } catch (error) {
         logger.debug({ error: (error as Error).message }, 'Failed to capture response');
       }
@@ -357,11 +455,101 @@ export class NetworkCollector {
     };
   }
 
+  // ─── WebSocket queries ──────────────────────────────────────────────────
+
+  /**
+   * Get all captured WebSocket connections.
+   */
+  getWebSockets(): CapturedWebSocket[] {
+    return [...this.websockets];
+  }
+
+  /**
+   * Get WebSocket connections that matched a known tool.
+   */
+  getWebSocketsByTool(): Array<{ tool: string; url: string; domain: string | null }> {
+    return this.websockets
+      .filter((ws) => ws.toolMatch !== null)
+      .map((ws) => ({ tool: ws.toolMatch!, url: ws.url, domain: ws.domain }));
+  }
+
+  // ─── Redirect chain queries ────────────────────────────────────────────
+
+  /**
+   * Get all redirect chains captured.
+   */
+  getRedirectChains(): RedirectChainEntry[] {
+    return [...this.redirectChains];
+  }
+
+  // ─── CORS preflight queries ────────────────────────────────────────────
+
+  /**
+   * Get OPTIONS (CORS preflight) requests.
+   */
+  getCORSPreflights(): CapturedRequest[] {
+    return this.requests.filter((r) => r.method === 'OPTIONS');
+  }
+
+  // ─── Protocol distribution ─────────────────────────────────────────────
+
+  /**
+   * Get protocol distribution from response headers (h2, h3, http/1.1).
+   * Note: Protocol data is from alt-svc / via headers, not always accurate.
+   */
+  getProtocolDistribution(): Record<string, number> {
+    const distribution: Record<string, number> = {};
+    for (const resp of this.responses) {
+      const altSvc = resp.headers['alt-svc'] ?? '';
+      let proto = 'unknown';
+      if (/h3/.test(altSvc)) proto = 'h3';
+      else if (/h2/.test(altSvc)) proto = 'h2';
+      else if (resp.headers['via'] && /1\.1/.test(resp.headers['via'])) proto = 'http/1.1';
+      else if (resp.headers['via'] && /2\.0/.test(resp.headers['via'])) proto = 'h2';
+
+      distribution[proto] = (distribution[proto] ?? 0) + 1;
+    }
+    return distribution;
+  }
+
+  // ─── API endpoint discovery ────────────────────────────────────────────
+
+  /**
+   * Discover API endpoints from first-party requests.
+   */
+  getAPIEndpoints(): Array<{ url: string; method: string; contentType: string | null }> {
+    const apiPattern = /\/api\/|\/graphql|\/rest\/|\/wp-json\/|\/_api\/|\/internal\//;
+    const seen = new Set<string>();
+    const results: Array<{ url: string; method: string; contentType: string | null }> = [];
+
+    for (const req of this.requests) {
+      if (req.category !== 'first_party') continue;
+      if (!apiPattern.test(req.url)) continue;
+
+      try {
+        const pathname = new URL(req.url).pathname;
+        const key = `${req.method}:${pathname}`;
+        if (seen.has(key) || results.length >= 50) continue;
+        seen.add(key);
+
+        // Find corresponding response for content-type
+        const resp = this.responses.find((r) => r.requestUrl === req.url);
+        const contentType = resp?.headers['content-type'] ?? null;
+
+        results.push({ url: pathname, method: req.method, contentType });
+      } catch { /* invalid URL */ }
+    }
+
+    return results;
+  }
+
   /**
    * Clear all captured data.
    */
   clear(): void {
     this.requests = [];
     this.responses = [];
+    this.websockets = [];
+    this.redirectChains = [];
   }
 }

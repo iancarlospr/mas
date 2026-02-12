@@ -138,7 +138,7 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
       );
 
       const signalsJson = JSON.stringify(
-        moduleResult.signals.slice(0, 15).map(s => ({
+        moduleResult.signals.slice(0, 30).map(s => ({
           type: s.type,
           name: s.name,
           evidence: s.evidence,
@@ -146,6 +146,38 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
           category: s.category,
         })),
       );
+
+      // Extract raw numeric metrics for modules that have them
+      const rawMetrics: Record<string, unknown> = {};
+      const md = moduleResult.data as Record<string, unknown>;
+      if (moduleId === 'M03') {
+        const perf = md['metrics'] as Record<string, unknown> | undefined;
+        if (perf) {
+          rawMetrics.lcpMs = perf['lcp']; rawMetrics.clsValue = perf['cls'];
+          rawMetrics.domNodes = (md['domForensics'] as Record<string, unknown> | undefined)?.['totalNodes'];
+          rawMetrics.renderBlockingScripts = perf['renderBlockingScripts'];
+        }
+      } else if (moduleId === 'M04') {
+        rawMetrics.readabilityScore = (md['contentAnalysis'] as Record<string, unknown> | undefined)?.['readabilityScore'];
+        rawMetrics.h1Count = (md['contentAnalysis'] as Record<string, unknown> | undefined)?.['h1Count'];
+        rawMetrics.wordCount = (md['contentAnalysis'] as Record<string, unknown> | undefined)?.['wordCount'];
+        rawMetrics.internalLinks = (md['linkStructure'] as Record<string, unknown> | undefined)?.['internalLinks'];
+      } else if (moduleId === 'M05') {
+        const tools = md['tools'] as Array<Record<string, unknown>> | undefined;
+        rawMetrics.totalTools = tools?.length ?? 0;
+        rawMetrics.cookieCount = (md['cookieSummary'] as Record<string, unknown> | undefined)?.['totalCookies'];
+        rawMetrics.thirdPartyCookies = (md['cookieSummary'] as Record<string, unknown> | undefined)?.['thirdPartyCount'];
+        rawMetrics.firstPartyCookies = (md['cookieSummary'] as Record<string, unknown> | undefined)?.['firstPartyCount'];
+      } else if (moduleId === 'M10') {
+        rawMetrics.altTextCoverage = (md['imageAccessibility'] as Record<string, unknown> | undefined)?.['altTextCoverage'];
+        rawMetrics.formLabelCoverage = (md['formAccessibility'] as Record<string, unknown> | undefined)?.['labelCoverage'];
+        rawMetrics.emptyAnchors = (md['linkAccessibility'] as Record<string, unknown> | undefined)?.['emptyAnchors'];
+      } else if (moduleId === 'M14') {
+        rawMetrics.responsiveImagePct = (md['responsiveImages'] as Record<string, unknown> | undefined)?.['modernFormatPct'];
+        rawMetrics.oversizedImages = (md['responsiveImages'] as Record<string, unknown> | undefined)?.['oversizedCount'];
+        rawMetrics.hasDarkMode = (md['modernCSSFeatures'] as Record<string, unknown> | undefined)?.['hasDarkMode'];
+      }
+      const rawMetricsJson = Object.keys(rawMetrics).length > 0 ? `\n\n### Raw Metrics\n${JSON.stringify(rawMetrics)}` : '';
 
       const moduleName = MODULE_NAMES[moduleId] ?? moduleId;
       const categoryName = MODULE_CATEGORIES[moduleId] ?? 'Other';
@@ -159,7 +191,7 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
 ${checkpointsJson}
 
 ### Detected Signals
-${signalsJson}
+${signalsJson}${rawMetricsJson}
 
 Produce your analysis as valid JSON matching this exact schema:
 
@@ -265,4 +297,5 @@ function buildFallbackSynthesis(moduleId: string, result: ModuleResult, url: str
   };
 }
 
+export { execute };
 registerModuleExecutor('M41' as ModuleId, execute);

@@ -18,7 +18,15 @@ export async function POST(request: NextRequest) {
   const { url, turnstileToken } = parsed.data;
 
   // Verify Turnstile token
-  if (process.env.TURNSTILE_SECRET_KEY && turnstileToken) {
+  if (process.env.NODE_ENV === 'production' && !process.env.TURNSTILE_SECRET_KEY) {
+    console.error('[scans] TURNSTILE_SECRET_KEY not set in production');
+    return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
+  }
+
+  if (process.env.TURNSTILE_SECRET_KEY) {
+    if (!turnstileToken) {
+      return NextResponse.json({ error: 'Security verification required' }, { status: 403 });
+    }
     const turnstileRes = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -49,12 +57,12 @@ export async function POST(request: NextRequest) {
   const dayStart = new Date();
   dayStart.setUTCHours(0, 0, 0, 0);
 
+  // Count ALL scans (cached and fresh) to prevent abuse
   const { count } = await supabase
     .from('scans')
     .select('id', { count: 'exact', head: true })
     .eq(user ? 'user_id' : 'ip_address', user ? user.id : ip)
-    .gte('created_at', dayStart.toISOString())
-    .is('cache_source', null);
+    .gte('created_at', dayStart.toISOString());
 
   const limit = user ? 4 : 2;
   if ((count ?? 0) >= limit) {
@@ -131,14 +139,16 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Scan engine unavailable' }, { status: 503 });
   }
 
-  // Audit log
-  await supabase.from('audit_log').insert({
+  // Audit log (non-critical)
+  supabase.from('audit_log').insert({
     user_id: user?.id ?? null,
     action: 'scan_created',
     resource: scan.id,
     ip_address: ip,
     metadata: { url, domain, tier, cached: false },
-  }).then(() => {}, () => {}); // non-critical
+  }).then(({ error: auditErr }) => {
+    if (auditErr) console.error('[scans] Audit log failed:', auditErr);
+  });
 
   return NextResponse.json({ scanId: scan.id, cached: false });
 }

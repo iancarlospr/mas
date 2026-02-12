@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { rateLimit } from '@/lib/rate-limit';
 import { z } from 'zod';
 
 const ChatSchema = z.object({
@@ -56,6 +57,15 @@ export async function POST(
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
   }
 
+  // Rate limit: 10 messages per minute per user
+  const rl = rateLimit(`chat:${user.id}`, 10, 60_000);
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { error: 'Too many messages. Please wait a moment.' },
+      { status: 429, headers: { 'Retry-After': String(Math.ceil((rl.resetAt - Date.now()) / 1000)) } },
+    );
+  }
+
   const body = await request.json();
   const parsed = ChatSchema.safeParse(body);
   if (!parsed.success) {
@@ -76,7 +86,7 @@ export async function POST(
   // Verify scan exists and user has access
   const { data: scan } = await supabase
     .from('scans')
-    .select('id, tier, domain')
+    .select('id, tier, domain, user_id')
     .eq('id', scanId)
     .single();
 
@@ -84,17 +94,13 @@ export async function POST(
     return NextResponse.json({ error: 'Scan not found' }, { status: 404 });
   }
 
+  if (scan.user_id !== user.id) {
+    return NextResponse.json({ error: 'Scan not found' }, { status: 404 });
+  }
+
   if (scan.tier !== 'paid') {
     return NextResponse.json({ error: 'Alpha Brief required for chat' }, { status: 403 });
   }
-
-  // Save user message
-  await supabase.from('chat_messages').insert({
-    scan_id: scanId,
-    user_id: user.id,
-    role: 'user',
-    content: parsed.data.message,
-  });
 
   // Get knowledge base from M46
   const { data: kb } = await supabase
@@ -106,7 +112,7 @@ export async function POST(
 
   const knowledgeBase = kb?.data?.knowledgeBase ?? kb?.data ?? {};
 
-  // Get chat history
+  // Get chat history (existing messages only — don't save user msg yet)
   const { data: history } = await supabase
     .from('chat_messages')
     .select('role, content')
@@ -137,35 +143,39 @@ export async function POST(
         parts: [{ text: m.content }],
       }));
 
-    // Remove the last user message (it's the current one, we'll send it separately)
-    if (chatHistory.length > 0 && chatHistory[chatHistory.length - 1]!.role === 'user') {
-      chatHistory.pop();
-    }
-
     const chat = model.startChat({ history: chatHistory });
     const result = await chat.sendMessage(parsed.data.message);
     assistantResponse = result.response.text();
-  } catch (error) {
-    // Fallback if Gemini is unavailable
-    assistantResponse = `I'm the AlphaScan AI Assistant for ${scan.domain}. I'm currently unable to process your question due to a temporary issue. Please try again in a moment. Your question: "${parsed.data.message}"`;
+  } catch (err) {
+    console.error(`[chat/${scanId}] Gemini error:`, err);
+    return NextResponse.json(
+      { error: 'AI service temporarily unavailable. No credit was charged.' },
+      { status: 503 },
+    );
   }
 
-  // Save assistant response
-  await supabase.from('chat_messages').insert({
-    scan_id: scanId,
-    user_id: user.id,
-    role: 'assistant',
-    content: assistantResponse,
-  });
-
-  // Decrement credits
-  await supabase
-    .from('chat_credits')
-    .update({
-      remaining: credits.remaining - 1,
-      updated_at: new Date().toISOString(),
-    })
-    .eq('user_id', user.id);
+  // Only save messages and decrement credits on success
+  await Promise.all([
+    supabase.from('chat_messages').insert({
+      scan_id: scanId,
+      user_id: user.id,
+      role: 'user',
+      content: parsed.data.message,
+    }),
+    supabase.from('chat_messages').insert({
+      scan_id: scanId,
+      user_id: user.id,
+      role: 'assistant',
+      content: assistantResponse,
+    }),
+    supabase
+      .from('chat_credits')
+      .update({
+        remaining: credits.remaining - 1,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('user_id', user.id),
+  ]);
 
   return NextResponse.json({
     message: assistantResponse,
@@ -183,6 +193,17 @@ export async function GET(
 
   if (!user) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+  }
+
+  // Verify scan ownership
+  const { data: scan } = await supabase
+    .from('scans')
+    .select('id, user_id')
+    .eq('id', scanId)
+    .single();
+
+  if (!scan || scan.user_id !== user.id) {
+    return NextResponse.json({ error: 'Scan not found' }, { status: 404 });
   }
 
   const { data: messages } = await supabase

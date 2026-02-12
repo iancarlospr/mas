@@ -31,19 +31,27 @@ export async function POST(
     return NextResponse.json({ error: 'Scan is already upgraded' }, { status: 400 });
   }
 
+  // Reject failed/cancelled scans
+  if (scan.status === 'failed' || scan.status === 'cancelled') {
+    return NextResponse.json({ error: 'Cannot upgrade a failed scan' }, { status: 400 });
+  }
+
+  // If scan already has an owner and it's not this user, reject
+  if (scan.user_id && scan.user_id !== user.id) {
+    return NextResponse.json({ error: 'Scan not found' }, { status: 404 });
+  }
+
   // Associate scan with user and upgrade tier
   await supabase
     .from('scans')
     .update({ user_id: user.id, tier: 'full' })
     .eq('id', scanId);
 
-  // Notify engine to run remaining modules if scan is still in progress or complete
-  if (scan.status !== 'failed' && scan.status !== 'cancelled') {
-    await engineFetch(`/engine/scans/${scanId}/upgrade`, {
-      method: 'POST',
-      body: JSON.stringify({ tier: 'full' }),
-    });
-  }
+  // Notify engine to run remaining modules
+  await engineFetch(`/engine/scans/${scanId}/upgrade`, {
+    method: 'POST',
+    body: JSON.stringify({ tier: 'full' }),
+  });
 
   return NextResponse.json({ upgraded: true });
 }

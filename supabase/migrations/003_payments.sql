@@ -1,5 +1,5 @@
 -- Payments table
-CREATE TABLE payments (
+CREATE TABLE IF NOT EXISTS payments (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users(id),
   scan_id UUID REFERENCES scans(id),
@@ -12,10 +12,16 @@ CREATE TABLE payments (
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
-CREATE INDEX idx_payments_user ON payments(user_id);
+CREATE INDEX IF NOT EXISTS idx_payments_user ON payments(user_id);
 
 -- RLS
 ALTER TABLE payments ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Users see own payments" ON payments
-  FOR SELECT USING (auth.uid() = user_id);
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE policyname = 'Users see own payments' AND tablename = 'payments'
+  ) THEN
+    CREATE POLICY "Users see own payments" ON payments
+      FOR SELECT USING (auth.uid() = user_id);
+  END IF;
+END $$;

@@ -12,6 +12,7 @@ export async function GET(
   let lastStatus = '';
   let lastModuleCount = 0;
   let closed = false;
+  let consecutiveErrors = 0;
 
   const stream = new ReadableStream({
     async start(controller) {
@@ -80,6 +81,8 @@ export async function GET(
             lastModuleCount = currentModules.length;
           }
 
+          consecutiveErrors = 0;
+
           // Check terminal states
           if (scan.status === 'complete') {
             send({
@@ -101,8 +104,15 @@ export async function GET(
             closed = true;
             controller.close();
           }
-        } catch {
-          // Supabase query error — skip this tick
+        } catch (err) {
+          console.error(`[stream/${id}] Poll error:`, err);
+          consecutiveErrors++;
+          if (consecutiveErrors >= 3) {
+            send({ type: 'error', scanId: id, error: 'Connection lost. Please refresh.' });
+            clearInterval(interval);
+            closed = true;
+            controller.close();
+          }
         }
       }, 2000);
 

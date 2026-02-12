@@ -6,10 +6,24 @@ import { fetchWithRetry } from '../../utils/http.js';
 import { normalizeUrl } from '../../utils/url.js';
 import { parseHtml, extractLinks } from '../../utils/html.js';
 import type { CheerioAPI } from '../../utils/html.js';
+import { detectPageLanguage, expandProbePaths, getMultilingualKeywords } from '../../utils/i18n-probes.js';
+import { discoverPathsFromSitemap } from '../../utils/sitemap.js';
 import * as cheerio from 'cheerio';
 
-// ─── Probe paths ────────────────────────────────────────────────────────────
-const PRESS_PATHS = ['/press', '/newsroom', '/media', '/news', '/press-releases', '/media-kit'];
+// ─── Probe paths (English base — expanded at runtime via i18n-probes) ───────
+const PRESS_PATHS_BASE = [
+  '/press', '/newsroom', '/media', '/news', '/press-releases', '/media-kit',
+  '/blog', '/blog/news', '/blog/press', '/about/press', '/about/news', '/company/news',
+  '/corporate/press', '/corporate/news', '/corporate/newsroom',
+] as const;
+
+// Common press subdomains (probed when path probes fail)
+const PRESS_SUBDOMAINS = ['news', 'press', 'newsroom', 'corporate', 'about', 'media'] as const;
+const PRESS_SUBDOMAIN_PATHS = ['/', '/newsroom', '/press', '/news'] as const;
+
+const PRESS_LINK_KEYWORDS_BASE = [
+  'press', 'newsroom', 'media', 'news', 'press releases',
+] as const;
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -19,6 +33,17 @@ interface ProbeResult {
   html?: string;
   status?: number;
 }
+
+// Keywords that indicate genuine press/newsroom content (not SPA shell or soft-404)
+const PRESS_CONTENT_SIGNALS = [
+  'press release', 'newsroom', 'media contact', 'press kit',
+  'news release', 'corporate news', 'press room', 'media relations',
+  'for immediate release', 'press inquir', 'media inquir',
+  'press center', 'company news',
+  // Modern/casual newsroom variants (Etsy-style blog/stories sections)
+  'latest news', 'announcement', 'company update', 'in the news',
+  'featured stories', 'our stories', 'press coverage', 'media coverage',
+] as const;
 
 async function probePath(
   baseUrl: string,
@@ -30,6 +55,12 @@ async function probePath(
       retries: 1,
     });
     if (result.ok) {
+      // Content validation: verify the page actually contains press/news-related content.
+      // Prevents SPA catch-all / soft-404 / redirect false positives
+      // (angular.dev returns 200 for every path with no press content).
+      const bodyLower = result.body.toLowerCase();
+      const hits = PRESS_CONTENT_SIGNALS.filter(kw => bodyLower.includes(kw)).length;
+      if (hits < 1) return { path, found: false, status: result.status };
       return { path, found: true, html: result.body, status: result.status };
     }
     return { path, found: false, status: result.status };
@@ -162,11 +193,20 @@ function detectMediaContact($: CheerioAPI): {
     });
   }
 
-  // Look for phone numbers near "press" or "media" context
-  const phoneRegex = /(?:\+?1?[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/g;
-  const phoneMatches = bodyText.match(phoneRegex);
-  if (phoneMatches && /press|media|pr\b|communications/i.test(bodyText)) {
-    result.phone = phoneMatches[0];
+  // Look for phone numbers near "press" or "media contact" context
+  // Extract a ~500 char window around "media contact", "press contact", etc.
+  const contactContext = bodyText.match(/(?:media|press|pr|communications)\s*(?:contact|inquir|office|department)[^]*?(?=\n\n|\r\n\r\n|$)/i);
+  if (contactContext) {
+    const contextWindow = contactContext[0].slice(0, 500);
+    const phoneRegex = /(?:\+?1?[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/g;
+    const phoneMatch = contextWindow.match(phoneRegex);
+    if (phoneMatch) {
+      const digits = phoneMatch[0].replace(/\D/g, '');
+      // Validate: 10-11 digits (US/intl format)
+      if (digits.length >= 10 && digits.length <= 11) {
+        result.phone = phoneMatch[0];
+      }
+    }
   }
 
   // Look for media kit link
@@ -226,18 +266,113 @@ function detectMediaLogos($: CheerioAPI): boolean {
 }
 
 /**
- * Check the main page HTML for nav/footer links to press-related pages.
+ * Detect press wire service usage (PRNewswire, BusinessWire, etc.)
  */
-function findPressLinksInMainPage($: CheerioAPI): string[] {
+const WIRE_SERVICES = [
+  { id: 'prnewswire', pattern: /prnewswire\.com/i, name: 'PR Newswire' },
+  { id: 'businesswire', pattern: /businesswire\.com/i, name: 'Business Wire' },
+  { id: 'globenewswire', pattern: /globenewswire\.com/i, name: 'GlobeNewsWire' },
+  { id: 'cision', pattern: /cision\.com/i, name: 'Cision' },
+  { id: 'accesswire', pattern: /accesswire\.com/i, name: 'Accesswire' },
+  { id: 'prweb', pattern: /prweb\.com/i, name: 'PRWeb' },
+];
+
+function detectWireServices($: CheerioAPI): string[] {
+  const found = new Set<string>();
+  const html = ($('body').html() ?? '').toLowerCase();
+  for (const ws of WIRE_SERVICES) {
+    if (ws.pattern.test(html)) found.add(ws.name);
+  }
+  return [...found];
+}
+
+/**
+ * Count press articles/entries on the page by looking for common article containers.
+ */
+function countPressArticles($: CheerioAPI): number {
+  const selectors = [
+    'article', '.press-release', '.news-item', '.post', '.blog-post',
+    '.news-entry', '.article-card', '.press-item', '.entry',
+    '[class*="press"] li', '[class*="news"] li',
+  ];
+  let maxCount = 0;
+  for (const sel of selectors) {
+    const count = $(sel).length;
+    if (count > maxCount) maxCount = count;
+  }
+  return maxCount;
+}
+
+/**
+ * Detect NewsArticle / BlogPosting structured data on press pages.
+ */
+function detectPressSchema($: CheerioAPI): string[] {
+  const types: string[] = [];
+  $('script[type="application/ld+json"]').each((_, el) => {
+    const text = $(el).html() ?? '';
+    try {
+      const data = JSON.parse(text);
+      const checkType = (obj: Record<string, unknown>) => {
+        const t = obj['@type'];
+        if (typeof t === 'string' && /article|blogposting|newsarticle|pressrelease/i.test(t)) {
+          types.push(t);
+        }
+      };
+      if (Array.isArray(data)) data.forEach((d: Record<string, unknown>) => checkType(d));
+      else if (data && typeof data === 'object') {
+        checkType(data as Record<string, unknown>);
+        if (Array.isArray((data as Record<string, unknown>)['@graph'])) {
+          ((data as Record<string, unknown>)['@graph'] as Record<string, unknown>[]).forEach(checkType);
+        }
+      }
+    } catch { /* skip */ }
+  });
+  return types;
+}
+
+/**
+ * Find all unique dates on a press page to compute frequency.
+ */
+function findAllDates($: CheerioAPI): Date[] {
+  const dates: Date[] = [];
+  const bodyText = $('body').text();
+  const dateRegex = /(?:\b(?:January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{1,2},?\s+\d{4})|(?:\d{4}-\d{2}-\d{2})/gi;
+  const matches = bodyText.match(dateRegex);
+  if (matches) {
+    for (const m of matches) {
+      const d = parseDateFromText(m);
+      if (d && d.getTime() > 0 && d.getTime() < Date.now()) dates.push(d);
+    }
+  }
+  // Also check time[datetime] elements
+  $('time[datetime]').each((_, el) => {
+    const d = parseDateFromText($(el).attr('datetime') ?? '');
+    if (d && d.getTime() > 0 && d.getTime() < Date.now()) dates.push(d);
+  });
+  // Dedupe by date string
+  const seen = new Set<string>();
+  return dates.filter(d => {
+    const key = d.toISOString().slice(0, 10);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  }).sort((a, b) => b.getTime() - a.getTime());
+}
+
+/**
+ * Check the main page HTML for nav/footer links to press-related pages.
+ * Uses multilingual keywords based on the page's detected language.
+ */
+function findPressLinksInMainPage($: CheerioAPI, lang: string): string[] {
   const pressLinks: string[] = [];
-  const keywords = ['press', 'newsroom', 'media', 'news', 'press releases'];
+  const keywords = getMultilingualKeywords(PRESS_LINK_KEYWORDS_BASE, lang, 'press');
 
   $('a[href]').each((_, el) => {
     const href = $(el).attr('href') ?? '';
     const text = $(el).text().trim().toLowerCase();
 
     for (const keyword of keywords) {
-      if (text === keyword || href.toLowerCase().includes(`/${keyword.replace(/\s+/g, '-')}`)) {
+      if (text === keyword || text.includes(keyword) || href.toLowerCase().includes(`/${keyword.replace(/\s+/g, '-')}`)) {
         pressLinks.push(href);
         break;
       }
@@ -256,11 +391,33 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
 
   const baseUrl = normalizeUrl(ctx.url);
 
+  // Detect page language for multilingual probe expansion
+  const lang = ctx.html ? detectPageLanguage(ctx.html) : 'en';
+  const PRESS_PATHS_STATIC = expandProbePaths(PRESS_PATHS_BASE, lang, 'press');
+  data.detected_language = lang;
+
+  // 0. Discover press/news paths from sitemap.xml / robots.txt
+  const PRESS_KEYWORDS = ['press', 'newsroom', 'news', 'media', 'press-release', 'announcement'];
+  const sitemapDiscovery = await discoverPathsFromSitemap(baseUrl, PRESS_KEYWORDS, { timeout: 6000, maxMatchedPaths: 10 });
+  data.sitemap_discovery = {
+    found: sitemapDiscovery.sitemapFound,
+    matched: sitemapDiscovery.matchedPaths,
+    robotsHints: sitemapDiscovery.robotsHints,
+  };
+
+  // Merge sitemap-discovered paths with static paths
+  const staticPathSet = new Set(PRESS_PATHS_STATIC);
+  const sitemapPaths = [
+    ...sitemapDiscovery.matchedPaths,
+    ...sitemapDiscovery.robotsHints,
+  ].filter(p => !staticPathSet.has(p));
+  const PRESS_PATHS = [...PRESS_PATHS_STATIC, ...sitemapPaths];
+
   // 1. Check the main page for press-related links
   let mainPagePressLinks: string[] = [];
   if (ctx.html) {
     const $main = parseHtml(ctx.html);
-    mainPagePressLinks = findPressLinksInMainPage($main);
+    mainPagePressLinks = findPressLinksInMainPage($main, lang);
 
     // Check RSS feed in main page
     const mainRss = detectRssFeed($main);
@@ -286,6 +443,79 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
     }
   }
 
+  // 2b. Follow discovered press links from the main page that weren't covered by fixed path probes
+  if (mainPagePressLinks.length > 0) {
+    const probedPathSet = new Set(PRESS_PATHS.map(p => `${baseUrl}${p}`.toLowerCase()));
+    const discoveredUrls: string[] = [];
+
+    for (const link of mainPagePressLinks) {
+      try {
+        const resolved = new URL(link, baseUrl).href;
+        if (probedPathSet.has(resolved.toLowerCase())) continue;
+        if (!resolved.startsWith('http')) continue;
+        discoveredUrls.push(resolved);
+      } catch { /* ignore */ }
+    }
+
+    const discoveredProbes = await Promise.allSettled(
+      discoveredUrls.slice(0, 5).map(async (url) => {
+        try {
+          const result = await fetchWithRetry(url, { timeout: 8000, retries: 1 });
+          if (result.ok) {
+            return { path: new URL(url).pathname, found: true as const, html: result.body, status: result.status };
+          }
+          return { path: new URL(url).pathname, found: false as const, status: result.status };
+        } catch {
+          return { path: new URL(url).pathname, found: false as const };
+        }
+      })
+    );
+
+    for (const result of discoveredProbes) {
+      if (result.status === 'fulfilled' && result.value.found) {
+        foundPages.push(result.value);
+      }
+    }
+  }
+
+  // 2c. Probe common press subdomains (news.company.com, press.company.com, etc.)
+  if (foundPages.length === 0) {
+    const registrableDomain = new URL(baseUrl).hostname.replace(/^www\./, '');
+    const subdomainProbes = await Promise.allSettled(
+      PRESS_SUBDOMAINS.flatMap(sub =>
+        PRESS_SUBDOMAIN_PATHS.map(async (path) => {
+          const subUrl = `https://${sub}.${registrableDomain}${path}`;
+          try {
+            const result = await fetchWithRetry(subUrl, { timeout: 8000, retries: 1 });
+            if (result.ok && result.body) {
+              // Guard against wildcard DNS: verify content contains press/news keywords
+              const bodyLower = result.body.toLowerCase();
+              const pressSignals = [
+                'press release', 'newsroom', 'media contact', 'press kit',
+                'news release', 'media inquir', 'corporate news', 'press center',
+                'latest news', 'in the news', 'media relations',
+              ];
+              const hits = pressSignals.filter(kw => bodyLower.includes(kw)).length;
+              if (hits >= 1) {
+                return { path: `${sub}.${registrableDomain}${path}`, found: true as const, html: result.body, status: result.status };
+              }
+            }
+            return { path: `${sub}.${registrableDomain}${path}`, found: false as const, status: result.status };
+          } catch {
+            return { path: `${sub}.${registrableDomain}${path}`, found: false as const };
+          }
+        })
+      )
+    );
+
+    for (const result of subdomainProbes) {
+      if (result.status === 'fulfilled' && result.value.found) {
+        foundPages.push(result.value);
+        break; // One successful subdomain is enough
+      }
+    }
+  }
+
   data.probed_paths = PRESS_PATHS;
   data.found_pages = foundPages.map((p) => p.path);
 
@@ -295,6 +525,10 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
   let mediaContact = { email: null as string | null, phone: null as string | null, mediaKitUrl: null as string | null };
   let rssFound: string | null = null;
   let mediaLogosFound = data.media_logos_main_page === true;
+  let totalArticleCount = 0;
+  const wireServices = new Set<string>();
+  const pressSchemaTypes: string[] = [];
+  let allDates: Date[] = [];
 
   for (const page of foundPages) {
     if (!page.html) continue;
@@ -311,6 +545,19 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
     if (pageDate && (!mostRecentDate || pageDate > mostRecentDate)) {
       mostRecentDate = pageDate;
     }
+
+    // Collect all dates for frequency analysis
+    const pageDates = findAllDates($);
+    allDates = allDates.concat(pageDates);
+
+    // Count press articles
+    totalArticleCount += countPressArticles($);
+
+    // Detect wire services
+    for (const ws of detectWireServices($)) wireServices.add(ws);
+
+    // Detect press-related structured data
+    pressSchemaTypes.push(...detectPressSchema($));
 
     // Detect media contact info
     const contact = detectMediaContact($);
@@ -334,14 +581,35 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
     rssFound = data.rss_feed_main_page as string;
   }
 
+  // Dedupe dates
+  const datesSeen = new Set<string>();
+  allDates = allDates.filter(d => {
+    const key = d.toISOString().slice(0, 10);
+    if (datesSeen.has(key)) return false;
+    datesSeen.add(key);
+    return true;
+  }).sort((a, b) => b.getTime() - a.getTime());
+
   // Store data
-  data.press_page_url = bestPressPage ? `${baseUrl}${bestPressPage.path}` : null;
+  // Use fully-qualified URL for external subdomain pages
+  const pressPageUrl = bestPressPage
+    ? (bestPressPage.path.includes('.') && !bestPressPage.path.startsWith('/'))
+      ? `https://${bestPressPage.path}`
+      : `${baseUrl}${bestPressPage.path}`
+    : null;
+  data.press_page_url = pressPageUrl;
+  data.press_page_type = bestPressPage?.path.replace('/', '') ?? null;
   data.press_contact_email = mediaContact.email;
   data.press_contact_phone = mediaContact.phone;
   data.media_kit_url = mediaContact.mediaKitUrl;
   data.rss_feed = rssFound;
   data.media_logos = mediaLogosFound;
   data.most_recent_date = mostRecentDate?.toISOString() ?? null;
+  data.oldest_date = allDates.length > 0 ? allDates[allDates.length - 1]!.toISOString().slice(0, 10) : null;
+  data.date_count = allDates.length;
+  data.article_count = totalArticleCount;
+  data.wire_services = [...wireServices];
+  data.press_schema_types = pressSchemaTypes;
   data.main_page_press_links = mainPagePressLinks;
 
   // ─── Build signals ──────────────────────────────────────────────────────
@@ -352,7 +620,7 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
         type: 'press_page',
         name: 'Press/Newsroom Page',
         confidence: 0.95,
-        evidence: `Press page found at ${baseUrl}${bestPressPage.path}`,
+        evidence: `Press page found at ${pressPageUrl}`,
         category: 'seo_content',
       }),
     );
@@ -406,6 +674,30 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
     );
   }
 
+  if (wireServices.size > 0) {
+    signals.push(
+      createSignal({
+        type: 'wire_service',
+        name: 'PR Wire Services',
+        confidence: 0.85,
+        evidence: `Wire services detected: ${[...wireServices].join(', ')}`,
+        category: 'digital_presence',
+      }),
+    );
+  }
+
+  if (pressSchemaTypes.length > 0) {
+    signals.push(
+      createSignal({
+        type: 'press_schema',
+        name: 'Press Structured Data',
+        confidence: 0.9,
+        evidence: `Press-related schema types: ${pressSchemaTypes.join(', ')}`,
+        category: 'seo_content',
+      }),
+    );
+  }
+
   // ─── Build checkpoints ──────────────────────────────────────────────────
 
   // CP1: Press/newsroom page (weight 5/10 = 0.5)
@@ -451,7 +743,7 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
         name: 'Press/newsroom page',
         weight: 0.5,
         health: 'good',
-        evidence: `Press page found at ${bestPressPage.path}`,
+        evidence: `Press page found at ${pressPageUrl}`,
       }),
     );
   } else {
@@ -607,4 +899,5 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
 };
 
 // ─── Register ───────────────────────────────────────────────────────────────
+export { execute };
 registerModuleExecutor('M16' as ModuleId, execute);

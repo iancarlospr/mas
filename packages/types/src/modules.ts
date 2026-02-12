@@ -6,7 +6,7 @@ export type ModuleId =
   | 'M21' | 'M22' | 'M23'
   | 'M24' | 'M25' | 'M26' | 'M27' | 'M28' | 'M29' | 'M30'
   | 'M31' | 'M32' | 'M33' | 'M34' | 'M35'
-  | 'M36' | 'M37' | 'M38' | 'M39'
+  | 'M36' | 'M37' | 'M38' | 'M39' | 'M40'
   | 'M41' | 'M42' | 'M43' | 'M44' | 'M45' | 'M46';
 
 export type ModulePhase = 'passive' | 'browser' | 'ghostscan' | 'external' | 'synthesis';

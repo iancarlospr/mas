@@ -1,5 +1,5 @@
 -- Chat messages
-CREATE TABLE chat_messages (
+CREATE TABLE IF NOT EXISTS chat_messages (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   scan_id UUID NOT NULL REFERENCES scans(id) ON DELETE CASCADE,
   user_id UUID NOT NULL REFERENCES auth.users(id),
@@ -8,10 +8,10 @@ CREATE TABLE chat_messages (
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
-CREATE INDEX idx_chat_messages_scan ON chat_messages(scan_id);
+CREATE INDEX IF NOT EXISTS idx_chat_messages_scan ON chat_messages(scan_id);
 
 -- Chat credits
-CREATE TABLE chat_credits (
+CREATE TABLE IF NOT EXISTS chat_credits (
   user_id UUID PRIMARY KEY REFERENCES auth.users(id),
   remaining INTEGER NOT NULL DEFAULT 0,
   updated_at TIMESTAMPTZ DEFAULT now()
@@ -21,11 +21,29 @@ CREATE TABLE chat_credits (
 ALTER TABLE chat_messages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE chat_credits ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Users see own chat" ON chat_messages
-  FOR SELECT USING (auth.uid() = user_id);
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE policyname = 'Users see own chat' AND tablename = 'chat_messages'
+  ) THEN
+    CREATE POLICY "Users see own chat" ON chat_messages
+      FOR SELECT USING (auth.uid() = user_id);
+  END IF;
+END $$;
 
-CREATE POLICY "Users insert own chat" ON chat_messages
-  FOR INSERT WITH CHECK (auth.uid() = user_id);
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE policyname = 'Users insert own chat' AND tablename = 'chat_messages'
+  ) THEN
+    CREATE POLICY "Users insert own chat" ON chat_messages
+      FOR INSERT WITH CHECK (auth.uid() = user_id);
+  END IF;
+END $$;
 
-CREATE POLICY "Users see own credits" ON chat_credits
-  FOR SELECT USING (auth.uid() = user_id);
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE policyname = 'Users see own credits' AND tablename = 'chat_credits'
+  ) THEN
+    CREATE POLICY "Users see own credits" ON chat_credits
+      FOR SELECT USING (auth.uid() = user_id);
+  END IF;
+END $$;

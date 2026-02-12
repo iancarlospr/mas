@@ -34,6 +34,25 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Product not configured' }, { status: 500 });
   }
 
+  // Verify scan ownership
+  const { data: scan } = await supabase
+    .from('scans')
+    .select('id, user_id, tier, status')
+    .eq('id', scanId)
+    .single();
+
+  if (!scan || (scan.user_id && scan.user_id !== user.id)) {
+    return NextResponse.json({ error: 'Scan not found' }, { status: 404 });
+  }
+
+  if (product === 'alpha_brief' && scan.tier === 'paid') {
+    return NextResponse.json({ error: 'Scan is already upgraded' }, { status: 400 });
+  }
+
+  if (scan.status === 'failed' || scan.status === 'cancelled') {
+    return NextResponse.json({ error: 'Cannot purchase for a failed scan' }, { status: 400 });
+  }
+
   const session = await stripe.checkout.sessions.create({
     mode: 'payment',
     payment_method_types: ['card'],

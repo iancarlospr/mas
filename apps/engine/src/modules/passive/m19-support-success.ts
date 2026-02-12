@@ -6,10 +6,20 @@ import { fetchWithRetry } from '../../utils/http.js';
 import { normalizeUrl } from '../../utils/url.js';
 import { parseHtml, extractLinks, extractScriptSrcs } from '../../utils/html.js';
 import type { CheerioAPI } from '../../utils/html.js';
+import { detectPageLanguage, expandProbePaths, getMultilingualKeywords } from '../../utils/i18n-probes.js';
 import * as cheerio from 'cheerio';
 
-// ─── Probe paths ────────────────────────────────────────────────────────────
-const SUPPORT_PATHS = ['/support', '/help', '/help-center', '/knowledge-base', '/status', '/community', '/contact'];
+// ─── Probe paths (English base — expanded at runtime via i18n-probes) ───────
+const SUPPORT_PATHS_BASE = [
+  '/support', '/help', '/help-center', '/knowledge-base', '/status',
+  '/community', '/contact', '/faq', '/docs', '/documentation',
+  '/developers', '/api', '/academy', '/training', '/getting-started',
+  '/resources/support', '/customer-support',
+] as const;
+
+const SUPPORT_LINK_KEYWORDS_BASE = [
+  'support', 'help', 'help center', 'knowledge base', 'contact', 'community',
+] as const;
 
 // ─── Help center providers ──────────────────────────────────────────────────
 const HELP_CENTER_PROVIDERS: { name: string; patterns: RegExp[] }[] = [
@@ -70,6 +80,15 @@ async function probePath(
       retries: 1,
     });
     if (result.ok) {
+      // Reject catch-all redirects to homepage that contain no support content
+      const finalUrl = new URL(result.finalUrl);
+      if (finalUrl.pathname === '/' && path !== '/') {
+        const bodyLower = result.body.toLowerCase();
+        const supportSignals = ['support', 'help center', 'knowledge base', 'contact us',
+          'faq', 'documentation', 'getting started', 'customer service', 'help desk'];
+        const hits = supportSignals.filter(kw => bodyLower.includes(kw)).length;
+        if (hits < 1) return { path, found: false, status: result.status };
+      }
       return { path, found: true, html: result.body, status: result.status };
     }
     return { path, found: false, status: result.status };
@@ -172,6 +191,8 @@ function detectCommunityForum(
     const text = link.text.toLowerCase();
 
     if (/community|forum|discuss/i.test(text) || /community|forum|discuss/i.test(href)) {
+      // Exclude non-community pages (startup programs, applications, pricing, etc.)
+      if (/startup|application|apply|program|pricing|product|affiliate|partner/i.test(href)) continue;
       for (const provider of COMMUNITY_PROVIDERS) {
         for (const pattern of provider.patterns) {
           if (pattern.test(link.href)) {
@@ -226,17 +247,29 @@ function countSupportChannels(
     channels.push('phone');
   }
 
-  // Live chat (check for chat widgets)
+  // Live chat (check for chat widgets — both third-party and custom)
   const chatProviders = [
     /intercom/i, /drift/i, /crisp/i, /zendesk.*chat/i, /zopim/i,
     /livechat/i, /tawk\.to/i, /olark/i, /hubspot.*chat/i,
-    /freshchat/i, /tidio/i, /chatra/i,
+    /freshchat/i, /tidio/i, /chatra/i, /kustomer/i,
   ];
+  const customChatPatterns = [
+    /chat[-_]?widget/i, /live[-_]?chat/i, /support[-_]?chat/i,
+    /chat\s+with\s+(us|a\s+rep|an?\s+agent|support)/i,
+    /start\s+a?\s*chat/i, /chat\s+now/i,
+    /support[-_]?conversations/i,
+  ];
+  let chatDetected = false;
   for (const provider of chatProviders) {
-    if (provider.test(bodyHtml)) {
-      channels.push('live_chat');
-      break;
+    if (provider.test(bodyHtml)) { chatDetected = true; break; }
+  }
+  if (!chatDetected) {
+    for (const pattern of customChatPatterns) {
+      if (pattern.test(bodyHtml) || pattern.test(bodyText)) { chatDetected = true; break; }
     }
+  }
+  if (chatDetected) {
+    channels.push('live_chat');
   }
 
   // Help center / knowledge base
@@ -340,11 +373,204 @@ function assessHelpPageQuality($: CheerioAPI, helpCenterProvider: string | null)
 }
 
 /**
- * Check the main page HTML for support-related links.
+ * Detect external support subdomains (help.company.com, support.company.com, etc).
  */
-function findSupportLinksInMainPage($: CheerioAPI): string[] {
+function detectSupportSubdomains($: CheerioAPI, domain: string): { subdomain: string; url: string }[] {
+  const subdomains: Map<string, string> = new Map();
+  const supportPrefixes = /^(help|support|community|docs|developers|api|academy|training|status|knowledge|learn|education|forum|faq)/i;
+
+  $('a[href]').each((_, el) => {
+    const href = $(el).attr('href') ?? '';
+    try {
+      const url = new URL(href, `https://${domain}`);
+      if (url.hostname !== domain && url.hostname.endsWith(domain) && supportPrefixes.test(url.hostname)) {
+        const prefix = url.hostname.split('.')[0]!;
+        if (!subdomains.has(prefix)) {
+          subdomains.set(prefix, url.href);
+        }
+      }
+    } catch { /* ignore */ }
+  });
+
+  return Array.from(subdomains.entries()).map(([subdomain, url]) => ({ subdomain, url }));
+}
+
+/**
+ * Probe a status page URL to detect the underlying provider.
+ */
+async function probeStatusPageProvider(statusUrl: string): Promise<string | null> {
+  try {
+    const result = await fetchWithRetry(statusUrl, { timeout: 8000, retries: 1 });
+    if (!result.ok) return null;
+    const html = result.body.toLowerCase();
+
+    // Atlassian Statuspage fingerprints
+    if (/statuspage\.io/i.test(html) || /data-page-id/i.test(html) || /sp-container/i.test(html) || /atlassian/i.test(html)) {
+      return 'Atlassian Statuspage';
+    }
+    // Instatus
+    if (/instatus/i.test(html)) return 'Instatus';
+    // BetterUptime / BetterStack
+    if (/betteruptime|betterstack/i.test(html)) return 'BetterUptime';
+    // Cachet
+    if (/cachet/i.test(html)) return 'Cachet';
+
+    return null; // status page exists but provider unknown
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Detect developer/API documentation.
+ */
+function detectDeveloperDocs($: CheerioAPI): { found: boolean; url: string | null; evidence: string } {
+  const links = extractLinks($);
+
+  for (const link of links) {
+    const text = link.text.toLowerCase();
+    const href = link.href.toLowerCase();
+    if (/(?:api|developer)\s*(?:doc|reference|guide)/i.test(text) ||
+        /\/(?:docs|api|developers)\b/i.test(href) ||
+        text === 'api' || text === 'developers' || text === 'documentation') {
+      return { found: true, url: link.href, evidence: `Developer docs: "${link.text.trim().replace(/\s+/g, ' ').slice(0, 60)}" (${link.href.slice(0, 80)})` };
+    }
+  }
+
+  return { found: false, url: null, evidence: 'No developer documentation detected' };
+}
+
+/**
+ * Detect training, academy, or certification programs.
+ */
+function detectTrainingAcademy($: CheerioAPI): { found: boolean; url: string | null; type: string | null; evidence: string } {
+  const links = extractLinks($);
+
+  for (const link of links) {
+    const text = link.text.toLowerCase();
+    const href = link.href.toLowerCase();
+
+    if (/academy/i.test(text) || /\/academy/i.test(href)) {
+      return { found: true, url: link.href, type: 'academy', evidence: `Academy: "${link.text.trim().replace(/\s+/g, ' ').slice(0, 60)}"` };
+    }
+    if (/certification/i.test(text) || /\/certification/i.test(href)) {
+      return { found: true, url: link.href, type: 'certification', evidence: `Certification program: "${link.text.trim().replace(/\s+/g, ' ').slice(0, 60)}"` };
+    }
+    if (/training/i.test(text) && /\/training/i.test(href)) {
+      return { found: true, url: link.href, type: 'training', evidence: `Training portal: "${link.text.trim().replace(/\s+/g, ' ').slice(0, 60)}"` };
+    }
+    if (/university|learning\s*(?:center|hub|path)/i.test(text)) {
+      return { found: true, url: link.href, type: 'learning', evidence: `Learning center: "${link.text.trim().replace(/\s+/g, ' ').slice(0, 60)}"` };
+    }
+  }
+
+  return { found: false, url: null, type: null, evidence: 'No training or academy detected' };
+}
+
+/**
+ * Detect support tier levels (free, premium, enterprise support).
+ */
+function detectSupportTiers($: CheerioAPI): { found: boolean; tiers: string[]; evidence: string } {
+  const bodyText = $('body').text().toLowerCase();
+  const tiers: string[] = [];
+
+  const tierPatterns: [RegExp, string][] = [
+    [/premium\s*support/i, 'premium'],
+    [/enterprise\s*support/i, 'enterprise'],
+    [/priority\s*support/i, 'priority'],
+    [/basic\s*support/i, 'basic'],
+    [/free\s*support/i, 'free'],
+    [/dedicated\s*(?:account\s*)?manager/i, 'dedicated_manager'],
+    [/technical\s*account\s*manager/i, 'TAM'],
+    [/24\/7\s*(?:premium|enterprise|priority)/i, '24/7_premium'],
+  ];
+
+  for (const [pattern, tier] of tierPatterns) {
+    if (pattern.test(bodyText)) tiers.push(tier);
+  }
+
+  if (tiers.length > 0) {
+    return { found: true, tiers, evidence: `Support tiers detected: ${tiers.join(', ')}` };
+  }
+
+  return { found: false, tiers: [], evidence: 'No support tier structure detected' };
+}
+
+/**
+ * Extract support email addresses.
+ */
+function extractSupportEmails($: CheerioAPI): string[] {
+  const emails: Set<string> = new Set();
+
+  $('a[href^="mailto:"]').each((_, el) => {
+    const href = $(el).attr('href') ?? '';
+    const addr = href.replace('mailto:', '').split('?')[0]?.toLowerCase() ?? '';
+    if (/support|help|contact|info|soporte|ayuda/i.test(addr)) {
+      emails.add(addr);
+    }
+  });
+
+  // Also scan body text for support emails
+  const bodyText = $('body').text();
+  const emailRegex = /(?:support|help|contact|info|soporte|ayuda)@[\w.-]+\.\w{2,}/gi;
+  const matches = bodyText.match(emailRegex);
+  if (matches) {
+    for (const m of matches) emails.add(m.toLowerCase());
+  }
+
+  return [...emails];
+}
+
+/**
+ * Detect chatbot specifically (vs live agent chat).
+ */
+function detectChatbot($: CheerioAPI): { found: boolean; evidence: string } {
+  const html = ($('body').html() ?? '').toLowerCase();
+  const chatbotIndicators = [
+    /chatbot/i, /virtual\s*assistant/i, /ai\s*assistant/i,
+    /bot\.js/i, /conversational\s*ai/i, /ada\.cx/i,
+    /drift.*playbook/i, /intercom.*bot/i,
+  ];
+
+  for (const pattern of chatbotIndicators) {
+    if (pattern.test(html)) {
+      return { found: true, evidence: 'AI chatbot or virtual assistant detected' };
+    }
+  }
+
+  return { found: false, evidence: 'No chatbot detected' };
+}
+
+/**
+ * Detect SLA or response time guarantees.
+ */
+function detectSla($: CheerioAPI): { found: boolean; evidence: string } {
+  const bodyText = $('body').text().toLowerCase();
+  const slaPatterns = [
+    /service\s*level\s*agreement/i,
+    /response\s*time/i,
+    /sla\b/i,
+    /guaranteed\s*(?:response|uptime|availability)/i,
+    /\d+%\s*uptime/i,
+    /(?:within|under)\s*\d+\s*(?:hour|minute|business\s*day)/i,
+  ];
+
+  for (const pattern of slaPatterns) {
+    if (pattern.test(bodyText)) {
+      return { found: true, evidence: 'SLA or response time guarantee detected' };
+    }
+  }
+
+  return { found: false, evidence: 'No SLA information detected' };
+}
+
+/**
+ * Check the main page HTML for support-related links.
+ * Uses multilingual keywords based on the page's detected language.
+ */
+function findSupportLinksInMainPage($: CheerioAPI, lang: string): string[] {
   const supportLinks: string[] = [];
-  const keywords = ['support', 'help', 'help center', 'knowledge base', 'contact', 'community'];
+  const keywords = getMultilingualKeywords(SUPPORT_LINK_KEYWORDS_BASE, lang, 'support');
 
   $('a[href]').each((_, el) => {
     const href = $(el).attr('href') ?? '';
@@ -370,6 +596,11 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
 
   const baseUrl = normalizeUrl(ctx.url);
 
+  // Detect page language for multilingual probe expansion
+  const lang = ctx.html ? detectPageLanguage(ctx.html) : 'en';
+  const SUPPORT_PATHS = expandProbePaths(SUPPORT_PATHS_BASE, lang, 'support');
+  data.detected_language = lang;
+
   // 1. Check the main page for support-related links and embedded widgets
   let mainPageSupportLinks: string[] = [];
   let mainPageHelpCenter: { name: string; evidence: string } | null = null;
@@ -378,7 +609,7 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
 
   if (ctx.html) {
     const $main = parseHtml(ctx.html);
-    mainPageSupportLinks = findSupportLinksInMainPage($main);
+    mainPageSupportLinks = findSupportLinksInMainPage($main, lang);
     mainPageHelpCenter = detectHelpCenterProvider($main);
     mainPageCommunity = detectCommunityForum($main);
     mainPageStatusPage = detectStatusPageFromHtml($main);
@@ -408,6 +639,20 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
   let helpPageQuality: 'professional' | 'any' | 'single_faq' | 'none' = 'none';
   let supportChannels = { count: 0, channels: [] as string[] };
   let bestSupportPage: ProbeResult | null = null;
+  let developerDocs = { found: false, url: null as string | null, evidence: 'No developer documentation detected' };
+  let trainingAcademy = { found: false, url: null as string | null, type: null as string | null, evidence: 'No training or academy detected' };
+  let supportTiers = { found: false, tiers: [] as string[], evidence: 'No support tier structure detected' };
+  let supportEmails: string[] = [];
+  let chatbot = { found: false, evidence: 'No chatbot detected' };
+  let sla = { found: false, evidence: 'No SLA information detected' };
+  let supportSubdomains: { subdomain: string; url: string }[] = [];
+  const domain = new URL(baseUrl).hostname.replace(/^www\./, '');
+
+  // Detect support subdomains from main page
+  if (ctx.html) {
+    const $main = parseHtml(ctx.html);
+    supportSubdomains = detectSupportSubdomains($main, domain);
+  }
 
   for (const page of foundPages) {
     if (!page.html) continue;
@@ -447,21 +692,57 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
       helpPageQuality = quality;
     }
 
-    // Count support channels
-    const channels = countSupportChannels($, helpCenterProvider !== null, communityForum.url !== null || communityForum.provider !== null);
+    // Count support channels — consider help center present if provider detected
+    // OR if we found quality help pages (even without a known provider)
+    const helpCenterActive = helpCenterProvider !== null || helpPageQuality === 'professional' || helpPageQuality === 'any';
+    const communityActive = communityForum.url !== null || communityForum.provider !== null;
+    const channels = countSupportChannels($, helpCenterActive, communityActive);
     if (channels.count > supportChannels.count) {
       supportChannels = channels;
     }
+
+    // New detectors
+    if (!developerDocs.found) developerDocs = detectDeveloperDocs($);
+    if (!trainingAcademy.found) trainingAcademy = detectTrainingAcademy($);
+    if (!supportTiers.found) supportTiers = detectSupportTiers($);
+    const pageEmails = extractSupportEmails($);
+    for (const e of pageEmails) { if (!supportEmails.includes(e)) supportEmails.push(e); }
+    if (!chatbot.found) chatbot = detectChatbot($);
+    if (!sla.found) sla = detectSla($);
+
+    // Also detect support subdomains from found pages
+    const pageSubs = detectSupportSubdomains($, domain);
+    for (const sub of pageSubs) {
+      if (!supportSubdomains.some((s) => s.subdomain === sub.subdomain)) {
+        supportSubdomains.push(sub);
+      }
+    }
   }
 
-  // Also count support channels from main page
-  if (ctx.html && supportChannels.count === 0) {
+  // Also check main page for new detectors
+  if (ctx.html) {
     const $main = parseHtml(ctx.html);
-    supportChannels = countSupportChannels(
-      $main,
-      helpCenterProvider !== null,
-      communityForum.url !== null || communityForum.provider !== null,
-    );
+    if (!developerDocs.found) developerDocs = detectDeveloperDocs($main);
+    if (!trainingAcademy.found) trainingAcademy = detectTrainingAcademy($main);
+    if (!supportTiers.found) supportTiers = detectSupportTiers($main);
+    const mainEmails = extractSupportEmails($main);
+    for (const e of mainEmails) { if (!supportEmails.includes(e)) supportEmails.push(e); }
+    if (!chatbot.found) chatbot = detectChatbot($main);
+    if (supportChannels.count === 0) {
+      const helpActive = helpCenterProvider !== null || helpPageQuality === 'professional' || helpPageQuality === 'any';
+      const commActive = communityForum.url !== null || communityForum.provider !== null;
+      supportChannels = countSupportChannels($main, helpActive, commActive);
+    }
+  }
+
+  // Probe status page URL to detect provider if URL found but provider unknown
+  if (statusPage.url && !statusPage.provider) {
+    const resolvedUrl = statusPage.url.startsWith('//') ? `https:${statusPage.url}` : statusPage.url;
+    const detectedProvider = await probeStatusPageProvider(resolvedUrl);
+    if (detectedProvider) {
+      statusPage.provider = detectedProvider;
+      statusPage.evidence = `${detectedProvider} status page: ${statusPage.url}`;
+    }
   }
 
   // Store data
@@ -473,6 +754,13 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
   data.community_forum = communityForum;
   data.business_hours = businessHoursDetected;
   data.support_channels = supportChannels;
+  data.developer_docs = developerDocs;
+  data.training_academy = trainingAcademy;
+  data.support_tiers = supportTiers;
+  data.support_emails = supportEmails;
+  data.chatbot = chatbot;
+  data.sla = sla;
+  data.support_subdomains = supportSubdomains;
 
   // ─── Build signals ──────────────────────────────────────────────────────
 
@@ -531,6 +819,54 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
         name: 'Business Hours Published',
         confidence: 0.7,
         evidence: 'Business/support hours detected on page',
+        category: 'digital_presence',
+      }),
+    );
+  }
+
+  if (developerDocs.found) {
+    signals.push(
+      createSignal({
+        type: 'developer_docs',
+        name: 'Developer Documentation',
+        confidence: 0.85,
+        evidence: developerDocs.evidence,
+        category: 'digital_presence',
+      }),
+    );
+  }
+
+  if (trainingAcademy.found) {
+    signals.push(
+      createSignal({
+        type: 'training_academy',
+        name: trainingAcademy.type === 'academy' ? 'Academy' : 'Training Portal',
+        confidence: 0.85,
+        evidence: trainingAcademy.evidence,
+        category: 'digital_presence',
+      }),
+    );
+  }
+
+  if (chatbot.found) {
+    signals.push(
+      createSignal({
+        type: 'chatbot',
+        name: 'AI Chatbot',
+        confidence: 0.75,
+        evidence: chatbot.evidence,
+        category: 'digital_presence',
+      }),
+    );
+  }
+
+  if (supportSubdomains.length > 0) {
+    signals.push(
+      createSignal({
+        type: 'support_subdomains',
+        name: 'Support Subdomains',
+        confidence: 0.9,
+        evidence: `${supportSubdomains.length} support subdomain(s): ${supportSubdomains.map((s) => s.subdomain).join(', ')}`,
         category: 'digital_presence',
       }),
     );
@@ -629,8 +965,7 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
   }
 
   // CP3: System status page (weight 4/10 = 0.4)
-  const isProfessionalStatusPage = statusPage.provider !== null &&
-    ['Atlassian Statuspage', 'Instatus'].includes(statusPage.provider);
+  const isProfessionalStatusPage = statusPage.provider !== null;
 
   if (isProfessionalStatusPage) {
     checkpoints.push(
@@ -684,8 +1019,10 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
   }
 
   // CP5: Community forum (weight 3/10 = 0.3)
-  const isActiveCommunity = communityForum.provider !== null &&
-    ['Discourse', 'Circle'].includes(communityForum.provider);
+  // Also treat a dedicated community subdomain as active
+  const hasCommunitySubdomain = supportSubdomains.some((s) => s.subdomain === 'community' || s.subdomain === 'forum');
+  const isActiveCommunity = communityForum.provider !== null ||
+    hasCommunitySubdomain;
 
   if (isActiveCommunity) {
     checkpoints.push(
@@ -694,7 +1031,9 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
         name: 'Community forum',
         weight: 0.3,
         health: 'excellent',
-        evidence: `Active community detected: ${communityForum.provider}${communityForum.url ? ` (${communityForum.url})` : ''}`,
+        evidence: communityForum.provider
+          ? `Active community: ${communityForum.provider}${communityForum.url ? ` (${communityForum.url})` : ''}`
+          : `Dedicated community subdomain: ${communityForum.url ?? 'detected'}`,
       }),
     );
   } else if (communityForum.url || communityForum.provider) {
@@ -717,6 +1056,48 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
     );
   }
 
+  // CP6: Developer documentation (weight 2/10 = 0.2)
+  if (developerDocs.found) {
+    checkpoints.push(
+      createCheckpoint({
+        id: 'm19-developer-docs',
+        name: 'Developer docs',
+        weight: 0.2,
+        health: 'excellent',
+        evidence: developerDocs.evidence,
+      }),
+    );
+  } else {
+    checkpoints.push(
+      infoCheckpoint(
+        'm19-developer-docs',
+        'Developer docs',
+        'No developer or API documentation detected',
+      ),
+    );
+  }
+
+  // CP7: Training / Academy (weight 2/10 = 0.2)
+  if (trainingAcademy.found) {
+    checkpoints.push(
+      createCheckpoint({
+        id: 'm19-training-academy',
+        name: 'Training/academy',
+        weight: 0.2,
+        health: 'excellent',
+        evidence: trainingAcademy.evidence,
+      }),
+    );
+  } else {
+    checkpoints.push(
+      infoCheckpoint(
+        'm19-training-academy',
+        'Training/academy',
+        'No training portal or academy detected',
+      ),
+    );
+  }
+
   return {
     moduleId: 'M19' as ModuleId,
     status: 'success',
@@ -727,6 +1108,8 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
     duration: 0, // set by runner
   };
 };
+
+export { execute };
 
 // ─── Register ───────────────────────────────────────────────────────────────
 registerModuleExecutor('M19' as ModuleId, execute);

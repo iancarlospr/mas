@@ -6,10 +6,23 @@ import { fetchWithRetry } from '../../utils/http.js';
 import { normalizeUrl } from '../../utils/url.js';
 import { parseHtml, extractLinks, extractScriptSrcs } from '../../utils/html.js';
 import type { CheerioAPI } from '../../utils/html.js';
+import { detectPageLanguage, expandProbePaths, getMultilingualKeywords } from '../../utils/i18n-probes.js';
+import { discoverPathsFromSitemap } from '../../utils/sitemap.js';
 import * as cheerio from 'cheerio';
 
-// ─── Probe paths ────────────────────────────────────────────────────────────
-const CAREERS_PATHS = ['/careers', '/jobs', '/join-us', '/about/team', '/team', '/culture'];
+// ─── Probe paths (English base — expanded at runtime via i18n-probes) ───────
+const CAREERS_PATHS_BASE = [
+  '/careers', '/careers/jobs', '/jobs', '/join-us', '/about/team', '/team', '/culture',
+  '/hiring', '/work-with-us', '/join', '/opportunities', '/about/careers',
+  '/careers/openings', '/open-positions',
+  // Locale-prefixed career paths (samsung.com/us/careers, etc.)
+  '/us/careers', '/en/careers', '/en-us/careers', '/global/careers',
+  '/company/careers', '/about-us/careers', '/corporate/careers',
+] as const;
+
+const CAREERS_LINK_KEYWORDS_BASE = [
+  'careers', 'jobs', 'join us', 'join our team', 'we\'re hiring', 'work with us',
+] as const;
 
 // ─── ATS providers ──────────────────────────────────────────────────────────
 const ATS_PROVIDERS: { name: string; patterns: RegExp[] }[] = [
@@ -23,6 +36,15 @@ const ATS_PROVIDERS: { name: string; patterns: RegExp[] }[] = [
   { name: 'Jobvite', patterns: [/jobvite\.com/i] },
   { name: 'SmartRecruiters', patterns: [/smartrecruiters\.com/i] },
   { name: 'Breezy HR', patterns: [/breezy\.hr/i] },
+  { name: 'Workable', patterns: [/workable\.com/i, /apply\.workable\.com/i] },
+  { name: 'JazzHR', patterns: [/jazzy?hr\.com/i, /app\.jazz\.co/i] },
+  { name: 'Rippling', patterns: [/rippling\.com/i] },
+  { name: 'Personio', patterns: [/personio\.de/i, /personio\.com/i] },
+  { name: 'Taleo', patterns: [/taleo\.net/i] },
+  { name: 'SuccessFactors', patterns: [/successfactors\.com/i] },
+  { name: 'LinkedIn Jobs', patterns: [/linkedin\.com\/jobs/i] },
+  { name: 'Indeed', patterns: [/indeed\.com/i] },
+  { name: 'Wellfound', patterns: [/wellfound\.com/i, /angel\.co\/company/i] },
 ];
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -44,6 +66,15 @@ async function probePath(
       retries: 1,
     });
     if (result.ok) {
+      // Reject catch-all redirects to homepage that contain no careers content
+      const finalUrl = new URL(result.finalUrl);
+      if (finalUrl.pathname === '/' && path !== '/') {
+        const bodyLower = result.body.toLowerCase();
+        const careerSignals = ['career', 'job opening', 'open position', 'join our team',
+          'we are hiring', 'work with us', 'current opportunities', 'apply now'];
+        const hits = careerSignals.filter(kw => bodyLower.includes(kw)).length;
+        if (hits < 1) return { path, found: false, status: result.status };
+      }
       return { path, found: true, html: result.body, status: result.status };
     }
     return { path, found: false, status: result.status };
@@ -125,9 +156,10 @@ function countOpenPositions($: CheerioAPI): number {
       const href = $(el).attr('href') ?? '';
       const text = $(el).text().trim().toLowerCase();
       if (
-        /\/jobs?\//i.test(href) ||
-        /\/positions?\//i.test(href) ||
-        /\/openings?\//i.test(href) ||
+        /\/jobs?(?:\/|\?|$)/i.test(href) ||
+        /\/positions?(?:\/|\?|$)/i.test(href) ||
+        /\/openings?(?:\/|\?|$)/i.test(href) ||
+        /\/careers\/jobs/i.test(href) ||
         /apply\s*(now)?$/i.test(text)
       ) {
         count++;
@@ -204,11 +236,79 @@ function detectTeamCultureContent($: CheerioAPI, path: string): { hasTeam: boole
 }
 
 /**
- * Check the main page HTML for nav/footer links to careers-related pages.
+ * Detect external careers subdomains (careers.company.com, jobs.company.com).
  */
-function findCareersLinksInMainPage($: CheerioAPI): string[] {
+function detectExternalCareersLinks($: CheerioAPI, domain: string): string[] {
+  const externalLinks = new Set<string>();
+  $('a[href]').each((_, el) => {
+    const href = $(el).attr('href') ?? '';
+    try {
+      const url = new URL(href, `https://${domain}`);
+      if (url.hostname !== domain && url.hostname.endsWith(domain)) {
+        if (/careers|jobs|talent|hiring/i.test(url.hostname)) {
+          externalLinks.add(url.href);
+        }
+      }
+      // Also catch ATS board links
+      if (/greenhouse\.io|lever\.co|workday\.com|ashbyhq\.com|smartrecruiters\.com|workable\.com/i.test(url.hostname)) {
+        externalLinks.add(url.href);
+      }
+    } catch { /* ignore malformed URLs */ }
+  });
+  return [...externalLinks];
+}
+
+/**
+ * Detect employer branding signals: benefits, remote work, DEI, reviews.
+ */
+function detectEmployerBranding($: CheerioAPI): {
+  benefits: boolean;
+  remoteWork: boolean;
+  dei: boolean;
+  reviewLinks: string[];
+} {
+  const bodyText = $('body').text().toLowerCase();
+  const result = {
+    benefits: false,
+    remoteWork: false,
+    dei: false,
+    reviewLinks: [] as string[],
+  };
+
+  // Benefits keywords
+  if (/\b(benefits|perks|compensation|health insurance|401k|equity|stock options|pto|paid time off|wellness)\b/i.test(bodyText)) {
+    result.benefits = true;
+  }
+
+  // Remote work
+  if (/\b(remote|hybrid|work from home|distributed|flexible work|remote-first)\b/i.test(bodyText)) {
+    result.remoteWork = true;
+  }
+
+  // DEI
+  if (/\b(diversity|equity|inclusion|dei|belonging|equal opportunity|underrepresented)\b/i.test(bodyText)) {
+    result.dei = true;
+  }
+
+  // Review site links (Glassdoor, Indeed, LinkedIn)
+  $('a[href]').each((_, el) => {
+    const href = $(el).attr('href') ?? '';
+    if (/glassdoor\.com|indeed\.com\/cmp|linkedin\.com\/company/i.test(href)) {
+      result.reviewLinks.push(href);
+    }
+  });
+  result.reviewLinks = [...new Set(result.reviewLinks)];
+
+  return result;
+}
+
+/**
+ * Check the main page HTML for nav/footer links to careers-related pages.
+ * Uses multilingual keywords based on the page's detected language.
+ */
+function findCareersLinksInMainPage($: CheerioAPI, lang: string): string[] {
   const careersLinks: string[] = [];
-  const keywords = ['careers', 'jobs', 'join us', 'join our team', 'we\'re hiring', 'work with us'];
+  const keywords = getMultilingualKeywords(CAREERS_LINK_KEYWORDS_BASE, lang, 'careers');
 
   $('a[href]').each((_, el) => {
     const href = $(el).attr('href') ?? '';
@@ -234,11 +334,33 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
 
   const baseUrl = normalizeUrl(ctx.url);
 
+  // Detect page language for multilingual probe expansion
+  const lang = ctx.html ? detectPageLanguage(ctx.html) : 'en';
+  const CAREERS_PATHS_STATIC = expandProbePaths(CAREERS_PATHS_BASE, lang, 'careers');
+  data.detected_language = lang;
+
+  // 0. Discover careers paths from sitemap.xml / robots.txt
+  const CAREERS_KEYWORDS = ['career', 'jobs', 'hiring', 'join', 'talent', 'employment', 'vacancies', 'openings'];
+  const sitemapDiscovery = await discoverPathsFromSitemap(baseUrl, CAREERS_KEYWORDS, { timeout: 6000, maxMatchedPaths: 10 });
+  data.sitemap_discovery = {
+    found: sitemapDiscovery.sitemapFound,
+    matched: sitemapDiscovery.matchedPaths,
+    robotsHints: sitemapDiscovery.robotsHints,
+  };
+
+  // Merge sitemap-discovered paths with static paths
+  const staticPathSet = new Set(CAREERS_PATHS_STATIC);
+  const sitemapPaths = [
+    ...sitemapDiscovery.matchedPaths,
+    ...sitemapDiscovery.robotsHints,
+  ].filter(p => !staticPathSet.has(p));
+  const CAREERS_PATHS = [...CAREERS_PATHS_STATIC, ...sitemapPaths];
+
   // 1. Check the main page for careers-related links
   let mainPageCareersLinks: string[] = [];
   if (ctx.html) {
     const $main = parseHtml(ctx.html);
-    mainPageCareersLinks = findCareersLinksInMainPage($main);
+    mainPageCareersLinks = findCareersLinksInMainPage($main, lang);
   }
 
   // 2. Probe known careers paths
@@ -250,6 +372,114 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
   for (const result of probeResults) {
     if (result.status === 'fulfilled' && result.value.found) {
       foundPages.push(result.value);
+    }
+  }
+
+  // 2b. Follow discovered careers links from the main page that weren't covered by fixed path probes
+  if (mainPageCareersLinks.length > 0 && foundPages.length === 0) {
+    const probedPathSet = new Set(CAREERS_PATHS.map(p => `${baseUrl}${p}`.toLowerCase()));
+    const discoveredUrls: string[] = [];
+
+    for (const link of mainPageCareersLinks) {
+      try {
+        const resolved = new URL(link, baseUrl).href;
+        if (probedPathSet.has(resolved.toLowerCase())) continue;
+        if (!resolved.startsWith('http')) continue;
+        discoveredUrls.push(resolved);
+      } catch { /* ignore malformed URLs */ }
+    }
+
+    const discoveredProbes = await Promise.allSettled(
+      discoveredUrls.slice(0, 5).map(async (url) => {
+        try {
+          const result = await fetchWithRetry(url, { timeout: 8000, retries: 1 });
+          if (result.ok) {
+            // Trust links discovered via career-keyword matching on main page.
+            // The link text already confirmed relevance (matched against career keywords).
+            // Skip body content validation — the page may need JS rendering
+            // (e.g., orientalbank.com's /es/conoce-a-oriental/oportunidades-de-empleo/).
+            // Only reject same-domain redirects to homepage (catch-all guard).
+            const finalUrl = new URL(result.finalUrl);
+            const originalUrl = new URL(url);
+            const finalHost = finalUrl.hostname.replace(/^www\./, '');
+            const origHost = originalUrl.hostname.replace(/^www\./, '');
+            if (finalUrl.pathname === '/' && originalUrl.pathname !== '/' && finalHost === origHost) {
+              return { path: originalUrl.pathname, found: false as const, status: result.status };
+            }
+            const parsedUrl = new URL(url);
+            const baseHost = new URL(baseUrl).hostname.replace(/^www\./, '');
+            const probeHost = parsedUrl.hostname.replace(/^www\./, '');
+            const pathKey = probeHost !== baseHost
+              ? `${probeHost}${parsedUrl.pathname}`
+              : parsedUrl.pathname;
+            return { path: pathKey, found: true as const, html: result.body, status: result.status };
+          }
+          return { path: new URL(url).pathname, found: false as const, status: result.status };
+        } catch {
+          // Trust links discovered via career-keyword matching even on fetch failure
+          // (e.g. orientalbank.com timeout on JS-rendered careers page).
+          // The link text already confirmed relevance; score with empty HTML so
+          // checkpoint logic sees the discovered page (even without content analysis).
+          try {
+            const parsedUrl = new URL(url);
+            const baseHost = new URL(baseUrl).hostname.replace(/^www\./, '');
+            const probeHost = parsedUrl.hostname.replace(/^www\./, '');
+            const pathKey = probeHost !== baseHost
+              ? `${probeHost}${parsedUrl.pathname}`
+              : parsedUrl.pathname;
+            return { path: pathKey, found: true as const, html: '', status: 0 };
+          } catch {
+            return { path: url, found: false as const };
+          }
+        }
+      })
+    );
+
+    for (const result of discoveredProbes) {
+      if (result.status === 'fulfilled' && result.value.found) {
+        foundPages.push(result.value);
+      }
+    }
+  }
+
+  // 2c. Probe common careers subdomains (careers.company.com, jobs.company.com, etc.)
+  if (foundPages.length === 0) {
+    const CAREERS_SUBDOMAINS = ['careers', 'jobs', 'talent', 'hiring', 'people'] as const;
+    const CAREERS_SUBDOMAIN_PATHS = ['/', '/search', '/jobs'] as const;
+    const registrableDomain = new URL(baseUrl).hostname.replace(/^www\./, '');
+
+    const subdomainProbes = await Promise.allSettled(
+      CAREERS_SUBDOMAINS.flatMap(sub =>
+        CAREERS_SUBDOMAIN_PATHS.map(async (path) => {
+          const subUrl = `https://${sub}.${registrableDomain}${path}`;
+          try {
+            const result = await fetchWithRetry(subUrl, { timeout: 8000, retries: 1 });
+            if (result.ok && result.body) {
+              // Guard against wildcard DNS: verify content contains career-related keywords
+              const bodyLower = result.body.toLowerCase();
+              const careerSignals = [
+                'career', 'job opening', 'open position', 'join our team',
+                'we are hiring', 'work with us', 'apply now', 'current opening',
+                'open role', 'empleo', 'vacante',
+              ];
+              const hits = careerSignals.filter(kw => bodyLower.includes(kw)).length;
+              if (hits >= 1) {
+                return { path: `${sub}.${registrableDomain}${path}`, found: true as const, html: result.body, status: result.status };
+              }
+            }
+            return { path: `${sub}.${registrableDomain}${path}`, found: false as const, status: result.status };
+          } catch {
+            return { path: `${sub}.${registrableDomain}${path}`, found: false as const };
+          }
+        })
+      )
+    );
+
+    for (const result of subdomainProbes) {
+      if (result.status === 'fulfilled' && result.value.found) {
+        foundPages.push(result.value);
+        break; // One successful subdomain is enough
+      }
     }
   }
 
@@ -298,14 +528,89 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
     }
   }
 
+  // 4. Detect external careers links and employer branding across all pages
+  let externalCareersLinks: string[] = [];
+  let branding = { benefits: false, remoteWork: false, dei: false, reviewLinks: [] as string[] };
+  const domain = new URL(baseUrl).hostname.replace(/^www\./, '');
+
+  for (const page of foundPages) {
+    if (!page.html) continue;
+    const $ = parseHtml(page.html);
+    externalCareersLinks.push(...detectExternalCareersLinks($, domain));
+    const pageBranding = detectEmployerBranding($);
+    if (pageBranding.benefits) branding.benefits = true;
+    if (pageBranding.remoteWork) branding.remoteWork = true;
+    if (pageBranding.dei) branding.dei = true;
+    branding.reviewLinks.push(...pageBranding.reviewLinks);
+  }
+  // Also check main page
+  if (ctx.html) {
+    const $m = parseHtml(ctx.html);
+    externalCareersLinks.push(...detectExternalCareersLinks($m, domain));
+    const mainBranding = detectEmployerBranding($m);
+    if (mainBranding.benefits) branding.benefits = true;
+    if (mainBranding.remoteWork) branding.remoteWork = true;
+    if (mainBranding.dei) branding.dei = true;
+    branding.reviewLinks.push(...mainBranding.reviewLinks);
+  }
+  externalCareersLinks = [...new Set(externalCareersLinks)];
+  branding.reviewLinks = [...new Set(branding.reviewLinks)];
+
+  // If external ATS links found but no ATS detected, infer from the URL
+  if (!atsDetected && externalCareersLinks.length > 0) {
+    for (const link of externalCareersLinks) {
+      for (const provider of ATS_PROVIDERS) {
+        for (const pattern of provider.patterns) {
+          if (pattern.test(link)) {
+            atsDetected = { name: provider.name, evidence: `${provider.name} detected via external link: ${link}` };
+            break;
+          }
+        }
+        if (atsDetected) break;
+      }
+      if (atsDetected) break;
+    }
+  }
+
+  // Fallback: infer ATS from M01 SPF record (DRY — reuses DNS data)
+  if (!atsDetected && ctx.previousResults) {
+    const m01 = ctx.previousResults.get('M01' as ModuleId);
+    const spf = (m01?.data as Record<string, unknown>)?.spf as string | undefined;
+    if (spf) {
+      const SPF_ATS_HINTS: Array<{ pattern: RegExp; name: string }> = [
+        { pattern: /greenhouse/i, name: 'Greenhouse' },
+        { pattern: /lever/i, name: 'Lever' },
+        { pattern: /ashbyhq/i, name: 'Ashby' },
+        { pattern: /smartrecruiters/i, name: 'SmartRecruiters' },
+      ];
+      for (const { pattern, name } of SPF_ATS_HINTS) {
+        if (pattern.test(spf)) {
+          atsDetected = { name, evidence: `${name} detected via SPF include in DNS record` };
+          break;
+        }
+      }
+    }
+  }
+
   // Store data
-  data.careers_page_url = bestCareersPage ? `${baseUrl}${bestCareersPage.path}` : null;
+  // Use fully-qualified URL for external/subdomain career pages
+  const careersPageUrl = bestCareersPage
+    ? (bestCareersPage.path.includes('.') && !bestCareersPage.path.startsWith('/'))
+      ? `https://${bestCareersPage.path}`   // subdomain probe path like "careers.samsung.com/"
+      : `${baseUrl}${bestCareersPage.path}` // standard path probe
+    : null;
+  data.careers_page_url = careersPageUrl;
   data.ats_provider = atsDetected?.name ?? null;
   data.ats_evidence = atsDetected?.evidence ?? null;
   data.open_positions_count = totalOpenPositions;
   data.has_team_page = hasTeamPage;
   data.has_culture_page = hasCulturePage;
   data.most_recent_posting = mostRecentPosting?.toISOString() ?? null;
+  data.external_careers_links = externalCareersLinks;
+  data.benefits_mentioned = branding.benefits;
+  data.remote_work_mentioned = branding.remoteWork;
+  data.dei_mentioned = branding.dei;
+  data.review_site_links = branding.reviewLinks;
 
   // ─── Build signals ──────────────────────────────────────────────────────
 
@@ -569,4 +874,5 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
 };
 
 // ─── Register ───────────────────────────────────────────────────────────────
+export { execute };
 registerModuleExecutor('M17' as ModuleId, execute);
