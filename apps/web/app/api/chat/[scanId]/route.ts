@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { rateLimit } from '@/lib/rate-limit';
+import { isValidUUID } from '@/lib/utils';
 import { z } from 'zod';
 
 const ChatSchema = z.object({
@@ -50,6 +51,9 @@ export async function POST(
   { params }: { params: Promise<{ scanId: string }> },
 ) {
   const { scanId } = await params;
+  if (!isValidUUID(scanId)) {
+    return NextResponse.json({ error: 'Invalid scan ID' }, { status: 400 });
+  }
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -188,6 +192,9 @@ export async function GET(
   { params }: { params: Promise<{ scanId: string }> },
 ) {
   const { scanId } = await params;
+  if (!isValidUUID(scanId)) {
+    return NextResponse.json({ error: 'Invalid scan ID' }, { status: 400 });
+  }
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 

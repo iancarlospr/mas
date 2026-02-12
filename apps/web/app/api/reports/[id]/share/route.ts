@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { generateShareToken } from '@/lib/report/share';
+import { isValidUUID } from '@/lib/utils';
 
 /** POST /api/reports/:id/share — generate a shareable report URL */
 export async function POST(
@@ -8,6 +9,9 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id: scanId } = await params;
+  if (!isValidUUID(scanId)) {
+    return NextResponse.json({ error: 'Invalid scan ID' }, { status: 400 });
+  }
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 

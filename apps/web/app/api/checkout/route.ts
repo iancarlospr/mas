@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { stripe } from '@/lib/stripe';
+import { getStripe } from '@/lib/stripe';
 import { z } from 'zod';
 
 const CheckoutSchema = z.object({
@@ -8,10 +8,12 @@ const CheckoutSchema = z.object({
   scanId: z.string().uuid(),
 });
 
-const PRICE_MAP = {
-  alpha_brief: process.env.STRIPE_ALPHA_BRIEF_PRICE_ID!,
-  chat_credits: process.env.STRIPE_CHAT_CREDITS_PRICE_ID!,
-};
+function getPriceMap() {
+  return {
+    alpha_brief: process.env.STRIPE_ALPHA_BRIEF_PRICE_ID!,
+    chat_credits: process.env.STRIPE_CHAT_CREDITS_PRICE_ID!,
+  };
+}
 
 export async function POST(request: NextRequest) {
   const supabase = await createClient();
@@ -28,7 +30,7 @@ export async function POST(request: NextRequest) {
   }
 
   const { product, scanId } = parsed.data;
-  const priceId = PRICE_MAP[product];
+  const priceId = getPriceMap()[product];
 
   if (!priceId) {
     return NextResponse.json({ error: 'Product not configured' }, { status: 500 });
@@ -53,7 +55,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Cannot purchase for a failed scan' }, { status: 400 });
   }
 
-  const session = await stripe.checkout.sessions.create({
+  const session = await getStripe().checkout.sessions.create({
     mode: 'payment',
     payment_method_types: ['card'],
     line_items: [{ price: priceId, quantity: 1 }],

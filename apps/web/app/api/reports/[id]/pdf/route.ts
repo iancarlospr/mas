@@ -2,12 +2,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { verifyShareToken } from '@/lib/report/share';
 import { engineFetch } from '@/lib/engine';
+import { isValidUUID } from '@/lib/utils';
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id: scanId } = await params;
+  if (!isValidUUID(scanId)) {
+    return NextResponse.json({ error: 'Invalid scan ID' }, { status: 400 });
+  }
 
   // Auth: either logged-in owner OR valid share token
   const supabase = await createClient();

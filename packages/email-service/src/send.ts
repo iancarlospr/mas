@@ -6,7 +6,13 @@ import { checkRateLimit } from './rate-limit';
 import { checkDedup } from './dedup';
 import type { SendEmailOptions, SendEmailResult } from './types';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+let _resend: Resend | undefined;
+function getResend(): Resend {
+  if (!_resend) {
+    _resend = new Resend(process.env.RESEND_API_KEY);
+  }
+  return _resend;
+}
 
 const FROM = process.env.RESEND_FROM_EMAIL ?? 'alpha@marketingalphascan.com';
 const REPLY_TO = process.env.RESEND_REPLY_TO_EMAIL ?? 'support@marketingalphascan.com';
@@ -52,7 +58,7 @@ export async function sendEmail(options: SendEmailOptions): Promise<SendEmailRes
 
     // 4. Render and send
     const html = await render(react);
-    const { data, error } = await resend.emails.send({
+    const { data, error } = await getResend().emails.send({
       from: `MarketingAlphaScan <${FROM}>`,
       replyTo: REPLY_TO,
       to,
