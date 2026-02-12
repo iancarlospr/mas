@@ -95,7 +95,6 @@ export async function upsertModuleResult(
     checkpoints: result.checkpoints,
     duration_ms: result.duration,
     error: result.error ?? null,
-    updated_at: new Date().toISOString(),
   };
 
   const { error } = await supabase
