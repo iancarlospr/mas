@@ -6,7 +6,16 @@ echo "=== MarketingAlphaScan Droplet Setup ==="
 # 1. System updates
 apt-get update && apt-get upgrade -y
 
-# 2. Create deploy user (not root)
+# 2. Install Docker Engine
+apt-get install -y ca-certificates curl gnupg
+install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+chmod a+r /etc/apt/keyrings/docker.asc
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" > /etc/apt/sources.list.d/docker.list
+apt-get update
+apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+# 3. Create deploy user (not root)
 adduser --disabled-password --gecos "" deploy
 usermod -aG docker deploy
 mkdir -p /home/deploy/.ssh
@@ -34,7 +43,8 @@ systemctl restart sshd
 ufw default deny incoming
 ufw default allow outgoing
 ufw allow 22/tcp     # SSH
-ufw allow 3001/tcp   # Engine API (will be behind Cloudflare)
+ufw allow 80/tcp     # HTTP (Caddy → HTTPS redirect)
+ufw allow 443/tcp    # HTTPS (Caddy SSL termination)
 ufw --force enable
 
 # 5. Swap (critical for 1GB RAM droplet)
@@ -48,9 +58,6 @@ echo '/swapfile none swap sw 0 0' >> /etc/fstab
 echo 'vm.swappiness=10' >> /etc/sysctl.conf
 echo 'vm.vfs_cache_pressure=50' >> /etc/sysctl.conf
 sysctl -p
-
-# 6. Install Docker Compose plugin (if not pre-installed)
-apt-get install -y docker-compose-plugin
 
 # 7. Create application directory
 mkdir -p /opt/alphascan
@@ -77,8 +84,14 @@ systemctl restart docker
 
 # 11. Done
 echo "=== Setup complete ==="
-echo "Next steps:"
+echo ""
+echo "Next steps (run as deploy user):"
 echo "1. SSH as deploy: ssh deploy@<ip>"
 echo "2. Login to GHCR: echo \$GHCR_TOKEN | docker login ghcr.io -u <username> --password-stdin"
-echo "3. Copy docker-compose.prod.yml and .env to /opt/alphascan/"
-echo "4. Run: cd /opt/alphascan && docker compose -f docker-compose.prod.yml up -d"
+echo "3. Copy files to droplet:"
+echo "   scp docker-compose.prod.yml apps/engine/Caddyfile deploy@<ip>:/opt/alphascan/"
+echo "   scp .env.engine deploy@<ip>:/opt/alphascan/.env"
+echo "4. On droplet: mkdir -p /opt/alphascan/apps/engine"
+echo "   mv /opt/alphascan/Caddyfile /opt/alphascan/apps/engine/Caddyfile"
+echo "5. Pull & start: cd /opt/alphascan && docker compose -f docker-compose.prod.yml pull && docker compose -f docker-compose.prod.yml up -d"
+echo "6. Verify: curl https://engine.marketingalphascan.com/engine/health"

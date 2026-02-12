@@ -1,0 +1,10 @@
+.git
+node_modules
+*.md
+.env*
+apps/web
+supabase
+.claude
+dist
+.next
+.turbo

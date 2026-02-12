@@ -43,7 +43,7 @@ export const metadata: Metadata = {
     title: 'MarketingAlphaScan',
     description: 'Forensic marketing intelligence for any URL.',
   },
-  robots: { index: true, follow: true },
+  robots: { index: false, follow: false },
 };
 
 export default function RootLayout({

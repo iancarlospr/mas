@@ -11,11 +11,7 @@ build/
 
 # Environment
 .env
-.env.local
-.env.production
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*
 !.env.example
 
 # IDE
@@ -52,6 +48,10 @@ supabase/.temp/
 # Docker
 docker-compose.override.yml
 
+# Redis
+*.rdb
+
 # Misc
 *.tsbuildinfo
 *.log
+.vercel

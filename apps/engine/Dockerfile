@@ -63,9 +63,9 @@ COPY apps/engine/package.json apps/engine/
 # Install production dependencies only
 RUN npm install --workspace=@marketing-alpha/engine --include-workspace-root --omit=dev
 
-# Install Playwright Chromium browser
+# Install Patchright Chromium browser (patched Playwright — bypasses CDP detection)
 ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
-RUN npx playwright install chromium
+RUN ./node_modules/.bin/patchright install chromium
 
 # Copy built JavaScript from build stage
 COPY --from=builder /app/apps/engine/dist/ apps/engine/dist/
