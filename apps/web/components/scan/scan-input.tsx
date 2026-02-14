@@ -120,8 +120,11 @@ export function ScanInput({ size = 'default', className, onCapture }: ScanInputP
         const { scanId } = await res.json();
         analytics.scanStarted(new URL(normalized).hostname, 'full');
         router.push(`/scan/${scanId}`);
-      } catch {
-        setError('Network error. Please try again.');
+      } catch (err) {
+        const message = err instanceof Error && err.message
+          ? err.message
+          : 'Network error. Please try again.';
+        setError(message);
         setLoading(false);
         if (window.turnstile && turnstileWidgetRef.current) {
           window.turnstile.reset(turnstileWidgetRef.current);

@@ -13,7 +13,7 @@ export default async function ConfirmPage({ searchParams }: ConfirmPageProps) {
   const params = await searchParams;
   const tokenHash = params.token_hash;
   const type = params.type as 'signup' | 'magiclink' | 'recovery' | undefined;
-  const redirectTo = params.redirect_to ?? '/dashboard';
+  const redirectTo = params.redirect_to ?? '/history';
 
   if (!tokenHash || !type) {
     redirect('/auth/error?message=invalid_link');
@@ -30,7 +30,7 @@ export default async function ConfirmPage({ searchParams }: ConfirmPageProps) {
     redirect('/auth/error?message=verification_failed');
   }
 
-  // For signup: trigger welcome email (30s delay handled server-side)
+  // For signup: trigger welcome email + redirect to "verified" interstitial
   if (type === 'signup') {
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
@@ -49,6 +49,9 @@ export default async function ConfirmPage({ searchParams }: ConfirmPageProps) {
         }),
       }).catch(() => {});
     }
+
+    // Redirect to interstitial that signals the original tab via BroadcastChannel
+    redirect(`/auth/verified?redirect_to=${encodeURIComponent(redirectTo)}`);
   }
 
   redirect(redirectTo);

@@ -17,16 +17,14 @@ export async function POST(request: NextRequest) {
 
   const { url, turnstileToken } = parsed.data;
 
-  // Verify Turnstile token
   if (process.env.NODE_ENV === 'production' && !process.env.TURNSTILE_SECRET_KEY) {
     console.error('[scans] TURNSTILE_SECRET_KEY not set in production');
     return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
   }
 
-  if (process.env.TURNSTILE_SECRET_KEY) {
-    if (!turnstileToken) {
-      return NextResponse.json({ error: 'Security verification required' }, { status: 403 });
-    }
+  // Verify Turnstile token (skip for auto-scan after email verification —
+  // the user is already authenticated and rate-limited to 4/day)
+  if (process.env.TURNSTILE_SECRET_KEY && turnstileToken) {
     const turnstileRes = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

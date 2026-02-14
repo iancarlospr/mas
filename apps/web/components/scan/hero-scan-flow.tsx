@@ -6,20 +6,51 @@ import { createClient } from '@/lib/supabase/client';
 import { ScanInput } from '@/components/scan/scan-input';
 import { FakeScanProgress } from '@/components/scan/fake-scan-progress';
 import { SignupWall } from '@/components/scan/signup-wall';
+import { PendingVerificationCard } from '@/components/scan/pending-verification-card';
 import { analytics } from '@/lib/analytics';
 
 type FlowState = 'idle' | 'fakeLoading' | 'gated';
+
+interface PendingVerification {
+  email: string;
+  scanUrl: string;
+  timestamp: number;
+}
+
+/** Read the pending-verification flag from localStorage (24h TTL). */
+function getPendingVerification(): PendingVerification | null {
+  try {
+    const raw = localStorage.getItem('alphascan_pending_verification');
+    if (!raw) return null;
+    const data: PendingVerification = JSON.parse(raw);
+    // Expire after 24 hours
+    if (Date.now() - data.timestamp > 24 * 60 * 60 * 1000) {
+      localStorage.removeItem('alphascan_pending_verification');
+      return null;
+    }
+    return data;
+  } catch {
+    return null;
+  }
+}
 
 export function HeroScanFlow() {
   const [state, setState] = useState<FlowState>('idle');
   const [capturedUrl, setCapturedUrl] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [pendingVerification, setPendingVerification] = useState<PendingVerification | null>(null);
   const router = useRouter();
 
   useEffect(() => {
     const supabase = createClient();
     supabase.auth.getUser().then(({ data: { user } }) => {
       setIsAuthenticated(!!user);
+      if (user) {
+        // Authenticated — clear any pending verification flag
+        try { localStorage.removeItem('alphascan_pending_verification'); } catch { /* */ }
+      } else {
+        setPendingVerification(getPendingVerification());
+      }
     });
   }, []);
 
@@ -27,25 +58,24 @@ export function HeroScanFlow() {
     async (url: string, turnstileToken: string) => {
       if (isAuthenticated) {
         // Authenticated user — start real scan immediately
-        try {
-          const res = await fetch('/api/scans', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ url, turnstileToken }),
-          });
+        const res = await fetch('/api/scans', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url, turnstileToken }),
+        });
 
-          if (!res.ok) {
+        if (!res.ok) {
+          let errorMsg = 'Failed to start scan';
+          try {
             const data = await res.json();
-            throw new Error(data.error ?? 'Failed to start scan');
-          }
-
-          const { scanId } = await res.json();
-          analytics.scanStarted(new URL(url).hostname, 'full');
-          router.push(`/scan/${scanId}`);
-        } catch (err) {
-          // Fall through — ScanInput will show its own error via the default path
-          throw err;
+            errorMsg = data.error ?? errorMsg;
+          } catch { /* non-JSON response (e.g. Next.js error page) */ }
+          throw new Error(errorMsg);
         }
+
+        const { scanId } = await res.json();
+        analytics.scanStarted(new URL(url).hostname, 'full');
+        router.push(`/scan/${scanId}`);
       } else {
         // Anonymous user — fake loading → signup wall
         setCapturedUrl(url);
@@ -57,6 +87,20 @@ export function HeroScanFlow() {
   );
 
   const domain = capturedUrl ? new URL(capturedUrl).hostname.replace(/^www\./, '') : '';
+
+  // Show "check your email" card if user signed up but hasn't verified yet
+  if (pendingVerification && isAuthenticated === false) {
+    return (
+      <PendingVerificationCard
+        email={pendingVerification.email}
+        scanUrl={pendingVerification.scanUrl}
+        onDismiss={() => {
+          try { localStorage.removeItem('alphascan_pending_verification'); } catch { /* */ }
+          setPendingVerification(null);
+        }}
+      />
+    );
+  }
 
   if (state === 'fakeLoading') {
     return (

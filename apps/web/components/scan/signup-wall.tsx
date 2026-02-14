@@ -65,6 +65,12 @@ export function SignupWall({ domain, scanUrl }: SignupWallProps) {
         });
         if (error) throw error;
         analytics.signupWallConverted(domain);
+        try {
+          localStorage.setItem(
+            'alphascan_pending_verification',
+            JSON.stringify({ email, scanUrl, timestamp: Date.now() }),
+          );
+        } catch { /* localStorage unavailable */ }
         router.push(`/verify?email=${encodeURIComponent(email)}&scan_url=${encodeURIComponent(scanUrl)}`);
       } else {
         const { error } = await supabase.auth.signInWithPassword({
