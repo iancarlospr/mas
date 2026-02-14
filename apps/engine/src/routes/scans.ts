@@ -13,7 +13,7 @@ import type { ModuleTier } from '@marketing-alpha/types';
 const EnqueueScanSchema = z.object({
   scanId: z.string().uuid(),
   url: z.string(),
-  tier: z.enum(['peek', 'full', 'paid']),
+  tier: z.enum(['full', 'paid']),
   userId: z.string().uuid().nullable().optional(),
   ipAddress: z.string().nullable().optional(),
   countryCode: z.string().max(3).nullable().optional(),

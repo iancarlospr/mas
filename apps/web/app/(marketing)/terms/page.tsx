@@ -36,8 +36,7 @@ export default function TermsPage() {
           <p className="mt-2">
             You may create an account using email verification or magic link
             authentication. You are responsible for maintaining the security of your
-            account credentials. Anonymous (peek) scans are available without an
-            account but are limited in scope.
+            account credentials. A free account is required to run scans.
           </p>
         </section>
 

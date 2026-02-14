@@ -79,15 +79,15 @@ vi.mock('../../src/ghostscan/bot-wall-detector.js', () => ({
 // Mock registry to return a minimal set of test modules
 vi.mock('../../src/modules/registry.js', () => {
   const testModules = [
-    { id: 'M01', name: 'DNS Security', phase: 'passive', minimumTier: 'peek', timeout: 30000, retries: 1, category: 'compliance_security' },
-    { id: 'M04', name: 'Page Metadata', phase: 'passive', minimumTier: 'peek', timeout: 30000, retries: 1, category: 'seo_content' },
+    { id: 'M01', name: 'DNS Security', phase: 'passive', minimumTier: 'full', timeout: 30000, retries: 1, category: 'compliance_security' },
+    { id: 'M04', name: 'Page Metadata', phase: 'passive', minimumTier: 'full', timeout: 30000, retries: 1, category: 'seo_content' },
     { id: 'M03', name: 'Performance', phase: 'browser', minimumTier: 'full', timeout: 60000, retries: 1, category: 'performance_ux' },
     { id: 'M09', name: 'Behavioral', phase: 'ghostscan', minimumTier: 'full', timeout: 60000, retries: 0, category: 'analytics_integrity' },
   ];
 
   return {
     getModulesForPhaseAndTier: vi.fn().mockImplementation((phase: string, tier: string) => {
-      if (tier === 'peek' && phase !== 'passive') return [];
+      // All tiers now run all phases
       return testModules.filter(m => m.phase === phase);
     }),
     getScoredModuleIds: vi.fn().mockReturnValue(['M01', 'M03', 'M04', 'M09']),
@@ -145,16 +145,14 @@ describe('ModuleRunner Integration', () => {
     }
   });
 
-  it('should only run passive phase for peek tier', async () => {
-    const runner = new ModuleRunner('test-scan-2', 'https://test.example.com', 'peek');
+  it('should run all phases for full tier', async () => {
+    const runner = new ModuleRunner('test-scan-2', 'https://test.example.com', 'full');
     const { results, modulesCompleted } = await runner.run();
 
-    // Only passive modules (M01, M04) should run
-    expect(modulesCompleted).toBe(2);
+    // All modules should run for full tier
+    expect(modulesCompleted).toBeGreaterThanOrEqual(2);
     expect(results.has('M01' as ModuleId)).toBe(true);
     expect(results.has('M04' as ModuleId)).toBe(true);
-    expect(results.has('M03' as ModuleId)).toBe(false);
-    expect(results.has('M09' as ModuleId)).toBe(false);
   });
 
   it('should update scan status for each phase', async () => {

@@ -11,7 +11,7 @@ export type ModuleId =
 
 export type ModulePhase = 'passive' | 'browser' | 'ghostscan' | 'external' | 'synthesis';
 
-export type ModuleTier = 'peek' | 'full' | 'paid';
+export type ModuleTier = 'full' | 'paid';
 
 export type ModuleStatus = 'pending' | 'running' | 'success' | 'partial' | 'error' | 'skipped';
 

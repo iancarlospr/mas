@@ -3,24 +3,7 @@ import { cn } from '@/lib/utils';
 
 const tiers = [
   {
-    name: 'Peek',
-    price: 'Free',
-    originalPrice: null,
-    description: 'Quick snapshot of any URL',
-    cta: 'Start Scanning',
-    ctaHref: '/#hero',
-    features: [
-      '6 passive scan modules',
-      'DNS & security baseline',
-      'CMS & infrastructure detection',
-      'Page metadata analysis',
-      'MarketingIQ teaser',
-      'No registration required',
-    ],
-    highlighted: false,
-  },
-  {
-    name: 'Full Scan',
+    name: 'Free Scan',
     price: 'Free',
     originalPrice: null,
     description: 'Complete marketing audit',
@@ -64,7 +47,7 @@ const addOn = {
 export function PricingCards() {
   return (
     <div className="space-y-8">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
         {tiers.map((tier) => (
           <div
             key={tier.name}

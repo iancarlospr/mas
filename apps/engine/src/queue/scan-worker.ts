@@ -20,7 +20,6 @@ let worker: Worker<ScanJobData, ScanJobResult> | null = null;
  * Process a scan job through all phases based on tier.
  *
  * Tier phases:
- *   peek = passive only
  *   full = passive + browser + ghostscan + external + M41 synthesis
  *   paid = all phases including M42-M46 synthesis
  */

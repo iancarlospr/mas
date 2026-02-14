@@ -4,7 +4,6 @@ import { useEffect, useState, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import { ScanProgress } from '@/components/scan/scan-progress';
 import { BentoDashboard } from '@/components/scan/bento-dashboard';
-import { EmailCapture } from '@/components/scan/email-capture';
 import type { ScanWithResults } from '@marketing-alpha/types';
 import { analytics } from '@/lib/analytics';
 
@@ -52,20 +51,14 @@ export default function ScanPage() {
   // If scan is still in progress, show progress view
   if (scan.status !== 'complete' && scan.status !== 'failed' && scan.status !== 'cancelled') {
     return (
-      <div>
-        <ScanProgress
-          scanId={id}
-          onComplete={() => {
-            fetchScan().then(() => {
-              if (scan) analytics.scanCompleted(id, scan.domain, scan.marketingIq);
-            });
-          }}
-        />
-        {/* Email capture for anonymous (peek) users during scan */}
-        {scan.tier === 'peek' && (
-          <EmailCapture scanId={id} className="mt-8 max-w-2xl mx-auto" />
-        )}
-      </div>
+      <ScanProgress
+        scanId={id}
+        onComplete={() => {
+          fetchScan().then(() => {
+            if (scan) analytics.scanCompleted(id, scan.domain, scan.marketingIq);
+          });
+        }}
+      />
     );
   }
 

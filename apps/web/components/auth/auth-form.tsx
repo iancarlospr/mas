@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { cn } from '@/lib/utils';
@@ -18,7 +18,15 @@ export function AuthForm({ mode }: AuthFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [magicLinkSent, setMagicLinkSent] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const supabase = createClient();
+
+  // Compute return path: scan_url > redirect > /history
+  const scanUrl = searchParams.get('scan_url');
+  const redirect = searchParams.get('redirect');
+  const returnPath = scanUrl
+    ? `/history?auto_scan=${encodeURIComponent(scanUrl)}`
+    : redirect ?? '/history';
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,18 +40,20 @@ export function AuthForm({ mode }: AuthFormProps) {
           password,
           options: {
             data: { name },
-            emailRedirectTo: `${window.location.origin}/verify`,
+            emailRedirectTo: `${window.location.origin}/auth/callback?redirect_to=${encodeURIComponent(returnPath)}`,
           },
         });
         if (error) throw error;
-        router.push('/verify?email=' + encodeURIComponent(email));
+        const verifyParams = new URLSearchParams({ email });
+        if (scanUrl) verifyParams.set('scan_url', scanUrl);
+        router.push('/verify?' + verifyParams.toString());
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
         if (error) throw error;
-        router.push('/history');
+        router.push(returnPath);
         router.refresh();
       }
     } catch (err: unknown) {
@@ -65,7 +75,7 @@ export function AuthForm({ mode }: AuthFormProps) {
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo: `${window.location.origin}/history`,
+        emailRedirectTo: `${window.location.origin}/auth/callback?redirect_to=${encodeURIComponent(returnPath)}`,
       },
     });
 
@@ -81,7 +91,7 @@ export function AuthForm({ mode }: AuthFormProps) {
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: `${window.location.origin}/history`,
+        redirectTo: `${window.location.origin}/auth/callback?redirect_to=${encodeURIComponent(returnPath)}`,
       },
     });
     if (error) setError(error.message);
@@ -221,14 +231,14 @@ export function AuthForm({ mode }: AuthFormProps) {
         {mode === 'login' ? (
           <>
             Don&apos;t have an account?{' '}
-            <Link href="/register" className="text-accent hover:underline font-medium">
+            <Link href={`/register${scanUrl ? `?scan_url=${encodeURIComponent(scanUrl)}` : redirect ? `?redirect=${encodeURIComponent(redirect)}` : ''}`} className="text-accent hover:underline font-medium">
               Sign up
             </Link>
           </>
         ) : (
           <>
             Already have an account?{' '}
-            <Link href="/login" className="text-accent hover:underline font-medium">
+            <Link href={`/login${scanUrl ? `?scan_url=${encodeURIComponent(scanUrl)}` : redirect ? `?redirect=${encodeURIComponent(redirect)}` : ''}`} className="text-accent hover:underline font-medium">
               Sign in
             </Link>
           </>

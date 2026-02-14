@@ -88,7 +88,7 @@ export interface ModuleContext {
   /** The unique scan identifier. */
   scanId: string;
 
-  /** The scan tier (peek, full, paid). */
+  /** The scan tier (full, paid). */
   tier: ModuleTier;
 
   /** The raw HTML from the initial fetch (passive phase). */

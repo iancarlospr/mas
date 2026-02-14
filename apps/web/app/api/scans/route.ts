@@ -45,9 +45,13 @@ export async function POST(request: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
+  if (!user) {
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+  }
+
   // Extract domain
   const domain = new URL(url).hostname.replace(/^www\./, '').toLowerCase();
-  const tier = user ? 'full' : 'peek';
+  const tier = 'full';
 
   // Get IP and country
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? '127.0.0.1';
@@ -61,10 +65,10 @@ export async function POST(request: NextRequest) {
   const { count } = await supabase
     .from('scans')
     .select('id', { count: 'exact', head: true })
-    .eq(user ? 'user_id' : 'ip_address', user ? user.id : ip)
+    .eq('user_id', user.id)
     .gte('created_at', dayStart.toISOString());
 
-  const limit = user ? 4 : 2;
+  const limit = 4;
   if ((count ?? 0) >= limit) {
     return NextResponse.json(
       { error: 'Daily scan limit reached', limit, used: count },
@@ -72,12 +76,11 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // Check cache
+  // Check cache — recent full scan for same domain
   const { data: cached } = await supabase
     .from('scans')
-    .select('id, tier, status, marketing_iq, created_at')
+    .select('id, status, marketing_iq, created_at')
     .eq('domain', domain)
-    .gte('tier', tier)
     .eq('status', 'complete')
     .gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
     .order('created_at', { ascending: false })
@@ -89,7 +92,7 @@ export async function POST(request: NextRequest) {
     const { data: newScan } = await supabase
       .from('scans')
       .insert({
-        user_id: user?.id ?? null,
+        user_id: user.id,
         url,
         domain,
         tier,
@@ -110,7 +113,7 @@ export async function POST(request: NextRequest) {
   const { data: scan, error } = await supabase
     .from('scans')
     .insert({
-      user_id: user?.id ?? null,
+      user_id: user.id,
       url,
       domain,
       tier,
@@ -141,7 +144,7 @@ export async function POST(request: NextRequest) {
 
   // Audit log (non-critical)
   supabase.from('audit_log').insert({
-    user_id: user?.id ?? null,
+    user_id: user.id,
     action: 'scan_created',
     resource: scan.id,
     ip_address: ip,

@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/server';
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
-  const redirectTo = searchParams.get('redirect_to') ?? '/dashboard';
+  const redirectTo = searchParams.get('redirect_to') ?? '/history';
 
   if (!code) {
     return NextResponse.redirect(new URL('/auth/error?message=invalid_link', origin));

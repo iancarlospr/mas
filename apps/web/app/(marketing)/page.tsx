@@ -1,4 +1,5 @@
 import { ScanInput } from '@/components/scan/scan-input';
+import { HeroScanFlow } from '@/components/scan/hero-scan-flow';
 import { PricingCards } from '@/components/marketing/pricing-cards';
 
 const features = [
@@ -62,10 +63,10 @@ export default function HomePage() {
               performance issues.
             </p>
             <div className="mt-10 flex justify-center">
-              <ScanInput size="large" />
+              <HeroScanFlow />
             </div>
             <p className="mt-4 text-sm text-white/40">
-              Free peek scan. No credit card required.
+              No credit card required.
             </p>
           </div>
         </div>

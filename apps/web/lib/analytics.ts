@@ -13,8 +13,12 @@ export const analytics = {
     posthog.capture('scan_completed', { scan_id: scanId, domain, marketing_iq: marketingIq });
   },
 
-  emailCaptured(scanId: string) {
-    posthog.capture('email_captured', { scan_id: scanId });
+  signupWallShown(domain: string) {
+    posthog.capture('signup_wall_shown', { domain });
+  },
+
+  signupWallConverted(domain: string) {
+    posthog.capture('signup_wall_converted', { domain });
   },
 
   reportPurchased(scanId: string, product: string) {

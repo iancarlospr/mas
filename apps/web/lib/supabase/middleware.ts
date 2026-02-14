@@ -27,12 +27,12 @@ export async function updateSession(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser();
 
-  // Protect authenticated-only routes (report, chat, history require login)
-  // Note: /scan/[id] is accessible without auth for peek tier
+  // Protect authenticated-only routes
   const isProtected =
     request.nextUrl.pathname.startsWith('/report') ||
     request.nextUrl.pathname.startsWith('/chat') ||
-    request.nextUrl.pathname.startsWith('/history');
+    request.nextUrl.pathname.startsWith('/history') ||
+    request.nextUrl.pathname.startsWith('/scan');
 
   if (isProtected && !user) {
     const url = request.nextUrl.clone();

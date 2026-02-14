@@ -72,7 +72,7 @@ vi.mock('../../src/ghostscan/bot-wall-detector.js', () => ({
 vi.mock('../../src/modules/registry.js', () => ({
   getModulesForPhaseAndTier: vi.fn().mockImplementation((phase: string) => {
     if (phase === 'passive') return [
-      { id: 'M04', name: 'Page Metadata', phase: 'passive', minimumTier: 'peek', timeout: 30000, retries: 0, category: 'seo_content' },
+      { id: 'M04', name: 'Page Metadata', phase: 'passive', minimumTier: 'full', timeout: 30000, retries: 0, category: 'seo_content' },
     ];
     if (phase === 'browser') return [
       { id: 'M03', name: 'Performance', phase: 'browser', minimumTier: 'full', timeout: 60000, retries: 0, category: 'performance_ux' },

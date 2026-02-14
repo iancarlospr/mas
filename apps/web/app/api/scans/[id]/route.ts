@@ -24,8 +24,8 @@ export async function GET(
     return NextResponse.json({ error: 'Scan not found' }, { status: 404 });
   }
 
-  // Ownership check: allow owner, or anonymous peek scans (user_id IS NULL)
-  if (scan.user_id && scan.user_id !== user?.id) {
+  // Ownership check: require auth and matching user
+  if (!user || scan.user_id !== user.id) {
     return NextResponse.json({ error: 'Scan not found' }, { status: 404 });
   }
 

@@ -1,6 +1,8 @@
+import { Suspense } from 'react';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { ScanInput } from '@/components/scan/scan-input';
+import { AutoScanTrigger } from '@/components/scan/auto-scan-trigger';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = { title: 'My Scans' };
@@ -30,6 +32,7 @@ export default async function HistoryPage() {
   if (!scans || scans.length === 0) {
     return (
       <div className="max-w-lg mx-auto text-center py-16">
+        <Suspense><AutoScanTrigger /></Suspense>
         <h1 className="font-heading text-h3 text-primary mb-2">No scans yet</h1>
         <p className="text-muted text-sm mb-8">
           Enter a URL to run your first marketing technology audit.
@@ -41,6 +44,7 @@ export default async function HistoryPage() {
 
   return (
     <div>
+      <Suspense><AutoScanTrigger /></Suspense>
       <div className="flex items-center justify-between mb-8">
         <h1 className="font-heading text-h2 text-primary">My Scans</h1>
       </div>
@@ -56,7 +60,7 @@ export default async function HistoryPage() {
                 {scan.domain}
               </span>
               <span className="ml-3 text-xs text-muted capitalize">
-                {scan.tier} &middot; {scan.status}
+                {scan.status}
               </span>
             </div>
             <div className="flex items-center gap-4">

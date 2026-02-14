@@ -69,7 +69,6 @@ function getExecutor(moduleId: ModuleId): ModuleExecuteFn {
  * Phase configuration mapping tiers to which phases they run.
  */
 const TIER_PHASES: Record<ModuleTier, ScanStatus[]> = {
-  peek: ['passive'],
   full: ['passive', 'browser', 'ghostscan', 'external', 'synthesis'],
   paid: ['passive', 'browser', 'ghostscan', 'external', 'synthesis'],
 };
@@ -953,7 +952,6 @@ export class ModuleRunner {
    * Non-blocking — returns null on any failure.
    */
   private async fetchCruxData(): Promise<void> {
-    if (this.tier === 'peek') return;
     try {
       const { fetchCruxData } = await import('../services/crux.js');
       this.context.cruxData = await fetchCruxData(this.context.url, 'mobile', CRUX_TIMEOUT);
@@ -967,8 +965,6 @@ export class ModuleRunner {
    * Uses a separate BrowserContext with mobile UA, viewport, and touch support.
    */
   private async runMobilePass(): Promise<void> {
-    if (this.tier === 'peek') return;
-
     let mobilePage: import('patchright').Page | null = null;
     let mobileContext: import('patchright').BrowserContext | null = null;
 

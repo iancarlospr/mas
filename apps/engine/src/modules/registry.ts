@@ -4,19 +4,19 @@ import type { ModuleDefinition, ModuleId } from '@marketing-alpha/types';
  * Complete MODULE_REGISTRY containing all 45 module definitions.
  *
  * Organized by phase:
- *   Phase 1 - Passive (peek tier): M01, M02, M04, M16, M17, M18, M19
+ *   Phase 1 - Passive (full tier): M01, M02, M04, M16, M17, M18, M19
  *   Phase 2 - Browser (full tier): M03, M05, M06, M06b, M07, M08, M13, M14, M15, M20
  *   Phase 3 - GhostScan (full tier): M09, M10, M11, M12
  *   Phase 4 - External (full tier): M21, M22, M23, M24-M39
  *   Phase 5 - Synthesis: M41 (full), M42-M46 (paid)
  */
 export const MODULE_REGISTRY: ModuleDefinition[] = [
-  // ─── Phase 1: Passive (peek tier) ──────────────────────────────────────────
+  // ─── Phase 1: Passive (full tier) ──────────────────────────────────────────
   {
     id: 'M01',
     name: 'DNS & Security Baseline',
     phase: 'passive',
-    minimumTier: 'peek',
+    minimumTier: 'full',
     timeout: 15_000,
     retries: 4,
     category: 'compliance_security',
@@ -25,7 +25,7 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     id: 'M02',
     name: 'CMS & Infrastructure',
     phase: 'passive',
-    minimumTier: 'peek',
+    minimumTier: 'full',
     timeout: 15_000,
     retries: 4,
     category: 'digital_presence',
@@ -34,7 +34,7 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     id: 'M04',
     name: 'Page Metadata',
     phase: 'passive',
-    minimumTier: 'peek',
+    minimumTier: 'full',
     timeout: 15_000,
     retries: 4,
     category: 'seo_content',
@@ -43,7 +43,7 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     id: 'M16',
     name: 'PR & Media',
     phase: 'passive',
-    minimumTier: 'peek',
+    minimumTier: 'full',
     timeout: 15_000,
     retries: 4,
     category: 'seo_content',
@@ -52,7 +52,7 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     id: 'M17',
     name: 'Careers & HR',
     phase: 'passive',
-    minimumTier: 'peek',
+    minimumTier: 'full',
     timeout: 15_000,
     retries: 4,
     category: 'digital_presence',
@@ -61,7 +61,7 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     id: 'M18',
     name: 'Investor Relations',
     phase: 'passive',
-    minimumTier: 'peek',
+    minimumTier: 'full',
     timeout: 15_000,
     retries: 4,
     category: 'digital_presence',
@@ -70,7 +70,7 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     id: 'M19',
     name: 'Support & Success',
     phase: 'passive',
-    minimumTier: 'peek',
+    minimumTier: 'full',
     timeout: 15_000,
     retries: 4,
     category: 'digital_presence',
@@ -475,12 +475,12 @@ export function getModulesByPhase(
 
 /**
  * Get all modules available for a given tier.
- * Tier hierarchy: peek < full < paid.
+ * Tier hierarchy: full < paid.
  */
 export function getModulesForTier(
   tier: ModuleDefinition['minimumTier'],
 ): ModuleDefinition[] {
-  const tierOrder = { peek: 0, full: 1, paid: 2 };
+  const tierOrder = { full: 0, paid: 1 };
   const maxTier = tierOrder[tier];
   return MODULE_REGISTRY.filter((m) => tierOrder[m.minimumTier] <= maxTier);
 }
@@ -492,7 +492,7 @@ export function getModulesForPhaseAndTier(
   phase: ModuleDefinition['phase'],
   tier: ModuleDefinition['minimumTier'],
 ): ModuleDefinition[] {
-  const tierOrder = { peek: 0, full: 1, paid: 2 };
+  const tierOrder = { full: 0, paid: 1 };
   const maxTier = tierOrder[tier];
   return MODULE_REGISTRY.filter(
     (m) => m.phase === phase && tierOrder[m.minimumTier] <= maxTier,

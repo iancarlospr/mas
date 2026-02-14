@@ -26,9 +26,10 @@ declare global {
 interface ScanInputProps {
   size?: 'default' | 'large';
   className?: string;
+  onCapture?: (url: string, turnstileToken: string) => void | Promise<void>;
 }
 
-export function ScanInput({ size = 'default', className }: ScanInputProps) {
+export function ScanInput({ size = 'default', className, onCapture }: ScanInputProps) {
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -86,14 +87,21 @@ export function ScanInput({ size = 'default', className }: ScanInputProps) {
       }
 
       setLoading(true);
+      const token = turnstileTokenRef.current ?? '';
 
       try {
+        if (onCapture) {
+          // Delegate to parent (e.g., HeroScanFlow handles auth check)
+          await onCapture(normalized, token);
+          return;
+        }
+
         const res = await fetch('/api/scans', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             url: normalized,
-            turnstileToken: turnstileTokenRef.current ?? '',
+            turnstileToken: token,
           }),
         });
 
@@ -110,7 +118,7 @@ export function ScanInput({ size = 'default', className }: ScanInputProps) {
         }
 
         const { scanId } = await res.json();
-        analytics.scanStarted(new URL(normalized).hostname, 'unknown');
+        analytics.scanStarted(new URL(normalized).hostname, 'full');
         router.push(`/scan/${scanId}`);
       } catch {
         setError('Network error. Please try again.');
@@ -121,7 +129,7 @@ export function ScanInput({ size = 'default', className }: ScanInputProps) {
         }
       }
     },
-    [url, router],
+    [url, router, onCapture],
   );
 
   const isLarge = size === 'large';
