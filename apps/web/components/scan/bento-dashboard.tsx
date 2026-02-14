@@ -1,85 +1,87 @@
 'use client';
 
-import type { ScanWithResults } from '@marketing-alpha/types';
-import { motion } from 'framer-motion';
-import { ScoreGauge } from './score-gauge';
-import { CategoryBar } from './category-bar';
-import { TechStack } from './tech-stack';
-import { ModuleCard } from './module-card';
-import { BentoCard } from '@/components/charts/bento-card';
-import { containerVariants, cardVariants } from '@/components/charts/animation-utils';
+import { useRef } from 'react';
+import type { ScanWithResults, ModuleResult } from '@marketing-alpha/types';
 import Link from 'next/link';
+import { SlideSidebar, CATEGORY_META, MODULE_NAMES, useSlideScrollSync } from './slide-sidebar';
+import { OverviewSlide } from './overview-slide';
+import { ModuleSlide } from './module-slide';
+import { PaidSlides } from './paid-slides';
 
-const MODULE_NAMES: Record<string, string> = {
-  M01: 'DNS & Security', M02: 'CMS & Infrastructure', M03: 'Performance',
-  M04: 'Page Metadata', M05: 'Analytics', M06: 'Paid Media',
-  M06b: 'PPC Landing Audit', M07: 'MarTech', M08: 'Tag Governance',
-  M09: 'Behavioral Intel', M10: 'Accessibility', M11: 'Console Errors',
-  M12: 'Compliance', M13: 'Perf & Carbon', M14: 'Mobile & Responsive',
-  M15: 'Social & Sharing', M16: 'PR & Media', M17: 'Careers & HR',
-  M18: 'Investor Relations', M19: 'Support', M20: 'Ecommerce/SaaS',
-  M21: 'Ad Library', M22: 'News Sentiment', M23: 'Social Sentiment',
-  M24: 'Monthly Visits', M25: 'Traffic by Country', M26: 'Rankings',
-  M27: 'Paid Traffic Cost', M28: 'Top Paid Keywords', M29: 'Competitors',
-  M30: 'Traffic Sources', M31: 'Domain Trust', M32: 'Mobile vs Desktop',
-  M33: 'Brand Search', M34: 'Losing Keywords', M35: 'Bounce Rate',
-  M36: 'Google Shopping', M37: 'Review Velocity', M38: 'Local Pack',
-  M39: 'Business Profile', M41: 'Module Synthesis', M42: 'Final Synthesis',
-  M43: 'PRD', M44: 'ROI Simulator', M45: 'Cost Cutter', M46: 'Knowledge Base',
-};
+const PAID_MODULES = new Set(['M42', 'M43', 'M44', 'M45', 'M46']);
+
+/** Internal-only modules that should not get a slide card */
+const HIDDEN_MODULES = new Set(['M41', 'M46']);
 
 interface BentoDashboardProps {
   scan: ScanWithResults;
 }
 
 export function BentoDashboard({ scan }: BentoDashboardProps) {
-  const categories = scan.marketingIqResult?.categories ?? [];
-  const allSignals = scan.moduleResults.flatMap((r) => r.signals);
-
-  const techTools = allSignals
-    .filter((s) => s.confidence >= 0.6)
-    .reduce<Record<string, string[]>>((acc, signal) => {
-      const cat = signal.category || 'other';
-      if (!acc[cat]) acc[cat] = [];
-      if (!acc[cat].includes(signal.name)) acc[cat].push(signal.name);
-      return acc;
-    }, {});
-
-  const sortedResults = [...scan.moduleResults].sort((a, b) =>
-    a.moduleId.localeCompare(b.moduleId, undefined, { numeric: true }),
+  const resultMap = new Map<string, ModuleResult>(
+    scan.moduleResults.map((r) => [r.moduleId, r]),
   );
+  const isPaid = scan.tier === 'paid';
+  const contentRef = useRef<HTMLDivElement>(null);
+  const { activeSlideId, scrollToSlide } = useSlideScrollSync(contentRef);
+
+  // Gather all visible module IDs in category order (skip overview + paid sections)
+  const moduleSlideIds: string[] = [];
+  for (const cat of CATEGORY_META) {
+    if (cat.paidOnly) continue; // handled by PaidSlides
+    for (const mId of cat.modules) {
+      if (mId === 'overview') continue;
+      if (HIDDEN_MODULES.has(mId)) continue;
+      const r = resultMap.get(mId);
+      if (r && r.status !== 'skipped') {
+        moduleSlideIds.push(mId);
+      }
+    }
+  }
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="font-heading text-h2 text-primary">{scan.domain}</h1>
-          <p className="text-sm text-muted mt-1">
-            Scanned {new Date(scan.createdAt).toLocaleDateString()}
-          </p>
-        </div>
-        <div className="flex items-center gap-4">
-          <div className="flex flex-col gap-2">
-            {scan.tier !== 'paid' && (
+    <div className="scan-dashboard flex min-h-screen -mx-4 sm:-mx-6 lg:-mx-8">
+      {/* Sidebar */}
+      <SlideSidebar
+        resultMap={resultMap}
+        isPaid={isPaid}
+        activeSlideId={activeSlideId}
+        onNavigate={scrollToSlide}
+      />
+
+      {/* Main content area */}
+      <div className="flex-1 min-w-0 lg:pl-0">
+        {/* Top bar */}
+        <div className="scan-topbar sticky top-0 z-20 bg-white/90 backdrop-blur-sm border-b border-border/40 px-6 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="font-heading text-sm font-700 text-primary">{scan.domain}</span>
+            <span className="text-xs text-muted">
+              Scanned {new Date(scan.createdAt).toLocaleDateString()}
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            {!isPaid && (
               <Link
                 href={`/report/${scan.id}`}
-                className="inline-flex items-center justify-center rounded-lg bg-highlight text-highlight-foreground px-4 py-2 text-sm font-heading font-700 hover:bg-highlight/90 transition-colors"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-highlight text-highlight-foreground px-4 py-2 text-xs font-heading font-700 hover:bg-highlight/90 transition-colors"
               >
-                Unlock Report — $9.99
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                </svg>
+                Unlock $9.99
               </Link>
             )}
-            {scan.tier === 'paid' && (
+            {isPaid && (
               <>
                 <Link
                   href={`/report/${scan.id}`}
-                  className="inline-flex items-center justify-center rounded-lg bg-accent text-accent-foreground px-4 py-2 text-sm font-heading font-700 hover:bg-accent/90 transition-colors"
+                  className="inline-flex items-center rounded-lg bg-accent text-accent-foreground px-3 py-1.5 text-xs font-heading font-700 hover:bg-accent/90 transition-colors"
                 >
                   View Report
                 </Link>
                 <Link
                   href={`/chat/${scan.id}`}
-                  className="inline-flex items-center justify-center rounded-lg border border-border px-4 py-2 text-sm font-heading font-700 hover:bg-background transition-colors"
+                  className="inline-flex items-center rounded-lg border border-border px-3 py-1.5 text-xs font-heading font-700 hover:bg-background transition-colors"
                 >
                   AI Chat
                 </Link>
@@ -87,88 +89,32 @@ export function BentoDashboard({ scan }: BentoDashboardProps) {
             )}
           </div>
         </div>
-      </div>
 
-      {/* Bento Grid */}
-      <motion.div
-        className="bento-grid"
-        variants={containerVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: '-40px' }}
-      >
-        {/* MarketingIQ Score — 2x2 hero */}
-        {scan.marketingIq != null && (
-          <motion.div variants={cardVariants} className="bento-card-2x2">
-            <BentoCard title="MarketingIQ Score" size="2x2">
-              <div className="flex items-center justify-center h-full">
-                <ScoreGauge score={scan.marketingIq} size="xl" />
-              </div>
-            </BentoCard>
-          </motion.div>
-        )}
+        {/* Scrollable slide area */}
+        <div ref={contentRef} className="p-6 space-y-6 max-w-5xl mx-auto">
+          {/* Overview slide (always first, always free) */}
+          <OverviewSlide scan={scan} />
 
-        {/* Category Scores — 2x1 wide */}
-        {categories.length > 0 && (
-          <motion.div variants={cardVariants} className="bento-card-2x1">
-            <BentoCard title="Category Scores" size="2x1">
-              <CategoryBar categories={categories} compact />
-            </BentoCard>
-          </motion.div>
-        )}
-
-        {/* Tech Stack — 2x2 */}
-        {Object.keys(techTools).length > 0 && (
-          <motion.div variants={cardVariants} className="bento-card-2x2">
-            <BentoCard title="Detected Technology Stack" size="2x2">
-              <div className="overflow-auto max-h-[340px]">
-                <TechStack tools={techTools} />
-              </div>
-            </BentoCard>
-          </motion.div>
-        )}
-
-        {/* Module cards as 1x1 bento items */}
-        {sortedResults
-          .filter((r) => r.status !== 'skipped' && !r.moduleId.startsWith('M4'))
-          .map((result) => (
-            <motion.div key={result.moduleId} variants={cardVariants} className="bento-card-1x1">
-              <ModuleCard
-                moduleId={result.moduleId}
-                moduleName={MODULE_NAMES[result.moduleId] ?? result.moduleId}
-                result={result}
-                scanId={scan.id}
-              />
-            </motion.div>
+          {/* Module slides */}
+          {moduleSlideIds.map((mId) => (
+            <ModuleSlide
+              key={mId}
+              moduleId={mId}
+              moduleName={MODULE_NAMES[mId] ?? mId}
+              result={resultMap.get(mId) ?? null}
+              scanId={scan.id}
+              isPaid={!isPaid && PAID_MODULES.has(mId)}
+            />
           ))}
-      </motion.div>
 
-      {/* Bento Grid CSS */}
-      <style>{`
-        .bento-grid {
-          display: grid;
-          gap: 16px;
-          max-width: 1400px;
-          margin: 0 auto;
-          grid-template-columns: repeat(4, 1fr);
-          grid-auto-rows: minmax(200px, auto);
-        }
-        @media (max-width: 1024px) {
-          .bento-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
-        }
-        @media (max-width: 640px) {
-          .bento-grid { grid-template-columns: 1fr; gap: 12px; }
-        }
-        .bento-card-1x1 { grid-column: span 1; grid-row: span 1; min-height: 200px; }
-        .bento-card-2x1 { grid-column: span 2; grid-row: span 1; min-height: 200px; }
-        .bento-card-1x2 { grid-column: span 1; grid-row: span 2; min-height: 416px; }
-        .bento-card-2x2 { grid-column: span 2; grid-row: span 2; min-height: 416px; }
-        @media (max-width: 640px) {
-          .bento-card-2x1, .bento-card-1x2, .bento-card-2x2 {
-            grid-column: span 1; grid-row: span 1; min-height: 200px;
-          }
-        }
-      `}</style>
+          {/* Paid synthesis slides */}
+          <PaidSlides
+            scanId={scan.id}
+            isPaid={isPaid}
+            resultMap={resultMap}
+          />
+        </div>
+      </div>
     </div>
   );
 }

@@ -49,14 +49,14 @@
 }
 
 /* ════════════════════════════════════════════════════════════
-   Print stylesheet — Legal size paper (8.5" × 14")
-   PRD-cont-4 Section 8 + PRD-cont-1 Section 6.1
+   Print stylesheet — Landscape 16:9 slide cards
+   Each .slide-card maps to one landscape page
    ════════════════════════════════════════════════════════════ */
 @media print {
-  /* Legal-size paper: 8.5" × 14" */
+  /* Landscape paper */
   @page {
-    size: 8.5in 14in;
-    margin: 20mm 15mm 25mm 15mm;
+    size: landscape;
+    margin: 10mm;
   }
 
   /* Ensure colors print */
@@ -67,7 +67,10 @@
     text-shadow: none !important;
   }
 
-  /* Hide interactive / web-only elements */
+  /* Hide sidebar, top bar, and interactive elements */
+  .scan-sidebar,
+  .scan-sidebar-toggle,
+  .scan-topbar,
   .report-sidebar,
   .report-topbar,
   .share-button,
@@ -77,6 +80,7 @@
   .collapse-button,
   [data-interactive],
   .hover-overlay,
+  .unlock-overlay,
   .recharts-tooltip-wrapper,
   .chart-expand-button,
   .chart-filter-controls,
@@ -93,7 +97,28 @@
     display: block !important;
   }
 
-  /* Page breaks */
+  /* Dashboard layout: remove flex, full-width */
+  .scan-dashboard {
+    display: block !important;
+    margin: 0 !important;
+  }
+
+  /* Slide cards: one per page, no shadow */
+  .slide-card {
+    break-before: page;
+    break-inside: avoid;
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    page-break-after: always;
+  }
+  .slide-card:first-child {
+    break-before: auto;
+  }
+
+  /* Other page break rules */
   .report-section {
     break-before: always;
   }
