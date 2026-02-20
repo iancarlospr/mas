@@ -9,7 +9,7 @@ export type ModuleId =
   | 'M36' | 'M37' | 'M38' | 'M39' | 'M40'
   | 'M41' | 'M42' | 'M43' | 'M44' | 'M45' | 'M46';
 
-export type ModulePhase = 'passive' | 'browser' | 'ghostscan' | 'external' | 'synthesis';
+export type ModulePhase = 'passive' | 'browser' | 'ghostscan' | 'external' | 'paid-media' | 'synthesis';
 
 export type ModuleTier = 'full' | 'paid';
 

@@ -189,6 +189,56 @@ export interface M06Data {
   totalNetworkFires: number;
 }
 
+// ── M06b: PPC Landing Page Audit ────────────────────────────────────────
+
+export interface M06bPageAudit {
+  hasGA4: boolean;
+  hasGTM: boolean;
+  hasMetaPixel: boolean;
+  hasGoogleAds: boolean;
+  hasTikTok: boolean;
+  hasLinkedIn: boolean;
+  hasTwitter: boolean;
+  hasUET: boolean;
+  hasConsent: boolean;
+  trackingScripts: string[];
+  hasNoindex: boolean;
+  hasCanonical: boolean;
+  formCount: number;
+  ctaAboveFold: boolean;
+  ctaText: string | null;
+  h1Text: string | null;
+  navLinkCount: number;
+  externalLinkCount: number;
+}
+
+export interface M06bData {
+  paidPageUrl: string;
+  isRealPaidPage: boolean;
+  pageAudit: M06bPageAudit;
+  homepageBaseline: {
+    toolNames: string[];
+    pixelNames: string[];
+    hasGA4: boolean;
+    hasGTM: boolean;
+    consentPlatform: string | null;
+  };
+  trackingParity: {
+    mainTrackingSet: string[];
+    paidPageTrackingSet: string[];
+    missing: string[];
+    extra: string[];
+    parityRatio: number;
+  };
+  loadTimeMs: number;
+  ctaAnalysis?: {
+    totalCTAs: number;
+    ctaAboveFold: number;
+    ctas: unknown[];
+  };
+  trustSignals?: unknown[];
+}
+
 // ── M07: MarTech Orchestration ──────────────────────────────────────────
 
 export interface M07Data {
@@ -358,6 +408,7 @@ export interface ModuleDataMap {
   M04: M04Data;
   M05: M05Data;
   M06: M06Data;
+  M06b: M06bData;
   M07: M07Data;
   M08: M08Data;
   M12: M12Data;

@@ -69,19 +69,20 @@ function getExecutor(moduleId: ModuleId): ModuleExecuteFn {
  * Phase configuration mapping tiers to which phases they run.
  */
 const TIER_PHASES: Record<ModuleTier, ScanStatus[]> = {
-  full: ['passive', 'browser', 'ghostscan', 'external', 'synthesis'],
-  paid: ['passive', 'browser', 'ghostscan', 'external', 'synthesis'],
+  full: ['passive', 'browser', 'ghostscan', 'external', 'paid-media', 'synthesis'],
+  paid: ['passive', 'browser', 'ghostscan', 'external', 'paid-media', 'synthesis'],
 };
 
 /**
  * ModuleRunner orchestrates the execution of all scan modules across phases.
  *
  * Phase execution order:
- *   1. Passive  - HTTP fetch + DNS, run modules in parallel
- *   2. Browser  - Playwright page, NetworkCollector, run modules sequentially
- *   3. GhostScan - Continue on same page, run modules sequentially
- *   4. External - Third-party API calls, run modules in parallel
- *   5. Synthesis - M41 parallel, then M42-M46 sequential
+ *   1. Passive    - HTTP fetch + DNS, run modules in parallel
+ *   2. Browser    - Playwright page, NetworkCollector, run modules sequentially
+ *   3. GhostScan  - Continue on same page, run modules sequentially
+ *   4. External   - Third-party API calls, run modules in parallel
+ *   4.5 Paid Media - M06/M06b on dedicated browser page targeting M21 CTA URL
+ *   5. Synthesis  - M41 parallel, then M42-M46 sequential
  *
  * Each module is:
  *   - Wrapped in a timeout via Promise.race
@@ -187,6 +188,9 @@ export class ModuleRunner {
             break;
           case 'external':
             await this.runExternalPhase();
+            break;
+          case 'paid-media':
+            await this.runPaidMediaPhase();
             break;
           case 'synthesis':
             await this.runSynthesisPhase();
@@ -742,6 +746,122 @@ export class ModuleRunner {
     );
 
     await Promise.allSettled(promises);
+  }
+
+  /**
+   * Phase 4.5: Paid Media modules (M06, M06b) run on a dedicated browser page
+   * targeting the real paid landing page URL extracted from M21 Facebook ad CTA URLs.
+   * This gives M06/M06b a clean network signal and real paid-page data.
+   */
+  private async runPaidMediaPhase(): Promise<void> {
+    const modules = getModulesForPhaseAndTier('paid-media', this.tier);
+    if (modules.length === 0) return;
+
+    logger.info({ moduleCount: modules.length }, 'Running paid-media phase');
+
+    // Extract best paid URL from M21 results (Facebook ad CTA URLs)
+    let paidUrl = this.context.url; // fallback to homepage
+    try {
+      const m21Result = this.context.previousResults.get('M21' as ModuleId);
+      if (m21Result?.data) {
+        const m21Data = m21Result.data as Record<string, unknown>;
+        const fb = m21Data['facebook'] as { ads?: Array<{ ctaUrl: string | null }> } | undefined;
+        if (fb?.ads) {
+          const ctaUrl = fb.ads.find(
+            a => a.ctaUrl &&
+              !a.ctaUrl.includes('facebook.com') &&
+              !a.ctaUrl.includes('meta.com') &&
+              !a.ctaUrl.includes('instagram.com'),
+          )?.ctaUrl;
+          if (ctaUrl) paidUrl = ctaUrl;
+        }
+      }
+    } catch {
+      // Fall back to ctx.url
+    }
+
+    logger.info(
+      { scanId: this.context.scanId, paidUrl, isCtaUrl: paidUrl !== this.context.url },
+      'Paid media target URL resolved',
+    );
+
+    // Store paid URL in context so M06/M06b know which URL they're scanning
+    this.context.paidMediaUrl = paidUrl;
+
+    // Save reference to old page so we can restore after
+    const previousPage = this.context.page;
+    const previousNetworkCollector = this.context.networkCollector;
+    const previousConsoleCollector = this.context.consoleCollector;
+
+    // Create a fresh browser page for the paid media phase
+    let page: Page | null = null;
+    try {
+      page = await this.browserPool.createPage(paidUrl);
+      const domain = getRegistrableDomain(paidUrl);
+      const networkCollector = new NetworkCollector(domain);
+      networkCollector.attach(page);
+      const consoleCollector = new ConsoleCollector();
+      consoleCollector.attach(page);
+
+      // Navigate with Google referrer
+      const referer = `https://www.google.com/search?q=${encodeURIComponent(
+        new URL(paidUrl).hostname.replace(/^www\./, ''),
+      )}`;
+
+      try {
+        await page.goto(paidUrl, {
+          waitUntil: 'networkidle',
+          timeout: 30_000,
+          referer,
+        });
+      } catch (error) {
+        logger.warn(
+          { error: (error as Error).message },
+          'Paid media page navigation did not reach networkidle, continuing',
+        );
+        try {
+          await page.waitForLoadState('domcontentloaded', { timeout: 10_000 });
+        } catch {
+          // Best effort
+        }
+      }
+
+      // Detect and resolve bot walls
+      const botWall = await detectAndHandleBotWall(page, paidUrl);
+      if (botWall.blocked) {
+        logger.warn(
+          { provider: botWall.provider, scanId: this.context.scanId },
+          'Paid media page blocked by bot wall',
+        );
+      }
+
+      // Update context with fresh page and collectors
+      this.context.page = page;
+      this.context.networkCollector = networkCollector;
+      this.context.consoleCollector = consoleCollector;
+
+      // Collect data layer snapshots on the paid page
+      await this.collectBrowserSnapshots(page, domain ?? new URL(paidUrl).hostname);
+
+      // Run M06 then M06b sequentially
+      for (const mod of modules) {
+        await this.executeModule(mod);
+      }
+    } catch (error) {
+      logger.error(
+        { scanId: this.context.scanId, error: (error as Error).message },
+        'Paid media phase failed',
+      );
+    } finally {
+      // Close the paid media page
+      if (page) {
+        await page.close().catch(() => {});
+      }
+      // Restore previous context (null out page for synthesis phase)
+      this.context.page = previousPage;
+      this.context.networkCollector = previousNetworkCollector;
+      this.context.consoleCollector = previousConsoleCollector;
+    }
   }
 
   /**

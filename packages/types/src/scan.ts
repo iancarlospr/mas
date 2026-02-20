@@ -6,6 +6,7 @@ export type ScanStatus =
   | 'browser'
   | 'ghostscan'
   | 'external'
+  | 'paid-media'
   | 'synthesis'
   | 'complete'
   | 'failed'

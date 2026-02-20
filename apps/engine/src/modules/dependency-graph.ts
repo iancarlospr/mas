@@ -45,6 +45,13 @@ export const MODULE_DEPENDENCIES: ModuleDependency[] = [
     fields: ['dataLayer', 'tagAudit', 'serverSideIndicators'],
     required: false,
   },
+  // M06 reads M21 Facebook ad CTA URLs (real paid landing page)
+  {
+    consumer: 'M06' as ModuleId,
+    producer: 'M21' as ModuleId,
+    fields: ['facebook.ads[].ctaUrl'],
+    required: false,
+  },
   // M06b reads M05 analytics data
   {
     consumer: 'M06b' as ModuleId,
@@ -57,6 +64,13 @@ export const MODULE_DEPENDENCIES: ModuleDependency[] = [
     consumer: 'M06b' as ModuleId,
     producer: 'M06' as ModuleId,
     fields: ['pixels', 'pixelNames'],
+    required: false,
+  },
+  // M06b reads M21 Facebook ad CTA URLs (real paid landing page)
+  {
+    consumer: 'M06b' as ModuleId,
+    producer: 'M21' as ModuleId,
+    fields: ['facebook.ads[].ctaUrl'],
     required: false,
   },
   // M07 reads M05 analytics data
@@ -92,6 +106,20 @@ export const MODULE_DEPENDENCIES: ModuleDependency[] = [
     consumer: 'M17' as ModuleId,
     producer: 'M04' as ModuleId,
     fields: ['hreflang', 'htmlLang'],
+    required: false,
+  },
+  // M21 reads M15 social data for Facebook page identification
+  {
+    consumer: 'M21' as ModuleId,
+    producer: 'M15' as ModuleId,
+    fields: ['socialData.sameAsLinks'],
+    required: false,
+  },
+  // M21 reads M04 jsonLd for Facebook page identification
+  {
+    consumer: 'M21' as ModuleId,
+    producer: 'M04' as ModuleId,
+    fields: ['jsonLd.socialProfiles'],
     required: false,
   },
   // M41 reads ALL scored modules (M01-M39) - checkpoints, signals, score

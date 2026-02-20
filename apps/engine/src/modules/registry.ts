@@ -5,9 +5,10 @@ import type { ModuleDefinition, ModuleId } from '@marketing-alpha/types';
  *
  * Organized by phase:
  *   Phase 1 - Passive (full tier): M01, M02, M04, M16, M17, M18, M19
- *   Phase 2 - Browser (full tier): M03, M05, M06, M06b, M07, M08, M13, M14, M15, M20
+ *   Phase 2 - Browser (full tier): M03, M05, M07, M08, M13, M14, M15, M20
  *   Phase 3 - GhostScan (full tier): M09, M10, M11, M12
  *   Phase 4 - External (full tier): M21, M22, M23, M24-M39
+ *   Phase 4.5 - Paid Media (full tier): M06, M06b (runs on M21 CTA URL)
  *   Phase 5 - Synthesis: M41 (full), M42-M46 (paid)
  */
 export const MODULE_REGISTRY: ModuleDefinition[] = [
@@ -98,7 +99,7 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
   {
     id: 'M06',
     name: 'Paid Media Infrastructure',
-    phase: 'browser',
+    phase: 'paid-media',
     minimumTier: 'full',
     timeout: 30_000,
     retries: 3,
@@ -107,9 +108,9 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
   {
     id: 'M06b',
     name: 'PPC Landing Page Analysis',
-    phase: 'browser',
+    phase: 'paid-media',
     minimumTier: 'full',
-    timeout: 45_000,
+    timeout: 15_000,
     retries: 3,
     category: 'paid_media_attribution',
   },
@@ -212,8 +213,8 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     name: 'Ad Library Recon',
     phase: 'external',
     minimumTier: 'full',
-    timeout: 60_000,
-    retries: 5,
+    timeout: 180_000,
+    retries: 2,
     category: 'paid_media_attribution',
   },
   {

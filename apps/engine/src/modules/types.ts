@@ -160,6 +160,9 @@ export interface ModuleContext {
   /** True when initial fetch returned a SPA shell (empty body, mount div only). */
   spaDetected?: boolean;
 
+  /** The paid media landing page URL (from M21 CTA), set during paid-media phase. */
+  paidMediaUrl?: string;
+
   /** Optional proxy configuration for this scan. */
   proxy?: { server: string };
 }
