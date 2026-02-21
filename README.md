@@ -55,7 +55,7 @@ The marketing ops audit is the most valuable, most underdelivered service in dig
 
 ## What It Actually Does
 
-You enter a URL. Ninety seconds later, you have a forensic audit across **46 analysis modules** spanning 8 scoring categories — the same ground truth a principal marketing technologist would uncover over weeks of manual work.
+You enter a URL. Ninety seconds later, you have a forensic audit across **45 analysis modules** spanning 8 scoring categories — the same ground truth a principal marketing technologist would uncover over weeks of manual work.
 
 This isn't a Lighthouse score with a bow on it. This is:
 
@@ -73,16 +73,16 @@ This isn't a Lighthouse score with a bow on it. This is:
 
 ## The 90-Second Scan
 
-Under the hood, a scan isn't a single HTTP request. It's an orchestrated pipeline of **5 sequential phases** executing 46 specialized modules:
+Under the hood, a scan isn't a single HTTP request. It's an orchestrated pipeline of **5 sequential phases** executing 45 specialized modules:
 
 ```
-Phase 1: PASSIVE          7 modules    ~5s     HTTP headers, DNS, HTML parsing
+Phase 1: PASSIVE          8 modules    ~5s     HTTP headers, DNS, HTML parsing, sitemap
 Phase 2: BROWSER         10 modules   ~25s     Real browser session, DOM forensics
 Phase 3: GHOSTSCAN        4 modules   ~15s     Deep interaction, accessibility, compliance
-Phase 4: EXTERNAL         20 modules  ~20s     Market intelligence enrichment
-Phase 5: SYNTHESIS         5 modules  ~25s     AI analysis, scoring, roadmap generation
-                          ----------  -----
-                          46 modules   ~90s
+Phase 4: EXTERNAL         17 modules  ~20s     Market intelligence enrichment
+Phase 5: SYNTHESIS         6 modules  ~25s     AI analysis, scoring, roadmap generation
+                          ----------  ------
+                          45 modules    ~90s
 ```
 
 Every module failure is isolated. Nothing cascades. A timeout on one module doesn't kill the next. A rate limit from an external API doesn't stall the browser phase. The scan always completes with whatever intelligence it could gather.
@@ -98,8 +98,8 @@ Every module produces typed data, scored checkpoints, and confidence-weighted si
 | **Performance and UX** | 15% | M03, M13, M14 | Core Web Vitals, carbon footprint, mobile parity |
 | **Compliance and Security** | 15% | M01, M10, M11, M12 | DMARC/SPF/DKIM, WCAG 2.1, consent, legal pages |
 | **MarTech Efficiency** | 12% | M07, M20 | Tool redundancy, form analytics, SaaS signals |
-| **SEO and Content** | 10% | M04, M15, M16, M34, M35, M40 | Metadata, social sharing, PR coverage, keyword gaps |
-| **Market Position** | 6% | M24-M33, M36-M39 | Traffic, competitors, domain authority, local SEO |
+| **SEO and Content** | 10% | M04, M15, M16, M34, M39 | Metadata, social sharing, PR coverage, sitemap, keyword gaps |
+| **Market Position** | 6% | M24-M31, M33-M34, M36-M38 | Traffic, competitors, brand search, local SEO |
 | **Digital Presence** | 4% | M02, M17-M19, M22, M23 | CMS detection, careers, IR, support, sentiment |
 
 ### The Full Module Inventory
@@ -116,6 +116,7 @@ Every module produces typed data, scored checkpoints, and confidence-weighted si
 | M17 | Careers and HR | Job listings, employer branding signals |
 | M18 | Investor Relations | SEC filings, IR page detection, earnings signals |
 | M19 | Support | Help desk, knowledge base, chatbot detection |
+| M39 | Sitemap and Indexing | Robots.txt, sitemap XML validation, URL categorization (blog/product/landing), content freshness, llms.txt detection |
 
 </details>
 
@@ -168,23 +169,20 @@ Every module produces typed data, scored checkpoints, and confidence-weighted si
 | M21 | Ad Library | Active ad creatives across Meta, Google, LinkedIn |
 | M22 | News Sentiment | Recent news coverage sentiment analysis |
 | M23 | Social Sentiment | Social media brand sentiment |
-| M24 | Monthly Visits | Estimated monthly traffic volume |
-| M25 | Traffic by Country | Geographic traffic distribution |
-| M26 | Rankings | Top organic keyword positions |
+| M24 | Monthly Visits | Estimated monthly traffic volume (organic + paid ETV) |
+| M25 | Traffic by Country | Geographic traffic distribution — ETV per country from domain_rank_overview (one call, all countries) |
+| M26 | Rankings | Top 15 organic keywords sorted by ETV with position, volume, CPC |
 | M27 | Paid Traffic Cost | Estimated paid search spend |
-| M28 | Top Paid Keywords | Highest-spend paid keywords |
-| M29 | Competitors | Top organic and paid competitors |
-| M30 | Traffic Sources | Channel breakdown (organic, paid, referral, social, direct) |
-| M31 | Domain Trust | Domain authority, backlink profile, anchor diversity |
-| M32 | Mobile vs Desktop | Traffic device split |
-| M33 | Brand Search | Branded keyword volume and trends |
-| M34 | Losing Keywords | Declining organic positions |
-| M35 | Bounce Rate | Engagement quality metrics |
-| M36 | Google Shopping | Product listing ads and merchant center signals |
-| M37 | Review Velocity | Review generation rate across platforms |
-| M38 | Local Pack | Google Maps/local search presence |
-| M39 | Business Profile | Google Business Profile completeness |
-| M40 | Sitemap and Indexing | Sitemap health, indexation coverage |
+| M28 | Top Paid Keywords | Highest-spend paid keywords with CPC, volume, estimated traffic |
+| M29 | Competitors | Business competitors via paid keyword SERP overlap — uses M28 cached data, serp_competitors endpoint, noise-filtered |
+| M30 | Traffic Sources | Top referring domains by backlink count with platform classification (requires backlinks subscription) |
+| M31 | Domain Trust | Domain authority, backlink profile, anchor text diversity (requires backlinks subscription) |
+| M33 | Brand Search | 12 branded keyword variations (core, reviews, pricing, demo, free, support, vs) with search volume + ratio-to-brand % |
+| M34 | Losing Keywords | Declining organic positions — gaining vs losing keyword ratio, ranking stability |
+| M36 | Google Shopping | Product listings via async Merchant API — title, price, seller, rating, delivery info |
+| M37 | Review Velocity | Google Reviews via business profile CID chain — recent reviews, 1-star reviews, month-over-month velocity trend |
+| M38 | Local Pack | Google Business Profile completeness — 10-field checklist (description, photos, hours, categories, etc.), photo health |
+| M40 | Subdomain & Attack Surface | Certificate Transparency enumeration, DNS resolution, HTTP probing (status, title, server), sensitive subdomain exposure |
 
 </details>
 
@@ -232,7 +230,7 @@ An Asana-style sidebar provides navigation with scroll sync. Print mode (`Cmd+P`
 
 ## The Business Model
 
-**Free tier**: Full 46-module scan. See your MarketingIQ score, checkpoint health levels, and detected tools. Enough to know what's broken.
+**Free tier**: Full 45-module scan. See your MarketingIQ score, checkpoint health levels, and detected tools. Enough to know what's broken.
 
 **Paid tier**: Unlock detailed evidence, actionable recommendations, the AI-generated Executive Brief, ROI Simulator, Remediation Roadmap, Cost Cutter analysis, AI Chat, and a shareable PDF report.
 
@@ -265,7 +263,7 @@ See `CLAUDE.md` for detailed architecture, environment setup, and deployment pro
 
 **1. Real browser, real fingerprints.** Most "website analyzers" make an HTTP request and parse the HTML. We launch an actual browser with a forensically-consistent identity and navigate the site the way a real user would. We wait for SPAs to hydrate. We detect and handle bot protection. This is what it takes to see the *real* state of a website, not the sanitized version served to crawlers.
 
-**2. 46 modules, not 46 checks.** Each module is a self-contained analysis engine with its own retry logic, timeout, scoring formula, and typed data contract. M05 (Analytics) alone examines measurement IDs, data layer events, consent mode configuration, cross-domain tracking, debug mode, and 8 categories of network requests. Most "audit tools" would call that 8 separate features. We call it one module.
+**2. 45 modules, not 45 checks.** Each module is a self-contained analysis engine with its own retry logic, timeout, scoring formula, and typed data contract. M05 (Analytics) alone examines measurement IDs, data layer events, consent mode configuration, cross-domain tracking, debug mode, and 8 categories of network requests. Most "audit tools" would call that 8 separate features. We call it one module.
 
 **3. AI synthesis that actually synthesizes.** The AI integration doesn't summarize — it *reasons*. It cross-references findings across modules to produce insights that no individual module could generate alone. "Your consent mode is misconfigured AND your top 3 paid keywords are in healthcare AND you're missing a BAA notice" isn't something a checklist produces. It's something a $400/hr consultant notices after reading three different reports.
 

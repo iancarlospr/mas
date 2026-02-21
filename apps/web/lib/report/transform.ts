@@ -111,9 +111,9 @@ const CATEGORY_MODULES: Record<ScoreCategory, string[]> = {
   performance_ux: ['M03', 'M13', 'M14'],
   compliance_security: ['M01', 'M10', 'M11', 'M12'],
   martech_efficiency: ['M07', 'M20'],
-  seo_content: ['M04', 'M15', 'M16', 'M34', 'M35'],
-  market_position: ['M24', 'M25', 'M26', 'M27', 'M30', 'M31', 'M32', 'M33', 'M36'],
-  digital_presence: ['M02', 'M17', 'M18', 'M19', 'M22', 'M23', 'M37', 'M38', 'M39'],
+  seo_content: ['M04', 'M15', 'M16', 'M34'],
+  market_position: ['M24', 'M25', 'M26', 'M27', 'M30', 'M31', 'M33', 'M36'],
+  digital_presence: ['M02', 'M17', 'M18', 'M19', 'M22', 'M23', 'M37', 'M38'],
 };
 
 const MODULE_NAMES: Record<string, string> = {
@@ -530,8 +530,8 @@ export function transformToReportData(
 
   // Key metrics
   const monthlyVisits = num(resultMap, 'M25', 'monthly_visits') || undefined;
-  const bounceRate = num(resultMap, 'M36', 'bounce_rate') || undefined;
-  const domainRank = num(resultMap, 'M32', 'domain_rank') || undefined;
+  const bounceRate = undefined;
+  const domainRank = num(resultMap, 'M31', 'rank') || undefined;
 
   const techStack = buildTechStackData(resultMap);
   const complianceScore = catEntries.compliance.category.score;

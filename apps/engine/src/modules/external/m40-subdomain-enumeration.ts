@@ -36,6 +36,10 @@ interface SubdomainEntry {
   isAlive: boolean;
   classification: string;
   securitySeverity: 'critical' | 'warning' | 'info';
+  httpStatus?: number | null;
+  pageTitle?: string | null;
+  serverHeader?: string | null;
+  redirectsTo?: string | null;
 }
 
 const CRITICAL_PATTERNS = [
@@ -208,8 +212,51 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
     const aliveCount = subdomainEntries.filter(e => e.isAlive).length;
     const deadCount = subdomainEntries.filter(e => !e.isAlive).length;
 
-    data.subdomains = subdomainEntries;
     logger.debug({ alive: aliveCount, dead: deadCount }, 'DNS resolution complete');
+
+    // Step 2.5: HTTP probe alive subdomains (up to 20, batches of 5)
+    const aliveToProbe = subdomainEntries.filter(e => e.isAlive).slice(0, 20);
+    const HTTP_PROBE_BATCH = 5;
+    const HTTP_PROBE_TIMEOUT = 5_000;
+
+    for (let i = 0; i < aliveToProbe.length; i += HTTP_PROBE_BATCH) {
+      const batch = aliveToProbe.slice(i, i + HTTP_PROBE_BATCH);
+      await Promise.allSettled(batch.map(async (entry) => {
+        try {
+          const controller = new AbortController();
+          const timer = setTimeout(() => controller.abort(), HTTP_PROBE_TIMEOUT);
+          const res = await fetch(`https://${entry.subdomain}`, {
+            method: 'GET',
+            redirect: 'manual',
+            signal: controller.signal,
+            headers: { 'User-Agent': 'Mozilla/5.0 (compatible; MarketingAlphaScan/1.0)' },
+          });
+          clearTimeout(timer);
+
+          entry.httpStatus = res.status;
+          entry.serverHeader = res.headers.get('server') ?? null;
+          entry.redirectsTo = res.headers.get('location') ?? null;
+
+          // Extract page title from body (only for 200 responses, limited read)
+          if (res.status === 200) {
+            try {
+              const body = await res.text();
+              const titleMatch = body.slice(0, 10_000).match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+              entry.pageTitle = titleMatch?.[1]?.trim().slice(0, 100) ?? null;
+            } catch {
+              entry.pageTitle = null;
+            }
+          }
+        } catch {
+          // Probe failed — subdomain may not serve HTTPS
+          entry.httpStatus = null;
+        }
+      }));
+    }
+
+    logger.debug({ probed: aliveToProbe.length }, 'HTTP probing complete');
+
+    data.subdomains = subdomainEntries;
 
     // Step 4: Detect wildcard DNS — two-stage approach:
     //   a) Check if >80% of alive subdomains resolve to the same IP (heuristic)

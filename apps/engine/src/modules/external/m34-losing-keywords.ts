@@ -25,8 +25,8 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
     const result = await getDomainRankedKeywords(domain, 100) as Record<string, unknown> | null;
 
     if (!result) {
-      checkpoints.push(infoCheckpoint('m35-keywords', 'Organic Keywords', 'No keyword data available'));
-      return { moduleId: 'M35' as ModuleId, status: 'success', data, signals, score: null, checkpoints, duration: 0 };
+      checkpoints.push(infoCheckpoint('m34-keywords', 'Organic Keywords', 'No keyword data available'));
+      return { moduleId: 'M34' as ModuleId, status: 'success', data, signals, score: null, checkpoints, duration: 0 };
     }
 
     const totalCount = (result['total_count'] as number) ?? 0;
@@ -85,7 +85,7 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
         evidence = 'No organic keywords ranking — critical SEO gap';
       }
 
-      checkpoints.push(createCheckpoint({ id: 'm35-keywords', name: 'Organic Keyword Health', weight: 0.7, health, evidence }));
+      checkpoints.push(createCheckpoint({ id: 'm34-keywords', name: 'Organic Keyword Health', weight: 0.7, health, evidence }));
     }
 
     // CP2: Ranking stability
@@ -94,20 +94,20 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
       if (total > 0) {
         const gainPct = Math.round((gainingKeywords.length / total) * 100);
         checkpoints.push(createCheckpoint({
-          id: 'm35-stability', name: 'Ranking Stability', weight: 0.5,
+          id: 'm34-stability', name: 'Ranking Stability', weight: 0.5,
           health: gainPct >= 60 ? 'excellent' : gainPct >= 40 ? 'good' : 'warning',
           evidence: `${gainPct}% of changing keywords are gaining rank (${gainingKeywords.length} up, ${losingKeywords.length} down)`,
         }));
       } else {
-        checkpoints.push(infoCheckpoint('m35-stability', 'Ranking Stability', 'No keyword movement data available'));
+        checkpoints.push(infoCheckpoint('m34-stability', 'Ranking Stability', 'No keyword movement data available'));
       }
     }
   } catch (error) {
-    return { moduleId: 'M35' as ModuleId, status: 'error', data, signals, score: null, checkpoints, duration: 0, error: (error as Error).message };
+    return { moduleId: 'M34' as ModuleId, status: 'error', data, signals, score: null, checkpoints, duration: 0, error: (error as Error).message };
   }
 
-  return { moduleId: 'M35' as ModuleId, status: 'success', data, signals, score: null, checkpoints, duration: 0 };
+  return { moduleId: 'M34' as ModuleId, status: 'success', data, signals, score: null, checkpoints, duration: 0 };
 };
 
 export { execute };
-registerModuleExecutor('M35' as ModuleId, execute);
+registerModuleExecutor('M34' as ModuleId, execute);

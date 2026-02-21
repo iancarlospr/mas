@@ -40,10 +40,10 @@ export const MODULE_NAMES: Record<string, string> = {
   M21: 'Ad Library', M22: 'News Sentiment', M23: 'Social Sentiment',
   M24: 'Monthly Visits', M25: 'Traffic by Country', M26: 'Rankings',
   M27: 'Paid Traffic Cost', M28: 'Top Paid Keywords', M29: 'Competitors',
-  M30: 'Traffic Sources', M31: 'Domain Trust', M32: 'Mobile vs Desktop',
-  M33: 'Brand Search', M34: 'Losing Keywords', M35: 'Bounce Rate',
+  M30: 'Traffic Sources', M31: 'Domain Trust',
+  M33: 'Brand Search', M34: 'Losing Keywords',
   M36: 'Google Shopping', M37: 'Review Velocity', M38: 'Local Pack',
-  M39: 'Business Profile', M40: 'Sitemap & Indexing',
+  M39: 'Sitemap & Indexing', M40: 'Subdomain & Attack Surface',
   M42: 'Executive Brief', M43: 'Remediation Roadmap',
   M44: 'ROI Analysis', M45: 'Cost Cutter',
 };

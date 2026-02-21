@@ -261,15 +261,64 @@ export async function getTrafficAnalyticsOverview(
 }
 
 /**
- * Get domain ranked keywords.
+ * Cache for paid keywords to avoid duplicate API calls between M28 and M29.
+ */
+const paidKeywordsCache = new Map<
+  string,
+  { data: unknown; timestamp: number }
+>();
+
+/**
+ * Cache for ranked keywords to avoid duplicate API calls between M26 and M34.
+ */
+const rankedKeywordsCache = new Map<
+  string,
+  { data: unknown; timestamp: number }
+>();
+
+/**
+ * Get domain ranked keywords (shared by M26 and M34).
+ * Cached for the scan duration.
  */
 export async function getDomainRankedKeywords(
   domain: string,
   limit: number = 100,
+  itemTypes: string[] = ['organic'],
+  orderBy: string[] = ['keyword_data.keyword_info.search_volume,desc'],
 ): Promise<unknown> {
+  const cacheKey = `${domain}:${limit}:${itemTypes.join(',')}`;
+  const cached = rankedKeywordsCache.get(cacheKey);
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    logger.debug({ domain }, 'Using cached ranked keywords');
+    return cached.data;
+  }
+
   const response = await dataForSeoPost(
     '/dataforseo_labs/google/ranked_keywords/live',
-    [{ target: domain, limit }],
+    [{ target: domain, limit, location_code: 2840, language_code: 'en', item_types: itemTypes, order_by: orderBy }],
+  );
+
+  const result = response.tasks?.[0]?.result?.[0] ?? null;
+
+  rankedKeywordsCache.set(cacheKey, {
+    data: result,
+    timestamp: Date.now(),
+  });
+
+  return result;
+}
+
+/**
+ * Get domain rank overview across all countries (M25 traffic by country).
+ * Returns organic + paid ETV per location when no location_code is specified.
+ */
+export async function getDomainRankOverview(
+  domain: string,
+  limit: number = 20,
+): Promise<unknown> {
+  const response = await dataForSeoPost(
+    '/dataforseo_labs/google/domain_rank_overview/live',
+    [{ target: domain, language_code: 'en', limit }],
   );
 
   return response.tasks?.[0]?.result?.[0] ?? null;
@@ -284,7 +333,7 @@ export async function getDomainCompetitors(
 ): Promise<unknown> {
   const response = await dataForSeoPost(
     '/dataforseo_labs/google/competitors_domain/live',
-    [{ target: domain, limit }],
+    [{ target: domain, limit, location_code: 2840, language_code: 'en' }],
   );
 
   return response.tasks?.[0]?.result?.[0] ?? null;
@@ -324,19 +373,41 @@ export async function getBacklinkSummary(
 }
 
 /**
- * Get backlink referring domains for a domain (for M32 enrichment).
- * Returns top referring domains sorted by rank.
+ * Cache for referring domains to avoid duplicate API calls between M30 and M32.
+ */
+const referringDomainsCache = new Map<
+  string,
+  { data: unknown; timestamp: number }
+>();
+
+/**
+ * Get backlink referring domains for a domain (shared by M30 and M32).
+ * Returns top referring domains sorted by rank. Cached for the scan duration.
  */
 export async function getBacklinkReferringDomains(
   domain: string,
   limit: number = 30,
 ): Promise<unknown> {
+  const cacheKey = `${domain}:${limit}`;
+  const cached = referringDomainsCache.get(cacheKey);
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    logger.debug({ domain }, 'Using cached referring domains');
+    return cached.data;
+  }
+
   const response = await dataForSeoPost(
     '/backlinks/referring_domains/live',
-    [{ target: domain, limit, order_by: ['rank,asc'] }],
+    [{ target: domain, limit, order_by: ['backlinks,desc'] }],
   );
 
-  return response.tasks?.[0]?.result?.[0] ?? null;
+  const result = response.tasks?.[0]?.result?.[0] ?? null;
+
+  referringDomainsCache.set(cacheKey, {
+    data: result,
+    timestamp: Date.now(),
+  });
+
+  return result;
 }
 
 /**
@@ -356,31 +427,123 @@ export async function getBacklinkAnchors(
 }
 
 /**
- * Get Google Shopping merchants (for M37).
+ * Get Google Shopping products for a domain (M36).
+ * Uses async task_post → poll → task_get flow since Merchant API has no live endpoint.
+ * Returns null if task doesn't complete within timeout.
  */
-export async function getGoogleShoppingMerchants(
+export async function getGoogleShoppingProducts(
   domain: string,
+  maxWaitMs: number = 25_000,
 ): Promise<unknown> {
-  const response = await dataForSeoPost(
-    '/merchant/google/sellers/search/live',
-    [{ target: domain }],
+  // Use brand name as keyword (not domain) — Google Shopping searches by product/brand
+  const brandName = domain.replace(/\.[^.]+$/, '');
+
+  // Step 1: Post the task
+  const postResponse = await dataForSeoPost(
+    '/merchant/google/products/task_post',
+    [{ keyword: brandName, location_code: 2840, language_code: 'en', priority: 1 }],
   );
 
-  return response.tasks?.[0]?.result?.[0] ?? null;
+  const taskId = postResponse.tasks?.[0]?.id;
+  if (!taskId) {
+    logger.warn({ domain }, 'Google Shopping task_post returned no task ID');
+    return null;
+  }
+
+  // Step 2: Poll for completion
+  const pollInterval = 2_000;
+  const maxAttempts = Math.floor(maxWaitMs / pollInterval);
+  let ready = false;
+
+  for (let i = 0; i < maxAttempts; i++) {
+    await new Promise(resolve => setTimeout(resolve, pollInterval));
+
+    try {
+      const readyResponse = await dataForSeoGet<{ id: string }>('/merchant/google/products/tasks_ready');
+      const readyTasks = readyResponse.tasks?.[0]?.result ?? [];
+      if (readyTasks.some((t: { id: string }) => t.id === taskId)) {
+        ready = true;
+        break;
+      }
+    } catch {
+      // tasks_ready can transiently fail — keep polling
+    }
+  }
+
+  if (!ready) {
+    logger.debug({ domain, taskId }, 'Google Shopping task not ready within timeout');
+    return null;
+  }
+
+  // Step 3: Fetch results
+  const getResponse = await dataForSeoGet(
+    `/merchant/google/products/task_get/advanced/${taskId}`,
+  );
+
+  return getResponse.tasks?.[0]?.result?.[0] ?? null;
 }
 
 /**
- * Get Google Business Profile (for M39, M40).
+ * Cache for business profile to avoid duplicate API calls between M37, M38, M39.
+ */
+const businessProfileCache = new Map<
+  string,
+  { data: unknown; timestamp: number }
+>();
+
+/**
+ * Get Google Business Profile (shared by M37, M38, M39).
+ * Returns the business name, place_id, CID, rating, address, etc.
+ * Tries the domain first, then falls back to brand name if no results.
+ * Cached for the scan duration.
  */
 export async function getBusinessProfile(
   domain: string,
 ): Promise<unknown> {
-  const response = await dataForSeoPost(
-    '/business_data/google/my_business_info/live',
-    [{ keyword: domain }],
-  );
+  const cached = businessProfileCache.get(domain);
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    logger.debug({ domain }, 'Using cached business profile');
+    return cached.data;
+  }
 
-  return response.tasks?.[0]?.result?.[0] ?? null;
+  // Try domain first (works for well-known brands like nike.com)
+  let result = await fetchBusinessInfo(domain);
+
+  // Fallback: try brand name (works for local businesses like "Maderas 3C")
+  if (!result || !hasItems(result)) {
+    // Extract brand: shop.maderas3c.com → maderas3c, www.nike.com → nike
+    const parts = domain.replace(/^www\./, '').split('.');
+    const brandName = parts.length >= 2 ? parts[parts.length - 2]! : parts[0]!;
+    if (brandName !== domain) {
+      logger.debug({ domain, brandName }, 'No GBP for domain, trying brand name');
+      result = await fetchBusinessInfo(brandName);
+    }
+  }
+
+  businessProfileCache.set(domain, {
+    data: result,
+    timestamp: Date.now(),
+  });
+
+  return result;
+}
+
+async function fetchBusinessInfo(keyword: string): Promise<unknown> {
+  try {
+    const response = await dataForSeoPost(
+      '/business_data/google/my_business_info/live',
+      [{ keyword, location_code: 2840, language_code: 'en' }],
+      45_000,
+    );
+    return response.tasks?.[0]?.result?.[0] ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function hasItems(result: unknown): boolean {
+  const items = (result as Record<string, unknown>)?.['items'];
+  return Array.isArray(items) && items.length > 0;
 }
 
 /**
@@ -391,25 +554,59 @@ export async function getKeywordSearchVolume(
   locationCode: number = 2840, // US
 ): Promise<unknown> {
   const response = await dataForSeoPost(
-    '/dataforseo_labs/google/bulk_keyword_search_volume/live',
-    [{ keywords: keywords.slice(0, 50), location_code: locationCode }],
+    '/dataforseo_labs/google/keyword_overview/live',
+    [{ keywords: keywords.slice(0, 50), location_code: locationCode, language_code: 'en' }],
   );
 
   return response.tasks?.[0]?.result?.[0] ?? null;
 }
 
 /**
- * Get Google Reviews for a business (for M38).
+ * Get Google Reviews for a business (M37).
+ * Uses async task_post → poll → task_get flow since Reviews API has no live endpoint.
  */
 export async function getGoogleReviews(
   keyword: string,
+  depth: number = 40,
+  sortBy: string = 'newest',
+  maxWaitMs: number = 25_000,
 ): Promise<unknown> {
-  const response = await dataForSeoPost(
-    '/business_data/google/reviews/live',
-    [{ keyword, depth: 20 }],
+  // Step 1: Post the task
+  const postResponse = await dataForSeoPost(
+    '/business_data/google/reviews/task_post',
+    [{ keyword, depth, sort_by: sortBy, location_code: 2840, language_code: 'en', priority: 1 }],
   );
 
-  return response.tasks?.[0]?.result?.[0] ?? null;
+  const taskId = postResponse.tasks?.[0]?.id;
+  if (!taskId) {
+    logger.warn({ keyword }, 'Google Reviews task_post returned no task ID');
+    return null;
+  }
+
+  // Step 2: Poll for completion
+  const pollInterval = 2_000;
+  const maxAttempts = Math.floor(maxWaitMs / pollInterval);
+
+  for (let i = 0; i < maxAttempts; i++) {
+    await new Promise(resolve => setTimeout(resolve, pollInterval));
+
+    try {
+      const readyResponse = await dataForSeoGet<{ id: string }>('/business_data/google/reviews/tasks_ready');
+      const readyTasks = readyResponse.tasks?.[0]?.result ?? [];
+      if (readyTasks.some((t: { id: string }) => t.id === taskId)) {
+        // Step 3: Fetch results
+        const getResponse = await dataForSeoGet(
+          `/business_data/google/reviews/task_get/${taskId}`,
+        );
+        return getResponse.tasks?.[0]?.result?.[0] ?? null;
+      }
+    } catch {
+      // tasks_ready can transiently fail — keep polling
+    }
+  }
+
+  logger.debug({ keyword, taskId }, 'Google Reviews task not ready within timeout');
+  return null;
 }
 
 /**
@@ -438,18 +635,57 @@ export async function getSerpResults(
 }
 
 /**
- * Get paid keywords for a domain (for M29).
+ * Find SERP competitors for a set of keywords.
+ * Given specific keywords, returns all domains ranking for them with visibility
+ * scores, traffic estimates, keyword counts, and per-keyword positions.
+ * This is the precision competitor discovery endpoint.
+ */
+export async function getSerpCompetitors(
+  keywords: string[],
+  limit: number = 20,
+): Promise<unknown> {
+  const response = await dataForSeoPost(
+    '/dataforseo_labs/google/serp_competitors/live',
+    [{
+      keywords: keywords.slice(0, 200),
+      limit,
+      location_code: 2840,
+      language_code: 'en',
+      item_types: ['organic', 'paid'],
+    }],
+  );
+
+  return response.tasks?.[0]?.result?.[0] ?? null;
+}
+
+/**
+ * Get paid keywords for a domain (shared by M28 and M29).
+ * Cached for the duration of a scan to avoid duplicate API calls.
  */
 export async function getDomainPaidKeywords(
   domain: string,
   limit: number = 50,
 ): Promise<unknown> {
+  const cacheKey = `${domain}:${limit}`;
+  const cached = paidKeywordsCache.get(cacheKey);
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    logger.debug({ domain }, 'Using cached paid keywords');
+    return cached.data;
+  }
+
   const response = await dataForSeoPost(
     '/dataforseo_labs/google/ranked_keywords/live',
     [{ target: domain, limit, filters: ['keyword_data.keyword_info.search_volume', '>', 0], item_types: ['paid'] }],
   );
 
-  return response.tasks?.[0]?.result?.[0] ?? null;
+  const result = response.tasks?.[0]?.result?.[0] ?? null;
+
+  paidKeywordsCache.set(cacheKey, {
+    data: result,
+    timestamp: Date.now(),
+  });
+
+  return result;
 }
 
 /**
@@ -457,4 +693,8 @@ export async function getDomainPaidKeywords(
  */
 export function clearTrafficCache(): void {
   trafficOverviewCache.clear();
+  paidKeywordsCache.clear();
+  referringDomainsCache.clear();
+  businessProfileCache.clear();
+  rankedKeywordsCache.clear();
 }
