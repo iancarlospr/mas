@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { enqueueScanJob, getJobState, getQueueDepth } from '../queue/scan-queue.js';
 import { getScanById } from '../services/supabase.js';
 import { normalizeUrl, getRegistrableDomain } from '../utils/url.js';
-import { generateReportPDF, uploadReportPDF } from '../services/pdf-generator.js';
+import { generateReportPDF, uploadReportPDF, generatePrdPDF, uploadPrdPDF } from '../services/pdf-generator.js';
 import type { ModuleTier } from '@marketing-alpha/types';
 
 /**
@@ -245,6 +245,46 @@ export async function scanRoutes(fastify: FastifyInstance): Promise<void> {
         );
         reply.code(500).send({
           error: 'PDF generation failed',
+          message: (error as Error).message,
+        });
+      }
+    },
+  );
+
+  /**
+   * POST /engine/reports/:id/prd-pdf
+   *
+   * Generate the M43 Remediation Plan PDF for a completed paid scan.
+   * Converts M43 markdown to styled HTML and renders to legal-size PDF
+   * using Patchright. Uploads to Supabase Storage.
+   */
+  fastify.post(
+    '/engine/reports/:id/prd-pdf',
+    async (
+      request: FastifyRequest<{ Params: ScanIdParamsType }>,
+      reply: FastifyReply,
+    ) => {
+      const parseResult = ScanIdParams.safeParse(request.params);
+      if (!parseResult.success) {
+        reply.code(400).send({ error: 'Invalid scan ID' });
+        return;
+      }
+
+      const { id: scanId } = parseResult.data;
+
+      try {
+        request.log.info({ scanId }, 'Generating PRD PDF');
+        const pdf = await generatePrdPDF(scanId);
+        const signedUrl = await uploadPrdPDF(scanId, pdf);
+        request.log.info({ scanId }, 'PRD PDF generated and uploaded');
+        reply.send({ signedUrl });
+      } catch (error) {
+        request.log.error(
+          { scanId, error: (error as Error).message },
+          'Failed to generate PRD PDF',
+        );
+        reply.code(500).send({
+          error: 'PRD PDF generation failed',
           message: (error as Error).message,
         });
       }

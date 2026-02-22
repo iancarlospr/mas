@@ -771,7 +771,7 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
         name: helpCenterProvider.name,
         confidence: 0.9,
         evidence: helpCenterProvider.evidence,
-        category: 'digital_presence',
+        category: 'brand_presence',
       }),
     );
   }
@@ -783,7 +783,7 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
         name: statusPage.provider ?? 'Status Page',
         confidence: 0.9,
         evidence: statusPage.evidence,
-        category: 'digital_presence',
+        category: 'brand_presence',
       }),
     );
   }
@@ -795,7 +795,7 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
         name: communityForum.provider ?? 'Community Forum',
         confidence: 0.8,
         evidence: communityForum.evidence,
-        category: 'digital_presence',
+        category: 'brand_presence',
       }),
     );
   }
@@ -807,7 +807,7 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
         name: 'Support Channels',
         confidence: 0.8,
         evidence: `${supportChannels.count} support channel(s): ${supportChannels.channels.join(', ')}`,
-        category: 'digital_presence',
+        category: 'brand_presence',
       }),
     );
   }
@@ -819,7 +819,7 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
         name: 'Business Hours Published',
         confidence: 0.7,
         evidence: 'Business/support hours detected on page',
-        category: 'digital_presence',
+        category: 'brand_presence',
       }),
     );
   }
@@ -831,7 +831,7 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
         name: 'Developer Documentation',
         confidence: 0.85,
         evidence: developerDocs.evidence,
-        category: 'digital_presence',
+        category: 'brand_presence',
       }),
     );
   }
@@ -843,7 +843,7 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
         name: trainingAcademy.type === 'academy' ? 'Academy' : 'Training Portal',
         confidence: 0.85,
         evidence: trainingAcademy.evidence,
-        category: 'digital_presence',
+        category: 'brand_presence',
       }),
     );
   }
@@ -855,7 +855,7 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
         name: 'AI Chatbot',
         confidence: 0.75,
         evidence: chatbot.evidence,
-        category: 'digital_presence',
+        category: 'brand_presence',
       }),
     );
   }
@@ -867,7 +867,7 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
         name: 'Support Subdomains',
         confidence: 0.9,
         evidence: `${supportSubdomains.length} support subdomain(s): ${supportSubdomains.map((s) => s.subdomain).join(', ')}`,
-        category: 'digital_presence',
+        category: 'brand_presence',
       }),
     );
   }

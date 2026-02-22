@@ -621,7 +621,7 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
         name: 'Careers Page',
         confidence: 0.95,
         evidence: `Careers page found at ${baseUrl}${bestCareersPage.path}`,
-        category: 'digital_presence',
+        category: 'brand_presence',
       }),
     );
   }
@@ -633,7 +633,7 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
         name: atsDetected.name,
         confidence: 0.9,
         evidence: atsDetected.evidence,
-        category: 'digital_presence',
+        category: 'brand_presence',
       }),
     );
   }
@@ -645,7 +645,7 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
         name: 'Open Positions',
         confidence: 0.7,
         evidence: `Approximately ${totalOpenPositions} open position(s) detected`,
-        category: 'digital_presence',
+        category: 'brand_presence',
       }),
     );
   }
@@ -657,7 +657,7 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
         name: 'Team Page',
         confidence: 0.85,
         evidence: 'Team page or section detected',
-        category: 'digital_presence',
+        category: 'brand_presence',
       }),
     );
   }
@@ -669,7 +669,7 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
         name: 'Culture Page',
         confidence: 0.85,
         evidence: 'Culture page or section detected',
-        category: 'digital_presence',
+        category: 'brand_presence',
       }),
     );
   }

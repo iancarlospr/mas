@@ -7,14 +7,14 @@ import { cn } from '@/lib/utils';
 import { TRAFFIC_LIGHT_COLORS } from '@/lib/chart-config';
 
 const CATEGORY_LABELS: Record<string, string> = {
-  analytics_integrity: 'Analytics Integrity',
-  paid_media_attribution: 'Paid Media & Attribution',
-  performance_ux: 'Performance & UX',
-  compliance_security: 'Compliance & Security',
-  martech_efficiency: 'MarTech Efficiency',
+  security_compliance: 'Security & Compliance',
+  analytics_measurement: 'Analytics & Measurement',
+  performance_experience: 'Performance & Experience',
   seo_content: 'SEO & Content',
-  market_position: 'Market Position',
-  digital_presence: 'Digital Presence',
+  paid_media: 'Paid Media',
+  martech_infrastructure: 'MarTech & Infrastructure',
+  brand_presence: 'Brand & Digital Presence',
+  market_intelligence: 'Market Intelligence',
 };
 
 interface OverviewSlideProps {

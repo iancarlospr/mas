@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { engineFetch } from '@/lib/engine';
+import { createScan, ScanError } from '@/lib/scan-service';
 import { z } from 'zod';
 
 const CreateScanSchema = z.object({
@@ -47,109 +47,27 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
   }
 
-  // Extract domain
-  const domain = new URL(url).hostname.replace(/^www\./, '').toLowerCase();
-  const tier = 'full';
-
-  // Get IP and country
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? '127.0.0.1';
   const countryCode = request.headers.get('cf-ipcountry')
     ?? request.headers.get('x-vercel-ip-country')
     ?? null;
-  const dayStart = new Date();
-  dayStart.setUTCHours(0, 0, 0, 0);
 
-  // Count ALL scans (cached and fresh) to prevent abuse
-  const { count } = await supabase
-    .from('scans')
-    .select('id', { count: 'exact', head: true })
-    .eq('user_id', user.id)
-    .gte('created_at', dayStart.toISOString());
-
-  const limit = 4;
-  if ((count ?? 0) >= limit) {
-    return NextResponse.json(
-      { error: 'Daily scan limit reached', limit, used: count },
-      { status: 429 },
-    );
-  }
-
-  // Check cache — recent full scan for same domain
-  const { data: cached } = await supabase
-    .from('scans')
-    .select('id, status, marketing_iq, created_at')
-    .eq('domain', domain)
-    .eq('status', 'complete')
-    .gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .single();
-
-  if (cached) {
-    // Return cached scan
-    const { data: newScan } = await supabase
-      .from('scans')
-      .insert({
-        user_id: user.id,
-        url,
-        domain,
-        tier,
-        status: 'complete',
-        marketing_iq: cached.marketing_iq,
-        cache_source: cached.id,
-        ip_address: ip,
-        country_code: countryCode,
-        completed_at: new Date().toISOString(),
-      })
-      .select('id')
-      .single();
-
-    return NextResponse.json({ scanId: newScan?.id ?? cached.id, cached: true });
-  }
-
-  // Create scan record
-  const { data: scan, error } = await supabase
-    .from('scans')
-    .insert({
-      user_id: user.id,
+  try {
+    const result = await createScan({
+      supabase,
+      userId: user.id,
       url,
-      domain,
-      tier,
-      status: 'queued',
-      ip_address: ip,
-      country_code: countryCode,
-    })
-    .select('id')
-    .single();
-
-  if (error || !scan) {
-    return NextResponse.json({ error: 'Failed to create scan' }, { status: 500 });
+      ip,
+      countryCode,
+    });
+    return NextResponse.json(result);
+  } catch (err) {
+    if (err instanceof ScanError) {
+      return NextResponse.json(
+        { error: err.message, ...err.details },
+        { status: err.status },
+      );
+    }
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-
-  // Forward to engine
-  const engineRes = await engineFetch('/engine/scans', {
-    method: 'POST',
-    body: JSON.stringify({ scanId: scan.id, url, domain, tier }),
-  });
-
-  if (!engineRes.ok) {
-    await supabase
-      .from('scans')
-      .update({ status: 'failed' })
-      .eq('id', scan.id);
-    return NextResponse.json({ error: 'Scan engine unavailable' }, { status: 503 });
-  }
-
-  // Audit log (non-critical)
-  supabase.from('audit_log').insert({
-    user_id: user.id,
-    action: 'scan_created',
-    resource: scan.id,
-    ip_address: ip,
-    metadata: { url, domain, tier, cached: false },
-  }).then(({ error: auditErr }) => {
-    if (auditErr) console.error('[scans] Audit log failed:', auditErr);
-  });
-
-  return NextResponse.json({ scanId: scan.id, cached: false });
 }

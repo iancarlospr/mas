@@ -79,7 +79,7 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
     signals.push(createSignal({
       type: 'news_sentiment', name: 'News Sentiment',
       confidence: 0.7, evidence: `${headlines.length} articles, overall: ${sentiment.overallSentiment}`,
-      category: 'market_position',
+      category: 'market_intelligence',
     }));
 
     // CP1: News coverage volume

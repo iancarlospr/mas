@@ -127,7 +127,7 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
         type: 'review_velocity', name: 'Review Velocity',
         confidence: 0.85,
         evidence: `${reviewsCount} reviews, avg ${avgRating}/5, trend: ${trend}`,
-        category: 'market_position',
+        category: 'market_intelligence',
       }));
     }
 

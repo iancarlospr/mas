@@ -7,7 +7,7 @@ export type ModuleId =
   | 'M24' | 'M25' | 'M26' | 'M27' | 'M28' | 'M29' | 'M30'
   | 'M31' | 'M32' | 'M33' | 'M34' | 'M35'
   | 'M36' | 'M37' | 'M38' | 'M39' | 'M40'
-  | 'M41' | 'M42' | 'M43' | 'M44' | 'M45' | 'M46';
+  | 'M41' | 'M42' | 'M43' | 'M44' | 'M45';
 
 export type ModulePhase = 'passive' | 'browser' | 'ghostscan' | 'external' | 'paid-media' | 'synthesis';
 
@@ -27,14 +27,14 @@ export interface ModuleDefinition {
 }
 
 export type ScoreCategory =
-  | 'analytics_integrity'
-  | 'paid_media_attribution'
-  | 'performance_ux'
-  | 'compliance_security'
-  | 'martech_efficiency'
+  | 'security_compliance'
+  | 'analytics_measurement'
+  | 'performance_experience'
   | 'seo_content'
-  | 'market_position'
-  | 'digital_presence';
+  | 'paid_media'
+  | 'martech_infrastructure'
+  | 'brand_presence'
+  | 'market_intelligence';
 
 export interface ModuleResult {
   moduleId: ModuleId;
@@ -75,14 +75,37 @@ export const HEALTH_MULTIPLIERS: Record<CheckpointHealth, number> = {
 };
 
 export const CATEGORY_WEIGHTS: Record<ScoreCategory, number> = {
-  analytics_integrity: 0.20,
-  paid_media_attribution: 0.18,
-  performance_ux: 0.15,
-  compliance_security: 0.15,
-  martech_efficiency: 0.12,
+  security_compliance: 0.15,
+  analytics_measurement: 0.20,
+  performance_experience: 0.15,
   seo_content: 0.10,
-  market_position: 0.06,
-  digital_presence: 0.04,
+  paid_media: 0.12,
+  martech_infrastructure: 0.10,
+  brand_presence: 0.08,
+  market_intelligence: 0.10,
+};
+
+export const CATEGORY_DISPLAY_NAMES: Record<ScoreCategory, string> = {
+  security_compliance: 'Security & Compliance',
+  analytics_measurement: 'Analytics & Measurement',
+  performance_experience: 'Performance & Experience',
+  seo_content: 'SEO & Content',
+  paid_media: 'Paid Media',
+  martech_infrastructure: 'MarTech & Infrastructure',
+  brand_presence: 'Brand & Digital Presence',
+  market_intelligence: 'Market Intelligence',
+};
+
+/** Maps each category to the module IDs it contains */
+export const CATEGORY_MODULES: Record<ScoreCategory, ModuleId[]> = {
+  security_compliance: ['M01', 'M12', 'M40'],
+  analytics_measurement: ['M05', 'M06', 'M06b', 'M08', 'M09'],
+  performance_experience: ['M03', 'M10', 'M11', 'M13', 'M14'],
+  seo_content: ['M04', 'M15', 'M26', 'M34', 'M39'],
+  paid_media: ['M21', 'M28', 'M29'],
+  martech_infrastructure: ['M02', 'M07', 'M20'],
+  brand_presence: ['M16', 'M17', 'M18', 'M19', 'M22', 'M23', 'M37', 'M38'],
+  market_intelligence: ['M24', 'M25', 'M27', 'M30', 'M31', 'M32', 'M33', 'M35', 'M36'],
 };
 
 export interface CategoryScore {

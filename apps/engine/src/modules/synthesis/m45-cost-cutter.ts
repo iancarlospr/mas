@@ -1,9 +1,12 @@
 /**
- * M45 - Cost Cutter Analysis
+ * M45 - Stack Analyzer
  *
- * Uses Gemini Flash to identify redundant tools, abandoned scripts,
- * and cheaper alternatives. Includes tool pricing knowledge base.
- * Follows PRD AI-6 prompt spec.
+ * Analyzes the detected marketing technology stack and produces
+ * recommendations: abandoned tool cleanup, redundancy consolidation,
+ * a Lean Stack (minimum viable), and an Optimal Stack (best-in-class).
+ *
+ * No pricing or cost estimates — focuses on tool fitness for the
+ * business type and scale.
  *
  * Depends on: M41
  * Tier: paid
@@ -16,98 +19,99 @@ import { createCheckpoint } from '../../utils/signals.js';
 import { callFlash } from '../../services/gemini.js';
 import { z } from 'zod';
 
+// ─── Output schema ──────────────────────────────────────────────────────
+
+const AbandonedToolSchema = z.object({
+  tool: z.string(),
+  evidence: z.string(),
+  sourceModule: z.string(),
+  recommendation: z.string(),
+});
+
 const RedundancySchema = z.object({
   tools: z.array(z.string()),
   function: z.string(),
   recommendation: z.string(),
   rationale: z.string(),
-  estimated_monthly_savings: z.string(),
-  effort_to_consolidate: z.enum(['S', 'M', 'L']),
+  effortToConsolidate: z.enum(['S', 'M', 'L']),
 });
 
-const AbandonedToolSchema = z.object({
+const LeanToolSchema = z.object({
   tool: z.string(),
-  evidence: z.string(),
-  estimated_monthly_cost: z.string(),
-  recommendation: z.string(),
+  purpose: z.string(),
+  replaces: z.array(z.string()),
+  rationale: z.string(),
 });
 
-const AlternativeSchema = z.object({
-  current_tool: z.string(),
-  alternative: z.string(),
-  current_estimated_cost: z.string(),
-  alternative_cost: z.string(),
-  savings: z.string(),
-  tradeoffs: z.string(),
-  recommendation_strength: z.enum(['strong', 'moderate', 'weak']),
+const OptimalToolSchema = z.object({
+  tool: z.string(),
+  purpose: z.string(),
+  isCurrentlyDetected: z.boolean(),
+  rationale: z.string(),
 });
 
-const CostCutterSchema = z.object({
-  redundancies: z.array(RedundancySchema),
-  abandoned_tools: z.array(AbandonedToolSchema),
-  cheaper_alternatives: z.array(AlternativeSchema),
-  stack_health_summary: z.object({
-    total_tools_detected: z.number(),
-    active_tools: z.number(),
-    inactive_or_abandoned: z.number(),
-    redundant_pairs: z.number(),
-    estimated_total_monthly_spend: z.string(),
-    estimated_monthly_savings: z.string(),
-    estimated_annual_savings: z.string(),
+const ToolAnalyzerSchema = z.object({
+  currentStack: z.object({
+    totalTools: z.number(),
+    activeTools: z.number(),
+    abandonedTools: z.number(),
+    redundantPairs: z.number(),
+    categories: z.array(z.object({
+      name: z.string(),
+      tools: z.array(z.string()),
+    })),
+    assessment: z.string(),
   }),
+  abandonedTools: z.array(AbandonedToolSchema),
+  redundancies: z.array(RedundancySchema),
+  leanStack: z.object({
+    description: z.string(),
+    tools: z.array(LeanToolSchema),
+    removals: z.array(z.object({
+      tool: z.string(),
+      reason: z.string(),
+    })),
+    totalToolsAfter: z.number(),
+    keyBenefit: z.string(),
+  }),
+  optimalStack: z.object({
+    description: z.string(),
+    tools: z.array(OptimalToolSchema),
+    gaps: z.array(z.object({
+      capability: z.string(),
+      recommendation: z.string(),
+      rationale: z.string(),
+    })),
+    upgrades: z.array(z.object({
+      currentTool: z.string(),
+      suggestedTool: z.string(),
+      rationale: z.string(),
+    })),
+    totalToolsAfter: z.number(),
+    keyBenefit: z.string(),
+  }),
+  methodology: z.string(),
 });
 
-const PRICING_KB = `
-GA4: free | GA360: ~$50K+/yr
-Adobe Analytics: ~$100K+/yr
-Mixpanel: $0-$1K/mo
-Amplitude: $0-$2K/mo
-Heap: $0-$1K/mo
-Segment: $0-$1.2K/mo
-HubSpot Marketing: $800-$3.6K/mo
-Marketo: $1K-$4K/mo
-Pardot: $1.25K-$4K/mo
-Intercom: $74-$999/mo
-Drift: $2.5K+/mo
-Zendesk: $19-$115/agent/mo
-Hotjar: $0-$171/mo
-FullStory: $0-$849/mo
-Optimizely: $36K+/yr
-VWO: $357-$1.7K/mo
-OneTrust: $1K+/mo
-Cookiebot: $0-$40/mo
-Sentry: $0-$80/mo
-Datadog RUM: $0-$15/1K sessions
-New Relic: $0-$0.30/GB
-Lucky Orange: $0-$39/mo
-Crazy Egg: $29-$249/mo
-Mailchimp: $0-$350/mo
-Klaviyo: $0-$1K/mo
-ActiveCampaign: $29-$259/mo
-Salesforce Marketing Cloud: $1.25K+/mo
-Unbounce: $99-$625/mo
-Instapage: $199-$599/mo
-Chatbot/Tidio: $0-$39/mo
-LiveChat: $20-$59/agent/mo
-Freshdesk: $0-$79/agent/mo
-`;
+// ─── System prompt ──────────────────────────────────────────────────────
 
-const SYSTEM_PROMPT = `You are a marketing technology auditor specializing in stack
-rationalization. Analyze the detected tools and identify cost reduction opportunities.
+const SYSTEM_PROMPT = `You are a marketing technology stack consultant. Analyze the detected tools for this business and produce stack recommendations.
 
 RULES:
-1. "Redundant" = two tools serving the same primary function
-   (e.g., GA4 + Adobe Analytics = redundant analytics).
-2. "Abandoned" = tool script loads but no active tracking fires,
-   OR tool is detected but misconfigured/inactive.
-3. "Cheaper alternative" = only suggest when the alternative provides
-   equivalent functionality. Don't suggest Plausible to replace GA4
-   for an enterprise with 50 custom dimensions.
-4. Every recommendation includes estimated savings with source.
-5. ONLY reference tools that are present in the input data. Never
-   invent or assume tools that weren't detected.
+1. ONLY reference tools that are present in the input data. Never invent tools that weren't detected.
+2. "Redundant" = two or more tools serving the SAME primary function (e.g., GA4 + Mixpanel for web analytics). Two tools in the same broad category but with different functions are NOT redundant (e.g., GA4 for web analytics + Hotjar for heatmaps).
+3. "Abandoned" = tool script loads but shows signs of inactivity: no tracking events fire, misconfigured, or the tool's evidence suggests it was set up and forgotten.
+4. Lean Stack: the minimum viable stack for this business. Remove abandoned tools, consolidate redundancies, keep only what's essential. Every tool must earn its place.
+5. Optimal Stack: the best-in-class stack for this business type and scale. Fill gaps in capabilities (e.g., missing server-side tracking, no A/B testing, no CDP). Suggest specific tools by name and explain why they're a good fit.
+6. When suggesting alternatives or upgrades, explain why: feature parity, better integration ecosystem, or better fit for business size.
+7. Never include pricing or cost estimates. Focus on capability, fit, and governance.
+8. Base business type/scale on the provided business context (if available). If not available, infer from the detected stack's sophistication.
+9. Categories should reflect actual functional groupings: Analytics, Tag Management, Advertising, Marketing Automation, Live Chat & Support, Session Recording, A/B Testing, CDP, Consent & Privacy, etc.
+10. methodology should be 2-3 sentences explaining the basis of your analysis.
 
-Respond in JSON.`;
+Respond in valid JSON matching the provided schema.`;
+
+// ─── Main executor ──────────────────────────────────────────────────────
 
 const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
   const signals: Signal[] = [];
@@ -142,59 +146,70 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
     }, {}),
   );
 
+  // Get M41 business context if available
+  const m41Result = ctx.previousResults.get('M41' as ModuleId);
+  const m41Data = (m41Result?.data ?? {}) as Record<string, unknown>;
+  const businessContext = m41Data['businessContext'] as Record<string, unknown> | undefined;
+
   try {
     const prompt = `## Domain: ${ctx.url}
 ## Company tier: ${companyTier}
+${businessContext ? `## Business Context
+- Name: ${businessContext['businessName'] ?? 'Unknown'}
+- Model: ${businessContext['businessModel'] ?? 'Unknown'}
+- Description: ${businessContext['description'] ?? 'N/A'}
+${(businessContext['ecommerce'] as Record<string, unknown> | undefined)?.['platform'] ? `- Ecommerce: ${(businessContext['ecommerce'] as Record<string, unknown>)['platform']}` : ''}
+${(businessContext['scale'] as Record<string, unknown> | undefined)?.['totalTraffic'] ? `- Monthly traffic: ${(businessContext['scale'] as Record<string, unknown>)['totalTraffic']}` : ''}` : '## Business Context: Not available (infer from stack)'}
 
 ### All Detected Tools (from M05, M06, M07, M08, M09, M20)
-${JSON.stringify(uniqueToolEntries)}
+${JSON.stringify(uniqueToolEntries, null, 2)}
 
-### Tool Pricing Knowledge Base
-${PRICING_KB}
+Analyze this stack and produce:
+1. currentStack: categorize all tools, count active/abandoned/redundant, write a 1-2 sentence assessment
+2. abandonedTools: list tools with evidence of inactivity
+3. redundancies: identify tools with overlapping primary functions
+4. leanStack: minimum viable stack — what to keep, what to remove, and why
+5. optimalStack: best-in-class stack — current tools + gap fills + upgrades
 
-Produce the analysis as valid JSON with these fields:
-- redundancies: array of { tools, function, recommendation, rationale, estimated_monthly_savings, effort_to_consolidate }
-- abandoned_tools: array of { tool, evidence, estimated_monthly_cost, recommendation }
-- cheaper_alternatives: array of { current_tool, alternative, current_estimated_cost, alternative_cost, savings, tradeoffs, recommendation_strength }
-- stack_health_summary: { total_tools_detected, active_tools, inactive_or_abandoned, redundant_pairs, estimated_total_monthly_spend, estimated_monthly_savings, estimated_annual_savings }`;
+Respond in valid JSON.`;
 
-    const result = await callFlash(prompt, CostCutterSchema, {
+    const result = await callFlash(prompt, ToolAnalyzerSchema, {
       systemInstruction: SYSTEM_PROMPT,
       temperature: 0.3,
-      maxTokens: 4096,
+      maxTokens: 6144,
     });
 
     // Post-processing: validate tool names against detected tools
     const detectedNames = new Set(uniqueToolEntries.map(t => t.name.toLowerCase()));
+
     const validatedRedundancies = result.data.redundancies.filter(r =>
       r.tools.some(t => detectedNames.has(t.toLowerCase())),
     );
-    const validatedAbandoned = result.data.abandoned_tools.filter(a =>
+    const validatedAbandoned = result.data.abandonedTools.filter(a =>
       detectedNames.has(a.tool.toLowerCase()),
     );
 
-    data.costAnalysis = {
+    data.stackAnalysis = {
       ...result.data,
       redundancies: validatedRedundancies,
-      abandoned_tools: validatedAbandoned,
+      abandonedTools: validatedAbandoned,
     };
     data.tokensUsed = result.tokensUsed;
 
-    const totalSavings = validatedRedundancies.length + validatedAbandoned.length + result.data.cheaper_alternatives.length;
+    const totalFindings = validatedRedundancies.length + validatedAbandoned.length + result.data.optimalStack.gaps.length;
 
     checkpoints.push(createCheckpoint({
-      id: 'm45-cost', name: 'Cost Optimization', weight: 0.5,
-      health: totalSavings > 0 ? 'excellent' : 'good',
-      evidence: `Cost analysis: ${validatedRedundancies.length} redundancies, ${validatedAbandoned.length} abandoned tools, ${result.data.cheaper_alternatives.length} alternatives. Est. savings: ${result.data.stack_health_summary.estimated_annual_savings}/yr`,
+      id: 'm45-stack', name: 'Stack Analysis', weight: 0.5,
+      health: totalFindings > 0 ? 'excellent' : 'good',
+      evidence: `Stack analysis: ${uniqueToolEntries.length} tools detected, ${validatedRedundancies.length} redundancies, ${validatedAbandoned.length} abandoned, lean=${result.data.leanStack.totalToolsAfter} tools, optimal=${result.data.optimalStack.totalToolsAfter} tools`,
     }));
   } catch (error) {
-    // Fallback: rule-based analysis
-    data.costAnalysis = buildFallbackAnalysis(uniqueToolEntries);
+    data.stackAnalysis = buildFallbackAnalysis(uniqueToolEntries);
 
     checkpoints.push(createCheckpoint({
-      id: 'm45-cost', name: 'Cost Optimization', weight: 0.5,
+      id: 'm45-stack', name: 'Stack Analysis', weight: 0.5,
       health: 'warning',
-      evidence: `Cost analysis used fallback: ${(error as Error).message.slice(0, 80)}`,
+      evidence: `Stack analysis used fallback: ${(error as Error).message.slice(0, 80)}`,
     }));
   }
 
@@ -211,19 +226,40 @@ function findSourceModule(signal: Signal, ctx: ModuleContext): string {
 }
 
 function buildFallbackAnalysis(tools: Array<{ name: string; type: string; category: string }>) {
+  const categories = new Map<string, string[]>();
+  for (const t of tools) {
+    const cat = t.category || 'Other';
+    if (!categories.has(cat)) categories.set(cat, []);
+    categories.get(cat)!.push(t.name);
+  }
+
   return {
-    redundancies: [],
-    abandoned_tools: [],
-    cheaper_alternatives: [],
-    stack_health_summary: {
-      total_tools_detected: tools.length,
-      active_tools: tools.length,
-      inactive_or_abandoned: 0,
-      redundant_pairs: 0,
-      estimated_total_monthly_spend: 'N/A',
-      estimated_monthly_savings: 'N/A',
-      estimated_annual_savings: 'N/A',
+    currentStack: {
+      totalTools: tools.length,
+      activeTools: tools.length,
+      abandonedTools: 0,
+      redundantPairs: 0,
+      categories: [...categories.entries()].map(([name, toolList]) => ({ name, tools: toolList })),
+      assessment: 'AI analysis was unavailable. Tool list shown as detected.',
     },
+    abandonedTools: [],
+    redundancies: [],
+    leanStack: {
+      description: 'AI analysis required for lean stack recommendation.',
+      tools: [],
+      removals: [],
+      totalToolsAfter: tools.length,
+      keyBenefit: 'N/A',
+    },
+    optimalStack: {
+      description: 'AI analysis required for optimal stack recommendation.',
+      tools: tools.map(t => ({ tool: t.name, purpose: t.category, isCurrentlyDetected: true, rationale: 'Currently detected' })),
+      gaps: [],
+      upgrades: [],
+      totalToolsAfter: tools.length,
+      keyBenefit: 'N/A',
+    },
+    methodology: 'Fallback mode — AI generation was unavailable. Only the detected tool inventory is shown.',
   };
 }
 

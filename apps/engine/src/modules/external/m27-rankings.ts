@@ -41,7 +41,7 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
     signals.push(createSignal({
       type: 'ranking_distribution', name: 'SERP Positions',
       confidence: 0.7, evidence: `#1: ${pos1}, #2-3: ${pos2_3}, #4-10: ${pos4_10}`,
-      category: 'market_position',
+      category: 'market_intelligence',
     }));
 
     // CP1: Top positions

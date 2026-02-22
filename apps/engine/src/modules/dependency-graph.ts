@@ -176,13 +176,6 @@ export const MODULE_DEPENDENCIES: ModuleDependency[] = [
     fields: ['adScriptBytes', 'pixelCount', 'totalNetworkFires'],
     required: false,
   },
-  // M46 reads M42 for knowledge base
-  {
-    consumer: 'M46' as ModuleId,
-    producer: 'M42' as ModuleId,
-    fields: ['*'],
-    required: true,
-  },
 ];
 
 /**

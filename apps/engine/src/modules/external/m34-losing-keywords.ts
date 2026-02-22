@@ -62,7 +62,7 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
       signals.push(createSignal({
         type: 'losing_keywords', name: 'Losing Keywords',
         confidence: 0.7, evidence: `${losingKeywords.length} keywords declining: ${losingKeywords.slice(0, 3).map(k => k.keyword).join(', ')}`,
-        category: 'market_position',
+        category: 'market_intelligence',
       }));
     }
 

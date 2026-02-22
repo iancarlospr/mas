@@ -681,7 +681,7 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
         name: 'PR Wire Services',
         confidence: 0.85,
         evidence: `Wire services detected: ${[...wireServices].join(', ')}`,
-        category: 'digital_presence',
+        category: 'brand_presence',
       }),
     );
   }

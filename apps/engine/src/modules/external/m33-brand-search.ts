@@ -79,7 +79,7 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
       signals.push(createSignal({
         type: 'brand_demand', name: 'Brand Search Volume',
         confidence: 0.8, evidence: `"${brandName}": ${brandVolume.toLocaleString()}/mo`,
-        category: 'market_position',
+        category: 'market_intelligence',
       }));
     }
 

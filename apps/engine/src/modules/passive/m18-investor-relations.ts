@@ -940,7 +940,7 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
         name: 'Investor Relations Portal',
         confidence: 0.95,
         evidence: `IR portal found at ${irPageUrl}`,
-        category: 'digital_presence',
+        category: 'brand_presence',
       }),
     );
   }
@@ -952,7 +952,7 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
         name: 'SEC Filings',
         confidence: 0.9,
         evidence: secFilings.evidence,
-        category: 'digital_presence',
+        category: 'brand_presence',
       }),
     );
   }
@@ -964,7 +964,7 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
         name: `Ticker: ${ticker.ticker}`,
         confidence: 0.85,
         evidence: `Stock ticker ${ticker.ticker}${ticker.exchange ? ` on ${ticker.exchange}` : ''} detected`,
-        category: 'digital_presence',
+        category: 'brand_presence',
       }),
     );
   }
@@ -976,7 +976,7 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
         name: 'ESG Report',
         confidence: 0.8,
         evidence: esgReport.evidence,
-        category: 'digital_presence',
+        category: 'brand_presence',
       }),
     );
   }
@@ -988,7 +988,7 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
         name: 'Corporate Governance',
         confidence: 0.85,
         evidence: governance.evidence,
-        category: 'digital_presence',
+        category: 'brand_presence',
       }),
     );
   }
@@ -1000,7 +1000,7 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
         name: 'Investor Presentations',
         confidence: 0.85,
         evidence: investorPresentations.evidence,
-        category: 'digital_presence',
+        category: 'brand_presence',
       }),
     );
   }
@@ -1012,7 +1012,7 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
         name: 'Dividend Information',
         confidence: 0.8,
         evidence: dividendInfo.evidence,
-        category: 'digital_presence',
+        category: 'brand_presence',
       }),
     );
   }
@@ -1024,7 +1024,7 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
         name: 'Investor Events',
         confidence: 0.8,
         evidence: upcomingEvents.evidence,
-        category: 'digital_presence',
+        category: 'brand_presence',
       }),
     );
   }

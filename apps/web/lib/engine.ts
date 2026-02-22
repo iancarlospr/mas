@@ -24,6 +24,8 @@ export async function engineFetch(path: string, options: RequestInit = {}): Prom
   const body = typeof options.body === 'string' ? options.body : '';
   const { signature, timestamp } = signRequest(method, path, body);
 
+  console.log(`[engineFetch] ${method} ${url} (ENGINE_URL=${ENGINE_URL}, HMAC_SECRET=${HMAC_SECRET ? 'set' : 'MISSING'})`);
+
   return fetch(url, {
     ...options,
     headers: {

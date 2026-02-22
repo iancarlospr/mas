@@ -37,9 +37,16 @@ export function ROISection({ data, sectionNumber, isPrintMode, onChartReady }: R
 
   return (
     <section className="report-section py-12 print:py-6 print:break-before-page">
-      <SectionHeader number={sectionNumber} title="ROI Impact Analysis" />
+      <SectionHeader number={sectionNumber} title="Impact Scenarios" />
 
-      {/* Hero Number */}
+      {/* Headline */}
+      {data.headline && (
+        <p className="text-sm text-[#1A1A2E] mb-6" style={{ fontFamily: '"Inter", sans-serif' }}>
+          {data.headline}
+        </p>
+      )}
+
+      {/* Hero Number — conservative to aggressive range */}
       <div
         className="text-center mb-8"
         style={{ padding: '40px 0', borderBottom: '1px solid #E2E8F0' }}
@@ -54,7 +61,7 @@ export function ROISection({ data, sectionNumber, isPrintMode, onChartReady }: R
             letterSpacing: '0.1em',
           }}
         >
-          Estimated Monthly Opportunity
+          Estimated Monthly Opportunity (Conservative — Aggressive)
         </p>
         <p
           style={{
@@ -67,6 +74,36 @@ export function ROISection({ data, sectionNumber, isPrintMode, onChartReady }: R
           {formatDollar(data.totalOpportunity.low)} — {formatDollar(data.totalOpportunity.high)}
         </p>
       </div>
+
+      {/* Scenario comparison cards */}
+      {data.scenarios.length > 0 && (
+        <div className="grid grid-cols-3 gap-4 mb-8" style={{ breakInside: 'avoid' }}>
+          {data.scenarios.map(s => (
+            <div
+              key={s.id}
+              className={`border rounded-xl p-4 text-center ${s.id === 'moderate' ? 'border-[#0F3460] bg-[#F8FAFC]' : 'border-[#E2E8F0]'}`}
+            >
+              <p className="text-xs text-[#64748B] uppercase tracking-wider font-semibold mb-1">
+                {s.label}
+              </p>
+              <p
+                className="font-mono text-xl font-bold"
+                style={{ fontFamily: '"JetBrains Mono", monospace', color: '#1A1A2E' }}
+              >
+                {formatDollar(s.totalMonthlyImpact)}/mo
+              </p>
+              <p className="text-xs text-[#94A3B8] mt-1">
+                {formatDollar(s.totalAnnualImpact)}/yr
+              </p>
+              {s.id === 'moderate' && (
+                <span className="inline-block mt-2 text-[10px] bg-[#0F3460] text-white px-2 py-0.5 rounded-full">
+                  Displayed below
+                </span>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Impact Cards Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
@@ -170,6 +207,13 @@ export function ROISection({ data, sectionNumber, isPrintMode, onChartReady }: R
             ))}
           </ul>
         </div>
+      )}
+
+      {/* Methodology note */}
+      {data.methodology && (
+        <p className="mt-6 text-xs italic text-[#94A3B8]" style={{ breakInside: 'avoid' }}>
+          {data.methodology}
+        </p>
       )}
     </section>
   );

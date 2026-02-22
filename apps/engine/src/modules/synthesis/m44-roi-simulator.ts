@@ -1,9 +1,14 @@
 /**
- * M44 - ROI Simulator
+ * M44 - Impact Scenarios
  *
  * Uses Gemini Flash to estimate financial impact of marketing technology
- * issues. Shows all math, cites sources, and is conservative.
- * Follows PRD AI-5 prompt spec.
+ * issues across three scenarios (conservative, moderate, aggressive).
+ * Each scenario uses different benchmark assumptions so users can see
+ * the range of possible outcomes.
+ *
+ * All dollar amounts are NUMERIC (not strings). Assumptions are surfaced
+ * prominently so users understand these are benchmark-based projections,
+ * not measured values.
  *
  * Depends on: M42
  * Tier: paid
@@ -16,71 +21,83 @@ import { createCheckpoint } from '../../utils/signals.js';
 import { callFlash } from '../../services/gemini.js';
 import { z } from 'zod';
 
-const CostCategorySchema = z.object({
+// ─── Output schema ──────────────────────────────────────────────────────
+
+const ImpactAreaSchema = z.object({
+  id: z.string(),
   title: z.string(),
-  monthly_estimate_low: z.string(),
-  monthly_estimate_high: z.string(),
-  calculation_steps: z.array(z.string()),
+  monthlyImpact: z.number(),
   assumptions: z.array(z.string()),
+  calculationSteps: z.array(z.string()),
+  sourceModules: z.array(z.string()),
   confidence: z.enum(['high', 'medium', 'low']),
-  source_modules: z.array(z.string()),
+});
+
+const ScenarioSchema = z.object({
+  id: z.enum(['conservative', 'moderate', 'aggressive']),
+  label: z.string(),
+  description: z.string(),
+  impactAreas: z.array(ImpactAreaSchema),
+  totalMonthlyImpact: z.number(),
+  totalAnnualImpact: z.number(),
+  keyAssumptions: z.array(z.string()),
 });
 
 const ComplianceRiskSchema = z.object({
-  title: z.string(),
-  annual_estimate_range: z.string(),
-  risk_factors: z.array(z.string()),
-  applicable_regulations: z.array(z.string()),
+  annualExposureLow: z.number(),
+  annualExposureHigh: z.number(),
+  riskFactors: z.array(z.string()),
+  applicableRegulations: z.array(z.string()),
   confidence: z.enum(['high', 'medium', 'low']),
-  source_modules: z.array(z.string()),
 });
 
-const ToolRedundancySchema = z.object({
-  title: z.string(),
-  monthly_estimate: z.string(),
-  tools_identified: z.array(z.string()),
-  confidence: z.enum(['high', 'medium', 'low']),
-  source_modules: z.array(z.string()),
-});
-
-const ROISchema = z.object({
-  tracking_gap_cost: CostCategorySchema,
-  attribution_waste: CostCategorySchema,
-  performance_impact: CostCategorySchema,
-  compliance_risk: ComplianceRiskSchema,
-  tool_redundancy_waste: ToolRedundancySchema,
-  summary: z.object({
-    total_monthly_opportunity_low: z.string(),
-    total_monthly_opportunity_high: z.string(),
-    total_annual_opportunity_low: z.string(),
-    total_annual_opportunity_high: z.string(),
-    headline: z.string(),
+const ImpactScenariosSchema = z.object({
+  scenarios: z.array(ScenarioSchema),
+  complianceRisk: ComplianceRiskSchema,
+  scoreImprovement: z.object({
+    current: z.number(),
+    estimated: z.number(),
   }),
+  headline: z.string(),
+  methodology: z.string(),
 });
 
-const SYSTEM_PROMPT = `You are a marketing finance analyst. Calculate the estimated financial
-impact of the marketing technology issues found in a forensic audit.
+// ─── System prompt ──────────────────────────────────────────────────────
+
+const SYSTEM_PROMPT = `You are a marketing technology impact analyst. Estimate the financial impact of marketing technology issues found in a forensic audit across THREE scenarios: conservative, moderate, and aggressive.
 
 RULES:
-1. Be CONSERVATIVE. Underestimate rather than overestimate. Mark
-   confidence levels honestly.
-2. Show ALL math. Every number must have a documented source or a
-   clearly stated assumption.
-3. Use these industry benchmarks (cite them):
-   - Average ecommerce conversion rate: 2.5-3.0%
-   - Every 100ms page speed improvement: +8.4% conversion (Deloitte)
-   - Server-side tracking recovers 15-30% of lost conversions (Google)
-   - Enhanced conversions improve attribution accuracy by 15-30% (Google)
-   - Average bounce rate: 41-55% (Semrush)
+1. All dollar amounts MUST be numbers (not strings). Return raw numeric values (e.g. 2500, not "$2,500").
+2. Show ALL math in calculationSteps. Every number must trace to a cited source or clearly stated assumption.
+3. Each scenario MUST have DIFFERENT assumptions that produce different numbers:
+   - Conservative: low end of every benchmark range, 60% implementation adoption
+   - Moderate: midpoints of benchmark ranges, 80% implementation adoption
+   - Aggressive: high end of benchmark ranges, 100% implementation adoption
+4. Each scenario's keyAssumptions array must list the specific values chosen for that scenario.
+5. Use these industry benchmarks (cite them by name):
+   - Average ecommerce conversion rate: 2.5-3.0% (Statista 2024)
+   - Every 100ms page speed improvement: +8.4% conversion (Deloitte/Google 2020)
+   - Server-side tracking recovers 15-30% of lost conversions (Google Ads Help)
+   - Enhanced conversions improve attribution accuracy by 15-30% (Google Ads)
+   - Average bounce rate: 41-55% (Semrush 2024)
    - Average CPC (search): $1.50-3.00 depending on industry
-   - GDPR average fine: €2.8M (2024)
+   - GDPR average fine: €2.8M (DLA Piper 2024)
    - CCPA per-violation penalty: $2,663-$7,988
-4. When data is insufficient, say "insufficient data" with confidence: low.
-   Never fabricate numbers.
-5. If traffic data is not available, use conservative estimates
-   based on the site's detected tech stack sophistication.
+6. The impact areas should cover these categories for all 3 scenarios:
+   - tracking: gaps in measurement causing invisible revenue
+   - attribution: wasted ad spend from poor attribution
+   - performance: revenue lost from slow pages
+   - redundancy: overlapping or unused tools
+   Compliance risk goes in the separate complianceRisk object, NOT in scenario areas.
+7. When data is insufficient for a category, set monthlyImpact to 0 and confidence to "low". Never fabricate traffic or spend data that was not provided.
+8. totalMonthlyImpact must equal the sum of all impactAreas[].monthlyImpact. totalAnnualImpact must equal totalMonthlyImpact * 12.
+9. scoreImprovement.current should reflect the MarketingIQ score from the audit (if available in findings). scoreImprovement.estimated should be the projected score after fixing P0+P1 issues (a reasonable uplift, not 100).
+10. methodology must be 2-3 sentences explaining that these are benchmark-based projections derived from industry research, not measured values from the client's actual revenue or conversion data. Be honest about the limitations.
+11. Scenarios must be ordered: conservative < moderate < aggressive for totalMonthlyImpact.
 
-Respond in JSON.`;
+Respond in valid JSON matching the provided schema.`;
+
+// ─── Main executor ──────────────────────────────────────────────────────
 
 const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
   const signals: Signal[] = [];
@@ -93,7 +110,7 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
   }
 
   const m42Data = m42Result.data as Record<string, unknown>;
-  const synthesis = m42Data['synthesis'] as Record<string, unknown> ?? {};
+  const synthesis = (m42Data['synthesis'] as Record<string, unknown>) ?? {};
 
   // Get traffic data from M24
   const m24Result = ctx.previousResults.get('M24' as ModuleId);
@@ -162,59 +179,83 @@ ${getModuleFindings('M12')}
 ### Critical Findings (from M42)
 ${JSON.stringify(synthesis['critical_findings'] ?? [])}
 
-Produce the ROI simulation as valid JSON with these fields:
-- tracking_gap_cost: { title, monthly_estimate_low, monthly_estimate_high, calculation_steps, assumptions, confidence, source_modules }
-- attribution_waste: same structure
-- performance_impact: same structure
-- compliance_risk: { title, annual_estimate_range, risk_factors, applicable_regulations, confidence, source_modules }
-- tool_redundancy_waste: { title, monthly_estimate, tools_identified, confidence, source_modules }
-- summary: { total_monthly_opportunity_low, total_monthly_opportunity_high, total_annual_opportunity_low, total_annual_opportunity_high, headline }`;
+Produce the impact scenarios as valid JSON with:
+- scenarios: array of 3 objects (conservative, moderate, aggressive), each with id, label, description, impactAreas (tracking, attribution, performance, redundancy), totalMonthlyImpact, totalAnnualImpact, keyAssumptions
+- complianceRisk: { annualExposureLow, annualExposureHigh, riskFactors, applicableRegulations, confidence }
+- scoreImprovement: { current, estimated }
+- headline: one-line summary
+- methodology: 2-3 sentences on approach and limitations`;
 
-    const result = await callFlash(prompt, ROISchema, {
+    const result = await callFlash(prompt, ImpactScenariosSchema, {
       systemInstruction: SYSTEM_PROMPT,
       temperature: 0.3,
-      maxTokens: 4096,
+      maxTokens: 6144,
     });
+
+    // Ensure scenarios are ordered by impact (conservative < moderate < aggressive)
+    result.data.scenarios.sort((a, b) => a.totalMonthlyImpact - b.totalMonthlyImpact);
 
     data.roi = result.data;
     data.tokensUsed = result.tokensUsed;
 
-    checkpoints.push(createCheckpoint({
-      id: 'm44-roi', name: 'ROI Simulation', weight: 0.5,
-      health: 'excellent',
-      evidence: `ROI simulation complete: ${result.data.summary.headline}`,
-    }));
-  } catch (error) {
-    // Fallback: basic ROI estimate
-    data.roi = buildFallbackROI(ctx.url, monthlyVisits);
+    const moderate = result.data.scenarios.find(s => s.id === 'moderate');
+    const totalDisplay = moderate ? `$${moderate.totalMonthlyImpact.toLocaleString()}/mo` : 'calculated';
 
     checkpoints.push(createCheckpoint({
-      id: 'm44-roi', name: 'ROI Simulation', weight: 0.5,
+      id: 'm44-scenarios', name: 'Impact Scenarios', weight: 0.5,
+      health: 'excellent',
+      evidence: `3 impact scenarios generated. Moderate estimate: ${totalDisplay}`,
+    }));
+  } catch (error) {
+    data.roi = buildFallbackScenarios(ctx.url, monthlyVisits);
+
+    checkpoints.push(createCheckpoint({
+      id: 'm44-scenarios', name: 'Impact Scenarios', weight: 0.5,
       health: 'warning',
-      evidence: `ROI simulation used fallback: ${(error as Error).message.slice(0, 80)}`,
+      evidence: `Impact scenarios used fallback: ${(error as Error).message.slice(0, 80)}`,
     }));
   }
 
   return { moduleId: 'M44' as ModuleId, status: 'success', data, signals, score: null, checkpoints, duration: 0 };
 };
 
-function buildFallbackROI(url: string, monthlyVisits?: number) {
+// ─── Fallback ───────────────────────────────────────────────────────────
+
+function buildFallbackScenarios(url: string, monthlyVisits?: number) {
   const visits = monthlyVisits ?? 5000;
-  const na = { title: '', monthly_estimate_low: 'N/A', monthly_estimate_high: 'N/A', calculation_steps: ['Insufficient data for AI calculation'], assumptions: [], confidence: 'low' as const, source_modules: [] };
+  const emptyAreas = [
+    { id: 'tracking', title: 'Tracking Gaps', monthlyImpact: 0, assumptions: [], calculationSteps: ['Insufficient data for calculation'], sourceModules: ['M05', 'M08'], confidence: 'low' as const },
+    { id: 'attribution', title: 'Attribution Waste', monthlyImpact: 0, assumptions: [], calculationSteps: ['Insufficient data for calculation'], sourceModules: ['M06', 'M28'], confidence: 'low' as const },
+    { id: 'performance', title: 'Performance Impact', monthlyImpact: 0, assumptions: [], calculationSteps: ['Insufficient data for calculation'], sourceModules: ['M03', 'M13'], confidence: 'low' as const },
+    { id: 'redundancy', title: 'Tool Redundancy', monthlyImpact: 0, assumptions: [], calculationSteps: ['Insufficient data for calculation'], sourceModules: ['M07'], confidence: 'low' as const },
+  ];
+
+  const makeScenario = (id: 'conservative' | 'moderate' | 'aggressive', label: string) => ({
+    id,
+    label,
+    description: 'Insufficient data for scenario generation.',
+    impactAreas: emptyAreas,
+    totalMonthlyImpact: 0,
+    totalAnnualImpact: 0,
+    keyAssumptions: ['AI scenario generation was unavailable'],
+  });
 
   return {
-    tracking_gap_cost: { ...na, title: 'Revenue Invisible Due to Broken/Missing Tracking' },
-    attribution_waste: { ...na, title: 'Ad Spend Wasted Due to Attribution Errors' },
-    performance_impact: { ...na, title: 'Revenue Lost from Slow Page Performance' },
-    compliance_risk: { title: 'Potential Regulatory Fine Exposure', annual_estimate_range: 'N/A', risk_factors: [], applicable_regulations: [], confidence: 'low' as const, source_modules: [] },
-    tool_redundancy_waste: { title: 'Monthly Spend on Redundant/Unused Tools', monthly_estimate: 'N/A', tools_identified: [], confidence: 'low' as const, source_modules: [] },
-    summary: {
-      total_monthly_opportunity_low: 'N/A',
-      total_monthly_opportunity_high: 'N/A',
-      total_annual_opportunity_low: 'N/A',
-      total_annual_opportunity_high: 'N/A',
-      headline: `ROI simulation for ${url} requires AI synthesis. Estimated ${visits.toLocaleString()} monthly visits.`,
+    scenarios: [
+      makeScenario('conservative', 'Conservative'),
+      makeScenario('moderate', 'Moderate'),
+      makeScenario('aggressive', 'Aggressive'),
+    ],
+    complianceRisk: {
+      annualExposureLow: 0,
+      annualExposureHigh: 0,
+      riskFactors: [],
+      applicableRegulations: [],
+      confidence: 'low' as const,
     },
+    scoreImprovement: { current: 0, estimated: 0 },
+    headline: `Impact scenarios for ${url} require AI synthesis. Estimated ${visits.toLocaleString()} monthly visits.`,
+    methodology: 'Fallback mode — AI generation was unavailable. No financial projections could be calculated.',
   };
 }
 

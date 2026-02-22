@@ -56,7 +56,7 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
       type: 'domain_trust', name: 'Domain Trust',
       confidence: 0.8,
       evidence: `Rank ${rank.toLocaleString()}, ${referringDomains.toLocaleString()} referring domains, ${backlinks.toLocaleString()} backlinks`,
-      category: 'market_position',
+      category: 'market_intelligence',
     }));
 
     // CP1: Domain authority

@@ -9,14 +9,14 @@ import { AXIS_STYLE, GRID_STYLE, CHART_MARGINS, TRAFFIC_LIGHT_COLORS } from '@/l
 import type { CategoryScore, ScoreCategory } from '@marketing-alpha/types';
 
 const CATEGORY_LABELS: Record<ScoreCategory, string> = {
-  analytics_integrity: 'Analytics',
-  paid_media_attribution: 'Paid Media',
-  performance_ux: 'Performance',
-  compliance_security: 'Compliance',
-  martech_efficiency: 'MarTech',
+  analytics_measurement: 'Analytics',
+  paid_media: 'Paid Media',
+  performance_experience: 'Performance',
+  security_compliance: 'Compliance',
+  martech_infrastructure: 'MarTech',
   seo_content: 'SEO',
-  market_position: 'Market Position',
-  digital_presence: 'Digital Presence',
+  market_intelligence: 'Market Intelligence',
+  brand_presence: 'Brand Presence',
 };
 
 interface CategoryScoresBarProps {

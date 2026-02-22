@@ -21,7 +21,7 @@ let worker: Worker<ScanJobData, ScanJobResult> | null = null;
  *
  * Tier phases:
  *   full = passive + browser + ghostscan + external + M41 synthesis
- *   paid = all phases including M42-M46 synthesis
+ *   paid = all phases including M42-M45 synthesis
  */
 async function processScanJob(
   job: Job<ScanJobData, ScanJobResult>,

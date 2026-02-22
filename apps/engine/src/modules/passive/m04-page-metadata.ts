@@ -1412,7 +1412,7 @@ function buildSignals(data: M04Data): Signal[] {
       name: 'schema-same-as',
       confidence: 0.95,
       evidence: `${data.jsonLd.socialProfiles.length} social profiles in JSON-LD: ${data.jsonLd.socialProfiles.map(u => { try { return new URL(u).hostname; } catch { return u; } }).join(', ')}`,
-      category: 'digital_presence',
+      category: 'brand_presence',
     }));
   }
 
@@ -1446,7 +1446,7 @@ function buildSignals(data: M04Data): Signal[] {
       name: 'favicon',
       confidence: 0.9,
       evidence: `Favicon formats: ${faviconLabels.join(', ')}`,
-      category: 'digital_presence',
+      category: 'brand_presence',
     }));
   }
 
@@ -1479,7 +1479,7 @@ function buildSignals(data: M04Data): Signal[] {
       name: 'resource-hints',
       confidence: 0.85,
       evidence: `${data.preconnectHints.length} resource hint(s)`,
-      category: 'performance_ux',
+      category: 'performance_experience',
     }));
   }
 
@@ -1490,7 +1490,7 @@ function buildSignals(data: M04Data): Signal[] {
       name: 'llms-txt',
       confidence: 0.9,
       evidence: 'llms.txt present',
-      category: 'digital_presence',
+      category: 'brand_presence',
     }));
   }
 
@@ -1501,7 +1501,7 @@ function buildSignals(data: M04Data): Signal[] {
       name: 'web-app-manifest',
       confidence: 0.9,
       evidence: 'manifest.json present',
-      category: 'digital_presence',
+      category: 'brand_presence',
     }));
   }
 
@@ -1523,7 +1523,7 @@ function buildSignals(data: M04Data): Signal[] {
       name: 'alternate-links',
       confidence: 0.95,
       evidence: `${data.alternateLinks.length} alternate link(s): ${data.alternateLinks.map(l => l.type).join(', ')}`,
-      category: 'digital_presence',
+      category: 'brand_presence',
     }));
   }
 
@@ -1534,7 +1534,7 @@ function buildSignals(data: M04Data): Signal[] {
       name: 'opensearch',
       confidence: 0.9,
       evidence: `OpenSearch descriptor${data.openSearch.title ? `: ${data.openSearch.title}` : ''}`,
-      category: 'digital_presence',
+      category: 'brand_presence',
     }));
   }
 
@@ -1545,7 +1545,7 @@ function buildSignals(data: M04Data): Signal[] {
       name: 'amp-page',
       confidence: 0.95,
       evidence: 'AMP version detected',
-      category: 'performance_ux',
+      category: 'performance_experience',
     }));
   }
 

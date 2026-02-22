@@ -94,8 +94,36 @@ export interface CategoryDeepDiveData {
   visualizationData: Record<string, unknown>;
 }
 
+export interface ImpactArea {
+  id: string;
+  title: string;
+  monthlyImpact: number;
+  assumptions: string[];
+  calculationSteps: string[];
+  sourceModules: string[];
+  confidence: Confidence;
+}
+
+export interface ImpactScenario {
+  id: 'conservative' | 'moderate' | 'aggressive';
+  label: string;
+  description: string;
+  impactAreas: ImpactArea[];
+  totalMonthlyImpact: number;
+  totalAnnualImpact: number;
+  keyAssumptions: string[];
+}
+
 export interface ROIData {
+  /** 3 pre-computed scenarios (conservative / moderate / aggressive) */
+  scenarios: ImpactScenario[];
+  defaultScenarioId: 'conservative' | 'moderate' | 'aggressive';
+  headline: string;
+  methodology: string;
+
+  /** Backward compat — conservative.total / aggressive.total */
   totalOpportunity: { low: number; high: number };
+  /** Backward compat — populated from moderate scenario */
   impactAreas: Array<{
     id: string;
     title: string;

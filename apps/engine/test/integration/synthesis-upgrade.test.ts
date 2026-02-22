@@ -2,7 +2,7 @@
  * WS6-C: Synthesis Upgrade Path Test
  *
  * Tests the runSynthesisOnly() path used when a free user upgrades to paid.
- * Pre-loads M01-M41 fixture results, then verifies M42-M46 execute
+ * Pre-loads M01-M41 fixture results, then verifies M42-M45 execute
  * with correct dependency chain.
  */
 
@@ -48,7 +48,6 @@ vi.mock('../../src/modules/registry.js', () => ({
       { id: 'M43', name: 'PRD Generation', phase: 'synthesis', minimumTier: 'paid', dependsOn: ['M42'], timeout: 120000, retries: 0, category: 'analytics_integrity' },
       { id: 'M44', name: 'ROI Simulator', phase: 'synthesis', minimumTier: 'paid', dependsOn: ['M42'], timeout: 120000, retries: 0, category: 'analytics_integrity' },
       { id: 'M45', name: 'Cost Cutter', phase: 'synthesis', minimumTier: 'paid', dependsOn: ['M42'], timeout: 120000, retries: 0, category: 'analytics_integrity' },
-      { id: 'M46', name: 'Knowledge Base', phase: 'synthesis', minimumTier: 'paid', dependsOn: ['M42'], timeout: 120000, retries: 0, category: 'analytics_integrity' },
     ];
     return [];
   }),
@@ -58,7 +57,7 @@ vi.mock('../../src/modules/registry.js', () => ({
 import { registerModuleExecutor, ModuleRunner } from '../../src/modules/runner.js';
 
 // Register synthesis module executors
-for (const id of ['M41', 'M42', 'M43', 'M44', 'M45', 'M46']) {
+for (const id of ['M41', 'M42', 'M43', 'M44', 'M45']) {
   registerModuleExecutor(id as ModuleId, async (ctx): Promise<ModuleResult> => {
     executionOrder.push(id);
     return {
@@ -97,8 +96,8 @@ describe('Synthesis Upgrade Path', () => {
     const runner = new ModuleRunner('upgrade-test', 'https://example.com', 'full');
     const { results, modulesCompleted } = await runner.runSynthesisOnly(existingResults);
 
-    // All 6 synthesis modules should complete
-    expect(modulesCompleted).toBeGreaterThanOrEqual(11); // 5 existing + 6 synthesis
+    // All 5 synthesis modules should complete
+    expect(modulesCompleted).toBeGreaterThanOrEqual(10); // 5 existing + 5 synthesis
 
     // Synthesis results should be present
     expect(results.has('M41' as ModuleId)).toBe(true);
@@ -106,7 +105,6 @@ describe('Synthesis Upgrade Path', () => {
     expect(results.has('M43' as ModuleId)).toBe(true);
     expect(results.has('M44' as ModuleId)).toBe(true);
     expect(results.has('M45' as ModuleId)).toBe(true);
-    expect(results.has('M46' as ModuleId)).toBe(true);
 
     // M41 should run first
     expect(executionOrder[0]).toBe('M41');
@@ -117,7 +115,7 @@ describe('Synthesis Upgrade Path', () => {
   });
 
   it('should skip synthesis modules with missing dependencies', async () => {
-    // Don't include M41 in existing results — M42-M46 depend on it
+    // Don't include M41 in existing results — M42-M45 depend on it
     const emptyResults = new Map<ModuleId, ModuleResult>();
 
     const runner = new ModuleRunner('upgrade-test-2', 'https://example.com', 'full');

@@ -3,7 +3,6 @@
 import type { ModuleResult } from '@marketing-alpha/types';
 import { ReportSection } from './report-section';
 import { ROIImpactBar } from '@/components/charts/roi-impact-bar';
-import { formatters } from '@/lib/chart-config';
 
 interface ROISectionProps {
   m44Result: ModuleResult | undefined;
@@ -15,116 +14,77 @@ export function ROISection({ m44Result }: ROISectionProps) {
 
   if (!roi) return null;
 
-  // Build chart data from the new M44 structure (AI-5)
-  const chartData: Array<{ category: string; wastedSpend: number; missedRevenue: number; inefficiencyCost: number }> = [];
+  const scenarios = (roi['scenarios'] as Array<Record<string, unknown>>) ?? [];
+  const methodology = (roi['methodology'] as string) ?? '';
+  const headline = (roi['headline'] as string) ?? '';
 
-  const trackingGap = roi['tracking_gap_cost'] as Record<string, unknown> | undefined;
-  const attributionWaste = roi['attribution_waste'] as Record<string, unknown> | undefined;
-  const perfImpact = roi['performance_impact'] as Record<string, unknown> | undefined;
-  const complianceRisk = roi['compliance_risk'] as Record<string, unknown> | undefined;
-  const toolRedundancy = roi['tool_redundancy_waste'] as Record<string, unknown> | undefined;
-  const summary = roi['summary'] as Record<string, unknown> | undefined;
+  if (scenarios.length === 0) return null;
 
-  if (trackingGap) {
-    chartData.push({
-      category: 'Tracking Gaps',
-      wastedSpend: parseAmount(trackingGap['monthly_untracked_revenue']),
-      missedRevenue: parseAmount(trackingGap['annual_impact']),
-      inefficiencyCost: 0,
-    });
-  }
+  // Build chart data from moderate scenario (or first available)
+  const moderate = scenarios.find(s => s['id'] === 'moderate') ?? scenarios[1] ?? scenarios[0];
+  if (!moderate) return null;
 
-  if (attributionWaste) {
-    chartData.push({
-      category: 'Attribution',
-      wastedSpend: parseAmount(attributionWaste['wasted_monthly_spend']),
-      missedRevenue: 0,
-      inefficiencyCost: parseAmount(attributionWaste['optimization_opportunity']),
-    });
-  }
+  const impactAreas = (moderate['impactAreas'] as Array<Record<string, unknown>>) ?? [];
 
-  if (perfImpact) {
-    chartData.push({
-      category: 'Performance',
-      wastedSpend: 0,
-      missedRevenue: parseAmount(perfImpact['estimated_monthly_revenue_loss']),
-      inefficiencyCost: 0,
-    });
-  }
-
-  if (complianceRisk) {
-    chartData.push({
-      category: 'Compliance',
-      wastedSpend: 0,
-      missedRevenue: 0,
-      inefficiencyCost: parseAmount(complianceRisk['estimated_exposure']),
-    });
-  }
-
-  if (toolRedundancy) {
-    chartData.push({
-      category: 'Tool Redundancy',
-      wastedSpend: parseAmount(toolRedundancy['monthly_waste']),
+  const chartData = impactAreas
+    .filter(a => ((a['monthlyImpact'] as number) ?? 0) > 0)
+    .map(a => ({
+      category: (a['title'] as string) ?? '',
+      wastedSpend: (a['monthlyImpact'] as number) ?? 0,
       missedRevenue: 0,
       inefficiencyCost: 0,
-    });
-  }
-
-  // Fallback: try old `scenarios` format
-  if (chartData.length === 0) {
-    const scenarios = (data?.['scenarios'] as Array<Record<string, unknown>>) ?? [];
-    for (const s of scenarios) {
-      chartData.push({
-        category: (s['name'] as string) ?? 'Unknown',
-        wastedSpend: parseAmount(s['annualImpact']),
-        missedRevenue: 0,
-        inefficiencyCost: 0,
-      });
-    }
-  }
+    }));
 
   if (chartData.length === 0) return null;
 
+  // Build summary row from all 3 scenarios
+  const conservative = scenarios.find(s => s['id'] === 'conservative');
+  const aggressive = scenarios.find(s => s['id'] === 'aggressive');
+
   return (
-    <ReportSection title="ROI Impact Analysis">
-      <p className="text-sm text-muted mb-4">
-        Estimated return on investment for implementing recommended improvements.
-      </p>
+    <ReportSection title="Impact Scenarios">
+      {headline && (
+        <p className="text-sm text-primary/80 mb-4">{headline}</p>
+      )}
+
       <ROIImpactBar data={chartData} height={280} />
-      {summary && (
-        <div className="mt-4 p-4 bg-[#FAFBFC] rounded-lg">
-          <h4 className="font-heading text-sm font-700 text-primary mb-2">Summary</h4>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
-            {summary['total_monthly_impact'] != null && (
-              <div>
-                <span className="text-muted">Monthly Impact:</span>
-                <div className="font-mono font-bold text-error text-sm">{String(summary['total_monthly_impact'])}</div>
+
+      {/* Scenario comparison */}
+      {scenarios.length > 1 && (
+        <div className="mt-4 grid grid-cols-3 gap-3">
+          {[conservative, moderate, aggressive].map(s => {
+            if (!s) return null;
+            const total = (s['totalMonthlyImpact'] as number) ?? 0;
+            return (
+              <div
+                key={s['id'] as string}
+                className="bg-[#FAFBFC] rounded-lg p-3 border border-[#E2E8F0] text-center"
+              >
+                <p className="text-xs font-heading font-600 text-muted uppercase tracking-wide">
+                  {(s['label'] as string) ?? (s['id'] as string)}
+                </p>
+                <p className="font-mono font-bold text-primary text-lg mt-1">
+                  {formatDollar(total)}
+                  <span className="text-xs font-normal text-muted">/mo</span>
+                </p>
               </div>
-            )}
-            {summary['total_annual_impact'] != null && (
-              <div>
-                <span className="text-muted">Annual Impact:</span>
-                <div className="font-mono font-bold text-error text-sm">{String(summary['total_annual_impact'])}</div>
-              </div>
-            )}
-            {summary['confidence_level'] != null && (
-              <div>
-                <span className="text-muted">Confidence:</span>
-                <div className="font-mono font-bold text-primary text-sm">{String(summary['confidence_level'])}</div>
-              </div>
-            )}
-          </div>
+            );
+          })}
         </div>
+      )}
+
+      {methodology && (
+        <p className="mt-4 text-xs text-muted italic">{methodology}</p>
       )}
     </ReportSection>
   );
 }
 
-function parseAmount(value: unknown): number {
-  if (typeof value === 'number') return value;
-  if (typeof value === 'string') {
-    const cleaned = value.replace(/[^0-9.-]/g, '');
-    return parseFloat(cleaned) || 0;
-  }
-  return 0;
+function formatDollar(n: number): string {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(n);
 }

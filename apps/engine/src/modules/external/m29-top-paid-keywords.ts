@@ -148,7 +148,7 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
         type: 'business_competitors', name: 'Business Competitors',
         confidence: 0.85,
         evidence: `Top business competitors: ${topCompetitors.slice(0, 3).map(c => c.domain).join(', ')}`,
-        category: 'market_position',
+        category: 'market_intelligence',
       }));
     }
 

@@ -10,37 +10,37 @@ interface CategoryDeepDiveProps {
 }
 
 const CATEGORY_LABELS: Record<ScoreCategory, string> = {
-  analytics_integrity: 'Analytics & Data Integrity',
-  paid_media_attribution: 'Paid Media & Attribution',
-  performance_ux: 'Performance & User Experience',
-  compliance_security: 'Compliance & Security',
-  martech_efficiency: 'MarTech Efficiency',
+  analytics_measurement: 'Analytics & Measurement',
+  paid_media: 'Paid Media',
+  performance_experience: 'Performance & Experience',
+  security_compliance: 'Security & Compliance',
+  martech_infrastructure: 'MarTech & Infrastructure',
   seo_content: 'SEO & Content',
-  market_position: 'Market Position',
-  digital_presence: 'Digital Presence',
+  market_intelligence: 'Market Intelligence',
+  brand_presence: 'Brand & Digital Presence',
 };
 
 const CATEGORY_DESCRIPTIONS: Record<ScoreCategory, string> = {
-  analytics_integrity: 'How well analytics tools are configured, tracking accuracy, and data governance.',
-  paid_media_attribution: 'Paid advertising infrastructure, pixel implementation, and attribution setup.',
-  performance_ux: 'Page speed, Core Web Vitals, mobile experience, and carbon efficiency.',
-  compliance_security: 'Legal compliance, security headers, consent management, and accessibility.',
-  martech_efficiency: 'Marketing technology stack health, tool utilization, and integration quality.',
-  seo_content: 'Search engine optimization, content structure, and social sharing readiness.',
-  market_position: 'Traffic metrics, competitive landscape, brand search demand, and authority.',
-  digital_presence: 'Corporate pages, support infrastructure, and investor relations.',
+  analytics_measurement: 'How well analytics tools are configured, tracking accuracy, and data governance.',
+  paid_media: 'Paid advertising infrastructure, pixel implementation, and attribution setup.',
+  performance_experience: 'Page speed, Core Web Vitals, mobile experience, and accessibility.',
+  security_compliance: 'Security headers, legal compliance, consent management, and privacy.',
+  martech_infrastructure: 'Marketing technology stack health, CMS infrastructure, and integration quality.',
+  seo_content: 'Search engine optimization, content structure, and indexing health.',
+  market_intelligence: 'Traffic metrics, competitive landscape, rankings, and domain authority.',
+  brand_presence: 'PR & media, corporate pages, reviews, social sentiment, and local presence.',
 };
 
 // Map categories to module IDs
 const CATEGORY_MODULES: Record<ScoreCategory, string[]> = {
-  analytics_integrity: ['M05', 'M08', 'M09'],
-  paid_media_attribution: ['M06', 'M06b', 'M21', 'M28', 'M29'],
-  performance_ux: ['M03', 'M13', 'M14'],
-  compliance_security: ['M01', 'M10', 'M11', 'M12'],
-  martech_efficiency: ['M07', 'M20'],
-  seo_content: ['M04', 'M15', 'M16', 'M34', 'M35'],
-  market_position: ['M24', 'M25', 'M26', 'M27', 'M30', 'M31', 'M32', 'M33', 'M36'],
-  digital_presence: ['M02', 'M17', 'M18', 'M19', 'M22', 'M23', 'M37', 'M38', 'M39'],
+  security_compliance: ['M01', 'M12', 'M40'],
+  analytics_measurement: ['M05', 'M06', 'M06b', 'M08', 'M09'],
+  performance_experience: ['M03', 'M10', 'M11', 'M13', 'M14'],
+  seo_content: ['M04', 'M15', 'M26', 'M34', 'M39'],
+  paid_media: ['M21', 'M28', 'M29'],
+  martech_infrastructure: ['M02', 'M07', 'M20'],
+  brand_presence: ['M16', 'M17', 'M18', 'M19', 'M22', 'M23', 'M37', 'M38'],
+  market_intelligence: ['M24', 'M25', 'M27', 'M30', 'M31', 'M32', 'M33', 'M35', 'M36'],
 };
 
 const MODULE_NAMES: Record<string, string> = {

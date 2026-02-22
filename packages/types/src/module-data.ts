@@ -334,27 +334,142 @@ export interface M24Data {
 
 // ── M41: Module Synthesis ───────────────────────────────────────────────
 
+export interface M41FindingRecommendation {
+  action: string;
+  priority: 'P0' | 'P1' | 'P2' | 'P3';
+  effort: 'S' | 'M' | 'L' | 'XL';
+  implementation_steps: string[];
+  expected_impact: string;
+}
+
+export interface M41KeyFinding {
+  parameter: string;
+  finding: string;
+  severity: 'critical' | 'warning' | 'info' | 'positive';
+  evidence: string;
+  detail: string;
+  business_impact: string;
+  recommendation?: M41FindingRecommendation;
+}
+
+export interface M41ScoreBreakdownEntry {
+  criterion: string;
+  score: number;
+  weight: number;
+  evidence: string;
+}
+
 export interface M41ModuleSynthesis {
+  source: 'ai' | 'fallback';
+  analysis: string;
   executive_summary: string;
-  key_findings: Array<{
-    finding: string;
-    severity: 'critical' | 'warning' | 'info' | 'positive';
-    evidence: string;
-    business_impact: string;
-  }>;
+  key_findings: M41KeyFinding[];
   recommendations: Array<{
     action: string;
     priority: 'P0' | 'P1' | 'P2' | 'P3';
     effort: 'S' | 'M' | 'L' | 'XL';
     expected_impact: string;
+    implementation_steps: string[];
   }>;
+  module_score: number;
+  score_breakdown: M41ScoreBreakdownEntry[];
   score_rationale: string;
 }
 
+export interface BusinessProfile {
+  url: string;
+  scanDate: string;
+  businessName: string | null;
+  description: string | null;
+  businessModel: string | null;
+  techStack: {
+    cms: string | null;
+    framework: string | null;
+    cdn: string | null;
+    hosting: string | null;
+  };
+  ecommerce: {
+    productType: string | null;
+    platform: string | null;
+    hasCheckout: boolean;
+    hasFreeTrial: boolean;
+  };
+  scale: {
+    totalTraffic: number | null;
+    organicTraffic: number | null;
+    paidTraffic: number | null;
+  };
+}
+
 export interface M41Data {
+  businessContext: BusinessProfile;
   moduleSummaries: Record<string, M41ModuleSynthesis>;
   synthesizedCount: number;
   failedCount: number;
+  modelVersion: string;
+  promptVersion: string;
+}
+
+// ── M43: Remediation Plan ─────────────────────────────────────────────
+
+export interface M43Metadata {
+  title: string;
+  businessName: string;
+  scanDate: string;
+  totalFindings: number;
+  p0Count: number;
+  p1Count: number;
+  p2Count: number;
+  p3Count: number;
+  estimatedTimelineWeeks: number;
+}
+
+export interface M43Data {
+  markdown: string;
+  metadata: M43Metadata;
+  promptVersion: string;
+}
+
+// ── M44: Impact Scenarios ───────────────────────────────────────────────
+
+export interface M44ImpactArea {
+  id: string;
+  title: string;
+  monthlyImpact: number;
+  assumptions: string[];
+  calculationSteps: string[];
+  sourceModules: string[];
+  confidence: 'high' | 'medium' | 'low';
+}
+
+export interface M44Scenario {
+  id: 'conservative' | 'moderate' | 'aggressive';
+  label: string;
+  description: string;
+  impactAreas: M44ImpactArea[];
+  totalMonthlyImpact: number;
+  totalAnnualImpact: number;
+  keyAssumptions: string[];
+}
+
+export interface M44Data {
+  roi: {
+    scenarios: M44Scenario[];
+    complianceRisk: {
+      annualExposureLow: number;
+      annualExposureHigh: number;
+      riskFactors: string[];
+      applicableRegulations: string[];
+      confidence: 'high' | 'medium' | 'low';
+    };
+    scoreImprovement: {
+      current: number;
+      estimated: number;
+    };
+    headline: string;
+    methodology: string;
+  };
+  tokensUsed?: { prompt: number; completion: number; total: number };
 }
 
 // ── M32: Domain Trust & Authority ───────────────────────────────────────
@@ -399,6 +514,65 @@ export interface M40Data {
   wildcardIp: string | null;
 }
 
+// ── M45: Stack Analyzer ─────────────────────────────────────────────────
+
+export interface M45AbandonedTool {
+  tool: string;
+  evidence: string;
+  sourceModule: string;
+  recommendation: string;
+}
+
+export interface M45Redundancy {
+  tools: string[];
+  function: string;
+  recommendation: string;
+  rationale: string;
+  effortToConsolidate: 'S' | 'M' | 'L';
+}
+
+export interface M45StackTool {
+  tool: string;
+  purpose: string;
+  rationale: string;
+}
+
+export interface M45LeanStack {
+  description: string;
+  tools: Array<M45StackTool & { replaces: string[] }>;
+  removals: Array<{ tool: string; reason: string }>;
+  totalToolsAfter: number;
+  keyBenefit: string;
+}
+
+export interface M45OptimalStack {
+  description: string;
+  tools: Array<M45StackTool & { isCurrentlyDetected: boolean }>;
+  gaps: Array<{ capability: string; recommendation: string; rationale: string }>;
+  upgrades: Array<{ currentTool: string; suggestedTool: string; rationale: string }>;
+  totalToolsAfter: number;
+  keyBenefit: string;
+}
+
+export interface M45Data {
+  stackAnalysis: {
+    currentStack: {
+      totalTools: number;
+      activeTools: number;
+      abandonedTools: number;
+      redundantPairs: number;
+      categories: Array<{ name: string; tools: string[] }>;
+      assessment: string;
+    };
+    abandonedTools: M45AbandonedTool[];
+    redundancies: M45Redundancy[];
+    leanStack: M45LeanStack;
+    optimalStack: M45OptimalStack;
+    methodology: string;
+  };
+  tokensUsed?: { prompt: number; completion: number; total: number };
+}
+
 // ── Module Data Map ─────────────────────────────────────────────────────
 // Maps module IDs to their data shapes for type-safe access
 
@@ -416,4 +590,6 @@ export interface ModuleDataMap {
   M32: M32Data;
   M40: M40Data;
   M41: M41Data;
+  M44: M44Data;
+  M45: M45Data;
 }

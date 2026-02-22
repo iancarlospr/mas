@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI, type GenerativeModel } from '@google/generative-ai';
+import { GoogleGenerativeAI, type GenerativeModel, type Part } from '@google/generative-ai';
 import { z, type ZodType } from 'zod';
 import pino from 'pino';
 
@@ -25,12 +25,20 @@ function getClient(): GoogleGenerativeAI {
 /**
  * Model identifiers for different quality tiers.
  */
+// NOTE: gemini-3-flash-preview is a preview model. Update to GA model ID
+// (e.g., 'gemini-3-flash') when Google promotes it to general availability.
 export const MODELS = {
-  flash: 'gemini-2.5-flash',
-  pro: 'gemini-2.5-pro',
+  flash: 'gemini-3-flash-preview',
+  // NOTE: gemini-3.1-pro-preview is a preview model. Update when GA releases.
+  pro: 'gemini-3.1-pro-preview',
 } as const;
 
 export type ModelTier = keyof typeof MODELS;
+
+export interface ImageInput {
+  mimeType: string;
+  uri: string;
+}
 
 interface GenerateOptions {
   model: ModelTier;
@@ -40,6 +48,7 @@ interface GenerateOptions {
   maxTokens?: number;
   retries?: number;
   retryDelay?: number;
+  images?: ImageInput[];
 }
 
 interface GenerateResult<T> {
@@ -66,6 +75,7 @@ export async function callFlash<T>(
     systemInstruction?: string;
     temperature?: number;
     maxTokens?: number;
+    images?: ImageInput[];
   },
 ): Promise<GenerateResult<T>> {
   return generateWithValidation({
@@ -73,7 +83,8 @@ export async function callFlash<T>(
     prompt,
     systemInstruction: options?.systemInstruction,
     temperature: options?.temperature ?? 0.3,
-    maxTokens: options?.maxTokens ?? 8192,
+    maxTokens: options?.maxTokens ?? 16384,
+    images: options?.images,
   }, schema);
 }
 
@@ -88,6 +99,7 @@ export async function callPro<T>(
     systemInstruction?: string;
     temperature?: number;
     maxTokens?: number;
+    images?: ImageInput[];
   },
 ): Promise<GenerateResult<T>> {
   return generateWithValidation({
@@ -96,6 +108,7 @@ export async function callPro<T>(
     systemInstruction: options?.systemInstruction,
     temperature: options?.temperature ?? 0.4,
     maxTokens: options?.maxTokens ?? 16384,
+    images: options?.images,
   }, schema);
 }
 
@@ -114,6 +127,7 @@ async function generateWithValidation<T>(
     maxTokens = 8192,
     retries = DEFAULT_RETRIES,
     retryDelay = DEFAULT_RETRY_DELAY,
+    images,
   } = options;
 
   const client = getClient();
@@ -141,8 +155,17 @@ async function generateWithValidation<T>(
     }
 
     try {
+      // Build multimodal parts: text first, then images (if any)
+      const parts: Part[] = [{ text: prompt }];
+      if (images?.length) {
+        for (const img of images) {
+          parts.push({ fileData: { mimeType: img.mimeType, fileUri: img.uri } });
+        }
+        logger.debug({ imageCount: images.length, model: modelId }, 'Sending multimodal request with images');
+      }
+
       const result = await generativeModel.generateContent({
-        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        contents: [{ role: 'user', parts }],
         generationConfig: {
           temperature,
           maxOutputTokens: maxTokens,

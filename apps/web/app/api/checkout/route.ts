@@ -4,16 +4,23 @@ import { getStripe } from '@/lib/stripe';
 import { z } from 'zod';
 
 const CheckoutSchema = z.object({
-  product: z.enum(['alpha_brief', 'chat_credits']),
+  product: z.enum(['alpha_brief', 'chat_activation', 'chat_credits']),
   scanId: z.string().uuid(),
 });
 
 function getPriceMap() {
   return {
     alpha_brief: process.env.STRIPE_ALPHA_BRIEF_PRICE_ID!,
+    chat_activation: process.env.STRIPE_CHAT_ACTIVATION_PRICE_ID!,
     chat_credits: process.env.STRIPE_CHAT_CREDITS_PRICE_ID!,
   };
 }
+
+const AMOUNT_MAP: Record<string, number> = {
+  alpha_brief: 999,
+  chat_activation: 100,
+  chat_credits: 499,
+};
 
 export async function POST(request: NextRequest) {
   const supabase = await createClient();
@@ -51,6 +58,31 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Scan is already upgraded' }, { status: 400 });
   }
 
+  if (product === 'chat_activation') {
+    // Require paid scan for chat activation
+    if (scan.tier !== 'paid') {
+      return NextResponse.json({ error: 'Alpha Brief required before chat activation' }, { status: 400 });
+    }
+
+    // Prevent double activation — user must not already have credits
+    const { data: existingCredits } = await supabase
+      .from('chat_credits')
+      .select('remaining')
+      .eq('user_id', user.id)
+      .single();
+
+    if (existingCredits) {
+      return NextResponse.json({ error: 'Chat already activated' }, { status: 400 });
+    }
+  }
+
+  if (product === 'chat_credits') {
+    // Require paid scan for chat top-up
+    if (scan.tier !== 'paid') {
+      return NextResponse.json({ error: 'Alpha Brief required for chat credits' }, { status: 400 });
+    }
+  }
+
   if (scan.status === 'failed' || scan.status === 'cancelled') {
     return NextResponse.json({ error: 'Cannot purchase for a failed scan' }, { status: 400 });
   }
@@ -75,7 +107,7 @@ export async function POST(request: NextRequest) {
     scan_id: scanId,
     stripe_session_id: session.id,
     product,
-    amount_cents: product === 'alpha_brief' ? 999 : 499,
+    amount_cents: AMOUNT_MAP[product] ?? 0,
     status: 'pending',
   });
 

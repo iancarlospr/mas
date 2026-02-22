@@ -101,7 +101,7 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
       type: 'google_shopping', name: 'Google Shopping',
       confidence: 0.85,
       evidence: `${products.length} product listing(s) across ${result.items.length} categories`,
-      category: 'market_position',
+      category: 'market_intelligence',
     }));
 
     // CP1: Shopping presence

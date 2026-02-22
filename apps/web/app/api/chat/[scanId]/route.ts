@@ -9,12 +9,176 @@ const ChatSchema = z.object({
   message: z.string().min(1).max(2000),
 });
 
-function buildSystemPrompt(domain: string, knowledgeBase: unknown): string {
-  return `You are the AlphaScan AI Assistant for ${domain}. You have access to
-the complete results of a forensic marketing technology audit.
+// ─── Question → Module Routing ───────────────────────────────────────────────
 
-You can answer ANY question about this domain's marketing technology
-stack, performance, compliance, tracking, paid media, and more.
+const MODULE_ROUTING: { patterns: RegExp; modules: string[] }[] = [
+  { patterns: /\b(analytics?|tracking|ga4|gtm|consent|measurement)\b/i, modules: ['M05', 'M08', 'M09'] },
+  { patterns: /\b(ads?|pixel|attribution|roas|paid media|ppc|landing page)\b/i, modules: ['M06', 'M06b', 'M21', 'M28'] },
+  { patterns: /\b(performance|speed|lcp|cls|fcp|ttfb|core web vitals?|cwv|carbon)\b/i, modules: ['M03', 'M13', 'M14'] },
+  { patterns: /\b(security|https|headers?|dns|ssl|tls|attack surface|subdomains?)\b/i, modules: ['M01', 'M40'] },
+  { patterns: /\b(compliance|gdpr|ccpa|cookies?|privacy|consent|legal)\b/i, modules: ['M12', 'M10'] },
+  { patterns: /\b(seo|metadata|rankings?|keywords?|sitemap|indexing|organic)\b/i, modules: ['M04', 'M26', 'M34', 'M39'] },
+  { patterns: /\b(tools?|stack|martech|redundant|cms|infrastructure|ecommerce|saas)\b/i, modules: ['M07', 'M20', 'M02'] },
+  { patterns: /\b(competitors?|traffic|market|visits?|countries|domain trust)\b/i, modules: ['M24', 'M25', 'M29', 'M30', 'M31', 'M33'] },
+  { patterns: /\b(social|sentiment|brand|reviews?|local pack|news)\b/i, modules: ['M15', 'M22', 'M23', 'M37', 'M38'] },
+  { patterns: /\b(fix|implement|how to|steps?|remediat|roadmap|workstream|prd)\b/i, modules: ['M43'] },
+  { patterns: /\b(roi|impact|savings?|cost|budget|spend|redundan)\b/i, modules: ['M44', 'M45'] },
+  { patterns: /\b(brief|summary|overview|executive|report)\b/i, modules: ['M42'] },
+  { patterns: /\b(mobile|responsive|viewport|android|ios)\b/i, modules: ['M14'] },
+  { patterns: /\b(errors?|console|logging|javascript)\b/i, modules: ['M11'] },
+  { patterns: /\b(accessibility|a11y|overlay|widget)\b/i, modules: ['M10'] },
+  { patterns: /\b(behavio|heatmap|scroll|session|replay|interact)\b/i, modules: ['M09'] },
+  { patterns: /\b(pr|media|press|careers?|hiring|investor|support|success)\b/i, modules: ['M16', 'M17', 'M18', 'M19'] },
+  { patterns: /\b(shopping|google shopping|product listing)\b/i, modules: ['M36'] },
+  { patterns: /\b(sharing|open graph|og:|twitter card)\b/i, modules: ['M15'] },
+];
+
+// Always include these synthesis modules for context framing
+const ALWAYS_INCLUDE = ['M41', 'M42'];
+
+function routeQuestion(question: string): string[] {
+  const matched = new Set<string>();
+
+  for (const route of MODULE_ROUTING) {
+    if (route.patterns.test(question)) {
+      for (const m of route.modules) {
+        matched.add(m);
+      }
+    }
+  }
+
+  // If no specific modules matched, include a broad set
+  if (matched.size === 0) {
+    // Include M43 for implementation questions and M42 for general
+    matched.add('M43');
+    matched.add('M44');
+    matched.add('M45');
+  }
+
+  // Always include synthesis context
+  for (const m of ALWAYS_INCLUDE) {
+    matched.add(m);
+  }
+
+  return [...matched];
+}
+
+// ─── Context Assembly ────────────────────────────────────────────────────────
+
+interface ModuleResultRow {
+  module_id: string;
+  data: Record<string, unknown>;
+  score: number | null;
+  checkpoints: { id: string; name: string; health: string; evidence: string }[];
+}
+
+function buildContextString(
+  results: ModuleResultRow[],
+  domain: string,
+  question: string,
+): string {
+  const resultMap = new Map(results.map(r => [r.module_id, r]));
+
+  // ─── Layer 1: Briefing ───
+  const m41 = resultMap.get('M41');
+  const m41Data = m41?.data as Record<string, unknown> | undefined;
+  const businessProfile = m41Data?.['businessProfile'] as Record<string, unknown> | undefined;
+  const moduleSummaries = m41Data?.['moduleSummaries'] as Record<string, unknown> | undefined;
+
+  const m42 = resultMap.get('M42');
+  const m42Data = m42?.data as Record<string, unknown> | undefined;
+  const synthesis = m42Data?.['synthesis'] as Record<string, unknown> | undefined;
+  const marketingIQ = m42Data?.['marketingIQ'] as Record<string, unknown> | undefined;
+  const categoryScores = m42Data?.['categoryScores'] as Record<string, unknown>[] | undefined;
+
+  const sections: string[] = [];
+
+  sections.push(`## LAYER 1: SCAN BRIEFING
+Domain: ${domain}
+MarketingIQ Score: ${marketingIQ?.['final'] ?? 'N/A'} / 100 (${marketingIQ?.['label'] ?? ''})
+Business: ${businessProfile?.['businessName'] ?? domain} | Model: ${businessProfile?.['businessModel'] ?? 'Unknown'} | Scale: ${businessProfile?.['scale'] ?? 'Unknown'}
+${categoryScores ? `Category Scores:\n${categoryScores.map((c: Record<string, unknown>) => `  - ${c['category']}: ${c['score']}/100`).join('\n')}` : ''}`);
+
+  // ─── Layer 2: Relevant Module Data ───
+  const moduleDataSections: string[] = [];
+  for (const [moduleId, result] of resultMap) {
+    if (['M41', 'M42'].includes(moduleId)) continue; // Handled in other layers
+
+    const summary = moduleSummaries?.[moduleId] as Record<string, unknown> | undefined;
+
+    moduleDataSections.push(`### ${moduleId} (Score: ${result.score ?? 'N/A'}/100)
+${summary?.['executive_summary'] ?? summary?.['summary'] ?? ''}
+${result.checkpoints?.length ? `Key Findings:\n${result.checkpoints.map(cp => `  - [${cp.health.toUpperCase()}] ${cp.name}: ${cp.evidence}`).join('\n')}` : ''}
+Data: ${JSON.stringify(result.data)}`);
+  }
+
+  if (moduleDataSections.length > 0) {
+    sections.push(`## LAYER 2: MODULE DATA (matched to question)\n${moduleDataSections.join('\n\n')}`);
+  }
+
+  // ─── Layer 3: Synthesis References ───
+  const synthesisSections: string[] = [];
+
+  if (synthesis) {
+    synthesisSections.push(`### Executive Brief (M42)
+${JSON.stringify(synthesis)}`);
+  }
+
+  const m43 = resultMap.get('M43');
+  if (m43?.data) {
+    synthesisSections.push(`### Remediation Roadmap (M43)
+${JSON.stringify(m43.data)}`);
+  }
+
+  const m44 = resultMap.get('M44');
+  if (m44?.data) {
+    synthesisSections.push(`### ROI Impact Scenarios (M44)
+${JSON.stringify(m44.data)}`);
+  }
+
+  const m45 = resultMap.get('M45');
+  if (m45?.data) {
+    synthesisSections.push(`### Stack & Cost Analysis (M45)
+${JSON.stringify(m45.data)}`);
+  }
+
+  if (synthesisSections.length > 0) {
+    sections.push(`## LAYER 3: SYNTHESIS REFERENCES\n${synthesisSections.join('\n\n')}`);
+  }
+
+  return sections.join('\n\n');
+}
+
+async function assembleContext(
+  scanId: string,
+  question: string,
+  domain: string,
+  supabase: Awaited<ReturnType<typeof createClient>>,
+): Promise<string> {
+  const relevantModules = routeQuestion(question);
+
+  // Always include M43, M44, M45 if they exist (synthesis references)
+  const moduleIds = [...new Set([...relevantModules, 'M43', 'M44', 'M45'])];
+
+  const { data: results } = await supabase
+    .from('module_results')
+    .select('module_id, data, score, checkpoints')
+    .eq('scan_id', scanId)
+    .in('module_id', moduleIds);
+
+  return buildContextString(
+    (results ?? []) as ModuleResultRow[],
+    domain,
+    question,
+  );
+}
+
+// ─── System Prompt ───────────────────────────────────────────────────────────
+
+function buildSystemPrompt(domain: string, context: string): string {
+  return `You are the AlphaScan AI Consultant for ${domain}. You have access to
+the complete results of a forensic marketing technology audit — raw module
+data, AI synthesis, remediation roadmap, ROI projections, and cost analysis.
 
 RULES:
 1. Always cite your sources using [Source: MXX] notation.
@@ -24,19 +188,24 @@ RULES:
    "That wasn't covered in this scan. The audit analyzed [list relevant
    modules]. For that specific question, I'd recommend [actionable
    alternative]."
-3. When giving recommendations, reference the PRD workstreams:
+3. When giving implementation guidance, reference the PRD workstreams:
    "This is addressed in Workstream WS-02, Task WS-02-T03 [Source: M43]."
 4. Be specific. Use actual tool names, configuration values, and
-   numbers from the scan data.
+   numbers from the scan data. Never invent data — only cite what's
+   in the context below.
 5. Keep responses concise unless the user asks for detail.
    Default to 2-3 paragraphs max.
-6. You may use the ROI data to quantify impact:
+6. Use ROI data to quantify impact when relevant:
    "Fixing this attribution gap could recover an estimated $X-$Y/month
    in trackable conversions [Source: M44]."
+7. When referencing costs or savings, cite the stack analysis:
+   "Your current spend on [tool] is estimated at $X/yr [Source: M45]."
 
-CONTEXT — SCAN KNOWLEDGE BASE:
-${JSON.stringify(knowledgeBase)}`;
+SCAN DATA:
+${context}`;
 }
+
+// ─── Gemini Client ───────────────────────────────────────────────────────────
 
 function getGeminiClient(): GoogleGenerativeAI {
   const apiKey = process.env.GOOGLE_AI_API_KEY;
@@ -45,6 +214,8 @@ function getGeminiClient(): GoogleGenerativeAI {
   }
   return new GoogleGenerativeAI(apiKey);
 }
+
+// ─── POST: Send message ──────────────────────────────────────────────────────
 
 export async function POST(
   request: NextRequest,
@@ -76,15 +247,25 @@ export async function POST(
     return NextResponse.json({ error: 'Invalid message' }, { status: 400 });
   }
 
-  // Check credits
+  // Check credits — distinguish "never had" vs "used all"
   const { data: credits } = await supabase
     .from('chat_credits')
     .select('remaining')
     .eq('user_id', user.id)
     .single();
 
-  if (!credits || credits.remaining <= 0) {
-    return NextResponse.json({ error: 'No chat credits remaining' }, { status: 402 });
+  if (!credits) {
+    return NextResponse.json(
+      { error: 'chat_activation_required' },
+      { status: 402 },
+    );
+  }
+
+  if (credits.remaining <= 0) {
+    return NextResponse.json(
+      { error: 'no_credits_remaining' },
+      { status: 402 },
+    );
   }
 
   // Verify scan exists and user has access
@@ -106,15 +287,8 @@ export async function POST(
     return NextResponse.json({ error: 'Alpha Brief required for chat' }, { status: 403 });
   }
 
-  // Get knowledge base from M46
-  const { data: kb } = await supabase
-    .from('module_results')
-    .select('data')
-    .eq('scan_id', scanId)
-    .eq('module_id', 'M46')
-    .single();
-
-  const knowledgeBase = kb?.data?.knowledgeBase ?? kb?.data ?? {};
+  // Assemble context from raw module data (replaces M46 knowledge base)
+  const context = await assembleContext(scanId, parsed.data.message, scan.domain, supabase);
 
   // Get chat history (existing messages only — don't save user msg yet)
   const { data: history } = await supabase
@@ -130,8 +304,8 @@ export async function POST(
   try {
     const genAI = getGeminiClient();
     const model = genAI.getGenerativeModel({
-      model: 'gemini-2.0-flash',
-      systemInstruction: buildSystemPrompt(scan.domain, knowledgeBase),
+      model: 'gemini-3.1-pro-preview',
+      systemInstruction: buildSystemPrompt(scan.domain, context),
       generationConfig: {
         temperature: 0.4,
         maxOutputTokens: 2048,
@@ -186,6 +360,8 @@ export async function POST(
     creditsRemaining: credits.remaining - 1,
   });
 }
+
+// ─── GET: Fetch chat history ─────────────────────────────────────────────────
 
 export async function GET(
   _request: NextRequest,

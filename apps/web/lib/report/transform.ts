@@ -15,6 +15,7 @@ import type {
   TechStackData,
   CategoryDeepDiveData,
   ROIData,
+  ImpactScenario,
   RoadmapData,
   TrafficLight,
   Severity,
@@ -63,57 +64,57 @@ function parseAmount(value: unknown): number {
 // ── Category metadata ────────────────────────────────────────
 
 const CATEGORY_META: Record<ScoreCategory, { name: string; shortName: string; description: string }> = {
-  analytics_integrity: {
-    name: 'Analytics & Data Integrity',
+  security_compliance: {
+    name: 'Security & Compliance',
+    shortName: 'Sec',
+    description: 'Security headers, legal compliance, consent management, and privacy.',
+  },
+  analytics_measurement: {
+    name: 'Analytics & Measurement',
     shortName: 'Anly',
     description: 'How well analytics tools are configured, tracking accuracy, and data governance.',
   },
-  paid_media_attribution: {
-    name: 'Paid Media & Attribution',
-    shortName: 'Paid',
-    description: 'Paid advertising infrastructure, pixel implementation, and attribution setup.',
-  },
-  performance_ux: {
-    name: 'Performance & UX',
+  performance_experience: {
+    name: 'Performance & Experience',
     shortName: 'Perf',
-    description: 'Page speed, Core Web Vitals, mobile experience, and resource efficiency.',
-  },
-  compliance_security: {
-    name: 'Compliance & Security',
-    shortName: 'Comp',
-    description: 'Legal compliance, security headers, consent management, and accessibility.',
-  },
-  martech_efficiency: {
-    name: 'MarTech Efficiency',
-    shortName: 'MTch',
-    description: 'Marketing technology stack health, tool utilization, and integration quality.',
+    description: 'Page speed, Core Web Vitals, mobile experience, and accessibility.',
   },
   seo_content: {
     name: 'SEO & Content',
     shortName: 'SEO',
-    description: 'Search engine optimization, content structure, and social sharing readiness.',
+    description: 'Search engine optimization, content structure, and indexing health.',
   },
-  market_position: {
-    name: 'Market Position',
+  paid_media: {
+    name: 'Paid Media',
+    shortName: 'Paid',
+    description: 'Paid advertising infrastructure, pixel implementation, and attribution setup.',
+  },
+  martech_infrastructure: {
+    name: 'MarTech & Infrastructure',
+    shortName: 'MTch',
+    description: 'Marketing technology stack health, CMS infrastructure, and integration quality.',
+  },
+  brand_presence: {
+    name: 'Brand & Digital Presence',
+    shortName: 'Brnd',
+    description: 'PR & media, corporate pages, reviews, social sentiment, and local presence.',
+  },
+  market_intelligence: {
+    name: 'Market Intelligence',
     shortName: 'Mkt',
-    description: 'Traffic metrics, competitive landscape, brand search demand, and authority.',
-  },
-  digital_presence: {
-    name: 'Digital Presence',
-    shortName: 'Dgtl',
-    description: 'Corporate pages, support infrastructure, and investor relations.',
+    description: 'Traffic metrics, competitive landscape, rankings, and domain authority.',
   },
 };
 
 const CATEGORY_MODULES: Record<ScoreCategory, string[]> = {
-  analytics_integrity: ['M05', 'M08', 'M09'],
-  paid_media_attribution: ['M06', 'M06b', 'M21', 'M28', 'M29'],
-  performance_ux: ['M03', 'M13', 'M14'],
-  compliance_security: ['M01', 'M10', 'M11', 'M12'],
-  martech_efficiency: ['M07', 'M20'],
-  seo_content: ['M04', 'M15', 'M16', 'M34'],
-  market_position: ['M24', 'M25', 'M26', 'M27', 'M30', 'M31', 'M33', 'M36'],
-  digital_presence: ['M02', 'M17', 'M18', 'M19', 'M22', 'M23', 'M37', 'M38'],
+  security_compliance: ['M01', 'M12', 'M40'],
+  analytics_measurement: ['M05', 'M06', 'M06b', 'M08', 'M09'],
+  performance_experience: ['M03', 'M10', 'M11', 'M13', 'M14'],
+  seo_content: ['M04', 'M15', 'M26', 'M34', 'M39'],
+  paid_media: ['M21', 'M28', 'M29'],
+  martech_infrastructure: ['M02', 'M07', 'M20'],
+  brand_presence: ['M16', 'M17', 'M18', 'M19', 'M22', 'M23', 'M37', 'M38'],
+  market_intelligence: ['M24', 'M25', 'M27', 'M30', 'M31', 'M32', 'M33', 'M35', 'M36'],
 };
 
 const MODULE_NAMES: Record<string, string> = {
@@ -131,29 +132,29 @@ const MODULE_NAMES: Record<string, string> = {
   M33: 'Mobile vs Desktop', M34: 'Brand Demand', M35: 'Losing Keywords',
   M36: 'Bounce Rate', M37: 'Google Shopping', M38: 'Review Velocity',
   M39: 'Local Pack', M41: 'Deep Dive Analysis', M42: 'Executive Synthesis',
-  M43: 'Remediation PRD', M44: 'ROI Analysis', M45: 'Cost Cutter', M46: 'MarketingIQ',
+  M43: 'Remediation PRD', M44: 'Impact Scenarios', M45: 'Stack Analyzer',
 };
 
 const CATEGORY_WEIGHTS_MAP: Record<ScoreCategory, number> = {
-  analytics_integrity: 0.20,
-  paid_media_attribution: 0.18,
-  performance_ux: 0.15,
-  compliance_security: 0.15,
-  martech_efficiency: 0.12,
+  security_compliance: 0.15,
+  analytics_measurement: 0.20,
+  performance_experience: 0.15,
   seo_content: 0.10,
-  market_position: 0.06,
-  digital_presence: 0.04,
+  paid_media: 0.12,
+  martech_infrastructure: 0.10,
+  brand_presence: 0.08,
+  market_intelligence: 0.10,
 };
 
 const CATEGORY_KEY_MAP: Record<ScoreCategory, keyof ReportData['categories']> = {
-  analytics_integrity: 'analytics',
-  paid_media_attribution: 'paidMedia',
-  performance_ux: 'performance',
-  compliance_security: 'compliance',
-  martech_efficiency: 'martech',
+  security_compliance: 'compliance',
+  analytics_measurement: 'analytics',
+  performance_experience: 'performance',
   seo_content: 'seo',
-  market_position: 'marketPosition',
-  digital_presence: 'digitalPresence',
+  paid_media: 'paidMedia',
+  martech_infrastructure: 'martech',
+  brand_presence: 'digitalPresence',
+  market_intelligence: 'marketPosition',
 };
 
 // ── Build Functions ──────────────────────────────────────────
@@ -162,9 +163,9 @@ function buildCategoryScores(
   categories: CategoryScore[],
 ): ReportCategoryScore[] {
   const allKeys: ScoreCategory[] = [
-    'analytics_integrity', 'paid_media_attribution', 'performance_ux',
-    'compliance_security', 'martech_efficiency', 'seo_content',
-    'market_position', 'digital_presence',
+    'security_compliance', 'analytics_measurement', 'performance_experience',
+    'seo_content', 'paid_media', 'martech_infrastructure',
+    'brand_presence', 'market_intelligence',
   ];
 
   const catMap = new Map(categories.map(c => [c.category, c]));
@@ -220,9 +221,10 @@ function buildTechStackData(resultMap: ResultMap): TechStackData {
   const active = tools.filter(t => t.status === 'active').length;
   const inactive = tools.filter(t => t.status !== 'active').length;
 
-  // M45 redundancy data
+  // M45 redundancy data (new: stackAnalysis, legacy: costAnalysis)
+  const stackAnalysis = field<Record<string, unknown>>(resultMap, 'M45', 'stackAnalysis');
   const costAnalysis = field<Record<string, unknown>>(resultMap, 'M45', 'costAnalysis');
-  const redundancies = (costAnalysis?.['redundancies'] as unknown[]) ?? [];
+  const redundancies = ((stackAnalysis ?? costAnalysis)?.['redundancies'] as unknown[]) ?? [];
 
   return {
     tools,
@@ -304,106 +306,103 @@ function buildCategoryData(
   };
 }
 
+const AREA_ICONS: Record<string, string> = {
+  tracking: 'BarChart3',
+  attribution: 'Target',
+  performance: 'Zap',
+  redundancy: 'Layers',
+};
+
 function buildROIData(resultMap: ResultMap): ROIData {
   const roi = field<Record<string, unknown>>(resultMap, 'M44', 'roi');
-  const summary = (roi?.['summary'] as Record<string, unknown>) ?? {};
 
-  const impactAreas: ROIData['impactAreas'] = [];
-
-  const trackingGap = roi?.['tracking_gap_cost'] as Record<string, unknown> | undefined;
-  if (trackingGap) {
-    impactAreas.push({
-      id: 'tracking',
-      title: 'Tracking Gaps',
-      icon: 'BarChart3',
-      low: parseAmount(trackingGap['monthly_untracked_revenue']) * 0.5,
-      high: parseAmount(trackingGap['monthly_untracked_revenue']),
-      confidence: 'medium',
-      calculationSteps: (trackingGap['calculation_steps'] as string[]) ?? [],
-      assumptions: (trackingGap['assumptions'] as string[]) ?? [],
-      sourceModules: ['M05', 'M08'],
-    });
+  // New scenario-based format
+  const rawScenarios = roi?.['scenarios'] as Array<Record<string, unknown>> | undefined;
+  if (rawScenarios && Array.isArray(rawScenarios) && rawScenarios.length > 0) {
+    return buildScenarioROIData(roi!, rawScenarios, resultMap);
   }
 
-  const attributionWaste = roi?.['attribution_waste'] as Record<string, unknown> | undefined;
-  if (attributionWaste) {
-    impactAreas.push({
-      id: 'attribution',
-      title: 'Attribution Waste',
-      icon: 'Target',
-      low: parseAmount(attributionWaste['wasted_monthly_spend']) * 0.7,
-      high: parseAmount(attributionWaste['wasted_monthly_spend']),
-      confidence: 'high',
-      calculationSteps: (attributionWaste['calculation_steps'] as string[]) ?? [],
-      assumptions: (attributionWaste['assumptions'] as string[]) ?? [],
-      sourceModules: ['M06', 'M28'],
-    });
-  }
+  // Legacy fallback for old scans in DB — return empty scenarios
+  return buildEmptyROIData();
+}
 
-  const perfImpact = roi?.['performance_impact'] as Record<string, unknown> | undefined;
-  if (perfImpact) {
-    impactAreas.push({
-      id: 'performance',
-      title: 'Performance Impact',
-      icon: 'Zap',
-      low: parseAmount(perfImpact['estimated_monthly_revenue_loss']) * 0.5,
-      high: parseAmount(perfImpact['estimated_monthly_revenue_loss']),
-      confidence: 'medium',
-      calculationSteps: (perfImpact['calculation_steps'] as string[]) ?? [],
-      assumptions: (perfImpact['assumptions'] as string[]) ?? [],
-      sourceModules: ['M03', 'M13'],
-    });
-  }
+function buildScenarioROIData(
+  roi: Record<string, unknown>,
+  rawScenarios: Array<Record<string, unknown>>,
+  resultMap: ResultMap,
+): ROIData {
+  const scenarios: ImpactScenario[] = rawScenarios.map(s => ({
+    id: (s['id'] as ImpactScenario['id']) ?? 'moderate',
+    label: (s['label'] as string) ?? '',
+    description: (s['description'] as string) ?? '',
+    impactAreas: ((s['impactAreas'] as Array<Record<string, unknown>>) ?? []).map(a => ({
+      id: (a['id'] as string) ?? '',
+      title: (a['title'] as string) ?? '',
+      monthlyImpact: (a['monthlyImpact'] as number) ?? 0,
+      assumptions: (a['assumptions'] as string[]) ?? [],
+      calculationSteps: (a['calculationSteps'] as string[]) ?? [],
+      sourceModules: (a['sourceModules'] as string[]) ?? [],
+      confidence: ((a['confidence'] as string) ?? 'low') as Confidence,
+    })),
+    totalMonthlyImpact: (s['totalMonthlyImpact'] as number) ?? 0,
+    totalAnnualImpact: (s['totalAnnualImpact'] as number) ?? 0,
+    keyAssumptions: (s['keyAssumptions'] as string[]) ?? [],
+  }));
 
-  const complianceRisk = roi?.['compliance_risk'] as Record<string, unknown> | undefined;
-  if (complianceRisk) {
-    impactAreas.push({
-      id: 'compliance',
-      title: 'Compliance Risk',
-      icon: 'Shield',
-      low: 0,
-      high: 0,
-      confidence: 'low',
-      calculationSteps: [],
-      assumptions: [],
-      sourceModules: ['M01', 'M12'],
-    });
-  }
+  const conservative = scenarios.find(s => s.id === 'conservative');
+  const moderate = scenarios.find(s => s.id === 'moderate') ?? scenarios[0]!;
+  const aggressive = scenarios.find(s => s.id === 'aggressive');
 
-  const toolRedundancy = roi?.['tool_redundancy_waste'] as Record<string, unknown> | undefined;
-  if (toolRedundancy) {
-    impactAreas.push({
-      id: 'redundancy',
-      title: 'Tool Redundancy',
-      icon: 'Layers',
-      low: parseAmount(toolRedundancy['monthly_waste']) * 0.5,
-      high: parseAmount(toolRedundancy['monthly_waste']),
-      confidence: 'medium',
-      calculationSteps: (toolRedundancy['calculation_steps'] as string[]) ?? [],
-      assumptions: (toolRedundancy['assumptions'] as string[]) ?? [],
-      sourceModules: ['M07', 'M45'],
-    });
-  }
+  // Backward-compat impactAreas from moderate scenario
+  const impactAreas: ROIData['impactAreas'] = moderate.impactAreas.map(a => ({
+    id: a.id,
+    title: a.title,
+    icon: AREA_ICONS[a.id] ?? 'Circle',
+    low: (conservative?.impactAreas.find(ca => ca.id === a.id)?.monthlyImpact ?? a.monthlyImpact * 0.5),
+    high: (aggressive?.impactAreas.find(aa => aa.id === a.id)?.monthlyImpact ?? a.monthlyImpact * 1.5),
+    confidence: a.confidence,
+    calculationSteps: a.calculationSteps,
+    assumptions: a.assumptions,
+    sourceModules: a.sourceModules,
+  }));
 
-  const totalLow = impactAreas.reduce((s, a) => s + a.low, 0);
-  const totalHigh = impactAreas.reduce((s, a) => s + a.high, 0);
-
-  const currentScore = num(resultMap, 'M44', 'roi', 'score_improvement', 'current');
-  const estimatedScore = num(resultMap, 'M44', 'roi', 'score_improvement', 'estimated');
+  const complianceRisk = roi['complianceRisk'] as Record<string, unknown> | undefined;
+  const scoreImprovement = (roi['scoreImprovement'] as Record<string, unknown>) ?? {};
+  const currentScore = (scoreImprovement['current'] as number) ?? num(resultMap, 'M44', 'roi', 'scoreImprovement', 'current');
+  const estimatedScore = (scoreImprovement['estimated'] as number) ?? 0;
 
   return {
-    totalOpportunity: { low: Math.round(totalLow), high: Math.round(totalHigh) },
+    scenarios,
+    defaultScenarioId: 'moderate',
+    headline: (roi['headline'] as string) ?? '',
+    methodology: (roi['methodology'] as string) ?? '',
+    totalOpportunity: {
+      low: Math.round(conservative?.totalMonthlyImpact ?? moderate.totalMonthlyImpact * 0.5),
+      high: Math.round(aggressive?.totalMonthlyImpact ?? moderate.totalMonthlyImpact * 1.5),
+    },
     impactAreas,
     complianceRisk: complianceRisk ? {
-      annualRange: (complianceRisk['estimated_exposure'] as string) ?? '',
-      riskFactors: (complianceRisk['risk_factors'] as string[]) ?? [],
-      regulations: (complianceRisk['regulations'] as string[]) ?? [],
+      annualRange: `$${((complianceRisk['annualExposureLow'] as number) ?? 0).toLocaleString()} – $${((complianceRisk['annualExposureHigh'] as number) ?? 0).toLocaleString()}`,
+      riskFactors: (complianceRisk['riskFactors'] as string[]) ?? [],
+      regulations: (complianceRisk['applicableRegulations'] as string[]) ?? [],
     } : undefined,
     scoreImprovement: {
       current: currentScore,
       estimated: estimatedScore || currentScore + 15,
-      label: 'If you fix all P0 issues',
+      label: 'Projected after fixing P0 + P1 issues',
     },
+  };
+}
+
+function buildEmptyROIData(): ROIData {
+  return {
+    scenarios: [],
+    defaultScenarioId: 'moderate',
+    headline: '',
+    methodology: '',
+    totalOpportunity: { low: 0, high: 0 },
+    impactAreas: [],
+    scoreImprovement: { current: 0, estimated: 0, label: '' },
   };
 }
 
@@ -519,9 +518,9 @@ export function transformToReportData(
 
   // Build all 8 categories
   const allCatKeys: ScoreCategory[] = [
-    'analytics_integrity', 'paid_media_attribution', 'performance_ux',
-    'compliance_security', 'martech_efficiency', 'seo_content',
-    'market_position', 'digital_presence',
+    'security_compliance', 'analytics_measurement', 'performance_experience',
+    'seo_content', 'paid_media', 'martech_infrastructure',
+    'brand_presence', 'market_intelligence',
   ];
 
   const catEntries = Object.fromEntries(

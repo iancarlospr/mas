@@ -102,7 +102,7 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
     signals.push(createSignal({
       type: 'social_sentiment', name: 'Social Sentiment',
       confidence: 0.65, evidence: `${allMentions.length} mentions across ${platforms.join(', ')}`,
-      category: 'market_position',
+      category: 'market_intelligence',
     }));
 
     // CP1: Social presence

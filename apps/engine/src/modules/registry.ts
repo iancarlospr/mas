@@ -9,7 +9,7 @@ import type { ModuleDefinition, ModuleId } from '@marketing-alpha/types';
  *   Phase 3 - GhostScan (full tier): M09, M10, M11, M12
  *   Phase 4 - External (full tier): M21, M22, M23, M24-M39
  *   Phase 4.5 - Paid Media (full tier): M06, M06b (runs on M21 CTA URL)
- *   Phase 5 - Synthesis: M41 (full), M42-M46 (paid)
+ *   Phase 5 - Synthesis: M41 (full), M42-M45 (paid)
  */
 export const MODULE_REGISTRY: ModuleDefinition[] = [
   // ─── Phase 1: Passive (full tier) ──────────────────────────────────────────
@@ -20,7 +20,7 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     minimumTier: 'full',
     timeout: 15_000,
     retries: 4,
-    category: 'compliance_security',
+    category: 'security_compliance',
   },
   {
     id: 'M02',
@@ -29,7 +29,7 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     minimumTier: 'full',
     timeout: 15_000,
     retries: 4,
-    category: 'digital_presence',
+    category: 'martech_infrastructure',
   },
   {
     id: 'M04',
@@ -47,7 +47,7 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     minimumTier: 'full',
     timeout: 15_000,
     retries: 4,
-    category: 'seo_content',
+    category: 'brand_presence',
   },
   {
     id: 'M17',
@@ -56,7 +56,7 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     minimumTier: 'full',
     timeout: 15_000,
     retries: 4,
-    category: 'digital_presence',
+    category: 'brand_presence',
   },
   {
     id: 'M18',
@@ -65,7 +65,7 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     minimumTier: 'full',
     timeout: 15_000,
     retries: 4,
-    category: 'digital_presence',
+    category: 'brand_presence',
   },
   {
     id: 'M19',
@@ -74,7 +74,7 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     minimumTier: 'full',
     timeout: 15_000,
     retries: 4,
-    category: 'digital_presence',
+    category: 'brand_presence',
   },
 
   // ─── Phase 2: Browser (full tier) ──────────────────────────────────────────
@@ -85,7 +85,7 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     minimumTier: 'full',
     timeout: 30_000,
     retries: 3,
-    category: 'performance_ux',
+    category: 'performance_experience',
   },
   {
     id: 'M05',
@@ -94,7 +94,7 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     minimumTier: 'full',
     timeout: 30_000,
     retries: 3,
-    category: 'analytics_integrity',
+    category: 'analytics_measurement',
   },
   {
     id: 'M06',
@@ -103,7 +103,7 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     minimumTier: 'full',
     timeout: 30_000,
     retries: 3,
-    category: 'paid_media_attribution',
+    category: 'analytics_measurement',
   },
   {
     id: 'M06b',
@@ -112,7 +112,7 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     minimumTier: 'full',
     timeout: 15_000,
     retries: 3,
-    category: 'paid_media_attribution',
+    category: 'analytics_measurement',
   },
   {
     id: 'M07',
@@ -121,7 +121,7 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     minimumTier: 'full',
     timeout: 30_000,
     retries: 3,
-    category: 'martech_efficiency',
+    category: 'martech_infrastructure',
   },
   {
     id: 'M08',
@@ -130,7 +130,7 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     minimumTier: 'full',
     timeout: 30_000,
     retries: 3,
-    category: 'analytics_integrity',
+    category: 'analytics_measurement',
   },
   {
     id: 'M13',
@@ -139,7 +139,7 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     minimumTier: 'full',
     timeout: 30_000,
     retries: 3,
-    category: 'performance_ux',
+    category: 'performance_experience',
   },
   {
     id: 'M14',
@@ -148,7 +148,7 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     minimumTier: 'full',
     timeout: 30_000,
     retries: 3,
-    category: 'performance_ux',
+    category: 'performance_experience',
   },
   {
     id: 'M15',
@@ -166,7 +166,7 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     minimumTier: 'full',
     timeout: 30_000,
     retries: 3,
-    category: 'martech_efficiency',
+    category: 'martech_infrastructure',
   },
 
   // ─── Phase 3: GhostScan (full tier) ───────────────────────────────────────
@@ -177,7 +177,7 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     minimumTier: 'full',
     timeout: 30_000,
     retries: 3,
-    category: 'analytics_integrity',
+    category: 'analytics_measurement',
   },
   {
     id: 'M10',
@@ -186,7 +186,7 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     minimumTier: 'full',
     timeout: 30_000,
     retries: 3,
-    category: 'compliance_security',
+    category: 'performance_experience',
   },
   {
     id: 'M11',
@@ -195,7 +195,7 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     minimumTier: 'full',
     timeout: 30_000,
     retries: 3,
-    category: 'compliance_security',
+    category: 'performance_experience',
   },
   {
     id: 'M12',
@@ -204,7 +204,7 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     minimumTier: 'full',
     timeout: 30_000,
     retries: 3,
-    category: 'compliance_security',
+    category: 'security_compliance',
   },
 
   // ─── Phase 4: External (full tier) ─────────────────────────────────────────
@@ -215,7 +215,7 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     minimumTier: 'full',
     timeout: 180_000,
     retries: 2,
-    category: 'paid_media_attribution',
+    category: 'paid_media',
   },
   {
     id: 'M22',
@@ -224,7 +224,7 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     minimumTier: 'full',
     timeout: 60_000,
     retries: 5,
-    category: 'market_position',
+    category: 'brand_presence',
   },
   {
     id: 'M23',
@@ -233,7 +233,7 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     minimumTier: 'full',
     timeout: 60_000,
     retries: 5,
-    category: 'market_position',
+    category: 'brand_presence',
   },
   {
     id: 'M24',
@@ -242,7 +242,7 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     minimumTier: 'full',
     timeout: 30_000,
     retries: 5,
-    category: 'market_position',
+    category: 'market_intelligence',
   },
   {
     id: 'M25',
@@ -251,7 +251,7 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     minimumTier: 'full',
     timeout: 30_000,
     retries: 5,
-    category: 'market_position',
+    category: 'market_intelligence',
   },
   {
     id: 'M26',
@@ -260,7 +260,7 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     minimumTier: 'full',
     timeout: 30_000,
     retries: 5,
-    category: 'market_position',
+    category: 'seo_content',
   },
   {
     id: 'M27',
@@ -269,7 +269,7 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     minimumTier: 'full',
     timeout: 30_000,
     retries: 5,
-    category: 'market_position',
+    category: 'market_intelligence',
   },
   {
     id: 'M28',
@@ -278,7 +278,7 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     minimumTier: 'full',
     timeout: 30_000,
     retries: 5,
-    category: 'paid_media_attribution',
+    category: 'paid_media',
   },
   {
     id: 'M29',
@@ -287,7 +287,7 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     minimumTier: 'full',
     timeout: 30_000,
     retries: 5,
-    category: 'paid_media_attribution',
+    category: 'paid_media',
   },
   {
     id: 'M30',
@@ -296,7 +296,7 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     minimumTier: 'full',
     timeout: 30_000,
     retries: 5,
-    category: 'market_position',
+    category: 'market_intelligence',
   },
   {
     id: 'M31',
@@ -305,7 +305,7 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     minimumTier: 'full',
     timeout: 30_000,
     retries: 5,
-    category: 'market_position',
+    category: 'market_intelligence',
   },
   {
     id: 'M33',
@@ -314,7 +314,7 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     minimumTier: 'full',
     timeout: 30_000,
     retries: 5,
-    category: 'market_position',
+    category: 'market_intelligence',
   },
   {
     id: 'M34',
@@ -323,7 +323,7 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     minimumTier: 'full',
     timeout: 30_000,
     retries: 5,
-    category: 'market_position',
+    category: 'seo_content',
   },
   {
     id: 'M36',
@@ -332,7 +332,7 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     minimumTier: 'full',
     timeout: 30_000,
     retries: 5,
-    category: 'market_position',
+    category: 'market_intelligence',
   },
   {
     id: 'M37',
@@ -341,7 +341,7 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     minimumTier: 'full',
     timeout: 30_000,
     retries: 5,
-    category: 'market_position',
+    category: 'brand_presence',
   },
   {
     id: 'M38',
@@ -350,7 +350,7 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     minimumTier: 'full',
     timeout: 30_000,
     retries: 5,
-    category: 'market_position',
+    category: 'brand_presence',
   },
   {
     id: 'M39',
@@ -368,7 +368,7 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     minimumTier: 'full',
     timeout: 45_000,
     retries: 3,
-    category: 'compliance_security',
+    category: 'security_compliance',
   },
 
   // ─── Phase 5: Synthesis ────────────────────────────────────────────────────
@@ -377,9 +377,9 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     name: 'Module AI Synthesis',
     phase: 'synthesis',
     minimumTier: 'full',
-    timeout: 30_000,
+    timeout: 180_000,
     retries: 4,
-    category: 'market_position',
+    category: 'market_intelligence',
     dependsOn: [
       'M01', 'M02', 'M03', 'M04', 'M05', 'M06', 'M06b', 'M07', 'M08',
       'M09', 'M10', 'M11', 'M12', 'M13', 'M14', 'M15', 'M16', 'M17',
@@ -390,12 +390,12 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
   },
   {
     id: 'M42',
-    name: 'Final AI Synthesis & Scoring',
+    name: 'Executive Brief',
     phase: 'synthesis',
     minimumTier: 'paid',
-    timeout: 60_000,
+    timeout: 120_000,
     retries: 4,
-    category: 'market_position',
+    category: 'market_intelligence',
     dependsOn: ['M41'],
   },
   {
@@ -405,38 +405,28 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     minimumTier: 'paid',
     timeout: 60_000,
     retries: 4,
-    category: 'market_position',
-    dependsOn: ['M42'],
+    category: 'market_intelligence',
+    dependsOn: ['M42', 'M44', 'M45'],
   },
   {
     id: 'M44',
-    name: 'ROI Simulator',
+    name: 'Impact Scenarios',
     phase: 'synthesis',
     minimumTier: 'paid',
     timeout: 30_000,
     retries: 4,
-    category: 'market_position',
+    category: 'market_intelligence',
     dependsOn: ['M42'],
   },
   {
     id: 'M45',
-    name: 'Cost Cutter Analysis',
+    name: 'Stack Analyzer',
     phase: 'synthesis',
     minimumTier: 'paid',
     timeout: 30_000,
     retries: 4,
-    category: 'market_position',
+    category: 'market_intelligence',
     dependsOn: ['M41'],
-  },
-  {
-    id: 'M46',
-    name: 'AI Knowledge Base',
-    phase: 'synthesis',
-    minimumTier: 'paid',
-    timeout: 30_000,
-    retries: 4,
-    category: 'market_position',
-    dependsOn: ['M42'],
   },
 ];
 

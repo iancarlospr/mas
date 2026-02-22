@@ -8,10 +8,10 @@ import { OverviewSlide } from './overview-slide';
 import { ModuleSlide } from './module-slide';
 import { PaidSlides } from './paid-slides';
 
-const PAID_MODULES = new Set(['M42', 'M43', 'M44', 'M45', 'M46']);
+const PAID_MODULES = new Set(['M42', 'M43', 'M44', 'M45']);
 
 /** Internal-only modules that should not get a slide card */
-const HIDDEN_MODULES = new Set(['M41', 'M46']);
+const HIDDEN_MODULES = new Set(['M41']);
 
 interface BentoDashboardProps {
   scan: ScanWithResults;

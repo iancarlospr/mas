@@ -54,7 +54,7 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
     signals.push(createSignal({
       type: 'traffic_volume', name: 'Estimated Traffic',
       confidence: 0.7, evidence: `Organic: ~${Math.round(organicTraffic).toLocaleString()}/mo, Paid: ~${Math.round(paidTraffic).toLocaleString()}/mo`,
-      category: 'market_position',
+      category: 'market_intelligence',
     }));
 
     // CP1: Traffic data

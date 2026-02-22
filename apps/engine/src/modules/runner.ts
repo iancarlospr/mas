@@ -82,7 +82,7 @@ const TIER_PHASES: Record<ModuleTier, ScanStatus[]> = {
  *   3. GhostScan  - Continue on same page, run modules sequentially
  *   4. External   - Third-party API calls, run modules in parallel
  *   4.5 Paid Media - M06/M06b on dedicated browser page targeting M21 CTA URL
- *   5. Synthesis  - M41 parallel, then M42-M46 sequential
+ *   5. Synthesis  - M41 parallel, then M42-M45 sequential
  *
  * Each module is:
  *   - Wrapped in a timeout via Promise.race
@@ -867,7 +867,7 @@ export class ModuleRunner {
   /**
    * Phase 5: Synthesis modules.
    * M41 runs first (parallel individual synthesis),
-   * then M42-M46 run sequentially (each depends on prior results).
+   * then M42-M45 run sequentially (each depends on prior results).
    */
   private async runSynthesisPhase(): Promise<void> {
     const allSynthesis = getModulesForPhaseAndTier('synthesis', this.tier);
@@ -881,7 +881,7 @@ export class ModuleRunner {
       await this.executeModule(m41);
     }
 
-    // M42-M46 run sequentially (dependency chain)
+    // M42-M45 run sequentially (dependency chain)
     const sequentialModules = allSynthesis
       .filter((m) => m.id !== 'M41')
       .sort((a, b) => {
@@ -890,7 +890,6 @@ export class ModuleRunner {
           M43: 1,
           M44: 2,
           M45: 3,
-          M46: 4,
         };
         return (order[a.id] ?? 99) - (order[b.id] ?? 99);
       });
@@ -1199,7 +1198,7 @@ export class ModuleRunner {
 
   /**
    * Run only the synthesis phase with pre-loaded results (for paid tier upgrade).
-   * Loads existing M01-M41 results into context, then runs M42-M46.
+   * Loads existing M01-M41 results into context, then runs M42-M45.
    */
   async runSynthesisOnly(existingResults: Map<ModuleId, ModuleResult>): Promise<{
     results: Map<ModuleId, ModuleResult>;

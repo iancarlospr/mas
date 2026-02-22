@@ -98,7 +98,7 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
       type: 'local_pack', name: 'Google Business Profile',
       confidence: 0.9,
       evidence: `"${title}" — ${category}, ${avgRating}/5 (${reviewCount} reviews), ${totalPhotos} photos`,
-      category: 'market_position',
+      category: 'market_intelligence',
     }));
 
     // CP1: GBP presence

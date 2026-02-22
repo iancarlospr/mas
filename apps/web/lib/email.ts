@@ -31,10 +31,15 @@ export async function sendScanCompleteEmail(to: string, scanId: string, domain: 
 
 export async function sendPaymentReceiptEmail(
   to: string,
-  product: 'alpha_brief' | 'chat_credits',
+  product: 'alpha_brief' | 'chat_activation' | 'chat_credits',
   amountCents: number,
 ) {
-  const productName = product === 'alpha_brief' ? 'Alpha Brief' : 'Chat Credits';
+  const productNames: Record<string, string> = {
+    alpha_brief: 'Alpha Brief',
+    chat_activation: 'Chat Activation',
+    chat_credits: 'Chat Credits',
+  };
+  const productName = productNames[product] ?? product;
   const amount = (amountCents / 100).toFixed(2);
 
   return sendEmail({

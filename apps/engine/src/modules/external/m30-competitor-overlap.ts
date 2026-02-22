@@ -84,7 +84,7 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
         type: 'traffic_sources', name: 'Top Traffic Sources',
         confidence: 0.8,
         evidence: `Top sources: ${topSources.slice(0, 3).map(s => s.domain).join(', ')}`,
-        category: 'market_position',
+        category: 'market_intelligence',
       }));
     }
 

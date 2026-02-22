@@ -56,19 +56,11 @@ export async function POST(request: NextRequest) {
       .eq('stripe_session_id', session.id);
 
     if (product === 'alpha_brief') {
-      // Upgrade scan tier to paid
+      // Upgrade scan tier to paid — no chat credits included
       await supabase
         .from('scans')
         .update({ tier: 'paid' })
         .eq('id', scanId);
-
-      // Add 50 chat credits
-      await supabase
-        .from('chat_credits')
-        .upsert(
-          { user_id: userId, remaining: 50, updated_at: new Date().toISOString() },
-          { onConflict: 'user_id' },
-        );
 
       // Trigger synthesis on engine
       await engineFetch('/engine/scans', {
@@ -81,8 +73,16 @@ export async function POST(request: NextRequest) {
           synthesisOnly: true,
         }),
       });
+    } else if (product === 'chat_activation') {
+      // First-time chat activation: 15 credits
+      await supabase
+        .from('chat_credits')
+        .upsert(
+          { user_id: userId, remaining: 15, updated_at: new Date().toISOString() },
+          { onConflict: 'user_id' },
+        );
     } else if (product === 'chat_credits') {
-      // Add 100 chat credits
+      // Top-up: +100 credits
       const { data: existing } = await supabase
         .from('chat_credits')
         .select('remaining')
@@ -100,11 +100,16 @@ export async function POST(request: NextRequest) {
 
     // Send receipt email
     const email = session.customer_details?.email ?? session.customer_email;
-    const amountCents = product === 'alpha_brief' ? 999 : 499;
+    const amountMap: Record<string, number> = {
+      alpha_brief: 999,
+      chat_activation: 100,
+      chat_credits: 499,
+    };
+    const amountCents = amountMap[product] ?? 0;
     if (email) {
       await sendPaymentReceiptEmail(
         email,
-        product as 'alpha_brief' | 'chat_credits',
+        product as 'alpha_brief' | 'chat_activation' | 'chat_credits',
         amountCents,
       ).catch((err) => {
         console.error('[stripe-webhook] Failed to send receipt email:', err);

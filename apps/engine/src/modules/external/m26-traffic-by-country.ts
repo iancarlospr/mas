@@ -60,7 +60,7 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
         type: 'organic_rankings', name: 'Organic Rankings',
         confidence: 0.85,
         evidence: `${totalCount.toLocaleString()} organic keywords, top: ${topKeywords.slice(0, 3).map(k => `"${k.keyword}" (#${k.rankAbsolute})`).join(', ')}`,
-        category: 'market_position',
+        category: 'market_intelligence',
       }));
     }
 

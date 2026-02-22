@@ -89,18 +89,18 @@ Every module failure is isolated. Nothing cascades. A timeout on one module does
 
 ## MarketingIQ Score
 
-Every module produces typed data, scored checkpoints, and confidence-weighted signals. The MarketingIQ composite score weights 8 categories:
+Every module produces typed data, scored checkpoints, and confidence-weighted signals. Each module also receives an **AI-driven contextual score** from Gemini 3 Flash, which evaluates the extracted data against per-module assessment rubrics with industry benchmarks. The MarketingIQ composite score weights 8 categories:
 
 | Category | Weight | Modules | What It Measures |
 |----------|--------|---------|-----------------|
-| **Analytics Integrity** | 20% | M05, M08, M09 | GA4 firing, tag governance, behavioral tracking |
-| **Paid Media Attribution** | 18% | M06, M06b, M21, M28, M29 | Pixel health, CAPI, landing page alignment |
-| **Performance and UX** | 15% | M03, M13, M14 | Core Web Vitals, carbon footprint, mobile parity |
-| **Compliance and Security** | 15% | M01, M10, M11, M12 | DMARC/SPF/DKIM, WCAG 2.1, consent, legal pages |
-| **MarTech Efficiency** | 12% | M07, M20 | Tool redundancy, form analytics, SaaS signals |
-| **SEO and Content** | 10% | M04, M15, M16, M34, M39 | Metadata, social sharing, PR coverage, sitemap, keyword gaps |
-| **Market Position** | 6% | M24-M31, M33-M34, M36-M38 | Traffic, competitors, brand search, local SEO |
-| **Digital Presence** | 4% | M02, M17-M19, M22, M23 | CMS detection, careers, IR, support, sentiment |
+| **Analytics & Measurement** | 20% | M05, M06, M06b, M08, M09 | GA4 config, pixel implementation, tag governance, consent mode, behavioral tracking |
+| **Security & Compliance** | 15% | M01, M12, M40 | DMARC/SPF/DKIM, HSTS, TLS, privacy/consent compliance, attack surface |
+| **Performance & Experience** | 15% | M03, M10, M11, M13, M14 | Core Web Vitals, accessibility (WCAG 2.1), console errors, carbon, mobile parity |
+| **Paid Media** | 12% | M21, M28, M29 | Ad library creative strategy, paid keyword efficiency, competitive landscape |
+| **SEO & Content** | 10% | M04, M15, M26, M34, M39 | Metadata, social sharing, keyword rankings, content decay, sitemap health |
+| **MarTech & Infrastructure** | 10% | M02, M07, M20 | CMS/CDN/framework stack, tool inventory, ecommerce/SaaS signals |
+| **Brand & Digital Presence** | 8% | M16-M19, M22, M23, M37, M38 | PR, careers, IR, support, news/social sentiment, reviews, local SEO |
+| **Market Intelligence** | 10% | M24, M25, M27, M30-M33, M35, M36 | Traffic volume, geography, domain authority, brand search, engagement |
 
 ### The Full Module Inventory
 
@@ -191,12 +191,11 @@ Every module produces typed data, scored checkpoints, and confidence-weighted si
 
 | ID | Module | What It Does |
 |----|--------|-------------|
-| M41 | Module Synthesis | Per-module AI summaries with findings, recommendations, evidence |
-| M42 | Executive Brief | Strategic narrative, key findings, score rationale |
-| M43 | Remediation Roadmap | Prioritized workstream with effort/impact sizing |
-| M44 | ROI Simulator | Dollar-value impact projections across cost areas |
-| M45 | Cost Cutter | Tool redundancy analysis with annual savings estimate |
-| M46 | Knowledge Base | Structured knowledge graph for AI chat context |
+| M41 | Module AI Synthesis | Per-module deep analysis via Gemini 3 Flash — sends ALL extracted data + business context + parameter-level rubrics. Produces 500-1500 word narratives, per-issue findings with embedded recommendations, AI-driven scores with criterion breakdowns. Multimodal: M21 ad screenshots sent as images for visual creative analysis. 10 concurrent calls, quality validation with retry. |
+| M42 | Executive Brief | Cross-module strategic synthesis via Gemini 3.1 Pro — per-category assessments (8 categories), 200-300 word executive narrative, 3 cross-module theme findings, tech stack summary, competitive context. Pure narrative — no scoring (scoring system is independent). |
+| M43 | PRD Generation | Full remediation roadmap with prioritized workstreams, effort/impact sizing, and chat teasers for AI follow-up |
+| M44 | Impact Scenarios | Dollar-value ROI projections across cost areas with conservative/moderate/aggressive scenarios |
+| M45 | Stack Analyzer | Tool redundancy analysis, overlap detection, and annual savings estimates across the martech stack |
 
 </details>
 
@@ -265,7 +264,7 @@ See `CLAUDE.md` for detailed architecture, environment setup, and deployment pro
 
 **2. 45 modules, not 45 checks.** Each module is a self-contained analysis engine with its own retry logic, timeout, scoring formula, and typed data contract. M05 (Analytics) alone examines measurement IDs, data layer events, consent mode configuration, cross-domain tracking, debug mode, and 8 categories of network requests. Most "audit tools" would call that 8 separate features. We call it one module.
 
-**3. AI synthesis that actually synthesizes.** The AI integration doesn't summarize — it *reasons*. It cross-references findings across modules to produce insights that no individual module could generate alone. "Your consent mode is misconfigured AND your top 3 paid keywords are in healthcare AND you're missing a BAA notice" isn't something a checklist produces. It's something a $400/hr consultant notices after reading three different reports.
+**3. AI synthesis that actually synthesizes.** Each module's full extracted data is sent to Gemini 3 Flash with a parameter-level assessment rubric containing industry benchmarks, step-by-step evaluation criteria, and scoring anchors. The AI produces a 500-1500 word consultant-grade analysis per module, enumerating every issue individually with cited evidence and embedded implementation-step recommendations. For M21 (Ad Library), screenshots are sent as multimodal image input — the AI visually assesses ad creative design alongside the extracted text data, and generates improved ad concepts. M42 then synthesizes ALL module analyses into cross-module strategic themes using Gemini 3.1 Pro. "Your consent mode is misconfigured AND your top 3 paid keywords are in healthcare AND you're missing a BAA notice" isn't something a checklist produces. It's something a $400/hr consultant notices after reading three different reports — except this does it in 90 seconds.
 
 **4. Failure isolation as a first-class design principle.** Module failures never cascade. A third-party API rate limit doesn't stall the browser phase. A bot wall on one module doesn't kill the next. Every module result — success, partial, or error — is stored immediately. The scan always completes with the maximum intelligence it could gather.
 

@@ -144,9 +144,9 @@ User submits URL on frontend
    - Mobile pass: separate context (Pixel 8 viewport, Android-consistent profile)
 3. **GhostScan** — Deep interaction (M09-M12), sequential on same page from Phase 2
 4. **External** — 3rd-party APIs (M21-M40), `Promise.allSettled` parallel
-5. **Synthesis** — AI analysis: M41 parallel, then M42-M46 sequential (dependency chain)
+5. **Synthesis** — AI analysis: M41 parallel, then M42-M45 sequential (dependency chain)
 
-**Synthesis-only mode**: After paid upgrade, `runSynthesisOnly()` loads existing M01-M41 results and runs M42-M46 only.
+**Synthesis-only mode**: After paid upgrade, `runSynthesisOnly()` loads existing M01-M41 results and runs M42-M45 only.
 
 ### Module System
 
@@ -222,9 +222,19 @@ User clicks "Unlock $9.99"
   → User pays → Stripe webhook fires
   → POST /api/webhooks/stripe (signature verified)
   → Dedup check (idempotent if already completed)
-  → Updates scan tier='paid', upserts chat_credits(50)
+  → Updates scan tier='paid' (no chat credits — chat sold separately)
   → Triggers synthesis: engineFetch('/engine/scans', { synthesisOnly: true })
   → Sends payment receipt email (fire-and-forget)
+
+Chat activation ($1.00 → 15 credits):
+  → POST /api/checkout { product: 'chat_activation', scanId }
+  → Validates: paid scan, no existing credits (one-time activation)
+  → Stripe checkout → webhook → upserts chat_credits(15)
+
+Chat top-up ($4.99 → 100 credits):
+  → POST /api/checkout { product: 'chat_credits', scanId }
+  → Validates: paid scan
+  → Stripe checkout → webhook → adds 100 to existing credits
 ```
 
 ## Browser Stealth Infrastructure (Engine)
@@ -252,9 +262,10 @@ User clicks "Unlock $9.99"
 ## Tier System
 
 - **`full`** (free): Runs all 5 scan phases, shows limited data per module with frosted unlock overlay (bottom 38% of slide card)
-- **`paid`**: Same scan data unlocked, synthesis slides (M42-M45), AI chat (50 credits), PDF report
-- Paid modules: M42 (Executive Brief), M43 (Roadmap), M44 (ROI), M45 (Cost Cutter), M46 (Knowledge Base)
-- Internal-only modules (no slide card): M41 (Module Synthesis), M46 (Knowledge Base)
+- **`paid`**: Same scan data unlocked, synthesis slides (M42-M45), PDF report. Chat sold separately ($1 activation, $4.99 top-up).
+- Paid modules: M42 (Executive Brief), M43 (Roadmap), M44 (ROI), M45 (Cost Cutter)
+- Internal-only modules (no slide card): M41 (Module Synthesis)
+- Chat context assembled lazily from raw module_results per question (no pre-computed knowledge base)
 
 ## Web App Structure
 
@@ -275,7 +286,7 @@ User clicks "Unlock $9.99"
 | `/api/checkout` | POST | User + ownership | Create Stripe checkout session |
 | `/api/webhooks/stripe` | POST | Stripe signature | Handle payment completion |
 | `/api/webhooks/resend` | POST | Svix signature | Email delivery events |
-| `/api/chat/[scanId]` | GET/POST | User + credits | AI chat (10 msg/min rate limit) |
+| `/api/chat/[scanId]` | GET/POST | User + credits | AI chat (Gemini Pro, 10 msg/min, 402 if no activation/credits) |
 | `/api/reports/[id]/pdf` | GET | Owner or share token | Generate/fetch PDF report |
 | `/api/reports/[id]/share` | POST | Owner + paid | Generate JWT share token (30-day) |
 | `/api/auth/send-email` | POST | Internal secret | Supabase email hook (Standard Webhooks) |
@@ -298,7 +309,7 @@ User clicks "Unlock $9.99"
 **Web (`apps/web/.env.local`)** — needed locally with `NEXT_PUBLIC_*` stubs for static prerendering:
 - Supabase: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
 - Engine: `ENGINE_URL`, `ENGINE_HMAC_SECRET`
-- Stripe: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, price IDs
+- Stripe: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_ALPHA_BRIEF_PRICE_ID`, `STRIPE_CHAT_ACTIVATION_PRICE_ID`, `STRIPE_CHAT_CREDITS_PRICE_ID`
 - PostHog: `NEXT_PUBLIC_POSTHOG_KEY`, `NEXT_PUBLIC_POSTHOG_HOST=/ingest`
 - Turnstile: `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`
 - Gemini: `GOOGLE_AI_API_KEY`

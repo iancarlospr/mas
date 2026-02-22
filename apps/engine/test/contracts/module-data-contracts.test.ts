@@ -209,7 +209,7 @@ describe('Dependency Graph Completeness', () => {
       'M09', 'M10', 'M11', 'M12', 'M13', 'M14', 'M15', 'M16', 'M17',
       'M18', 'M19', 'M20', 'M21', 'M22', 'M23', 'M24', 'M25', 'M26',
       'M27', 'M28', 'M29', 'M30', 'M31', 'M33', 'M34',
-      'M36', 'M37', 'M38', 'M39', 'M41', 'M42', 'M43', 'M44', 'M45', 'M46',
+      'M36', 'M37', 'M38', 'M39', 'M41', 'M42', 'M43', 'M44', 'M45',
     ]);
 
     for (const dep of MODULE_DEPENDENCIES) {
@@ -255,10 +255,10 @@ describe('Dependency Graph Completeness', () => {
     const requiredDeps = MODULE_DEPENDENCIES.filter(d => d.required);
     expect(requiredDeps.length).toBeGreaterThan(0);
 
-    // Every synthesis module (M42-M46) should have M42 as required dep
+    // Every synthesis module (M42-M45) should have M42 as required dep
     // (or M41 for M42)
     const synthesisConsumers = requiredDeps.filter(d =>
-      ['M42', 'M43', 'M44', 'M45', 'M46'].includes(d.consumer)
+      ['M42', 'M43', 'M44', 'M45'].includes(d.consumer)
     );
     expect(synthesisConsumers.length).toBeGreaterThan(0);
   });

@@ -113,7 +113,7 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
         type: 'traffic_by_country', name: 'Traffic by Country',
         confidence: 0.85,
         evidence: `Top markets: ${countries.slice(0, 3).map(c => `${c.country} (${Math.round(c.totalEtv).toLocaleString()} ETV)`).join(', ')}`,
-        category: 'market_position',
+        category: 'market_intelligence',
       }));
     }
 

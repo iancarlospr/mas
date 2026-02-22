@@ -15,18 +15,18 @@ export const CATEGORY_META: {
   paidOnly?: boolean;
 }[] = [
   { key: 'overview', label: 'Overview', modules: ['overview'] },
-  { key: 'analytics_integrity', label: 'Analytics Integrity', modules: ['M05', 'M08', 'M09'] },
-  { key: 'paid_media_attribution', label: 'Paid Media', modules: ['M06', 'M06b', 'M21', 'M28', 'M29'] },
-  { key: 'performance_ux', label: 'Performance & UX', modules: ['M03', 'M13', 'M14'] },
-  { key: 'compliance_security', label: 'Compliance & Security', modules: ['M01', 'M10', 'M11', 'M12'] },
-  { key: 'martech_efficiency', label: 'MarTech Efficiency', modules: ['M07', 'M20'] },
-  { key: 'seo_content', label: 'SEO & Content', modules: ['M04', 'M15', 'M16', 'M34', 'M35', 'M40'] },
-  { key: 'market_position', label: 'Market Position', modules: ['M24', 'M25', 'M26', 'M27', 'M30', 'M31', 'M32', 'M33', 'M36', 'M37', 'M38', 'M39'] },
-  { key: 'digital_presence', label: 'Digital Presence', modules: ['M02', 'M17', 'M18', 'M19', 'M22', 'M23'] },
+  { key: 'security_compliance', label: 'Security & Compliance', modules: ['M01', 'M12', 'M40'] },
+  { key: 'analytics_measurement', label: 'Analytics & Measurement', modules: ['M05', 'M06', 'M06b', 'M08', 'M09'] },
+  { key: 'performance_experience', label: 'Performance & Experience', modules: ['M03', 'M10', 'M11', 'M13', 'M14'] },
+  { key: 'seo_content', label: 'SEO & Content', modules: ['M04', 'M15', 'M26', 'M34', 'M39'] },
+  { key: 'paid_media', label: 'Paid Media', modules: ['M21', 'M28', 'M29'] },
+  { key: 'martech_infrastructure', label: 'MarTech & Infrastructure', modules: ['M02', 'M07', 'M20'] },
+  { key: 'brand_presence', label: 'Brand & Digital Presence', modules: ['M16', 'M17', 'M18', 'M19', 'M22', 'M23', 'M37', 'M38'] },
+  { key: 'market_intelligence', label: 'Market Intelligence', modules: ['M24', 'M25', 'M27', 'M30', 'M31', 'M32', 'M33', 'M35', 'M36'] },
   { key: 'paid_executive', label: 'Executive Brief', modules: ['M42'], paidOnly: true },
-  { key: 'paid_roi', label: 'ROI Analysis', modules: ['M44'], paidOnly: true },
+  { key: 'paid_roi', label: 'Impact Scenarios', modules: ['M44'], paidOnly: true },
   { key: 'paid_roadmap', label: 'Remediation Roadmap', modules: ['M43'], paidOnly: true },
-  { key: 'paid_costcutter', label: 'Cost Cutter', modules: ['M45'], paidOnly: true },
+  { key: 'paid_costcutter', label: 'Stack Analyzer', modules: ['M45'], paidOnly: true },
 ];
 
 export const MODULE_NAMES: Record<string, string> = {
@@ -45,7 +45,7 @@ export const MODULE_NAMES: Record<string, string> = {
   M36: 'Google Shopping', M37: 'Review Velocity', M38: 'Local Pack',
   M39: 'Sitemap & Indexing', M40: 'Subdomain & Attack Surface',
   M42: 'Executive Brief', M43: 'Remediation Roadmap',
-  M44: 'ROI Analysis', M45: 'Cost Cutter',
+  M44: 'Impact Scenarios', M45: 'Stack Analyzer',
 };
 
 /* ── Sidebar ───────────────────────────────────────────────────── */
