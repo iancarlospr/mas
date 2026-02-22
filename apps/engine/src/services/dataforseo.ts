@@ -618,20 +618,64 @@ export async function getSerpResults(
     type?: 'organic' | 'news';
     depth?: number;
     locationCode?: number;
+    timeRange?: string; // DataForSEO: 'y' (past year), 'm' (past month), 'w' (past week), 'd' (past day)
   } = {},
 ): Promise<unknown> {
-  const { type = 'organic', depth = 10, locationCode = 2840 } = options;
+  const { type = 'organic', depth = 10, locationCode = 2840, timeRange } = options;
 
   const endpoint = type === 'news'
     ? '/serp/google/news/live/advanced'
     : '/serp/google/organic/live/advanced';
 
-  const response = await dataForSeoPost(
-    endpoint,
-    [{ keyword, depth, location_code: locationCode }],
-  );
+  const payload: Record<string, unknown> = { keyword, depth, location_code: locationCode, language_code: 'en' };
+  if (timeRange) payload.time_range = timeRange;
+
+  const response = await dataForSeoPost(endpoint, [payload]);
 
   return response.tasks?.[0]?.result?.[0] ?? null;
+}
+
+/**
+ * Convert ISO 3166-1 alpha-2 country code to DataForSEO location code.
+ * Falls back to US (2840) for unknown codes.
+ */
+const COUNTRY_TO_DATAFORSEO_LOCATION: Record<string, number> = {
+  // North America
+  US: 2840, CA: 2124, MX: 2484,
+  // Caribbean & US Territories
+  PR: 2630, VI: 2850, GU: 2316,
+  DO: 2214, CU: 2192, JM: 2388, TT: 2780, BS: 2044, BB: 2052,
+  HT: 2332, KY: 2136, AW: 2533, CW: 2531, BM: 2060, TC: 2796,
+  AG: 2028, LC: 2662, GD: 2308, VC: 2670, KN: 2659, DM: 2212,
+  // Central America
+  GT: 2320, HN: 2340, SV: 2222, NI: 2558, CR: 2188, PA: 2591, BZ: 2084,
+  // South America
+  BR: 2076, AR: 2032, CO: 2170, CL: 2152, PE: 2604, VE: 2862,
+  EC: 2218, BO: 2068, PY: 2600, UY: 2858, GY: 2328, SR: 2740,
+  // Europe
+  GB: 2826, DE: 2276, FR: 2250, ES: 2724, IT: 2380, PT: 2620, NL: 2528,
+  BE: 2056, AT: 2040, CH: 2756, SE: 2752, NO: 2578, DK: 2208, FI: 2246,
+  IE: 2372, PL: 2616, CZ: 2203, RO: 2642, HU: 2348, GR: 2300,
+  // Asia-Pacific
+  AU: 2036, NZ: 2554, IN: 2356, JP: 2392, KR: 2410, SG: 2702,
+  MY: 2458, TH: 2764, HK: 2344, TW: 2158, ID: 2360,
+  // Middle East & Africa
+  IL: 2376, AE: 2784, SA: 2682, ZA: 2710, EG: 2818, TR: 2792,
+};
+
+export function getDataForSEOLocationCode(countryCode: string): number {
+  return COUNTRY_TO_DATAFORSEO_LOCATION[countryCode] ?? 2840;
+}
+
+/**
+ * Convert ISO 3166-1 alpha-2 country code to English display name.
+ */
+export function getCountryDisplayName(code: string): string {
+  try {
+    return new Intl.DisplayNames(['en'], { type: 'region' }).of(code) ?? '';
+  } catch {
+    return '';
+  }
 }
 
 /**

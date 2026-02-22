@@ -1,8 +1,9 @@
 /**
  * M22 - News Sentiment Scanner
  *
- * Searches for recent news about the brand via DataForSEO SERP
- * and classifies sentiment using Gemini Flash.
+ * Resolves brand name from M04 metadata + Gemini, searches Google News
+ * via DataForSEO with location-aware dual queries (brand alone + brand + country),
+ * past-year time range, and classifies sentiment with notable mention extraction.
  *
  * Checkpoints:
  *   1. News coverage volume
@@ -13,9 +14,19 @@ import { registerModuleExecutor } from '../runner.js';
 import type { ModuleContext } from '../types.js';
 import type { ModuleResult, ModuleId, Signal, Checkpoint, CheckpointHealth } from '@marketing-alpha/types';
 import { createSignal, createCheckpoint, infoCheckpoint } from '../../utils/signals.js';
-import { getSerpResults } from '../../services/dataforseo.js';
+import { getSerpResults, getDataForSEOLocationCode, getCountryDisplayName } from '../../services/dataforseo.js';
+import { getScanById } from '../../services/supabase.js';
 import { callFlash } from '../../services/gemini.js';
 import { z } from 'zod';
+import pino from 'pino';
+
+const logger = pino({ name: 'm22-news-sentiment' });
+
+// ─── Schemas ─────────────────────────────────────────────────────────────────
+
+const BrandNameSchema = z.object({
+  brandName: z.string(),
+});
 
 const SentimentSchema = z.object({
   articles: z.array(z.object({
@@ -24,61 +35,212 @@ const SentimentSchema = z.object({
     summary: z.string(),
   })),
   overallSentiment: z.enum(['positive', 'negative', 'neutral', 'mixed']),
+  notableMention: z.string(),
 });
+
+// ─── Brand Name Resolution ───────────────────────────────────────────────────
+
+function extractFromMetadata(m04Data: Record<string, unknown>): string | null {
+  // Try og:site_name first (most reliable brand indicator)
+  const ogTags = m04Data['openGraph'] as Record<string, string> | undefined;
+  if (ogTags?.['og:site_name']) {
+    const siteName = ogTags['og:site_name'].trim();
+    if (siteName.length > 1 && siteName.length < 80) return siteName;
+  }
+
+  // Fall back to <title> tag with common suffix stripping
+  const title = m04Data['title'] as string | undefined;
+  if (title) {
+    const cleaned = title
+      .replace(/\s*[|\-–—:]\s*(Home|Official Site|Homepage|Welcome|Main).*$/i, '')
+      .replace(/\s*[|\-–—:]\s*$/, '')
+      .trim();
+    if (cleaned.length > 1 && cleaned.length < 80) return cleaned;
+  }
+
+  return null;
+}
+
+function extractFromDomain(url: string): string {
+  const domain = new URL(url).hostname.replace('www.', '');
+  const base = domain.split('.')[0] ?? domain;
+  // Convert hyphens and camelCase to spaces: "una-app" → "una app", "UnaApp" → "Una App"
+  return base
+    .replace(/-/g, ' ')
+    .replace(/([a-z])([A-Z])/g, '$1 $2')
+    .replace(/\b\w/g, c => c.toUpperCase())
+    .trim();
+}
+
+async function resolveBrandName(ctx: ModuleContext): Promise<string> {
+  const domain = new URL(ctx.url).hostname.replace('www.', '');
+
+  // Step 1: Try M04 metadata
+  const m04 = ctx.previousResults.get('M04' as ModuleId);
+  const m04Data = m04?.data as Record<string, unknown> | undefined;
+  const metadataName = m04Data ? extractFromMetadata(m04Data) : null;
+
+  // Step 2: Domain-based fallback
+  const domainName = extractFromDomain(ctx.url);
+
+  // Step 3: Let Gemini pick the best brand name (cheap, fast)
+  const title = (m04Data?.['title'] as string) ?? '';
+  try {
+    const result = await callFlash(
+      `Given the domain "${domain}" and page title "${title}", what is the company or brand name? Reply with just the brand name, nothing else.`,
+      BrandNameSchema,
+      { temperature: 0.1, maxTokens: 50 },
+    );
+    const name = result.data.brandName.trim();
+    if (name.length > 1 && name.length < 80) return name;
+  } catch {
+    // Gemini failed — use metadata or domain fallback
+  }
+
+  return metadataName ?? domainName;
+}
+
+// ─── Location Resolution ─────────────────────────────────────────────────────
+
+async function resolveLocation(scanId: string): Promise<{ countryCode: string; locationCode: number; countryName: string }> {
+  let countryCode = 'US';
+
+  try {
+    const scan = await getScanById(scanId);
+    const code = scan?.['country_code'] as string | null;
+    if (code && /^[A-Z]{2}$/.test(code)) countryCode = code;
+  } catch {
+    logger.warn({ scanId }, 'Could not fetch scan record for country code — using US fallback');
+  }
+
+  return {
+    countryCode,
+    locationCode: getDataForSEOLocationCode(countryCode),
+    countryName: getCountryDisplayName(countryCode),
+  };
+}
+
+// ─── News Fetching (dual query + dedup) ──────────────────────────────────────
+
+interface NewsItem {
+  title: string;
+  snippet: string;
+  source: string;
+  url: string;
+  date: string;
+}
+
+async function fetchNews(
+  brandName: string,
+  locationCode: number,
+  countryName: string,
+): Promise<{ items: NewsItem[]; queries: string[] }> {
+  const queries = [brandName];
+  if (countryName) {
+    queries.push(`${brandName} ${countryName}`);
+  }
+
+  const allItems: NewsItem[] = [];
+  const seenUrls = new Set<string>();
+
+  for (const query of queries) {
+    try {
+      const result = await getSerpResults(query, {
+        type: 'news',
+        depth: 10,
+        locationCode,
+        timeRange: 'y', // past year
+      }) as Record<string, unknown> | null;
+
+      const items = result ? (result['items'] as Array<Record<string, unknown>>) ?? [] : [];
+
+      for (const item of items) {
+        const url = (item['url'] as string ?? '').slice(0, 500);
+        if (seenUrls.has(url)) continue;
+        seenUrls.add(url);
+
+        allItems.push({
+          title: (item['title'] as string ?? '').slice(0, 200),
+          snippet: (item['snippet'] as string ?? '').slice(0, 300),
+          source: (item['source'] as string) ?? '',
+          url,
+          date: (item['date'] as string) ?? '',
+        });
+      }
+    } catch (err) {
+      logger.warn({ query, error: (err as Error).message }, 'News search failed for query');
+    }
+  }
+
+  // Cap at 15 articles total
+  return { items: allItems.slice(0, 15), queries };
+}
+
+// ─── Execute ─────────────────────────────────────────────────────────────────
 
 const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
   const signals: Signal[] = [];
   const checkpoints: Checkpoint[] = [];
   const data: Record<string, unknown> = {};
 
-  const domain = new URL(ctx.url).hostname.replace('www.', '');
-  const brandName = domain.split('.')[0] ?? domain;
-
   try {
-    // Fetch news results
-    const newsResult = await getSerpResults(brandName, { type: 'news', depth: 10 }) as Record<string, unknown> | null;
+    // Resolve brand name and location in parallel
+    const [brandName, location] = await Promise.all([
+      resolveBrandName(ctx),
+      resolveLocation(ctx.scanId),
+    ]);
 
-    const items = newsResult ? (newsResult['items'] as Array<Record<string, unknown>>) ?? [] : [];
+    data.brandName = brandName;
+    data.countryCode = location.countryCode;
 
-    if (items.length === 0) {
-      checkpoints.push(infoCheckpoint('m22-coverage', 'News Coverage', `No recent news found for "${brandName}"`));
-      data.news = { articles: [], overallSentiment: 'neutral' };
+    logger.info(
+      { scanId: ctx.scanId, brandName, countryCode: location.countryCode, countryName: location.countryName },
+      'Starting news sentiment search',
+    );
+
+    // Fetch news with dual query
+    const { items: headlines, queries } = await fetchNews(brandName, location.locationCode, location.countryName);
+    data.newsHeadlines = headlines;
+    data.searchQueries = queries;
+
+    if (headlines.length === 0) {
+      checkpoints.push(infoCheckpoint('m22-coverage', 'News Coverage', `No recent news found for "${brandName}" in ${location.countryName || 'US'} (past year)`));
+      data.sentiment = { articles: [], overallSentiment: 'neutral', notableMention: 'No news coverage found' };
       return { moduleId: 'M22' as ModuleId, status: 'success', data, signals, score: null, checkpoints, duration: 0 };
     }
 
-    // Extract headlines for sentiment analysis
-    const headlines = items.slice(0, 10).map(item => ({
-      title: (item['title'] as string ?? '').slice(0, 200),
-      snippet: (item['snippet'] as string ?? '').slice(0, 300),
-      source: (item['source'] as string) ?? '',
-      url: (item['url'] as string ?? '').slice(0, 200),
-    }));
-
-    data.newsHeadlines = headlines;
-
     // Classify sentiment with Gemini
-    let sentiment;
+    let sentiment: z.infer<typeof SentimentSchema>;
     try {
-      const prompt = `Analyze sentiment of these news headlines about "${brandName}". For each article, classify as positive, negative, or neutral. Also give an overall sentiment.\n\nArticles:\n${headlines.map((h, i) => `${i + 1}. "${h.title}" - ${h.snippet}`).join('\n')}`;
+      const prompt = `Analyze sentiment of these news headlines about "${brandName}".
+For each article, classify as positive, negative, or neutral.
+Give an overall sentiment.
+Identify the single most notable or recurring topic across all articles (e.g., "product launch", "funding round", "data breach", "expansion", "partnership").
+
+Articles:
+${headlines.map((h, i) => `${i + 1}. "${h.title}" — ${h.snippet} (${h.source})`).join('\n')}`;
 
       const result = await callFlash(prompt, SentimentSchema, {
-        systemInstruction: 'You are a sentiment analysis expert. Respond in JSON format.',
+        systemInstruction: 'You are a news sentiment analyst. Classify each article and identify the dominant theme. Respond in JSON.',
         temperature: 0.2,
       });
       sentiment = result.data;
     } catch {
-      // If Gemini fails, provide basic analysis without sentiment
+      // Gemini fallback — neutral for everything
       sentiment = {
         articles: headlines.map(h => ({ title: h.title, sentiment: 'neutral' as const, summary: h.snippet })),
-        overallSentiment: 'neutral' as const,
+        overallSentiment: 'neutral',
+        notableMention: 'Unable to classify — defaulted to neutral',
       };
     }
 
     data.sentiment = sentiment;
 
+    // Signal
     signals.push(createSignal({
       type: 'news_sentiment', name: 'News Sentiment',
-      confidence: 0.7, evidence: `${headlines.length} articles, overall: ${sentiment.overallSentiment}`,
+      confidence: 0.7,
+      evidence: `${headlines.length} articles for "${brandName}" (${location.countryName || 'US'}), overall: ${sentiment.overallSentiment}. Notable: ${sentiment.notableMention}`,
       category: 'market_intelligence',
     }));
 
@@ -92,7 +254,7 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
       checkpoints.push(createCheckpoint({
         id: 'm22-coverage', name: 'News Coverage', weight: 0.5,
         health,
-        evidence: `${headlines.length} recent news article(s) found for "${brandName}"`,
+        evidence: `${headlines.length} news article(s) found for "${brandName}" in ${location.countryName || 'US'} (past year)`,
       }));
     }
 
@@ -100,19 +262,20 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
     {
       const positive = sentiment.articles.filter(a => a.sentiment === 'positive').length;
       const negative = sentiment.articles.filter(a => a.sentiment === 'negative').length;
+      const neutral = sentiment.articles.length - positive - negative;
 
       let health: CheckpointHealth;
       let evidence: string;
 
       if (sentiment.overallSentiment === 'positive') {
         health = 'excellent';
-        evidence = `Positive news sentiment: ${positive} positive, ${negative} negative out of ${sentiment.articles.length} articles`;
+        evidence = `Positive news sentiment: ${positive} positive, ${negative} negative, ${neutral} neutral. Notable: ${sentiment.notableMention}`;
       } else if (sentiment.overallSentiment === 'neutral' || sentiment.overallSentiment === 'mixed') {
         health = 'good';
-        evidence = `Mixed/neutral sentiment: ${positive} positive, ${negative} negative, ${sentiment.articles.length - positive - negative} neutral`;
+        evidence = `Mixed/neutral sentiment: ${positive} positive, ${negative} negative, ${neutral} neutral. Notable: ${sentiment.notableMention}`;
       } else {
         health = 'warning';
-        evidence = `Negative news sentiment: ${negative} negative out of ${sentiment.articles.length} articles — reputation management may be needed`;
+        evidence = `Negative news sentiment: ${negative} negative out of ${sentiment.articles.length} articles. Notable: ${sentiment.notableMention}`;
       }
 
       checkpoints.push(createCheckpoint({ id: 'm22-sentiment', name: 'News Sentiment', weight: 0.6, health, evidence }));

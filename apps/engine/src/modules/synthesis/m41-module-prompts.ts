@@ -1702,8 +1702,8 @@ Include this as a special recommendation with action: "Recommended Creative Conc
   M22: {
     name: 'News Sentiment',
     category: 'Brand & Digital Presence',
-    purpose: 'Analyzes recent news coverage and media sentiment (positive/negative/neutral). News sentiment affects brand perception, investor confidence, and customer trust.',
-    assessmentInstructions: `Evaluate news volume, sentiment distribution, and recency. Negative news requires attention. No news may be acceptable for small businesses but concerning for public companies.`,
+    purpose: 'Analyzes recent news coverage (past year) and media sentiment for the brand. Uses location-aware search based on user country. News sentiment affects brand perception, investor confidence, and customer trust.',
+    assessmentInstructions: `Evaluate news volume, sentiment distribution, notable mentions, and search context. The data includes brandName (AI-resolved company name), countryCode, searchQueries (what was actually searched), and a notableMention (dominant theme). Negative news requires attention. No news may be acceptable for small businesses but concerning for public companies.`,
     parameters: [
       {
         parameter: 'News Coverage',
@@ -1711,25 +1711,30 @@ Include this as a special recommendation with action: "Recommended Creative Conc
    - 0: INFO for small businesses, WARNING for larger companies
    - 1-5: moderate coverage
    - 5+: active media presence
-2. Review headline sources for credibility`,
+2. Review headline sources for credibility
+3. Note the searchQueries to understand what was searched
+4. Note the brandName to verify correct company was found`,
         benchmarks: 'Active media presence correlates with brand awareness and trust.',
       },
       {
-        parameter: 'Sentiment Analysis',
+        parameter: 'Sentiment & Notable Mentions',
         evaluationSteps: `1. Check sentiment.overallSentiment:
    - "positive": POSITIVE
    - "neutral": INFO
    - "mixed": WARNING — investigate negative articles
    - "negative": CRITICAL — active reputation risk
-2. Review individual article sentiments for specific concerns`,
+2. Check sentiment.notableMention for the dominant topic/theme
+   - Positive themes (funding, expansion, partnership): highlight as brand strengths
+   - Negative themes (lawsuit, breach, layoffs): flag as reputation risks
+3. Review individual article sentiments for specific concerns`,
         benchmarks: 'Negative news sentiment can impact stock price by 1-5% for public companies.',
       },
     ],
     scoringAnchors: {
-      excellent: 'Active positive news coverage from credible sources.',
+      excellent: 'Active positive news coverage from credible sources with constructive themes.',
       good: 'Some positive coverage, no negative articles.',
       moderate: 'Limited coverage, neutral sentiment.',
-      poor: 'Mixed sentiment with some negative articles.',
+      poor: 'Mixed sentiment with some negative articles or concerning themes.',
       critical: 'Predominantly negative news coverage indicating active reputation crisis.',
     },
   },
@@ -1737,32 +1742,38 @@ Include this as a special recommendation with action: "Recommended Creative Conc
   M23: {
     name: 'Social Sentiment',
     category: 'Brand & Digital Presence',
-    purpose: 'Analyzes social media mentions and sentiment across Reddit, Twitter/X, LinkedIn, and other platforms. Social sentiment reflects real-time brand perception among customers and prospects.',
-    assessmentInstructions: `Evaluate social mention volume, platform diversity, and sentiment. Cross-reference with news sentiment (M22) for consistent brand narrative.`,
+    purpose: 'Analyzes social media mentions and sentiment across Reddit, Twitter/X, and LinkedIn (past year). Uses location-aware search with the brand name resolved by M22. Social sentiment reflects real-time brand perception among customers and prospects.',
+    assessmentInstructions: `Evaluate social mention volume, platform diversity, sentiment, and the notable mention theme. The data includes brandName (reused from M22), countryCode, searchQuery (the actual Google query used), and notableMention (dominant social theme). Cross-reference with news sentiment (M22) for consistent brand narrative.`,
     parameters: [
       {
         parameter: 'Social Mentions',
         evaluationSteps: `1. Check socialMentions array:
    - 0: INFO for B2B, WARNING for B2C consumer brands
    - Multiple platforms: POSITIVE — broad social footprint
-2. Check platform diversity in socialSentiment.platforms`,
+2. Check platform diversity in socialSentiment.platforms
+3. Note the searchQuery and brandName for context`,
         benchmarks: 'Social listening is essential for brand monitoring and customer feedback.',
       },
       {
-        parameter: 'Social Sentiment',
+        parameter: 'Social Sentiment & Notable Themes',
         evaluationSteps: `1. Check socialSentiment.overallSentiment:
    - "positive": POSITIVE
    - "neutral": INFO
    - "negative": WARNING — active social dissatisfaction
-2. Review per-platform sentiment for specific issues`,
+2. Check socialSentiment.notableMention for the dominant topic
+   - Customer complaints: flag as reputation risk
+   - Product praise: highlight as brand strength
+   - Pricing discussions: note as market perception signal
+3. Review per-platform sentiment for specific issues
+4. Cross-reference with M22 notableMention for consistent themes`,
         benchmarks: 'Negative social sentiment spreads 3x faster than positive (MIT Sloan study).',
       },
     ],
     scoringAnchors: {
-      excellent: 'Active positive social mentions across multiple platforms.',
+      excellent: 'Active positive social mentions across multiple platforms with constructive themes.',
       good: 'Some positive mentions, no negative trends.',
       moderate: 'Limited social presence, neutral sentiment.',
-      poor: 'Mixed sentiment with negative mentions.',
+      poor: 'Mixed sentiment with negative mentions or concerning themes.',
       critical: 'Predominantly negative social sentiment, active complaints.',
     },
   },
