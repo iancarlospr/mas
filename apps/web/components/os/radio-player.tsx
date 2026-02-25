@@ -20,12 +20,12 @@ const STATIONS = [
   {
     name: 'lofi beats to audit to',
     url: 'https://streams.fluxfm.de/Chillhop/mp3-128/audio/',
-    color: 'bg-gs-cyan',
+    color: 'bg-gs-red',
   },
   {
     name: 'synthwave radio',
     url: 'https://streams.fluxfm.de/80s/mp3-128/audio/',
-    color: 'bg-gs-fuchsia',
+    color: 'bg-gs-red',
   },
   {
     name: 'the void',
@@ -119,20 +119,20 @@ export function RadioPlayer({ onClose }: RadioPlayerProps) {
       width={280}
       onClose={onClose}
     >
-      <div className="p-gs-4 bg-gs-black space-y-gs-3">
+      <div className="p-gs-4 bg-gs-ink space-y-gs-3">
         {/* Equalizer */}
         <div className="flex items-end justify-center gap-[3px] h-[40px]">
           {eqBars.map((height, i) => (
             <div
               key={i}
-              className={`w-[6px] transition-all duration-150 ${playing ? station.color : 'bg-gs-mid-dark'}`}
+              className={`w-[6px] transition-all duration-150 ${playing ? station.color : 'bg-gs-ink'}`}
               style={{ height: `${playing ? height * 5 : 4}px` }}
             />
           ))}
         </div>
 
         {/* Station name */}
-        <div className="bevel-sunken bg-gs-dark p-gs-2 text-center">
+        <div className="bevel-sunken bg-gs-ink p-gs-2 text-center">
           <span className="font-data text-data-xs text-gs-terminal">
             {playing ? station.name : 'Radio.exe — Idle'}
           </span>
@@ -145,7 +145,7 @@ export function RadioPlayer({ onClose }: RadioPlayerProps) {
               key={s.name}
               onClick={() => changeStation(i)}
               className={`flex-1 text-os-xs py-gs-1 ${
-                i === stationIndex ? 'bevel-sunken bg-gs-mid-dark text-gs-near-white' : 'bevel-button'
+                i === stationIndex ? 'bevel-sunken bg-gs-ink text-gs-paper' : 'bevel-button'
               }`}
               title={s.name}
             >
@@ -165,14 +165,14 @@ export function RadioPlayer({ onClose }: RadioPlayerProps) {
 
           {/* Volume */}
           <div className="flex-1 flex items-center gap-gs-2">
-            <span className="font-data text-data-xs text-gs-mid">🔊</span>
+            <span className="font-data text-data-xs text-gs-muted">🔊</span>
             <input
               type="range"
               min="0"
               max="100"
               value={volume}
               onChange={handleVolume}
-              className="flex-1 h-[4px] appearance-none bg-gs-mid-dark cursor-pointer accent-gs-cyan"
+              className="flex-1 h-[4px] appearance-none bg-gs-ink cursor-pointer accent-gs-red"
             />
           </div>
         </div>

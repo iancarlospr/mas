@@ -67,13 +67,13 @@ export function PricingCards() {
           <div
             key={tier.name}
             className={cn(
-              'relative bevel-raised bg-gs-light p-gs-6 flex flex-col',
+              'relative bevel-raised bg-gs-chrome p-gs-6 flex flex-col',
               tier.highlighted && 'shadow-ghost-glow',
             )}
           >
             {/* Edition label */}
-            <div className="bevel-sunken bg-gs-near-white px-gs-3 py-gs-1 mb-gs-4 inline-block self-start">
-              <span className="font-system text-os-xs text-gs-mid-dark">
+            <div className="bevel-sunken bg-gs-paper px-gs-3 py-gs-1 mb-gs-4 inline-block self-start">
+              <span className="font-system text-os-xs text-gs-muted">
                 {tier.edition}
               </span>
             </div>
@@ -84,25 +84,25 @@ export function PricingCards() {
               </div>
             )}
 
-            <h3 className="font-system text-os-lg font-bold text-gs-black">
+            <h3 className="font-system text-os-lg font-bold text-gs-ink">
               {tier.name}
             </h3>
-            <p className="font-data text-data-sm text-gs-mid mt-gs-1">
+            <p className="font-data text-data-sm text-gs-muted mt-gs-1">
               {tier.description}
             </p>
 
             {/* Price */}
             <div className="mt-gs-6 mb-gs-6">
               {tier.originalPrice && (
-                <span className="font-data text-data-sm text-gs-mid-light line-through mr-gs-2">
+                <span className="font-data text-data-sm text-gs-muted line-through mr-gs-2">
                   {tier.originalPrice}
                 </span>
               )}
-              <span className="font-data text-data-hero text-gs-black">
+              <span className="font-data text-data-hero text-gs-ink">
                 {tier.price}
               </span>
               {tier.price !== 'Free' && (
-                <span className="font-data text-data-xs text-gs-mid ml-gs-2">one-time</span>
+                <span className="font-data text-data-xs text-gs-muted ml-gs-2">one-time</span>
               )}
             </div>
 
@@ -111,7 +111,7 @@ export function PricingCards() {
               {tier.features.map((feature) => (
                 <li key={feature} className="flex items-start gap-gs-2 font-data text-data-sm">
                   <span className="text-gs-terminal font-bold flex-shrink-0">☑</span>
-                  <span className="text-gs-mid-dark">{feature}</span>
+                  <span className="text-gs-muted">{feature}</span>
                 </li>
               ))}
             </ul>
@@ -133,20 +133,20 @@ export function PricingCards() {
       </div>
 
       {/* Chat Credits add-on */}
-      <div className="max-w-md mx-auto bevel-raised bg-gs-light p-gs-6 text-center">
-        <span className="font-system text-os-xs text-gs-mid uppercase tracking-wider">
+      <div className="max-w-md mx-auto bevel-raised bg-gs-chrome p-gs-6 text-center">
+        <span className="font-system text-os-xs text-gs-muted uppercase tracking-wider">
           Add-on
         </span>
-        <h3 className="font-system text-os-lg font-bold text-gs-black mt-gs-1">
+        <h3 className="font-system text-os-lg font-bold text-gs-ink mt-gs-1">
           {addOn.name}
         </h3>
-        <p className="font-data text-data-sm text-gs-mid mt-gs-1 mb-gs-3">
+        <p className="font-data text-data-sm text-gs-muted mt-gs-1 mb-gs-3">
           {addOn.description}
         </p>
-        <span className="font-data text-data-2xl font-bold text-gs-black">
+        <span className="font-data text-data-2xl font-bold text-gs-ink">
           {addOn.price}
         </span>
-        <span className="font-data text-data-xs text-gs-mid ml-gs-2">one-time</span>
+        <span className="font-data text-data-xs text-gs-muted ml-gs-2">one-time</span>
       </div>
     </div>
   );

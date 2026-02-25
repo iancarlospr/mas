@@ -3,7 +3,7 @@
 import {
   PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer,
 } from 'recharts';
-import { TRAFFIC_SOURCE_COLORS, CHART_PALETTE, TOOLTIP_STYLE, TOOLTIP_LABEL_STYLE, TOOLTIP_ITEM_STYLE, OKLCH } from '@/lib/chart-config';
+import { TRAFFIC_SOURCE_COLORS, CHART_PALETTE, TOOLTIP_STYLE, TOOLTIP_LABEL_STYLE, TOOLTIP_ITEM_STYLE, RESOLVED_COLORS } from '@/lib/chart-config';
 import { formatters } from '@/lib/chart-config';
 
 interface TrafficSource {
@@ -25,7 +25,7 @@ function DonutTooltip({ active, payload }: { active?: boolean; payload?: Array<{
     <div style={TOOLTIP_STYLE}>
       <p style={TOOLTIP_LABEL_STYLE}>{entry.payload.source}</p>
       <p style={TOOLTIP_ITEM_STYLE}>
-        <span style={{ color: OKLCH.nearWhite, fontFamily: 'var(--font-data)' }}>
+        <span style={{ color: RESOLVED_COLORS.paper, fontFamily: 'var(--font-data)' }}>
           {entry.payload.percentage}%
         </span>
         {' · '}
@@ -74,7 +74,7 @@ export function TrafficSourcesDonut({ data, height = 200, compact = false }: Tra
               wrapperStyle={{
                 fontFamily: 'var(--font-data)',
                 fontSize: '12px',
-                color: OKLCH.mid,
+                color: RESOLVED_COLORS.muted,
                 paddingTop: '16px',
               }}
             />
@@ -89,7 +89,7 @@ export function TrafficSourcesDonut({ data, height = 200, compact = false }: Tra
               fontFamily: 'var(--font-data)',
               fontSize: compact ? 20 : 28,
               fontWeight: 700,
-              fill: OKLCH.black,
+              fill: RESOLVED_COLORS.ink,
             }}
           >
             {formatters.thousands(totalVisits)}

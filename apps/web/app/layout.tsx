@@ -1,16 +1,24 @@
 import type { Metadata } from 'next';
-import { Pixelify_Sans, JetBrains_Mono, Permanent_Marker } from 'next/font/google';
+import { Instrument_Serif, Pixelify_Sans, JetBrains_Mono, Permanent_Marker } from 'next/font/google';
 import { PostHogProvider } from '@/components/providers/posthog-provider';
 import { EasterEggs } from '@/components/os/easter-eggs';
+import { DesktopRoot } from '@/components/os/desktop-root';
 import './globals.css';
 
 /**
- * GhostScan OS — Font Stack
+ * GhostScan OS — Root Layout
  *
- * System:      Pixelify Sans — Win95 OS chrome (titles, menus, buttons, labels)
- * Data:        JetBrains Mono — All metrics, scores, terminal text, body copy
- * Personality: Permanent Marker — Chloé's speech, easter eggs, personality moments
+ * The entire app is one persistent Desktop shell.
+ * WindowManagerProvider wraps everything for window state.
+ * DesktopShell renders at root — persists across all navigations.
  */
+
+const displayFont = Instrument_Serif({
+  subsets: ['latin'],
+  variable: '--font-display',
+  display: 'swap',
+  weight: '400',
+});
 
 const systemFont = Pixelify_Sans({
   subsets: ['latin'],
@@ -52,7 +60,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'AlphaScan',
-    description: 'Your MarTech stack is a landfill. Let Chloé run the forensics.',
+    description: 'Your MarTech stack is a landfill. Let Chloe run the forensics.',
   },
   robots: { index: false, follow: false },
 };
@@ -65,11 +73,13 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${systemFont.variable} ${dataFont.variable} ${personalityFont.variable}`}
+      className={`${displayFont.variable} ${systemFont.variable} ${dataFont.variable} ${personalityFont.variable}`}
     >
       <body>
         <PostHogProvider>
-          {children}
+          <DesktopRoot>
+            {children}
+          </DesktopRoot>
           <EasterEggs />
         </PostHogProvider>
       </body>

@@ -57,16 +57,16 @@ export function OverviewSlide({ scan }: OverviewSlideProps) {
   return (
     <div id="slide-overview" className="p-gs-4">
       {/* ── Hero Score Section ────────────────────────────── */}
-      <div className="bevel-sunken bg-gs-near-white p-gs-6 mb-gs-4">
+      <div className="bevel-sunken bg-gs-paper p-gs-6 mb-gs-4">
         <div className="flex flex-col lg:flex-row items-center gap-gs-8">
           {/* Big number */}
           <div className="text-center lg:text-left flex-shrink-0">
             {score != null ? (
               <>
-                <div className="font-data text-data-hero text-ghost-gradient leading-none">
+                <div className="font-data text-data-hero text-gs-red leading-none">
                   {score}
                 </div>
-                <div className="font-system text-os-lg text-gs-mid-dark mt-gs-2">
+                <div className="font-system text-os-lg text-gs-muted mt-gs-2">
                   MarketingIQ™
                 </div>
                 <div
@@ -79,7 +79,7 @@ export function OverviewSlide({ scan }: OverviewSlideProps) {
                 </div>
               </>
             ) : (
-              <div className="font-data text-data-2xl text-gs-mid">
+              <div className="font-data text-data-2xl text-gs-muted">
                 Score unavailable
               </div>
             )}
@@ -93,7 +93,7 @@ export function OverviewSlide({ scan }: OverviewSlideProps) {
           )}
 
           {/* Meta info */}
-          <div className="bevel-sunken bg-gs-white px-gs-3 py-gs-2 font-data text-data-xs text-gs-mid space-y-gs-1 flex-shrink-0">
+          <div className="bevel-sunken bg-gs-paper px-gs-3 py-gs-2 font-data text-data-xs text-gs-muted space-y-gs-1 flex-shrink-0">
             <div>{scan.domain}</div>
             <div>{new Date(scan.createdAt).toLocaleDateString()}</div>
             <div>{moduleCount} modules executed</div>
@@ -103,14 +103,14 @@ export function OverviewSlide({ scan }: OverviewSlideProps) {
 
       {/* ── Category Breakdown ────────────────────────────── */}
       <div className="space-y-gs-2">
-        <h3 className="font-system text-os-base text-gs-mid-dark mb-gs-2">
+        <h3 className="font-system text-os-base text-gs-muted mb-gs-2">
           Category Scores
         </h3>
         {categories.map((cat) => (
           <CategoryBar key={cat.category} category={cat} />
         ))}
         {categories.length === 0 && (
-          <p className="font-data text-data-sm text-gs-mid text-center py-gs-4">
+          <p className="font-data text-data-sm text-gs-muted text-center py-gs-4">
             Category scores unavailable
           </p>
         )}
@@ -128,12 +128,12 @@ function CategoryBar({ category }: { category: CategoryScore }) {
   return (
     <div className="flex items-center gap-gs-3">
       {/* Label */}
-      <span className="font-system text-os-xs text-gs-mid-dark w-[160px] truncate text-right">
+      <span className="font-system text-os-xs text-gs-muted w-[160px] truncate text-right">
         {label}
       </span>
 
       {/* Bar track (bevel sunken) */}
-      <div className="flex-1 bevel-sunken bg-gs-white h-[16px] relative overflow-hidden">
+      <div className="flex-1 bevel-sunken bg-gs-paper h-[16px] relative overflow-hidden">
         <div
           className="absolute inset-y-[2px] left-[2px] transition-all duration-700"
           style={{

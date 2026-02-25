@@ -1,16 +1,12 @@
-import { NavBar } from '@/components/marketing/navbar';
-import { Footer } from '@/components/marketing/footer';
-
+/**
+ * Marketing Layout — Pass-through.
+ * Marketing content is now in desktop icon windows.
+ * NavBar and Footer replaced by MenuBar and Taskbar in DesktopShell.
+ */
 export default function MarketingLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <>
-      <NavBar />
-      <main>{children}</main>
-      <Footer />
-    </>
-  );
+  return <>{children}</>;
 }

@@ -65,11 +65,11 @@ export function SlideSidebar({ resultMap, isPaid, activeSlideId, onNavigate }: S
     <>
       {/* Mobile hamburger */}
       <button
-        className="scan-sidebar-toggle fixed top-20 left-4 z-50 lg:hidden bg-white border border-gs-mid-light p-2 shadow-md"
+        className="scan-sidebar-toggle fixed top-20 left-4 z-50 lg:hidden bg-white border border-gs-chrome p-2 shadow-md"
         onClick={() => setMobileOpen(!mobileOpen)}
         aria-label="Toggle sidebar"
       >
-        <svg className="w-5 h-5 text-gs-black" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+        <svg className="w-5 h-5 text-gs-ink" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
           {mobileOpen ? (
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           ) : (
@@ -89,7 +89,7 @@ export function SlideSidebar({ resultMap, isPaid, activeSlideId, onNavigate }: S
       {/* Sidebar */}
       <nav
         className={cn(
-          'scan-sidebar fixed top-0 left-0 h-screen w-60 bg-white border-r border-gs-mid-light/60 overflow-y-auto z-50 transition-transform duration-200',
+          'scan-sidebar fixed top-0 left-0 h-screen w-60 bg-white border-r border-gs-chrome/60 overflow-y-auto z-50 transition-transform duration-200',
           'lg:sticky lg:top-0 lg:translate-x-0 lg:z-10',
           mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
         )}
@@ -114,7 +114,7 @@ export function SlideSidebar({ resultMap, isPaid, activeSlideId, onNavigate }: S
                 <div
                   className={cn(
                     'px-3 py-1.5 text-[12px] font-system font-semibold uppercase tracking-wider',
-                    isLockedSection ? 'text-gs-mid/50' : 'text-gs-mid',
+                    isLockedSection ? 'text-gs-muted/50' : 'text-gs-muted',
                   )}
                 >
                   {isLockedSection && (
@@ -147,24 +147,24 @@ export function SlideSidebar({ resultMap, isPaid, activeSlideId, onNavigate }: S
                         className={cn(
                           'w-full flex items-center gap-2 px-3 py-1.5 text-left transition-colors text-sm',
                           isActive
-                            ? 'bg-gs-cyan/10 border-l-[3px] border-gs-cyan font-semibold pl-[9px]'
-                            : 'hover:bg-gs-near-white border-l-[3px] border-transparent pl-[9px]',
+                            ? 'bg-gs-red/10 border-l-[3px] border-gs-red font-semibold pl-[9px]'
+                            : 'hover:bg-gs-paper border-l-[3px] border-transparent pl-[9px]',
                         )}
                       >
                         {mId !== 'overview' && (
-                          <span className="text-[11px] font-mono text-gs-mid w-8 flex-shrink-0">
+                          <span className="text-[11px] font-mono text-gs-muted w-8 flex-shrink-0">
                             {mId}
                           </span>
                         )}
                         <span className={cn(
                           'flex-1 truncate font-body',
-                          score == null && mId !== 'overview' ? 'font-normal text-gs-mid' : 'font-medium text-gs-black',
+                          score == null && mId !== 'overview' ? 'font-normal text-gs-muted' : 'font-medium text-gs-ink',
                         )}>
                           {mId === 'overview' ? 'MarketingIQ Score' : (MODULE_NAMES[mId] ?? mId)}
                         </span>
                         {score != null && (
                           <div className="flex items-center gap-1.5 flex-shrink-0">
-                            <span className="text-xs font-mono tabular-nums text-gs-mid">{score}</span>
+                            <span className="text-xs font-mono tabular-nums text-gs-muted">{score}</span>
                             <span
                               className="w-2 h-2 rounded-full"
                               style={{ backgroundColor: dotColor }}

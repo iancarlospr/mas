@@ -76,9 +76,9 @@ export function ChloeChatAvatar({
             mode === 'typing' && 'animate-ghost-pulse',
           )}
           style={{
-            border: '2px solid var(--gs-cyan)',
+            border: '2px solid var(--gs-red)',
             boxShadow: mode === 'typing'
-              ? '0 0 8px var(--gs-cyan), inset 0 0 4px oklch(0.82 0.08 192 / 0.2)'
+              ? '0 0 8px var(--gs-red), inset 0 0 4px oklch(0.82 0.08 192 / 0.2)'
               : '0 0 4px oklch(0.82 0.08 192 / 0.2)',
           }}
         />
@@ -95,15 +95,15 @@ export function ChloeChatAvatar({
       {mode === 'typing' && (
         <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 flex gap-[2px]">
           <span
-            className="w-[4px] h-[4px] rounded-full bg-gs-cyan animate-bounce"
+            className="w-[4px] h-[4px] rounded-full bg-gs-red animate-bounce"
             style={{ animationDelay: '0ms' }}
           />
           <span
-            className="w-[4px] h-[4px] rounded-full bg-gs-cyan animate-bounce"
+            className="w-[4px] h-[4px] rounded-full bg-gs-red animate-bounce"
             style={{ animationDelay: '150ms' }}
           />
           <span
-            className="w-[4px] h-[4px] rounded-full bg-gs-cyan animate-bounce"
+            className="w-[4px] h-[4px] rounded-full bg-gs-red animate-bounce"
             style={{ animationDelay: '300ms' }}
           />
         </div>

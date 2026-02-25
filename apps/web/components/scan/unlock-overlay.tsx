@@ -88,8 +88,8 @@ export function UnlockOverlay({
           style={{
             background: `repeating-linear-gradient(
               0deg,
-              var(--gs-black) 0px,
-              var(--gs-black) 12px,
+              var(--gs-ink) 0px,
+              var(--gs-ink) 12px,
               transparent 12px,
               transparent 16px
             )`,
@@ -105,7 +105,7 @@ export function UnlockOverlay({
         {/* CTA content */}
         <div className="relative z-20 flex flex-col items-center justify-center h-full gap-gs-3 px-gs-4">
           {/* Descriptor text */}
-          <p className="font-data text-data-sm text-gs-near-white text-center max-w-[300px]">
+          <p className="font-data text-data-sm text-gs-paper text-center max-w-[300px]">
             {hiddenCount != null
               ? `${hiddenCount} data points redacted. Full evidence & recommendations classified.`
               : 'Evidence & recommendations classified.'}
@@ -133,8 +133,8 @@ export function UnlockOverlay({
       </div>
 
       {/* ── Print Fallback ───────────────────────────────── */}
-      <div className="hidden print:flex absolute inset-x-0 bottom-0 h-[38%] items-center justify-center border-t" style={{ borderColor: 'var(--gs-mid)' }}>
-        <p className="font-data text-data-xs text-gs-mid italic">
+      <div className="hidden print:flex absolute inset-x-0 bottom-0 h-[38%] items-center justify-center border-t" style={{ borderColor: 'var(--gs-chrome-dark)' }}>
+        <p className="font-data text-data-xs text-gs-muted italic">
           Full dossier at marketingalphascan.com
         </p>
       </div>

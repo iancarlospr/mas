@@ -4,55 +4,38 @@
 
 /* ═══════════════════════════════════════════════════════════════
    GhostScan OS — Design System Foundation
-   Color space: OKLCH for perceptual uniformity
-   Aesthetic: Win95 meets PostHog meets MSCHF
+   Palette: "Classified File on Gallery Paper"
+   Kruger × MSCHF × Valentino red on warm cream
    ═══════════════════════════════════════════════════════════════ */
 
 @layer base {
   :root {
     /* ── Typography ─────────────────────────────────────────── */
+    --font-display: 'Instrument Serif', Georgia, serif;
     --font-system: 'Pixelify Sans', 'VT323', monospace;
     --font-data: 'JetBrains Mono', 'Menlo', monospace;
     --font-personality: 'Permanent Marker', cursive;
 
-    /* ── Monochrome Scale (Warm Charcoal) ────────────────────
-       8 steps from near-black to near-white.
-       Warm undertone (hue 80°) — not blue-corporate, not purple-gamer.
-       Like expensive paper. Like a Comme des Garçons store interior. */
-    --gs-black:       oklch(0.15 0.01 80);
-    --gs-dark:        oklch(0.25 0.01 80);
-    --gs-mid-dark:    oklch(0.35 0.01 80);
-    --gs-mid:         oklch(0.50 0.01 80);
-    --gs-mid-light:   oklch(0.65 0.01 80);
-    --gs-light:       oklch(0.80 0.01 80);
-    --gs-near-white:  oklch(0.93 0.01 80);
-    --gs-white:       oklch(0.97 0.005 80);
+    /* ── Core Palette — Classified File on Gallery Paper ─────
+       One warm cream. One near-black ink. One red that DEMANDS.
+       Plus a 4-tone chrome system for bevels.
+       This is the whole palette. Nothing else. */
+    --gs-paper:        #FFFBF5;   /* Desktop bg, window content — warm cream */
+    --gs-ink:          #1A1A1A;   /* Primary text, borders — near-black */
+    --gs-red:          #E63946;   /* THE accent — buttons, stamps, links, active title bars */
+    --gs-red-dark:     #C1121F;   /* Red hover/active states */
+    --gs-chrome:       #E8E3DB;   /* Inactive title bars, bevel surfaces */
+    --gs-chrome-dark:  #D1CBC1;   /* Bevel shadow edges */
+    --gs-chrome-light: #F5F0EA;   /* Bevel highlight edges */
+    --gs-muted:        #8B8680;   /* Secondary text, disabled states */
+    --gs-ghost:        #E0F0FF;   /* Subtle ghost aura — Chloe glow, very sparingly */
 
-    /* ── Chloé's Signature ──────────────────────────────────
-       The two colors that ARE the brand.
-       Phosphorescent cyan + laser fuchsia.
-       Together they form the ghost's aura gradient. */
-    --gs-cyan:        oklch(0.82 0.18 192);
-    --gs-fuchsia:     oklch(0.65 0.28 350);
+    /* ── Functional Colors (severity only, never decorative) ── */
+    --gs-terminal:    oklch(0.80 0.25 145);   /* CRT phosphor green — scan sequence ONLY */
+    --gs-critical:    oklch(0.55 0.22 25);    /* Red — critical findings in data */
+    --gs-warning:     oklch(0.78 0.15 75);    /* Amber — warnings in data */
 
-    /* ── Functional Colors ──────────────────────────────────
-       Severity only. Never decorative. */
-    --gs-terminal:    oklch(0.80 0.25 145);   /* CRT phosphor green */
-    --gs-critical:    oklch(0.55 0.22 25);    /* Red — critical findings */
-    --gs-warning:     oklch(0.78 0.15 75);    /* Amber — warnings */
-
-    /* ── Chloé's Gradient ───────────────────────────────────
-       Used on: active title bars, scan button, loading bar,
-       ghost glow, primary CTAs, MarketingIQ arc */
-    --gs-gradient: linear-gradient(135deg, var(--gs-cyan), var(--gs-fuchsia));
-
-    /* ── Ghost Glow ─────────────────────────────────────────
-       The supernatural aura around Chloé and ghost-variant windows */
-    --gs-glow: 0 0 12px var(--gs-cyan), 0 0 24px oklch(0.82 0.12 192 / 0.3);
-    --gs-glow-fuchsia: 0 0 12px var(--gs-fuchsia), 0 0 24px oklch(0.65 0.18 350 / 0.3);
-
-    /* ── Spacing ────────────────────────────────────────────
-       Pixel-perfect increments for retro UI */
+    /* ── Spacing ────────────────────────────────────────────── */
     --gs-space-1: 4px;
     --gs-space-2: 8px;
     --gs-space-3: 12px;
@@ -60,7 +43,7 @@
     --gs-space-6: 24px;
     --gs-space-8: 32px;
 
-    /* ── Title Bar Height ───────────────────────────────────── */
+    /* ── Component Heights ─────────────────────────────────── */
     --gs-titlebar-h: 24px;
     --gs-menubar-h: 28px;
     --gs-taskbar-h: 36px;
@@ -71,41 +54,42 @@
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    /* Pixel fonts should NOT be antialiased — crisp edges */
     image-rendering: -moz-crisp-edges;
     image-rendering: pixelated;
   }
 
   body {
     font-family: var(--font-data);
-    color: oklch(0.15 0.01 80 / 0.9); /* --gs-black at 90% opacity, PostHog technique */
-    background-color: var(--gs-near-white);
+    color: var(--gs-ink);
+    background-color: var(--gs-paper);
     min-height: 100vh;
-    overflow: hidden; /* Desktop fills viewport */
+    overflow: hidden;
   }
 
-  /* Mobile: allow body scroll for non-OS pages (history, chat, report) */
+  /* Mobile: allow body scroll for non-OS pages */
   @media (max-width: 1023px) {
     body {
       overflow: auto;
       -webkit-overflow-scrolling: touch;
     }
-
-    /* Subtler atmospheric effects on mobile for readability */
-    .noise-grain { opacity: 0.02 !important; }
-    .crt-scanlines { opacity: 0.01 !important; }
+    .noise-grain { opacity: 0.01 !important; }
   }
 
   /* System font for OS chrome */
   .font-system {
     font-family: var(--font-system);
-    /* Pixel fonts need specific rendering */
     -webkit-font-smoothing: none;
     -moz-osx-font-smoothing: unset;
     font-smooth: never;
   }
 
-  /* Personality font for Chloé moments */
+  /* Display font for headlines */
+  .font-display {
+    font-family: var(--font-display);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Personality font for Chloe moments */
   .font-personality {
     font-family: var(--font-personality);
   }
@@ -118,36 +102,33 @@
 
 /* ═══════════════════════════════════════════════════════════════
    3D Bevel System — Win95 UI Primitives
-   The heart of the retro OS aesthetic.
+   Now using warm cream chrome palette instead of cold grays.
    ═══════════════════════════════════════════════════════════════ */
 
 @layer components {
-  /* ── Raised Bevel ─────────────────────────────────────────
-     Used on: windows, panels, raised surfaces */
+  /* ── Raised Bevel ─────────────────────────────────────────── */
   .bevel-raised {
     border: 2px solid;
-    border-color: var(--gs-white) var(--gs-mid-dark) var(--gs-mid-dark) var(--gs-white);
+    border-color: var(--gs-chrome-light) var(--gs-chrome-dark) var(--gs-chrome-dark) var(--gs-chrome-light);
     box-shadow:
-      inset 1px 1px 0 var(--gs-white),
-      inset -1px -1px 0 var(--gs-mid);
+      inset 1px 1px 0 var(--gs-chrome-light),
+      inset -1px -1px 0 var(--gs-muted);
   }
 
-  /* ── Sunken Bevel ─────────────────────────────────────────
-     Used on: input fields, content wells, progress bar tracks */
+  /* ── Sunken Bevel ─────────────────────────────────────────── */
   .bevel-sunken {
     border: 2px solid;
-    border-color: var(--gs-mid-dark) var(--gs-white) var(--gs-white) var(--gs-mid-dark);
+    border-color: var(--gs-chrome-dark) var(--gs-chrome-light) var(--gs-chrome-light) var(--gs-chrome-dark);
     box-shadow:
-      inset 1px 1px 0 var(--gs-mid),
-      inset -1px -1px 0 var(--gs-white);
+      inset 1px 1px 0 var(--gs-muted),
+      inset -1px -1px 0 var(--gs-chrome-light);
   }
 
-  /* ── Button ───────────────────────────────────────────────
-     Standard Win95 button with press state */
+  /* ── Button ───────────────────────────────────────────────── */
   .bevel-button {
     border: 2px solid;
-    border-color: var(--gs-white) var(--gs-mid) var(--gs-mid) var(--gs-white);
-    background: var(--gs-light);
+    border-color: var(--gs-chrome-light) var(--gs-chrome-dark) var(--gs-chrome-dark) var(--gs-chrome-light);
+    background: var(--gs-chrome);
     padding: 2px 8px;
     font-family: var(--font-system);
     font-size: 14px;
@@ -158,35 +139,35 @@
     justify-content: center;
     gap: 4px;
     min-height: 24px;
-    transition: none; /* Retro buttons don't transition */
+    transition: none;
   }
   .bevel-button:hover {
-    background: oklch(0.82 0.01 80); /* Slightly lighter */
+    background: var(--gs-chrome-light);
   }
   .bevel-button:active,
   .bevel-button[data-pressed="true"] {
-    border-color: var(--gs-mid) var(--gs-white) var(--gs-white) var(--gs-mid);
+    border-color: var(--gs-chrome-dark) var(--gs-chrome-light) var(--gs-chrome-light) var(--gs-chrome-dark);
     box-shadow:
-      inset 1px 1px 0 var(--gs-mid),
-      inset -1px -1px 0 var(--gs-white);
-    padding: 3px 7px 1px 9px; /* Shift content down-right on press */
+      inset 1px 1px 0 var(--gs-muted),
+      inset -1px -1px 0 var(--gs-chrome-light);
+    padding: 3px 7px 1px 9px;
   }
   .bevel-button:focus-visible {
-    outline: 1px dotted var(--gs-black);
+    outline: 1px dotted var(--gs-ink);
     outline-offset: -4px;
   }
   .bevel-button:disabled {
-    color: var(--gs-mid);
-    text-shadow: 1px 1px 0 var(--gs-white);
+    color: var(--gs-muted);
+    text-shadow: 1px 1px 0 var(--gs-chrome-light);
     cursor: default;
   }
 
-  /* ── Primary Button (Chloé gradient) ──────────────────── */
+  /* ── Primary Button (Solid Red — THE accent) ────────────── */
   .bevel-button-primary {
     border: 2px solid;
-    border-color: oklch(0.9 0.1 192) oklch(0.5 0.2 350) oklch(0.5 0.2 350) oklch(0.9 0.1 192);
-    background: var(--gs-gradient);
-    color: var(--gs-white);
+    border-color: #FF6B6B var(--gs-red-dark) var(--gs-red-dark) #FF6B6B;
+    background: var(--gs-red);
+    color: white;
     padding: 4px 12px;
     font-family: var(--font-system);
     font-size: 14px;
@@ -198,27 +179,27 @@
     justify-content: center;
     gap: 4px;
     min-height: 28px;
-    text-shadow: 0 1px 2px oklch(0 0 0 / 0.3);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
     transition: none;
   }
   .bevel-button-primary:hover {
-    filter: brightness(1.1);
+    background: #EE4B5A;
   }
   .bevel-button-primary:active {
-    border-color: oklch(0.5 0.2 350) oklch(0.9 0.1 192) oklch(0.9 0.1 192) oklch(0.5 0.2 350);
+    border-color: var(--gs-red-dark) #FF6B6B #FF6B6B var(--gs-red-dark);
     padding: 5px 11px 3px 13px;
   }
 
-  /* ── Window Chrome ────────────────────────────────────────
-     The title bar, content area, and status bar */
+  /* ── Window Chrome ────────────────────────────────────────── */
   .window {
-    background: var(--gs-light);
+    background: var(--gs-chrome);
     border: 2px solid;
-    border-color: var(--gs-white) var(--gs-mid-dark) var(--gs-mid-dark) var(--gs-white);
+    border-color: var(--gs-chrome-light) var(--gs-chrome-dark) var(--gs-chrome-dark) var(--gs-chrome-light);
     box-shadow:
-      inset 1px 1px 0 var(--gs-white),
-      inset -1px -1px 0 var(--gs-mid),
-      3px 3px 12px oklch(0 0 0 / 0.08);
+      inset 1px 1px 0 var(--gs-chrome-light),
+      inset -1px -1px 0 var(--gs-muted),
+      4px 4px 0 rgba(0, 0, 0, 0.08),
+      8px 8px 24px rgba(0, 0, 0, 0.06);
     display: flex;
     flex-direction: column;
   }
@@ -234,14 +215,14 @@
     font-weight: 700;
     user-select: none;
     flex-shrink: 0;
-    /* Inactive state */
-    background: var(--gs-mid-light);
-    color: var(--gs-mid);
+    /* Inactive state (warm chrome) */
+    background: var(--gs-chrome);
+    color: var(--gs-muted);
   }
   .window-titlebar[data-active="true"] {
-    background: var(--gs-gradient);
-    color: var(--gs-white);
-    text-shadow: 0 1px 1px oklch(0 0 0 / 0.2);
+    background: var(--gs-red);
+    color: white;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
   }
 
   .window-titlebar-icon {
@@ -270,8 +251,8 @@
     width: 18px;
     height: 16px;
     border: 2px solid;
-    border-color: var(--gs-white) var(--gs-mid-dark) var(--gs-mid-dark) var(--gs-white);
-    background: var(--gs-light);
+    border-color: var(--gs-chrome-light) var(--gs-chrome-dark) var(--gs-chrome-dark) var(--gs-chrome-light);
+    background: var(--gs-chrome);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -281,17 +262,18 @@
     cursor: pointer;
     line-height: 1;
     padding: 0;
+    color: var(--gs-ink);
   }
   .window-titlebar-btn:active {
-    border-color: var(--gs-mid-dark) var(--gs-white) var(--gs-white) var(--gs-mid-dark);
+    border-color: var(--gs-chrome-dark) var(--gs-chrome-light) var(--gs-chrome-light) var(--gs-chrome-dark);
   }
 
   .window-content {
     flex: 1;
-    background: var(--gs-white);
+    background: var(--gs-paper);
     overflow: auto;
     border: 2px solid;
-    border-color: var(--gs-mid-dark) var(--gs-white) var(--gs-white) var(--gs-mid-dark);
+    border-color: var(--gs-chrome-dark) var(--gs-chrome-light) var(--gs-chrome-light) var(--gs-chrome-dark);
     margin: 0 2px 2px 2px;
   }
 
@@ -302,26 +284,26 @@
     padding: 0 4px;
     font-family: var(--font-system);
     font-size: 12px;
-    color: var(--gs-mid-dark);
+    color: var(--gs-muted);
     border-top: 2px solid;
-    border-color: var(--gs-mid-dark) var(--gs-white) var(--gs-white) var(--gs-mid-dark);
+    border-color: var(--gs-chrome-dark) var(--gs-chrome-light) var(--gs-chrome-light) var(--gs-chrome-dark);
     gap: 8px;
     flex-shrink: 0;
-    background: var(--gs-light);
+    background: var(--gs-chrome);
   }
   .window-statusbar-section {
     flex: 1;
     border: 1px solid;
-    border-color: var(--gs-mid) var(--gs-white) var(--gs-white) var(--gs-mid);
+    border-color: var(--gs-chrome-dark) var(--gs-chrome-light) var(--gs-chrome-light) var(--gs-chrome-dark);
     padding: 0 4px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 
-  /* ── Terminal Variant ─────────────────────────────────────── */
+  /* ── Terminal Variant (scan sequence context ONLY) ────────── */
   .window-terminal .window-content {
-    background: var(--gs-black);
+    background: #0A0A0A;
     color: var(--gs-terminal);
     font-family: var(--font-data);
     font-size: 13px;
@@ -332,21 +314,20 @@
   /* ── Ghost Variant ────────────────────────────────────────── */
   .window-ghost {
     box-shadow:
-      inset 1px 1px 0 var(--gs-white),
-      inset -1px -1px 0 var(--gs-mid),
-      0 0 20px oklch(0.82 0.12 192 / 0.15),
-      3px 3px 12px oklch(0 0 0 / 0.08);
+      inset 1px 1px 0 var(--gs-chrome-light),
+      inset -1px -1px 0 var(--gs-muted),
+      0 0 20px rgba(224, 240, 255, 0.15),
+      4px 4px 0 rgba(0, 0, 0, 0.08);
   }
   .window-ghost .window-titlebar[data-active="true"] {
-    background: var(--gs-gradient);
+    background: var(--gs-red);
   }
 
-  /* ── Module Sub-Panel ─────────────────────────────────────
-     Mini windows inside the Dashboard window */
+  /* ── Module Sub-Panel ───────────────────────────────────── */
   .module-panel {
     border: 2px solid;
-    border-color: var(--gs-white) var(--gs-mid) var(--gs-mid) var(--gs-white);
-    background: var(--gs-white);
+    border-color: var(--gs-chrome-light) var(--gs-chrome-dark) var(--gs-chrome-dark) var(--gs-chrome-light);
+    background: var(--gs-paper);
     margin-bottom: 8px;
   }
   .module-panel-header {
@@ -355,8 +336,8 @@
     align-items: center;
     gap: 6px;
     padding: 0 6px;
-    background: var(--gs-light);
-    border-bottom: 1px solid var(--gs-mid);
+    background: var(--gs-chrome);
+    border-bottom: 1px solid var(--gs-chrome-dark);
     font-family: var(--font-system);
     font-size: 12px;
     font-weight: 700;
@@ -365,8 +346,7 @@
     padding: 12px;
   }
 
-  /* ── Redaction Aesthetic (Free Tier Gate) ──────────────────
-     Instead of frosted glass, we redact. Like a classified document. */
+  /* ── Redaction Aesthetic (Free Tier Gate) ──────────────────── */
   .redacted {
     position: relative;
     overflow: hidden;
@@ -378,8 +358,8 @@
     background:
       repeating-linear-gradient(
         0deg,
-        var(--gs-black) 0px,
-        var(--gs-black) 14px,
+        var(--gs-ink) 0px,
+        var(--gs-ink) 14px,
         transparent 14px,
         transparent 18px
       );
@@ -394,8 +374,8 @@
     font-family: var(--font-system);
     font-size: 24px;
     font-weight: 700;
-    color: var(--gs-critical);
-    border: 3px solid var(--gs-critical);
+    color: var(--gs-red);
+    border: 3px solid var(--gs-red);
     padding: 4px 16px;
     text-transform: uppercase;
     letter-spacing: 4px;
@@ -404,7 +384,7 @@
     opacity: 0.9;
   }
 
-  /* ── Traffic Light Badges ─────────────────────────────────── */
+  /* ── Traffic Light Badges ────────────────────────────────── */
   .traffic-green {
     color: var(--gs-terminal);
   }
@@ -419,7 +399,7 @@
     height: 10px;
     border-radius: 50%;
     display: inline-block;
-    box-shadow: inset 0 1px 2px oklch(1 0 0 / 0.3);
+    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.3);
   }
   .traffic-dot-green { background: var(--gs-terminal); }
   .traffic-dot-amber { background: var(--gs-warning); }
@@ -427,14 +407,13 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   CRT / Atmospheric Effects
-   All effects are pointer-events:none, CSS-only, <1ms/frame.
-   Respect prefers-reduced-motion.
+   Atmospheric Effects
+   CRT effects scoped to scan-sequence context only.
+   Desktop gets ONLY the subtle paper grain.
    ═══════════════════════════════════════════════════════════════ */
 
 @layer utilities {
-  /* ── CRT Scanlines ────────────────────────────────────────
-     Very subtle (3% opacity). Atmospheric, not obstructive. */
+  /* ── CRT Scanlines — scan sequence ONLY ──────────────────── */
   .crt-scanlines {
     position: fixed;
     inset: 0;
@@ -445,14 +424,13 @@
       0deg,
       transparent,
       transparent 2px,
-      oklch(0 0 0 / 0.03) 2px,
-      oklch(0 0 0 / 0.03) 4px
+      rgba(0, 0, 0, 0.03) 2px,
+      rgba(0, 0, 0, 0.03) 4px
     );
     mix-blend-mode: multiply;
   }
 
-  /* ── CRT Vignette ─────────────────────────────────────────
-     Subtle edge darkening */
+  /* ── CRT Vignette — scan sequence ONLY ───────────────────── */
   .crt-vignette {
     position: fixed;
     inset: 0;
@@ -462,52 +440,45 @@
     background: radial-gradient(
       ellipse at center,
       transparent 60%,
-      oklch(0 0 0 / 0.06) 100%
+      rgba(0, 0, 0, 0.06) 100%
     );
   }
 
-  /* ── Noise Grain ──────────────────────────────────────────
-     Static SVG noise at 6% opacity */
+  /* ── Paper Grain (desktop) ──────────────────────────────── */
   .noise-grain {
     position: fixed;
     inset: 0;
     pointer-events: none;
     z-index: 9997;
     contain: strict;
-    opacity: 0.06;
+    opacity: 0.02;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     background-repeat: repeat;
     background-size: 256px 256px;
   }
 
-  /* ── Ghost Glow Utility ───────────────────────────────────── */
-  .ghost-glow {
-    filter: drop-shadow(0 0 12px var(--gs-cyan)) drop-shadow(0 0 24px oklch(0.82 0.12 192 / 0.3));
-  }
-  .ghost-glow-fuchsia {
-    filter: drop-shadow(0 0 8px var(--gs-fuchsia)) drop-shadow(0 0 16px oklch(0.65 0.18 350 / 0.3));
-  }
-
-  /* ── Chloé's Gradient Text ────────────────────────────────── */
-  .text-ghost-gradient {
-    background: var(--gs-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  /* ── Terminal Text Glow ───────────────────────────────────── */
+  /* ── Terminal Text Glow (scan sequence ONLY) ────────────── */
   .terminal-glow {
     text-shadow: 0 0 4px var(--gs-terminal), 0 0 8px oklch(0.80 0.15 145 / 0.3);
   }
 
-  /* ── Skeleton Loading (Updated) ───────────────────────────── */
+  /* ── Ghost Glow (subtle pale blue, Chloe only) ─────────── */
+  .ghost-glow {
+    filter: drop-shadow(0 0 8px var(--gs-ghost)) drop-shadow(0 0 16px rgba(224, 240, 255, 0.2));
+  }
+
+  /* ── Red Accent Text ─────────────────────────────────────── */
+  .text-accent {
+    color: var(--gs-red);
+  }
+
+  /* ── Skeleton Loading ───────────────────────────────────── */
   .skeleton {
     background: linear-gradient(
       90deg,
-      var(--gs-light) 0%,
-      var(--gs-mid-light) 50%,
-      var(--gs-light) 100%
+      var(--gs-chrome) 0%,
+      var(--gs-chrome-light) 50%,
+      var(--gs-chrome) 100%
     );
     background-size: 200% 100%;
     animation: skeleton-slide 1.5s ease-in-out infinite;
@@ -520,45 +491,44 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   Custom Scrollbars — Retro OS Style
+   Custom Scrollbars — Warm Chrome
    ═══════════════════════════════════════════════════════════════ */
 
-/* Webkit (Chrome, Safari, Edge) */
 ::-webkit-scrollbar {
   width: 16px;
   height: 16px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--gs-light);
-  border: 1px solid var(--gs-mid);
+  background: var(--gs-chrome);
+  border: 1px solid var(--gs-chrome-dark);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--gs-light);
+  background: var(--gs-chrome);
   border: 2px solid;
-  border-color: var(--gs-white) var(--gs-mid-dark) var(--gs-mid-dark) var(--gs-white);
+  border-color: var(--gs-chrome-light) var(--gs-chrome-dark) var(--gs-chrome-dark) var(--gs-chrome-light);
   min-height: 24px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--gs-mid-light);
+  background: var(--gs-chrome-light);
 }
 ::-webkit-scrollbar-thumb:active {
-  border-color: var(--gs-mid-dark) var(--gs-white) var(--gs-white) var(--gs-mid-dark);
+  border-color: var(--gs-chrome-dark) var(--gs-chrome-light) var(--gs-chrome-light) var(--gs-chrome-dark);
 }
 ::-webkit-scrollbar-button {
-  background: var(--gs-light);
+  background: var(--gs-chrome);
   border: 2px solid;
-  border-color: var(--gs-white) var(--gs-mid-dark) var(--gs-mid-dark) var(--gs-white);
+  border-color: var(--gs-chrome-light) var(--gs-chrome-dark) var(--gs-chrome-dark) var(--gs-chrome-light);
   height: 16px;
   width: 16px;
 }
 ::-webkit-scrollbar-corner {
-  background: var(--gs-light);
+  background: var(--gs-chrome);
 }
 
 /* Firefox */
 * {
   scrollbar-width: auto;
-  scrollbar-color: var(--gs-mid-light) var(--gs-light);
+  scrollbar-color: var(--gs-chrome-dark) var(--gs-chrome);
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -582,7 +552,7 @@ input, textarea, [contenteditable] {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   Reduced Motion — Respect accessibility
+   Reduced Motion
    ═══════════════════════════════════════════════════════════════ */
 
 @media (prefers-reduced-motion: reduce) {
@@ -602,7 +572,7 @@ input, textarea, [contenteditable] {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   Print Stylesheet — Hide OS chrome, show clean data
+   Print Stylesheet
    ═══════════════════════════════════════════════════════════════ */
 
 @media print {
@@ -618,7 +588,6 @@ input, textarea, [contenteditable] {
     text-shadow: none !important;
   }
 
-  /* Hide all OS chrome */
   .gs-menubar,
   .gs-taskbar,
   .gs-desktop-icons,
@@ -636,7 +605,6 @@ input, textarea, [contenteditable] {
     display: none !important;
   }
 
-  /* Windows become borderless containers */
   .window {
     border: none !important;
     box-shadow: none !important;
@@ -653,7 +621,6 @@ input, textarea, [contenteditable] {
     overflow: visible !important;
   }
 
-  /* Module panels: one per page */
   .module-panel {
     break-before: page;
     break-inside: avoid;
@@ -673,7 +640,6 @@ input, textarea, [contenteditable] {
   h2 { font-size: 14pt; }
   h3 { font-size: 12pt; }
 
-  /* Show watermark */
   .print-watermark {
     display: block !important;
     position: fixed;
@@ -681,7 +647,7 @@ input, textarea, [contenteditable] {
     left: 50%;
     transform: translate(-50%, -50%) rotate(-45deg);
     font-size: 72pt;
-    color: oklch(0 0 0 / 0.03);
+    color: rgba(0, 0, 0, 0.03);
     white-space: nowrap;
     z-index: 9999;
     pointer-events: none;
@@ -695,15 +661,15 @@ input, textarea, [contenteditable] {
 @media (prefers-contrast: high) {
   .window {
     border-width: 3px;
-    border-color: var(--gs-black);
+    border-color: var(--gs-ink);
   }
   .bevel-button {
-    border-color: var(--gs-black);
+    border-color: var(--gs-ink);
   }
   .module-panel {
-    border-color: var(--gs-black);
+    border-color: var(--gs-ink);
   }
   .traffic-dot {
-    border: 1px solid var(--gs-black);
+    border: 1px solid var(--gs-ink);
   }
 }

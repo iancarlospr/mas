@@ -76,17 +76,17 @@ export function FakeScanProgress({ url, onGateReached }: FakeScanProgressProps) 
 
   return (
     <div className="max-w-2xl mx-auto py-gs-8">
-      <h2 className="font-system text-os-lg font-bold text-gs-black text-center mb-gs-2">
+      <h2 className="font-system text-os-lg font-bold text-gs-ink text-center mb-gs-2">
         Scanning...
       </h2>
-      <p className="font-data text-data-sm text-gs-mid text-center mb-gs-6">
+      <p className="font-data text-data-sm text-gs-muted text-center mb-gs-6">
         Analyzing marketing technology stack across {PHASES.length} phases
       </p>
 
       {/* Progress bar */}
-      <div className="bevel-sunken bg-gs-near-white h-[20px] mb-gs-6 p-[2px]">
+      <div className="bevel-sunken bg-gs-paper h-[20px] mb-gs-6 p-[2px]">
         <div
-          className="h-full bg-gs-cyan transition-all duration-500 ease-out"
+          className="h-full bg-gs-red transition-all duration-500 ease-out"
           style={{ width: `${Math.max(progress, 5)}%` }}
         />
       </div>
@@ -102,16 +102,16 @@ export function FakeScanProgress({ url, onGateReached }: FakeScanProgressProps) 
               <div
                 className={cn(
                   'w-[40px] h-[40px] bevel-raised flex items-center justify-center font-system text-os-sm font-bold transition-all',
-                  isComplete && 'bg-gs-terminal text-gs-black',
-                  isActive && 'bg-gs-cyan text-gs-black animate-pulse',
-                  !isComplete && !isActive && 'bg-gs-light text-gs-mid',
+                  isComplete && 'bg-gs-terminal text-gs-ink',
+                  isActive && 'bg-gs-red text-gs-ink animate-pulse',
+                  !isComplete && !isActive && 'bg-gs-chrome text-gs-muted',
                 )}
               >
                 {isComplete ? '✓' : phase.number}
               </div>
               <span className={cn(
                 'font-data text-data-xs',
-                isActive ? 'text-gs-cyan' : 'text-gs-mid',
+                isActive ? 'text-gs-red' : 'text-gs-muted',
               )}>
                 {phase.label}
               </span>
@@ -123,15 +123,15 @@ export function FakeScanProgress({ url, onGateReached }: FakeScanProgressProps) 
       {/* Completed modules list */}
       {completedModules.length > 0 && (
         <div className="space-y-gs-2">
-          <h3 className="font-system text-os-sm font-bold text-gs-black mb-gs-2">
+          <h3 className="font-system text-os-sm font-bold text-gs-ink mb-gs-2">
             Completed Modules
           </h3>
           {completedModules.map((mod) => (
             <div
               key={mod.moduleId}
-              className="flex items-center justify-between bevel-raised bg-gs-light px-gs-4 py-gs-2"
+              className="flex items-center justify-between bevel-raised bg-gs-chrome px-gs-4 py-gs-2"
             >
-              <span className="font-data text-data-sm text-gs-black">
+              <span className="font-data text-data-sm text-gs-ink">
                 {mod.moduleId} &mdash; {mod.name}
               </span>
               <span

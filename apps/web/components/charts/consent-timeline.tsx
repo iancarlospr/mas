@@ -11,7 +11,7 @@ import {
 } from 'recharts';
 import { ChartContainer } from './chart-container';
 import { AlphaTooltip } from './alpha-tooltip';
-import { AXIS_STYLE, GRID_STYLE, CHART_MARGINS, LEGEND_CONFIG, OKLCH } from '@/lib/chart-config';
+import { AXIS_STYLE, GRID_STYLE, CHART_MARGINS, LEGEND_CONFIG, RESOLVED_COLORS } from '@/lib/chart-config';
 import { cn } from '@/lib/utils';
 import { Check, AlertTriangle, ArrowRight } from 'lucide-react';
 
@@ -117,9 +117,9 @@ export function ConsentTimeline({
           <YAxis {...AXIS_STYLE} allowDecimals={false} />
           <Tooltip content={<AlphaTooltip />} />
           <Legend {...LEGEND_CONFIG} />
-          <Bar dataKey="Cookies" fill={OKLCH.warning} radius={[4, 4, 0, 0]} />
-          <Bar dataKey="Requests" fill={OKLCH.black} radius={[4, 4, 0, 0]} />
-          <Bar dataKey="Pixels" fill={OKLCH.critical} radius={[4, 4, 0, 0]} />
+          <Bar dataKey="Cookies" fill={RESOLVED_COLORS.warning} radius={[4, 4, 0, 0]} />
+          <Bar dataKey="Requests" fill={RESOLVED_COLORS.ink} radius={[4, 4, 0, 0]} />
+          <Bar dataKey="Pixels" fill={RESOLVED_COLORS.critical} radius={[4, 4, 0, 0]} />
         </BarChart>
       </ChartContainer>
     </div>

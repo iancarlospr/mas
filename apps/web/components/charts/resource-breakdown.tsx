@@ -21,7 +21,7 @@ import {
   CHART_MARGINS,
   LEGEND_CONFIG,
   ANIMATION_CONFIG,
-  OKLCH,
+  RESOLVED_COLORS,
   formatters,
 } from '@/lib/chart-config';
 import { cn } from '@/lib/utils';
@@ -62,7 +62,7 @@ const TYPE_COLOR_MAP: Record<string, string> = {
 };
 
 function getTypeColor(type: string): string {
-  return TYPE_COLOR_MAP[type.toLowerCase()] ?? OKLCH.midLight;
+  return TYPE_COLOR_MAP[type.toLowerCase()] ?? RESOLVED_COLORS.chrome;
 }
 
 export function ResourceBreakdown({
@@ -99,11 +99,11 @@ export function ResourceBreakdown({
                 if (!active || !payload?.length) return null;
                 const d = payload[0]!.payload as ResourceTypeData;
                 return (
-                  <div className="bg-gs-black text-white rounded-lg px-4 py-3 shadow-lg text-xs">
+                  <div className="bg-gs-ink text-white rounded-lg px-4 py-3 shadow-lg text-xs">
                     <div className="font-system font-bold text-sm mb-1">{d.type}</div>
-                    <div className="text-gs-mid-light">Size: <span className="text-white font-mono">{formatters.bytes(d.size)}</span></div>
-                    <div className="text-gs-mid-light">Files: <span className="text-white font-mono">{d.count}</span></div>
-                    <div className="text-gs-mid-light">Share: <span className="text-white font-mono">{totalSize > 0 ? Math.round((d.size / totalSize) * 100) : 0}%</span></div>
+                    <div className="text-gs-muted">Size: <span className="text-white font-mono">{formatters.bytes(d.size)}</span></div>
+                    <div className="text-gs-muted">Files: <span className="text-white font-mono">{d.count}</span></div>
+                    <div className="text-gs-muted">Share: <span className="text-white font-mono">{totalSize > 0 ? Math.round((d.size / totalSize) * 100) : 0}%</span></div>
                   </div>
                 );
               }}

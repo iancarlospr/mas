@@ -7,12 +7,12 @@ export const metadata: Metadata = {
 export default function TermsPage() {
   return (
     <div className="mx-auto max-w-3xl px-gs-4 py-gs-12">
-      <h1 className="font-system text-[clamp(24px,3vw,36px)] font-bold text-gs-black">Terms of Service</h1>
-      <p className="mt-gs-2 font-data text-data-sm text-gs-mid">Last updated: February 10, 2026</p>
+      <h1 className="font-system text-[clamp(24px,3vw,36px)] font-bold text-gs-ink">Terms of Service</h1>
+      <p className="mt-gs-2 font-data text-data-sm text-gs-muted">Last updated: February 10, 2026</p>
 
-      <div className="mt-gs-8 space-y-gs-6 font-data text-data-sm text-gs-mid-dark leading-relaxed">
+      <div className="mt-gs-8 space-y-gs-6 font-data text-data-sm text-gs-muted leading-relaxed">
         <section>
-          <h2 className="font-system text-os-base font-bold text-gs-black">1. Service Description</h2>
+          <h2 className="font-system text-os-base font-bold text-gs-ink">1. Service Description</h2>
           <p className="mt-2">
             MarketingAlphaScan (&quot;the Service&quot;) is a forensic marketing intelligence
             platform that scans websites to audit their marketing technology stack,
@@ -22,7 +22,7 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2 className="font-system text-os-base font-bold text-gs-black">2. Acceptable Use</h2>
+          <h2 className="font-system text-os-base font-bold text-gs-ink">2. Acceptable Use</h2>
           <p className="mt-2">
             You may only scan websites you own or have authorization to audit. You
             agree not to use the Service to scan websites for malicious purposes,
@@ -32,7 +32,7 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2 className="font-system text-os-base font-bold text-gs-black">3. Accounts</h2>
+          <h2 className="font-system text-os-base font-bold text-gs-ink">3. Accounts</h2>
           <p className="mt-2">
             You may create an account using email verification or magic link
             authentication. You are responsible for maintaining the security of your
@@ -41,7 +41,7 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2 className="font-system text-os-base font-bold text-gs-black">4. Payments & Pricing</h2>
+          <h2 className="font-system text-os-base font-bold text-gs-ink">4. Payments & Pricing</h2>
           <p className="mt-2">
             The following paid products are available:
           </p>
@@ -59,7 +59,7 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2 className="font-system text-os-base font-bold text-gs-black">5. Data & Results</h2>
+          <h2 className="font-system text-os-base font-bold text-gs-ink">5. Data & Results</h2>
           <p className="mt-2">
             Scan results are generated algorithmically and enhanced by AI. While we
             strive for accuracy, results are provided &quot;as is&quot; without
@@ -69,7 +69,7 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2 className="font-system text-os-base font-bold text-gs-black">6. Account Deletion</h2>
+          <h2 className="font-system text-os-base font-bold text-gs-ink">6. Account Deletion</h2>
           <p className="mt-2">
             You may delete your account at any time from the dashboard settings.
             Account deletion removes your personal data, scan history, and chat
@@ -78,7 +78,7 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2 className="font-system text-os-base font-bold text-gs-black">7. Limitation of Liability</h2>
+          <h2 className="font-system text-os-base font-bold text-gs-ink">7. Limitation of Liability</h2>
           <p className="mt-2">
             To the maximum extent permitted by law, MarketingAlphaScan shall not be
             liable for any indirect, incidental, special, consequential, or punitive
@@ -87,7 +87,7 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2 className="font-system text-os-base font-bold text-gs-black">8. Changes to Terms</h2>
+          <h2 className="font-system text-os-base font-bold text-gs-ink">8. Changes to Terms</h2>
           <p className="mt-2">
             We reserve the right to modify these terms at any time. Continued use of
             the Service after changes constitutes acceptance of the updated terms.
@@ -95,10 +95,10 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2 className="font-system text-os-base font-bold text-gs-black">9. Contact</h2>
+          <h2 className="font-system text-os-base font-bold text-gs-ink">9. Contact</h2>
           <p className="mt-2">
             For questions about these terms, contact us at{' '}
-            <a href="mailto:support@marketingalphascan.com" className="text-gs-fuchsia hover:underline">
+            <a href="mailto:support@marketingalphascan.com" className="text-gs-red hover:underline">
               support@marketingalphascan.com
             </a>.
           </p>

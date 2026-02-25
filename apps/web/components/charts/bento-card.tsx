@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { OKLCH } from '@/lib/chart-config';
+import { RESOLVED_COLORS } from '@/lib/chart-config';
 import { TrafficLight } from '@/components/scan/traffic-light';
 
 type CardSize = '1x1' | '2x1' | '1x2' | '2x2';
@@ -52,7 +52,7 @@ export function BentoCard({
         className,
       )}
       style={{
-        border: `1px solid ${OKLCH.light}`,
+        border: `1px solid ${RESOLVED_COLORS.chromeLight}`,
         boxShadow: '0 1px 3px oklch(0.15 0.01 80 / 0.04), 0 4px 16px oklch(0.15 0.01 80 / 0.03)',
         padding: '20px',
       }}
@@ -68,7 +68,7 @@ export function BentoCard({
             fontFamily: 'var(--font-system)',
             fontWeight: 600,
             fontSize: 15,
-            color: OKLCH.black,
+            color: RESOLVED_COLORS.ink,
           }}
         >
           {title}
@@ -80,7 +80,7 @@ export function BentoCard({
                 fontFamily: 'var(--font-data)',
                 fontSize: 14,
                 fontWeight: 700,
-                color: OKLCH.black,
+                color: RESOLVED_COLORS.ink,
               }}
             >
               {score}
@@ -90,7 +90,7 @@ export function BentoCard({
           {onToggleExpand && (
             <button
               onClick={onToggleExpand}
-              className="ml-1 p-0.5 rounded hover:bg-gs-light transition-colors"
+              className="ml-1 p-0.5 rounded hover:bg-gs-chrome transition-colors"
               aria-label={expanded ? 'Collapse' : 'Expand'}
             >
               <svg
@@ -101,7 +101,7 @@ export function BentoCard({
                 className="transition-transform duration-200"
                 style={{ transform: expanded ? 'rotate(180deg)' : undefined }}
               >
-                <path d="M4 6l4 4 4-4" stroke={OKLCH.midLight} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M4 6l4 4 4-4" stroke={RESOLVED_COLORS.chrome} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </button>
           )}
@@ -109,7 +109,7 @@ export function BentoCard({
       </div>
 
       {/* Divider when expanded */}
-      {expanded && <div className="border-b border-gs-light mb-3" />}
+      {expanded && <div className="border-b border-gs-chrome mb-3" />}
 
       {/* Error state */}
       {error && (
@@ -118,18 +118,18 @@ export function BentoCard({
           style={{ backgroundColor: 'oklch(0.55 0.22 25 / 0.03)', borderRadius: 8 }}
         >
           <svg width={24} height={24} viewBox="0 0 24 24" fill="none" className="mb-2">
-            <path d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke={OKLCH.critical} strokeWidth="1.5" strokeLinecap="round" />
+            <path d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke={RESOLVED_COLORS.critical} strokeWidth="1.5" strokeLinecap="round" />
           </svg>
-          <p style={{ fontSize: 13, color: OKLCH.mid }}>{error}</p>
+          <p style={{ fontSize: 13, color: RESOLVED_COLORS.muted }}>{error}</p>
         </div>
       )}
 
       {/* Loading state */}
       {isLoading && !error && (
         <div className="animate-pulse space-y-2 py-4">
-          <div className="h-4 bg-gs-light rounded w-3/4" />
-          <div className="h-4 bg-gs-light rounded w-1/2" />
-          <div className="h-20 bg-gs-light rounded" />
+          <div className="h-4 bg-gs-chrome rounded w-3/4" />
+          <div className="h-4 bg-gs-chrome rounded w-1/2" />
+          <div className="h-20 bg-gs-chrome rounded" />
         </div>
       )}
 
@@ -146,7 +146,7 @@ export function BentoCard({
             transition={{ duration: 0.3, ease: 'easeInOut' }}
             className="overflow-hidden"
           >
-            <div className="pt-3 border-t border-gs-light mt-3">
+            <div className="pt-3 border-t border-gs-chrome mt-3">
               {expandedContent}
             </div>
           </motion.div>

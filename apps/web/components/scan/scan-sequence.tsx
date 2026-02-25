@@ -208,7 +208,7 @@ export function ScanSequence({
 
   /* ── Render ──────────────────────────────────────────────── */
   return (
-    <div className="fixed inset-0 z-[1000] bg-gs-black overflow-hidden">
+    <div className="fixed inset-0 z-[1000] bg-gs-ink overflow-hidden">
       {/* ── Phase 0: Matrix Intro ────────────────────────── */}
       {currentPhase === 0 && (
         <div className="absolute inset-0 flex items-center justify-center">
@@ -259,7 +259,7 @@ export function ScanSequence({
       {currentPhase === 2 && (
         <div className="absolute inset-0 flex">
           {/* ASCII movie (main area) */}
-          <div className="flex-1 flex items-center justify-center bg-gs-black p-gs-4">
+          <div className="flex-1 flex items-center justify-center bg-gs-ink p-gs-4">
             <AsciiPlayer
               moviePath={asciiMovie.current.path}
               autoPlay
@@ -270,7 +270,7 @@ export function ScanSequence({
           </div>
 
           {/* Side terminal showing real module progress */}
-          <div className="w-[300px] border-l border-gs-mid-dark">
+          <div className="w-[300px] border-l border-gs-chrome-dark">
             <TerminalBoot
               domain={domain}
               progress={progress}
@@ -320,7 +320,7 @@ export function ScanSequence({
       {(scanStatus === 'complete' || scanStatus === 'failed') && !isSkipping && (
         <button
           className="fixed bottom-gs-4 right-gs-4 z-[1001] bevel-button font-system text-os-sm
-                     text-gs-mid-light hover:text-gs-white"
+                     text-gs-muted hover:text-gs-paper"
           onClick={handleSkip}
         >
           Skip →
@@ -333,7 +333,7 @@ export function ScanSequence({
           className="h-full transition-all duration-500"
           style={{
             width: `${progress}%`,
-            background: 'var(--gs-gradient)',
+            background: 'var(--gs-red)',
           }}
         />
       </div>

@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { RESOURCE_COLORS, OKLCH } from '@/lib/chart-config';
+import { RESOURCE_COLORS, RESOLVED_COLORS } from '@/lib/chart-config';
 
 interface WaterfallEntry {
   label: string;
@@ -32,11 +32,11 @@ interface WaterfallChartProps {
 }
 
 const TIMING_COLORS: Record<string, string> = {
-  dns: OKLCH.midLight,
-  connect: OKLCH.warning,
-  ssl: OKLCH.fuchsia,
-  ttfb: OKLCH.black,
-  download: OKLCH.terminal,
+  dns: RESOLVED_COLORS.chrome,
+  connect: RESOLVED_COLORS.warning,
+  ssl: RESOLVED_COLORS.red,
+  ttfb: RESOLVED_COLORS.ink,
+  download: RESOLVED_COLORS.terminal,
 };
 
 const LABEL_COL = 200;
@@ -114,7 +114,7 @@ export function WaterfallChart({
                 y1={0}
                 x2={x}
                 y2={timeAxisY}
-                stroke={OKLCH.light}
+                stroke={RESOLVED_COLORS.chromeLight}
                 strokeWidth={1}
                 strokeDasharray="3 3"
               />
@@ -124,7 +124,7 @@ export function WaterfallChart({
                 textAnchor="middle"
                 fontSize={10}
                 fontFamily="var(--font-data)"
-                fill={OKLCH.midLight}
+                fill={RESOLVED_COLORS.chrome}
               >
                 {t >= 1000 ? `${(t / 1000).toFixed(1)}s` : `${t}ms`}
               </text>
@@ -171,7 +171,7 @@ export function WaterfallChart({
           const barWidth = Math.max(2, (entry.duration / maxTime) * 700);
           const typeKey = entry.type.toLowerCase() as keyof typeof RESOURCE_COLORS;
           const barColor =
-            RESOURCE_COLORS[typeKey] ?? OKLCH.midLight;
+            RESOURCE_COLORS[typeKey] ?? RESOLVED_COLORS.chrome;
           const isHovered = hoveredRow === i;
 
           return (
@@ -191,7 +191,7 @@ export function WaterfallChart({
                   y={y - 2}
                   width={1000}
                   height={rowHeight + 4}
-                  fill={OKLCH.nearWhite}
+                  fill={RESOLVED_COLORS.paper}
                   rx={4}
                 />
               )}
@@ -202,7 +202,7 @@ export function WaterfallChart({
                 y={y + rowHeight / 2 + 4}
                 fontSize={11}
                 fontFamily="var(--font-data)"
-                fill={isHovered ? OKLCH.black : OKLCH.mid}
+                fill={isHovered ? RESOLVED_COLORS.ink : RESOLVED_COLORS.muted}
               >
                 {entry.label.length > 35
                   ? entry.label.slice(0, 35) + '...'
@@ -234,7 +234,7 @@ export function WaterfallChart({
                 y={y + rowHeight / 2 + 4}
                 fontSize={10}
                 fontFamily="var(--font-data)"
-                fill={OKLCH.mid}
+                fill={RESOLVED_COLORS.muted}
               >
                 {entry.duration >= 1000
                   ? `${(entry.duration / 1000).toFixed(2)}s`
@@ -249,7 +249,7 @@ export function WaterfallChart({
       {hasMore && (
         <button
           onClick={() => setShowCount((c) => Math.min(c + 20, data.length))}
-          className="mt-2 text-xs text-gs-cyan hover:underline"
+          className="mt-2 text-xs text-gs-red hover:underline"
         >
           Show {Math.min(20, data.length - showCount)} more resources ({data.length - showCount} remaining)
         </button>

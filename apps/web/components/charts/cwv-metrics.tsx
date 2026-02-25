@@ -12,7 +12,7 @@ import {
 } from 'recharts';
 import { ChartContainer } from './chart-container';
 import { AlphaTooltip } from './alpha-tooltip';
-import { AXIS_STYLE, GRID_STYLE, CHART_MARGINS, LEGEND_CONFIG, OKLCH } from '@/lib/chart-config';
+import { AXIS_STYLE, GRID_STYLE, CHART_MARGINS, LEGEND_CONFIG, RESOLVED_COLORS } from '@/lib/chart-config';
 import { cn } from '@/lib/utils';
 
 interface CWVMetric {
@@ -102,9 +102,9 @@ export function CWVMetrics({
             <YAxis {...AXIS_STYLE} />
             <Tooltip content={<AlphaTooltip />} />
             <Legend {...LEGEND_CONFIG} />
-            <Bar dataKey="site" name="Your Site" fill={OKLCH.black} radius={[4, 4, 0, 0]} />
-            <Bar dataKey="good" name="Good Threshold" fill={OKLCH.terminal} radius={[4, 4, 0, 0]} />
-            <Bar dataKey="industry" name="Industry Avg" fill={OKLCH.midLight} radius={[4, 4, 0, 0]} />
+            <Bar dataKey="site" name="Your Site" fill={RESOLVED_COLORS.ink} radius={[4, 4, 0, 0]} />
+            <Bar dataKey="good" name="Good Threshold" fill={RESOLVED_COLORS.terminal} radius={[4, 4, 0, 0]} />
+            <Bar dataKey="industry" name="Industry Avg" fill={RESOLVED_COLORS.chrome} radius={[4, 4, 0, 0]} />
           </BarChart>
         </ChartContainer>
       )}

@@ -1,7 +1,7 @@
 'use client';
 
 import type { TooltipProps } from 'recharts';
-import { OKLCH, TOOLTIP_STYLE, TOOLTIP_LABEL_STYLE, TOOLTIP_ITEM_STYLE } from '@/lib/chart-config';
+import { RESOLVED_COLORS, TOOLTIP_STYLE, TOOLTIP_LABEL_STYLE, TOOLTIP_ITEM_STYLE } from '@/lib/chart-config';
 
 export function AlphaTooltip({
   active,
@@ -37,7 +37,7 @@ export function AlphaTooltip({
           <span>{entry.name}: </span>
           <span
             style={{
-              color: OKLCH.nearWhite,
+              color: RESOLVED_COLORS.paper,
               fontFamily: 'var(--font-data)',
               fontWeight: 500,
             }}

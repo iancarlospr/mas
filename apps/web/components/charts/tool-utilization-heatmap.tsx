@@ -16,10 +16,10 @@ interface ToolUtilizationHeatmapProps {
 }
 
 const UTIL_COLORS: { [key: string]: { bg: string; text: string; label: string } } = {
-  high: { bg: 'bg-gs-black', text: 'text-white', label: 'High' },
-  medium: { bg: 'bg-gs-black/60', text: 'text-white', label: 'Medium' },
-  low: { bg: 'bg-gs-black/25', text: 'text-primary', label: 'Low' },
-  unused: { bg: 'bg-gs-light', text: 'text-muted', label: 'Unused' },
+  high: { bg: 'bg-gs-ink', text: 'text-white', label: 'High' },
+  medium: { bg: 'bg-gs-ink/60', text: 'text-white', label: 'Medium' },
+  low: { bg: 'bg-gs-ink/25', text: 'text-primary', label: 'Low' },
+  unused: { bg: 'bg-gs-chrome', text: 'text-muted', label: 'Unused' },
   redundant: { bg: 'bg-gs-critical/10', text: 'text-gs-critical', label: 'Redundant' },
 };
 
@@ -94,7 +94,7 @@ export function ToolUtilizationHeatmap({
       </div>
 
       {/* Legend */}
-      <div className="flex flex-wrap gap-3 mt-4 pt-3 border-t border-gs-light">
+      <div className="flex flex-wrap gap-3 mt-4 pt-3 border-t border-gs-chrome">
         {Object.entries(UTIL_COLORS).map(([key, val]) => (
           <div key={key} className="flex items-center gap-1.5 text-[10px] text-muted">
             <div className={cn('w-3 h-3 rounded', val.bg)} />

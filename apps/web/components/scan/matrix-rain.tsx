@@ -10,7 +10,7 @@ import { useEffect, useRef } from 'react';
 
    Uses Chloé's brand colors:
    - Primary: gs-cyan (phosphorescent cyan)
-   - Accent: gs-fuchsia (laser pink)
+   - Accent: gs-red (laser pink)
    - Classic: gs-terminal (green, for authenticity)
 
    Performance: requestAnimationFrame, ~60fps on modern hardware.

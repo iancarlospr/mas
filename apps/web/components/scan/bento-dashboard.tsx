@@ -4,12 +4,8 @@ import { useRef, useState, useMemo, useCallback } from 'react';
 import type { ScanWithResults, ModuleResult } from '@marketing-alpha/types';
 import Link from 'next/link';
 import { Window } from '@/components/os/window';
-import { Desktop, type DesktopProgram } from '@/components/os/desktop';
-import { ChloeScreenmate } from '@/components/chloe/chloe-screenmate';
 import { ChloeReactionsProvider } from '@/components/chloe/chloe-reactions';
 import { RadioPlayer } from '@/components/os/radio-player';
-import { soundEffects } from '@/lib/sound-effects';
-import { useWindowManager } from '@/lib/os-state';
 import { CATEGORY_META, MODULE_NAMES } from './slide-sidebar';
 import { OverviewSlide } from './overview-slide';
 import { ModuleSlide } from './module-slide';
@@ -53,12 +49,6 @@ export function BentoDashboard({ scan }: BentoDashboardProps) {
   /* ── Category tab state ──────────────────────────────────── */
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [radioOpen, setRadioOpen] = useState(false);
-  const [audioEnabled, setAudioEnabled] = useState(false);
-
-  const handleToggleAudio = useCallback(() => {
-    const nowEnabled = soundEffects.toggle();
-    setAudioEnabled(nowEnabled);
-  }, []);
 
   /* ── Gather visible module IDs in category order ─────────── */
   const moduleSlideIds = useMemo(() => {
@@ -88,57 +78,6 @@ export function BentoDashboard({ scan }: BentoDashboardProps) {
 
   const contentRef = useRef<HTMLDivElement>(null);
 
-  /* ── Window manager for multi-window support ─────────────── */
-  const wm = useWindowManager(['dashboard', 'chat', 'report']);
-
-  /* ── Desktop programs (icons) ────────────────────────────── */
-  const programs: DesktopProgram[] = useMemo(
-    () => [
-      {
-        id: 'dashboard',
-        label: 'Dashboard',
-        icon: '📊',
-        isOpen: true,
-        onOpen: () => wm.openWindow('dashboard'),
-      },
-      {
-        id: 'scans',
-        label: 'My Scans',
-        icon: '📁',
-        onOpen: () => {},
-      },
-      {
-        id: 'ghost',
-        label: 'GhostScan™',
-        icon: '👻',
-        onOpen: () => {},
-      },
-      ...(isPaid
-        ? [
-            {
-              id: 'brief',
-              label: 'Alpha Brief',
-              icon: '📋',
-              onOpen: () => {},
-            },
-            {
-              id: 'chat',
-              label: 'Ask Chloé',
-              icon: '💬',
-              onOpen: () => {},
-            },
-          ]
-        : []),
-      {
-        id: 'radio',
-        label: 'Radio.exe',
-        icon: '🎵',
-        onOpen: () => setRadioOpen(true),
-      },
-    ],
-    [isPaid, wm],
-  );
-
   /* ── Scroll to category ──────────────────────────────────── */
   const handleCategoryClick = useCallback((catId: string | null) => {
     setActiveCategory((prev) => (prev === catId ? null : catId));
@@ -146,13 +85,7 @@ export function BentoDashboard({ scan }: BentoDashboardProps) {
 
   return (
     <ChloeReactionsProvider>
-      <Desktop
-        programs={programs}
-        chloe={<ChloeScreenmate active />}
-        audioEnabled={audioEnabled}
-        onToggleAudio={handleToggleAudio}
-      >
-        {/* ── Dashboard Window ──────────────────────────────── */}
+        {/* ── Dashboard Content ────────────────────────────── */}
         <Window
           id="dashboard"
           title={`📊 Dashboard — ${scan.domain} — Scanned ${new Date(scan.createdAt).toLocaleDateString()}`}
@@ -189,11 +122,11 @@ export function BentoDashboard({ scan }: BentoDashboardProps) {
           }
         >
           {/* ── Category Tab Bar (replaces old sidebar) ────── */}
-          <div className="bg-gs-light border-b border-gs-mid px-gs-2 py-gs-1 flex items-center gap-gs-1 overflow-x-auto flex-shrink-0">
+          <div className="bg-gs-chrome border-b border-gs-chrome-dark px-gs-2 py-gs-1 flex items-center gap-gs-1 overflow-x-auto flex-shrink-0">
             <button
               className={cn(
                 'bevel-button text-os-xs whitespace-nowrap',
-                !activeCategory && 'bevel-sunken bg-gs-white',
+                !activeCategory && 'bevel-sunken bg-gs-paper',
               )}
               onClick={() => handleCategoryClick(null)}
             >
@@ -218,7 +151,7 @@ export function BentoDashboard({ scan }: BentoDashboardProps) {
                   key={cat.key}
                   className={cn(
                     'bevel-button text-os-xs whitespace-nowrap flex items-center gap-gs-1',
-                    isActive && 'bevel-sunken bg-gs-white',
+                    isActive && 'bevel-sunken bg-gs-paper',
                   )}
                   onClick={() => handleCategoryClick(cat.key)}
                 >
@@ -281,11 +214,10 @@ export function BentoDashboard({ scan }: BentoDashboardProps) {
 
         {/* ── Radio.exe Floating Window ───────────────────────── */}
         {radioOpen && (
-          <div className="fixed bottom-[60px] right-gs-4 z-desktop-menu">
+          <div className="fixed bottom-[60px] right-gs-4 z-[600]">
             <RadioPlayer onClose={() => setRadioOpen(false)} />
           </div>
         )}
-      </Desktop>
     </ChloeReactionsProvider>
   );
 }

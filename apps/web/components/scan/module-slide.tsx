@@ -68,7 +68,7 @@ const HEALTH_COLORS: Record<string, string> = {
   good: 'text-gs-terminal/70',
   warning: 'text-gs-warning',
   critical: 'text-gs-critical',
-  info: 'text-gs-mid-light',
+  info: 'text-gs-muted',
 };
 
 /* ── Component ─────────────────────────────────────────────── */
@@ -118,7 +118,7 @@ export function ModuleSlide({
       >
         {/* Error state */}
         {isError && (
-          <div className="flex items-center justify-center py-gs-8 font-data text-data-sm text-gs-mid">
+          <div className="flex items-center justify-center py-gs-8 font-data text-data-sm text-gs-muted">
             Module could not complete for this site.
           </div>
         )}
@@ -140,7 +140,7 @@ export function ModuleSlide({
 
         {/* No data */}
         {!result && !isError && (
-          <div className="flex items-center justify-center py-gs-8 font-data text-data-sm text-gs-mid">
+          <div className="flex items-center justify-center py-gs-8 font-data text-data-sm text-gs-muted">
             Awaiting data...
           </div>
         )}
@@ -171,7 +171,7 @@ function PaidContent({
       <div className="space-y-gs-3">
         {result.checkpoints.length > 0 && (
           <div>
-            <h4 className="font-system text-os-xs text-gs-mid uppercase tracking-wider mb-gs-2">
+            <h4 className="font-system text-os-xs text-gs-muted uppercase tracking-wider mb-gs-2">
               Checkpoints
             </h4>
             <div className="space-y-gs-2">
@@ -184,7 +184,7 @@ function PaidContent({
 
         {result.signals.length > 0 && (
           <div>
-            <h4 className="font-system text-os-xs text-gs-mid uppercase tracking-wider mb-gs-2">
+            <h4 className="font-system text-os-xs text-gs-muted uppercase tracking-wider mb-gs-2">
               Signals
             </h4>
             <div className="flex flex-wrap gap-gs-1">
@@ -200,7 +200,7 @@ function PaidContent({
       <div className="space-y-gs-3">
         {toolSignals.length > 0 && (
           <div>
-            <h4 className="font-system text-os-xs text-gs-mid uppercase tracking-wider mb-gs-2">
+            <h4 className="font-system text-os-xs text-gs-muted uppercase tracking-wider mb-gs-2">
               Detected Tools ({toolSignals.length})
             </h4>
             <div className="flex flex-wrap gap-gs-1">
@@ -213,14 +213,14 @@ function PaidContent({
 
         {dataEntries.length > 0 && (
           <div>
-            <h4 className="font-system text-os-xs text-gs-mid uppercase tracking-wider mb-gs-2">
+            <h4 className="font-system text-os-xs text-gs-muted uppercase tracking-wider mb-gs-2">
               Details
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-gs-4 gap-y-gs-1">
               {dataEntries.map(([label, value]) => (
                 <div key={label} className="flex items-baseline justify-between font-data text-data-xs gap-gs-2">
-                  <span className="text-gs-mid truncate">{label}</span>
-                  <span className="text-gs-black font-bold text-right flex-shrink-0 max-w-[50%] truncate">
+                  <span className="text-gs-muted truncate">{label}</span>
+                  <span className="text-gs-ink font-bold text-right flex-shrink-0 max-w-[50%] truncate">
                     {value}
                   </span>
                 </div>
@@ -250,7 +250,7 @@ function FreeContent({
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-gs-4">
       {result.checkpoints.length > 0 && (
         <div>
-          <h4 className="font-system text-os-xs text-gs-mid uppercase tracking-wider mb-gs-2">
+          <h4 className="font-system text-os-xs text-gs-muted uppercase tracking-wider mb-gs-2">
             Checkpoints
           </h4>
           <div className="space-y-gs-1">
@@ -264,7 +264,7 @@ function FreeContent({
       <div className="space-y-gs-3">
         {toolSignals.length > 0 && (
           <div>
-            <h4 className="font-system text-os-xs text-gs-mid uppercase tracking-wider mb-gs-2">
+            <h4 className="font-system text-os-xs text-gs-muted uppercase tracking-wider mb-gs-2">
               Detected Tools
             </h4>
             <div className="flex flex-wrap gap-gs-1">
@@ -272,7 +272,7 @@ function FreeContent({
                 <SignalBadge key={`tool-${s.name}-${i}`} signal={s} />
               ))}
               {toolSignals.length > freeSignalLimit && (
-                <span className="font-data text-data-xs text-gs-mid self-center">
+                <span className="font-data text-data-xs text-gs-muted self-center">
                   +{toolSignals.length - freeSignalLimit} more
                 </span>
               )}
@@ -296,21 +296,21 @@ function CheckpointRow({
   return (
     <div>
       <div className="flex items-center justify-between">
-        <span className="font-data text-data-xs text-gs-black/80">{checkpoint.name}</span>
+        <span className="font-data text-data-xs text-gs-ink/80">{checkpoint.name}</span>
         <span className={cn(
           'font-data text-data-xs font-bold capitalize',
-          HEALTH_COLORS[checkpoint.health] ?? 'text-gs-mid-light',
+          HEALTH_COLORS[checkpoint.health] ?? 'text-gs-muted',
         )}>
           {checkpoint.health}
         </span>
       </div>
       {showEvidence && checkpoint.evidence && (
-        <p className="font-data text-[11px] text-gs-mid mt-[2px] leading-relaxed">
+        <p className="font-data text-[11px] text-gs-muted mt-[2px] leading-relaxed">
           {checkpoint.evidence}
         </p>
       )}
       {showEvidence && checkpoint.recommendation && (
-        <p className="font-data text-[11px] text-gs-cyan mt-[2px] leading-relaxed">
+        <p className="font-data text-[11px] text-gs-red mt-[2px] leading-relaxed">
           → {checkpoint.recommendation}
         </p>
       )}

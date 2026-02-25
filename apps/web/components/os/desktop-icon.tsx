@@ -30,8 +30,8 @@ export function DesktopIcon({
     <button
       className={cn(
         'flex flex-col items-center gap-gs-1 p-gs-1 w-[72px] rounded-none',
-        'outline-none focus-visible:outline-1 focus-visible:outline-dotted focus-visible:outline-gs-black',
-        selected && 'bg-gs-cyan/20',
+        'outline-none focus-visible:outline-1 focus-visible:outline-dotted focus-visible:outline-gs-ink',
+        selected && 'bg-gs-red/20',
         className,
       )}
       onClick={() => setSelected(true)}
@@ -48,8 +48,8 @@ export function DesktopIcon({
         className={cn(
           'font-system text-os-xs text-center leading-tight max-w-full px-gs-1',
           selected
-            ? 'bg-gs-mid-dark text-gs-white'
-            : 'text-gs-black',
+            ? 'bg-gs-ink text-gs-paper'
+            : 'text-gs-ink',
         )}
       >
         {label}

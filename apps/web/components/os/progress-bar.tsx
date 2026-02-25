@@ -43,7 +43,7 @@ export function ProgressBar({
 
   return (
     <div className={cn('flex items-center gap-gs-2', className)}>
-      <div className={cn('bevel-sunken flex-1 bg-gs-white relative', sizeClass)}>
+      <div className={cn('bevel-sunken flex-1 bg-gs-paper relative', sizeClass)}>
         {/* Segmented fill blocks (Win95 style) */}
         <div
           className="absolute inset-[2px] flex gap-px overflow-hidden"
@@ -55,12 +55,12 @@ export function ProgressBar({
               className={cn(
                 'flex-shrink-0 w-[8px] h-full',
                 variant === 'ghost'
-                  ? 'bg-gs-cyan'
-                  : 'bg-gs-mid-dark',
+                  ? 'bg-gs-red'
+                  : 'bg-gs-ink',
               )}
               style={
                 variant === 'ghost'
-                  ? { background: 'var(--gs-gradient)' }
+                  ? { background: 'var(--gs-red)' }
                   : undefined
               }
             />
@@ -69,7 +69,7 @@ export function ProgressBar({
       </div>
 
       {showLabel && (
-        <span className="font-data text-data-xs text-gs-mid-dark min-w-[36px] text-right">
+        <span className="font-data text-data-xs text-gs-muted min-w-[36px] text-right">
           {Math.round(clampedValue)}%
         </span>
       )}
@@ -97,7 +97,7 @@ function TerminalProgress({
       <span className="text-gs-terminal">[</span>
       <span className="text-gs-terminal">{bar}</span>
       <span className="text-gs-terminal">]</span>
-      <span className="text-gs-mid-light ml-gs-2">{Math.round(value)}%</span>
+      <span className="text-gs-muted ml-gs-2">{Math.round(value)}%</span>
     </div>
   );
 }

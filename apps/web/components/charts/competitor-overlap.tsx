@@ -11,7 +11,7 @@ import {
   ReferenceLine,
 } from 'recharts';
 import { ChartContainer } from './chart-container';
-import { AXIS_STYLE, GRID_STYLE, CHART_MARGINS, CHART_PALETTE, OKLCH } from '@/lib/chart-config';
+import { AXIS_STYLE, GRID_STYLE, CHART_MARGINS, CHART_PALETTE, RESOLVED_COLORS } from '@/lib/chart-config';
 import { cn } from '@/lib/utils';
 
 interface CompetitorData {
@@ -55,7 +55,7 @@ export function CompetitorOverlap({
               position: 'insideBottom',
               offset: -5,
               fontSize: 11,
-              fill: OKLCH.mid,
+              fill: RESOLVED_COLORS.muted,
             }}
           />
           <YAxis
@@ -69,7 +69,7 @@ export function CompetitorOverlap({
               position: 'insideLeft',
               offset: 10,
               fontSize: 11,
-              fill: OKLCH.mid,
+              fill: RESOLVED_COLORS.muted,
             }}
           />
           <ZAxis type="number" dataKey="z" range={[80, 400]} />
@@ -78,15 +78,15 @@ export function CompetitorOverlap({
               if (!active || !payload?.length) return null;
               const d = payload[0]!.payload as (typeof scatterData)[0];
               return (
-                <div className="bg-gs-black text-white rounded-lg px-4 py-3 shadow-lg text-xs">
+                <div className="bg-gs-ink text-white rounded-lg px-4 py-3 shadow-lg text-xs">
                   <div className="font-system font-bold text-sm mb-1">{d.name}</div>
-                  <div className="text-gs-mid-light">
+                  <div className="text-gs-muted">
                     Shared: <span className="text-white font-mono">{d.y}</span>
                   </div>
-                  <div className="text-gs-mid-light">
+                  <div className="text-gs-muted">
                     Their Unique: <span className="text-white font-mono">{d.x}</span>
                   </div>
-                  <div className="text-gs-mid-light">
+                  <div className="text-gs-muted">
                     Overlap: <span className="text-white font-mono">{d.z}%</span>
                   </div>
                 </div>

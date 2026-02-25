@@ -21,11 +21,11 @@ export const BevelInput = forwardRef<HTMLInputElement, BevelInputProps>(
       <input
         ref={ref}
         className={cn(
-          'bevel-sunken bg-gs-white px-gs-2 py-gs-1',
-          'font-data text-data-base text-gs-black',
-          'placeholder:text-gs-mid-light',
+          'bevel-sunken bg-gs-paper px-gs-2 py-gs-1',
+          'font-data text-data-base text-gs-ink',
+          'placeholder:text-gs-muted',
           'focus:outline-none',
-          'disabled:bg-gs-light disabled:text-gs-mid disabled:cursor-default',
+          'disabled:bg-gs-chrome disabled:text-gs-muted disabled:cursor-default',
           'min-h-[24px]',
           fullWidth && 'w-full',
           className,

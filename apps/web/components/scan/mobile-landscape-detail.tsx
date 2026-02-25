@@ -80,13 +80,13 @@ export function MobileLandscapeDetail({
   );
 
   return (
-    <div className="fixed inset-0 bg-gs-near-white flex flex-col overflow-hidden">
+    <div className="fixed inset-0 bg-gs-paper flex flex-col overflow-hidden">
       {/* ── Header (36px) ───────────────────────────────── */}
-      <header className="h-[36px] flex items-center px-gs-2 bg-gs-light bevel-raised flex-shrink-0 z-10 gap-gs-2">
+      <header className="h-[36px] flex items-center px-gs-2 bg-gs-chrome bevel-raised flex-shrink-0 z-10 gap-gs-2">
         <button onClick={onBack} className="bevel-button text-os-xs px-gs-2 py-px flex-shrink-0">
           ← Back
         </button>
-        <span className="flex-1 text-center font-system text-os-sm font-bold text-gs-black truncate">
+        <span className="flex-1 text-center font-system text-os-sm font-bold text-gs-ink truncate">
           {name} — {score ?? '--'}
         </span>
         <span
@@ -95,10 +95,10 @@ export function MobileLandscapeDetail({
             light === 'green' && 'bg-gs-terminal',
             light === 'yellow' && 'bg-gs-warning',
             light === 'red' && 'bg-gs-critical',
-            !light && 'bg-gs-mid',
+            !light && 'bg-gs-muted',
           )}
         />
-        <span className="font-data text-data-xs text-gs-mid flex-shrink-0">
+        <span className="font-data text-data-xs text-gs-muted flex-shrink-0">
           {currentIdx + 1}/{moduleIds.length}
         </span>
       </header>
@@ -120,14 +120,14 @@ export function MobileLandscapeDetail({
       </div>
 
       {/* ── Pagination Dots (24px) ──────────────────────── */}
-      <div className="h-[24px] flex items-center justify-center gap-[4px] bg-gs-light flex-shrink-0 overflow-x-auto px-gs-2">
+      <div className="h-[24px] flex items-center justify-center gap-[4px] bg-gs-chrome flex-shrink-0 overflow-x-auto px-gs-2">
         {moduleIds.map((mId) => (
           <button
             key={mId}
             onClick={() => onNavigate(mId)}
             className={cn(
               'w-[6px] h-[6px] rounded-full flex-shrink-0 transition-colors',
-              mId === activeModuleId ? 'bg-gs-cyan' : 'bg-gs-mid-light',
+              mId === activeModuleId ? 'bg-gs-red' : 'bg-gs-chrome',
             )}
             aria-label={MODULE_NAMES[mId] ?? mId}
           />

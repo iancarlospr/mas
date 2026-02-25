@@ -3,7 +3,7 @@
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { FLOW_NODE_COLORS, OKLCH } from '@/lib/chart-config';
+import { FLOW_NODE_COLORS, RESOLVED_COLORS } from '@/lib/chart-config';
 
 interface FlowNode {
   id: string;
@@ -32,15 +32,15 @@ interface FlowDiagramProps {
 }
 
 const NODE_COLORS: Record<FlowNode['type'], string> = {
-  source: FLOW_NODE_COLORS['source'] ?? OKLCH.cyan,
-  processor: FLOW_NODE_COLORS['warning'] ?? OKLCH.warning,
-  destination: OKLCH.black,
+  source: FLOW_NODE_COLORS['source'] ?? RESOLVED_COLORS.red,
+  processor: FLOW_NODE_COLORS['warning'] ?? RESOLVED_COLORS.warning,
+  destination: RESOLVED_COLORS.ink,
 };
 
 const STATUS_DOT: Record<string, string> = {
-  active: OKLCH.terminal,
-  inactive: OKLCH.midLight,
-  error: OKLCH.critical,
+  active: RESOLVED_COLORS.terminal,
+  inactive: RESOLVED_COLORS.chrome,
+  error: RESOLVED_COLORS.critical,
 };
 
 const NODE_W = 140;
@@ -135,8 +135,8 @@ export function FlowDiagram({
               width={maxLX - minX}
               height={maxLY - minY}
               rx={8}
-              fill={li % 2 === 0 ? OKLCH.nearWhite : OKLCH.nearWhite}
-              stroke={OKLCH.light}
+              fill={li % 2 === 0 ? RESOLVED_COLORS.paper : RESOLVED_COLORS.paper}
+              stroke={RESOLVED_COLORS.chromeLight}
               strokeWidth={1}
             />
           );
@@ -171,13 +171,13 @@ export function FlowDiagram({
                   refY="3"
                   orient="auto"
                 >
-                  <polygon points="0 0, 8 3, 0 6" fill={OKLCH.midLight} />
+                  <polygon points="0 0, 8 3, 0 6" fill={RESOLVED_COLORS.chrome} />
                 </marker>
               </defs>
               <motion.path
                 d={d}
                 fill="none"
-                stroke={OKLCH.midLight}
+                stroke={RESOLVED_COLORS.chrome}
                 strokeWidth={1.5}
                 markerEnd={`url(#arrowhead-${i})`}
                 strokeDasharray={edge.animated ? '8 4' : undefined}
@@ -201,7 +201,7 @@ export function FlowDiagram({
                   y={midY - 6}
                   textAnchor="middle"
                   fontSize={10}
-                  fill={OKLCH.midLight}
+                  fill={RESOLVED_COLORS.chrome}
                   fontFamily="var(--font-data)"
                 >
                   {edge.label}
@@ -233,7 +233,7 @@ export function FlowDiagram({
                 height={nh}
                 rx={8}
                 fill="white"
-                stroke={OKLCH.light}
+                stroke={RESOLVED_COLORS.chromeLight}
                 strokeWidth={1}
               />
               {/* Left accent */}
@@ -251,7 +251,7 @@ export function FlowDiagram({
                   cx={pos.x + nw - 8}
                   cy={pos.y + 8}
                   r={4}
-                  fill={STATUS_DOT[node.status] ?? OKLCH.midLight}
+                  fill={STATUS_DOT[node.status] ?? RESOLVED_COLORS.chrome}
                 />
               )}
               {/* Label */}
@@ -261,7 +261,7 @@ export function FlowDiagram({
                 fontSize={compact ? 10 : 12}
                 fontFamily="var(--font-data)"
                 fontWeight={500}
-                fill={OKLCH.black}
+                fill={RESOLVED_COLORS.ink}
               >
                 {node.label.length > (compact ? 12 : 18)
                   ? node.label.slice(0, compact ? 12 : 18) + '...'

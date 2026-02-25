@@ -15,10 +15,10 @@ export function MobileScoreHero({ scan }: { scan: ScanWithResults }) {
 
   return (
     <div className="px-gs-3 py-gs-3">
-      <div className="bevel-sunken bg-gs-near-white p-gs-3 flex items-center gap-gs-3">
+      <div className="bevel-sunken bg-gs-paper p-gs-3 flex items-center gap-gs-3">
         <ScoreGauge score={score ?? 0} size="sm" animate />
         <div className="flex-1 min-w-0">
-          <div className="font-system text-os-xs text-gs-mid-dark">MarketingIQ™</div>
+          <div className="font-system text-os-xs text-gs-muted">MarketingIQ™</div>
           <div
             className={cn(
               'font-data text-data-lg font-bold',
@@ -31,10 +31,10 @@ export function MobileScoreHero({ scan }: { scan: ScanWithResults }) {
           >
             {score ?? '--'} — {label}
           </div>
-          <div className="font-data text-data-xs text-gs-mid mt-gs-1 truncate">
+          <div className="font-data text-data-xs text-gs-muted mt-gs-1 truncate">
             {scan.domain} — {new Date(scan.createdAt).toLocaleDateString()}
           </div>
-          <div className="font-data text-data-xs text-gs-mid-light">
+          <div className="font-data text-data-xs text-gs-muted">
             {scan.moduleResults.filter((r) => r.status === 'success' || r.status === 'partial').length} modules completed
           </div>
         </div>

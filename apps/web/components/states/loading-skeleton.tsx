@@ -16,7 +16,7 @@ interface SkeletonProps {
 
 export function Skeleton({ className }: SkeletonProps) {
   return (
-    <div className={cn('bevel-sunken bg-gs-mid-light/30 animate-pulse', className)} />
+    <div className={cn('bevel-sunken bg-gs-chrome/30 animate-pulse', className)} />
   );
 }
 

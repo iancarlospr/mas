@@ -27,15 +27,15 @@ import {
  *
  * Visual: [OK] in green, [!!] in cyan (ghost), [>>] in yellow, [ERR] in red.
  * Font: JetBrains Mono (--font-data) at 13px.
- * Background: --gs-black with terminal text glow.
+ * Background: --gs-ink with terminal text glow.
  */
 
 /* ── Line type → visual prefix + color ─────────────────────── */
 
 const LINE_PREFIXES: Record<BootLineType, { prefix: string; colorClass: string }> = {
   ok:    { prefix: '[OK]', colorClass: 'text-gs-terminal' },
-  info:  { prefix: '    ', colorClass: 'text-gs-mid-light' },
-  ghost: { prefix: '[!!]', colorClass: 'text-gs-cyan' },
+  info:  { prefix: '    ', colorClass: 'text-gs-muted' },
+  ghost: { prefix: '[!!]', colorClass: 'text-gs-red' },
   scan:  { prefix: '[>>]', colorClass: 'text-gs-warning' },
   error: { prefix: '[ERR]', colorClass: 'text-gs-critical' },
 };
@@ -127,7 +127,7 @@ export function TerminalBoot({
   return (
     <div
       className={cn(
-        'flex flex-col h-full bg-gs-black font-data text-data-sm',
+        'flex flex-col h-full bg-gs-ink font-data text-data-sm',
         className,
       )}
     >
@@ -153,7 +153,7 @@ export function TerminalBoot({
               style={{
                 textShadow:
                   line.type === 'ghost'
-                    ? '0 0 6px var(--gs-cyan)'
+                    ? '0 0 6px var(--gs-red)'
                     : line.type === 'error'
                       ? '0 0 6px var(--gs-critical)'
                       : '0 0 3px var(--gs-terminal)',
@@ -172,7 +172,7 @@ export function TerminalBoot({
       </div>
 
       {/* Terminal progress bar at bottom */}
-      <div className="p-gs-2 border-t border-gs-mid-dark">
+      <div className="p-gs-2 border-t border-gs-chrome-dark">
         <ProgressBar value={progress} variant="terminal" />
       </div>
     </div>

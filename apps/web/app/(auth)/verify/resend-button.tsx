@@ -57,7 +57,7 @@ export function ResendVerificationButton({ email }: { email: string }) {
     <button
       onClick={handleResend}
       disabled={status !== 'idle'}
-      className="font-data text-data-xs text-gs-cyan hover:text-gs-fuchsia disabled:opacity-50 disabled:cursor-not-allowed"
+      className="font-data text-data-xs text-gs-red hover:text-gs-red disabled:opacity-50 disabled:cursor-not-allowed"
     >
       {status === 'sent'
         ? 'Verification email resent'

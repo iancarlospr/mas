@@ -104,7 +104,7 @@ export function SignupWall({ domain, scanUrl }: SignupWallProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Dark CRT backdrop */}
-      <div className="absolute inset-0 bg-gs-black/90" />
+      <div className="absolute inset-0 bg-gs-ink/90" />
       <div className="noise-grain" aria-hidden="true" />
       <div className="crt-scanlines" aria-hidden="true" />
 
@@ -123,8 +123,8 @@ export function SignupWall({ domain, scanUrl }: SignupWallProps) {
         >
           <div className="p-gs-6 space-y-gs-4">
             <div className="text-center">
-              <p className="font-data text-data-sm text-gs-mid">
-                Your audit of <strong className="text-gs-fuchsia">{domain}</strong> is ready.
+              <p className="font-data text-data-sm text-gs-muted">
+                Your audit of <strong className="text-gs-red">{domain}</strong> is ready.
                 {mode === 'register' ? ' Create a free account to see all 42 modules.' : ' Sign in to see your results.'}
               </p>
             </div>
@@ -153,9 +153,9 @@ export function SignupWall({ domain, scanUrl }: SignupWallProps) {
 
             {/* Divider */}
             <div className="flex items-center gap-gs-3">
-              <div className="flex-1 h-px bg-gs-mid" />
-              <span className="font-system text-os-xs text-gs-mid">or</span>
-              <div className="flex-1 h-px bg-gs-mid" />
+              <div className="flex-1 h-px bg-gs-muted" />
+              <span className="font-system text-os-xs text-gs-muted">or</span>
+              <div className="flex-1 h-px bg-gs-muted" />
             </div>
 
             {/* Form */}
@@ -206,13 +206,13 @@ export function SignupWall({ domain, scanUrl }: SignupWallProps) {
               </button>
             </form>
 
-            <p className="text-center font-data text-data-xs text-gs-mid">
+            <p className="text-center font-data text-data-xs text-gs-muted">
               {mode === 'register' ? (
                 <>
                   Already have an account?{' '}
                   <button
                     onClick={() => { setMode('login'); setError(null); }}
-                    className="text-gs-fuchsia hover:underline font-bold"
+                    className="text-gs-red hover:underline font-bold"
                   >
                     Log in
                   </button>
@@ -222,7 +222,7 @@ export function SignupWall({ domain, scanUrl }: SignupWallProps) {
                   Don&apos;t have an account?{' '}
                   <button
                     onClick={() => { setMode('register'); setError(null); }}
-                    className="text-gs-fuchsia hover:underline font-bold"
+                    className="text-gs-red hover:underline font-bold"
                   >
                     Sign up
                   </button>
@@ -230,11 +230,11 @@ export function SignupWall({ domain, scanUrl }: SignupWallProps) {
               )}
             </p>
 
-            <p className="text-center font-data text-data-xs text-gs-mid-light">
+            <p className="text-center font-data text-data-xs text-gs-muted">
               By continuing, you agree to our{' '}
-              <Link href="/terms" className="text-gs-fuchsia hover:underline">Terms</Link>{' '}
+              <Link href="/terms" className="text-gs-red hover:underline">Terms</Link>{' '}
               and{' '}
-              <Link href="/privacy" className="text-gs-fuchsia hover:underline">Privacy Policy</Link>.
+              <Link href="/privacy" className="text-gs-red hover:underline">Privacy Policy</Link>.
             </p>
           </div>
         </Window>

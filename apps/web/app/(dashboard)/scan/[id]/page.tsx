@@ -49,7 +49,7 @@ export default function ScanPage() {
   /* ── Loading state ───────────────────────────────────────── */
   if (loading) {
     return (
-      <div className="fixed inset-0 bg-gs-black flex items-center justify-center">
+      <div className="fixed inset-0 bg-gs-ink flex items-center justify-center">
         <div className="text-center">
           <ChloeSprite state="scanning" size={64} glowing />
           <p className="font-data text-data-sm text-gs-terminal mt-gs-4 terminal-glow animate-blink">
@@ -63,14 +63,14 @@ export default function ScanPage() {
   /* ── Not found state ─────────────────────────────────────── */
   if (!scan) {
     return (
-      <div className="fixed inset-0 bg-gs-near-white flex items-center justify-center">
+      <div className="fixed inset-0 bg-gs-paper flex items-center justify-center">
         <Window id="not-found" title="⚠ Error" variant="dialog" isActive width={400}>
           <div className="p-gs-6 text-center">
             <ChloeSprite state="found" size={64} glowing className="mx-auto" />
-            <h1 className="font-system text-os-lg text-gs-black mt-gs-4 mb-gs-2">
+            <h1 className="font-system text-os-lg text-gs-ink mt-gs-4 mb-gs-2">
               Scan not found
             </h1>
-            <p className="font-data text-data-sm text-gs-mid">
+            <p className="font-data text-data-sm text-gs-muted">
               This scan doesn&apos;t exist or you don&apos;t have access.
             </p>
           </div>
@@ -97,7 +97,7 @@ export default function ScanPage() {
   /* ── Failed state ────────────────────────────────────────── */
   if (scan.status === 'failed') {
     return (
-      <div className="fixed inset-0 bg-gs-near-white flex items-center justify-center">
+      <div className="fixed inset-0 bg-gs-paper flex items-center justify-center">
         <div className="relative">
           <ChloeSprite state="found" size={64} glowing className="absolute -top-[80px] left-1/2 -translate-x-1/2" />
           <ChloeSpeech
@@ -111,10 +111,10 @@ export default function ScanPage() {
               <p className="font-data text-data-lg text-gs-critical font-bold mb-gs-2">
                 Scan Could Not Complete
               </p>
-              <p className="font-data text-data-sm text-gs-mid mb-gs-4">
+              <p className="font-data text-data-sm text-gs-muted mb-gs-4">
                 The scan hit a wall. {scan.domain} is either down or blocking us.
               </p>
-              <p className="font-data text-data-xs text-gs-mid-light">
+              <p className="font-data text-data-xs text-gs-muted">
                 Scan ID: {scan.id}
               </p>
             </div>

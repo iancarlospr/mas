@@ -23,11 +23,11 @@ export function ScanFailed({ domain, error, scanId }: ScanFailedProps) {
     <div className="max-w-lg mx-auto text-center py-gs-8">
       <ChloeSprite state="critical" size={64} glowing className="mx-auto mb-gs-6" />
 
-      <h2 className="font-system text-os-lg font-bold text-gs-black mb-gs-2">
+      <h2 className="font-system text-os-lg font-bold text-gs-ink mb-gs-2">
         Scan Hit a Wall
       </h2>
-      <p className="font-data text-data-sm text-gs-mid mb-gs-6">
-        <strong className="text-gs-fuchsia">{domain}</strong> is either down
+      <p className="font-data text-data-sm text-gs-muted mb-gs-6">
+        <strong className="text-gs-red">{domain}</strong> is either down
         or blocking me. Not personal — some sites are like that.
       </p>
 
@@ -39,9 +39,9 @@ export function ScanFailed({ domain, error, scanId }: ScanFailedProps) {
       </Link>
 
       {error && (
-        <div className="mt-gs-6 bevel-sunken bg-gs-near-white p-gs-3">
-          <p className="font-data text-data-xs text-gs-mid">Error: {error}</p>
-          <p className="font-data text-data-xs text-gs-mid-light">Scan ID: {scanId}</p>
+        <div className="mt-gs-6 bevel-sunken bg-gs-paper p-gs-3">
+          <p className="font-data text-data-xs text-gs-muted">Error: {error}</p>
+          <p className="font-data text-data-xs text-gs-muted">Scan ID: {scanId}</p>
         </div>
       )}
     </div>

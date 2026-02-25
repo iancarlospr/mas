@@ -1,6 +1,6 @@
 'use client';
 
-import { OKLCH } from '@/lib/chart-config';
+import { RESOLVED_COLORS } from '@/lib/chart-config';
 
 export function BarChartSkeleton({ bars = 5, height = 200 }: { bars?: number; height?: number }) {
   return (
@@ -25,7 +25,7 @@ export function LineChartSkeleton({ height = 200 }: { height?: number }) {
         <path
           d="M 20 150 Q 100 80 200 120 T 380 60"
           fill="none"
-          stroke={OKLCH.light}
+          stroke={RESOLVED_COLORS.chromeLight}
           strokeWidth="3"
           strokeLinecap="round"
         />
@@ -52,7 +52,7 @@ export function GaugeSkeleton({ size = 200 }: { size?: number }) {
         <circle
           cx="100" cy="100" r="80"
           fill="none"
-          stroke={OKLCH.light}
+          stroke={RESOLVED_COLORS.chromeLight}
           strokeWidth="12"
           strokeDasharray="377"
           strokeDashoffset="126"

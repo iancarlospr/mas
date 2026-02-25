@@ -55,7 +55,7 @@ export function ContextMenu({ x, y, items, onClose }: ContextMenuProps) {
   return (
     <div
       ref={menuRef}
-      className="fixed bg-gs-light bevel-raised py-gs-1 min-w-[180px] z-context-menu shadow-window"
+      className="fixed bg-gs-chrome bevel-raised py-gs-1 min-w-[180px] z-context-menu shadow-window"
       style={{ left: x, top: y }}
       role="menu"
     >
@@ -66,8 +66,8 @@ export function ContextMenu({ x, y, items, onClose }: ContextMenuProps) {
               key={`sep-${i}`}
               className="mx-gs-1 my-gs-1 h-px"
               style={{
-                borderTop: '1px solid var(--gs-mid)',
-                borderBottom: '1px solid var(--gs-white)',
+                borderTop: '1px solid var(--gs-chrome-dark)',
+                borderBottom: '1px solid var(--gs-paper)',
               }}
             />
           );
@@ -79,8 +79,8 @@ export function ContextMenu({ x, y, items, onClose }: ContextMenuProps) {
             className={`w-full text-left px-gs-6 py-gs-1 font-system text-os-base
                        flex items-center justify-between
               ${item.disabled
-                ? 'text-gs-mid cursor-default'
-                : 'hover:bg-gs-mid-dark hover:text-gs-white'
+                ? 'text-gs-muted cursor-default'
+                : 'hover:bg-gs-ink hover:text-gs-paper'
               }`}
             onClick={() => {
               if (!item.disabled) {
@@ -92,7 +92,7 @@ export function ContextMenu({ x, y, items, onClose }: ContextMenuProps) {
           >
             <span>{item.label}</span>
             {item.shortcut && (
-              <span className="text-os-xs text-gs-mid-light ml-gs-8">
+              <span className="text-os-xs text-gs-muted ml-gs-8">
                 {item.shortcut}
               </span>
             )}

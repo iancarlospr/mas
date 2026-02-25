@@ -65,9 +65,9 @@ export function AutoScanTrigger() {
 
   if (status === 'scanning') {
     return (
-      <div className="bevel-raised bg-gs-cyan/10 p-gs-4 mb-gs-4 flex items-center gap-gs-3">
-        <span className="font-data text-data-sm text-gs-cyan animate-pulse">⏳</span>
-        <span className="font-data text-data-sm text-gs-black">Starting your scan...</span>
+      <div className="bevel-raised bg-gs-red/10 p-gs-4 mb-gs-4 flex items-center gap-gs-3">
+        <span className="font-data text-data-sm text-gs-red animate-pulse">⏳</span>
+        <span className="font-data text-data-sm text-gs-ink">Starting your scan...</span>
       </div>
     );
   }

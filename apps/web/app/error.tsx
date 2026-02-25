@@ -18,18 +18,18 @@ export default function GlobalError({
   reset: () => void;
 }) {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gs-black relative">
+    <div className="min-h-screen flex items-center justify-center bg-gs-ink relative">
       <div className="noise-grain" aria-hidden="true" />
       <div className="text-center max-w-md px-gs-4">
         <div className="text-[64px] mb-gs-4">👻</div>
-        <h1 className="font-system text-[32px] font-bold text-gs-near-white mb-gs-4">
+        <h1 className="font-system text-[32px] font-bold text-gs-paper mb-gs-4">
           System Crash
         </h1>
-        <p className="font-data text-data-lg text-gs-mid-light mb-gs-2">
+        <p className="font-data text-data-lg text-gs-muted mb-gs-2">
           An unexpected error occurred.
         </p>
         {error.digest && (
-          <p className="font-data text-data-xs text-gs-mid-light mb-gs-6">
+          <p className="font-data text-data-xs text-gs-muted mb-gs-6">
             Error ID: {error.digest}
           </p>
         )}

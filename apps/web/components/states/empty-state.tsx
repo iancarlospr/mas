@@ -16,10 +16,10 @@ export function EmptyState() {
     <div className="max-w-lg mx-auto text-center py-gs-12">
       <ChloeSprite state="idle" size={64} glowing className="mx-auto mb-gs-6" />
 
-      <h2 className="font-system text-os-lg font-bold text-gs-black mb-gs-2">
+      <h2 className="font-system text-os-lg font-bold text-gs-ink mb-gs-2">
         Nothing here yet
       </h2>
-      <p className="font-data text-data-sm text-gs-mid mb-gs-8">
+      <p className="font-data text-data-sm text-gs-muted mb-gs-8">
         Drop a URL to wake me up. I&apos;ll extract the ground truth.
       </p>
 

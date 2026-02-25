@@ -38,7 +38,7 @@ export function MobileBottomBar({ scanId, isPaid, activeTab = 'dashboard' }: Mob
 
   if (!isPaid) {
     return (
-      <div className="h-[48px] flex items-center px-gs-3 bg-gs-light bevel-raised flex-shrink-0">
+      <div className="h-[48px] flex items-center px-gs-3 bg-gs-chrome bevel-raised flex-shrink-0">
         <button
           onClick={handleDeclassify}
           disabled={loading}
@@ -54,11 +54,11 @@ export function MobileBottomBar({ scanId, isPaid, activeTab = 'dashboard' }: Mob
   }
 
   return (
-    <div className="h-[48px] flex items-center gap-gs-1 px-gs-2 bg-gs-light bevel-raised flex-shrink-0">
+    <div className="h-[48px] flex items-center gap-gs-1 px-gs-2 bg-gs-chrome bevel-raised flex-shrink-0">
       <button
         className={cn(
           'flex-1 text-os-xs py-gs-1',
-          activeTab === 'dashboard' ? 'bevel-sunken bg-gs-mid-dark text-gs-near-white' : 'bevel-button',
+          activeTab === 'dashboard' ? 'bevel-sunken bg-gs-ink text-gs-paper' : 'bevel-button',
         )}
       >
         📊 Dashboard
@@ -67,7 +67,7 @@ export function MobileBottomBar({ scanId, isPaid, activeTab = 'dashboard' }: Mob
         href={`/chat/${scanId}`}
         className={cn(
           'flex-1 text-os-xs py-gs-1 text-center',
-          activeTab === 'chat' ? 'bevel-sunken bg-gs-mid-dark text-gs-near-white' : 'bevel-button',
+          activeTab === 'chat' ? 'bevel-sunken bg-gs-ink text-gs-paper' : 'bevel-button',
         )}
       >
         💬 Chat
@@ -76,7 +76,7 @@ export function MobileBottomBar({ scanId, isPaid, activeTab = 'dashboard' }: Mob
         href={`/report/${scanId}`}
         className={cn(
           'flex-1 text-os-xs py-gs-1 text-center',
-          activeTab === 'report' ? 'bevel-sunken bg-gs-mid-dark text-gs-near-white' : 'bevel-button',
+          activeTab === 'report' ? 'bevel-sunken bg-gs-ink text-gs-paper' : 'bevel-button',
         )}
       >
         📋 Report

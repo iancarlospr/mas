@@ -29,7 +29,7 @@ interface ComparisonMatrixProps {
 const SEVERITY_BADGE: Record<string, string> = {
   critical: 'bg-gs-critical/10 text-gs-critical',
   warning: 'bg-gs-warning/10 text-gs-warning',
-  info: 'bg-gs-cyan/10 text-gs-cyan',
+  info: 'bg-gs-red/10 text-gs-red',
 };
 
 export function ComparisonMatrix({
@@ -77,7 +77,7 @@ export function ComparisonMatrix({
             'text-xs px-3 py-1 rounded-full border transition-colors',
             showOnlyMismatches
               ? 'bg-gs-critical/10 border-gs-critical/30 text-gs-critical'
-              : 'border-gs-light text-muted hover:border-gs-mid-light',
+              : 'border-gs-chrome text-muted hover:border-gs-chrome',
           )}
         >
           {showOnlyMismatches ? 'Showing mismatches' : 'Show mismatches only'}
@@ -88,17 +88,17 @@ export function ComparisonMatrix({
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="bg-gs-near-white sticky top-0 z-10">
-              <th className="text-left font-system text-xs font-semibold text-gs-mid uppercase tracking-wide px-3 py-2">
+            <tr className="bg-gs-paper sticky top-0 z-10">
+              <th className="text-left font-system text-xs font-semibold text-gs-muted uppercase tracking-wide px-3 py-2">
                 Attribute
               </th>
-              <th className="text-left font-system text-xs font-semibold text-gs-mid uppercase tracking-wide px-3 py-2">
+              <th className="text-left font-system text-xs font-semibold text-gs-muted uppercase tracking-wide px-3 py-2">
                 {labelA}
               </th>
-              <th className="text-left font-system text-xs font-semibold text-gs-mid uppercase tracking-wide px-3 py-2">
+              <th className="text-left font-system text-xs font-semibold text-gs-muted uppercase tracking-wide px-3 py-2">
                 {labelB}
               </th>
-              <th className="text-center font-system text-xs font-semibold text-gs-mid uppercase tracking-wide px-3 py-2 w-24">
+              <th className="text-center font-system text-xs font-semibold text-gs-muted uppercase tracking-wide px-3 py-2 w-24">
                 Match
               </th>
             </tr>
@@ -117,7 +117,7 @@ export function ComparisonMatrix({
                     <tr>
                       <td
                         colSpan={4}
-                        className="bg-gs-light px-3 py-1.5 font-system text-xs font-bold text-primary"
+                        className="bg-gs-chrome px-3 py-1.5 font-system text-xs font-bold text-primary"
                       >
                         {category}
                       </td>
@@ -131,10 +131,10 @@ export function ComparisonMatrix({
                       exit={{ opacity: 0, x: -8 }}
                       transition={{ delay: i * 0.03 }}
                       className={cn(
-                        'border-b border-gs-light',
+                        'border-b border-gs-chrome',
                         !item.match && 'bg-gs-critical/[0.03]',
                         i % 2 === 0 && item.match && 'bg-white',
-                        i % 2 !== 0 && item.match && 'bg-gs-near-white',
+                        i % 2 !== 0 && item.match && 'bg-gs-paper',
                       )}
                     >
                       <td className="px-3 py-2 text-secondary">{item.attribute}</td>

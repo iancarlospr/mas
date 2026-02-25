@@ -89,7 +89,7 @@ export function Desktop({
 
   return (
     <div
-      className="fixed inset-0 flex flex-col bg-gs-near-white overflow-hidden select-none"
+      className="fixed inset-0 flex flex-col bg-gs-paper overflow-hidden select-none"
       role="application"
       aria-label="GhostScan OS Desktop"
       onClick={handleDesktopClick}
@@ -101,14 +101,7 @@ export function Desktop({
       <div className="crt-scanlines" aria-hidden="true" />
 
       {/* ── Menu Bar (Top) ───────────────────────────────── */}
-      <MenuBar
-        audioEnabled={audioEnabled}
-        onToggleAudio={onToggleAudio}
-        onNewScan={onNewScan}
-        onViewHistory={onViewHistory}
-        onSettings={onSettings}
-        currentTime={currentTime}
-      />
+      <MenuBar />
 
       {/* ── Desktop Area ─────────────────────────────────── */}
       <div className="flex-1 relative overflow-hidden">
@@ -144,12 +137,7 @@ export function Desktop({
       </div>
 
       {/* ── Taskbar (Bottom) ─────────────────────────────── */}
-      <Taskbar
-        programs={programs}
-        currentTime={currentTime}
-        audioEnabled={audioEnabled}
-        onToggleAudio={onToggleAudio}
-      />
+      <Taskbar />
 
       {/* ── Context Menu ─────────────────────────────────── */}
       {contextMenu && (

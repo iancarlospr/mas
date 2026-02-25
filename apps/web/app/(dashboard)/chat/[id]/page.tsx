@@ -40,7 +40,7 @@ export default async function ChatPage({
     return (
       <div className="text-center py-gs-8">
         <ChloeSprite state="mischief" size={64} className="mx-auto mb-gs-4" />
-        <h1 className="font-system text-os-lg font-bold text-gs-black">
+        <h1 className="font-system text-os-lg font-bold text-gs-ink">
           Scan not found
         </h1>
       </div>
@@ -51,10 +51,10 @@ export default async function ChatPage({
     return (
       <div className="text-center py-gs-8">
         <ChloeSprite state="smug" size={64} className="mx-auto mb-gs-4" />
-        <h1 className="font-system text-os-lg font-bold text-gs-black mb-gs-2">
+        <h1 className="font-system text-os-lg font-bold text-gs-ink mb-gs-2">
           Alpha Brief Required
         </h1>
-        <p className="font-data text-data-sm text-gs-mid mb-gs-4">
+        <p className="font-data text-data-sm text-gs-muted mb-gs-4">
           Upgrade to Alpha Brief to unlock AI Chat for {scan.domain}.
         </p>
         <Link href={`/scan/${scanId}`} className="bevel-button-primary text-os-sm">

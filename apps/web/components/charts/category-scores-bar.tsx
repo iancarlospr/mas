@@ -5,7 +5,7 @@ import {
   ResponsiveContainer, Cell,
 } from 'recharts';
 import { AlphaTooltip } from './alpha-tooltip';
-import { OKLCH, AXIS_STYLE, GRID_STYLE, CHART_MARGINS, TRAFFIC_LIGHT_COLORS } from '@/lib/chart-config';
+import { RESOLVED_COLORS, AXIS_STYLE, GRID_STYLE, CHART_MARGINS, TRAFFIC_LIGHT_COLORS } from '@/lib/chart-config';
 import type { CategoryScore, ScoreCategory } from '@marketing-alpha/types';
 
 const CATEGORY_LABELS: Record<ScoreCategory, string> = {
@@ -65,7 +65,7 @@ export function CategoryScoresBar({ categories, height = 240, compact = false }:
               fontWeight: 600,
               fontFamily: 'var(--font-system)',
               fontSize: 13,
-              fill: OKLCH.black,
+              fill: RESOLVED_COLORS.ink,
             }}
             axisLine={false}
             tickLine={false}

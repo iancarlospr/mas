@@ -120,17 +120,17 @@ export function AuthForm({ mode }: AuthFormProps) {
   /* ── Magic link sent state ───────────────────────────────── */
   if (magicLinkSent) {
     return (
-      <div className="fixed inset-0 bg-gs-black flex items-center justify-center">
+      <div className="fixed inset-0 bg-gs-ink flex items-center justify-center">
         <div className="noise-grain" aria-hidden="true" />
         <div className="crt-scanlines" aria-hidden="true" />
         <div className="relative">
           <ChloeSprite state="smug" size={64} glowing className="mx-auto mb-gs-4" />
           <Window id="magic-link" title="📧 Check Your Email" variant="dialog" isActive width={380}>
             <div className="p-gs-6 text-center">
-              <p className="font-data text-data-lg text-gs-black mb-gs-2">
+              <p className="font-data text-data-lg text-gs-ink mb-gs-2">
                 Magic link sent to <strong>{email}</strong>
               </p>
-              <p className="font-data text-data-sm text-gs-mid mb-gs-4">
+              <p className="font-data text-data-sm text-gs-muted mb-gs-4">
                 Click the link in your email to access GhostScan OS.
               </p>
               <button
@@ -148,7 +148,7 @@ export function AuthForm({ mode }: AuthFormProps) {
 
   /* ── Main auth form ──────────────────────────────────────── */
   return (
-    <div className="fixed inset-0 bg-gs-black flex items-center justify-center">
+    <div className="fixed inset-0 bg-gs-ink flex items-center justify-center">
       {/* CRT atmosphere */}
       <div className="noise-grain" aria-hidden="true" />
       <div className="crt-scanlines" aria-hidden="true" />
@@ -203,16 +203,16 @@ export function AuthForm({ mode }: AuthFormProps) {
 
             {/* Divider */}
             <div className="flex items-center gap-gs-3">
-              <div className="flex-1 h-px bg-gs-mid" />
-              <span className="font-system text-os-xs text-gs-mid">or</span>
-              <div className="flex-1 h-px bg-gs-mid" />
+              <div className="flex-1 h-px bg-gs-muted" />
+              <span className="font-system text-os-xs text-gs-muted">or</span>
+              <div className="flex-1 h-px bg-gs-muted" />
             </div>
 
             {/* Email/password form */}
             <form onSubmit={handleEmailAuth} className="space-y-gs-3">
               {mode === 'register' && (
                 <div>
-                  <label className="block font-system text-os-xs text-gs-mid-dark mb-gs-1">
+                  <label className="block font-system text-os-xs text-gs-muted mb-gs-1">
                     Name:
                   </label>
                   <BevelInput
@@ -225,7 +225,7 @@ export function AuthForm({ mode }: AuthFormProps) {
                 </div>
               )}
               <div>
-                <label className="block font-system text-os-xs text-gs-mid-dark mb-gs-1">
+                <label className="block font-system text-os-xs text-gs-muted mb-gs-1">
                   Email:
                 </label>
                 <BevelInput
@@ -238,7 +238,7 @@ export function AuthForm({ mode }: AuthFormProps) {
                 />
               </div>
               <div>
-                <label className="block font-system text-os-xs text-gs-mid-dark mb-gs-1">
+                <label className="block font-system text-os-xs text-gs-muted mb-gs-1">
                   Password:
                 </label>
                 <BevelInput
@@ -274,20 +274,20 @@ export function AuthForm({ mode }: AuthFormProps) {
                 type="button"
                 onClick={handleMagicLink}
                 disabled={loading}
-                className="w-full font-data text-data-xs text-gs-cyan hover:text-gs-fuchsia text-center"
+                className="w-full font-data text-data-xs text-gs-red hover:text-gs-red text-center"
               >
                 Send me a magic link instead
               </button>
             </form>
 
             {/* Switch mode link */}
-            <p className="text-center font-data text-data-xs text-gs-mid">
+            <p className="text-center font-data text-data-xs text-gs-muted">
               {mode === 'login' ? (
                 <>
                   New operative?{' '}
                   <Link
                     href={`/register${scanUrl ? `?scan_url=${encodeURIComponent(scanUrl)}` : redirect ? `?redirect=${encodeURIComponent(redirect)}` : ''}`}
-                    className="text-gs-fuchsia hover:underline font-bold"
+                    className="text-gs-red hover:underline font-bold"
                   >
                     Create account
                   </Link>
@@ -297,7 +297,7 @@ export function AuthForm({ mode }: AuthFormProps) {
                   Already registered?{' '}
                   <Link
                     href={`/login${scanUrl ? `?scan_url=${encodeURIComponent(scanUrl)}` : redirect ? `?redirect=${encodeURIComponent(redirect)}` : ''}`}
-                    className="text-gs-fuchsia hover:underline font-bold"
+                    className="text-gs-red hover:underline font-bold"
                   >
                     Sign in
                   </Link>

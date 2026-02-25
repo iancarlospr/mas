@@ -99,18 +99,18 @@ export function ChatInterface({ scanId, initialMessages, initialCredits }: ChatI
   return (
     <div className="flex flex-col h-full">
       {/* Chloe header */}
-      <div className="flex items-center gap-gs-3 p-gs-4 border-b-2 border-gs-mid-light">
+      <div className="flex items-center gap-gs-3 p-gs-4 border-b-2 border-gs-chrome">
         <ChloeSprite state={loading ? 'scanning' : 'chat'} size={32} />
         <div className="flex-1">
-          <h2 className="font-system text-os-sm font-bold text-gs-black">
+          <h2 className="font-system text-os-sm font-bold text-gs-ink">
             Ask Chloe
           </h2>
-          <span className="font-data text-data-xs text-gs-mid">
+          <span className="font-data text-data-xs text-gs-muted">
             {loading ? 'Analyzing...' : 'Ready'}
           </span>
         </div>
-        <div className="bevel-sunken bg-gs-near-white px-gs-3 py-gs-1">
-          <span className="font-data text-data-xs text-gs-mid-dark">
+        <div className="bevel-sunken bg-gs-paper px-gs-3 py-gs-1">
+          <span className="font-data text-data-xs text-gs-muted">
             {credits} credits
           </span>
         </div>
@@ -121,7 +121,7 @@ export function ChatInterface({ scanId, initialMessages, initialCredits }: ChatI
         {messages.length === 0 && (
           <div className="text-center py-gs-8">
             <ChloeSprite state="chat" size={64} glowing className="mx-auto mb-gs-4" />
-            <p className="font-data text-data-sm text-gs-mid">
+            <p className="font-data text-data-sm text-gs-muted">
               Ask me anything about your scan results.
               <br />
               I cite specific modules as evidence.
@@ -146,8 +146,8 @@ export function ChatInterface({ scanId, initialMessages, initialCredits }: ChatI
               className={cn(
                 'max-w-[80%] px-gs-4 py-gs-3',
                 msg.role === 'user'
-                  ? 'bevel-raised bg-gs-light font-data text-data-sm text-gs-black'
-                  : 'bevel-sunken bg-gs-near-white font-data text-data-sm text-gs-mid-dark border-l-2 border-gs-cyan',
+                  ? 'bevel-raised bg-gs-chrome font-data text-data-sm text-gs-ink'
+                  : 'bevel-sunken bg-gs-paper font-data text-data-sm text-gs-muted border-l-2 border-gs-red',
               )}
             >
               <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
@@ -160,11 +160,11 @@ export function ChatInterface({ scanId, initialMessages, initialCredits }: ChatI
             <div className="flex-shrink-0 mt-gs-1">
               <ChloeSprite state="scanning" size={32} />
             </div>
-            <div className="bevel-sunken bg-gs-near-white px-gs-4 py-gs-3 border-l-2 border-gs-cyan">
+            <div className="bevel-sunken bg-gs-paper px-gs-4 py-gs-3 border-l-2 border-gs-red">
               <div className="flex gap-gs-1">
-                <span className="w-[6px] h-[6px] bg-gs-cyan animate-bounce" style={{ animationDelay: '0ms' }} />
-                <span className="w-[6px] h-[6px] bg-gs-cyan animate-bounce" style={{ animationDelay: '150ms' }} />
-                <span className="w-[6px] h-[6px] bg-gs-cyan animate-bounce" style={{ animationDelay: '300ms' }} />
+                <span className="w-[6px] h-[6px] bg-gs-red animate-bounce" style={{ animationDelay: '0ms' }} />
+                <span className="w-[6px] h-[6px] bg-gs-red animate-bounce" style={{ animationDelay: '150ms' }} />
+                <span className="w-[6px] h-[6px] bg-gs-red animate-bounce" style={{ animationDelay: '300ms' }} />
               </div>
             </div>
           </div>
@@ -173,12 +173,12 @@ export function ChatInterface({ scanId, initialMessages, initialCredits }: ChatI
       </div>
 
       {/* Input area */}
-      <div className="p-gs-4 border-t-2 border-gs-mid-light">
+      <div className="p-gs-4 border-t-2 border-gs-chrome">
         {credits <= 0 ? (
-          <div className="bevel-sunken bg-gs-near-white p-gs-3 text-center">
-            <p className="font-data text-data-xs text-gs-mid">
+          <div className="bevel-sunken bg-gs-paper p-gs-3 text-center">
+            <p className="font-data text-data-xs text-gs-muted">
               No credits remaining.{' '}
-              <a href="#" className="text-gs-fuchsia hover:underline font-bold">
+              <a href="#" className="text-gs-red hover:underline font-bold">
                 Purchase more
               </a>
             </p>

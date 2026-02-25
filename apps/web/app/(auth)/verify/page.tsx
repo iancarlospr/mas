@@ -32,7 +32,7 @@ export default async function VerifyPage({
   })();
 
   return (
-    <div className="fixed inset-0 bg-gs-black flex items-center justify-center">
+    <div className="fixed inset-0 bg-gs-ink flex items-center justify-center">
       <div className="noise-grain" aria-hidden="true" />
       <div className="crt-scanlines" aria-hidden="true" />
 
@@ -51,18 +51,18 @@ export default async function VerifyPage({
         >
           <div className="p-gs-6 text-center space-y-gs-4">
             {/* Mail icon */}
-            <div className="bevel-sunken bg-gs-near-white w-[64px] h-[64px] mx-auto flex items-center justify-center">
+            <div className="bevel-sunken bg-gs-paper w-[64px] h-[64px] mx-auto flex items-center justify-center">
               <span className="text-[32px]">📧</span>
             </div>
 
             <div>
-              <h1 className="font-system text-os-lg font-bold text-gs-black mb-gs-2">
+              <h1 className="font-system text-os-lg font-bold text-gs-ink mb-gs-2">
                 Check your email
               </h1>
-              <p className="font-data text-data-sm text-gs-mid">
+              <p className="font-data text-data-sm text-gs-muted">
                 Verification link sent to{' '}
                 {email ? (
-                  <strong className="text-gs-black">{email}</strong>
+                  <strong className="text-gs-ink">{email}</strong>
                 ) : (
                   'your email address'
                 )}
@@ -71,15 +71,15 @@ export default async function VerifyPage({
             </div>
 
             {scanDomain ? (
-              <div className="bevel-sunken bg-gs-near-white px-gs-3 py-gs-2">
-                <p className="font-data text-data-xs text-gs-mid-dark">
+              <div className="bevel-sunken bg-gs-paper px-gs-3 py-gs-2">
+                <p className="font-data text-data-xs text-gs-muted">
                   Your scan of{' '}
-                  <strong className="text-gs-fuchsia">{scanDomain}</strong>{' '}
+                  <strong className="text-gs-red">{scanDomain}</strong>{' '}
                   will start automatically after you verify.
                 </p>
               </div>
             ) : (
-              <p className="font-data text-data-xs text-gs-mid">
+              <p className="font-data text-data-xs text-gs-muted">
                 Click the link to verify your account and start scanning.
               </p>
             )}
@@ -92,7 +92,7 @@ export default async function VerifyPage({
 
             <Link
               href="/login"
-              className="inline-block font-data text-data-xs text-gs-fuchsia hover:underline font-bold"
+              className="inline-block font-data text-data-xs text-gs-red hover:underline font-bold"
             >
               Back to login
             </Link>

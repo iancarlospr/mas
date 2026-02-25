@@ -54,13 +54,13 @@ export function NavBar() {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-gs-light bevel-raised border-b-0">
+    <header className="sticky top-0 z-50 bg-gs-chrome bevel-raised border-b-0">
       <div className="mx-auto max-w-7xl px-gs-4">
         <div className="flex h-[44px] items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-gs-2">
             <span className="text-os-lg">👻</span>
-            <span className="font-system text-os-base font-bold text-ghost-gradient">
+            <span className="font-system text-os-base font-bold text-gs-red">
               AlphaScan
             </span>
           </Link>
@@ -118,7 +118,7 @@ export function NavBar() {
 
         {/* Mobile nav dropdown */}
         {mobileOpen && (
-          <div className="md:hidden border-t border-gs-mid py-gs-3 bg-gs-light">
+          <div className="md:hidden border-t border-gs-chrome-dark py-gs-3 bg-gs-chrome">
             <nav className="flex flex-col gap-gs-1">
               {navLinks.map((link) => (
                 <Link
@@ -130,7 +130,7 @@ export function NavBar() {
                   {link.label}
                 </Link>
               ))}
-              <div className="flex gap-gs-2 pt-gs-3 border-t border-gs-mid mt-gs-2">
+              <div className="flex gap-gs-2 pt-gs-3 border-t border-gs-chrome-dark mt-gs-2">
                 {user ? (
                   <>
                     <Link

@@ -43,21 +43,21 @@ export function MobilePortraitSummary({
   onModuleSelect,
 }: MobilePortraitSummaryProps) {
   return (
-    <div className="fixed inset-0 bg-gs-near-white flex flex-col overflow-hidden">
+    <div className="fixed inset-0 bg-gs-paper flex flex-col overflow-hidden">
       {/* Atmospheric overlays (subtle on mobile) */}
       <div className="noise-grain" aria-hidden="true" />
       <div className="crt-scanlines" aria-hidden="true" />
 
       {/* ── Top Bar ────────────────────────────────────── */}
-      <header className="h-[44px] flex items-center px-gs-3 bg-gs-light bevel-raised flex-shrink-0 z-10 relative">
+      <header className="h-[44px] flex items-center px-gs-3 bg-gs-chrome bevel-raised flex-shrink-0 z-10 relative">
         <div className="flex items-center gap-gs-1">
           <span className="text-os-base">👻</span>
-          <span className="font-system text-os-sm font-bold text-ghost-gradient">AlphaScan</span>
+          <span className="font-system text-os-sm font-bold text-gs-red">AlphaScan</span>
         </div>
-        <span className="flex-1 text-center font-data text-data-xs text-gs-mid truncate px-gs-2">
+        <span className="flex-1 text-center font-data text-data-xs text-gs-muted truncate px-gs-2">
           {scan.domain}
         </span>
-        <Link href="/history" className="font-data text-data-xs text-gs-cyan">
+        <Link href="/history" className="font-data text-data-xs text-gs-red">
           My Scans
         </Link>
       </header>
@@ -79,10 +79,10 @@ export function MobilePortraitSummary({
           <div className="px-gs-3 pb-gs-2 space-y-gs-1">
             {scan.marketingIqResult.categories.map((cat) => (
               <div key={cat.category} className="flex items-center gap-gs-2">
-                <span className="font-data text-data-xs text-gs-mid w-[100px] text-right truncate">
+                <span className="font-data text-data-xs text-gs-muted w-[100px] text-right truncate">
                   {CATEGORY_META.find((c) => c.key === cat.category)?.label ?? cat.category}
                 </span>
-                <div className="flex-1 bevel-sunken bg-gs-near-white h-[12px] overflow-hidden">
+                <div className="flex-1 bevel-sunken bg-gs-paper h-[12px] overflow-hidden">
                   <div
                     className="h-full transition-all duration-500"
                     style={{
@@ -96,7 +96,7 @@ export function MobilePortraitSummary({
                     }}
                   />
                 </div>
-                <span className="font-data text-data-xs font-bold text-gs-black w-[28px] text-right">
+                <span className="font-data text-data-xs font-bold text-gs-ink w-[28px] text-right">
                   {cat.score}
                 </span>
               </div>
@@ -118,12 +118,12 @@ export function MobilePortraitSummary({
 
           {/* Unlock banner for free tier */}
           {!activeCategory && !isPaid && (
-            <div className="bevel-raised bg-gs-dark p-gs-4 text-center">
+            <div className="bevel-raised bg-gs-ink p-gs-4 text-center">
               <ChloeSprite state="smug" size={32} className="mx-auto mb-gs-2" />
-              <p className="font-data text-data-xs text-gs-near-white mb-gs-1">
+              <p className="font-data text-data-xs text-gs-paper mb-gs-1">
                 4 premium analyses classified
               </p>
-              <p className="font-data text-data-xs text-gs-mid-light">
+              <p className="font-data text-data-xs text-gs-muted">
                 Executive Brief, Roadmap, ROI, Stack Analyzer
               </p>
             </div>
@@ -156,7 +156,7 @@ function CategoryChips({
         onClick={() => onCategoryChange(null)}
         className={cn(
           'whitespace-nowrap text-os-xs px-gs-3 py-gs-1 flex-shrink-0',
-          !activeCategory ? 'bevel-sunken bg-gs-mid-dark text-gs-near-white' : 'bevel-button',
+          !activeCategory ? 'bevel-sunken bg-gs-ink text-gs-paper' : 'bevel-button',
         )}
       >
         All
@@ -178,7 +178,7 @@ function CategoryChips({
             className={cn(
               'whitespace-nowrap text-os-xs px-gs-3 py-gs-1 flex-shrink-0 flex items-center gap-gs-1',
               activeCategory === cat.key
-                ? 'bevel-sunken bg-gs-mid-dark text-gs-near-white'
+                ? 'bevel-sunken bg-gs-ink text-gs-paper'
                 : 'bevel-button',
             )}
           >
@@ -226,7 +226,7 @@ function MobileModuleCard({
   }, []);
 
   return (
-    <div className="bevel-raised bg-gs-light">
+    <div className="bevel-raised bg-gs-chrome">
       {/* Header — always visible */}
       <button
         className="w-full flex items-center gap-gs-2 px-gs-3 py-gs-2 text-left"
@@ -239,14 +239,14 @@ function MobileModuleCard({
             light === 'green' && 'bg-gs-terminal',
             light === 'yellow' && 'bg-gs-warning',
             light === 'red' && 'bg-gs-critical',
-            !light && 'bg-gs-mid',
+            !light && 'bg-gs-muted',
           )}
         />
 
         {/* Module info */}
         <div className="flex-1 min-w-0">
-          <span className="font-data text-data-xs text-gs-mid">{moduleId}</span>
-          <span className="font-data text-data-sm font-bold text-gs-black truncate block">
+          <span className="font-data text-data-xs text-gs-muted">{moduleId}</span>
+          <span className="font-data text-data-sm font-bold text-gs-ink truncate block">
             {isLocked ? `🔒 ${name}` : name}
           </span>
         </div>
@@ -258,7 +258,7 @@ function MobileModuleCard({
             light === 'green' && 'text-gs-terminal',
             light === 'yellow' && 'text-gs-warning',
             light === 'red' && 'text-gs-critical',
-            !light && 'text-gs-mid',
+            !light && 'text-gs-muted',
           )}
         >
           {score ?? '--'}
@@ -267,7 +267,7 @@ function MobileModuleCard({
         {/* Chevron */}
         <span
           className={cn(
-            'text-os-xs text-gs-mid transition-transform flex-shrink-0',
+            'text-os-xs text-gs-muted transition-transform flex-shrink-0',
             expanded && 'rotate-180',
           )}
         >
@@ -277,16 +277,16 @@ function MobileModuleCard({
 
       {/* Expanded content */}
       {expanded && (
-        <div className="px-gs-3 pb-gs-3 border-t border-gs-mid-light/50">
+        <div className="px-gs-3 pb-gs-3 border-t border-gs-chrome/50">
           {isLocked ? (
-            <p className="font-data text-data-xs text-gs-mid py-gs-2">
+            <p className="font-data text-data-xs text-gs-muted py-gs-2">
               This analysis is classified. Declassify to view findings.
             </p>
           ) : result?.checkpoints && result.checkpoints.length > 0 ? (
             <div className="space-y-gs-1 pt-gs-2">
               {result.checkpoints.slice(0, 3).map((cp) => (
                 <div key={cp.id} className="flex justify-between items-center">
-                  <span className="font-data text-data-xs text-gs-mid-dark truncate flex-1 mr-gs-2">
+                  <span className="font-data text-data-xs text-gs-muted truncate flex-1 mr-gs-2">
                     {cp.name}
                   </span>
                   <span
@@ -296,7 +296,7 @@ function MobileModuleCard({
                       cp.health === 'good' && 'text-gs-terminal',
                       cp.health === 'warning' && 'text-gs-warning',
                       cp.health === 'critical' && 'text-gs-critical',
-                      cp.health === 'info' && 'text-gs-cyan',
+                      cp.health === 'info' && 'text-gs-red',
                     )}
                   >
                     {cp.health}
@@ -304,13 +304,13 @@ function MobileModuleCard({
                 </div>
               ))}
               {result.checkpoints.length > 3 && (
-                <p className="font-data text-data-xs text-gs-mid-light">
+                <p className="font-data text-data-xs text-gs-muted">
                   +{result.checkpoints.length - 3} more checkpoints
                 </p>
               )}
             </div>
           ) : (
-            <p className="font-data text-data-xs text-gs-mid py-gs-2">
+            <p className="font-data text-data-xs text-gs-muted py-gs-2">
               No checkpoint data available.
             </p>
           )}

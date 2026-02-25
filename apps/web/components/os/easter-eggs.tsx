@@ -97,13 +97,13 @@ export function EasterEggs() {
   return (
     <div className="fixed inset-0 z-[9999] pointer-events-none flex items-center justify-center">
       {/* Screen flash */}
-      <div className="absolute inset-0 bg-gs-cyan/20 animate-pulse" />
+      <div className="absolute inset-0 bg-gs-red/20 animate-pulse" />
 
       {/* Chloe celebrating */}
       <div className="relative animate-bounce">
         <ChloeSprite state="celebrating" size={256} glowing />
         <div className="absolute -bottom-[40px] left-1/2 -translate-x-1/2 whitespace-nowrap">
-          <span className="font-personality text-[24px] text-gs-fuchsia">
+          <span className="font-personality text-[24px] text-gs-red">
             You found the secret!
           </span>
         </div>

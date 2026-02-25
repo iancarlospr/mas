@@ -1,92 +1,98 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { ChloeSprite } from '@/components/chloe/chloe-sprite';
-import { BevelInput } from '@/components/os/bevel-input';
 
 /**
  * GhostScan OS — Mobile Gate
- * ═══════════════════════════════
  *
- * WHAT: Full-screen Chloe prompt telling mobile users to use desktop.
- * WHY:  The desktop OS metaphor is a large-screen experience. On mobile
- *       we don't compromise — we redirect the energy (Plan Section 10).
- * HOW:  Viewport check (< 768px), full-screen Chloe with speech bubble,
- *       "send yourself a link" email input, dismiss option for persistent
- *       users who scroll below the gate.
+ * Screen < 1024px: Show gate with option to "Scan anyway."
+ * The desktop OS metaphor requires a large screen.
+ * Mobile users can still scan — they just can't use the OS.
  */
 
 export function MobileGate({ children }: { children: React.ReactNode }) {
   const [isMobile, setIsMobile] = useState(false);
   const [dismissed, setDismissed] = useState(false);
-  const [email, setEmail] = useState('');
-  const [sent, setSent] = useState(false);
+  const [scanUrl, setScanUrl] = useState('');
+  const [scanning, setScanning] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 768);
+    const check = () => setIsMobile(window.innerWidth < 1024);
     check();
     window.addEventListener('resize', check);
     return () => window.removeEventListener('resize', check);
   }, []);
 
-  // Don't gate on desktop
+  const handleScan = useCallback(async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!scanUrl.trim() || scanning) return;
+
+    setScanning(true);
+    try {
+      const res = await fetch('/api/scans', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: scanUrl.trim() }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        router.push(`/scan/${data.id}`);
+      }
+    } catch {
+      setScanning(false);
+    }
+  }, [scanUrl, scanning, router]);
+
   if (!isMobile || dismissed) {
     return <>{children}</>;
   }
 
-  const handleSendLink = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email) return;
-    // In production, this would send an email via API
-    // For now, just show confirmation
-    setSent(true);
-  };
-
   return (
-    <div className="fixed inset-0 bg-gs-black z-[9999] flex flex-col items-center justify-center p-gs-6">
-      <div className="noise-grain" aria-hidden="true" />
-      <div className="crt-scanlines" aria-hidden="true" />
+    <div className="fixed inset-0 bg-gs-paper z-[9999] flex flex-col items-center justify-center p-gs-6">
+      <div className="noise-grain opacity-[0.02]" aria-hidden="true" />
 
-      <div className="relative text-center space-y-gs-6 max-w-sm">
-        <ChloeSprite state="smug" size={128} glowing className="mx-auto" />
+      <div className="text-center space-y-gs-6 max-w-sm">
+        <ChloeSprite state="idle" size={128} className="mx-auto" />
 
-        <div className="bevel-raised bg-gs-light p-gs-6">
-          <h1 className="font-system text-os-lg font-bold text-gs-black mb-gs-3">
-            Desktop Required
+        <div className="space-y-gs-3">
+          <h1 className="font-display text-display-sm text-gs-ink">
+            GhostScan OS
           </h1>
-          <p className="font-data text-data-sm text-gs-mid mb-gs-4">
-            This forensic lab requires a desktop. I don&apos;t do small screens.
+          <p className="font-data text-data-sm text-gs-muted">
+            This is a desktop experience. Open on your computer for the full OS.
           </p>
-
-          {/* Send link form */}
-          {!sent ? (
-            <form onSubmit={handleSendLink} className="space-y-gs-2">
-              <BevelInput
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="your@email.com"
-                fullWidth
-              />
-              <button type="submit" className="bevel-button-primary text-os-sm w-full">
-                Send me a link
-              </button>
-            </form>
-          ) : (
-            <div className="bevel-sunken bg-gs-near-white p-gs-3">
-              <p className="font-data text-data-sm text-gs-terminal">
-                Link sent to {email}
-              </p>
-            </div>
-          )}
         </div>
 
-        {/* Dismiss option */}
+        <div className="bevel-raised bg-gs-chrome p-gs-4 space-y-gs-3">
+          <p className="font-system text-os-sm text-gs-ink font-bold">
+            Scan anyway?
+          </p>
+          <form onSubmit={handleScan} className="space-y-gs-2">
+            <input
+              type="url"
+              value={scanUrl}
+              onChange={(e) => setScanUrl(e.target.value)}
+              placeholder="https://example.com"
+              className="w-full bevel-sunken bg-gs-paper px-gs-3 py-gs-2 font-data text-data-sm text-gs-ink outline-none"
+            />
+            <button
+              type="submit"
+              className="bevel-button-primary w-full"
+              disabled={scanning}
+            >
+              {scanning ? '⏳ Scanning...' : '▶ Execute Scan'}
+            </button>
+          </form>
+        </div>
+
         <button
           onClick={() => setDismissed(true)}
-          className="font-data text-data-xs text-gs-mid-light hover:text-gs-fuchsia"
+          className="font-data text-data-xs text-gs-muted hover:text-gs-red underline"
         >
-          I insist on using mobile anyway
+          Show desktop anyway
         </button>
       </div>
     </div>

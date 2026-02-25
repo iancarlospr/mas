@@ -16,7 +16,7 @@ import { cn } from '@/lib/utils';
  *       a configurable duration. Three visual variants: normal, alert, ghost.
  *
  * Typography: Uses --font-personality (Permanent Marker) per Plan Section 2.
- * Colors: Body uses --gs-white, border uses --gs-mid, variants use accent colors.
+ * Colors: Body uses --gs-paper, border uses --gs-mid, variants use accent colors.
  */
 
 export type SpeechVariant = 'normal' | 'alert' | 'ghost';
@@ -41,7 +41,7 @@ export interface ChloeSpeechProps {
 /** Variant-specific border colors */
 const VARIANT_STYLES: Record<SpeechVariant, { border: string; glow: string }> = {
   normal: {
-    border: 'var(--gs-mid)',
+    border: 'var(--gs-chrome-dark)',
     glow: 'none',
   },
   alert: {
@@ -49,7 +49,7 @@ const VARIANT_STYLES: Record<SpeechVariant, { border: string; glow: string }> = 
     glow: '0 0 8px oklch(0.55 0.15 25 / 0.3)',
   },
   ghost: {
-    border: 'var(--gs-cyan)',
+    border: 'var(--gs-red)',
     glow: '0 0 12px oklch(0.82 0.12 192 / 0.2)',
   },
 };
@@ -102,15 +102,15 @@ export function ChloeSpeech({
       <div
         className="relative px-gs-3 py-gs-2 font-personality text-chloe leading-snug"
         style={{
-          background: 'var(--gs-white)',
+          background: 'var(--gs-paper)',
           border: `2px solid ${style.border}`,
           boxShadow: `
-            inset 1px 1px 0 var(--gs-white),
-            inset -1px -1px 0 var(--gs-near-white),
-            2px 2px 0 var(--gs-mid),
+            inset 1px 1px 0 var(--gs-paper),
+            inset -1px -1px 0 var(--gs-paper),
+            2px 2px 0 var(--gs-chrome-dark),
             ${style.glow}
           `,
-          color: 'var(--gs-black)',
+          color: 'var(--gs-ink)',
           imageRendering: 'pixelated',
         }}
       >
@@ -151,12 +151,12 @@ export function ChloeSpeech({
             ? {
                 borderLeft: '4px solid transparent',
                 borderRight: '4px solid transparent',
-                borderTop: '6px solid var(--gs-white)',
+                borderTop: '6px solid var(--gs-paper)',
               }
             : {
                 borderLeft: '4px solid transparent',
                 borderRight: '4px solid transparent',
-                borderBottom: '6px solid var(--gs-white)',
+                borderBottom: '6px solid var(--gs-paper)',
               }),
         }}
       />

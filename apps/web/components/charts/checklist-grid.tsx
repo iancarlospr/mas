@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { OKLCH } from '@/lib/chart-config';
+import { RESOLVED_COLORS } from '@/lib/chart-config';
 
 interface ChecklistItem {
   id: string;
@@ -24,10 +24,10 @@ interface ChecklistGridProps {
 }
 
 const STATUS_CONFIG = {
-  pass: { border: OKLCH.terminal, icon: '✓', color: OKLCH.terminal },
-  fail: { border: OKLCH.critical, icon: '✕', color: OKLCH.critical },
-  partial: { border: OKLCH.warning, icon: '!', color: OKLCH.warning },
-  na: { border: OKLCH.light, icon: '—', color: OKLCH.midLight },
+  pass: { border: RESOLVED_COLORS.terminal, icon: '✓', color: RESOLVED_COLORS.terminal },
+  fail: { border: RESOLVED_COLORS.critical, icon: '✕', color: RESOLVED_COLORS.critical },
+  partial: { border: RESOLVED_COLORS.warning, icon: '!', color: RESOLVED_COLORS.warning },
+  na: { border: RESOLVED_COLORS.chromeLight, icon: '—', color: RESOLVED_COLORS.chrome },
 };
 
 export function ChecklistGrid({
@@ -51,17 +51,17 @@ export function ChecklistGrid({
       {showSummary && (
         <div className="mb-4">
           <div className="flex items-center justify-between text-sm mb-1">
-            <span className="font-system font-semibold" style={{ color: OKLCH.black }}>{title}</span>
-            <span style={{ fontFamily: 'var(--font-data)', fontSize: 13, color: OKLCH.mid }}>
+            <span className="font-system font-semibold" style={{ color: RESOLVED_COLORS.ink }}>{title}</span>
+            <span style={{ fontFamily: 'var(--font-data)', fontSize: 13, color: RESOLVED_COLORS.muted }}>
               {passCount}/{totalCheckable} configured
             </span>
           </div>
-          <div className="w-full h-2 bg-gs-light rounded-full overflow-hidden">
+          <div className="w-full h-2 bg-gs-chrome rounded-full overflow-hidden">
             <div
               className="h-full rounded-full transition-all duration-700"
               style={{
                 width: `${passRate}%`,
-                backgroundColor: passRate >= 70 ? OKLCH.terminal : passRate >= 40 ? OKLCH.warning : OKLCH.critical,
+                backgroundColor: passRate >= 70 ? RESOLVED_COLORS.terminal : passRate >= 40 ? RESOLVED_COLORS.warning : RESOLVED_COLORS.critical,
               }}
             />
           </div>
@@ -93,7 +93,7 @@ export function ChecklistGrid({
               style={{
                 padding: compact ? '6px 8px' : '8px 12px',
                 borderLeft: `3px solid ${config.border}`,
-                border: `1px solid ${OKLCH.light}`,
+                border: `1px solid ${RESOLVED_COLORS.chromeLight}`,
                 borderLeftWidth: 3,
                 borderLeftColor: config.border,
               }}
@@ -108,7 +108,7 @@ export function ChecklistGrid({
                 </span>
                 <span
                   className={cn('text-sm', compact ? 'text-xs' : 'text-sm')}
-                  style={{ fontFamily: 'var(--font-data)', color: OKLCH.black }}
+                  style={{ fontFamily: 'var(--font-data)', color: RESOLVED_COLORS.ink }}
                 >
                   {item.name}
                 </span>
@@ -117,8 +117,8 @@ export function ChecklistGrid({
                     className="ml-auto text-xs font-bold px-1.5 py-0.5 rounded"
                     style={{
                       fontFamily: 'var(--font-data)',
-                      backgroundColor: OKLCH.light,
-                      color: OKLCH.black,
+                      backgroundColor: RESOLVED_COLORS.chromeLight,
+                      color: RESOLVED_COLORS.ink,
                     }}
                   >
                     {item.grade}
@@ -130,7 +130,7 @@ export function ChecklistGrid({
                   className="mt-1 text-xs truncate"
                   style={{
                     fontFamily: 'var(--font-data)',
-                    color: OKLCH.midLight,
+                    color: RESOLVED_COLORS.chrome,
                     marginLeft: 28,
                   }}
                 >
@@ -141,7 +141,7 @@ export function ChecklistGrid({
               {expandable && isExpanded && item.recommendation && (
                 <div
                   className="mt-2 text-xs leading-relaxed"
-                  style={{ color: OKLCH.mid, marginLeft: 28 }}
+                  style={{ color: RESOLVED_COLORS.muted, marginLeft: 28 }}
                 >
                   {item.recommendation}
                 </div>

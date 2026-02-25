@@ -153,7 +153,7 @@ export function Window({
       <div
         className={cn(
           'window-content',
-          variant === 'terminal' && 'bg-gs-black text-gs-terminal font-data text-data-sm',
+          variant === 'terminal' && 'bg-gs-ink text-gs-terminal font-data text-data-sm',
           contentClassName,
         )}
       >
@@ -212,10 +212,10 @@ export function ModulePanel({
     >
       {/* Module header (mini title bar) */}
       <div className="module-panel-header">
-        <span className="font-data text-data-xs text-gs-mid-dark">{moduleId}</span>
+        <span className="font-data text-data-xs text-gs-muted">{moduleId}</span>
         <span className="flex-1 truncate">{moduleName}</span>
         {isGhostModule && (
-          <span className="text-os-xs text-gs-cyan">👻 GhostScan™</span>
+          <span className="text-os-xs text-gs-red">👻 GhostScan™</span>
         )}
         {score != null && (
           <span className={cn(
@@ -239,8 +239,8 @@ export function ModulePanel({
 
       {/* Action title (the insight) */}
       {actionTitle && (
-        <div className="px-3 py-2 border-b border-gs-mid/30 bg-gs-near-white">
-          <p className="font-data text-data-xl text-gs-black leading-snug">
+        <div className="px-3 py-2 border-b border-gs-chrome-dark/30 bg-gs-paper">
+          <p className="font-data text-data-xl text-gs-ink leading-snug">
             {actionTitle}
           </p>
         </div>
@@ -268,7 +268,7 @@ export function DialogWindow({
     <>
       {showBackdrop && (
         <div
-          className="fixed inset-0 bg-gs-black/30 z-[590]"
+          className="fixed inset-0 bg-gs-ink/30 z-[590]"
           onClick={props.onClose}
         />
       )}

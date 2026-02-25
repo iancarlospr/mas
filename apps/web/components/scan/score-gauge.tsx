@@ -127,7 +127,7 @@ export function ScoreGauge({
         <path
           d={bgArc}
           fill="none"
-          style={{ stroke: 'var(--gs-near-white)' }}
+          style={{ stroke: 'var(--gs-paper)' }}
           strokeWidth={s.strokeWidth}
           strokeLinecap="round"
         />
@@ -182,7 +182,7 @@ export function ScoreGauge({
             fontFamily: 'var(--font-system), monospace',
             fontSize: s.labelSize,
             fontWeight: 600,
-            fill: 'var(--gs-mid)',
+            fill: 'var(--gs-chrome-dark)',
           }}
         >
           {mqLabel}
@@ -208,7 +208,7 @@ export function ScoreGauge({
                   ? 'var(--gs-terminal)'
                   : trend.direction === 'down'
                     ? 'var(--gs-critical)'
-                    : 'var(--gs-mid)',
+                    : 'var(--gs-chrome-dark)',
             }}
           >
             {trend.direction === 'up' ? '↑' : trend.direction === 'down' ? '↓' : '→'}
@@ -217,7 +217,7 @@ export function ScoreGauge({
             style={{
               fontFamily: 'var(--font-data)',
               fontSize: s.labelSize - 2,
-              color: 'var(--gs-mid)',
+              color: 'var(--gs-chrome-dark)',
             }}
           >
             {trend.delta > 0 ? '+' : ''}

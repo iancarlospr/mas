@@ -2,31 +2,19 @@
  * GhostScan OS — Chart Configuration
  * ═══════════════════════════════════════
  *
- * WHAT: Shared constants for all Recharts and custom SVG chart components.
- * WHY:  Centralizes visual config so all 26 chart components render
- *       consistently within the GhostScan OS aesthetic (Plan Section 16).
- * HOW:  Colors migrated from old hex palette to OKLCH CSS variables.
- *       Fonts updated to JetBrains Mono (data) and Pixelify Sans (system).
- *       All tooltip/legend/axis styling matches the retro OS design.
- *
- * MIGRATION from old palette:
- *   #1A1A2E → var(--gs-black)        Primary data series
- *   #E94560 → var(--gs-fuchsia)      Accent / Chloé
- *   #06D6A0 → var(--gs-terminal)     Healthy / positive
- *   #FFD166 → var(--gs-warning)      Warning / caution
- *   #94A3B8 → var(--gs-mid-light)    Neutral / secondary
- *   #7C3AED → var(--gs-cyan)         Ghost accent
- *   #EF476F → var(--gs-critical)     Critical / error
+ * Palette: "Classified File on Gallery Paper"
+ * Charts use ink (primary), red (accent), plus functional traffic lights.
+ * No cyan/fuchsia — those are dead.
  */
 
-/* ── Dimensions & Aspect Ratios (unchanged) ────────────────── */
+/* ── Dimensions & Aspect Ratios ──────────────────────────────── */
 
 export const CHART_ASPECTS = {
-  wide: 3,        // 3:1 — sparklines, trend lines
-  landscape: 2,   // 2:1 — bar charts, area charts
-  standard: 1.6,  // 16:10 — general purpose
-  square: 1,      // 1:1 — scatter plots, quadrants
-  portrait: 0.75, // 3:4 — vertical bar charts on mobile
+  wide: 3,
+  landscape: 2,
+  standard: 1.6,
+  square: 1,
+  portrait: 0.75,
 } as const;
 
 export const CHART_HEIGHTS = {
@@ -40,18 +28,18 @@ export const CHART_HEIGHTS = {
   printA4Half: 340,
 } as const;
 
-/* ── Tooltip Styling (OKLCH migrated) ──────────────────────── */
+/* ── Tooltip Styling ─────────────────────────────────────────── */
 
 export const TOOLTIP_STYLE: React.CSSProperties = {
-  backgroundColor: 'var(--gs-black)',
-  border: '2px solid var(--gs-mid)',
-  borderRadius: '0px', /* Retro — no rounded corners */
+  backgroundColor: 'var(--gs-ink)',
+  border: '2px solid var(--gs-chrome-dark)',
+  borderRadius: '0px',
   padding: '8px 12px',
-  boxShadow: '2px 2px 0 var(--gs-mid-dark)',
+  boxShadow: '2px 2px 0 var(--gs-chrome-dark)',
 };
 
 export const TOOLTIP_LABEL_STYLE: React.CSSProperties = {
-  color: 'var(--gs-near-white)',
+  color: 'var(--gs-paper)',
   fontFamily: 'var(--font-data)',
   fontWeight: 700,
   fontSize: '13px',
@@ -59,13 +47,13 @@ export const TOOLTIP_LABEL_STYLE: React.CSSProperties = {
 };
 
 export const TOOLTIP_ITEM_STYLE: React.CSSProperties = {
-  color: 'var(--gs-mid-light)',
+  color: 'var(--gs-chrome)',
   fontFamily: 'var(--font-data)',
   fontSize: '12px',
   padding: '2px 0',
 };
 
-/* ── Legend Configuration (OKLCH migrated) ──────────────────── */
+/* ── Legend Configuration ─────────────────────────────────────── */
 
 export const LEGEND_CONFIG = {
   verticalAlign: 'bottom' as const,
@@ -75,7 +63,7 @@ export const LEGEND_CONFIG = {
   wrapperStyle: {
     fontFamily: 'var(--font-data)',
     fontSize: '12px',
-    color: 'var(--gs-mid-dark)',
+    color: 'var(--gs-muted)',
     paddingTop: '16px',
   },
 };
@@ -92,16 +80,16 @@ export const LEGEND_RIGHT_CONFIG = {
   },
 };
 
-/* ── Axis Styling (OKLCH migrated) ─────────────────────────── */
+/* ── Axis Styling ────────────────────────────────────────────── */
 
 export const AXIS_STYLE = {
   tick: {
     fontFamily: 'var(--font-data)',
     fontSize: 12,
-    fill: 'var(--gs-mid)',
+    fill: 'var(--gs-muted)',
   },
   axisLine: {
-    stroke: 'var(--gs-mid-light)',
+    stroke: 'var(--gs-chrome-dark)',
     strokeWidth: 1,
   },
   tickLine: false as const,
@@ -109,11 +97,11 @@ export const AXIS_STYLE = {
 
 export const GRID_STYLE = {
   strokeDasharray: '3 3',
-  stroke: 'var(--gs-mid-light)',
+  stroke: 'var(--gs-chrome-dark)',
   vertical: false,
 };
 
-/* ── Number Formatters (unchanged) ─────────────────────────── */
+/* ── Number Formatters ───────────────────────────────────────── */
 
 export const formatters = {
   thousands: (value: number) =>
@@ -132,7 +120,7 @@ export const formatters = {
   },
 };
 
-/* ── Animation Config (unchanged) ──────────────────────────── */
+/* ── Animation Config ────────────────────────────────────────── */
 
 export const ANIMATION_CONFIG = {
   isAnimationActive: true,
@@ -156,26 +144,24 @@ export const ANIMATION_CONFIG = {
 };
 
 /* ═══════════════════════════════════════════════════════════════
-   Color Palettes — OKLCH Migrated (Plan Section 16)
+   Color Palettes — Classified File on Gallery Paper
    ═══════════════════════════════════════════════════════════════ */
 
 /**
  * Primary chart palette — 10 colors.
- * Uses CSS variables for OKLCH support.
- * NOTE: Recharts requires actual color values in some contexts,
- * not CSS variables. These are the computed OKLCH fallbacks.
+ * Ink (primary), Red (accent), then functional + warm neutrals.
  */
 export const CHART_PALETTE = [
-  'var(--gs-black)',       // Primary data series (warm near-black)
-  'var(--gs-fuchsia)',     // Accent / Chloé (laser fuchsia)
-  'var(--gs-terminal)',    // Positive / healthy (CRT green)
-  'var(--gs-warning)',     // Caution / warning (amber)
-  'var(--gs-mid-light)',   // Neutral / baseline (warm gray)
-  'var(--gs-cyan)',        // Ghost accent (phosphorescent cyan)
-  'oklch(0.70 0.15 230)', // Tertiary (cool blue)
-  'oklch(0.72 0.18 50)',  // Quaternary (warm orange)
-  'oklch(0.65 0.20 330)', // Quinary (rose)
-  'oklch(0.75 0.15 170)', // Senary (seafoam)
+  'var(--gs-ink)',          // Primary data series (near-black)
+  'var(--gs-red)',          // Accent (the red)
+  'var(--gs-terminal)',     // Positive / healthy (green)
+  'var(--gs-warning)',      // Caution (amber)
+  'var(--gs-muted)',        // Neutral / baseline
+  'var(--gs-red-dark)',     // Dark red variant
+  '#5B8A72',               // Tertiary (muted sage)
+  '#C17F59',               // Quaternary (warm copper)
+  '#7B6B8A',               // Quinary (dusty plum)
+  '#5A8F8F',               // Senary (teal slate)
 ] as const;
 
 /** Traffic light — the universal health indicator */
@@ -185,44 +171,44 @@ export const TRAFFIC_LIGHT_COLORS = {
   red: 'var(--gs-critical)',
 } as const;
 
-/** Status indicators for tools/services */
+/** Status indicators */
 export const STATUS_COLORS = {
   active: 'var(--gs-terminal)',
-  inactive: 'var(--gs-mid-light)',
+  inactive: 'var(--gs-muted)',
   degraded: 'var(--gs-warning)',
   error: 'var(--gs-critical)',
-  blocked: 'var(--gs-black)',
+  blocked: 'var(--gs-ink)',
 } as const;
 
-/** Resource type colors (JS/CSS/images) */
+/** Resource type colors */
 export const RESOURCE_COLORS = {
   js: 'var(--gs-warning)',
   css: 'var(--gs-terminal)',
-  images: 'var(--gs-fuchsia)',
-  fonts: 'var(--gs-mid-light)',
-  xhr: 'var(--gs-black)',
-  other: 'var(--gs-cyan)',
+  images: 'var(--gs-red)',
+  fonts: 'var(--gs-muted)',
+  xhr: 'var(--gs-ink)',
+  other: '#5A8F8F',
 } as const;
 
 /** Category badge accent colors */
 export const CATEGORY_BADGE_COLORS: Record<string, string> = {
-  analytics: 'var(--gs-black)',
-  ads: 'var(--gs-fuchsia)',
+  analytics: 'var(--gs-ink)',
+  ads: 'var(--gs-red)',
   automation: 'var(--gs-terminal)',
   cms: 'var(--gs-warning)',
-  cdn: 'var(--gs-cyan)',
-  security: 'oklch(0.70 0.15 230)',
-  ecommerce: 'oklch(0.72 0.18 50)',
-  social: 'oklch(0.65 0.20 330)',
-  other: 'var(--gs-mid-light)',
+  cdn: '#5A8F8F',
+  security: '#5B8A72',
+  ecommerce: '#C17F59',
+  social: '#7B6B8A',
+  other: 'var(--gs-muted)',
 };
 
-/** Score tier colors — traffic light mapped to score ranges */
+/** Score tier colors */
 export const SCORE_TIER_COLORS = {
-  critical: 'var(--gs-critical)',   // 0-39
-  warning: 'var(--gs-warning)',     // 40-59
-  good: 'var(--gs-terminal)',       // 60-79
-  excellent: 'var(--gs-cyan)',      // 80-100 (Chloé glows for excellence)
+  critical: 'var(--gs-critical)',
+  warning: 'var(--gs-warning)',
+  good: 'var(--gs-terminal)',
+  excellent: 'var(--gs-red)',       // Red = excellence in this palette
 } as const;
 
 export function getScoreTierColor(score: number): string {
@@ -234,16 +220,16 @@ export function getScoreTierColor(score: number): string {
 
 /** Traffic source colors */
 export const TRAFFIC_SOURCE_COLORS: Record<string, string> = {
-  Direct: 'var(--gs-black)',
+  Direct: 'var(--gs-ink)',
   'Organic Search': 'var(--gs-terminal)',
-  'Paid Search': 'var(--gs-fuchsia)',
+  'Paid Search': 'var(--gs-red)',
   Social: 'var(--gs-warning)',
-  Referral: 'var(--gs-mid-light)',
-  Email: 'var(--gs-cyan)',
-  Display: 'oklch(0.70 0.15 230)',
+  Referral: 'var(--gs-muted)',
+  Email: '#5A8F8F',
+  Display: '#5B8A72',
 };
 
-/* ── Margins (unchanged) ───────────────────────────────────── */
+/* ── Margins ─────────────────────────────────────────────────── */
 
 export const CHART_MARGINS = {
   bento: { top: 8, right: 8, bottom: 8, left: 8 },
@@ -253,7 +239,7 @@ export const CHART_MARGINS = {
   print: { top: 24, right: 40, bottom: 24, left: 48 },
 } as const;
 
-/* ── PDF Dimensions (unchanged) ────────────────────────────── */
+/* ── PDF Dimensions ──────────────────────────────────────────── */
 
 export const PDF_DIMENSIONS = {
   pageWidth: 794,
@@ -273,77 +259,71 @@ export const PDF_DIMENSIONS = {
   metricCardHeight: 100,
 } as const;
 
-/** Print-safe monochrome palette (B&W-friendly) */
+/** Print-safe monochrome palette */
 export const PRINT_PALETTE = [
-  'var(--gs-black)',
-  'var(--gs-mid-dark)',
-  'var(--gs-mid)',
-  'var(--gs-mid-light)',
-  'var(--gs-light)',
+  'var(--gs-ink)',
+  'var(--gs-muted)',
+  'var(--gs-chrome-dark)',
+  'var(--gs-chrome)',
+  'var(--gs-chrome-light)',
 ] as const;
 
 /* ═══════════════════════════════════════════════════════════════
-   Resolved OKLCH Values for SVG Inline Styles
-   ═══════════════════════════════════════════════════════════════
-   Recharts/SVG elements use inline `fill` and `stroke` attributes.
-   CSS var() doesn't resolve inside SVG fill="..." attributes in all
-   contexts (esp. tooltips, custom labels, gradients). These are the
-   resolved OKLCH equivalents for direct use in inline styles.
-*/
+   Resolved Values for SVG Inline Styles
+   ═══════════════════════════════════════════════════════════════ */
 
-export const OKLCH = {
-  black:     'oklch(0.15 0.01 80)',
-  dark:      'oklch(0.25 0.01 80)',
-  midDark:   'oklch(0.35 0.01 80)',
-  mid:       'oklch(0.50 0.01 80)',
-  midLight:  'oklch(0.65 0.01 80)',
-  light:     'oklch(0.80 0.01 80)',
-  nearWhite: 'oklch(0.93 0.01 80)',
-  white:     'oklch(0.97 0.005 80)',
-  cyan:      'oklch(0.82 0.18 192)',
-  fuchsia:   'oklch(0.65 0.28 350)',
-  terminal:  'oklch(0.80 0.25 145)',
-  critical:  'oklch(0.55 0.22 25)',
-  warning:   'oklch(0.78 0.15 75)',
+export const RESOLVED_COLORS = {
+  ink:         '#1A1A1A',
+  red:         '#E63946',
+  redDark:     '#C1121F',
+  chrome:      '#E8E3DB',
+  chromeDark:  '#D1CBC1',
+  chromeLight: '#F5F0EA',
+  paper:       '#FFFBF5',
+  muted:       '#8B8680',
+  ghost:       '#E0F0FF',
+  terminal:    'oklch(0.80 0.25 145)',
+  critical:    'oklch(0.55 0.22 25)',
+  warning:     'oklch(0.78 0.15 75)',
 } as const;
 
-/** Cookie category colors — extracted from cookie-audit-bar.tsx */
+/** Cookie category colors */
 export const COOKIE_CATEGORY_COLORS: Record<string, string> = {
-  essential:   OKLCH.terminal,
-  functional:  OKLCH.cyan,
-  analytics:   OKLCH.warning,
-  advertising: OKLCH.critical,
-  unknown:     OKLCH.midLight,
+  essential:   RESOLVED_COLORS.terminal,
+  functional:  '#5A8F8F',
+  analytics:   RESOLVED_COLORS.warning,
+  advertising: RESOLVED_COLORS.critical,
+  unknown:     RESOLVED_COLORS.muted,
 };
 
-/** CWV rating colors — extracted from cwv-metrics.tsx */
+/** CWV rating colors */
 export const CWV_RATING_COLORS: Record<string, string> = {
-  good:                  OKLCH.terminal,
-  'needs-improvement':   OKLCH.warning,
-  poor:                  OKLCH.critical,
+  good:                  RESOLVED_COLORS.terminal,
+  'needs-improvement':   RESOLVED_COLORS.warning,
+  poor:                  RESOLVED_COLORS.critical,
 };
 
-/** Tool utilization heat levels — extracted from tool-utilization-heatmap.tsx */
+/** Tool utilization heat levels */
 export const UTILIZATION_COLORS: Record<string, string> = {
-  high:   OKLCH.terminal,
-  medium: OKLCH.warning,
-  low:    OKLCH.critical,
-  none:   OKLCH.light,
+  high:   RESOLVED_COLORS.terminal,
+  medium: RESOLVED_COLORS.warning,
+  low:    RESOLVED_COLORS.critical,
+  none:   RESOLVED_COLORS.chromeLight,
 };
 
-/** Flow diagram node colors — extracted from flow-diagram.tsx */
+/** Flow diagram node colors */
 export const FLOW_NODE_COLORS: Record<string, string> = {
-  source:   OKLCH.cyan,
-  healthy:  OKLCH.terminal,
-  warning:  OKLCH.warning,
-  critical: OKLCH.critical,
-  neutral:  OKLCH.midLight,
+  source:   RESOLVED_COLORS.red,
+  healthy:  RESOLVED_COLORS.terminal,
+  warning:  RESOLVED_COLORS.warning,
+  critical: RESOLVED_COLORS.critical,
+  neutral:  RESOLVED_COLORS.muted,
 };
 
-/** Scatter quadrant colors — extracted from remediation-scatter.tsx */
+/** Scatter quadrant colors */
 export const QUADRANT_COLORS: Record<string, string> = {
-  quickWins:   OKLCH.terminal,
-  strategic:   OKLCH.cyan,
-  lowPriority: OKLCH.midLight,
-  avoid:       OKLCH.critical,
+  quickWins:   RESOLVED_COLORS.terminal,
+  strategic:   RESOLVED_COLORS.red,
+  lowPriority: RESOLVED_COLORS.muted,
+  avoid:       RESOLVED_COLORS.critical,
 };

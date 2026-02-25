@@ -3,11 +3,11 @@ import type { Config } from 'tailwindcss';
 /**
  * GhostScan OS — Tailwind Configuration
  *
- * Color space: OKLCH (defined in globals.css as CSS variables)
- * Aesthetic: Win95 × PostHog × MSCHF
+ * Palette: "Classified File on Gallery Paper"
+ * Kruger × MSCHF × Valentino red on warm cream
  *
- * Colors are referenced via CSS variables for OKLCH support.
- * Tailwind doesn't natively support OKLCH, so we bridge with var() references.
+ * Colors are hex CSS variables (no OKLCH for Tailwind compat).
+ * Functional colors (terminal/critical/warning) remain OKLCH in globals.css.
  */
 
 const config: Config = {
@@ -18,41 +18,47 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      /* ── Colors (mapped to OKLCH CSS variables) ──────────── */
+      /* ── Colors ──────────────────────────────────────────── */
       colors: {
         gs: {
-          black:      'var(--gs-black)',
-          dark:       'var(--gs-dark)',
-          'mid-dark': 'var(--gs-mid-dark)',
-          mid:        'var(--gs-mid)',
-          'mid-light':'var(--gs-mid-light)',
-          light:      'var(--gs-light)',
-          'near-white':'var(--gs-near-white)',
-          white:      'var(--gs-white)',
-          cyan:       'var(--gs-cyan)',
-          fuchsia:    'var(--gs-fuchsia)',
-          terminal:   'var(--gs-terminal)',
-          critical:   'var(--gs-critical)',
-          warning:    'var(--gs-warning)',
+          paper:        'var(--gs-paper)',
+          ink:          'var(--gs-ink)',
+          red:          'var(--gs-red)',
+          'red-dark':   'var(--gs-red-dark)',
+          chrome:       'var(--gs-chrome)',
+          'chrome-dark':'var(--gs-chrome-dark)',
+          'chrome-light':'var(--gs-chrome-light)',
+          muted:        'var(--gs-muted)',
+          ghost:        'var(--gs-ghost)',
+          terminal:     'var(--gs-terminal)',
+          critical:     'var(--gs-critical)',
+          warning:      'var(--gs-warning)',
         },
-        /* Legacy aliases for gradual migration */
-        background: 'var(--gs-near-white)',
-        surface:    'var(--gs-white)',
-        border:     'var(--gs-mid)',
+        /* Semantic aliases */
+        background: 'var(--gs-paper)',
+        surface:    'var(--gs-paper)',
+        border:     'var(--gs-chrome-dark)',
       },
 
       /* ── Font Families ──────────────────────────────────── */
       fontFamily: {
+        display:     ['var(--font-display)', 'Instrument Serif', 'Georgia', 'serif'],
         system:      ['var(--font-system)', 'Pixelify Sans', 'monospace'],
         data:        ['var(--font-data)', 'JetBrains Mono', 'monospace'],
         personality: ['var(--font-personality)', 'Permanent Marker', 'cursive'],
-        /* Legacy aliases */
         mono:        ['var(--font-data)', 'JetBrains Mono', 'monospace'],
       },
 
-      /* ── Font Sizes (Retro OS Scale) ────────────────────── */
+      /* ── Font Sizes ─────────────────────────────────────── */
       fontSize: {
-        /* OS Chrome (pixel font) */
+        /* Display (Instrument Serif) */
+        'display-sm':  ['24px', { lineHeight: '1.1', fontWeight: '400' }],
+        'display-base':['32px', { lineHeight: '1.1', fontWeight: '400' }],
+        'display-lg':  ['48px', { lineHeight: '1.0', fontWeight: '400' }],
+        'display-xl':  ['64px', { lineHeight: '1.0', fontWeight: '400' }],
+        'display-hero':['80px', { lineHeight: '0.95', fontWeight: '400' }],
+
+        /* OS Chrome (Pixelify Sans) */
         'os-xs':      ['10px', { lineHeight: '1.0' }],
         'os-sm':      ['12px', { lineHeight: '1.2' }],
         'os-base':    ['14px', { lineHeight: '1.0' }],
@@ -68,13 +74,13 @@ const config: Config = {
         'data-2xl':   ['24px', { lineHeight: '1.0', letterSpacing: '-0.01em', fontWeight: '700' }],
         'data-hero':  ['48px', { lineHeight: '1.0', letterSpacing: '-0.02em', fontWeight: '800' }],
 
-        /* Personality (Chloé's font) */
+        /* Personality (Chloe) */
         'chloe':      ['16px', { lineHeight: '1.4' }],
         'chloe-lg':   ['20px', { lineHeight: '1.3' }],
         'chloe-xl':   ['28px', { lineHeight: '1.2' }],
       },
 
-      /* ── Spacing (Pixel-perfect multiples of 4) ─────────── */
+      /* ── Spacing ────────────────────────────────────────── */
       spacing: {
         'gs-1': '4px',
         'gs-2': '8px',
@@ -86,28 +92,26 @@ const config: Config = {
         'gs-10': '40px',
         'gs-12': '48px',
         'gs-16': '64px',
-        /* OS component heights */
         'titlebar': '24px',
         'menubar':  '28px',
         'taskbar':  '36px',
         'statusbar': '22px',
       },
 
-      /* ── Shadows (Retro + Ghost) ────────────────────────── */
+      /* ── Shadows ────────────────────────────────────────── */
       boxShadow: {
-        'bevel': 'inset 1px 1px 0 var(--gs-white), inset -1px -1px 0 var(--gs-mid)',
-        'bevel-sunken': 'inset 1px 1px 0 var(--gs-mid), inset -1px -1px 0 var(--gs-white)',
-        'window': 'inset 1px 1px 0 var(--gs-white), inset -1px -1px 0 var(--gs-mid), 3px 3px 12px oklch(0 0 0 / 0.08)',
-        'ghost-glow': '0 0 20px oklch(0.82 0.12 192 / 0.15), 3px 3px 12px oklch(0 0 0 / 0.08)',
-        'ghost-glow-strong': '0 0 30px oklch(0.82 0.18 192 / 0.25), 0 0 60px oklch(0.82 0.12 192 / 0.1)',
-        'fuchsia-glow': '0 0 20px oklch(0.65 0.18 350 / 0.2)',
+        'bevel': 'inset 1px 1px 0 var(--gs-chrome-light), inset -1px -1px 0 var(--gs-muted)',
+        'bevel-sunken': 'inset 1px 1px 0 var(--gs-muted), inset -1px -1px 0 var(--gs-chrome-light)',
+        'window': 'inset 1px 1px 0 var(--gs-chrome-light), inset -1px -1px 0 var(--gs-muted), 4px 4px 0 rgba(0,0,0,0.08)',
+        'window-float': '4px 4px 0 rgba(0,0,0,0.08), 8px 8px 24px rgba(0,0,0,0.06)',
+        'ghost-glow': '0 0 16px rgba(224, 240, 255, 0.2)',
       },
 
-      /* ── Border Radius (Retro = no radius, mostly) ──────── */
+      /* ── Border Radius ──────────────────────────────────── */
       borderRadius: {
         'none': '0px',
-        'gs':   '0px',      /* Default for OS chrome */
-        'pill': '9999px',   /* For traffic dots */
+        'gs':   '0px',
+        'pill': '9999px',
         DEFAULT: '0px',
       },
 
@@ -132,8 +136,8 @@ const config: Config = {
           '50%': { transform: 'translateY(-8px)' },
         },
         'ghost-pulse': {
-          '0%, 100%': { filter: 'drop-shadow(0 0 8px var(--gs-cyan))' },
-          '50%': { filter: 'drop-shadow(0 0 20px var(--gs-cyan)) drop-shadow(0 0 40px oklch(0.82 0.12 192 / 0.3))' },
+          '0%, 100%': { filter: 'drop-shadow(0 0 8px var(--gs-ghost))' },
+          '50%': { filter: 'drop-shadow(0 0 16px var(--gs-ghost)) drop-shadow(0 0 32px rgba(224,240,255,0.2))' },
         },
         'scan-bar': {
           '0%': { backgroundPosition: '-200% 0' },
@@ -154,14 +158,14 @@ const config: Config = {
         },
       },
 
-      /* ── Z-Index Scale (Window Manager) ─────────────────── */
+      /* ── Z-Index Scale ──────────────────────────────────── */
       zIndex: {
         'desktop':    '0',
         'icons':      '10',
-        'window':     '100',      /* Windows start here, increment per focus */
-        'window-max': '500',      /* Maximized window */
-        'dialog':     '600',      /* Modal dialogs */
-        'chloe':      '700',      /* Chloé always above windows */
+        'window':     '100',
+        'window-max': '500',
+        'dialog':     '600',
+        'chloe':      '700',
         'menubar':    '800',
         'start-menu': '850',
         'taskbar':    '800',

@@ -272,7 +272,7 @@ export function ScanInput({
 
           {/* Error message */}
           {error && (
-            <div className="bevel-sunken bg-gs-near-white px-gs-3 py-gs-2">
+            <div className="bevel-sunken bg-gs-paper px-gs-3 py-gs-2">
               <p className="font-data text-data-sm text-gs-critical">
                 ⚠ {error}
               </p>

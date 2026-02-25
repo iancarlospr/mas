@@ -136,12 +136,12 @@ export function AsciiPlayer({
       </pre>
 
       {/* Movie info bar */}
-      <div className="flex items-center justify-between mt-gs-2 font-data text-data-xs text-gs-mid">
+      <div className="flex items-center justify-between mt-gs-2 font-data text-data-xs text-gs-muted">
         <span>
           {movie?.title ?? 'Loading...'} — Frame {currentFrame + 1}/{movie?.frameCount ?? '?'}
         </span>
         <button
-          className="text-gs-terminal hover:text-gs-cyan"
+          className="text-gs-terminal hover:text-gs-red"
           onClick={() => setIsPlaying((p) => !p)}
         >
           {isPlaying ? '⏸ Pause' : '▶ Play'}
@@ -150,12 +150,12 @@ export function AsciiPlayer({
 
       {/* SSH command hint */}
       {showSshHint && (
-        <div className="mt-gs-4 border-t border-gs-mid-dark pt-gs-2">
-          <p className="font-data text-data-xs text-gs-mid mb-gs-1">
+        <div className="mt-gs-4 border-t border-gs-chrome-dark pt-gs-2">
+          <p className="font-data text-data-xs text-gs-muted mb-gs-1">
             Or watch in your real terminal:
           </p>
           <button
-            className="font-data text-data-xs text-gs-cyan hover:text-gs-fuchsia cursor-pointer bg-transparent border-none"
+            className="font-data text-data-xs text-gs-red hover:text-gs-red cursor-pointer bg-transparent border-none"
             onClick={() => {
               navigator.clipboard.writeText(
                 'ssh -o StrictHostKeyChecking=no watch.ascii.theater',
@@ -164,7 +164,7 @@ export function AsciiPlayer({
             title="Click to copy"
           >
             $ ssh -o StrictHostKeyChecking=no watch.ascii.theater
-            <span className="text-gs-mid ml-gs-2">[click to copy]</span>
+            <span className="text-gs-muted ml-gs-2">[click to copy]</span>
           </button>
         </div>
       )}

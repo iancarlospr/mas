@@ -33,30 +33,30 @@ export default function AboutPage() {
   return (
     <>
       {/* Hero */}
-      <section className="relative bg-gs-black py-gs-16">
+      <section className="relative bg-gs-ink py-gs-16">
         <div className="noise-grain" aria-hidden="true" />
         <div className="crt-scanlines" aria-hidden="true" />
 
         <div className="relative mx-auto max-w-7xl px-gs-4 text-center">
           <ChloeSprite state="idle" size={64} glowing className="mx-auto mb-gs-6" />
-          <h1 className="font-system text-[clamp(24px,4vw,44px)] font-bold text-gs-near-white mb-gs-3">
+          <h1 className="font-system text-[clamp(24px,4vw,44px)] font-bold text-gs-paper mb-gs-3">
             About GhostScan OS
           </h1>
-          <p className="font-data text-data-lg text-gs-mid-light max-w-xl mx-auto">
+          <p className="font-data text-data-lg text-gs-muted max-w-xl mx-auto">
             Version 2.0.26 &mdash; Forensic marketing intelligence.
           </p>
         </div>
 
-        <div className="absolute bottom-0 left-0 right-0 h-[60px] bg-gradient-to-t from-gs-near-white to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-[60px] bg-gradient-to-t from-gs-paper to-transparent" />
       </section>
 
-      <section className="bg-gs-near-white py-gs-16">
+      <section className="bg-gs-paper py-gs-16">
         <div className="mx-auto max-w-3xl px-gs-4 space-y-gs-8">
           {/* About window */}
-          <div className="bevel-raised bg-gs-light">
+          <div className="bevel-raised bg-gs-chrome">
             {/* Title bar */}
-            <div className="h-[28px] bg-gradient-to-r from-gs-cyan to-gs-fuchsia flex items-center px-gs-3">
-              <span className="font-system text-os-xs text-gs-black font-bold">
+            <div className="h-[28px] bg-gs-red flex items-center px-gs-3">
+              <span className="font-system text-os-xs text-gs-ink font-bold">
                 About GhostScan OS
               </span>
             </div>
@@ -65,10 +65,10 @@ export default function AboutPage() {
               <div className="flex items-start gap-gs-4">
                 <div className="flex-shrink-0 text-[48px]">👻</div>
                 <div>
-                  <h2 className="font-system text-os-lg font-bold text-gs-black">
+                  <h2 className="font-system text-os-lg font-bold text-gs-ink">
                     MarketingAlphaScan
                   </h2>
-                  <p className="font-data text-data-sm text-gs-mid mt-gs-1">
+                  <p className="font-data text-data-sm text-gs-muted mt-gs-1">
                     The AlphaScan Method&trade; &mdash; a proprietary forensic
                     framework that reverse-engineers any brand&apos;s complete
                     marketing technology stack, strategy, and performance.
@@ -76,8 +76,8 @@ export default function AboutPage() {
                 </div>
               </div>
 
-              <div className="bevel-sunken bg-gs-near-white p-gs-4">
-                <p className="font-data text-data-sm text-gs-mid-dark leading-relaxed">
+              <div className="bevel-sunken bg-gs-paper p-gs-4">
+                <p className="font-data text-data-sm text-gs-muted leading-relaxed">
                   42 forensic modules spanning DNS security, analytics architecture,
                   ad pixel tracking, tag governance, consent compliance, and
                   AI-powered synthesis. GhostScan&trade; active browser probing
@@ -86,8 +86,8 @@ export default function AboutPage() {
                 </p>
               </div>
 
-              <div className="bevel-sunken bg-gs-near-white p-gs-4">
-                <p className="font-data text-data-sm text-gs-mid-dark leading-relaxed">
+              <div className="bevel-sunken bg-gs-paper p-gs-4">
+                <p className="font-data text-data-sm text-gs-muted leading-relaxed">
                   The result: a MarketingIQ&trade; score (0&ndash;100), an
                   executive-grade Alpha Brief&trade; dossier, and Chloe &mdash;
                   an AI analyst who knows your scan data better than you do.
@@ -97,23 +97,23 @@ export default function AboutPage() {
           </div>
 
           {/* System Requirements (Tech Stack) */}
-          <div className="bevel-raised bg-gs-light">
-            <div className="h-[28px] bg-gs-mid-light flex items-center px-gs-3">
-              <span className="font-system text-os-xs text-gs-black font-bold">
+          <div className="bevel-raised bg-gs-chrome">
+            <div className="h-[28px] bg-gs-chrome flex items-center px-gs-3">
+              <span className="font-system text-os-xs text-gs-ink font-bold">
                 System Specifications
               </span>
             </div>
 
             <div className="p-gs-6">
-              <div className="bevel-sunken bg-gs-near-white p-gs-4">
+              <div className="bevel-sunken bg-gs-paper p-gs-4">
                 <table className="w-full">
                   <tbody>
                     {techStack.map((item) => (
-                      <tr key={item.label} className="border-b border-gs-mid-light last:border-0">
-                        <td className="py-gs-2 pr-gs-4 font-system text-os-xs text-gs-mid-dark w-1/2">
+                      <tr key={item.label} className="border-b border-gs-chrome last:border-0">
+                        <td className="py-gs-2 pr-gs-4 font-system text-os-xs text-gs-muted w-1/2">
                           {item.label}
                         </td>
-                        <td className="py-gs-2 font-data text-data-sm text-gs-black font-bold">
+                        <td className="py-gs-2 font-data text-data-sm text-gs-ink font-bold">
                           {item.value}
                         </td>
                       </tr>
@@ -125,9 +125,9 @@ export default function AboutPage() {
           </div>
 
           {/* The Method */}
-          <div className="bevel-raised bg-gs-light">
-            <div className="h-[28px] bg-gs-mid-light flex items-center px-gs-3">
-              <span className="font-system text-os-xs text-gs-black font-bold">
+          <div className="bevel-raised bg-gs-chrome">
+            <div className="h-[28px] bg-gs-chrome flex items-center px-gs-3">
+              <span className="font-system text-os-xs text-gs-ink font-bold">
                 The AlphaScan Method&trade;
               </span>
             </div>
@@ -161,16 +161,16 @@ export default function AboutPage() {
                 },
               ].map((phase) => (
                 <div key={phase.phase} className="flex gap-gs-4">
-                  <div className="flex-shrink-0 bevel-raised bg-gs-dark w-[64px] h-[40px] flex items-center justify-center">
-                    <span className="font-data text-data-xs text-gs-cyan font-bold">
+                  <div className="flex-shrink-0 bevel-raised bg-gs-ink w-[64px] h-[40px] flex items-center justify-center">
+                    <span className="font-data text-data-xs text-gs-red font-bold">
                       {phase.phase}
                     </span>
                   </div>
                   <div>
-                    <h3 className="font-system text-os-sm font-bold text-gs-black">
+                    <h3 className="font-system text-os-sm font-bold text-gs-ink">
                       {phase.title}
                     </h3>
-                    <p className="font-data text-data-xs text-gs-mid">
+                    <p className="font-data text-data-xs text-gs-muted">
                       {phase.desc}
                     </p>
                   </div>
@@ -181,7 +181,7 @@ export default function AboutPage() {
 
           {/* Copyright */}
           <div className="text-center">
-            <p className="font-data text-data-xs text-gs-mid-light">
+            <p className="font-data text-data-xs text-gs-muted">
               &copy; {new Date().getFullYear()} MarketingAlphaScan. All rights reserved.
               <br />
               GhostScan&trade;, MarketingIQ&trade;, Alpha Brief&trade;, and

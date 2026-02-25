@@ -44,21 +44,21 @@ export function PendingVerificationCard({ email, scanUrl, onDismiss }: PendingVe
 
   return (
     <div className="w-full max-w-lg mx-auto">
-      <div className="bevel-raised bg-gs-light p-gs-6 text-center">
+      <div className="bevel-raised bg-gs-chrome p-gs-6 text-center">
         <ChloeSprite state="idle" size={32} glowing className="mx-auto mb-gs-4" />
 
-        <div className="bevel-sunken bg-gs-near-white w-[56px] h-[56px] mx-auto flex items-center justify-center mb-gs-4">
+        <div className="bevel-sunken bg-gs-paper w-[56px] h-[56px] mx-auto flex items-center justify-center mb-gs-4">
           <span className="text-[28px]">📧</span>
         </div>
 
-        <h2 className="font-system text-os-lg font-bold text-gs-black mb-gs-2">
+        <h2 className="font-system text-os-lg font-bold text-gs-ink mb-gs-2">
           Check your email
         </h2>
-        <p className="font-data text-data-sm text-gs-mid mb-gs-1">
-          Verification link sent to <strong className="text-gs-black">{email}</strong>.
+        <p className="font-data text-data-sm text-gs-muted mb-gs-1">
+          Verification link sent to <strong className="text-gs-ink">{email}</strong>.
         </p>
-        <p className="font-data text-data-sm text-gs-mid mb-gs-4">
-          Your scan of <strong className="text-gs-fuchsia">{pendingDomain}</strong> will
+        <p className="font-data text-data-sm text-gs-muted mb-gs-4">
+          Your scan of <strong className="text-gs-red">{pendingDomain}</strong> will
           start automatically once verified.
         </p>
 
@@ -72,7 +72,7 @@ export function PendingVerificationCard({ email, scanUrl, onDismiss }: PendingVe
           </button>
           <button
             onClick={onDismiss}
-            className="font-data text-data-xs text-gs-mid hover:text-gs-fuchsia transition-colors"
+            className="font-data text-data-xs text-gs-muted hover:text-gs-red transition-colors"
           >
             Start a new scan instead
           </button>

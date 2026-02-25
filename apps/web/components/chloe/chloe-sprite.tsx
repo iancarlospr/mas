@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 
 /**
@@ -58,19 +58,19 @@ export interface ChloeSpriteProps {
 /** Chloé's color palette — matches Plan Section 4 */
 const C = {
   /** Ghost body — near-white */
-  body: 'var(--gs-white)',
+  body: 'var(--gs-paper)',
   /** Body shadow — slightly darker for depth */
-  bodyShade: 'var(--gs-near-white)',
+  bodyShade: 'var(--gs-paper)',
   /** Outline — dark for contrast */
-  outline: 'var(--gs-mid-dark)',
+  outline: 'var(--gs-chrome-dark)',
   /** Eyes — fuchsia (idle), brighter when active */
-  eyes: 'var(--gs-fuchsia)',
+  eyes: 'var(--gs-red)',
   /** Cyan glow — ghost aura */
-  glow: 'var(--gs-cyan)',
+  glow: 'var(--gs-red)',
   /** Blush — subtle warmth */
   blush: 'oklch(0.75 0.12 15)',
   /** Sleep Z's */
-  sleep: 'var(--gs-mid-light)',
+  sleep: 'var(--gs-chrome)',
   /** Exclamation — alert yellow */
   alert: 'var(--gs-warning)',
   /** Transparent */
@@ -245,27 +245,19 @@ function getStateGrid(state: ChloeState, frame: number): PixelGrid {
   return grid;
 }
 
-/* ── Grid → CSS box-shadow conversion ──────────────────────── */
+/* ── Resolved colors for canvas (CSS vars don't work in canvas) ── */
 
-function gridToBoxShadow(grid: PixelGrid): string {
-  const shadows: string[] = [];
-
-  for (let y = 0; y < grid.length; y++) {
-    const row = grid[y]!;
-    for (let x = 0; x < row.length; x++) {
-      const colorKey = row[x];
-      if (colorKey == null) continue;
-
-      const color = C[colorKey];
-      if (color === 'transparent') continue;
-
-      // box-shadow: offsetX offsetY 0 0 color
-      shadows.push(`${x}px ${y}px 0 0 ${color}`);
-    }
-  }
-
-  return shadows.join(',');
-}
+const CANVAS_COLORS: Record<keyof typeof C, string> = {
+  body: '#FFFBF5',
+  bodyShade: '#FFFBF5',
+  outline: '#D1CBC1',
+  eyes: '#E63946',
+  glow: '#E63946',
+  blush: '#FFD6D9',
+  sleep: '#E8E3DB',
+  alert: '#FFB84D',
+  t: 'transparent',
+};
 
 /* ── Animation class mapping ───────────────────────────────── */
 
@@ -292,16 +284,35 @@ export function ChloeSprite({
   flipped = false,
   className,
 }: ChloeSpriteProps) {
-  /** Scale factor: base grid is 16px, scale to requested size */
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const scale = size / 16;
-
-  /** Generate the pixel art box-shadow for current state + frame */
-  const boxShadow = useMemo(
-    () => gridToBoxShadow(getStateGrid(state, frame)),
-    [state, frame],
-  );
-
   const animClass = STATE_ANIMATIONS[state] ?? '';
+
+  /** Render pixel art to canvas */
+  const grid = useMemo(() => getStateGrid(state, frame), [state, frame]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    ctx.clearRect(0, 0, 16, 16);
+
+    for (let y = 0; y < grid.length; y++) {
+      const row = grid[y]!;
+      for (let x = 0; x < row.length; x++) {
+        const colorKey = row[x];
+        if (colorKey == null) continue;
+        const color = CANVAS_COLORS[colorKey];
+        if (color === 'transparent') continue;
+
+        ctx.fillStyle = color;
+        ctx.fillRect(x, y, 1, 1);
+      }
+    }
+  }, [grid]);
 
   return (
     <div
@@ -310,32 +321,30 @@ export function ChloeSprite({
         animClass,
         className,
       )}
-      style={{
-        width: size,
-        height: size,
-      }}
+      style={{ width: size, height: size }}
       role="img"
-      aria-label={`Chloé the ghost — ${state}`}
+      aria-label={`Chloe the ghost — ${state}`}
     >
-      {/* The pixel art element: 1x1px with box-shadow pixels */}
-      <div
+      {/* Canvas pixel art: 16×16 native, CSS scales with pixelated rendering */}
+      <canvas
+        ref={canvasRef}
+        width={16}
+        height={16}
         className="absolute top-0 left-0"
         style={{
-          width: '1px',
-          height: '1px',
-          boxShadow,
-          transform: `scale(${scale})${flipped ? ' scaleX(-1)' : ''}`,
-          transformOrigin: 'top left',
+          width: size,
+          height: size,
           imageRendering: 'pixelated',
+          transform: flipped ? 'scaleX(-1)' : undefined,
         }}
       />
 
-      {/* Ghost glow overlay */}
+      {/* Ghost glow overlay (subtle pale blue, not red) */}
       {glowing && (
         <div
-          className="absolute inset-0 rounded-full opacity-30"
+          className="absolute inset-0 rounded-full opacity-20"
           style={{
-            background: `radial-gradient(ellipse at center, var(--gs-cyan) 0%, transparent 70%)`,
+            background: 'radial-gradient(ellipse at center, var(--gs-ghost) 0%, transparent 70%)',
             filter: 'blur(8px)',
             transform: 'scale(1.5)',
             pointerEvents: 'none',
@@ -353,7 +362,7 @@ export function ChloeSprite({
               left: `${1 * scale}px`,
               width: 0,
               height: `${scale}px`,
-              background: `linear-gradient(90deg, var(--gs-fuchsia), var(--gs-critical))`,
+              background: 'linear-gradient(90deg, #E63946, #C1121F)',
               opacity: 0.8,
               filter: 'blur(1px)',
               pointerEvents: 'none',
@@ -366,7 +375,7 @@ export function ChloeSprite({
               right: `${1 * scale}px`,
               width: 0,
               height: `${scale}px`,
-              background: `linear-gradient(270deg, var(--gs-fuchsia), var(--gs-critical))`,
+              background: 'linear-gradient(270deg, #E63946, #C1121F)',
               opacity: 0.8,
               filter: 'blur(1px)',
               pointerEvents: 'none',
@@ -378,7 +387,7 @@ export function ChloeSprite({
       {/* Sleeping Z's */}
       {state === 'sleeping' && (
         <div
-          className="absolute font-personality text-gs-mid-light animate-ghost-float"
+          className="absolute font-personality text-gs-muted animate-ghost-float"
           style={{
             top: `-${scale * 4}px`,
             right: `-${scale * 2}px`,
