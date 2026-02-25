@@ -4,6 +4,16 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 
+/**
+ * GhostScan OS — Resend Verification Button
+ * ═══════════════════════════════════════════════
+ *
+ * WHAT: Button to resend the email verification link.
+ * WHY:  Users miss emails. This gives them a retry path without
+ *       leaving the retro verification dialog (Plan Section 15).
+ * HOW:  Bevel button with status states, retro styling.
+ */
+
 export function ResendVerificationButton({ email }: { email: string }) {
   const router = useRouter();
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error' | 'already_verified'>('idle');
@@ -14,13 +24,11 @@ export function ResendVerificationButton({ email }: { email: string }) {
     const { error } = await supabase.auth.resend({ type: 'signup', email });
 
     if (error) {
-      // If the user is already confirmed, guide them to login instead
       if (error.message?.toLowerCase().includes('already confirmed') ||
           error.message?.toLowerCase().includes('already registered')) {
         setStatus('already_verified');
       } else {
         setStatus('error');
-        // Allow retry after 3s
         setTimeout(() => setStatus('idle'), 3000);
       }
       return;
@@ -31,11 +39,13 @@ export function ResendVerificationButton({ email }: { email: string }) {
 
   if (status === 'already_verified') {
     return (
-      <div className="flex flex-col items-center gap-2">
-        <p className="text-sm text-success">Your email is already verified.</p>
+      <div className="flex flex-col items-center gap-gs-2">
+        <p className="font-data text-data-xs text-gs-terminal">
+          Your email is already verified.
+        </p>
         <button
           onClick={() => router.push('/login')}
-          className="text-sm font-medium text-accent hover:underline"
+          className="bevel-button-primary text-os-sm"
         >
           Go to login
         </button>
@@ -47,7 +57,7 @@ export function ResendVerificationButton({ email }: { email: string }) {
     <button
       onClick={handleResend}
       disabled={status !== 'idle'}
-      className="text-sm text-accent hover:underline disabled:opacity-50 disabled:no-underline"
+      className="font-data text-data-xs text-gs-cyan hover:text-gs-fuchsia disabled:opacity-50 disabled:cursor-not-allowed"
     >
       {status === 'sent'
         ? 'Verification email resent'

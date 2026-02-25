@@ -127,7 +127,7 @@ export function ScoreGauge({
         <path
           d={bgArc}
           fill="none"
-          stroke="#F1F5F9"
+          style={{ stroke: 'var(--gs-near-white)' }}
           strokeWidth={s.strokeWidth}
           strokeLinecap="round"
         />
@@ -163,7 +163,7 @@ export function ScoreGauge({
           textAnchor="middle"
           dominantBaseline="central"
           style={{
-            fontFamily: '"JetBrains Mono", monospace',
+            fontFamily: 'var(--font-data)',
             fontSize: s.fontSize,
             fontWeight: 800,
             fill: tierColor,
@@ -179,10 +179,10 @@ export function ScoreGauge({
           textAnchor="middle"
           dominantBaseline="hanging"
           style={{
-            fontFamily: '"Plus Jakarta Sans", sans-serif',
+            fontFamily: 'var(--font-system), monospace',
             fontSize: s.labelSize,
             fontWeight: 600,
-            fill: '#64748B',
+            fill: 'var(--gs-mid)',
           }}
         >
           {mqLabel}
@@ -191,7 +191,7 @@ export function ScoreGauge({
 
       {/* IQ Label below gauge */}
       <span
-        className="font-heading font-700 mt-1"
+        className="font-system font-bold mt-1"
         style={{ fontSize: s.labelSize, color: tierColor }}
       >
         {iqLabel}
@@ -205,19 +205,19 @@ export function ScoreGauge({
               fontSize: s.labelSize - 2,
               color:
                 trend.direction === 'up'
-                  ? '#06D6A0'
+                  ? 'var(--gs-terminal)'
                   : trend.direction === 'down'
-                    ? '#EF476F'
-                    : '#94A3B8',
+                    ? 'var(--gs-critical)'
+                    : 'var(--gs-mid)',
             }}
           >
             {trend.direction === 'up' ? '↑' : trend.direction === 'down' ? '↓' : '→'}
           </span>
           <span
             style={{
-              fontFamily: '"JetBrains Mono", monospace',
+              fontFamily: 'var(--font-data)',
               fontSize: s.labelSize - 2,
-              color: '#64748B',
+              color: 'var(--gs-mid)',
             }}
           >
             {trend.delta > 0 ? '+' : ''}

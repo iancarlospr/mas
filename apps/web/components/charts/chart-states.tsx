@@ -1,5 +1,7 @@
 'use client';
 
+import { OKLCH } from '@/lib/chart-config';
+
 interface EmptyChartProps {
   chartType?: 'bar' | 'line' | 'pie' | 'table' | 'checklist' | 'gauge' | 'flow';
   message?: string;
@@ -11,8 +13,8 @@ export function EmptyChart({ message = 'No data available', action }: EmptyChart
     <div
       className="flex flex-col items-center justify-center text-center py-8"
       style={{
-        backgroundColor: '#FAFBFC',
-        border: '1px dashed #E2E8F0',
+        backgroundColor: OKLCH.nearWhite,
+        border: `1px dashed ${OKLCH.light}`,
         borderRadius: 8,
         minHeight: 120,
       }}
@@ -20,19 +22,19 @@ export function EmptyChart({ message = 'No data available', action }: EmptyChart
       <svg width={32} height={32} viewBox="0 0 24 24" fill="none" className="mb-3">
         <path
           d="M3 3v18h18M7 16l4-8 4 4 4-8"
-          stroke="#94A3B8"
+          stroke={OKLCH.midLight}
           strokeWidth="1.5"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
-        <line x1="2" y1="2" x2="22" y2="22" stroke="#94A3B8" strokeWidth="1.5" strokeLinecap="round" />
+        <line x1="2" y1="2" x2="22" y2="22" stroke={OKLCH.midLight} strokeWidth="1.5" strokeLinecap="round" />
       </svg>
-      <p style={{ fontSize: 14, color: '#94A3B8', fontFamily: '"Inter", sans-serif' }}>{message}</p>
+      <p style={{ fontSize: 14, color: OKLCH.midLight, fontFamily: 'var(--font-data)' }}>{message}</p>
       {action && (
         <button
           onClick={action.onClick}
-          className="mt-3 px-3 py-1.5 text-sm font-medium rounded-lg border border-[#E2E8F0] hover:bg-[#F1F5F9] transition-colors"
-          style={{ color: '#1A1A2E' }}
+          className="mt-3 px-3 py-1.5 text-sm font-medium rounded-lg border border-gs-light hover:bg-gs-light transition-colors"
+          style={{ color: OKLCH.black }}
         >
           {action.label}
         </button>
@@ -53,7 +55,7 @@ export function ChartError({ message, retryable = false, onRetry }: ChartErrorPr
     <div
       className="flex flex-col items-center justify-center text-center py-8"
       style={{
-        backgroundColor: 'rgba(239, 71, 111, 0.03)',
+        backgroundColor: 'oklch(0.55 0.22 25 / 0.03)',
         borderRadius: 8,
         minHeight: 120,
       }}
@@ -61,18 +63,18 @@ export function ChartError({ message, retryable = false, onRetry }: ChartErrorPr
       <svg width={28} height={28} viewBox="0 0 24 24" fill="none" className="mb-2">
         <path
           d="M12 9v4m0 4h.01M10.29 3.86l-8.69 15A2 2 0 003.34 22h17.32a2 2 0 001.74-2.86l-8.69-15a2 2 0 00-3.42 0z"
-          stroke="#EF476F"
+          stroke={OKLCH.critical}
           strokeWidth="1.5"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
       </svg>
-      <p style={{ fontSize: 13, color: '#64748B', fontFamily: '"Inter", sans-serif' }}>{message}</p>
+      <p style={{ fontSize: 13, color: OKLCH.mid, fontFamily: 'var(--font-data)' }}>{message}</p>
       {retryable && onRetry && (
         <button
           onClick={onRetry}
           className="mt-3 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors"
-          style={{ borderColor: '#EF476F', color: '#EF476F' }}
+          style={{ borderColor: OKLCH.critical, color: OKLCH.critical }}
         >
           Retry
         </button>

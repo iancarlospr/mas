@@ -1,4 +1,15 @@
 import Link from 'next/link';
+import { ChloeSprite } from '@/components/chloe/chloe-sprite';
+
+/**
+ * GhostScan OS — Rate Limited State
+ * ═══════════════════════════════════════
+ *
+ * WHAT: Shown when user hits the 4-scan-per-day limit.
+ * WHY:  Chloe enforces limits with personality, not apologies
+ *       (Plan Section 17).
+ * HOW:  Chloe smug sprite, usage counter, retro dialog styling.
+ */
 
 interface RateLimitedProps {
   used: number;
@@ -8,24 +19,30 @@ interface RateLimitedProps {
 
 export function RateLimited({ used, limit, isAuthenticated }: RateLimitedProps) {
   return (
-    <div className="max-w-md mx-auto text-center bg-surface border border-border rounded-xl p-8">
-      <h2 className="font-heading text-h4 text-primary mb-2">
-        Daily Scan Limit Reached
+    <div className="max-w-md mx-auto text-center bevel-raised bg-gs-light p-gs-8">
+      <ChloeSprite state="smug" size={64} className="mx-auto mb-gs-4" />
+
+      <h2 className="font-system text-os-lg font-bold text-gs-black mb-gs-2">
+        Daily Limit Reached
       </h2>
-      <p className="text-sm text-muted mb-4">
-        You&apos;ve used {used}/{limit} scans today. Limits reset at midnight UTC.
+
+      <div className="bevel-sunken bg-gs-near-white px-gs-4 py-gs-2 inline-block mb-gs-4">
+        <span className="font-data text-data-lg font-bold text-gs-critical">
+          {used}/{limit}
+        </span>
+        <span className="font-data text-data-xs text-gs-mid ml-gs-2">
+          scans used today
+        </span>
+      </div>
+
+      <p className="font-data text-data-sm text-gs-mid mb-gs-4">
+        4 scans a day. You&apos;re out. Come back tomorrow.
       </p>
-      {!isAuthenticated ? (
-        <Link
-          href="/register"
-          className="inline-flex items-center justify-center rounded-lg bg-primary text-primary-foreground px-6 py-2.5 text-sm font-heading font-700"
-        >
-          Register for more scans
+
+      {!isAuthenticated && (
+        <Link href="/register" className="bevel-button-primary text-os-sm">
+          Register for More Scans
         </Link>
-      ) : (
-        <p className="text-xs text-muted">
-          Paid users have unlimited scans.
-        </p>
       )}
     </div>
   );

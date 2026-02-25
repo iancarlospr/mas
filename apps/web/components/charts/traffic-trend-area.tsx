@@ -5,7 +5,7 @@ import {
   ResponsiveContainer, ReferenceLine,
 } from 'recharts';
 import { AlphaTooltip } from './alpha-tooltip';
-import { AXIS_STYLE, GRID_STYLE, CHART_MARGINS, formatters } from '@/lib/chart-config';
+import { AXIS_STYLE, GRID_STYLE, CHART_MARGINS, OKLCH, formatters } from '@/lib/chart-config';
 
 interface TrafficTrendPoint {
   month: string;
@@ -42,8 +42,8 @@ export function TrafficTrendArea({
         >
           <defs>
             <linearGradient id="trafficGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#1A1A2E" stopOpacity={0.2} />
-              <stop offset="100%" stopColor="#1A1A2E" stopOpacity={0} />
+              <stop offset="0%" stopColor={OKLCH.black} stopOpacity={0.2} />
+              <stop offset="100%" stopColor={OKLCH.black} stopOpacity={0} />
             </linearGradient>
           </defs>
           <CartesianGrid {...GRID_STYLE} />
@@ -60,19 +60,19 @@ export function TrafficTrendArea({
           <Tooltip content={<AlphaTooltip formatter={(v) => formatters.thousands(v as number)} />} />
           <ReferenceLine
             y={avg}
-            stroke="#94A3B8"
+            stroke={OKLCH.midLight}
             strokeDasharray="3 3"
             label={compact ? undefined : {
               value: `Avg: ${formatters.thousands(avg)}`,
               position: 'right',
-              style: { fontFamily: '"Inter", sans-serif', fontSize: 11, fill: '#94A3B8' },
+              style: { fontFamily: 'var(--font-data)', fontSize: 11, fill: OKLCH.midLight },
             }}
           />
           {showPreviousYear && (
             <Area
               type="monotone"
               dataKey="previousYear"
-              stroke="#94A3B8"
+              stroke={OKLCH.midLight}
               strokeDasharray="4 4"
               fill="none"
               strokeWidth={1.5}
@@ -84,12 +84,12 @@ export function TrafficTrendArea({
           <Area
             type="monotone"
             dataKey="visits"
-            stroke="#1A1A2E"
+            stroke={OKLCH.black}
             strokeWidth={2}
             fill="url(#trafficGradient)"
             animationDuration={1200}
             animationEasing="ease-in-out"
-            activeDot={{ r: 5, fill: '#1A1A2E', stroke: '#fff', strokeWidth: 2 }}
+            activeDot={{ r: 5, fill: OKLCH.black, stroke: OKLCH.white, strokeWidth: 2 }}
             name="Visits"
           />
         </AreaChart>

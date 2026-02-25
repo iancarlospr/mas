@@ -3,6 +3,7 @@
 import { LineChart, Line, YAxis } from 'recharts';
 import { ChartContainer } from './chart-container';
 import { cn } from '@/lib/utils';
+import { OKLCH } from '@/lib/chart-config';
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 
 interface SparklineData {
@@ -45,9 +46,9 @@ export function BrandSparkline({
           <div
             className={cn(
               'flex items-center gap-0.5 text-xs font-medium',
-              trend === 'up' && 'text-[#06D6A0]',
-              trend === 'down' && 'text-[#EF476F]',
-              trend === 'flat' && 'text-[#94A3B8]',
+              trend === 'up' && 'text-gs-terminal',
+              trend === 'down' && 'text-gs-critical',
+              trend === 'flat' && 'text-gs-mid-light',
             )}
           >
             {trend === 'up' && <TrendingUp className="w-3 h-3" />}
@@ -65,12 +66,12 @@ export function BrandSparkline({
             <Line
               type="monotone"
               dataKey="volume"
-              stroke="#1A1A2E"
+              stroke={OKLCH.black}
               strokeWidth={2}
               dot={false}
               activeDot={{
                 r: 3,
-                fill: '#1A1A2E',
+                fill: OKLCH.black,
                 stroke: 'white',
                 strokeWidth: 2,
               }}

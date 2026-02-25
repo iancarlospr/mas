@@ -1,47 +1,58 @@
 import type { Metadata } from 'next';
-import { Plus_Jakarta_Sans, Inter, JetBrains_Mono } from 'next/font/google';
+import { Pixelify_Sans, JetBrains_Mono, Permanent_Marker } from 'next/font/google';
 import { PostHogProvider } from '@/components/providers/posthog-provider';
+import { EasterEggs } from '@/components/os/easter-eggs';
 import './globals.css';
 
-const heading = Plus_Jakarta_Sans({
+/**
+ * GhostScan OS — Font Stack
+ *
+ * System:      Pixelify Sans — Win95 OS chrome (titles, menus, buttons, labels)
+ * Data:        JetBrains Mono — All metrics, scores, terminal text, body copy
+ * Personality: Permanent Marker — Chloé's speech, easter eggs, personality moments
+ */
+
+const systemFont = Pixelify_Sans({
   subsets: ['latin'],
-  variable: '--font-heading',
+  variable: '--font-system',
   display: 'swap',
-  weight: ['400', '500', '600', '700', '800'],
+  weight: ['400', '500', '600', '700'],
 });
 
-const body = Inter({
+const dataFont = JetBrains_Mono({
   subsets: ['latin'],
-  variable: '--font-body',
+  variable: '--font-data',
   display: 'swap',
+  weight: ['300', '400', '500', '600', '700', '800'],
 });
 
-const mono = JetBrains_Mono({
+const personalityFont = Permanent_Marker({
   subsets: ['latin'],
-  variable: '--font-mono',
+  variable: '--font-personality',
   display: 'swap',
+  weight: '400',
 });
 
 export const metadata: Metadata = {
   title: {
-    default: 'MarketingAlphaScan — Reverse-Engineer Any Marketing Stack',
-    template: '%s | MarketingAlphaScan',
+    default: 'AlphaScan — Forensic Marketing Intelligence',
+    template: '%s | AlphaScan',
   },
   description:
-    'Forensic marketing intelligence platform that analyzes any URL to reverse-engineer a brand\'s marketing technology stack, strategy, and performance.',
+    'Your MarTech stack is a landfill. Let\'s run the forensics. AlphaScan reverse-engineers any URL to extract the ground truth about marketing infrastructure, tracking, and performance.',
   metadataBase: new URL('https://marketingalphascan.com'),
   openGraph: {
     type: 'website',
-    siteName: 'MarketingAlphaScan',
-    title: 'MarketingAlphaScan — Reverse-Engineer Any Marketing Stack',
+    siteName: 'AlphaScan',
+    title: 'AlphaScan — Forensic Marketing Intelligence',
     description:
-      'Analyze any URL to uncover the complete marketing technology stack, tracking setup, compliance gaps, and performance issues.',
+      'Serve an unclockable audit in 90 seconds. Extract the ground truth from any marketing stack.',
     url: 'https://marketingalphascan.com',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'MarketingAlphaScan',
-    description: 'Forensic marketing intelligence for any URL.',
+    title: 'AlphaScan',
+    description: 'Your MarTech stack is a landfill. Let Chloé run the forensics.',
   },
   robots: { index: false, follow: false },
 };
@@ -54,11 +65,12 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${heading.variable} ${body.variable} ${mono.variable}`}
+      className={`${systemFont.variable} ${dataFont.variable} ${personalityFont.variable}`}
     >
-      <body className="min-h-screen bg-background antialiased">
+      <body>
         <PostHogProvider>
           {children}
+          <EasterEggs />
         </PostHogProvider>
       </body>
     </html>

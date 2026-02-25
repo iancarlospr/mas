@@ -11,7 +11,7 @@ import {
 } from 'recharts';
 import { ChartContainer } from './chart-container';
 import { AlphaTooltip } from './alpha-tooltip';
-import { AXIS_STYLE, GRID_STYLE, CHART_MARGINS, LEGEND_CONFIG } from '@/lib/chart-config';
+import { AXIS_STYLE, GRID_STYLE, CHART_MARGINS, LEGEND_CONFIG, OKLCH } from '@/lib/chart-config';
 import { cn } from '@/lib/utils';
 import { Check, AlertTriangle, ArrowRight } from 'lucide-react';
 
@@ -61,8 +61,8 @@ export function ConsentTimeline({
           className={cn(
             'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium mb-4',
             compliant
-              ? 'bg-[#06D6A0]/10 text-[#06D6A0]'
-              : 'bg-[#EF476F]/10 text-[#EF476F]',
+              ? 'bg-gs-terminal/10 text-gs-terminal'
+              : 'bg-gs-critical/10 text-gs-critical',
           )}
         >
           {compliant ? (
@@ -85,7 +85,7 @@ export function ConsentTimeline({
             const deltaReject = r - b;
             return (
               <div key={key} className="text-xs">
-                <div className="font-heading font-semibold text-muted uppercase tracking-wide mb-1">
+                <div className="font-system font-semibold text-muted uppercase tracking-wide mb-1">
                   {key}
                 </div>
                 <div className="flex items-center justify-center gap-1">
@@ -96,7 +96,7 @@ export function ConsentTimeline({
                     <span
                       className={cn(
                         'text-[10px] font-mono',
-                        deltaAccept > 0 ? 'text-[#EF476F]' : 'text-[#06D6A0]',
+                        deltaAccept > 0 ? 'text-gs-critical' : 'text-gs-terminal',
                       )}
                     >
                       ({deltaAccept > 0 ? '+' : ''}{deltaAccept})
@@ -117,9 +117,9 @@ export function ConsentTimeline({
           <YAxis {...AXIS_STYLE} allowDecimals={false} />
           <Tooltip content={<AlphaTooltip />} />
           <Legend {...LEGEND_CONFIG} />
-          <Bar dataKey="Cookies" fill="#FFD166" radius={[4, 4, 0, 0]} />
-          <Bar dataKey="Requests" fill="#1A1A2E" radius={[4, 4, 0, 0]} />
-          <Bar dataKey="Pixels" fill="#E94560" radius={[4, 4, 0, 0]} />
+          <Bar dataKey="Cookies" fill={OKLCH.warning} radius={[4, 4, 0, 0]} />
+          <Bar dataKey="Requests" fill={OKLCH.black} radius={[4, 4, 0, 0]} />
+          <Bar dataKey="Pixels" fill={OKLCH.critical} radius={[4, 4, 0, 0]} />
         </BarChart>
       </ChartContainer>
     </div>

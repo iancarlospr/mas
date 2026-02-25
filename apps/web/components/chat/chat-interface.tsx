@@ -3,6 +3,22 @@
 import { useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { analytics } from '@/lib/analytics';
+import { soundEffects } from '@/lib/sound-effects';
+import { ChloeSprite } from '@/components/chloe/chloe-sprite';
+import { BevelInput } from '@/components/os/bevel-input';
+
+/**
+ * GhostScan OS — Chat Interface (Ask Chloe Window)
+ * ═══════════════════════════════════════════════════
+ *
+ * WHAT: AI chat with Chloe rendered as a retro OS chat window.
+ * WHY:  The chat IS Chloe — she's the AI analyst who knows your scan
+ *       data. Retro bubble styling, her sprite as avatar, credits as
+ *       gems in the status area (Plan Section 7).
+ * HOW:  Chloe messages left-aligned with cyan accent border, user
+ *       messages right-aligned with bevel style, typing indicator
+ *       with bouncing dots, bevel input + send button.
+ */
 
 interface Message {
   id: string;
@@ -35,7 +51,6 @@ export function ChatInterface({ scanId, initialMessages, initialCredits }: ChatI
     setInput('');
     setLoading(true);
 
-    // Optimistic update
     const userMsg: Message = {
       id: crypto.randomUUID(),
       role: 'user',
@@ -44,6 +59,7 @@ export function ChatInterface({ scanId, initialMessages, initialCredits }: ChatI
     };
     setMessages((prev) => [...prev, userMsg]);
     analytics.chatMessageSent(scanId);
+    soundEffects.play('chatSend');
 
     try {
       const res = await fetch(`/api/chat/${scanId}`, {
@@ -66,11 +82,12 @@ export function ChatInterface({ scanId, initialMessages, initialCredits }: ChatI
       };
       setMessages((prev) => [...prev, assistantMsg]);
       setCredits(data.creditsRemaining);
+      soundEffects.play('chatReceive');
     } catch (err) {
       const errMsg: Message = {
         id: crypto.randomUUID(),
         role: 'assistant',
-        content: `Error: ${err instanceof Error ? err.message : 'Something went wrong'}`,
+        content: `${err instanceof Error ? err.message : 'Connection lost. Try again.'}`,
         createdAt: new Date().toISOString(),
       };
       setMessages((prev) => [...prev, errMsg]);
@@ -80,51 +97,74 @@ export function ChatInterface({ scanId, initialMessages, initialCredits }: ChatI
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-8rem)]">
-      {/* Header */}
-      <div className="flex items-center justify-between pb-4 border-b border-border">
-        <h2 className="font-heading text-h4 text-primary">AI Chat</h2>
-        <span className="text-xs text-muted bg-border/50 px-3 py-1 rounded-full">
-          {credits} credits remaining
-        </span>
+    <div className="flex flex-col h-full">
+      {/* Chloe header */}
+      <div className="flex items-center gap-gs-3 p-gs-4 border-b-2 border-gs-mid-light">
+        <ChloeSprite state={loading ? 'scanning' : 'chat'} size={32} />
+        <div className="flex-1">
+          <h2 className="font-system text-os-sm font-bold text-gs-black">
+            Ask Chloe
+          </h2>
+          <span className="font-data text-data-xs text-gs-mid">
+            {loading ? 'Analyzing...' : 'Ready'}
+          </span>
+        </div>
+        <div className="bevel-sunken bg-gs-near-white px-gs-3 py-gs-1">
+          <span className="font-data text-data-xs text-gs-mid-dark">
+            {credits} credits
+          </span>
+        </div>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto py-6 space-y-4">
+      <div className="flex-1 overflow-y-auto p-gs-4 space-y-gs-4">
         {messages.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-muted text-sm">
-              Ask anything about the scan results. I&apos;ll cite specific modules as sources.
+          <div className="text-center py-gs-8">
+            <ChloeSprite state="chat" size={64} glowing className="mx-auto mb-gs-4" />
+            <p className="font-data text-data-sm text-gs-mid">
+              Ask me anything about your scan results.
+              <br />
+              I cite specific modules as evidence.
             </p>
           </div>
         )}
+
         {messages.map((msg) => (
           <div
             key={msg.id}
             className={cn(
-              'flex',
+              'flex gap-gs-2',
               msg.role === 'user' ? 'justify-end' : 'justify-start',
             )}
           >
+            {msg.role === 'assistant' && (
+              <div className="flex-shrink-0 mt-gs-1">
+                <ChloeSprite state="chat" size={32} />
+              </div>
+            )}
             <div
               className={cn(
-                'max-w-[80%] rounded-xl px-4 py-3 text-sm',
+                'max-w-[80%] px-gs-4 py-gs-3',
                 msg.role === 'user'
-                  ? 'bg-accent text-white'
-                  : 'bg-surface border border-border text-primary',
+                  ? 'bevel-raised bg-gs-light font-data text-data-sm text-gs-black'
+                  : 'bevel-sunken bg-gs-near-white font-data text-data-sm text-gs-mid-dark border-l-2 border-gs-cyan',
               )}
             >
-              <p className="whitespace-pre-wrap">{msg.content}</p>
+              <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
             </div>
           </div>
         ))}
+
         {loading && (
-          <div className="flex justify-start">
-            <div className="bg-surface border border-border rounded-xl px-4 py-3">
-              <div className="flex gap-1">
-                <span className="w-2 h-2 bg-muted rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                <span className="w-2 h-2 bg-muted rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                <span className="w-2 h-2 bg-muted rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+          <div className="flex gap-gs-2 justify-start">
+            <div className="flex-shrink-0 mt-gs-1">
+              <ChloeSprite state="scanning" size={32} />
+            </div>
+            <div className="bevel-sunken bg-gs-near-white px-gs-4 py-gs-3 border-l-2 border-gs-cyan">
+              <div className="flex gap-gs-1">
+                <span className="w-[6px] h-[6px] bg-gs-cyan animate-bounce" style={{ animationDelay: '0ms' }} />
+                <span className="w-[6px] h-[6px] bg-gs-cyan animate-bounce" style={{ animationDelay: '150ms' }} />
+                <span className="w-[6px] h-[6px] bg-gs-cyan animate-bounce" style={{ animationDelay: '300ms' }} />
               </div>
             </div>
           </div>
@@ -132,30 +172,34 @@ export function ChatInterface({ scanId, initialMessages, initialCredits }: ChatI
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input */}
-      <div className="pt-4 border-t border-border">
+      {/* Input area */}
+      <div className="p-gs-4 border-t-2 border-gs-mid-light">
         {credits <= 0 ? (
-          <p className="text-center text-sm text-muted">
-            No credits remaining.{' '}
-            <a href="#" className="text-accent hover:underline">Purchase more</a>
-          </p>
+          <div className="bevel-sunken bg-gs-near-white p-gs-3 text-center">
+            <p className="font-data text-data-xs text-gs-mid">
+              No credits remaining.{' '}
+              <a href="#" className="text-gs-fuchsia hover:underline font-bold">
+                Purchase more
+              </a>
+            </p>
+          </div>
         ) : (
           <form
             onSubmit={(e) => { e.preventDefault(); handleSend(); }}
-            className="flex gap-3"
+            className="flex gap-gs-2"
           >
-            <input
+            <BevelInput
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask about the scan results..."
-              className="flex-1 border border-border rounded-lg px-4 py-2.5 text-sm bg-surface focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent"
+              placeholder="Ask Chloe anything..."
               disabled={loading}
+              fullWidth
             />
             <button
               type="submit"
               disabled={loading || !input.trim()}
-              className="bg-accent text-white rounded-lg px-6 py-2.5 text-sm font-heading font-700 hover:bg-accent/90 transition-colors disabled:opacity-50"
+              className="bevel-button-primary text-os-sm px-gs-4 flex-shrink-0 disabled:opacity-50"
             >
               Send
             </button>

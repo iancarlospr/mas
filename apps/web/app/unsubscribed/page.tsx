@@ -1,22 +1,30 @@
 import Link from 'next/link';
+import { ChloeSprite } from '@/components/chloe/chloe-sprite';
+import { Window } from '@/components/os/window';
 
 export default function UnsubscribedPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#FAFBFC]">
-      <div className="mx-auto max-w-md rounded-xl border border-[#E2E8F0] bg-white p-8 text-center shadow-sm">
-        <h1 className="mb-4 text-2xl font-extrabold text-[#1A1A2E]">
-          Unsubscribed
-        </h1>
-        <p className="mb-6 text-[#64748B]">
-          You&apos;ve been unsubscribed from marketing emails. You&apos;ll still
-          receive essential account and scan notifications.
-        </p>
-        <Link
-          href="/"
-          className="inline-block rounded-lg bg-[#0F3460] px-6 py-3 text-sm font-bold text-white hover:opacity-90 transition-opacity"
-        >
-          Go Home
-        </Link>
+    <div className="fixed inset-0 bg-gs-black flex items-center justify-center">
+      <div className="noise-grain" aria-hidden="true" />
+      <div className="crt-scanlines" aria-hidden="true" />
+
+      <div className="relative text-center px-gs-4">
+        <ChloeSprite state="idle" size={64} glowing className="mx-auto mb-gs-8" />
+
+        <Window id="unsubscribed" title="📧 Unsubscribed" variant="dialog" isActive width={400}>
+          <div className="p-gs-6 text-center">
+            <h1 className="font-system font-bold text-gs-black text-lg mb-gs-4">
+              Unsubscribed
+            </h1>
+            <p className="font-data text-data-sm text-gs-mid mb-gs-6">
+              You&apos;ve been unsubscribed from marketing emails. You&apos;ll still
+              receive essential account and scan notifications.
+            </p>
+            <Link href="/" className="bevel-button-primary text-os-sm">
+              Go Home
+            </Link>
+          </div>
+        </Window>
       </div>
     </div>
   );

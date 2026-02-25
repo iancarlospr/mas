@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { OKLCH } from '@/lib/chart-config';
 
 interface ChecklistItem {
   id: string;
@@ -23,10 +24,10 @@ interface ChecklistGridProps {
 }
 
 const STATUS_CONFIG = {
-  pass: { border: '#06D6A0', icon: '✓', color: '#06D6A0' },
-  fail: { border: '#EF476F', icon: '✕', color: '#EF476F' },
-  partial: { border: '#FFD166', icon: '!', color: '#FFD166' },
-  na: { border: '#E2E8F0', icon: '—', color: '#94A3B8' },
+  pass: { border: OKLCH.terminal, icon: '✓', color: OKLCH.terminal },
+  fail: { border: OKLCH.critical, icon: '✕', color: OKLCH.critical },
+  partial: { border: OKLCH.warning, icon: '!', color: OKLCH.warning },
+  na: { border: OKLCH.light, icon: '—', color: OKLCH.midLight },
 };
 
 export function ChecklistGrid({
@@ -50,17 +51,17 @@ export function ChecklistGrid({
       {showSummary && (
         <div className="mb-4">
           <div className="flex items-center justify-between text-sm mb-1">
-            <span className="font-heading font-600 text-[#1A1A2E]">{title}</span>
-            <span style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: 13, color: '#64748B' }}>
+            <span className="font-system font-semibold" style={{ color: OKLCH.black }}>{title}</span>
+            <span style={{ fontFamily: 'var(--font-data)', fontSize: 13, color: OKLCH.mid }}>
               {passCount}/{totalCheckable} configured
             </span>
           </div>
-          <div className="w-full h-2 bg-[#F1F5F9] rounded-full overflow-hidden">
+          <div className="w-full h-2 bg-gs-light rounded-full overflow-hidden">
             <div
               className="h-full rounded-full transition-all duration-700"
               style={{
                 width: `${passRate}%`,
-                backgroundColor: passRate >= 70 ? '#06D6A0' : passRate >= 40 ? '#FFD166' : '#EF476F',
+                backgroundColor: passRate >= 70 ? OKLCH.terminal : passRate >= 40 ? OKLCH.warning : OKLCH.critical,
               }}
             />
           </div>
@@ -92,7 +93,7 @@ export function ChecklistGrid({
               style={{
                 padding: compact ? '6px 8px' : '8px 12px',
                 borderLeft: `3px solid ${config.border}`,
-                border: `1px solid #F1F5F9`,
+                border: `1px solid ${OKLCH.light}`,
                 borderLeftWidth: 3,
                 borderLeftColor: config.border,
               }}
@@ -107,7 +108,7 @@ export function ChecklistGrid({
                 </span>
                 <span
                   className={cn('text-sm', compact ? 'text-xs' : 'text-sm')}
-                  style={{ fontFamily: '"Inter", sans-serif', color: '#1A1A2E' }}
+                  style={{ fontFamily: 'var(--font-data)', color: OKLCH.black }}
                 >
                   {item.name}
                 </span>
@@ -115,9 +116,9 @@ export function ChecklistGrid({
                   <span
                     className="ml-auto text-xs font-bold px-1.5 py-0.5 rounded"
                     style={{
-                      fontFamily: '"JetBrains Mono", monospace',
-                      backgroundColor: '#F1F5F9',
-                      color: '#1A1A2E',
+                      fontFamily: 'var(--font-data)',
+                      backgroundColor: OKLCH.light,
+                      color: OKLCH.black,
                     }}
                   >
                     {item.grade}
@@ -128,8 +129,8 @@ export function ChecklistGrid({
                 <div
                   className="mt-1 text-xs truncate"
                   style={{
-                    fontFamily: '"JetBrains Mono", monospace',
-                    color: '#94A3B8',
+                    fontFamily: 'var(--font-data)',
+                    color: OKLCH.midLight,
                     marginLeft: 28,
                   }}
                 >
@@ -140,7 +141,7 @@ export function ChecklistGrid({
               {expandable && isExpanded && item.recommendation && (
                 <div
                   className="mt-2 text-xs leading-relaxed"
-                  style={{ color: '#64748B', marginLeft: 28 }}
+                  style={{ color: OKLCH.mid, marginLeft: 28 }}
                 >
                   {item.recommendation}
                 </div>

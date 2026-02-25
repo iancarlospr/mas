@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <!-- Win95-style arrow cursor, pixel art -->
+  <g fill="none">
+    <!-- Black outline -->
+    <path d="M2 1 L2 19 L6 15 L10 21 L13 19 L9 13 L14 13 L2 1Z" fill="#000000"/>
+    <!-- White fill -->
+    <path d="M3 3 L3 17 L6.5 13.5 L10.5 19.5 L12 18.5 L8 12.5 L12.5 12.5 L3 3Z" fill="#FFFFFF"/>
+    <!-- 1px shadow -->
+    <path d="M3 19 L7 15 L11 21 L14 19 L10 13 L15 13" stroke="#666666" stroke-width="0.5" fill="none" opacity="0.3"/>
+  </g>
+</svg>

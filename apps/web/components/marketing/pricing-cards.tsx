@@ -1,18 +1,32 @@
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 
+/**
+ * GhostScan OS — Pricing Cards (Retro Software Editions)
+ * ═══════════════════════════════════════════════════════════
+ *
+ * WHAT: Pricing tiers rendered as retro software edition boxes.
+ * WHY:  Old cards were generic SaaS. Now they match the GhostScan OS
+ *       brand — bevel borders, system font, pixel art vibes.
+ *       Think "Standard Edition" vs "Pro Edition" physical box art
+ *       (Plan Section 14).
+ * HOW:  Bevel-raised cards, JetBrains Mono prices, retro checkbox
+ *       checklist. All content/pricing data preserved.
+ */
+
 const tiers = [
   {
     name: 'Free Scan',
+    edition: 'Standard Edition',
     price: 'Free',
     originalPrice: null,
-    description: 'Complete marketing audit',
+    description: 'Complete marketing audit — 42 forensic modules.',
     cta: 'Register Free',
     ctaHref: '/register',
     features: [
-      'All 40+ scan modules',
-      'GhostScan active probing',
-      'Bento dashboard with all results',
+      'All 42 scan modules',
+      'GhostScan™ active probing',
+      'Dashboard with all findings',
       'Per-module AI insights',
       'PPC landing page audit',
       'DataForSEO market intelligence',
@@ -20,18 +34,19 @@ const tiers = [
     highlighted: true,
   },
   {
-    name: 'Alpha Brief',
+    name: 'Alpha Brief™',
+    edition: 'Professional Edition',
     price: '$9.99',
     originalPrice: '$29.99',
-    description: 'Executive intelligence report',
-    cta: 'Unlock Report',
+    description: 'Executive intelligence dossier. The full receipts.',
+    cta: 'Declassify',
     ctaHref: '/register',
     features: [
-      'Everything in Full Scan',
-      'McKinsey-style PDF report',
+      'Everything in Standard',
+      'Alpha Brief™ executive report',
       'Remediation PRD with timeline',
       'ROI simulator & cost cutter',
-      '50 AI Chat messages',
+      '15 Chloé chat questions',
       'Shareable report link',
     ],
     highlighted: false,
@@ -41,72 +56,74 @@ const tiers = [
 const addOn = {
   name: 'Chat Credits',
   price: '$4.99',
-  description: '100 additional AI Chat messages to dive deeper into any scan.',
+  description: '100 additional questions for Chloé. She knows more than she lets on.',
 };
 
 export function PricingCards() {
   return (
-    <div className="space-y-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+    <div className="space-y-gs-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-gs-6 max-w-3xl mx-auto">
         {tiers.map((tier) => (
           <div
             key={tier.name}
             className={cn(
-              'relative bg-surface border rounded-xl p-8 flex flex-col',
-              tier.highlighted
-                ? 'border-highlight shadow-xl scale-105 z-10'
-                : 'border-border shadow-sm',
+              'relative bevel-raised bg-gs-light p-gs-6 flex flex-col',
+              tier.highlighted && 'shadow-ghost-glow',
             )}
           >
+            {/* Edition label */}
+            <div className="bevel-sunken bg-gs-near-white px-gs-3 py-gs-1 mb-gs-4 inline-block self-start">
+              <span className="font-system text-os-xs text-gs-mid-dark">
+                {tier.edition}
+              </span>
+            </div>
+
             {tier.highlighted && (
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-highlight text-highlight-foreground text-xs font-heading font-700 px-3 py-1 rounded-full">
+              <div className="absolute -top-[12px] right-gs-4 bevel-button-primary text-os-xs px-gs-3 py-gs-1">
                 Most Popular
               </div>
             )}
 
-            <h3 className="font-heading text-h4 text-primary">{tier.name}</h3>
-            <p className="text-sm text-muted mt-1">{tier.description}</p>
+            <h3 className="font-system text-os-lg font-bold text-gs-black">
+              {tier.name}
+            </h3>
+            <p className="font-data text-data-sm text-gs-mid mt-gs-1">
+              {tier.description}
+            </p>
 
-            <div className="mt-6 mb-6">
+            {/* Price */}
+            <div className="mt-gs-6 mb-gs-6">
               {tier.originalPrice && (
-                <span className="text-sm text-muted line-through mr-2">
+                <span className="font-data text-data-sm text-gs-mid-light line-through mr-gs-2">
                   {tier.originalPrice}
                 </span>
               )}
-              <span className="font-heading text-h2 text-primary">
+              <span className="font-data text-data-hero text-gs-black">
                 {tier.price}
               </span>
               {tier.price !== 'Free' && (
-                <span className="text-sm text-muted ml-1">one-time</span>
+                <span className="font-data text-data-xs text-gs-mid ml-gs-2">one-time</span>
               )}
             </div>
 
-            <ul className="space-y-3 flex-1">
+            {/* Feature checklist */}
+            <ul className="space-y-gs-2 flex-1">
               {tier.features.map((feature) => (
-                <li key={feature} className="flex items-start gap-2 text-sm">
-                  <svg
-                    className="h-5 w-5 flex-shrink-0 text-success mt-0.5"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  <span className="text-muted-foreground">{feature}</span>
+                <li key={feature} className="flex items-start gap-gs-2 font-data text-data-sm">
+                  <span className="text-gs-terminal font-bold flex-shrink-0">☑</span>
+                  <span className="text-gs-mid-dark">{feature}</span>
                 </li>
               ))}
             </ul>
 
+            {/* CTA */}
             <Link
               href={tier.ctaHref}
               className={cn(
-                'mt-8 inline-flex items-center justify-center rounded-lg px-6 py-3 text-sm font-heading font-700 transition-colors',
+                'mt-gs-6 text-center',
                 tier.highlighted
-                  ? 'bg-highlight text-highlight-foreground hover:bg-highlight/90'
-                  : 'bg-primary text-primary-foreground hover:bg-primary/90',
+                  ? 'bevel-button-primary text-os-base w-full'
+                  : 'bevel-button text-os-base w-full',
               )}
             >
               {tier.cta}
@@ -116,14 +133,20 @@ export function PricingCards() {
       </div>
 
       {/* Chat Credits add-on */}
-      <div className="max-w-md mx-auto bg-surface border border-border rounded-xl p-6 text-center shadow-sm">
-        <p className="text-xs font-heading font-700 uppercase tracking-wider text-muted mb-2">
+      <div className="max-w-md mx-auto bevel-raised bg-gs-light p-gs-6 text-center">
+        <span className="font-system text-os-xs text-gs-mid uppercase tracking-wider">
           Add-on
+        </span>
+        <h3 className="font-system text-os-lg font-bold text-gs-black mt-gs-1">
+          {addOn.name}
+        </h3>
+        <p className="font-data text-data-sm text-gs-mid mt-gs-1 mb-gs-3">
+          {addOn.description}
         </p>
-        <h3 className="font-heading text-h4 text-primary">{addOn.name}</h3>
-        <p className="text-sm text-muted mt-1 mb-4">{addOn.description}</p>
-        <span className="font-heading text-h3 text-primary">{addOn.price}</span>
-        <span className="text-sm text-muted ml-1">one-time</span>
+        <span className="font-data text-data-2xl font-bold text-gs-black">
+          {addOn.price}
+        </span>
+        <span className="font-data text-data-xs text-gs-mid ml-gs-2">one-time</span>
       </div>
     </div>
   );

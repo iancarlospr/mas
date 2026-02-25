@@ -1,3 +1,12 @@
+/**
+ * GhostScan OS — Module Unavailable State
+ * ═══════════════════════════════════════════════
+ *
+ * WHAT: Placeholder for individual modules that couldn't complete analysis.
+ * WHY:  Graceful per-module degradation with retro styling (Plan Section 17).
+ * HOW:  Semi-transparent bevel-raised card with Chloe personality copy.
+ */
+
 interface ModuleUnavailableProps {
   moduleName: string;
   error?: string;
@@ -5,18 +14,20 @@ interface ModuleUnavailableProps {
 
 export function ModuleUnavailable({ moduleName, error }: ModuleUnavailableProps) {
   return (
-    <div className="bg-surface border border-border rounded-xl p-6 opacity-60">
-      <div className="flex items-center justify-between mb-2">
-        <h3 className="font-heading text-sm font-700 text-primary">{moduleName}</h3>
-        <span className="text-xs text-warning bg-warning/10 px-2 py-0.5 rounded-full font-medium">
+    <div className="bevel-raised bg-gs-light p-gs-6 opacity-60">
+      <div className="flex items-center justify-between mb-gs-2">
+        <h3 className="font-system text-os-sm font-bold text-gs-black">{moduleName}</h3>
+        <span className="bevel-sunken bg-gs-warning/20 px-gs-2 py-gs-1 font-data text-data-xs text-gs-warning font-bold">
           Unavailable
         </span>
       </div>
-      <p className="text-xs text-muted">
-        This module couldn&apos;t complete its analysis.
+      <p className="font-data text-data-xs text-gs-mid">
+        This module couldn&apos;t extract data. The site might be blocking us.
         {error && <> Reason: {error}</>}
       </p>
-      <p className="text-xs text-muted mt-1">Other modules are not affected.</p>
+      <p className="font-data text-data-xs text-gs-mid-light mt-gs-1">
+        Other modules are not affected.
+      </p>
     </div>
   );
 }

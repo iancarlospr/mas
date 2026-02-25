@@ -27,9 +27,9 @@ interface ComparisonMatrixProps {
 }
 
 const SEVERITY_BADGE: Record<string, string> = {
-  critical: 'bg-[#EF476F]/10 text-[#EF476F]',
-  warning: 'bg-[#FFD166]/10 text-[#FFD166]',
-  info: 'bg-[#0EA5E9]/10 text-[#0EA5E9]',
+  critical: 'bg-gs-critical/10 text-gs-critical',
+  warning: 'bg-gs-warning/10 text-gs-warning',
+  info: 'bg-gs-cyan/10 text-gs-cyan',
 };
 
 export function ComparisonMatrix({
@@ -66,7 +66,7 @@ export function ComparisonMatrix({
           </div>
         )}
         <div className="flex-1">
-          <h3 className="font-heading text-sm font-bold text-primary">{title}</h3>
+          <h3 className="font-system text-sm font-bold text-primary">{title}</h3>
           <p className="text-xs text-muted">
             {matchCount} of {data.length} attributes match
           </p>
@@ -76,8 +76,8 @@ export function ComparisonMatrix({
           className={cn(
             'text-xs px-3 py-1 rounded-full border transition-colors',
             showOnlyMismatches
-              ? 'bg-[#EF476F]/10 border-[#EF476F]/30 text-[#EF476F]'
-              : 'border-[#E2E8F0] text-muted hover:border-[#94A3B8]',
+              ? 'bg-gs-critical/10 border-gs-critical/30 text-gs-critical'
+              : 'border-gs-light text-muted hover:border-gs-mid-light',
           )}
         >
           {showOnlyMismatches ? 'Showing mismatches' : 'Show mismatches only'}
@@ -88,17 +88,17 @@ export function ComparisonMatrix({
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="bg-[#FAFBFC] sticky top-0 z-10">
-              <th className="text-left font-heading text-xs font-semibold text-[#64748B] uppercase tracking-wide px-3 py-2">
+            <tr className="bg-gs-near-white sticky top-0 z-10">
+              <th className="text-left font-system text-xs font-semibold text-gs-mid uppercase tracking-wide px-3 py-2">
                 Attribute
               </th>
-              <th className="text-left font-heading text-xs font-semibold text-[#64748B] uppercase tracking-wide px-3 py-2">
+              <th className="text-left font-system text-xs font-semibold text-gs-mid uppercase tracking-wide px-3 py-2">
                 {labelA}
               </th>
-              <th className="text-left font-heading text-xs font-semibold text-[#64748B] uppercase tracking-wide px-3 py-2">
+              <th className="text-left font-system text-xs font-semibold text-gs-mid uppercase tracking-wide px-3 py-2">
                 {labelB}
               </th>
-              <th className="text-center font-heading text-xs font-semibold text-[#64748B] uppercase tracking-wide px-3 py-2 w-24">
+              <th className="text-center font-system text-xs font-semibold text-gs-mid uppercase tracking-wide px-3 py-2 w-24">
                 Match
               </th>
             </tr>
@@ -117,7 +117,7 @@ export function ComparisonMatrix({
                     <tr>
                       <td
                         colSpan={4}
-                        className="bg-[#F1F5F9] px-3 py-1.5 font-heading text-xs font-bold text-primary"
+                        className="bg-gs-light px-3 py-1.5 font-system text-xs font-bold text-primary"
                       >
                         {category}
                       </td>
@@ -131,10 +131,10 @@ export function ComparisonMatrix({
                       exit={{ opacity: 0, x: -8 }}
                       transition={{ delay: i * 0.03 }}
                       className={cn(
-                        'border-b border-[#F1F5F9]',
-                        !item.match && 'bg-[#EF476F]/[0.03]',
+                        'border-b border-gs-light',
+                        !item.match && 'bg-gs-critical/[0.03]',
                         i % 2 === 0 && item.match && 'bg-white',
-                        i % 2 !== 0 && item.match && 'bg-[#FAFBFC]',
+                        i % 2 !== 0 && item.match && 'bg-gs-near-white',
                       )}
                     >
                       <td className="px-3 py-2 text-secondary">{item.attribute}</td>
@@ -147,9 +147,9 @@ export function ComparisonMatrix({
                       <td className="px-3 py-2 text-center">
                         <div className="flex items-center justify-center gap-1.5">
                           {item.match ? (
-                            <Check className="w-4 h-4 text-[#06D6A0]" />
+                            <Check className="w-4 h-4 text-gs-terminal" />
                           ) : (
-                            <X className="w-4 h-4 text-[#EF476F]" />
+                            <X className="w-4 h-4 text-gs-critical" />
                           )}
                           {!item.match && (
                             <span
@@ -178,7 +178,7 @@ export function ComparisonMatrix({
 function renderCellValue(value: string | boolean | number): React.ReactNode {
   if (typeof value === 'boolean') {
     return value ? (
-      <Check className="w-4 h-4 text-[#06D6A0] inline" />
+      <Check className="w-4 h-4 text-gs-terminal inline" />
     ) : (
       <span className="text-muted italic">missing</span>
     );

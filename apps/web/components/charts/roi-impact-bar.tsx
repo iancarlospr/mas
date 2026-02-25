@@ -4,7 +4,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
   ResponsiveContainer,
 } from 'recharts';
-import { AXIS_STYLE, GRID_STYLE, CHART_MARGINS, LEGEND_CONFIG, formatters } from '@/lib/chart-config';
+import { AXIS_STYLE, GRID_STYLE, CHART_MARGINS, LEGEND_CONFIG, OKLCH, formatters } from '@/lib/chart-config';
 import { TOOLTIP_STYLE, TOOLTIP_LABEL_STYLE, TOOLTIP_ITEM_STYLE } from '@/lib/chart-config';
 
 interface ROICategory {
@@ -30,13 +30,13 @@ function ROITooltip({ active, payload, label }: { active?: boolean; payload?: Ar
         <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, ...TOOLTIP_ITEM_STYLE }}>
           <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: entry.color, display: 'inline-block', flexShrink: 0 }} />
           <span>{entry.name}: </span>
-          <span style={{ color: '#FAFBFC', fontFamily: '"JetBrains Mono", monospace' }}>
+          <span style={{ color: OKLCH.nearWhite, fontFamily: 'var(--font-data)' }}>
             {formatters.currency(entry.value)}
           </span>
         </div>
       ))}
       <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', marginTop: 4, paddingTop: 4, ...TOOLTIP_ITEM_STYLE }}>
-        <span style={{ color: '#FAFBFC', fontWeight: 600 }}>Total: {formatters.currency(total)}</span>
+        <span style={{ color: OKLCH.nearWhite, fontWeight: 600 }}>Total: {formatters.currency(total)}</span>
       </div>
     </div>
   );
@@ -53,12 +53,12 @@ export function ROIImpactBar({ data, height = 300, compact = false }: ROIImpactB
       {/* Grand total callout */}
       {!compact && (
         <div className="text-center mb-4">
-          <span style={{ fontFamily: '"Inter", sans-serif', fontSize: 13, color: '#64748B' }}>
+          <span style={{ fontFamily: 'var(--font-data)', fontSize: 13, color: OKLCH.mid }}>
             Estimated Total Impact
           </span>
-          <div style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: 28, fontWeight: 800, color: '#EF476F' }}>
+          <div style={{ fontFamily: 'var(--font-data)', fontSize: 28, fontWeight: 800, color: OKLCH.critical }}>
             {formatters.currency(grandTotal)}
-            <span style={{ fontSize: 14, fontWeight: 400, color: '#94A3B8' }}>/mo</span>
+            <span style={{ fontSize: 14, fontWeight: 400, color: OKLCH.midLight }}>/mo</span>
           </div>
         </div>
       )}
@@ -87,9 +87,9 @@ export function ROIImpactBar({ data, height = 300, compact = false }: ROIImpactB
           {!compact && (
             <Legend {...LEGEND_CONFIG} />
           )}
-          <Bar dataKey="wastedSpend" name="Wasted Spend" stackId="a" fill="#EF476F" radius={[0, 0, 0, 0]} animationDuration={800} />
-          <Bar dataKey="missedRevenue" name="Missed Revenue" stackId="a" fill="#FFD166" animationDuration={800} />
-          <Bar dataKey="inefficiencyCost" name="Inefficiency Cost" stackId="a" fill="#94A3B8" radius={[0, 4, 4, 0]} animationDuration={800} />
+          <Bar dataKey="wastedSpend" name="Wasted Spend" stackId="a" fill={OKLCH.critical} radius={[0, 0, 0, 0]} animationDuration={800} />
+          <Bar dataKey="missedRevenue" name="Missed Revenue" stackId="a" fill={OKLCH.warning} animationDuration={800} />
+          <Bar dataKey="inefficiencyCost" name="Inefficiency Cost" stackId="a" fill={OKLCH.midLight} radius={[0, 4, 4, 0]} animationDuration={800} />
         </BarChart>
       </ResponsiveContainer>
     </div>

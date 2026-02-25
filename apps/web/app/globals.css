@@ -2,64 +2,615 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ═══════════════════════════════════════════════════════════════
+   GhostScan OS — Design System Foundation
+   Color space: OKLCH for perceptual uniformity
+   Aesthetic: Win95 meets PostHog meets MSCHF
+   ═══════════════════════════════════════════════════════════════ */
+
 @layer base {
   :root {
-    --font-heading: 'Plus Jakarta Sans', sans-serif;
-    --font-body: 'Inter', sans-serif;
-    --font-mono: 'JetBrains Mono', monospace;
+    /* ── Typography ─────────────────────────────────────────── */
+    --font-system: 'Pixelify Sans', 'VT323', monospace;
+    --font-data: 'JetBrains Mono', 'Menlo', monospace;
+    --font-personality: 'Permanent Marker', cursive;
+
+    /* ── Monochrome Scale (Warm Charcoal) ────────────────────
+       8 steps from near-black to near-white.
+       Warm undertone (hue 80°) — not blue-corporate, not purple-gamer.
+       Like expensive paper. Like a Comme des Garçons store interior. */
+    --gs-black:       oklch(0.15 0.01 80);
+    --gs-dark:        oklch(0.25 0.01 80);
+    --gs-mid-dark:    oklch(0.35 0.01 80);
+    --gs-mid:         oklch(0.50 0.01 80);
+    --gs-mid-light:   oklch(0.65 0.01 80);
+    --gs-light:       oklch(0.80 0.01 80);
+    --gs-near-white:  oklch(0.93 0.01 80);
+    --gs-white:       oklch(0.97 0.005 80);
+
+    /* ── Chloé's Signature ──────────────────────────────────
+       The two colors that ARE the brand.
+       Phosphorescent cyan + laser fuchsia.
+       Together they form the ghost's aura gradient. */
+    --gs-cyan:        oklch(0.82 0.18 192);
+    --gs-fuchsia:     oklch(0.65 0.28 350);
+
+    /* ── Functional Colors ──────────────────────────────────
+       Severity only. Never decorative. */
+    --gs-terminal:    oklch(0.80 0.25 145);   /* CRT phosphor green */
+    --gs-critical:    oklch(0.55 0.22 25);    /* Red — critical findings */
+    --gs-warning:     oklch(0.78 0.15 75);    /* Amber — warnings */
+
+    /* ── Chloé's Gradient ───────────────────────────────────
+       Used on: active title bars, scan button, loading bar,
+       ghost glow, primary CTAs, MarketingIQ arc */
+    --gs-gradient: linear-gradient(135deg, var(--gs-cyan), var(--gs-fuchsia));
+
+    /* ── Ghost Glow ─────────────────────────────────────────
+       The supernatural aura around Chloé and ghost-variant windows */
+    --gs-glow: 0 0 12px var(--gs-cyan), 0 0 24px oklch(0.82 0.12 192 / 0.3);
+    --gs-glow-fuchsia: 0 0 12px var(--gs-fuchsia), 0 0 24px oklch(0.65 0.18 350 / 0.3);
+
+    /* ── Spacing ────────────────────────────────────────────
+       Pixel-perfect increments for retro UI */
+    --gs-space-1: 4px;
+    --gs-space-2: 8px;
+    --gs-space-3: 12px;
+    --gs-space-4: 16px;
+    --gs-space-6: 24px;
+    --gs-space-8: 32px;
+
+    /* ── Title Bar Height ───────────────────────────────────── */
+    --gs-titlebar-h: 24px;
+    --gs-menubar-h: 28px;
+    --gs-taskbar-h: 36px;
+    --gs-statusbar-h: 22px;
   }
 
   html {
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* Pixel fonts should NOT be antialiased — crisp edges */
+    image-rendering: -moz-crisp-edges;
+    image-rendering: pixelated;
   }
 
   body {
-    @apply bg-background text-primary font-body;
+    font-family: var(--font-data);
+    color: oklch(0.15 0.01 80 / 0.9); /* --gs-black at 90% opacity, PostHog technique */
+    background-color: var(--gs-near-white);
+    min-height: 100vh;
+    overflow: hidden; /* Desktop fills viewport */
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-heading;
+  /* Mobile: allow body scroll for non-OS pages (history, chat, report) */
+  @media (max-width: 1023px) {
+    body {
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* Subtler atmospheric effects on mobile for readability */
+    .noise-grain { opacity: 0.02 !important; }
+    .crt-scanlines { opacity: 0.01 !important; }
+  }
+
+  /* System font for OS chrome */
+  .font-system {
+    font-family: var(--font-system);
+    /* Pixel fonts need specific rendering */
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: unset;
+    font-smooth: never;
+  }
+
+  /* Personality font for Chloé moments */
+  .font-personality {
+    font-family: var(--font-personality);
+  }
+
+  /* Data font (default body) */
+  .font-data {
+    font-family: var(--font-data);
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   3D Bevel System — Win95 UI Primitives
+   The heart of the retro OS aesthetic.
+   ═══════════════════════════════════════════════════════════════ */
+
+@layer components {
+  /* ── Raised Bevel ─────────────────────────────────────────
+     Used on: windows, panels, raised surfaces */
+  .bevel-raised {
+    border: 2px solid;
+    border-color: var(--gs-white) var(--gs-mid-dark) var(--gs-mid-dark) var(--gs-white);
+    box-shadow:
+      inset 1px 1px 0 var(--gs-white),
+      inset -1px -1px 0 var(--gs-mid);
+  }
+
+  /* ── Sunken Bevel ─────────────────────────────────────────
+     Used on: input fields, content wells, progress bar tracks */
+  .bevel-sunken {
+    border: 2px solid;
+    border-color: var(--gs-mid-dark) var(--gs-white) var(--gs-white) var(--gs-mid-dark);
+    box-shadow:
+      inset 1px 1px 0 var(--gs-mid),
+      inset -1px -1px 0 var(--gs-white);
+  }
+
+  /* ── Button ───────────────────────────────────────────────
+     Standard Win95 button with press state */
+  .bevel-button {
+    border: 2px solid;
+    border-color: var(--gs-white) var(--gs-mid) var(--gs-mid) var(--gs-white);
+    background: var(--gs-light);
+    padding: 2px 8px;
+    font-family: var(--font-system);
+    font-size: 14px;
+    cursor: pointer;
+    user-select: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-height: 24px;
+    transition: none; /* Retro buttons don't transition */
+  }
+  .bevel-button:hover {
+    background: oklch(0.82 0.01 80); /* Slightly lighter */
+  }
+  .bevel-button:active,
+  .bevel-button[data-pressed="true"] {
+    border-color: var(--gs-mid) var(--gs-white) var(--gs-white) var(--gs-mid);
+    box-shadow:
+      inset 1px 1px 0 var(--gs-mid),
+      inset -1px -1px 0 var(--gs-white);
+    padding: 3px 7px 1px 9px; /* Shift content down-right on press */
+  }
+  .bevel-button:focus-visible {
+    outline: 1px dotted var(--gs-black);
+    outline-offset: -4px;
+  }
+  .bevel-button:disabled {
+    color: var(--gs-mid);
+    text-shadow: 1px 1px 0 var(--gs-white);
+    cursor: default;
+  }
+
+  /* ── Primary Button (Chloé gradient) ──────────────────── */
+  .bevel-button-primary {
+    border: 2px solid;
+    border-color: oklch(0.9 0.1 192) oklch(0.5 0.2 350) oklch(0.5 0.2 350) oklch(0.9 0.1 192);
+    background: var(--gs-gradient);
+    color: var(--gs-white);
+    padding: 4px 12px;
+    font-family: var(--font-system);
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    user-select: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-height: 28px;
+    text-shadow: 0 1px 2px oklch(0 0 0 / 0.3);
+    transition: none;
+  }
+  .bevel-button-primary:hover {
+    filter: brightness(1.1);
+  }
+  .bevel-button-primary:active {
+    border-color: oklch(0.5 0.2 350) oklch(0.9 0.1 192) oklch(0.9 0.1 192) oklch(0.5 0.2 350);
+    padding: 5px 11px 3px 13px;
+  }
+
+  /* ── Window Chrome ────────────────────────────────────────
+     The title bar, content area, and status bar */
+  .window {
+    background: var(--gs-light);
+    border: 2px solid;
+    border-color: var(--gs-white) var(--gs-mid-dark) var(--gs-mid-dark) var(--gs-white);
+    box-shadow:
+      inset 1px 1px 0 var(--gs-white),
+      inset -1px -1px 0 var(--gs-mid),
+      3px 3px 12px oklch(0 0 0 / 0.08);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .window-titlebar {
+    height: var(--gs-titlebar-h);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 3px;
+    font-family: var(--font-system);
+    font-size: 14px;
+    font-weight: 700;
+    user-select: none;
+    flex-shrink: 0;
+    /* Inactive state */
+    background: var(--gs-mid-light);
+    color: var(--gs-mid);
+  }
+  .window-titlebar[data-active="true"] {
+    background: var(--gs-gradient);
+    color: var(--gs-white);
+    text-shadow: 0 1px 1px oklch(0 0 0 / 0.2);
+  }
+
+  .window-titlebar-icon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: pixelated;
+  }
+
+  .window-titlebar-text {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 0 4px;
+  }
+
+  .window-titlebar-buttons {
+    display: flex;
+    gap: 2px;
+    flex-shrink: 0;
+  }
+
+  .window-titlebar-btn {
+    width: 18px;
+    height: 16px;
+    border: 2px solid;
+    border-color: var(--gs-white) var(--gs-mid-dark) var(--gs-mid-dark) var(--gs-white);
+    background: var(--gs-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-system);
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+  }
+  .window-titlebar-btn:active {
+    border-color: var(--gs-mid-dark) var(--gs-white) var(--gs-white) var(--gs-mid-dark);
+  }
+
+  .window-content {
+    flex: 1;
+    background: var(--gs-white);
+    overflow: auto;
+    border: 2px solid;
+    border-color: var(--gs-mid-dark) var(--gs-white) var(--gs-white) var(--gs-mid-dark);
+    margin: 0 2px 2px 2px;
+  }
+
+  .window-statusbar {
+    height: var(--gs-statusbar-h);
+    display: flex;
+    align-items: center;
+    padding: 0 4px;
+    font-family: var(--font-system);
+    font-size: 12px;
+    color: var(--gs-mid-dark);
+    border-top: 2px solid;
+    border-color: var(--gs-mid-dark) var(--gs-white) var(--gs-white) var(--gs-mid-dark);
+    gap: 8px;
+    flex-shrink: 0;
+    background: var(--gs-light);
+  }
+  .window-statusbar-section {
+    flex: 1;
+    border: 1px solid;
+    border-color: var(--gs-mid) var(--gs-white) var(--gs-white) var(--gs-mid);
+    padding: 0 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* ── Terminal Variant ─────────────────────────────────────── */
+  .window-terminal .window-content {
+    background: var(--gs-black);
+    color: var(--gs-terminal);
+    font-family: var(--font-data);
+    font-size: 13px;
+    line-height: 1.4;
+    padding: 8px;
+  }
+
+  /* ── Ghost Variant ────────────────────────────────────────── */
+  .window-ghost {
+    box-shadow:
+      inset 1px 1px 0 var(--gs-white),
+      inset -1px -1px 0 var(--gs-mid),
+      0 0 20px oklch(0.82 0.12 192 / 0.15),
+      3px 3px 12px oklch(0 0 0 / 0.08);
+  }
+  .window-ghost .window-titlebar[data-active="true"] {
+    background: var(--gs-gradient);
+  }
+
+  /* ── Module Sub-Panel ─────────────────────────────────────
+     Mini windows inside the Dashboard window */
+  .module-panel {
+    border: 2px solid;
+    border-color: var(--gs-white) var(--gs-mid) var(--gs-mid) var(--gs-white);
+    background: var(--gs-white);
+    margin-bottom: 8px;
+  }
+  .module-panel-header {
+    height: 22px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 6px;
+    background: var(--gs-light);
+    border-bottom: 1px solid var(--gs-mid);
+    font-family: var(--font-system);
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .module-panel-content {
+    padding: 12px;
+  }
+
+  /* ── Redaction Aesthetic (Free Tier Gate) ──────────────────
+     Instead of frosted glass, we redact. Like a classified document. */
+  .redacted {
+    position: relative;
+    overflow: hidden;
+  }
+  .redacted::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      repeating-linear-gradient(
+        0deg,
+        var(--gs-black) 0px,
+        var(--gs-black) 14px,
+        transparent 14px,
+        transparent 18px
+      );
+    opacity: 0.85;
+    pointer-events: none;
+  }
+  .redacted-stamp {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-12deg);
+    font-family: var(--font-system);
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--gs-critical);
+    border: 3px solid var(--gs-critical);
+    padding: 4px 16px;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    z-index: 10;
+    pointer-events: none;
+    opacity: 0.9;
+  }
+
+  /* ── Traffic Light Badges ─────────────────────────────────── */
+  .traffic-green {
+    color: var(--gs-terminal);
+  }
+  .traffic-amber {
+    color: var(--gs-warning);
+  }
+  .traffic-red {
+    color: var(--gs-critical);
+  }
+  .traffic-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    box-shadow: inset 0 1px 2px oklch(1 0 0 / 0.3);
+  }
+  .traffic-dot-green { background: var(--gs-terminal); }
+  .traffic-dot-amber { background: var(--gs-warning); }
+  .traffic-dot-red { background: var(--gs-critical); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CRT / Atmospheric Effects
+   All effects are pointer-events:none, CSS-only, <1ms/frame.
+   Respect prefers-reduced-motion.
+   ═══════════════════════════════════════════════════════════════ */
 
 @layer utilities {
-  .hero-gradient {
-    background: linear-gradient(135deg, #1A1A2E 0%, #16213E 50%, #0F3460 100%);
+  /* ── CRT Scanlines ────────────────────────────────────────
+     Very subtle (3% opacity). Atmospheric, not obstructive. */
+  .crt-scanlines {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    contain: strict;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      oklch(0 0 0 / 0.03) 2px,
+      oklch(0 0 0 / 0.03) 4px
+    );
+    mix-blend-mode: multiply;
   }
 
-  .glass {
-    @apply bg-white/80 backdrop-blur-lg;
+  /* ── CRT Vignette ─────────────────────────────────────────
+     Subtle edge darkening */
+  .crt-vignette {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9998;
+    contain: strict;
+    background: radial-gradient(
+      ellipse at center,
+      transparent 60%,
+      oklch(0 0 0 / 0.06) 100%
+    );
   }
 
-  .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-accent to-highlight;
+  /* ── Noise Grain ──────────────────────────────────────────
+     Static SVG noise at 6% opacity */
+  .noise-grain {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9997;
+    contain: strict;
+    opacity: 0.06;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 256px 256px;
+  }
+
+  /* ── Ghost Glow Utility ───────────────────────────────────── */
+  .ghost-glow {
+    filter: drop-shadow(0 0 12px var(--gs-cyan)) drop-shadow(0 0 24px oklch(0.82 0.12 192 / 0.3));
+  }
+  .ghost-glow-fuchsia {
+    filter: drop-shadow(0 0 8px var(--gs-fuchsia)) drop-shadow(0 0 16px oklch(0.65 0.18 350 / 0.3));
+  }
+
+  /* ── Chloé's Gradient Text ────────────────────────────────── */
+  .text-ghost-gradient {
+    background: var(--gs-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* ── Terminal Text Glow ───────────────────────────────────── */
+  .terminal-glow {
+    text-shadow: 0 0 4px var(--gs-terminal), 0 0 8px oklch(0.80 0.15 145 / 0.3);
+  }
+
+  /* ── Skeleton Loading (Updated) ───────────────────────────── */
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      var(--gs-light) 0%,
+      var(--gs-mid-light) 50%,
+      var(--gs-light) 100%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-slide 1.5s ease-in-out infinite;
   }
 }
 
-/* Skeleton loading animation */
-@keyframes skeleton-pulse {
-  0%, 100% { opacity: 0.4; transform: scale(0.98); }
-  50% { opacity: 1; transform: scale(1); }
+@keyframes skeleton-slide {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
-.skeleton {
-  animation: skeleton-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+/* ═══════════════════════════════════════════════════════════════
+   Custom Scrollbars — Retro OS Style
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Webkit (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 16px;
+  height: 16px;
+}
+::-webkit-scrollbar-track {
+  background: var(--gs-light);
+  border: 1px solid var(--gs-mid);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--gs-light);
+  border: 2px solid;
+  border-color: var(--gs-white) var(--gs-mid-dark) var(--gs-mid-dark) var(--gs-white);
+  min-height: 24px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gs-mid-light);
+}
+::-webkit-scrollbar-thumb:active {
+  border-color: var(--gs-mid-dark) var(--gs-white) var(--gs-white) var(--gs-mid-dark);
+}
+::-webkit-scrollbar-button {
+  background: var(--gs-light);
+  border: 2px solid;
+  border-color: var(--gs-white) var(--gs-mid-dark) var(--gs-mid-dark) var(--gs-white);
+  height: 16px;
+  width: 16px;
+}
+::-webkit-scrollbar-corner {
+  background: var(--gs-light);
 }
 
-/* ════════════════════════════════════════════════════════════
-   Print stylesheet — Landscape 16:9 slide cards
-   Each .slide-card maps to one landscape page
-   ════════════════════════════════════════════════════════════ */
+/* Firefox */
+* {
+  scrollbar-width: auto;
+  scrollbar-color: var(--gs-mid-light) var(--gs-light);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Custom Cursors
+   ═══════════════════════════════════════════════════════════════ */
+
+body {
+  cursor: url('/cursors/default.svg') 0 0, default;
+}
+a, button, [role="button"], .bevel-button, .bevel-button-primary, [cursor="pointer"] {
+  cursor: url('/cursors/pointer.svg') 6 0, pointer;
+}
+input, textarea, [contenteditable] {
+  cursor: url('/cursors/text.svg') 4 8, text;
+}
+.cursor-wait, [data-loading="true"] {
+  cursor: url('/cursors/hourglass.svg') 8 8, wait;
+}
+.cursor-ghost {
+  cursor: url('/cursors/ghost.svg') 8 8, default;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Reduced Motion — Respect accessibility
+   ═══════════════════════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+  .crt-scanlines,
+  .crt-vignette,
+  .noise-grain {
+    display: none !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Print Stylesheet — Hide OS chrome, show clean data
+   ═══════════════════════════════════════════════════════════════ */
+
 @media print {
-  /* Landscape paper */
   @page {
     size: landscape;
     margin: 10mm;
   }
 
-  /* Ensure colors print */
   * {
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
@@ -67,112 +618,62 @@
     text-shadow: none !important;
   }
 
-  /* Hide sidebar, top bar, and interactive elements */
-  .scan-sidebar,
-  .scan-sidebar-toggle,
-  .scan-topbar,
-  .report-sidebar,
-  .report-topbar,
-  .share-button,
-  .download-button,
-  .tooltip,
-  .expand-button,
-  .collapse-button,
+  /* Hide all OS chrome */
+  .gs-menubar,
+  .gs-taskbar,
+  .gs-desktop-icons,
+  .gs-chloe-screenmate,
+  .crt-scanlines,
+  .crt-vignette,
+  .noise-grain,
+  .window-titlebar-buttons,
+  .bevel-button,
+  .bevel-button-primary,
+  .redacted-stamp,
+  .redacted::after,
   [data-interactive],
-  .hover-overlay,
-  .unlock-overlay,
-  .recharts-tooltip-wrapper,
-  .chart-expand-button,
-  .chart-filter-controls,
-  .chart-hover-indicator {
+  [data-no-print] {
     display: none !important;
   }
 
-  /* Expand all collapsed sections */
-  [data-expandable] {
-    max-height: none !important;
+  /* Windows become borderless containers */
+  .window {
+    border: none !important;
+    box-shadow: none !important;
+    background: white !important;
+  }
+  .window-titlebar {
+    background: none !important;
+    color: black !important;
+    border-bottom: 1px solid #ccc;
+  }
+  .window-content {
+    border: none !important;
+    margin: 0 !important;
     overflow: visible !important;
   }
-  [data-collapsed] {
-    display: block !important;
-  }
 
-  /* Dashboard layout: remove flex, full-width */
-  .scan-dashboard {
-    display: block !important;
-    margin: 0 !important;
-  }
-
-  /* Slide cards: one per page, no shadow */
-  .slide-card {
+  /* Module panels: one per page */
+  .module-panel {
     break-before: page;
     break-inside: avoid;
-    border: 1px solid #E2E8F0 !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    page-break-after: always;
+    border: 1px solid #ddd !important;
   }
-  .slide-card:first-child {
+  .module-panel:first-child {
     break-before: auto;
   }
 
-  /* Other page break rules */
-  .report-section {
-    break-before: always;
-  }
-  .report-section:first-child {
-    break-before: auto;
-  }
-  .chart-container,
-  .finding-card,
-  .data-table,
-  .report-chart-container,
-  .recharts-wrapper {
-    break-inside: avoid;
-  }
-  .section-header,
-  .report-section-header {
-    break-after: avoid;
-  }
-
-  /* Typography adjustments for print */
   body {
     font-size: 10pt;
     color: #000 !important;
     background: white !important;
+    overflow: visible !important;
   }
   h1 { font-size: 18pt; }
   h2 { font-size: 14pt; }
   h3 { font-size: 12pt; }
 
-  /* Chart adjustments */
-  .recharts-cartesian-grid-horizontal line,
-  .recharts-cartesian-grid-vertical line {
-    stroke: #E2E8F0 !important;
-    stroke-dasharray: none !important;
-  }
-  .recharts-text,
-  .recharts-legend-item-text {
-    fill: #1A1A2E !important;
-    font-size: 10px !important;
-  }
-  .recharts-legend-wrapper {
-    display: block !important;
-  }
-  .chart-container {
-    border: 1px solid #E2E8F0;
-  }
-
-  /* Content width — fill available space */
-  .report-content {
-    max-width: 100% !important;
-    padding: 0 !important;
-    margin-left: 0 !important;
-  }
-
-  /* Watermark (subtle) */
+  /* Show watermark */
   .print-watermark {
     display: block !important;
     position: fixed;
@@ -180,52 +681,29 @@
     left: 50%;
     transform: translate(-50%, -50%) rotate(-45deg);
     font-size: 72pt;
-    color: rgba(0, 0, 0, 0.03);
+    color: oklch(0 0 0 / 0.03);
     white-space: nowrap;
     z-index: 9999;
     pointer-events: none;
   }
-
-  /* Print header/footer */
-  .print-header {
-    display: block !important;
-    position: running(header);
-  }
-  .print-footer {
-    display: block !important;
-    position: running(footer);
-  }
 }
 
-/* High contrast mode (Section 9.5) */
+/* ═══════════════════════════════════════════════════════════════
+   High Contrast Mode
+   ═══════════════════════════════════════════════════════════════ */
+
 @media (prefers-contrast: high) {
-  .bento-card,
-  .bento-card-1x1,
-  .bento-card-2x1,
-  .bento-card-1x2,
-  .bento-card-2x2 {
-    border-width: 2px;
-    border-color: #1A1A2E;
+  .window {
+    border-width: 3px;
+    border-color: var(--gs-black);
   }
-
-  .recharts-cartesian-grid line {
-    stroke: #94A3B8 !important;
+  .bevel-button {
+    border-color: var(--gs-black);
   }
-
-  .recharts-text {
-    fill: #1A1A2E !important;
+  .module-panel {
+    border-color: var(--gs-black);
   }
-
-  .recharts-line .recharts-curve {
-    stroke-width: 3 !important;
-  }
-
-  .recharts-bar-rectangle rect {
-    stroke: #1A1A2E !important;
-    stroke-width: 1 !important;
-  }
-
-  .traffic-light-icon {
-    display: inline-block !important;
+  .traffic-dot {
+    border: 1px solid var(--gs-black);
   }
 }

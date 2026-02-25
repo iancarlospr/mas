@@ -1,5 +1,15 @@
 'use client';
 
+/**
+ * GhostScan OS — Global Error Boundary
+ * ═══════════════════════════════════════════
+ *
+ * WHAT: Root-level error fallback.
+ * WHY:  Even catastrophic failures look intentional (Plan Section 17).
+ * HOW:  Inline styles only (CSS may not have loaded). Retro aesthetic
+ *       maintained with system colors.
+ */
+
 export default function GlobalError({
   error,
   reset,
@@ -8,24 +18,26 @@ export default function GlobalError({
   reset: () => void;
 }) {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#FAFBFC]">
-      <div className="text-center max-w-md px-6">
-        <h1 className="font-heading font-700 text-4xl text-[#1A1A2E]">
-          Something went wrong
+    <div className="min-h-screen flex items-center justify-center bg-gs-black relative">
+      <div className="noise-grain" aria-hidden="true" />
+      <div className="text-center max-w-md px-gs-4">
+        <div className="text-[64px] mb-gs-4">👻</div>
+        <h1 className="font-system text-[32px] font-bold text-gs-near-white mb-gs-4">
+          System Crash
         </h1>
-        <p className="mt-4 text-[#64748B]">
-          An unexpected error occurred. Please try again.
+        <p className="font-data text-data-lg text-gs-mid-light mb-gs-2">
+          An unexpected error occurred.
         </p>
         {error.digest && (
-          <p className="mt-2 text-xs text-[#94A3B8] font-mono">
+          <p className="font-data text-data-xs text-gs-mid-light mb-gs-6">
             Error ID: {error.digest}
           </p>
         )}
         <button
           onClick={reset}
-          className="mt-8 bg-[#0F3460] text-white rounded-lg px-6 py-3 font-heading font-700 hover:bg-[#0F3460]/90 transition-colors"
+          className="bevel-button-primary text-os-sm"
         >
-          Try Again
+          Reboot
         </button>
       </div>
     </div>

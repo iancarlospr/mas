@@ -1,5 +1,14 @@
 import Link from 'next/link';
 
+/**
+ * GhostScan OS — Marketing Footer
+ * ═══════════════════════════════════════
+ *
+ * WHAT: Footer for marketing pages with retro GhostScan OS styling.
+ * WHY:  Consistent brand experience from navbar to footer (Plan Section 14).
+ * HOW:  Bevel-raised bar, system font, ghost pixel logo, OS-styled links.
+ */
+
 const footerLinks = {
   Product: [
     { href: '/#features', label: 'Features' },
@@ -11,36 +20,41 @@ const footerLinks = {
     { href: 'mailto:support@marketingalphascan.com', label: 'Contact' },
   ],
   Legal: [
-    { href: '/privacy', label: 'Privacy Policy' },
-    { href: '/terms', label: 'Terms of Service' },
-    { href: '/cookies', label: 'Cookie Policy' },
+    { href: '/privacy', label: 'Privacy' },
+    { href: '/terms', label: 'Terms' },
   ],
 };
 
 export function Footer() {
   return (
-    <footer className="border-t border-border bg-surface">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+    <footer className="bg-gs-light bevel-raised border-t-0 mt-gs-8">
+      <div className="mx-auto max-w-7xl px-gs-4 py-gs-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-gs-6">
+          {/* Brand */}
           <div className="col-span-2 md:col-span-1">
-            <span className="font-heading text-lg font-800 text-primary">
-              MarketingAlpha<span className="text-highlight">Scan</span>
-            </span>
-            <p className="mt-2 text-sm text-muted">
-              Forensic marketing intelligence for any URL.
+            <div className="flex items-center gap-gs-2 mb-gs-2">
+              <span className="text-os-lg">👻</span>
+              <span className="font-system text-os-base font-bold text-ghost-gradient">
+                AlphaScan
+              </span>
+            </div>
+            <p className="font-data text-data-xs text-gs-mid">
+              Forensic marketing intelligence. Powered by GhostScan™.
             </p>
           </div>
+
+          {/* Link columns */}
           {Object.entries(footerLinks).map(([category, links]) => (
             <div key={category}>
-              <h3 className="font-heading text-sm font-700 text-primary mb-3">
+              <h3 className="font-system text-os-xs text-gs-mid-dark uppercase tracking-wider mb-gs-2">
                 {category}
               </h3>
-              <ul className="space-y-2">
+              <ul className="space-y-gs-1">
                 {links.map((link) => (
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className="text-sm text-muted hover:text-primary transition-colors"
+                      className="font-data text-data-xs text-gs-mid hover:text-gs-fuchsia transition-colors"
                     >
                       {link.label}
                     </Link>
@@ -50,9 +64,12 @@ export function Footer() {
             </div>
           ))}
         </div>
-        <div className="mt-12 pt-8 border-t border-border">
-          <p className="text-xs text-muted text-center">
+
+        {/* Bottom bar */}
+        <div className="mt-gs-8 pt-gs-4 border-t border-gs-mid">
+          <p className="font-data text-data-xs text-gs-mid-light text-center">
             &copy; {new Date().getFullYear()} MarketingAlphaScan. All rights reserved.
+            Built with GhostScan OS v2.0.26.
           </p>
         </div>
       </div>

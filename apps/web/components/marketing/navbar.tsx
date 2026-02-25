@@ -4,7 +4,19 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { cn } from '@/lib/utils';
+
+/**
+ * GhostScan OS — Marketing NavBar
+ * ═══════════════════════════════════════
+ *
+ * WHAT: Top navigation for marketing pages (landing, pricing, about, blog).
+ * WHY:  The old navbar was generic SaaS with glass blur. Now it matches
+ *       the GhostScan OS aesthetic — menu bar style, pixel font logo,
+ *       Chloé's gradient accent (Plan Section 14).
+ * HOW:  Bevel-raised bar with system font, ghost pixel logo, retro
+ *       link styling. Preserves all auth logic (Supabase user state,
+ *       sign out, conditional nav items).
+ */
 
 const navLinks = [
   { href: '/#features', label: 'Features' },
@@ -20,11 +32,13 @@ export function NavBar() {
 
   useEffect(() => {
     const supabase = createClient();
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUser(user);
+    supabase.auth.getUser().then(({ data: { user: u } }) => {
+      setUser(u);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
     });
 
@@ -40,56 +54,50 @@ export function NavBar() {
   };
 
   return (
-    <header className="sticky top-0 z-50 glass border-b border-border/50">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <span className="font-heading text-xl font-800 text-primary">
-              MarketingAlpha<span className="text-highlight">Scan</span>
+    <header className="sticky top-0 z-50 bg-gs-light bevel-raised border-b-0">
+      <div className="mx-auto max-w-7xl px-gs-4">
+        <div className="flex h-[44px] items-center justify-between">
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-gs-2">
+            <span className="text-os-lg">👻</span>
+            <span className="font-system text-os-base font-bold text-ghost-gradient">
+              AlphaScan
             </span>
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="hidden md:flex items-center gap-gs-1">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+                className="bevel-button text-os-sm"
               >
                 {link.label}
               </Link>
             ))}
           </nav>
 
-          <div className="hidden md:flex items-center gap-4">
+          {/* Desktop auth actions */}
+          <div className="hidden md:flex items-center gap-gs-2">
             {user ? (
               <>
-                <Link
-                  href="/history"
-                  className="inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
-                >
+                <Link href="/history" className="bevel-button-primary text-os-sm">
                   My Scans
                 </Link>
                 <button
                   onClick={handleSignOut}
-                  className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+                  className="bevel-button text-os-sm"
                 >
                   Sign out
                 </button>
               </>
             ) : (
               <>
-                <Link
-                  href="/login"
-                  className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
-                >
+                <Link href="/login" className="bevel-button text-os-sm">
                   Log in
                 </Link>
-                <Link
-                  href="/register"
-                  className="inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
-                >
+                <Link href="/register" className="bevel-button-primary text-os-sm">
                   Get Started
                 </Link>
               </>
@@ -98,65 +106,62 @@ export function NavBar() {
 
           {/* Mobile menu button */}
           <button
-            className="md:hidden p-2"
+            className="md:hidden bevel-button p-gs-1"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="Toggle menu"
           >
-            <svg
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-            >
-              {mobileOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 9h16.5m-16.5 6.75h16.5" />
-              )}
-            </svg>
+            <span className="font-system text-os-base">
+              {mobileOpen ? '✕' : '☰'}
+            </span>
           </button>
         </div>
 
-        {/* Mobile nav */}
+        {/* Mobile nav dropdown */}
         {mobileOpen && (
-          <div className="md:hidden border-t border-border/50 py-4">
-            <nav className="flex flex-col gap-4">
+          <div className="md:hidden border-t border-gs-mid py-gs-3 bg-gs-light">
+            <nav className="flex flex-col gap-gs-1">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="text-sm font-medium text-muted-foreground"
+                  className="bevel-button text-os-sm w-full text-left"
                   onClick={() => setMobileOpen(false)}
                 >
                   {link.label}
                 </Link>
               ))}
-              <div className="flex gap-4 pt-4 border-t border-border/50">
+              <div className="flex gap-gs-2 pt-gs-3 border-t border-gs-mid mt-gs-2">
                 {user ? (
                   <>
                     <Link
                       href="/history"
-                      className="inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+                      className="bevel-button-primary text-os-sm flex-1 text-center"
                       onClick={() => setMobileOpen(false)}
                     >
                       My Scans
                     </Link>
                     <button
-                      onClick={() => { handleSignOut(); setMobileOpen(false); }}
-                      className="text-sm font-medium"
+                      onClick={() => {
+                        handleSignOut();
+                        setMobileOpen(false);
+                      }}
+                      className="bevel-button text-os-sm"
                     >
                       Sign out
                     </button>
                   </>
                 ) : (
                   <>
-                    <Link href="/login" className="text-sm font-medium" onClick={() => setMobileOpen(false)}>
+                    <Link
+                      href="/login"
+                      className="bevel-button text-os-sm"
+                      onClick={() => setMobileOpen(false)}
+                    >
                       Log in
                     </Link>
                     <Link
                       href="/register"
-                      className="inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+                      className="bevel-button-primary text-os-sm flex-1 text-center"
                       onClick={() => setMobileOpen(false)}
                     >
                       Get Started

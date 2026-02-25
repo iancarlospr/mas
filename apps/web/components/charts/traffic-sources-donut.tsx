@@ -3,7 +3,7 @@
 import {
   PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer,
 } from 'recharts';
-import { TRAFFIC_SOURCE_COLORS, CHART_PALETTE, TOOLTIP_STYLE, TOOLTIP_LABEL_STYLE, TOOLTIP_ITEM_STYLE } from '@/lib/chart-config';
+import { TRAFFIC_SOURCE_COLORS, CHART_PALETTE, TOOLTIP_STYLE, TOOLTIP_LABEL_STYLE, TOOLTIP_ITEM_STYLE, OKLCH } from '@/lib/chart-config';
 import { formatters } from '@/lib/chart-config';
 
 interface TrafficSource {
@@ -25,7 +25,7 @@ function DonutTooltip({ active, payload }: { active?: boolean; payload?: Array<{
     <div style={TOOLTIP_STYLE}>
       <p style={TOOLTIP_LABEL_STYLE}>{entry.payload.source}</p>
       <p style={TOOLTIP_ITEM_STYLE}>
-        <span style={{ color: '#FAFBFC', fontFamily: '"JetBrains Mono", monospace' }}>
+        <span style={{ color: OKLCH.nearWhite, fontFamily: 'var(--font-data)' }}>
           {entry.payload.percentage}%
         </span>
         {' · '}
@@ -72,9 +72,9 @@ export function TrafficSourcesDonut({ data, height = 200, compact = false }: Tra
               iconType="circle"
               iconSize={8}
               wrapperStyle={{
-                fontFamily: '"Inter", sans-serif',
+                fontFamily: 'var(--font-data)',
                 fontSize: '12px',
-                color: '#64748B',
+                color: OKLCH.mid,
                 paddingTop: '16px',
               }}
             />
@@ -86,10 +86,10 @@ export function TrafficSourcesDonut({ data, height = 200, compact = false }: Tra
             textAnchor="middle"
             dominantBaseline="central"
             style={{
-              fontFamily: '"JetBrains Mono", monospace',
+              fontFamily: 'var(--font-data)',
               fontSize: compact ? 20 : 28,
               fontWeight: 700,
-              fill: '#1A1A2E',
+              fill: OKLCH.black,
             }}
           >
             {formatters.thousands(totalVisits)}

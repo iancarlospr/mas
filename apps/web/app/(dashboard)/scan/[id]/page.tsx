@@ -4,11 +4,32 @@ import { useEffect, useState, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import { ScanProgress } from '@/components/scan/scan-progress';
 import { BentoDashboard } from '@/components/scan/bento-dashboard';
+import { MobileDashboard } from '@/components/scan/mobile-dashboard';
+import { useViewport } from '@/hooks/use-viewport';
+import { ChloeSprite } from '@/components/chloe/chloe-sprite';
+import { ChloeSpeech } from '@/components/chloe/chloe-speech';
+import { Window } from '@/components/os/window';
+import { pickRandom, ERROR_STATES } from '@/lib/chloe-ai-copy';
 import type { ScanWithResults } from '@marketing-alpha/types';
 import { analytics } from '@/lib/analytics';
 
+/**
+ * GhostScan OS — Scan Page
+ * ═══════════════════════════
+ *
+ * WHAT: The main scan route — handles loading, in-progress (Hollywood Hack),
+ *       failed, and complete (Desktop Dashboard) states.
+ * WHY:  This is the entry point to the scan experience (Plan Section 5, 6).
+ * HOW:  Fetches scan data, renders ScanProgress during scanning (which
+ *       drives the full Hollywood Hack sequence), then BentoDashboard
+ *       (which renders the Desktop OS) when complete.
+ *
+ * All states now use GhostScan OS visual language.
+ */
+
 export default function ScanPage() {
   const { id } = useParams<{ id: string }>();
+  const viewport = useViewport();
   const [scan, setScan] = useState<ScanWithResults | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -25,34 +46,45 @@ export default function ScanPage() {
     fetchScan();
   }, [fetchScan]);
 
+  /* ── Loading state ───────────────────────────────────────── */
   if (loading) {
     return (
-      <div className="animate-pulse space-y-6 py-12">
-        <div className="h-8 bg-border rounded w-1/3" />
-        <div className="h-4 bg-border rounded w-1/2" />
-        <div className="grid grid-cols-3 gap-4">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-32 bg-border rounded-xl" />
-          ))}
+      <div className="fixed inset-0 bg-gs-black flex items-center justify-center">
+        <div className="text-center">
+          <ChloeSprite state="scanning" size={64} glowing />
+          <p className="font-data text-data-sm text-gs-terminal mt-gs-4 terminal-glow animate-blink">
+            Loading scan data...
+          </p>
         </div>
       </div>
     );
   }
 
+  /* ── Not found state ─────────────────────────────────────── */
   if (!scan) {
     return (
-      <div className="text-center py-12">
-        <h1 className="font-heading text-h3 text-primary mb-2">Scan not found</h1>
-        <p className="text-muted">This scan doesn&apos;t exist or you don&apos;t have access.</p>
+      <div className="fixed inset-0 bg-gs-near-white flex items-center justify-center">
+        <Window id="not-found" title="⚠ Error" variant="dialog" isActive width={400}>
+          <div className="p-gs-6 text-center">
+            <ChloeSprite state="found" size={64} glowing className="mx-auto" />
+            <h1 className="font-system text-os-lg text-gs-black mt-gs-4 mb-gs-2">
+              Scan not found
+            </h1>
+            <p className="font-data text-data-sm text-gs-mid">
+              This scan doesn&apos;t exist or you don&apos;t have access.
+            </p>
+          </div>
+        </Window>
       </div>
     );
   }
 
-  // If scan is still in progress, show progress view
+  /* ── In-progress → Hollywood Hack sequence ───────────────── */
   if (scan.status !== 'complete' && scan.status !== 'failed' && scan.status !== 'cancelled') {
     return (
       <ScanProgress
         scanId={id}
+        domain={scan.domain}
         onComplete={() => {
           fetchScan().then(() => {
             if (scan) analytics.scanCompleted(id, scan.domain, scan.marketingIq);
@@ -62,23 +94,39 @@ export default function ScanPage() {
     );
   }
 
-  // If scan failed
+  /* ── Failed state ────────────────────────────────────────── */
   if (scan.status === 'failed') {
     return (
-      <div className="max-w-lg mx-auto text-center py-12">
-        <div className="mx-auto w-16 h-16 bg-error/10 rounded-full flex items-center justify-center mb-6">
-          <svg className="w-8 h-8 text-error" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
-          </svg>
+      <div className="fixed inset-0 bg-gs-near-white flex items-center justify-center">
+        <div className="relative">
+          <ChloeSprite state="found" size={64} glowing className="absolute -top-[80px] left-1/2 -translate-x-1/2" />
+          <ChloeSpeech
+            message={pickRandom(ERROR_STATES.authError)}
+            variant="alert"
+            autoDismissMs={0}
+            className="absolute -top-[140px] left-1/2 -translate-x-1/2"
+          />
+          <Window id="scan-failed" title="⚠ Scan Failed" variant="dialog" isActive width={440}>
+            <div className="p-gs-6 text-center">
+              <p className="font-data text-data-lg text-gs-critical font-bold mb-gs-2">
+                Scan Could Not Complete
+              </p>
+              <p className="font-data text-data-sm text-gs-mid mb-gs-4">
+                The scan hit a wall. {scan.domain} is either down or blocking us.
+              </p>
+              <p className="font-data text-data-xs text-gs-mid-light">
+                Scan ID: {scan.id}
+              </p>
+            </div>
+          </Window>
         </div>
-        <h1 className="font-heading text-h3 text-primary mb-2">Scan Could Not Complete</h1>
-        <p className="text-muted text-sm">
-          We couldn&apos;t reach {scan.domain}. The site may be blocking automated requests or is temporarily unavailable.
-        </p>
-        <p className="text-xs text-muted mt-4">Scan ID: {scan.id}</p>
       </div>
     );
   }
 
+  /* ── Complete → Dashboard (mobile or desktop) ───────────── */
+  if (viewport === 'mobile') {
+    return <MobileDashboard scan={scan} />;
+  }
   return <BentoDashboard scan={scan} />;
 }

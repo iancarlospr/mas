@@ -2,6 +2,15 @@
 
 import { useState } from 'react';
 
+/**
+ * GhostScan OS — Partial Results Banner
+ * ═══════════════════════════════════════════
+ *
+ * WHAT: Dismissible warning when a scan completes with some module errors.
+ * WHY:  Transparency about data quality without panic (Plan Section 17).
+ * HOW:  Bevel-raised warning banner with retro styling, dismiss button.
+ */
+
 interface PartialResultsProps {
   errorCount: number;
 }
@@ -12,14 +21,17 @@ export function PartialResults({ errorCount }: PartialResultsProps) {
   if (dismissed) return null;
 
   return (
-    <div className="bg-warning/10 border border-warning/20 rounded-lg px-4 py-3 flex items-center justify-between">
-      <p className="text-sm text-warning">
-        This scan completed with partial results. {errorCount} module{errorCount !== 1 ? 's' : ''}{' '}
-        encountered issues. MarketingIQ is based on available data.
+    <div className="bevel-raised bg-gs-warning/10 px-gs-4 py-gs-3 flex items-center justify-between">
+      <p className="font-data text-data-sm text-gs-mid-dark">
+        Most of the scan went fine but{' '}
+        <strong className="text-gs-warning">
+          {errorCount} module{errorCount !== 1 ? 's' : ''}
+        </strong>{' '}
+        ghosted us. Showing what I found. MarketingIQ is based on available data.
       </p>
       <button
         onClick={() => setDismissed(true)}
-        className="text-warning hover:text-warning/80 text-sm ml-4"
+        className="bevel-button text-os-xs ml-gs-4 flex-shrink-0"
       >
         Dismiss
       </button>

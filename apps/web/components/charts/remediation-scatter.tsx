@@ -12,7 +12,7 @@ import {
   Label,
 } from 'recharts';
 import { ChartContainer } from './chart-container';
-import { AXIS_STYLE, GRID_STYLE, CHART_MARGINS, CHART_PALETTE } from '@/lib/chart-config';
+import { AXIS_STYLE, GRID_STYLE, CHART_MARGINS, CHART_PALETTE, OKLCH, QUADRANT_COLORS } from '@/lib/chart-config';
 import { cn } from '@/lib/utils';
 
 interface RemediationTask {
@@ -37,10 +37,10 @@ const PRIORITY_SIZE: Record<string, number> = {
 };
 
 const QUADRANT_LABELS = [
-  { x: 2.5, y: 8, text: 'Quick Wins', color: '#06D6A0' },
-  { x: 7.5, y: 8, text: 'Strategic', color: '#0EA5E9' },
-  { x: 2.5, y: 2, text: 'Fill-Ins', color: '#94A3B8' },
-  { x: 7.5, y: 2, text: 'Deprioritize', color: '#EF476F' },
+  { x: 2.5, y: 8, text: 'Quick Wins', color: QUADRANT_COLORS.quickWins },
+  { x: 7.5, y: 8, text: 'Strategic', color: QUADRANT_COLORS.strategic },
+  { x: 2.5, y: 2, text: 'Fill-Ins', color: QUADRANT_COLORS.lowPriority },
+  { x: 7.5, y: 2, text: 'Deprioritize', color: QUADRANT_COLORS.avoid },
 ];
 
 export function RemediationScatter({
@@ -79,7 +79,7 @@ export function RemediationScatter({
               value="Implementation Effort →"
               position="insideBottom"
               offset={-10}
-              style={{ fontSize: 11, fill: '#64748B', fontFamily: 'Inter, sans-serif' }}
+              style={{ fontSize: 11, fill: OKLCH.mid, fontFamily: 'var(--font-data)' }}
             />
           </XAxis>
           <YAxis
@@ -93,43 +93,43 @@ export function RemediationScatter({
               angle={-90}
               position="insideLeft"
               offset={15}
-              style={{ fontSize: 11, fill: '#64748B', fontFamily: 'Inter, sans-serif' }}
+              style={{ fontSize: 11, fill: OKLCH.mid, fontFamily: 'var(--font-data)' }}
             />
           </YAxis>
           <ZAxis type="number" dataKey="z" range={[50, 200]} />
 
           {/* Quadrant dividers */}
-          <ReferenceLine x={5} stroke="#E2E8F0" strokeDasharray="6 3" />
-          <ReferenceLine y={5} stroke="#E2E8F0" strokeDasharray="6 3" />
+          <ReferenceLine x={5} stroke={OKLCH.light} strokeDasharray="6 3" />
+          <ReferenceLine y={5} stroke={OKLCH.light} strokeDasharray="6 3" />
 
           <Tooltip
             content={({ active, payload }) => {
               if (!active || !payload?.length) return null;
               const d = payload[0]!.payload as (typeof scatterData)[0];
               return (
-                <div className="bg-[#1A1A2E] text-white rounded-lg px-4 py-3 shadow-lg text-xs max-w-[240px]">
-                  <div className="font-heading font-bold text-sm mb-1">{d.name}</div>
-                  <div className="text-[#94A3B8]">
+                <div className="bg-gs-black text-white rounded-lg px-4 py-3 shadow-lg text-xs max-w-[240px]">
+                  <div className="font-system font-bold text-sm mb-1">{d.name}</div>
+                  <div className="text-gs-mid-light">
                     Impact: <span className="text-white font-mono">{d.y}/10</span>
                   </div>
-                  <div className="text-[#94A3B8]">
+                  <div className="text-gs-mid-light">
                     Effort: <span className="text-white font-mono">{d.x}/10</span>
                   </div>
-                  <div className="text-[#94A3B8]">
+                  <div className="text-gs-mid-light">
                     Priority:{' '}
                     <span
                       className={cn(
                         'font-mono',
-                        d.priority === 'critical' && 'text-[#EF476F]',
-                        d.priority === 'high' && 'text-[#FFD166]',
-                        d.priority === 'medium' && 'text-[#06D6A0]',
-                        d.priority === 'low' && 'text-[#94A3B8]',
+                        d.priority === 'critical' && 'text-gs-critical',
+                        d.priority === 'high' && 'text-gs-warning',
+                        d.priority === 'medium' && 'text-gs-terminal',
+                        d.priority === 'low' && 'text-gs-mid-light',
                       )}
                     >
                       {d.priority}
                     </span>
                   </div>
-                  <div className="text-[#94A3B8]">Category: <span className="text-white">{d.category}</span></div>
+                  <div className="text-gs-mid-light">Category: <span className="text-white">{d.category}</span></div>
                 </div>
               );
             }}

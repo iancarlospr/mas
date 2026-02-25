@@ -1,6 +1,16 @@
 'use client';
 
 import Link from 'next/link';
+import { ChloeSprite } from '@/components/chloe/chloe-sprite';
+
+/**
+ * GhostScan OS — Dashboard Error Boundary
+ * ═══════════════════════════════════════════════
+ *
+ * WHAT: Error fallback for dashboard pages.
+ * WHY:  Even crashes get the Chloe treatment (Plan Section 17).
+ * HOW:  Chloe critical sprite, retro error dialog, retry + escape buttons.
+ */
 
 export default function DashboardError({
   error,
@@ -10,29 +20,27 @@ export default function DashboardError({
   reset: () => void;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center py-24">
-      <h1 className="font-heading font-700 text-3xl text-primary">
-        Something went wrong
+    <div className="flex flex-col items-center justify-center py-gs-16">
+      <ChloeSprite state="critical" size={64} glowing className="mb-gs-6" />
+
+      <h1 className="font-system text-os-lg font-bold text-gs-black mb-gs-2">
+        Something Broke
       </h1>
-      <p className="mt-4 text-muted-foreground max-w-md text-center">
-        An error occurred while loading this page. Please try again or go back to your scans.
+      <p className="font-data text-data-sm text-gs-mid max-w-md text-center mb-gs-4">
+        An error occurred while loading this page. Not my fault.
       </p>
+
       {error.digest && (
-        <p className="mt-2 text-xs text-muted-foreground/60 font-mono">
+        <p className="font-data text-data-xs text-gs-mid-light mb-gs-6">
           Error ID: {error.digest}
         </p>
       )}
-      <div className="mt-8 flex gap-4">
-        <button
-          onClick={reset}
-          className="bg-[#0F3460] text-white rounded-lg px-6 py-3 font-heading font-700 hover:bg-[#0F3460]/90 transition-colors"
-        >
+
+      <div className="flex gap-gs-4">
+        <button onClick={reset} className="bevel-button-primary text-os-sm">
           Try Again
         </button>
-        <Link
-          href="/history"
-          className="border border-border rounded-lg px-6 py-3 font-heading font-700 text-primary hover:bg-muted transition-colors"
-        >
+        <Link href="/history" className="bevel-button text-os-sm">
           My Scans
         </Link>
       </div>

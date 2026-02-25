@@ -1,54 +1,159 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import type { ScanProgressEvent, ScanStatus } from '@marketing-alpha/types';
-import { cn } from '@/lib/utils';
+import { soundEffects } from '@/lib/sound-effects';
+import { ScanSequence } from './scan-sequence';
+
+/**
+ * GhostScan OS — Scan Progress (SSE → Hollywood Hack Bridge)
+ * ═══════════════════════════════════════════════════════════════
+ *
+ * WHAT: Connects the SSE scan progress stream to the Hollywood Hack
+ *       loading sequence. This is the bridge between backend events
+ *       and the theatrical frontend experience.
+ * WHY:  The original component was a generic progress bar with phase dots.
+ *       Now it drives the full-screen cinematic scan sequence that is
+ *       the single most memorable moment in the product (Plan Section 5).
+ * HOW:  Opens EventSource to /api/scans/{id}/stream, collects SSE events,
+ *       and passes them as props to <ScanSequence> which handles all
+ *       the visual choreography. SSE logic is UNCHANGED from original —
+ *       only the rendering is replaced.
+ *
+ * Backend contract (unchanged):
+ *   SSE events: { type: 'status'|'module'|'complete'|'error',
+ *                 scanId, status, moduleId?, moduleScore?, progress?,
+ *                 marketingIq?, error? }
+ */
 
 interface ScanProgressProps {
+  /** Scan ID for SSE stream */
   scanId: string;
+  /** Target domain (for display in the sequence) */
+  domain: string;
+  /** Callback when scan completes and sequence finishes */
   onComplete: () => void;
+  /** Whether this scan was served from cache */
+  isCached?: boolean;
+  /** Whether this is the user's first scan */
+  isFirstScan?: boolean;
+  /** User's display name */
+  userName?: string;
 }
 
-const PHASES: { status: ScanStatus; label: string; number: number }[] = [
-  { status: 'passive', label: 'Infrastructure', number: 1 },
-  { status: 'browser', label: 'Browser Analysis', number: 2 },
-  { status: 'ghostscan', label: 'GhostScan', number: 3 },
-  { status: 'external', label: 'Market Intel', number: 4 },
-  { status: 'synthesis', label: 'AI Synthesis', number: 5 },
-];
+/** Module name lookup — maps IDs to human-readable names for the terminal boot */
+const MODULE_NAMES: Record<string, string> = {
+  M01: 'DNS & Security',
+  M02: 'CMS & Infrastructure',
+  M03: 'Performance',
+  M04: 'Page Metadata',
+  M05: 'Analytics Architecture',
+  M06: 'Paid Media',
+  M06b: 'PPC Landing Audit',
+  M07: 'MarTech Orchestration',
+  M08: 'Tag Governance',
+  M09: 'Behavioral Intel',
+  M10: 'Accessibility',
+  M11: 'Console Errors',
+  M12: 'Compliance',
+  M13: 'Performance & Carbon',
+  M14: 'Mobile & Responsive',
+  M15: 'Social & Sharing',
+  M16: 'PR & Media',
+  M17: 'Careers & HR',
+  M18: 'Investor Relations',
+  M19: 'Support',
+  M20: 'Ecommerce/SaaS',
+  M21: 'Ad Library',
+  M22: 'News Sentiment',
+  M23: 'Social Sentiment',
+  M24: 'Monthly Visits',
+  M25: 'Traffic by Country',
+  M26: 'Rankings',
+  M27: 'Paid Traffic Cost',
+  M28: 'Top Paid Keywords',
+  M29: 'Competitors',
+  M30: 'Traffic Sources',
+  M31: 'Domain Trust',
+  M33: 'Brand Search',
+  M34: 'Losing Keywords',
+  M36: 'Google Shopping',
+  M37: 'Review Velocity',
+  M38: 'Local Pack',
+  M39: 'Sitemap & Indexing',
+  M40: 'Attack Surface',
+  M42: 'Executive Brief',
+  M43: 'Remediation Roadmap',
+  M44: 'Impact Scenarios',
+  M45: 'Stack Analyzer',
+};
 
 interface CompletedModule {
-  moduleId: string;
+  id: string;
+  name: string;
   score: number | null;
 }
 
-export function ScanProgress({ scanId, onComplete }: ScanProgressProps) {
+export function ScanProgress({
+  scanId,
+  domain,
+  onComplete,
+  isCached = false,
+  isFirstScan = true,
+  userName,
+}: ScanProgressProps) {
+  /* ── SSE state (logic preserved from original) ───────────── */
   const [status, setStatus] = useState<ScanStatus>('queued');
   const [progress, setProgress] = useState(0);
   const [completedModules, setCompletedModules] = useState<CompletedModule[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [marketingIq, setMarketingIq] = useState<number | undefined>();
+  const [sequenceComplete, setSequenceComplete] = useState(false);
   const eventSourceRef = useRef<EventSource | null>(null);
 
+  /* ── SSE connection (unchanged logic from original) ──────── */
   useEffect(() => {
     const es = new EventSource(`/api/scans/${scanId}/stream`);
     eventSourceRef.current = es;
 
+    let scanStartFired = false;
+
     es.onmessage = (event) => {
       const data: ScanProgressEvent = JSON.parse(event.data);
 
-      if (data.status) setStatus(data.status);
+      if (data.status) {
+        setStatus(data.status);
+        // Fire scanStart on first non-queued status
+        if (!scanStartFired && data.status !== 'queued') {
+          scanStartFired = true;
+          soundEffects.play('scanStart');
+        }
+      }
       if (data.progress != null) setProgress(data.progress);
+      if (data.marketingIq != null) setMarketingIq(data.marketingIq);
 
       if (data.type === 'module' && data.moduleId) {
+        soundEffects.play('moduleComplete');
+        // Critical finding sound when module score < 30
+        if (data.moduleScore != null && data.moduleScore < 30) {
+          soundEffects.play('criticalFound');
+        }
         setCompletedModules((prev) => {
-          if (prev.some((m) => m.moduleId === data.moduleId)) return prev;
-          return [...prev, { moduleId: data.moduleId!, score: data.moduleScore ?? null }];
+          if (prev.some((m) => m.id === data.moduleId)) return prev;
+          return [
+            ...prev,
+            {
+              id: data.moduleId!,
+              name: MODULE_NAMES[data.moduleId!] ?? data.moduleId!,
+              score: data.moduleScore ?? null,
+            },
+          ];
         });
       }
 
       if (data.type === 'complete') {
+        soundEffects.play('scanComplete');
         es.close();
-        onComplete();
       }
 
       if (data.type === 'error') {
@@ -64,96 +169,60 @@ export function ScanProgress({ scanId, onComplete }: ScanProgressProps) {
     return () => {
       es.close();
     };
-  }, [scanId, onComplete]);
+  }, [scanId]);
 
-  const currentPhaseIndex = PHASES.findIndex((p) => p.status === status);
+  /* ── When the visual sequence finishes, notify parent ────── */
+  const handleSequenceComplete = useCallback(() => {
+    setSequenceComplete(true);
+    onComplete();
+  }, [onComplete]);
 
+  /* ── Derive score label from MarketingIQ ─────────────────── */
+  const scoreLabel = marketingIq != null
+    ? marketingIq >= 85
+      ? 'Marketing Leader'
+      : marketingIq >= 70
+        ? 'Competitive'
+        : marketingIq >= 50
+          ? 'Developing'
+          : marketingIq >= 30
+            ? 'At Risk'
+            : 'Critical'
+    : undefined;
+
+  /* Don't render if sequence already completed */
+  if (sequenceComplete) return null;
+
+  /* Error state — show brief error then let parent handle */
+  if (error) {
+    return (
+      <ScanSequence
+        domain={domain}
+        scanStatus="failed"
+        progress={progress}
+        completedModules={completedModules}
+        isCached={isCached}
+        isFirstScan={isFirstScan}
+        onComplete={handleSequenceComplete}
+        userName={userName}
+      />
+    );
+  }
+
+  /* ── Render the Hollywood Hack sequence ──────────────────── */
   return (
-    <div className="max-w-2xl mx-auto py-12">
-      <h2 className="font-heading text-h3 text-primary text-center mb-2">
-        Scanning...
-      </h2>
-      <p className="text-sm text-muted text-center mb-8">
-        Analyzing marketing technology stack across {PHASES.length} phases
-      </p>
-
-      {/* Progress bar */}
-      <div className="w-full bg-border rounded-full h-2 mb-8">
-        <div
-          className="bg-accent h-2 rounded-full transition-all duration-500 ease-out"
-          style={{ width: `${Math.max(progress, 5)}%` }}
-        />
-      </div>
-
-      {/* Phase indicators */}
-      <div className="flex justify-between mb-12">
-        {PHASES.map((phase, i) => {
-          const isActive = i === currentPhaseIndex;
-          const isComplete = i < currentPhaseIndex;
-
-          return (
-            <div key={phase.status} className="flex flex-col items-center gap-2">
-              <div
-                className={cn(
-                  'w-10 h-10 rounded-full flex items-center justify-center text-sm font-heading font-700 transition-all',
-                  isComplete && 'bg-success text-white',
-                  isActive && 'bg-accent text-white animate-pulse',
-                  !isComplete && !isActive && 'bg-border text-muted',
-                )}
-              >
-                {isComplete ? (
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                  </svg>
-                ) : (
-                  phase.number
-                )}
-              </div>
-              <span className={cn(
-                'text-xs font-medium',
-                isActive ? 'text-accent' : 'text-muted',
-              )}>
-                {phase.label}
-              </span>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Completed modules list */}
-      {completedModules.length > 0 && (
-        <div className="space-y-2">
-          <h3 className="text-sm font-heading font-700 text-primary mb-3">
-            Completed Modules
-          </h3>
-          {completedModules.map((mod) => (
-            <div
-              key={mod.moduleId}
-              className="flex items-center justify-between bg-surface border border-border rounded-lg px-4 py-2 animate-in fade-in slide-in-from-bottom-2"
-            >
-              <span className="text-sm font-medium text-primary">
-                {mod.moduleId}
-              </span>
-              {mod.score != null && (
-                <span
-                  className={cn(
-                    'text-sm font-mono font-700',
-                    mod.score >= 70 ? 'text-success' : mod.score >= 40 ? 'text-warning' : 'text-error',
-                  )}
-                >
-                  {mod.score}/100
-                </span>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
-
-      {error && (
-        <div className="mt-8 bg-error/10 border border-error/20 rounded-lg p-4 text-center">
-          <p className="text-sm text-error font-medium">{error}</p>
-        </div>
-      )}
-    </div>
+    <ScanSequence
+      domain={domain}
+      scanStatus={status}
+      progress={progress}
+      completedModules={completedModules}
+      isCached={isCached}
+      isFirstScan={isFirstScan}
+      finalScore={marketingIq}
+      finalScoreLabel={scoreLabel}
+      moduleCount={completedModules.length}
+      onComplete={handleSequenceComplete}
+      userName={userName}
+    />
   );
 }

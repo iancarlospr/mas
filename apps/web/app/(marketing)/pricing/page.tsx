@@ -1,32 +1,90 @@
 import { PricingCards } from '@/components/marketing/pricing-cards';
+import { ChloeSprite } from '@/components/chloe/chloe-sprite';
 import type { Metadata } from 'next';
 
-export const metadata: Metadata = { title: 'Pricing' };
+/**
+ * GhostScan OS — Pricing Page
+ * ═══════════════════════════════
+ *
+ * WHAT: Pricing tiers as retro software "editions" (Standard vs Pro box art).
+ * WHY:  Old pricing was generic SaaS cards. Now matches GhostScan OS brand
+ *       (Plan Section 14). Chloé anchors the page personality.
+ * HOW:  Dark hero with Chloé, bevel-raised content area, retro copy.
+ */
+
+export const metadata: Metadata = {
+  title: 'Pricing — GhostScan OS',
+  description: 'Free forensic scan. Full intelligence dossier for $9.99.',
+};
 
 export default function PricingPage() {
   return (
-    <section className="py-24">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h1 className="font-heading text-h1 text-primary">
-            Simple, Transparent Pricing
-          </h1>
-          <p className="mt-4 text-lg text-muted max-w-2xl mx-auto">
-            Start free. Upgrade when you see the value.
-          </p>
-        </div>
-        <PricingCards />
+    <>
+      {/* Hero */}
+      <section className="relative bg-gs-black py-gs-16">
+        <div className="noise-grain" aria-hidden="true" />
+        <div className="crt-scanlines" aria-hidden="true" />
 
-        <div className="mt-16 text-center">
-          <h2 className="font-heading text-h3 text-primary mb-4">
-            Additional Credits
-          </h2>
-          <p className="text-muted text-sm max-w-lg mx-auto">
-            Need more AI Chat messages? Purchase 100 additional credits for $4.99 (one-time).
-            Credits never expire and work across all your scans.
+        <div className="relative mx-auto max-w-7xl px-gs-4 text-center">
+          <ChloeSprite state="smug" size={64} glowing className="mx-auto mb-gs-6" />
+          <h1 className="font-system text-[clamp(24px,4vw,44px)] font-bold text-gs-near-white mb-gs-3">
+            Choose Your Edition
+          </h1>
+          <p className="font-data text-data-lg text-gs-mid-light max-w-xl mx-auto">
+            The free scan gives you everything. The paid upgrade gives you
+            the receipts.
           </p>
         </div>
-      </div>
-    </section>
+
+        <div className="absolute bottom-0 left-0 right-0 h-[60px] bg-gradient-to-t from-gs-near-white to-transparent" />
+      </section>
+
+      {/* Pricing Cards */}
+      <section className="bg-gs-near-white py-gs-16">
+        <div className="mx-auto max-w-7xl px-gs-4">
+          <PricingCards />
+        </div>
+      </section>
+
+      {/* FAQ / Details */}
+      <section className="bg-gs-light py-gs-16">
+        <div className="mx-auto max-w-3xl px-gs-4">
+          <div className="bevel-raised bg-gs-near-white p-gs-8">
+            <h2 className="font-system text-os-lg font-bold text-gs-black mb-gs-6 text-center">
+              Frequently Asked Questions
+            </h2>
+            <div className="space-y-gs-6">
+              {[
+                {
+                  q: 'What does the free scan include?',
+                  a: 'All 42 forensic modules, GhostScan active probing, a full dashboard with findings, per-module AI insights, PPC landing page audit, and DataForSEO market intelligence. No credit card required.',
+                },
+                {
+                  q: 'What does the Alpha Brief unlock?',
+                  a: 'The full executive intelligence dossier: remediation PRD with timeline, ROI simulator & cost cutter analysis, 15 Chloe chat questions, and a shareable report link. One-time $9.99 — no subscription.',
+                },
+                {
+                  q: 'Do credits expire?',
+                  a: 'Never. Chat credits persist across sessions and work on any of your scans.',
+                },
+                {
+                  q: 'Can I scan competitors?',
+                  a: 'Yes. Any public URL. Chloe doesn\'t discriminate.',
+                },
+              ].map((faq) => (
+                <div key={faq.q}>
+                  <h3 className="font-system text-os-base font-bold text-gs-black mb-gs-1">
+                    {faq.q}
+                  </h3>
+                  <p className="font-data text-data-sm text-gs-mid leading-relaxed">
+                    {faq.a}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+    </>
   );
 }

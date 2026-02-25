@@ -26,22 +26,14 @@ export function PaidSlides({ scanId, isPaid, resultMap }: PaidSlidesProps) {
           <div
             key={moduleId}
             id={`slide-${moduleId}`}
-            className="slide-card relative w-full bg-white border border-border/60 rounded-xl shadow-sm overflow-hidden"
-            style={{ aspectRatio: '16 / 9' }}
+            className="module-panel relative w-full overflow-hidden"
           >
             {/* Header bar */}
-            <div className="flex items-center justify-between px-6 py-3 border-b border-border/40">
-              <div className="flex items-center gap-3">
-                <span className="text-xs font-mono text-muted">{moduleId}</span>
-                <span className="font-heading text-sm font-600 text-primary">{label}</span>
-              </div>
+            <div className="module-panel-header">
+              <span className="font-data text-data-xs text-gs-mid-dark">{moduleId}</span>
+              <span className="flex-1 truncate">{label}</span>
               {!isPaid && (
-                <span className="inline-flex items-center gap-1 text-xs font-medium text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full">
-                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-                  </svg>
-                  Paid
-                </span>
+                <span className="font-system text-os-xs text-gs-fuchsia">🔒 Paid</span>
               )}
             </div>
 
@@ -81,22 +73,22 @@ function ExecutiveBriefContent({ data }: { data: Record<string, unknown> }) {
     <div className="space-y-4 h-full overflow-y-auto">
       {summary && (
         <div>
-          <h4 className="text-xs font-heading font-700 text-muted uppercase tracking-wide mb-2">
+          <h4 className="text-xs font-system font-bold text-gs-mid uppercase tracking-wide mb-2">
             Executive Summary
           </h4>
-          <p className="text-sm text-primary/80 leading-relaxed">{summary}</p>
+          <p className="text-sm text-gs-black/80 leading-relaxed">{summary}</p>
         </div>
       )}
       {findings.length > 0 && (
         <div>
-          <h4 className="text-xs font-heading font-700 text-muted uppercase tracking-wide mb-2">
+          <h4 className="text-xs font-system font-bold text-gs-mid uppercase tracking-wide mb-2">
             Key Findings
           </h4>
           <div className="space-y-2">
             {findings.slice(0, 6).map((f, i) => (
               <div key={i} className="flex items-start gap-2 text-xs">
                 <SeverityDot severity={f.severity} />
-                <span className="text-primary/80">{f.finding}</span>
+                <span className="text-gs-black/80">{f.finding}</span>
               </div>
             ))}
           </div>
@@ -116,7 +108,7 @@ function ROIContent({ data }: { data: Record<string, unknown> }) {
 
   if (!active) {
     return (
-      <div className="flex items-center justify-center h-full text-xs text-muted">
+      <div className="flex items-center justify-center h-full text-xs text-gs-mid">
         Impact scenario data unavailable.
       </div>
     );
@@ -132,9 +124,9 @@ function ROIContent({ data }: { data: Record<string, unknown> }) {
     new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n);
 
   const CONFIDENCE_COLORS: Record<string, string> = {
-    high: 'text-success',
-    medium: 'text-warning',
-    low: 'text-muted',
+    high: 'text-gs-terminal',
+    medium: 'text-gs-warning',
+    low: 'text-gs-mid',
   };
 
   return (
@@ -149,10 +141,10 @@ function ROIContent({ data }: { data: Record<string, unknown> }) {
             <button
               key={id}
               onClick={() => setActiveId(id)}
-              className={`px-3 py-1 rounded-full text-xs font-heading font-600 transition-colors ${
+              className={`px-3 py-1 bevel-button text-xs font-system font-semibold transition-colors ${
                 isActive
-                  ? 'bg-accent/10 text-accent'
-                  : 'bg-slate-50 text-muted hover:bg-slate-100'
+                  ? 'bg-gs-cyan/10 text-gs-cyan'
+                  : 'bg-gs-near-white text-gs-mid hover:bg-gs-light'
               }`}
             >
               {label}
@@ -163,7 +155,7 @@ function ROIContent({ data }: { data: Record<string, unknown> }) {
 
       {/* Scenario description */}
       {description && (
-        <p className="text-[11px] text-muted italic mb-3">{description}</p>
+        <p className="text-[11px] text-gs-mid italic mb-3">{description}</p>
       )}
 
       {/* Impact area cards */}
@@ -173,15 +165,15 @@ function ROIContent({ data }: { data: Record<string, unknown> }) {
             const impact = (a['monthlyImpact'] as number) ?? 0;
             const confidence = (a['confidence'] as string) ?? 'low';
             return (
-              <div key={i} className="bg-slate-50 rounded-lg p-2.5 text-center">
-                <p className="text-[10px] font-heading font-600 text-primary truncate">
+              <div key={i} className="bg-gs-near-white bevel-sunken p-2.5 text-center">
+                <p className="text-[10px] font-system font-semibold text-gs-black truncate">
                   {(a['title'] as string) ?? ''}
                 </p>
-                <p className="text-sm font-mono font-700 text-primary mt-0.5">
+                <p className="text-sm font-data font-bold text-gs-black mt-0.5">
                   {impact > 0 ? fmt(impact) : 'N/A'}
                 </p>
-                <p className="text-[10px] text-muted">/mo</p>
-                <p className={`text-[9px] font-medium mt-0.5 ${CONFIDENCE_COLORS[confidence] ?? 'text-muted'}`}>
+                <p className="text-[10px] text-gs-mid">/mo</p>
+                <p className={`text-[9px] font-medium mt-0.5 ${CONFIDENCE_COLORS[confidence] ?? 'text-gs-mid'}`}>
                   {confidence} confidence
                 </p>
               </div>
@@ -191,28 +183,28 @@ function ROIContent({ data }: { data: Record<string, unknown> }) {
       )}
 
       {/* Hero totals */}
-      <div className="text-center py-2 border-t border-border/30">
+      <div className="text-center py-2 border-t border-gs-mid/30">
         <div className="flex items-center justify-center gap-6">
           <div>
-            <p className="text-[10px] font-heading font-600 text-muted uppercase tracking-wide">Monthly</p>
-            <p className="text-lg font-mono font-800 text-primary">{fmt(totalMonthly)}</p>
+            <p className="text-[10px] font-system font-semibold text-gs-mid uppercase tracking-wide">Monthly</p>
+            <p className="text-lg font-data font-bold text-gs-black">{fmt(totalMonthly)}</p>
           </div>
           <div>
-            <p className="text-[10px] font-heading font-600 text-muted uppercase tracking-wide">Annual</p>
-            <p className="text-lg font-mono font-800 text-success">{fmt(totalAnnual)}</p>
+            <p className="text-[10px] font-system font-semibold text-gs-mid uppercase tracking-wide">Annual</p>
+            <p className="text-lg font-data font-bold text-gs-terminal">{fmt(totalAnnual)}</p>
           </div>
         </div>
       </div>
 
       {/* Assumptions */}
       {keyAssumptions.length > 0 && (
-        <div className="mt-2 pt-2 border-t border-border/30">
-          <p className="text-[10px] font-heading font-600 text-muted uppercase tracking-wide mb-1">
+        <div className="mt-2 pt-2 border-t border-gs-mid/30">
+          <p className="text-[10px] font-system font-semibold text-gs-mid uppercase tracking-wide mb-1">
             Key Assumptions
           </p>
           <ul className="space-y-0.5">
             {keyAssumptions.slice(0, 4).map((a, i) => (
-              <li key={i} className="text-[10px] text-muted leading-tight">
+              <li key={i} className="text-[10px] text-gs-mid leading-tight">
                 &middot; {a}
               </li>
             ))}
@@ -222,7 +214,7 @@ function ROIContent({ data }: { data: Record<string, unknown> }) {
 
       {/* Methodology disclaimer */}
       {methodology && (
-        <p className="mt-auto pt-2 text-[9px] text-muted/60 italic leading-tight">
+        <p className="mt-auto pt-2 text-[9px] text-gs-mid/60 italic leading-tight">
           {methodology}
         </p>
       )}
@@ -244,49 +236,49 @@ function RoadmapContent({ data }: { data: Record<string, unknown> }) {
 
   return (
     <div className="flex flex-col items-center justify-center h-full space-y-4 py-6">
-      <h4 className="text-xs font-heading font-700 text-muted uppercase tracking-wide">
+      <h4 className="text-xs font-system font-bold text-gs-mid uppercase tracking-wide">
         Remediation Plan
       </h4>
 
       <div className="text-center space-y-2">
-        <p className="text-2xl font-heading font-700 text-primary">
+        <p className="text-2xl font-system font-bold text-gs-black">
           {total} Findings
         </p>
-        <div className="flex items-center justify-center gap-3 text-xs font-mono">
+        <div className="flex items-center justify-center gap-3 text-xs font-data">
           {p0 > 0 && (
-            <span className="bg-red-50 text-red-700 px-2 py-0.5 rounded">
+            <span className="bg-gs-critical/10 text-gs-critical px-2 py-0.5 bevel-raised">
               {p0} P0
             </span>
           )}
           {p1 > 0 && (
-            <span className="bg-orange-50 text-orange-700 px-2 py-0.5 rounded">
+            <span className="bg-gs-warning/10 text-gs-warning px-2 py-0.5 bevel-raised">
               {p1} P1
             </span>
           )}
           {p2 > 0 && (
-            <span className="bg-yellow-50 text-yellow-700 px-2 py-0.5 rounded">
+            <span className="bg-gs-warning/10 text-gs-warning px-2 py-0.5 bevel-raised">
               {p2} P2
             </span>
           )}
           {p3 > 0 && (
-            <span className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded">
+            <span className="bg-gs-light text-gs-mid-dark px-2 py-0.5 bevel-raised">
               {p3} P3
             </span>
           )}
         </div>
         {weeks > 0 && (
-          <p className="text-xs text-muted">
+          <p className="text-xs text-gs-mid">
             Estimated timeline: ~{weeks} weeks
           </p>
         )}
       </div>
 
-      <p className="text-xs text-muted text-center max-w-xs">
+      <p className="text-xs text-gs-mid text-center max-w-xs">
         A detailed, step-by-step remediation document with implementation
         instructions, verification checklists, and timeline.
       </p>
 
-      <p className="text-xs text-muted italic">
+      <p className="text-xs text-gs-mid italic">
         Available as a downloadable PDF in the report section.
       </p>
     </div>
@@ -299,7 +291,7 @@ function StackAnalyzerContent({ data }: { data: Record<string, unknown> }) {
 
   if (!analysis) {
     return (
-      <div className="flex items-center justify-center h-full text-xs text-muted">
+      <div className="flex items-center justify-center h-full text-xs text-gs-mid">
         Stack analysis data unavailable.
       </div>
     );
@@ -323,22 +315,22 @@ function StackAnalyzerContent({ data }: { data: Record<string, unknown> }) {
   const optimalGaps = (optimalStack['gaps'] as Array<{ capability: string; recommendation: string }>) ?? [];
   const optimalUpgrades = (optimalStack['upgrades'] as Array<{ currentTool: string; suggestedTool: string }>) ?? [];
 
-  const EFFORT_COLORS: Record<string, string> = { S: 'text-success', M: 'text-warning', L: 'text-error' };
+  const EFFORT_COLORS: Record<string, string> = { S: 'text-gs-terminal', M: 'text-gs-warning', L: 'text-gs-critical' };
 
   return (
     <div className="flex flex-col h-full overflow-y-auto">
       {/* Summary chips */}
       <div className="flex items-center gap-2 mb-2 flex-wrap">
-        <span className="px-2 py-0.5 bg-slate-50 rounded text-[10px] font-mono font-600 text-primary">
+        <span className="px-2 py-0.5 bg-gs-near-white bevel-raised text-[10px] font-data font-semibold text-gs-black">
           {totalTools} tools
         </span>
         {redundantPairs > 0 && (
-          <span className="px-2 py-0.5 bg-warning/10 rounded text-[10px] font-mono font-600 text-warning">
+          <span className="px-2 py-0.5 bg-gs-warning/10 bevel-raised text-[10px] font-data font-semibold text-gs-warning">
             {redundantPairs} redundant
           </span>
         )}
         {abandonedCount > 0 && (
-          <span className="px-2 py-0.5 bg-error/10 rounded text-[10px] font-mono font-600 text-error">
+          <span className="px-2 py-0.5 bg-gs-critical/10 bevel-raised text-[10px] font-data font-semibold text-gs-critical">
             {abandonedCount} abandoned
           </span>
         )}
@@ -346,7 +338,7 @@ function StackAnalyzerContent({ data }: { data: Record<string, unknown> }) {
 
       {/* Assessment */}
       {assessment && (
-        <p className="text-[11px] text-muted italic mb-3">{assessment}</p>
+        <p className="text-[11px] text-gs-mid italic mb-3">{assessment}</p>
       )}
 
       {/* Tabs */}
@@ -359,10 +351,10 @@ function StackAnalyzerContent({ data }: { data: Record<string, unknown> }) {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`px-3 py-1 rounded-full text-xs font-heading font-600 transition-colors ${
+            className={`px-3 py-1 bevel-button text-xs font-system font-semibold transition-colors ${
               activeTab === tab.id
-                ? 'bg-accent/10 text-accent'
-                : 'bg-slate-50 text-muted hover:bg-slate-100'
+                ? 'bg-gs-cyan/10 text-gs-cyan'
+                : 'bg-gs-near-white text-gs-mid hover:bg-gs-light'
             }`}
           >
             {tab.label}
@@ -376,10 +368,10 @@ function StackAnalyzerContent({ data }: { data: Record<string, unknown> }) {
           <div className="space-y-2">
             {categories.map((cat, i) => (
               <div key={i}>
-                <p className="text-[10px] font-heading font-600 text-muted uppercase tracking-wide">
+                <p className="text-[10px] font-system font-semibold text-gs-mid uppercase tracking-wide">
                   {cat.name}
                 </p>
-                <p className="text-xs text-primary/80">{cat.tools.join(', ')}</p>
+                <p className="text-xs text-gs-black/80">{cat.tools.join(', ')}</p>
               </div>
             ))}
           </div>
@@ -388,17 +380,17 @@ function StackAnalyzerContent({ data }: { data: Record<string, unknown> }) {
         {activeTab === 'lean' && (
           <div className="space-y-2">
             {leanBenefit && (
-              <p className="text-[11px] text-success font-medium">{leanBenefit}</p>
+              <p className="text-[11px] text-gs-terminal font-medium">{leanBenefit}</p>
             )}
             {leanRemovals.length > 0 && (
               <>
-                <p className="text-[10px] font-heading font-600 text-muted uppercase tracking-wide">Remove</p>
+                <p className="text-[10px] font-system font-semibold text-gs-mid uppercase tracking-wide">Remove</p>
                 {leanRemovals.map((r, i) => (
                   <div key={i} className="flex items-start gap-2 text-[11px]">
-                    <span className="text-error font-mono">-</span>
-                    <span className="text-primary/80">
-                      <span className="font-600">{r.tool}</span>
-                      <span className="text-muted ml-1">— {r.reason}</span>
+                    <span className="text-gs-critical font-data">-</span>
+                    <span className="text-gs-black/80">
+                      <span className="font-semibold">{r.tool}</span>
+                      <span className="text-gs-mid ml-1">— {r.reason}</span>
                     </span>
                   </div>
                 ))}
@@ -410,17 +402,17 @@ function StackAnalyzerContent({ data }: { data: Record<string, unknown> }) {
         {activeTab === 'optimal' && (
           <div className="space-y-2">
             {optimalBenefit && (
-              <p className="text-[11px] text-accent font-medium">{optimalBenefit}</p>
+              <p className="text-[11px] text-gs-cyan font-medium">{optimalBenefit}</p>
             )}
             {optimalGaps.length > 0 && (
               <>
-                <p className="text-[10px] font-heading font-600 text-muted uppercase tracking-wide">Gaps to Fill</p>
+                <p className="text-[10px] font-system font-semibold text-gs-mid uppercase tracking-wide">Gaps to Fill</p>
                 {optimalGaps.map((g, i) => (
                   <div key={i} className="flex items-start gap-2 text-[11px]">
-                    <span className="text-success font-mono">+</span>
-                    <span className="text-primary/80">
-                      <span className="font-600">{g.capability}</span>
-                      <span className="text-muted ml-1">— {g.recommendation}</span>
+                    <span className="text-gs-terminal font-data">+</span>
+                    <span className="text-gs-black/80">
+                      <span className="font-semibold">{g.capability}</span>
+                      <span className="text-gs-mid ml-1">— {g.recommendation}</span>
                     </span>
                   </div>
                 ))}
@@ -428,12 +420,12 @@ function StackAnalyzerContent({ data }: { data: Record<string, unknown> }) {
             )}
             {optimalUpgrades.length > 0 && (
               <>
-                <p className="text-[10px] font-heading font-600 text-muted uppercase tracking-wide mt-2">Upgrades</p>
+                <p className="text-[10px] font-system font-semibold text-gs-mid uppercase tracking-wide mt-2">Upgrades</p>
                 {optimalUpgrades.map((u, i) => (
-                  <div key={i} className="text-[11px] text-primary/80">
-                    <span className="font-600">{u.currentTool}</span>
-                    <span className="text-muted mx-1">&rarr;</span>
-                    <span className="font-600">{u.suggestedTool}</span>
+                  <div key={i} className="text-[11px] text-gs-black/80">
+                    <span className="font-semibold">{u.currentTool}</span>
+                    <span className="text-gs-mid mx-1">&rarr;</span>
+                    <span className="font-semibold">{u.suggestedTool}</span>
                   </div>
                 ))}
               </>
@@ -449,16 +441,16 @@ function LockedPlaceholder({ icon, label }: { icon: string; label: string }) {
   return (
     <div className="flex flex-col items-center justify-center h-full text-center gap-3 opacity-40">
       <span className="text-5xl">{icon}</span>
-      <p className="text-sm font-heading font-600 text-primary">{label}</p>
-      <p className="text-xs text-muted">Available in the paid report</p>
+      <p className="text-sm font-system font-semibold text-gs-black">{label}</p>
+      <p className="text-xs text-gs-mid">Available in the paid report</p>
     </div>
   );
 }
 
 function SeverityDot({ severity }: { severity: string }) {
   const color =
-    severity === 'critical' ? 'bg-error' :
-    severity === 'warning' ? 'bg-warning' :
-    severity === 'positive' ? 'bg-success' : 'bg-muted';
+    severity === 'critical' ? 'bg-gs-critical' :
+    severity === 'warning' ? 'bg-gs-warning' :
+    severity === 'positive' ? 'bg-gs-terminal' : 'bg-gs-mid';
   return <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1.5 ${color}`} />;
 }

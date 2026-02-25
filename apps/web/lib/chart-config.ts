@@ -1,9 +1,26 @@
 /**
- * Chart configuration constants per PRD-cont-1 Section 2.
- * Shared by all Recharts and custom SVG chart components.
+ * GhostScan OS — Chart Configuration
+ * ═══════════════════════════════════════
+ *
+ * WHAT: Shared constants for all Recharts and custom SVG chart components.
+ * WHY:  Centralizes visual config so all 26 chart components render
+ *       consistently within the GhostScan OS aesthetic (Plan Section 16).
+ * HOW:  Colors migrated from old hex palette to OKLCH CSS variables.
+ *       Fonts updated to JetBrains Mono (data) and Pixelify Sans (system).
+ *       All tooltip/legend/axis styling matches the retro OS design.
+ *
+ * MIGRATION from old palette:
+ *   #1A1A2E → var(--gs-black)        Primary data series
+ *   #E94560 → var(--gs-fuchsia)      Accent / Chloé
+ *   #06D6A0 → var(--gs-terminal)     Healthy / positive
+ *   #FFD166 → var(--gs-warning)      Warning / caution
+ *   #94A3B8 → var(--gs-mid-light)    Neutral / secondary
+ *   #7C3AED → var(--gs-cyan)         Ghost accent
+ *   #EF476F → var(--gs-critical)     Critical / error
  */
 
-// 2.1 Default Dimensions and Aspect Ratios
+/* ── Dimensions & Aspect Ratios (unchanged) ────────────────── */
+
 export const CHART_ASPECTS = {
   wide: 3,        // 3:1 — sparklines, trend lines
   landscape: 2,   // 2:1 — bar charts, area charts
@@ -13,50 +30,52 @@ export const CHART_ASPECTS = {
 } as const;
 
 export const CHART_HEIGHTS = {
-  bentoSmall: 200,   // 1x1 bento cards
-  bentoWide: 240,    // 2x1 bento cards
-  bentoTall: 400,    // 1x2 bento cards
-  bentoFeature: 360, // 2x2 bento cards
-  reportFull: 400,   // P2 full-width
-  reportHalf: 300,   // P2 half-width
-  printA4Full: 500,  // A4 print full-width
-  printA4Half: 340,  // A4 print half-width
+  bentoSmall: 200,
+  bentoWide: 240,
+  bentoTall: 400,
+  bentoFeature: 360,
+  reportFull: 400,
+  reportHalf: 300,
+  printA4Full: 500,
+  printA4Half: 340,
 } as const;
 
-// 2.3 Tooltip styling
+/* ── Tooltip Styling (OKLCH migrated) ──────────────────────── */
+
 export const TOOLTIP_STYLE: React.CSSProperties = {
-  backgroundColor: '#1A1A2E',
-  border: 'none',
-  borderRadius: '8px',
-  padding: '12px 16px',
-  boxShadow: '0 4px 24px rgba(26, 26, 46, 0.24)',
+  backgroundColor: 'var(--gs-black)',
+  border: '2px solid var(--gs-mid)',
+  borderRadius: '0px', /* Retro — no rounded corners */
+  padding: '8px 12px',
+  boxShadow: '2px 2px 0 var(--gs-mid-dark)',
 };
 
 export const TOOLTIP_LABEL_STYLE: React.CSSProperties = {
-  color: '#FAFBFC',
-  fontFamily: '"Plus Jakarta Sans", sans-serif',
+  color: 'var(--gs-near-white)',
+  fontFamily: 'var(--font-data)',
   fontWeight: 700,
   fontSize: '13px',
   marginBottom: '4px',
 };
 
 export const TOOLTIP_ITEM_STYLE: React.CSSProperties = {
-  color: '#94A3B8',
-  fontFamily: '"Inter", sans-serif',
+  color: 'var(--gs-mid-light)',
+  fontFamily: 'var(--font-data)',
   fontSize: '12px',
   padding: '2px 0',
 };
 
-// 2.4 Legend configuration
+/* ── Legend Configuration (OKLCH migrated) ──────────────────── */
+
 export const LEGEND_CONFIG = {
   verticalAlign: 'bottom' as const,
   align: 'center' as const,
   iconType: 'circle' as const,
   iconSize: 8,
   wrapperStyle: {
-    fontFamily: '"Inter", sans-serif',
+    fontFamily: 'var(--font-data)',
     fontSize: '12px',
-    color: '#64748B',
+    color: 'var(--gs-mid-dark)',
     paddingTop: '16px',
   },
 };
@@ -73,15 +92,16 @@ export const LEGEND_RIGHT_CONFIG = {
   },
 };
 
-// 2.5 Axis styling
+/* ── Axis Styling (OKLCH migrated) ─────────────────────────── */
+
 export const AXIS_STYLE = {
   tick: {
-    fontFamily: '"Inter", sans-serif',
+    fontFamily: 'var(--font-data)',
     fontSize: 12,
-    fill: '#64748B',
+    fill: 'var(--gs-mid)',
   },
   axisLine: {
-    stroke: '#E2E8F0',
+    stroke: 'var(--gs-mid-light)',
     strokeWidth: 1,
   },
   tickLine: false as const,
@@ -89,11 +109,12 @@ export const AXIS_STYLE = {
 
 export const GRID_STYLE = {
   strokeDasharray: '3 3',
-  stroke: '#F1F5F9',
+  stroke: 'var(--gs-mid-light)',
   vertical: false,
 };
 
-// 2.5 Number formatters for axes
+/* ── Number Formatters (unchanged) ─────────────────────────── */
+
 export const formatters = {
   thousands: (value: number) =>
     value >= 1000 ? `${(value / 1000).toFixed(1)}K` : String(value),
@@ -111,7 +132,8 @@ export const formatters = {
   },
 };
 
-// 2.6 Animation configuration
+/* ── Animation Config (unchanged) ──────────────────────────── */
+
 export const ANIMATION_CONFIG = {
   isAnimationActive: true,
   animationBegin: 0,
@@ -133,61 +155,74 @@ export const ANIMATION_CONFIG = {
   },
 };
 
-// 2.7 Color palettes
+/* ═══════════════════════════════════════════════════════════════
+   Color Palettes — OKLCH Migrated (Plan Section 16)
+   ═══════════════════════════════════════════════════════════════ */
+
+/**
+ * Primary chart palette — 10 colors.
+ * Uses CSS variables for OKLCH support.
+ * NOTE: Recharts requires actual color values in some contexts,
+ * not CSS variables. These are the computed OKLCH fallbacks.
+ */
 export const CHART_PALETTE = [
-  '#1A1A2E', // Deep Navy — primary series
-  '#E94560', // Soft Red — secondary/CTA
-  '#06D6A0', // Soft Green — success/positive
-  '#FFD166', // Warm Amber — warning/tertiary
-  '#94A3B8', // Slate — muted/baseline
-  '#7C3AED', // Purple — extended palette
-  '#0EA5E9', // Sky — extended palette
-  '#F97316', // Orange — extended palette
-  '#EC4899', // Pink — extended palette
-  '#14B8A6', // Teal — extended palette
+  'var(--gs-black)',       // Primary data series (warm near-black)
+  'var(--gs-fuchsia)',     // Accent / Chloé (laser fuchsia)
+  'var(--gs-terminal)',    // Positive / healthy (CRT green)
+  'var(--gs-warning)',     // Caution / warning (amber)
+  'var(--gs-mid-light)',   // Neutral / baseline (warm gray)
+  'var(--gs-cyan)',        // Ghost accent (phosphorescent cyan)
+  'oklch(0.70 0.15 230)', // Tertiary (cool blue)
+  'oklch(0.72 0.18 50)',  // Quaternary (warm orange)
+  'oklch(0.65 0.20 330)', // Quinary (rose)
+  'oklch(0.75 0.15 170)', // Senary (seafoam)
 ] as const;
 
+/** Traffic light — the universal health indicator */
 export const TRAFFIC_LIGHT_COLORS = {
-  green: '#06D6A0',
-  amber: '#FFD166',
-  red: '#EF476F',
+  green: 'var(--gs-terminal)',
+  amber: 'var(--gs-warning)',
+  red: 'var(--gs-critical)',
 } as const;
 
+/** Status indicators for tools/services */
 export const STATUS_COLORS = {
-  active: '#06D6A0',
-  inactive: '#94A3B8',
-  degraded: '#FFD166',
-  error: '#EF476F',
-  blocked: '#1A1A2E',
+  active: 'var(--gs-terminal)',
+  inactive: 'var(--gs-mid-light)',
+  degraded: 'var(--gs-warning)',
+  error: 'var(--gs-critical)',
+  blocked: 'var(--gs-black)',
 } as const;
 
+/** Resource type colors (JS/CSS/images) */
 export const RESOURCE_COLORS = {
-  js: '#FFD166',
-  css: '#06D6A0',
-  images: '#E94560',
-  fonts: '#94A3B8',
-  xhr: '#1A1A2E',
-  other: '#7C3AED',
+  js: 'var(--gs-warning)',
+  css: 'var(--gs-terminal)',
+  images: 'var(--gs-fuchsia)',
+  fonts: 'var(--gs-mid-light)',
+  xhr: 'var(--gs-black)',
+  other: 'var(--gs-cyan)',
 } as const;
 
+/** Category badge accent colors */
 export const CATEGORY_BADGE_COLORS: Record<string, string> = {
-  analytics: '#1A1A2E',
-  ads: '#E94560',
-  automation: '#06D6A0',
-  cms: '#FFD166',
-  cdn: '#0EA5E9',
-  security: '#7C3AED',
-  ecommerce: '#F97316',
-  social: '#EC4899',
-  other: '#94A3B8',
+  analytics: 'var(--gs-black)',
+  ads: 'var(--gs-fuchsia)',
+  automation: 'var(--gs-terminal)',
+  cms: 'var(--gs-warning)',
+  cdn: 'var(--gs-cyan)',
+  security: 'oklch(0.70 0.15 230)',
+  ecommerce: 'oklch(0.72 0.18 50)',
+  social: 'oklch(0.65 0.20 330)',
+  other: 'var(--gs-mid-light)',
 };
 
-// Score tier colors (Section 1.1)
+/** Score tier colors — traffic light mapped to score ranges */
 export const SCORE_TIER_COLORS = {
-  critical: '#EF476F',  // 0-39
-  warning: '#FFD166',   // 40-59
-  good: '#06D6A0',      // 60-79
-  excellent: '#1A1A2E', // 80-100
+  critical: 'var(--gs-critical)',   // 0-39
+  warning: 'var(--gs-warning)',     // 40-59
+  good: 'var(--gs-terminal)',       // 60-79
+  excellent: 'var(--gs-cyan)',      // 80-100 (Chloé glows for excellence)
 } as const;
 
 export function getScoreTierColor(score: number): string {
@@ -197,18 +232,19 @@ export function getScoreTierColor(score: number): string {
   return SCORE_TIER_COLORS.critical;
 }
 
-// Traffic source colors (Section 1.13)
+/** Traffic source colors */
 export const TRAFFIC_SOURCE_COLORS: Record<string, string> = {
-  Direct: '#1A1A2E',
-  'Organic Search': '#06D6A0',
-  'Paid Search': '#E94560',
-  Social: '#FFD166',
-  Referral: '#94A3B8',
-  Email: '#7C3AED',
-  Display: '#0EA5E9',
+  Direct: 'var(--gs-black)',
+  'Organic Search': 'var(--gs-terminal)',
+  'Paid Search': 'var(--gs-fuchsia)',
+  Social: 'var(--gs-warning)',
+  Referral: 'var(--gs-mid-light)',
+  Email: 'var(--gs-cyan)',
+  Display: 'oklch(0.70 0.15 230)',
 };
 
-// 2.8 Margin/Padding standards
+/* ── Margins (unchanged) ───────────────────────────────────── */
+
 export const CHART_MARGINS = {
   bento: { top: 8, right: 8, bottom: 8, left: 8 },
   standard: { top: 20, right: 30, bottom: 20, left: 40 },
@@ -217,7 +253,8 @@ export const CHART_MARGINS = {
   print: { top: 24, right: 40, bottom: 24, left: 48 },
 } as const;
 
-// 6.2 A4 PDF Dimensions
+/* ── PDF Dimensions (unchanged) ────────────────────────────── */
+
 export const PDF_DIMENSIONS = {
   pageWidth: 794,
   pageHeight: 1123,
@@ -236,11 +273,77 @@ export const PDF_DIMENSIONS = {
   metricCardHeight: 100,
 } as const;
 
-// Print B&W-safe palette (Section 6.4)
+/** Print-safe monochrome palette (B&W-friendly) */
 export const PRINT_PALETTE = [
-  '#1A1A2E',
-  '#4A4A5E',
-  '#7A7A8E',
-  '#AAAABC',
-  '#D0D0DD',
+  'var(--gs-black)',
+  'var(--gs-mid-dark)',
+  'var(--gs-mid)',
+  'var(--gs-mid-light)',
+  'var(--gs-light)',
 ] as const;
+
+/* ═══════════════════════════════════════════════════════════════
+   Resolved OKLCH Values for SVG Inline Styles
+   ═══════════════════════════════════════════════════════════════
+   Recharts/SVG elements use inline `fill` and `stroke` attributes.
+   CSS var() doesn't resolve inside SVG fill="..." attributes in all
+   contexts (esp. tooltips, custom labels, gradients). These are the
+   resolved OKLCH equivalents for direct use in inline styles.
+*/
+
+export const OKLCH = {
+  black:     'oklch(0.15 0.01 80)',
+  dark:      'oklch(0.25 0.01 80)',
+  midDark:   'oklch(0.35 0.01 80)',
+  mid:       'oklch(0.50 0.01 80)',
+  midLight:  'oklch(0.65 0.01 80)',
+  light:     'oklch(0.80 0.01 80)',
+  nearWhite: 'oklch(0.93 0.01 80)',
+  white:     'oklch(0.97 0.005 80)',
+  cyan:      'oklch(0.82 0.18 192)',
+  fuchsia:   'oklch(0.65 0.28 350)',
+  terminal:  'oklch(0.80 0.25 145)',
+  critical:  'oklch(0.55 0.22 25)',
+  warning:   'oklch(0.78 0.15 75)',
+} as const;
+
+/** Cookie category colors — extracted from cookie-audit-bar.tsx */
+export const COOKIE_CATEGORY_COLORS: Record<string, string> = {
+  essential:   OKLCH.terminal,
+  functional:  OKLCH.cyan,
+  analytics:   OKLCH.warning,
+  advertising: OKLCH.critical,
+  unknown:     OKLCH.midLight,
+};
+
+/** CWV rating colors — extracted from cwv-metrics.tsx */
+export const CWV_RATING_COLORS: Record<string, string> = {
+  good:                  OKLCH.terminal,
+  'needs-improvement':   OKLCH.warning,
+  poor:                  OKLCH.critical,
+};
+
+/** Tool utilization heat levels — extracted from tool-utilization-heatmap.tsx */
+export const UTILIZATION_COLORS: Record<string, string> = {
+  high:   OKLCH.terminal,
+  medium: OKLCH.warning,
+  low:    OKLCH.critical,
+  none:   OKLCH.light,
+};
+
+/** Flow diagram node colors — extracted from flow-diagram.tsx */
+export const FLOW_NODE_COLORS: Record<string, string> = {
+  source:   OKLCH.cyan,
+  healthy:  OKLCH.terminal,
+  warning:  OKLCH.warning,
+  critical: OKLCH.critical,
+  neutral:  OKLCH.midLight,
+};
+
+/** Scatter quadrant colors — extracted from remediation-scatter.tsx */
+export const QUADRANT_COLORS: Record<string, string> = {
+  quickWins:   OKLCH.terminal,
+  strategic:   OKLCH.cyan,
+  lowPriority: OKLCH.midLight,
+  avoid:       OKLCH.critical,
+};

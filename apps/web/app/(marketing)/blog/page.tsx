@@ -11,30 +11,30 @@ export default function BlogPage() {
   const posts = getAllPosts();
 
   return (
-    <section className="py-24">
-      <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-        <h1 className="font-heading text-h1 text-primary mb-2">
+    <section className="py-gs-16">
+      <div className="mx-auto max-w-4xl px-gs-4">
+        <h1 className="font-system text-[clamp(24px,4vw,44px)] font-bold text-gs-black mb-gs-2">
           UnderTheStack
         </h1>
-        <p className="text-lg text-muted mb-12">
+        <p className="font-data text-data-lg text-gs-mid mb-gs-8">
           Marketing technology teardowns, insights, and analysis.
         </p>
 
         {posts.length === 0 ? (
-          <p className="text-muted">No posts yet. Check back soon.</p>
+          <p className="font-data text-data-sm text-gs-mid">No posts yet. Check back soon.</p>
         ) : (
-          <div className="space-y-8">
+          <div className="space-y-gs-6">
             {posts.map((post) => (
               <Link
                 key={post.slug}
                 href={`/blog/${post.slug}`}
-                className="block bg-surface border border-border rounded-xl p-8 hover:shadow-lg hover:border-accent/20 transition-all"
+                className="block bevel-raised bg-gs-light p-gs-6 hover:shadow-ghost-glow transition-shadow"
               >
-                <time className="text-xs text-muted">{post.date}</time>
-                <h2 className="font-heading text-h3 text-primary mt-2 mb-2">
+                <time className="font-data text-data-xs text-gs-mid">{post.date}</time>
+                <h2 className="font-system text-os-lg font-bold text-gs-black mt-gs-2 mb-gs-2">
                   {post.title}
                 </h2>
-                <p className="text-muted text-sm">{post.excerpt}</p>
+                <p className="font-data text-data-sm text-gs-mid">{post.excerpt}</p>
               </Link>
             ))}
           </div>

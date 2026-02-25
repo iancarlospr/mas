@@ -10,9 +10,8 @@ import {
   Tooltip,
 } from 'recharts';
 import { ChartContainer } from './chart-container';
-import { LEGEND_CONFIG, ANIMATION_CONFIG } from '@/lib/chart-config';
+import { LEGEND_CONFIG, ANIMATION_CONFIG, OKLCH, getScoreTierColor } from '@/lib/chart-config';
 import { cn } from '@/lib/utils';
-import { getScoreTierColor } from '@/lib/chart-config';
 
 interface TrustMetric {
   dimension: string;
@@ -60,35 +59,35 @@ export function DomainTrustRadar({
               <PolarGrid
                 gridType="polygon"
                 strokeDasharray="3 3"
-                stroke="#E2E8F0"
+                stroke={OKLCH.light}
               />
               <PolarAngleAxis
                 dataKey="dimension"
                 tick={{
                   fontSize: 11,
-                  fill: '#64748B',
-                  fontFamily: 'Inter, sans-serif',
+                  fill: OKLCH.mid,
+                  fontFamily: 'var(--font-data)',
                 }}
               />
               <PolarRadiusAxis
                 angle={30}
                 domain={[0, 100]}
-                tick={{ fontSize: 9, fill: '#94A3B8' }}
+                tick={{ fontSize: 9, fill: OKLCH.midLight }}
               />
               <Radar
                 name="Your Domain"
                 dataKey="value"
-                stroke="#1A1A2E"
-                fill="#1A1A2E"
+                stroke={OKLCH.black}
+                fill={OKLCH.black}
                 fillOpacity={0.3}
                 {...ANIMATION_CONFIG}
               />
               <Radar
                 name="Benchmark"
                 dataKey="benchmark"
-                stroke="#06D6A0"
+                stroke={OKLCH.terminal}
                 strokeDasharray="4 3"
-                fill="#06D6A0"
+                fill={OKLCH.terminal}
                 fillOpacity={0.15}
                 {...ANIMATION_CONFIG}
               />
@@ -98,10 +97,10 @@ export function DomainTrustRadar({
                   if (!active || !payload?.length) return null;
                   const dim = payload[0]?.payload?.dimension;
                   return (
-                    <div className="bg-[#1A1A2E] text-white rounded-lg px-4 py-3 shadow-lg text-xs">
-                      <div className="font-heading font-bold text-sm mb-1">{dim}</div>
+                    <div className="bg-gs-black text-white rounded-lg px-4 py-3 shadow-lg text-xs">
+                      <div className="font-system font-bold text-sm mb-1">{dim}</div>
                       {payload.map((p, i) => (
-                        <div key={i} className="flex items-center gap-2 text-[#94A3B8]">
+                        <div key={i} className="flex items-center gap-2 text-gs-mid-light">
                           <span
                             className="w-2 h-2 rounded-full inline-block"
                             style={{ backgroundColor: p.color }}

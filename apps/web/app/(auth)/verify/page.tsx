@@ -1,9 +1,22 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { ChloeSprite } from '@/components/chloe/chloe-sprite';
+import { Window } from '@/components/os/window';
 import { ResendVerificationButton } from './resend-button';
 
+/**
+ * GhostScan OS — Email Verification Page
+ * ═══════════════════════════════════════════
+ *
+ * WHAT: "Awaiting Verification" screen after registration.
+ * WHY:  Auth pages live outside the OS — dark CRT background, you're
+ *       trying to get in. Chloe waits impatiently (Plan Section 15).
+ * HOW:  Full-screen dark bg, Window dialog, Chloe idle sprite,
+ *       verification instructions, resend button.
+ */
+
 export const metadata: Metadata = {
-  title: 'Verify Email',
+  title: 'Verify Email — GhostScan OS',
 };
 
 export default async function VerifyPage({
@@ -19,39 +32,73 @@ export default async function VerifyPage({
   })();
 
   return (
-    <div className="text-center">
-      <div className="mx-auto w-16 h-16 bg-success/10 rounded-full flex items-center justify-center mb-6">
-        <svg className="w-8 h-8 text-success" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
-        </svg>
-      </div>
-      <h1 className="font-heading text-h3 text-primary mb-2">Check your email</h1>
-      <p className="text-muted text-sm">
-        We sent a verification link to{' '}
-        {email ? <strong>{email}</strong> : 'your email address'}.
-      </p>
-      {scanDomain ? (
-        <p className="text-muted text-sm mt-2">
-          Your scan of <strong className="text-primary">{scanDomain}</strong> will start automatically after you verify.
-        </p>
-      ) : (
-        <p className="text-muted text-sm mt-2">
-          Click the link to verify your account and start scanning.
-        </p>
-      )}
+    <div className="fixed inset-0 bg-gs-black flex items-center justify-center">
+      <div className="noise-grain" aria-hidden="true" />
+      <div className="crt-scanlines" aria-hidden="true" />
 
-      {email && (
-        <div className="mt-5">
-          <ResendVerificationButton email={email} />
+      <div className="relative">
+        {/* Chloe waiting */}
+        <div className="absolute -top-[80px] left-1/2 -translate-x-1/2 flex flex-col items-center">
+          <ChloeSprite state="idle" size={64} glowing />
         </div>
-      )}
 
-      <Link
-        href="/login"
-        className="inline-block mt-4 text-sm text-accent hover:underline"
-      >
-        Back to login
-      </Link>
+        <Window
+          id="verify-email"
+          title="Awaiting Verification"
+          variant="dialog"
+          isActive
+          width={400}
+        >
+          <div className="p-gs-6 text-center space-y-gs-4">
+            {/* Mail icon */}
+            <div className="bevel-sunken bg-gs-near-white w-[64px] h-[64px] mx-auto flex items-center justify-center">
+              <span className="text-[32px]">📧</span>
+            </div>
+
+            <div>
+              <h1 className="font-system text-os-lg font-bold text-gs-black mb-gs-2">
+                Check your email
+              </h1>
+              <p className="font-data text-data-sm text-gs-mid">
+                Verification link sent to{' '}
+                {email ? (
+                  <strong className="text-gs-black">{email}</strong>
+                ) : (
+                  'your email address'
+                )}
+                .
+              </p>
+            </div>
+
+            {scanDomain ? (
+              <div className="bevel-sunken bg-gs-near-white px-gs-3 py-gs-2">
+                <p className="font-data text-data-xs text-gs-mid-dark">
+                  Your scan of{' '}
+                  <strong className="text-gs-fuchsia">{scanDomain}</strong>{' '}
+                  will start automatically after you verify.
+                </p>
+              </div>
+            ) : (
+              <p className="font-data text-data-xs text-gs-mid">
+                Click the link to verify your account and start scanning.
+              </p>
+            )}
+
+            {email && (
+              <div>
+                <ResendVerificationButton email={email} />
+              </div>
+            )}
+
+            <Link
+              href="/login"
+              className="inline-block font-data text-data-xs text-gs-fuchsia hover:underline font-bold"
+            >
+              Back to login
+            </Link>
+          </div>
+        </Window>
+      </div>
     </div>
   );
 }

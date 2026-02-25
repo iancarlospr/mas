@@ -3,6 +3,7 @@
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { FLOW_NODE_COLORS, OKLCH } from '@/lib/chart-config';
 
 interface FlowNode {
   id: string;
@@ -31,15 +32,15 @@ interface FlowDiagramProps {
 }
 
 const NODE_COLORS: Record<FlowNode['type'], string> = {
-  source: '#06D6A0',
-  processor: '#FFD166',
-  destination: '#1A1A2E',
+  source: FLOW_NODE_COLORS['source'] ?? OKLCH.cyan,
+  processor: FLOW_NODE_COLORS['warning'] ?? OKLCH.warning,
+  destination: OKLCH.black,
 };
 
 const STATUS_DOT: Record<string, string> = {
-  active: '#06D6A0',
-  inactive: '#94A3B8',
-  error: '#EF476F',
+  active: OKLCH.terminal,
+  inactive: OKLCH.midLight,
+  error: OKLCH.critical,
 };
 
 const NODE_W = 140;
@@ -134,8 +135,8 @@ export function FlowDiagram({
               width={maxLX - minX}
               height={maxLY - minY}
               rx={8}
-              fill={li % 2 === 0 ? '#F8FAFC' : '#FAFBFC'}
-              stroke="#F1F5F9"
+              fill={li % 2 === 0 ? OKLCH.nearWhite : OKLCH.nearWhite}
+              stroke={OKLCH.light}
               strokeWidth={1}
             />
           );
@@ -170,13 +171,13 @@ export function FlowDiagram({
                   refY="3"
                   orient="auto"
                 >
-                  <polygon points="0 0, 8 3, 0 6" fill="#94A3B8" />
+                  <polygon points="0 0, 8 3, 0 6" fill={OKLCH.midLight} />
                 </marker>
               </defs>
               <motion.path
                 d={d}
                 fill="none"
-                stroke="#94A3B8"
+                stroke={OKLCH.midLight}
                 strokeWidth={1.5}
                 markerEnd={`url(#arrowhead-${i})`}
                 strokeDasharray={edge.animated ? '8 4' : undefined}
@@ -200,8 +201,8 @@ export function FlowDiagram({
                   y={midY - 6}
                   textAnchor="middle"
                   fontSize={10}
-                  fill="#94A3B8"
-                  fontFamily="Inter, sans-serif"
+                  fill={OKLCH.midLight}
+                  fontFamily="var(--font-data)"
                 >
                   {edge.label}
                 </text>
@@ -232,7 +233,7 @@ export function FlowDiagram({
                 height={nh}
                 rx={8}
                 fill="white"
-                stroke="#F1F5F9"
+                stroke={OKLCH.light}
                 strokeWidth={1}
               />
               {/* Left accent */}
@@ -250,7 +251,7 @@ export function FlowDiagram({
                   cx={pos.x + nw - 8}
                   cy={pos.y + 8}
                   r={4}
-                  fill={STATUS_DOT[node.status] ?? '#94A3B8'}
+                  fill={STATUS_DOT[node.status] ?? OKLCH.midLight}
                 />
               )}
               {/* Label */}
@@ -258,9 +259,9 @@ export function FlowDiagram({
                 x={pos.x + 14}
                 y={pos.y + nh / 2 + 4}
                 fontSize={compact ? 10 : 12}
-                fontFamily="Inter, sans-serif"
+                fontFamily="var(--font-data)"
                 fontWeight={500}
-                fill="#1A1A2E"
+                fill={OKLCH.black}
               >
                 {node.label.length > (compact ? 12 : 18)
                   ? node.label.slice(0, compact ? 12 : 18) + '...'

@@ -6,13 +6,13 @@ export const metadata: Metadata = {
 
 export default function PrivacyPage() {
   return (
-    <div className="mx-auto max-w-3xl px-6 py-16">
-      <h1 className="font-heading font-800 text-3xl text-[#1A1A2E]">Privacy Policy</h1>
-      <p className="mt-2 text-sm text-[#94A3B8]">Last updated: February 10, 2026</p>
+    <div className="mx-auto max-w-3xl px-gs-4 py-gs-12">
+      <h1 className="font-system text-[clamp(24px,3vw,36px)] font-bold text-gs-black">Privacy Policy</h1>
+      <p className="mt-gs-2 font-data text-data-sm text-gs-mid">Last updated: February 10, 2026</p>
 
-      <div className="mt-8 space-y-6 text-[#334155] leading-relaxed">
+      <div className="mt-gs-8 space-y-gs-6 font-data text-data-sm text-gs-mid-dark leading-relaxed">
         <section>
-          <h2 className="font-heading font-700 text-xl text-[#1A1A2E]">1. Data We Collect</h2>
+          <h2 className="font-system text-os-base font-bold text-gs-black">1. Data We Collect</h2>
           <p className="mt-2">We collect the following information:</p>
           <ul className="mt-2 list-disc pl-6 space-y-1">
             <li><strong>Account data:</strong> Email address (required for signup).</li>
@@ -28,7 +28,7 @@ export default function PrivacyPage() {
         </section>
 
         <section>
-          <h2 className="font-heading font-700 text-xl text-[#1A1A2E]">2. How We Use Your Data</h2>
+          <h2 className="font-system text-os-base font-bold text-gs-black">2. How We Use Your Data</h2>
           <ul className="mt-2 list-disc pl-6 space-y-1">
             <li>To provide and improve the scanning and reporting service.</li>
             <li>To process payments and send transactional emails (receipts, scan
@@ -39,7 +39,7 @@ export default function PrivacyPage() {
         </section>
 
         <section>
-          <h2 className="font-heading font-700 text-xl text-[#1A1A2E]">3. Third-Party Processors</h2>
+          <h2 className="font-system text-os-base font-bold text-gs-black">3. Third-Party Processors</h2>
           <p className="mt-2">We share data with the following service providers:</p>
           <ul className="mt-2 list-disc pl-6 space-y-1">
             <li><strong>Supabase</strong> — Database hosting and authentication.</li>
@@ -54,7 +54,7 @@ export default function PrivacyPage() {
         </section>
 
         <section>
-          <h2 className="font-heading font-700 text-xl text-[#1A1A2E]">4. Cookies</h2>
+          <h2 className="font-system text-os-base font-bold text-gs-black">4. Cookies</h2>
           <p className="mt-2">
             We use essential cookies for authentication (Supabase session) and
             analytics cookies (PostHog). No advertising or third-party tracking
@@ -63,7 +63,7 @@ export default function PrivacyPage() {
         </section>
 
         <section>
-          <h2 className="font-heading font-700 text-xl text-[#1A1A2E]">5. Email Communications</h2>
+          <h2 className="font-system text-os-base font-bold text-gs-black">5. Email Communications</h2>
           <p className="mt-2">
             We send transactional emails (verification, scan notifications, receipts)
             that are required for the service. You may unsubscribe from non-essential
@@ -72,7 +72,7 @@ export default function PrivacyPage() {
         </section>
 
         <section>
-          <h2 className="font-heading font-700 text-xl text-[#1A1A2E]">6. Data Retention</h2>
+          <h2 className="font-system text-os-base font-bold text-gs-black">6. Data Retention</h2>
           <ul className="mt-2 list-disc pl-6 space-y-1">
             <li><strong>Scan data:</strong> Stored indefinitely (or until account deletion).</li>
             <li><strong>Email logs:</strong> Retained for 90 days.</li>
@@ -82,7 +82,7 @@ export default function PrivacyPage() {
         </section>
 
         <section>
-          <h2 className="font-heading font-700 text-xl text-[#1A1A2E]">7. Your Rights (GDPR/CCPA)</h2>
+          <h2 className="font-system text-os-base font-bold text-gs-black">7. Your Rights (GDPR/CCPA)</h2>
           <p className="mt-2">You have the right to:</p>
           <ul className="mt-2 list-disc pl-6 space-y-1">
             <li><strong>Access</strong> your personal data.</li>
@@ -93,14 +93,14 @@ export default function PrivacyPage() {
           </ul>
           <p className="mt-2">
             To exercise these rights, contact us at{' '}
-            <a href="mailto:privacy@marketingalphascan.com" className="text-[#0F3460] underline">
+            <a href="mailto:privacy@marketingalphascan.com" className="text-gs-fuchsia hover:underline">
               privacy@marketingalphascan.com
             </a>.
           </p>
         </section>
 
         <section>
-          <h2 className="font-heading font-700 text-xl text-[#1A1A2E]">8. Geographic Restrictions</h2>
+          <h2 className="font-system text-os-base font-bold text-gs-black">8. Geographic Restrictions</h2>
           <p className="mt-2">
             The Service is not available in certain countries due to regulatory and
             compliance requirements. Access from restricted regions is blocked at the
@@ -109,7 +109,7 @@ export default function PrivacyPage() {
         </section>
 
         <section>
-          <h2 className="font-heading font-700 text-xl text-[#1A1A2E]">9. Changes to This Policy</h2>
+          <h2 className="font-system text-os-base font-bold text-gs-black">9. Changes to This Policy</h2>
           <p className="mt-2">
             We may update this privacy policy from time to time. We will notify
             registered users of significant changes via email.
@@ -117,10 +117,10 @@ export default function PrivacyPage() {
         </section>
 
         <section>
-          <h2 className="font-heading font-700 text-xl text-[#1A1A2E]">10. Contact</h2>
+          <h2 className="font-system text-os-base font-bold text-gs-black">10. Contact</h2>
           <p className="mt-2">
             For privacy-related inquiries, contact us at{' '}
-            <a href="mailto:privacy@marketingalphascan.com" className="text-[#0F3460] underline">
+            <a href="mailto:privacy@marketingalphascan.com" className="text-gs-fuchsia hover:underline">
               privacy@marketingalphascan.com
             </a>.
           </p>

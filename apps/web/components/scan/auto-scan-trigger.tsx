@@ -15,7 +15,6 @@ export function AutoScanTrigger() {
   useEffect(() => {
     if (triggeredRef.current) return;
 
-    // Check URL param first, then localStorage fallback
     let url = searchParams.get('auto_scan') ?? null;
 
     if (!url) {
@@ -26,27 +25,21 @@ export function AutoScanTrigger() {
           if (Date.now() - parsed.timestamp < TTL_MS) {
             url = parsed.url;
           }
-          // Always clear stale entries
           localStorage.removeItem('alphascan_pending_url');
         }
-      } catch {
-        // ignore
-      }
+      } catch { /* ignore */ }
     }
 
     if (!url) return;
 
     triggeredRef.current = true;
 
-    // Clear localStorage and strip auto_scan from URL
-    try { localStorage.removeItem('alphascan_pending_url'); } catch {}
+    try { localStorage.removeItem('alphascan_pending_url'); } catch { /* */ }
 
-    // Remove auto_scan param from URL without triggering navigation
     const cleanUrl = new URL(window.location.href);
     cleanUrl.searchParams.delete('auto_scan');
     window.history.replaceState({}, '', cleanUrl.pathname + cleanUrl.search);
 
-    // Start scan
     setStatus('scanning');
 
     fetch('/api/scans', {
@@ -72,20 +65,17 @@ export function AutoScanTrigger() {
 
   if (status === 'scanning') {
     return (
-      <div className="bg-accent/5 border border-accent/20 rounded-xl p-6 mb-6 flex items-center gap-4">
-        <svg className="animate-spin h-5 w-5 text-accent" viewBox="0 0 24 24" fill="none">
-          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-        </svg>
-        <span className="text-sm font-medium text-primary">Starting your scan...</span>
+      <div className="bevel-raised bg-gs-cyan/10 p-gs-4 mb-gs-4 flex items-center gap-gs-3">
+        <span className="font-data text-data-sm text-gs-cyan animate-pulse">⏳</span>
+        <span className="font-data text-data-sm text-gs-black">Starting your scan...</span>
       </div>
     );
   }
 
   if (status === 'error') {
     return (
-      <div className="bg-error/10 border border-error/20 rounded-xl p-4 mb-6">
-        <p className="text-sm text-error font-medium">{errorMsg}</p>
+      <div className="bevel-raised bg-gs-critical/10 p-gs-4 mb-gs-4">
+        <p className="font-data text-data-sm text-gs-critical">{errorMsg}</p>
       </div>
     );
   }

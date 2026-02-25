@@ -21,6 +21,7 @@ import {
   CHART_MARGINS,
   LEGEND_CONFIG,
   ANIMATION_CONFIG,
+  OKLCH,
   formatters,
 } from '@/lib/chart-config';
 import { cn } from '@/lib/utils';
@@ -61,7 +62,7 @@ const TYPE_COLOR_MAP: Record<string, string> = {
 };
 
 function getTypeColor(type: string): string {
-  return TYPE_COLOR_MAP[type.toLowerCase()] ?? '#94A3B8';
+  return TYPE_COLOR_MAP[type.toLowerCase()] ?? OKLCH.midLight;
 }
 
 export function ResourceBreakdown({
@@ -98,11 +99,11 @@ export function ResourceBreakdown({
                 if (!active || !payload?.length) return null;
                 const d = payload[0]!.payload as ResourceTypeData;
                 return (
-                  <div className="bg-[#1A1A2E] text-white rounded-lg px-4 py-3 shadow-lg text-xs">
-                    <div className="font-heading font-bold text-sm mb-1">{d.type}</div>
-                    <div className="text-[#94A3B8]">Size: <span className="text-white font-mono">{formatters.bytes(d.size)}</span></div>
-                    <div className="text-[#94A3B8]">Files: <span className="text-white font-mono">{d.count}</span></div>
-                    <div className="text-[#94A3B8]">Share: <span className="text-white font-mono">{totalSize > 0 ? Math.round((d.size / totalSize) * 100) : 0}%</span></div>
+                  <div className="bg-gs-black text-white rounded-lg px-4 py-3 shadow-lg text-xs">
+                    <div className="font-system font-bold text-sm mb-1">{d.type}</div>
+                    <div className="text-gs-mid-light">Size: <span className="text-white font-mono">{formatters.bytes(d.size)}</span></div>
+                    <div className="text-gs-mid-light">Files: <span className="text-white font-mono">{d.count}</span></div>
+                    <div className="text-gs-mid-light">Share: <span className="text-white font-mono">{totalSize > 0 ? Math.round((d.size / totalSize) * 100) : 0}%</span></div>
                   </div>
                 );
               }}
@@ -116,7 +117,7 @@ export function ResourceBreakdown({
               dominantBaseline="central"
               className="fill-primary"
               fontSize={28}
-              fontFamily="JetBrains Mono, monospace"
+              fontFamily="var(--font-data)"
               fontWeight={700}
             >
               {formatters.bytes(totalSize)}
@@ -128,7 +129,7 @@ export function ResourceBreakdown({
               dominantBaseline="central"
               className="fill-muted"
               fontSize={11}
-              fontFamily="Inter, sans-serif"
+              fontFamily="var(--font-data)"
             >
               Total Size
             </text>

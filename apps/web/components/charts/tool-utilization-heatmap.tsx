@@ -16,11 +16,11 @@ interface ToolUtilizationHeatmapProps {
 }
 
 const UTIL_COLORS: { [key: string]: { bg: string; text: string; label: string } } = {
-  high: { bg: 'bg-[#1A1A2E]', text: 'text-white', label: 'High' },
-  medium: { bg: 'bg-[#1A1A2E]/60', text: 'text-white', label: 'Medium' },
-  low: { bg: 'bg-[#1A1A2E]/25', text: 'text-primary', label: 'Low' },
-  unused: { bg: 'bg-[#F1F5F9]', text: 'text-muted', label: 'Unused' },
-  redundant: { bg: 'bg-[#EF476F]/10', text: 'text-[#EF476F]', label: 'Redundant' },
+  high: { bg: 'bg-gs-black', text: 'text-white', label: 'High' },
+  medium: { bg: 'bg-gs-black/60', text: 'text-white', label: 'Medium' },
+  low: { bg: 'bg-gs-black/25', text: 'text-primary', label: 'Low' },
+  unused: { bg: 'bg-gs-light', text: 'text-muted', label: 'Unused' },
+  redundant: { bg: 'bg-gs-critical/10', text: 'text-gs-critical', label: 'Redundant' },
 };
 
 export function ToolUtilizationHeatmap({
@@ -50,7 +50,7 @@ export function ToolUtilizationHeatmap({
       <div className="space-y-4">
         {grouped.map((group) => (
           <div key={group.category}>
-            <h4 className="font-heading text-xs font-bold text-muted uppercase tracking-wide mb-2">
+            <h4 className="font-system text-xs font-bold text-muted uppercase tracking-wide mb-2">
               {group.category}
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
@@ -62,7 +62,7 @@ export function ToolUtilizationHeatmap({
                     className={cn(
                       'flex items-center justify-between rounded-lg px-3 py-2 text-xs transition-shadow hover:shadow-sm',
                       style.bg,
-                      tool.utilization === 'redundant' && 'border border-[#EF476F]/30',
+                      tool.utilization === 'redundant' && 'border border-gs-critical/30',
                     )}
                   >
                     <div className="flex items-center gap-2">
@@ -70,7 +70,7 @@ export function ToolUtilizationHeatmap({
                         {tool.tool}
                       </span>
                       {tool.utilization === 'redundant' && (
-                        <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#EF476F]/10 text-[#EF476F] font-bold uppercase">
+                        <span className="text-[9px] px-1.5 py-0.5 rounded bg-gs-critical/10 text-gs-critical font-bold uppercase">
                           Redundant
                         </span>
                       )}
@@ -94,7 +94,7 @@ export function ToolUtilizationHeatmap({
       </div>
 
       {/* Legend */}
-      <div className="flex flex-wrap gap-3 mt-4 pt-3 border-t border-[#F1F5F9]">
+      <div className="flex flex-wrap gap-3 mt-4 pt-3 border-t border-gs-light">
         {Object.entries(UTIL_COLORS).map(([key, val]) => (
           <div key={key} className="flex items-center gap-1.5 text-[10px] text-muted">
             <div className={cn('w-3 h-3 rounded', val.bg)} />

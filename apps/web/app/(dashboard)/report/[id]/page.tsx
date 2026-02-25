@@ -35,7 +35,7 @@ export default async function ReportPage({
   if (!scan) {
     return (
       <div className="text-center py-12">
-        <h1 className="font-heading text-h3 text-primary">Scan not found</h1>
+        <h1 className="font-system text-h3 text-gs-black">Scan not found</h1>
       </div>
     );
   }

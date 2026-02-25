@@ -115,7 +115,7 @@ export const hoverScale = {
 export const hoverElevate = {
   whileHover: {
     y: -2,
-    boxShadow: '0 8px 32px rgba(26, 26, 46, 0.12)',
+    boxShadow: '0 8px 32px oklch(0.15 0.01 80 / 0.12)',
     transition: { duration: 0.2 },
   },
 };

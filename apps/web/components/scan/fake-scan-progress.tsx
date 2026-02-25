@@ -4,6 +4,17 @@ import { useEffect, useState, useRef } from 'react';
 import type { ScanStatus } from '@marketing-alpha/types';
 import { cn } from '@/lib/utils';
 
+/**
+ * GhostScan OS — Fake Scan Progress (Pre-Auth Teaser)
+ * ═══════════════════════════════════════════════════════
+ *
+ * WHAT: Simulated scan progress shown to anonymous users before the signup wall.
+ * WHY:  Show enough progress to hook users before gating. The retro terminal
+ *       aesthetic makes even fake progress feel exciting (Plan Section 5).
+ * HOW:  Terminal-style output with [OK] prefixed lines, bevel-raised module
+ *       cards, segmented progress bar. Gates after ~4 seconds.
+ */
+
 interface FakeScanProgressProps {
   url: string;
   onGateReached: () => void;
@@ -38,14 +49,12 @@ export function FakeScanProgress({ url, onGateReached }: FakeScanProgressProps) 
   useEffect(() => {
     const timers: ReturnType<typeof setTimeout>[] = [];
 
-    // Module reveals
     FAKE_MODULES.forEach(({ delay, module }) => {
       timers.push(setTimeout(() => {
         setCompletedModules((prev) => [...prev, module]);
       }, delay));
     });
 
-    // Progress updates
     timers.push(setTimeout(() => setProgress(12), 1600));
     timers.push(setTimeout(() => {
       setStatus('browser');
@@ -53,7 +62,6 @@ export function FakeScanProgress({ url, onGateReached }: FakeScanProgressProps) 
     }, 2500));
     timers.push(setTimeout(() => setProgress(22), 4000));
 
-    // Gate
     timers.push(setTimeout(() => {
       if (!gateCalledRef.current) {
         gateCalledRef.current = true;
@@ -61,57 +69,49 @@ export function FakeScanProgress({ url, onGateReached }: FakeScanProgressProps) 
       }
     }, 4000));
 
-    return () => {
-      timers.forEach(clearTimeout);
-    };
+    return () => { timers.forEach(clearTimeout); };
   }, [onGateReached]);
 
   const currentPhaseIndex = PHASES.findIndex((p) => p.status === status);
 
   return (
-    <div className="max-w-2xl mx-auto py-12">
-      <h2 className="font-heading text-h3 text-primary text-center mb-2">
+    <div className="max-w-2xl mx-auto py-gs-8">
+      <h2 className="font-system text-os-lg font-bold text-gs-black text-center mb-gs-2">
         Scanning...
       </h2>
-      <p className="text-sm text-muted text-center mb-8">
+      <p className="font-data text-data-sm text-gs-mid text-center mb-gs-6">
         Analyzing marketing technology stack across {PHASES.length} phases
       </p>
 
       {/* Progress bar */}
-      <div className="w-full bg-border rounded-full h-2 mb-8">
+      <div className="bevel-sunken bg-gs-near-white h-[20px] mb-gs-6 p-[2px]">
         <div
-          className="bg-accent h-2 rounded-full transition-all duration-500 ease-out"
+          className="h-full bg-gs-cyan transition-all duration-500 ease-out"
           style={{ width: `${Math.max(progress, 5)}%` }}
         />
       </div>
 
       {/* Phase indicators */}
-      <div className="flex justify-between mb-12">
+      <div className="flex justify-between mb-gs-8">
         {PHASES.map((phase, i) => {
           const isActive = i === currentPhaseIndex;
           const isComplete = i < currentPhaseIndex;
 
           return (
-            <div key={phase.status} className="flex flex-col items-center gap-2">
+            <div key={phase.status} className="flex flex-col items-center gap-gs-2">
               <div
                 className={cn(
-                  'w-10 h-10 rounded-full flex items-center justify-center text-sm font-heading font-700 transition-all',
-                  isComplete && 'bg-success text-white',
-                  isActive && 'bg-accent text-white animate-pulse',
-                  !isComplete && !isActive && 'bg-border text-muted',
+                  'w-[40px] h-[40px] bevel-raised flex items-center justify-center font-system text-os-sm font-bold transition-all',
+                  isComplete && 'bg-gs-terminal text-gs-black',
+                  isActive && 'bg-gs-cyan text-gs-black animate-pulse',
+                  !isComplete && !isActive && 'bg-gs-light text-gs-mid',
                 )}
               >
-                {isComplete ? (
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                  </svg>
-                ) : (
-                  phase.number
-                )}
+                {isComplete ? '✓' : phase.number}
               </div>
               <span className={cn(
-                'text-xs font-medium',
-                isActive ? 'text-accent' : 'text-muted',
+                'font-data text-data-xs',
+                isActive ? 'text-gs-cyan' : 'text-gs-mid',
               )}>
                 {phase.label}
               </span>
@@ -122,22 +122,22 @@ export function FakeScanProgress({ url, onGateReached }: FakeScanProgressProps) 
 
       {/* Completed modules list */}
       {completedModules.length > 0 && (
-        <div className="space-y-2">
-          <h3 className="text-sm font-heading font-700 text-primary mb-3">
+        <div className="space-y-gs-2">
+          <h3 className="font-system text-os-sm font-bold text-gs-black mb-gs-2">
             Completed Modules
           </h3>
           {completedModules.map((mod) => (
             <div
               key={mod.moduleId}
-              className="flex items-center justify-between bg-surface border border-border rounded-lg px-4 py-2 animate-in fade-in slide-in-from-bottom-2"
+              className="flex items-center justify-between bevel-raised bg-gs-light px-gs-4 py-gs-2"
             >
-              <span className="text-sm font-medium text-primary">
-                {mod.moduleId} — {mod.name}
+              <span className="font-data text-data-sm text-gs-black">
+                {mod.moduleId} &mdash; {mod.name}
               </span>
               <span
                 className={cn(
-                  'text-sm font-mono font-700',
-                  mod.score >= 70 ? 'text-success' : mod.score >= 40 ? 'text-warning' : 'text-error',
+                  'font-data text-data-sm font-bold',
+                  mod.score >= 70 ? 'text-gs-terminal' : mod.score >= 40 ? 'text-gs-warning' : 'text-gs-critical',
                 )}
               >
                 {mod.score}/100

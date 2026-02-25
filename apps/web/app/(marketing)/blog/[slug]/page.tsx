@@ -33,16 +33,16 @@ export default async function BlogPostPage({
   if (!post) notFound();
 
   return (
-    <article className="py-24">
-      <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-        <Link href="/blog" className="text-sm text-accent hover:underline mb-8 inline-block">
+    <article className="py-gs-16">
+      <div className="mx-auto max-w-3xl px-gs-4">
+        <Link href="/blog" className="font-data text-data-sm text-gs-fuchsia hover:underline mb-gs-6 inline-block">
           &larr; Back to blog
         </Link>
-        <time className="block text-xs text-muted mb-4">{post.date}</time>
-        <h1 className="font-heading text-h1 text-primary mb-8">
+        <time className="block font-data text-data-xs text-gs-mid mb-gs-4">{post.date}</time>
+        <h1 className="font-system text-[clamp(24px,4vw,44px)] font-bold text-gs-black mb-gs-8">
           {post.title}
         </h1>
-        <div className="prose prose-lg max-w-none">
+        <div className="prose prose-lg max-w-none font-data text-data-sm text-gs-mid-dark leading-relaxed">
           <MDXRemote source={post.content} />
         </div>
       </div>

@@ -70,8 +70,8 @@ export function ModuleAccordionRow({
   return (
     <div
       className={cn(
-        'bg-surface transition-colors',
-        canExpand && 'cursor-pointer hover:bg-surface-hover',
+        'bg-gs-light transition-colors',
+        canExpand && 'cursor-pointer hover:bg-gs-near-white',
         (isPaid || isError) && 'opacity-50',
       )}
     >
@@ -90,10 +90,10 @@ export function ModuleAccordionRow({
         aria-expanded={canExpand ? expanded : undefined}
       >
         {/* Module ID */}
-        <span className="text-xs font-mono text-muted w-10 flex-shrink-0">{moduleId}</span>
+        <span className="text-xs font-mono text-gs-mid w-10 flex-shrink-0">{moduleId}</span>
 
         {/* Module name */}
-        <span className="font-heading text-sm font-600 text-primary flex-1 min-w-0 truncate">
+        <span className="font-system text-sm font-semibold text-gs-black flex-1 min-w-0 truncate">
           {moduleName}
         </span>
 
@@ -107,7 +107,7 @@ export function ModuleAccordionRow({
           </span>
         )}
         {isError && (
-          <span className="text-xs font-medium text-warning bg-warning/10 px-2 py-0.5 rounded-full flex-shrink-0">
+          <span className="text-xs font-medium text-gs-warning bg-gs-warning/10 px-2 py-0.5 rounded-full flex-shrink-0">
             Unavailable
           </span>
         )}
@@ -116,8 +116,8 @@ export function ModuleAccordionRow({
         {result?.score != null && light && !isPaid && (
           <div className="flex items-center gap-2 flex-shrink-0">
             <span className={cn(
-              'text-sm font-heading font-800 tabular-nums',
-              light === 'green' ? 'text-success' : light === 'yellow' ? 'text-warning' : 'text-error',
+              'text-sm font-system font-bold tabular-nums',
+              light === 'green' ? 'text-gs-terminal' : light === 'yellow' ? 'text-gs-warning' : 'text-gs-critical',
             )}>
               {result.score}
             </span>
@@ -129,7 +129,7 @@ export function ModuleAccordionRow({
         {canExpand && (
           <svg
             className={cn(
-              'w-4 h-4 text-muted transition-transform duration-200 flex-shrink-0',
+              'w-4 h-4 text-gs-mid transition-transform duration-200 flex-shrink-0',
               expanded && 'rotate-180',
             )}
             fill="none"
@@ -149,23 +149,23 @@ export function ModuleAccordionRow({
       >
         <div className="overflow-hidden">
           {expanded && result && (
-            <div className="px-4 pb-4 pt-1 space-y-4 border-t border-border/50">
+            <div className="px-4 pb-4 pt-1 space-y-4 border-t border-gs-mid-light/50">
               {/* Checkpoints */}
               {result.checkpoints.length > 0 && (
                 <div>
-                  <h4 className="text-xs font-heading font-700 text-muted uppercase tracking-wide mb-2">
+                  <h4 className="text-xs font-system font-bold text-gs-mid uppercase tracking-wide mb-2">
                     Checkpoints
                   </h4>
                   <div className="space-y-1">
                     {result.checkpoints.map((cp) => (
                       <div key={cp.id} className="flex items-center justify-between text-xs">
-                        <span className="text-primary/80">{cp.name}</span>
+                        <span className="text-gs-black/80">{cp.name}</span>
                         <span className={cn(
                           'font-medium capitalize',
-                          cp.health === 'excellent' ? 'text-success' :
-                          cp.health === 'good' ? 'text-success/70' :
-                          cp.health === 'warning' ? 'text-warning' :
-                          cp.health === 'critical' ? 'text-error' : 'text-muted',
+                          cp.health === 'excellent' ? 'text-gs-terminal' :
+                          cp.health === 'good' ? 'text-gs-terminal/70' :
+                          cp.health === 'warning' ? 'text-gs-warning' :
+                          cp.health === 'critical' ? 'text-gs-critical' : 'text-gs-mid',
                         )}>
                           {cp.health}
                         </span>
@@ -178,7 +178,7 @@ export function ModuleAccordionRow({
               {/* Signals */}
               {result.signals.length > 0 && (
                 <div>
-                  <h4 className="text-xs font-heading font-700 text-muted uppercase tracking-wide mb-2">
+                  <h4 className="text-xs font-system font-bold text-gs-mid uppercase tracking-wide mb-2">
                     Signals
                   </h4>
                   <div className="flex flex-wrap gap-1.5">
@@ -186,7 +186,7 @@ export function ModuleAccordionRow({
                       <SignalBadge key={`${signal.name}-${i}`} signal={signal} />
                     ))}
                     {result.signals.length > 8 && (
-                      <span className="text-xs text-muted self-center">
+                      <span className="text-xs text-gs-mid self-center">
                         +{result.signals.length - 8} more
                       </span>
                     )}
@@ -197,14 +197,14 @@ export function ModuleAccordionRow({
               {/* Details — top-level primitive data */}
               {dataEntries.length > 0 && (
                 <div>
-                  <h4 className="text-xs font-heading font-700 text-muted uppercase tracking-wide mb-2">
+                  <h4 className="text-xs font-system font-bold text-gs-mid uppercase tracking-wide mb-2">
                     Details
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1">
                     {dataEntries.slice(0, 10).map(([label, value]) => (
                       <div key={label} className="flex items-baseline justify-between text-xs gap-2">
-                        <span className="text-muted truncate">{label}</span>
-                        <span className="text-primary font-medium text-right flex-shrink-0">{value}</span>
+                        <span className="text-gs-mid truncate">{label}</span>
+                        <span className="text-gs-black font-medium text-right flex-shrink-0">{value}</span>
                       </div>
                     ))}
                   </div>

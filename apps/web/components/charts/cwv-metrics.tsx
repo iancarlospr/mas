@@ -12,7 +12,7 @@ import {
 } from 'recharts';
 import { ChartContainer } from './chart-container';
 import { AlphaTooltip } from './alpha-tooltip';
-import { AXIS_STYLE, GRID_STYLE, CHART_MARGINS, LEGEND_CONFIG } from '@/lib/chart-config';
+import { AXIS_STYLE, GRID_STYLE, CHART_MARGINS, LEGEND_CONFIG, OKLCH } from '@/lib/chart-config';
 import { cn } from '@/lib/utils';
 
 interface CWVMetric {
@@ -33,12 +33,12 @@ interface CWVMetricsProps {
 }
 
 const RATING_COLORS: Record<string, { bg: string; text: string; border: string }> = {
-  good: { bg: 'bg-[#06D6A0]/5', text: 'text-[#06D6A0]', border: 'border-[#06D6A0]' },
-  'needs-improvement': { bg: 'bg-[#FFD166]/5', text: 'text-[#FFD166]', border: 'border-[#FFD166]' },
-  poor: { bg: 'bg-[#EF476F]/5', text: 'text-[#EF476F]', border: 'border-[#EF476F]' },
+  good: { bg: 'bg-gs-terminal/5', text: 'text-gs-terminal', border: 'border-gs-terminal' },
+  'needs-improvement': { bg: 'bg-gs-warning/5', text: 'text-gs-warning', border: 'border-gs-warning' },
+  poor: { bg: 'bg-gs-critical/5', text: 'text-gs-critical', border: 'border-gs-critical' },
 };
 
-const DEFAULT_RATING = { bg: 'bg-[#06D6A0]/5', text: 'text-[#06D6A0]', border: 'border-[#06D6A0]' };
+const DEFAULT_RATING = { bg: 'bg-gs-terminal/5', text: 'text-gs-terminal', border: 'border-gs-terminal' };
 
 export function CWVMetrics({
   metrics,
@@ -63,7 +63,7 @@ export function CWVMetrics({
                 'border-opacity-30',
               )}
             >
-              <div className="text-xs font-heading font-semibold text-muted uppercase tracking-wide mb-1">
+              <div className="text-xs font-system font-semibold text-muted uppercase tracking-wide mb-1">
                 {m.name}
               </div>
               <div className={cn('font-mono text-3xl font-extrabold', compact && 'text-2xl', colors.text)}>
@@ -73,9 +73,9 @@ export function CWVMetrics({
               <div
                 className={cn(
                   'mt-1 text-[10px] px-2 py-0.5 rounded-full inline-block font-medium',
-                  m.rating === 'good' && 'bg-[#06D6A0]/10 text-[#06D6A0]',
-                  m.rating === 'needs-improvement' && 'bg-[#FFD166]/10 text-[#FFD166]',
-                  m.rating === 'poor' && 'bg-[#EF476F]/10 text-[#EF476F]',
+                  m.rating === 'good' && 'bg-gs-terminal/10 text-gs-terminal',
+                  m.rating === 'needs-improvement' && 'bg-gs-warning/10 text-gs-warning',
+                  m.rating === 'poor' && 'bg-gs-critical/10 text-gs-critical',
                 )}
               >
                 {m.rating === 'needs-improvement' ? 'Needs Improvement' : m.rating.charAt(0).toUpperCase() + m.rating.slice(1)}
@@ -102,9 +102,9 @@ export function CWVMetrics({
             <YAxis {...AXIS_STYLE} />
             <Tooltip content={<AlphaTooltip />} />
             <Legend {...LEGEND_CONFIG} />
-            <Bar dataKey="site" name="Your Site" fill="#1A1A2E" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="good" name="Good Threshold" fill="#06D6A0" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="industry" name="Industry Avg" fill="#94A3B8" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="site" name="Your Site" fill={OKLCH.black} radius={[4, 4, 0, 0]} />
+            <Bar dataKey="good" name="Good Threshold" fill={OKLCH.terminal} radius={[4, 4, 0, 0]} />
+            <Bar dataKey="industry" name="Industry Avg" fill={OKLCH.midLight} radius={[4, 4, 0, 0]} />
           </BarChart>
         </ChartContainer>
       )}

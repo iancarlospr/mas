@@ -126,7 +126,7 @@ export function HeroScanFlow() {
   // Wait for auth check before rendering to avoid flash
   return (
     <ScanInput
-      size="large"
+      variant="dialog"
       onCapture={isAuthenticated != null ? handleCapture : undefined}
     />
   );

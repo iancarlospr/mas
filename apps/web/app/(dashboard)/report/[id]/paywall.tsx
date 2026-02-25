@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { ChloeSprite } from '@/components/chloe/chloe-sprite';
 
 interface ReportPaywallProps {
   scanId: string;
@@ -27,31 +28,48 @@ export function ReportPaywall({ scanId }: ReportPaywallProps) {
   }
 
   return (
-    <div className="max-w-lg mx-auto text-center py-16">
-      <h1 className="font-heading text-h2 text-primary mb-4">
-        Unlock the Executive Report
+    <div className="max-w-lg mx-auto text-center py-gs-12">
+      <ChloeSprite state="smug" size={64} glowing className="mx-auto mb-gs-6" />
+
+      <h1 className="font-system text-[clamp(20px,3vw,32px)] font-bold text-gs-black mb-gs-4">
+        Declassify the Executive Report
       </h1>
-      <p className="text-muted mb-2">
-        Get a McKinsey-style marketing technology audit report with:
+      <p className="font-data text-data-sm text-gs-mid mb-gs-2">
+        The full intelligence dossier with:
       </p>
-      <ul className="text-sm text-muted text-left max-w-xs mx-auto space-y-2 mb-8">
-        <li>- Executive summary and MarketingIQ breakdown</li>
-        <li>- ROI impact analysis with dollar estimates</li>
-        <li>- Prioritized remediation roadmap (PRD)</li>
-        <li>- Cost cutter analysis for tool rationalization</li>
-        <li>- 50 AI Chat messages to explore findings</li>
+      <ul className="font-data text-data-sm text-gs-mid text-left max-w-xs mx-auto space-y-gs-2 mb-gs-6">
+        <li className="flex items-start gap-gs-2">
+          <span className="text-gs-terminal font-bold flex-shrink-0">☑</span>
+          <span>Executive summary and MarketingIQ breakdown</span>
+        </li>
+        <li className="flex items-start gap-gs-2">
+          <span className="text-gs-terminal font-bold flex-shrink-0">☑</span>
+          <span>ROI impact analysis with dollar estimates</span>
+        </li>
+        <li className="flex items-start gap-gs-2">
+          <span className="text-gs-terminal font-bold flex-shrink-0">☑</span>
+          <span>Prioritized remediation roadmap (PRD)</span>
+        </li>
+        <li className="flex items-start gap-gs-2">
+          <span className="text-gs-terminal font-bold flex-shrink-0">☑</span>
+          <span>Cost cutter analysis for tool rationalization</span>
+        </li>
+        <li className="flex items-start gap-gs-2">
+          <span className="text-gs-terminal font-bold flex-shrink-0">☑</span>
+          <span>15 Chloe chat questions</span>
+        </li>
       </ul>
-      <div className="flex items-center justify-center gap-2 mb-6">
-        <span className="text-lg text-muted line-through">$29.99</span>
-        <span className="font-heading text-h2 text-primary">$9.99</span>
-        <span className="text-sm text-muted">one-time</span>
+      <div className="flex items-center justify-center gap-gs-2 mb-gs-6">
+        <span className="font-data text-data-sm text-gs-mid-light line-through">$29.99</span>
+        <span className="font-data text-data-hero text-gs-black">$9.99</span>
+        <span className="font-data text-data-xs text-gs-mid">one-time</span>
       </div>
       <button
         onClick={handleUnlock}
         disabled={loading}
-        className="inline-flex items-center justify-center rounded-lg bg-highlight text-highlight-foreground px-8 py-3 font-heading font-700 hover:bg-highlight/90 transition-colors disabled:opacity-50"
+        className="bevel-button-primary text-os-base px-gs-8 disabled:opacity-50"
       >
-        {loading ? 'Redirecting...' : 'Unlock Report'}
+        {loading ? '⏳ Redirecting...' : 'Declassify — $9.99'}
       </button>
     </div>
   );

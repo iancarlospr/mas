@@ -5,6 +5,29 @@ import { useRouter } from 'next/navigation';
 import Script from 'next/script';
 import { cn, normalizeUrl } from '@/lib/utils';
 import { analytics } from '@/lib/analytics';
+import { soundEffects } from '@/lib/sound-effects';
+import { Window } from '@/components/os/window';
+import { BevelInput } from '@/components/os/bevel-input';
+import { ChloeSprite } from '@/components/chloe/chloe-sprite';
+import { ChloeSpeech } from '@/components/chloe/chloe-speech';
+import { pickRandom, GREETINGS } from '@/lib/chloe-ai-copy';
+
+/**
+ * GhostScan OS — Scan Input (Win95 Dialog)
+ * ═══════════════════════════════════════════
+ *
+ * WHAT: URL input for starting a new scan, redesigned as a Win95 dialog.
+ * WHY:  The scan input is the first functional interaction. It must
+ *       immediately establish the GhostScan OS aesthetic and Chloé's
+ *       presence (Plan Section 5 — URL Input).
+ * HOW:  Uses <Window variant="dialog"> with sunken bevel input,
+ *       gradient primary button, and Chloé floating nearby with
+ *       a greeting speech bubble. Turnstile widget positioned below.
+ *
+ * Preserves all existing functionality: URL normalization, validation,
+ * Turnstile bot protection, API call to /api/scans, error handling.
+ * Visual only — no backend changes.
+ */
 
 declare global {
   interface Window {
@@ -24,12 +47,19 @@ declare global {
 }
 
 interface ScanInputProps {
-  size?: 'default' | 'large';
+  /** Display variant */
+  variant?: 'dialog' | 'inline';
+  /** Additional CSS classes */
   className?: string;
+  /** Delegate scan handling to parent (e.g., HeroScanFlow handles auth) */
   onCapture?: (url: string, turnstileToken: string) => void | Promise<void>;
 }
 
-export function ScanInput({ size = 'default', className, onCapture }: ScanInputProps) {
+export function ScanInput({
+  variant = 'dialog',
+  className,
+  onCapture,
+}: ScanInputProps) {
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -40,32 +70,41 @@ export function ScanInput({ size = 'default', className, onCapture }: ScanInputP
 
   const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
+  /* ── Chloé greeting (random on mount) ────────────────────── */
+  const [greeting] = useState(() => pickRandom(GREETINGS.firstVisit));
+
+  /* ── Turnstile integration (preserved from original) ─────── */
+
   const renderTurnstile = useCallback(() => {
     if (!siteKey || !window.turnstile || !turnstileContainerRef.current) return;
-    if (turnstileWidgetRef.current) return; // already rendered
+    if (turnstileWidgetRef.current) return;
 
-    turnstileWidgetRef.current = window.turnstile.render(turnstileContainerRef.current, {
-      sitekey: siteKey,
-      callback: (token: string) => {
-        turnstileTokenRef.current = token;
+    turnstileWidgetRef.current = window.turnstile.render(
+      turnstileContainerRef.current,
+      {
+        sitekey: siteKey,
+        callback: (token: string) => {
+          turnstileTokenRef.current = token;
+        },
+        'expired-callback': () => {
+          turnstileTokenRef.current = null;
+        },
+        'error-callback': () => {
+          turnstileTokenRef.current = null;
+        },
+        theme: 'dark',
+        size: 'normal',
       },
-      'expired-callback': () => {
-        turnstileTokenRef.current = null;
-      },
-      'error-callback': () => {
-        turnstileTokenRef.current = null;
-      },
-      theme: 'auto',
-      size: 'normal',
-    });
+    );
   }, [siteKey]);
 
   useEffect(() => {
-    // If turnstile script already loaded, render immediately
     if (window.turnstile && siteKey) {
       renderTurnstile();
     }
   }, [renderTurnstile, siteKey]);
+
+  /* ── Submit handler (preserved from original) ────────────── */
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
@@ -74,7 +113,7 @@ export function ScanInput({ size = 'default', className, onCapture }: ScanInputP
 
       const trimmed = url.trim();
       if (!trimmed) {
-        setError('Please enter a URL');
+        setError('Enter a URL, operative.');
         return;
       }
 
@@ -82,16 +121,16 @@ export function ScanInput({ size = 'default', className, onCapture }: ScanInputP
       try {
         new URL(normalized);
       } catch {
-        setError('Please enter a valid URL');
+        setError("That's not a valid URL. Try again.");
         return;
       }
 
       setLoading(true);
+      soundEffects.play('buttonClick');
       const token = turnstileTokenRef.current ?? '';
 
       try {
         if (onCapture) {
-          // Delegate to parent (e.g., HeroScanFlow handles auth check)
           await onCapture(normalized, token);
           return;
         }
@@ -107,9 +146,8 @@ export function ScanInput({ size = 'default', className, onCapture }: ScanInputP
 
         if (!res.ok) {
           const data = await res.json();
-          setError(data.error ?? 'Failed to start scan');
+          setError(data.error ?? 'Scan failed to initialize.');
           setLoading(false);
-          // Reset turnstile for retry
           if (window.turnstile && turnstileWidgetRef.current) {
             window.turnstile.reset(turnstileWidgetRef.current);
             turnstileTokenRef.current = null;
@@ -121,9 +159,10 @@ export function ScanInput({ size = 'default', className, onCapture }: ScanInputP
         analytics.scanStarted(new URL(normalized).hostname, 'full');
         router.push(`/scan/${scanId}`);
       } catch (err) {
-        const message = err instanceof Error && err.message
-          ? err.message
-          : 'Network error. Please try again.';
+        const message =
+          err instanceof Error && err.message
+            ? err.message
+            : 'Network error. Try again.';
         setError(message);
         setLoading(false);
         if (window.turnstile && turnstileWidgetRef.current) {
@@ -135,78 +174,145 @@ export function ScanInput({ size = 'default', className, onCapture }: ScanInputP
     [url, router, onCapture],
   );
 
-  const isLarge = size === 'large';
-
-  return (
-    <form onSubmit={handleSubmit} className={cn('w-full max-w-2xl', className)}>
-      <div
-        className={cn(
-          'flex items-center bg-surface border border-border rounded-xl shadow-lg transition-shadow focus-within:shadow-xl focus-within:border-accent/30',
-          isLarge ? 'p-2' : 'p-1.5',
+  /* ── Inline variant (for embedding in other layouts) ─────── */
+  if (variant === 'inline') {
+    return (
+      <form onSubmit={handleSubmit} className={cn('w-full', className)}>
+        <div className="flex items-end gap-gs-2">
+          <div className="flex-1">
+            <BevelInput
+              type="text"
+              value={url}
+              onChange={(e) => {
+                setUrl(e.target.value);
+                if (error) setError(null);
+              }}
+              placeholder="https://example.com"
+              disabled={loading}
+              fullWidth
+              autoFocus
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className={cn(
+              'bevel-button-primary',
+              loading && 'cursor-wait opacity-70',
+            )}
+          >
+            {loading ? 'Scanning...' : 'Execute Scan'}
+          </button>
+        </div>
+        {error && (
+          <p className="mt-gs-2 font-data text-data-sm text-gs-critical">{error}</p>
         )}
-      >
-        <input
-          type="text"
-          value={url}
-          onChange={(e) => {
-            setUrl(e.target.value);
-            if (error) setError(null);
-          }}
-          placeholder="Enter any URL to scan..."
-          className={cn(
-            'flex-1 bg-transparent border-none outline-none font-body text-primary placeholder:text-muted',
-            isLarge ? 'px-4 py-3 text-lg' : 'px-3 py-2 text-base',
-          )}
-          disabled={loading}
-          autoFocus={isLarge}
-        />
-        <button
-          type="submit"
-          disabled={loading}
-          className={cn(
-            'inline-flex items-center justify-center rounded-lg bg-highlight text-highlight-foreground font-heading font-700 transition-all hover:bg-highlight/90 disabled:opacity-50 disabled:cursor-not-allowed',
-            isLarge ? 'px-8 py-3 text-base' : 'px-5 py-2 text-sm',
-          )}
-        >
-          {loading ? (
-            <svg
-              className="animate-spin h-5 w-5"
-              viewBox="0 0 24 24"
-              fill="none"
-            >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-              />
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-              />
-            </svg>
-          ) : (
-            'Scan'
-          )}
-        </button>
-      </div>
-      {error && (
-        <p className="mt-2 text-sm text-error font-medium">{error}</p>
-      )}
+        {siteKey && (
+          <>
+            <Script
+              src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+              strategy="afterInteractive"
+              onLoad={renderTurnstile}
+            />
+            <div ref={turnstileContainerRef} className="mt-gs-3" />
+          </>
+        )}
+      </form>
+    );
+  }
 
-      {siteKey && (
-        <>
-          <Script
-            src="https://challenges.cloudflare.com/turnstile/v0/api.js"
-            strategy="afterInteractive"
-            onLoad={renderTurnstile}
-          />
-          <div ref={turnstileContainerRef} className="mt-3" />
-        </>
-      )}
-    </form>
+  /* ── Dialog variant (full Win95 window) ──────────────────── */
+  return (
+    <div className={cn('relative', className)}>
+      {/* Chloé floating beside the dialog */}
+      <div className="absolute -left-[100px] top-1/2 -translate-y-1/2 hidden lg:block">
+        <ChloeSprite state="idle" size={64} glowing />
+        <ChloeSpeech
+          message={greeting}
+          variant="ghost"
+          tailPosition="top-right"
+          autoDismissMs={0}
+          className="absolute -top-[80px] -left-[40px]"
+        />
+      </div>
+
+      <Window
+        id="new-scan"
+        title="New Scan — Enter Target URL"
+        icon={<span className="text-os-sm">🔍</span>}
+        variant="dialog"
+        isActive
+        width={480}
+        showStatusBar
+        statusBarContent={
+          <div className="window-statusbar-section">
+            {loading ? 'Scanning...' : 'Ready'}
+          </div>
+        }
+      >
+        <form onSubmit={handleSubmit} className="p-gs-4 space-y-gs-4">
+          {/* URL Input */}
+          <div>
+            <label className="block font-system text-os-base mb-gs-1">
+              Target URL:
+            </label>
+            <BevelInput
+              type="text"
+              value={url}
+              onChange={(e) => {
+                setUrl(e.target.value);
+                if (error) setError(null);
+              }}
+              placeholder="https://example.com"
+              disabled={loading}
+              fullWidth
+              autoFocus
+            />
+          </div>
+
+          {/* Error message */}
+          {error && (
+            <div className="bevel-sunken bg-gs-near-white px-gs-3 py-gs-2">
+              <p className="font-data text-data-sm text-gs-critical">
+                ⚠ {error}
+              </p>
+            </div>
+          )}
+
+          {/* Turnstile widget */}
+          {siteKey && (
+            <>
+              <Script
+                src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+                strategy="afterInteractive"
+                onLoad={renderTurnstile}
+              />
+              <div ref={turnstileContainerRef} />
+            </>
+          )}
+
+          {/* Submit button row */}
+          <div className="flex justify-end gap-gs-2 pt-gs-2">
+            <button
+              type="submit"
+              disabled={loading}
+              className={cn(
+                'bevel-button-primary min-w-[160px]',
+                loading && 'cursor-wait',
+              )}
+            >
+              {loading ? (
+                <span className="flex items-center gap-gs-2">
+                  <span className="animate-blink">⏳</span>
+                  Scanning...
+                </span>
+              ) : (
+                '▶ Execute Scan'
+              )}
+            </button>
+          </div>
+        </form>
+      </Window>
+    </div>
   );
 }
