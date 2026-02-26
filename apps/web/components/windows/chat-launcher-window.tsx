@@ -60,7 +60,7 @@ export default function ChatLauncherWindow() {
   if (!authed) {
     return (
       <div className="p-gs-8 text-center space-y-gs-4">
-        <div className="text-[48px]">🔒</div>
+        <div className="font-system text-os-lg font-bold text-gs-muted">Locked</div>
         <h2 className="font-system text-os-base font-bold">Login Required</h2>
         <p className="font-data text-data-sm text-gs-muted">
           Log in to chat with Chloe about your scans.
@@ -75,7 +75,6 @@ export default function ChatLauncherWindow() {
   if (scans.length === 0) {
     return (
       <div className="p-gs-8 text-center space-y-gs-4">
-        <div className="text-[48px]">💬</div>
         <h2 className="font-system text-os-base font-bold">No paid scans yet</h2>
         <p className="font-data text-data-sm text-gs-muted">
           Upgrade a scan to Alpha Brief to unlock GhostChat.
@@ -105,7 +104,7 @@ export default function ChatLauncherWindow() {
               href={`/chat/${scan.id}`}
               className="flex items-center gap-gs-3 px-gs-4 py-gs-3 hover:bg-gs-red/5 border-b border-gs-chrome-dark/20"
             >
-              <span className="text-[20px]">💬</span>
+              <span className="font-system text-os-sm text-gs-muted">{'>'}</span>
               <div className="flex-1 min-w-0">
                 <div className="font-data text-data-sm font-bold truncate">{domain}</div>
                 <div className="font-data text-data-xs text-gs-muted">

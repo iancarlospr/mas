@@ -189,7 +189,7 @@ export function SignupWall({ domain, scanUrl }: SignupWallProps) {
 
               {error && (
                 <div className="bevel-sunken bg-gs-critical/10 px-gs-3 py-gs-2">
-                  <p className="font-data text-data-xs text-gs-critical">⚠ {error}</p>
+                  <p className="font-data text-data-xs text-gs-critical">{error}</p>
                 </div>
               )}
 
@@ -199,7 +199,7 @@ export function SignupWall({ domain, scanUrl }: SignupWallProps) {
                 className="bevel-button-primary w-full text-os-sm"
               >
                 {loading
-                  ? '⏳ Loading...'
+                  ? 'Loading...'
                   : mode === 'register'
                     ? '▶ Create Account'
                     : '▶ Sign In'}

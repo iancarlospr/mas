@@ -9,32 +9,32 @@
 
 const PRODUCTS = [
   {
-    icon: '🔬',
+    icon: '01',
     name: 'Stack Forensics',
     desc: 'Every script, pixel, and SDK — identified, categorized, and scored. We find what they\'re running.',
   },
   {
-    icon: '👻',
+    icon: '02',
     name: 'GhostScan™',
     desc: 'Deep browser interaction that triggers hidden scripts, lazy modals, and shadow DOM. Nothing hides.',
   },
   {
-    icon: '📊',
+    icon: '03',
     name: 'Performance Audit',
     desc: 'Core Web Vitals, resource budgets, render-blocking analysis. Real Lighthouse, not cached junk.',
   },
   {
-    icon: '🔒',
+    icon: '04',
     name: 'Privacy & Consent',
     desc: 'Cookie audit, consent manager detection, GDPR/CCPA compliance gaps. The legal exposures.',
   },
   {
-    icon: '📈',
+    icon: '05',
     name: 'Competitive Intel',
     desc: 'Traffic estimates, SEO profiles, backlink analysis, tech stack comparison vs. competitors.',
   },
   {
-    icon: '🧠',
+    icon: '06',
     name: 'AI Executive Brief',
     desc: 'Gemini Pro synthesizes all 45 modules into actionable insights, roadmap, and ROI projections.',
   },
@@ -52,7 +52,7 @@ export default function ProductsWindow() {
         {PRODUCTS.map((p) => (
           <div key={p.name} className="bevel-raised bg-gs-chrome p-gs-4 space-y-gs-2">
             <div className="flex items-center gap-gs-2">
-              <span className="text-[24px]">{p.icon}</span>
+              <span className="font-data text-data-sm font-bold text-gs-red">{p.icon}</span>
               <h3 className="font-system text-os-base font-bold">{p.name}</h3>
             </div>
             <p className="font-data text-data-sm text-gs-muted">{p.desc}</p>

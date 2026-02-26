@@ -22,7 +22,7 @@ export default function TrashWindow() {
 
   return (
     <div className="p-gs-6 space-y-gs-6 text-center">
-      <div className="text-[48px]">🗑️</div>
+      <div className="font-system text-os-lg font-bold text-gs-muted">Trash</div>
 
       <div className="space-y-gs-2">
         <h2 className="font-system text-os-base font-bold">Empty Trash?</h2>
@@ -36,7 +36,7 @@ export default function TrashWindow() {
           className="bevel-button-primary"
           onClick={handleLogout}
         >
-          🚪 Log Out
+          Log Out
         </button>
       </div>
 

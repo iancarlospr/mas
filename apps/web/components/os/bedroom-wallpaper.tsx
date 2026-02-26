@@ -3,162 +3,212 @@
 /* =================================================================
    Chloe's Bedroom OS — Bedroom Wallpaper
 
-   Multi-layer CSS/SVG illustrated bedroom background.
-   - Radial gradient warmth (ambient light feel)
-   - Fairy/string lights with randomized glow intensities
-   - Furniture silhouettes: bed, window, poster, lamp, rug edge
-   - Subtle stars/particles
-   Everything VERY subtle — atmospheric, not focal.
+   A stylized bedroom scene in forced perspective.
+   The desktop IS the room — floor, walls, ceiling visible.
+   Pink monochrome palette with depth through value contrast.
+   Objects (icons) sit in this space contextually.
+
+   Layers:
+   1. Back wall (lighter deep pink)
+   2. Floor plane (darker, perspective gradient)
+   3. Ceiling (subtle)
+   4. Wall details: window with moonlight, posters, string lights
+   5. Furniture silhouettes that frame the space
    ================================================================= */
 
 export function BedroomWallpaper() {
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
-      {/* Layer 1: Ambient warmth — multiple overlapping radial gradients */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background: `
-            radial-gradient(ellipse 70% 50% at 45% 35%, oklch(0.17 0.04 340) 0%, transparent 70%),
-            radial-gradient(ellipse 50% 60% at 80% 65%, oklch(0.14 0.03 340) 0%, transparent 55%),
-            radial-gradient(ellipse 30% 40% at 15% 80%, oklch(0.13 0.025 340) 0%, transparent 50%),
-            var(--gs-void)
-          `,
-        }}
-      />
+      {/* Layer 1: Room structure — wall + floor split */}
+      <div className="absolute inset-0" style={{
+        background: `
+          linear-gradient(
+            180deg,
+            oklch(0.16 0.04 340) 0%,
+            oklch(0.18 0.045 340) 45%,
+            oklch(0.14 0.035 340) 45.5%,
+            oklch(0.11 0.03 340) 100%
+          )
+        `,
+      }} />
 
-      {/* Layer 2: Fairy / string lights with varied glow */}
-      <svg className="absolute top-0 left-0 w-full h-[140px]" viewBox="0 0 1400 130" preserveAspectRatio="none">
-        <defs>
-          <filter id="fairy-glow-sm"><feGaussianBlur stdDeviation="3" /></filter>
-          <filter id="fairy-glow-md"><feGaussianBlur stdDeviation="6" /></filter>
-          <filter id="fairy-glow-lg"><feGaussianBlur stdDeviation="10" /></filter>
-        </defs>
-        {/* String wire — catenary curve */}
-        <path
-          d="M-10 20 Q100 50 220 28 Q340 8 480 38 Q600 58 740 25 Q880 -5 1020 32 Q1140 55 1280 22 Q1350 10 1410 30"
-          fill="none"
-          stroke="oklch(0.30 0.04 340)"
-          strokeWidth="0.6"
-          opacity="0.25"
-        />
-        {/* Lights — varied sizes, opacities, warmth */}
-        {[
-          { x: 60,   y: 32, r: 6,  op: 0.04, warm: false },
-          { x: 160,  y: 38, r: 8,  op: 0.05, warm: true },
-          { x: 280,  y: 22, r: 5,  op: 0.03, warm: false },
-          { x: 380,  y: 30, r: 10, op: 0.06, warm: true },
-          { x: 500,  y: 45, r: 7,  op: 0.04, warm: false },
-          { x: 620,  y: 40, r: 9,  op: 0.05, warm: true },
-          { x: 740,  y: 20, r: 6,  op: 0.035, warm: false },
-          { x: 860,  y: 12, r: 11, op: 0.06, warm: true },
-          { x: 980,  y: 35, r: 7,  op: 0.04, warm: false },
-          { x: 1100, y: 42, r: 8,  op: 0.05, warm: true },
-          { x: 1220, y: 25, r: 6,  op: 0.035, warm: false },
-          { x: 1340, y: 18, r: 9,  op: 0.045, warm: true },
-        ].map((light, i) => (
-          <g key={i}>
-            {/* Outer glow */}
-            <circle
-              cx={light.x} cy={light.y} r={light.r * 2.5}
-              fill={light.warm ? 'oklch(0.88 0.14 340)' : 'oklch(0.85 0.10 340)'}
-              opacity={light.op}
-              filter={light.r > 8 ? 'url(#fairy-glow-lg)' : 'url(#fairy-glow-md)'}
-            />
-            {/* Inner dot */}
-            <circle
-              cx={light.x} cy={light.y} r={1.2}
-              fill={light.warm ? 'oklch(0.92 0.15 340)' : 'oklch(0.88 0.12 340)'}
-              opacity={light.op * 4}
-            />
-          </g>
-        ))}
-      </svg>
+      {/* Layer 2: Wall texture — subtle vertical stripes (wallpaper) */}
+      <div className="absolute inset-0" style={{
+        backgroundImage: `repeating-linear-gradient(
+          90deg,
+          oklch(0.19 0.045 340) 0px,
+          oklch(0.19 0.045 340) 1px,
+          transparent 1px,
+          transparent 40px
+        )`,
+        opacity: 0.08,
+        height: '45%',
+      }} />
 
-      {/* Layer 3: Window with moonlight (upper-right) */}
-      <svg className="absolute top-[6%] right-[10%] w-[130px] h-[170px]" viewBox="0 0 100 130" preserveAspectRatio="xMidYMid meet">
+      {/* Layer 3: Floor — wood plank lines */}
+      <div className="absolute left-0 right-0 bottom-0" style={{
+        top: '45%',
+        backgroundImage: `repeating-linear-gradient(
+          90deg,
+          oklch(0.13 0.03 340) 0px,
+          oklch(0.13 0.03 340) 1px,
+          transparent 1px,
+          transparent 80px
+        )`,
+        opacity: 0.12,
+      }} />
+
+      {/* Layer 4: Baseboard line where wall meets floor */}
+      <div className="absolute left-0 right-0 h-[2px]" style={{
+        top: '45%',
+        background: 'oklch(0.22 0.05 340)',
+        opacity: 0.3,
+      }} />
+
+      {/* Layer 5: Window with moonlight (upper right) */}
+      <svg className="absolute" style={{ top: '5%', right: '15%', width: '120px', height: '160px' }} viewBox="0 0 120 160">
         {/* Window frame */}
-        <rect x="8" y="8" width="84" height="114" rx="2" fill="none" stroke="oklch(0.20 0.04 340)" strokeWidth="2" opacity="0.12" />
+        <rect x="5" y="5" width="110" height="150" rx="2" fill="none" stroke="oklch(0.25 0.05 340)" strokeWidth="3" opacity="0.25" />
         {/* Cross panes */}
-        <line x1="50" y1="8" x2="50" y2="122" stroke="oklch(0.20 0.04 340)" strokeWidth="1.5" opacity="0.10" />
-        <line x1="8" y1="65" x2="92" y2="65" stroke="oklch(0.20 0.04 340)" strokeWidth="1.5" opacity="0.10" />
-        {/* Moonlight spill — soft glow through window */}
-        <circle cx="50" cy="45" r="30" fill="oklch(0.88 0.06 340)" opacity="0.015" />
-        <circle cx="50" cy="45" r="18" fill="oklch(0.90 0.08 340)" opacity="0.02" />
-        {/* Curtain hints */}
-        <path d="M8 8c3 20 -2 50 5 80" stroke="oklch(0.22 0.04 340)" strokeWidth="1" opacity="0.06" fill="none" />
-        <path d="M92 8c-3 20 2 50 -5 80" stroke="oklch(0.22 0.04 340)" strokeWidth="1" opacity="0.06" fill="none" />
+        <line x1="60" y1="5" x2="60" y2="155" stroke="oklch(0.25 0.05 340)" strokeWidth="2" opacity="0.20" />
+        <line x1="5" y1="80" x2="115" y2="80" stroke="oklch(0.25 0.05 340)" strokeWidth="2" opacity="0.20" />
+        {/* Night sky through window — slightly lighter */}
+        <rect x="8" y="8" width="49" height="69" rx="1" fill="oklch(0.14 0.03 340)" opacity="0.5" />
+        <rect x="63" y="8" width="49" height="69" rx="1" fill="oklch(0.14 0.03 340)" opacity="0.5" />
+        <rect x="8" y="83" width="49" height="69" rx="1" fill="oklch(0.14 0.03 340)" opacity="0.4" />
+        <rect x="63" y="83" width="49" height="69" rx="1" fill="oklch(0.14 0.03 340)" opacity="0.4" />
+        {/* Moon visible through upper-right pane */}
+        <circle cx="85" cy="35" r="12" fill="oklch(0.85 0.06 340)" opacity="0.06" />
+        <circle cx="85" cy="35" r="6" fill="oklch(0.90 0.08 340)" opacity="0.08" />
+        {/* Stars through window */}
+        <circle cx="25" cy="25" r="0.8" fill="oklch(0.80 0.06 340)" opacity="0.15" />
+        <circle cx="40" cy="45" r="0.6" fill="oklch(0.80 0.06 340)" opacity="0.12" />
+        <circle cx="75" cy="55" r="0.7" fill="oklch(0.80 0.06 340)" opacity="0.10" />
+        {/* Moonlight spill on floor */}
+        <defs>
+          <linearGradient id="moonspill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="oklch(0.85 0.06 340)" stopOpacity="0" />
+            <stop offset="100%" stopColor="oklch(0.85 0.06 340)" stopOpacity="0.03" />
+          </linearGradient>
+        </defs>
       </svg>
 
-      {/* Layer 4: Bed silhouette (bottom-right) */}
-      <svg className="absolute bottom-0 right-0 w-[55%] h-[40%]" viewBox="0 0 600 350" preserveAspectRatio="xMaxYMax meet">
-        {/* Bed frame */}
+      {/* Moonlight spill on floor from window */}
+      <div className="absolute" style={{
+        top: '45%',
+        right: '10%',
+        width: '180px',
+        height: '200px',
+        background: 'linear-gradient(180deg, oklch(0.85 0.06 340 / 0.03) 0%, transparent 80%)',
+        transform: 'perspective(400px) rotateX(60deg)',
+        transformOrigin: 'top center',
+      }} />
+
+      {/* Layer 6: String lights along top of back wall */}
+      <svg className="absolute top-[2%] left-0 w-full h-[60px]" viewBox="0 0 1400 50" preserveAspectRatio="none">
+        {/* Wire */}
         <path
-          d="M80 350 L80 270 Q80 250 100 250 L560 250 Q580 250 580 270 L580 350"
-          fill="none"
-          stroke="oklch(0.19 0.035 340)"
-          strokeWidth="2"
-          opacity="0.12"
+          d="M0 20 Q70 30 140 22 Q210 14 280 24 Q350 34 420 20 Q490 10 560 25 Q630 35 700 18 Q770 8 840 22 Q910 32 980 20 Q1050 12 1120 26 Q1190 36 1260 18 Q1330 10 1400 24"
+          fill="none" stroke="oklch(0.25 0.04 340)" strokeWidth="0.8" opacity="0.20"
         />
-        {/* Headboard — ornate */}
-        <path
-          d="M530 250 L530 180 Q530 150 500 150 Q460 150 440 170 Q420 150 380 150 Q360 150 340 170 Q320 150 280 150 Q260 150 240 170 Q220 150 180 150 Q150 150 140 180 L140 250"
-          fill="none"
-          stroke="oklch(0.19 0.035 340)"
-          strokeWidth="1.5"
-          opacity="0.10"
-        />
-        {/* Pillows */}
-        <ellipse cx="200" cy="240" rx="50" ry="14" fill="none" stroke="oklch(0.21 0.04 340)" strokeWidth="1" opacity="0.08" />
-        <ellipse cx="360" cy="238" rx="55" ry="15" fill="none" stroke="oklch(0.21 0.04 340)" strokeWidth="1" opacity="0.07" />
-        {/* Blanket fold line */}
-        <path d="M100 280 Q200 260 350 275 Q500 290 560 270" fill="none" stroke="oklch(0.20 0.035 340)" strokeWidth="1" opacity="0.06" />
+        {/* Light bulbs */}
+        {[70, 210, 350, 490, 630, 770, 910, 1050, 1190, 1330].map((x, i) => {
+          const y = 20 + Math.sin(x * 0.007) * 10;
+          const warmth = i % 2 === 0;
+          return (
+            <g key={i}>
+              <line x1={x} y1={y} x2={x} y2={y + 4} stroke="oklch(0.25 0.04 340)" strokeWidth="0.5" opacity="0.15" />
+              <circle cx={x} cy={y + 7} r="3" fill={warmth ? 'oklch(0.85 0.12 340)' : 'oklch(0.80 0.08 340)'} opacity={warmth ? 0.06 : 0.04} />
+              <circle cx={x} cy={y + 7} r="1" fill={warmth ? 'oklch(0.92 0.15 340)' : 'oklch(0.88 0.10 340)'} opacity={warmth ? 0.10 : 0.07} />
+            </g>
+          );
+        })}
       </svg>
 
-      {/* Layer 5: Wall poster (upper-left) */}
-      <svg className="absolute top-[12%] left-[6%] w-[90px] h-[110px]" viewBox="0 0 80 100" preserveAspectRatio="xMidYMid meet">
-        <rect x="5" y="8" width="70" height="87" rx="1" fill="none" stroke="oklch(0.19 0.035 340)" strokeWidth="1.5" opacity="0.08" />
-        {/* Pin */}
-        <circle cx="40" cy="7" r="2.5" fill="oklch(0.25 0.05 340)" opacity="0.10" />
-        {/* Abstract art suggestion */}
-        <circle cx="40" cy="50" r="15" fill="none" stroke="oklch(0.22 0.04 340)" strokeWidth="0.75" opacity="0.05" />
-        <path d="M25 65h30" stroke="oklch(0.22 0.04 340)" strokeWidth="0.75" opacity="0.04" />
+      {/* Layer 7: Bed frame silhouette — bottom right, large */}
+      <svg className="absolute" style={{ bottom: '0', right: '2%', width: '45%', height: '50%' }} viewBox="0 0 500 350" preserveAspectRatio="xMaxYMax meet">
+        {/* Headboard */}
+        <path d="M380 120 L380 50 Q380 20 350 20 L180 20 Q150 20 150 50 L150 120"
+          fill="oklch(0.13 0.03 340)" stroke="oklch(0.20 0.04 340)" strokeWidth="2" opacity="0.18" />
+        {/* Mattress */}
+        <rect x="130" y="120" width="270" height="180" rx="8"
+          fill="oklch(0.12 0.028 340)" stroke="oklch(0.20 0.04 340)" strokeWidth="1.5" opacity="0.15" />
+        {/* Pillow */}
+        <ellipse cx="200" cy="145" rx="45" ry="18"
+          fill="oklch(0.15 0.035 340)" stroke="oklch(0.22 0.045 340)" strokeWidth="1" opacity="0.12" />
+        <ellipse cx="310" cy="148" rx="40" ry="16"
+          fill="oklch(0.15 0.035 340)" stroke="oklch(0.22 0.045 340)" strokeWidth="1" opacity="0.10" />
+        {/* Blanket fold */}
+        <path d="M140 200 Q200 180 270 195 Q340 210 390 190"
+          fill="none" stroke="oklch(0.20 0.04 340)" strokeWidth="1" opacity="0.10" />
       </svg>
 
-      {/* Layer 6: Bedside lamp (left of bed) */}
-      <svg className="absolute bottom-[25%] left-[30%] w-[50px] h-[80px]" viewBox="0 0 40 70" preserveAspectRatio="xMidYMax meet">
-        {/* Lampshade */}
-        <path d="M10 10 L5 35 h30 L30 10 z" fill="none" stroke="oklch(0.20 0.035 340)" strokeWidth="1" opacity="0.07" />
-        {/* Stand */}
-        <line x1="20" y1="35" x2="20" y2="60" stroke="oklch(0.20 0.035 340)" strokeWidth="1.5" opacity="0.06" />
-        {/* Base */}
-        <ellipse cx="20" cy="62" rx="8" ry="2" fill="none" stroke="oklch(0.20 0.035 340)" strokeWidth="1" opacity="0.06" />
-        {/* Light glow */}
-        <circle cx="20" cy="25" r="12" fill="oklch(0.85 0.10 340)" opacity="0.012" />
+      {/* Layer 8: Nightstand — left of bed */}
+      <svg className="absolute" style={{ bottom: '8%', right: '46%', width: '60px', height: '80px' }} viewBox="0 0 60 80">
+        <rect x="5" y="10" width="50" height="65" rx="3"
+          fill="oklch(0.14 0.03 340)" stroke="oklch(0.22 0.045 340)" strokeWidth="1.5" opacity="0.18" />
+        <line x1="5" y1="40" x2="55" y2="40" stroke="oklch(0.22 0.045 340)" strokeWidth="1" opacity="0.12" />
+        {/* Lamp on nightstand */}
+        <path d="M22 10 L18 0 h24 L38 10" fill="oklch(0.16 0.035 340)" stroke="oklch(0.24 0.05 340)" strokeWidth="1" opacity="0.15" />
+        <line x1="30" y1="0" x2="30" y2="-8" stroke="oklch(0.24 0.05 340)" strokeWidth="1" opacity="0.12" />
+        {/* Lamp glow */}
+        <circle cx="30" cy="-5" r="15" fill="oklch(0.85 0.10 340)" opacity="0.015" />
       </svg>
 
-      {/* Layer 7: Rug edge (bottom, spanning width) */}
-      <div
-        className="absolute bottom-0 left-[15%] right-[15%] h-[3px]"
+      {/* Layer 9: Rug on floor */}
+      <ellipse
+        className="absolute"
         style={{
-          background: 'linear-gradient(90deg, transparent, oklch(0.22 0.04 340 / 0.08) 20%, oklch(0.22 0.04 340 / 0.10) 50%, oklch(0.22 0.04 340 / 0.08) 80%, transparent)',
+          bottom: '5%',
+          left: '25%',
+          width: '35%',
+          height: '18%',
+          background: 'radial-gradient(ellipse, oklch(0.16 0.045 340 / 0.15) 0%, oklch(0.14 0.035 340 / 0.08) 60%, transparent 100%)',
           borderRadius: '50%',
-        }}
+          border: '1px solid oklch(0.20 0.04 340 / 0.08)',
+        } as React.CSSProperties}
       />
+      <div className="absolute" style={{
+        bottom: '5%',
+        left: '25%',
+        width: '35%',
+        height: '18%',
+        background: 'radial-gradient(ellipse, oklch(0.16 0.045 340 / 0.12) 0%, transparent 70%)',
+        borderRadius: '50%',
+      }} />
 
-      {/* Layer 8: Ambient dust particles — very sparse */}
-      <svg className="absolute inset-0 w-full h-full" viewBox="0 0 1000 600" preserveAspectRatio="none">
-        {[
-          { x: 150, y: 120, r: 0.8, op: 0.04 },
-          { x: 450, y: 200, r: 0.6, op: 0.03 },
-          { x: 700, y: 80,  r: 0.9, op: 0.035 },
-          { x: 300, y: 400, r: 0.7, op: 0.025 },
-          { x: 850, y: 350, r: 0.5, op: 0.03 },
-          { x: 550, y: 500, r: 0.6, op: 0.02 },
-        ].map((p, i) => (
-          <circle key={i} cx={p.x} cy={p.y} r={p.r} fill="oklch(0.85 0.08 340)" opacity={p.op} />
-        ))}
+      {/* Layer 10: Poster on wall (upper left) */}
+      <svg className="absolute" style={{ top: '8%', left: '5%', width: '80px', height: '100px' }} viewBox="0 0 80 100">
+        <rect x="5" y="8" width="70" height="87" rx="1"
+          fill="oklch(0.15 0.035 340)" stroke="oklch(0.22 0.045 340)" strokeWidth="1.5" opacity="0.15" />
+        {/* Pin */}
+        <circle cx="40" cy="6" r="2" fill="oklch(0.30 0.06 340)" opacity="0.20" />
+        {/* Poster content — abstract */}
+        <rect x="12" y="20" width="56" height="3" rx="1" fill="oklch(0.20 0.04 340)" opacity="0.08" />
+        <rect x="12" y="30" width="40" height="2" rx="1" fill="oklch(0.20 0.04 340)" opacity="0.06" />
+        <rect x="12" y="38" width="50" height="2" rx="1" fill="oklch(0.20 0.04 340)" opacity="0.06" />
       </svg>
+
+      {/* Layer 11: Second poster on wall */}
+      <svg className="absolute" style={{ top: '6%', left: '18%', width: '60px', height: '80px' }} viewBox="0 0 60 80">
+        <rect x="5" y="5" width="50" height="70" rx="1"
+          fill="oklch(0.15 0.035 340)" stroke="oklch(0.22 0.045 340)" strokeWidth="1" opacity="0.12" />
+        <circle cx="30" cy="5" r="1.5" fill="oklch(0.30 0.06 340)" opacity="0.15" />
+      </svg>
+
+      {/* Layer 12: Shelf on wall (left side) */}
+      <svg className="absolute" style={{ top: '25%', left: '3%', width: '100px', height: '12px' }} viewBox="0 0 100 12">
+        <rect x="0" y="0" width="100" height="4" rx="1"
+          fill="oklch(0.18 0.04 340)" stroke="oklch(0.22 0.045 340)" strokeWidth="1" opacity="0.15" />
+        {/* Brackets */}
+        <path d="M15 4 L15 12" stroke="oklch(0.22 0.045 340)" strokeWidth="1.5" opacity="0.12" />
+        <path d="M85 4 L85 12" stroke="oklch(0.22 0.045 340)" strokeWidth="1.5" opacity="0.12" />
+      </svg>
+
+      {/* Layer 13: Ambient corner shadow — vignette feel */}
+      <div className="absolute inset-0" style={{
+        background: 'radial-gradient(ellipse 80% 70% at 50% 50%, transparent 40%, oklch(0.08 0.02 340 / 0.4) 100%)',
+      }} />
     </div>
   );
 }

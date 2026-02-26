@@ -15,7 +15,6 @@ export default function BlogWindow() {
       </p>
 
       <div className="bevel-sunken p-gs-8 text-center space-y-gs-2">
-        <div className="text-[32px]">📝</div>
         <p className="font-system text-os-base text-gs-muted">No posts yet.</p>
         <p className="font-data text-data-xs text-gs-muted">Check back soon.</p>
       </div>

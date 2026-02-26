@@ -47,7 +47,7 @@ export function MobileBottomBar({ scanId, isPaid, activeTab = 'dashboard' }: Mob
             loading && 'cursor-wait opacity-70',
           )}
         >
-          {loading ? '⏳ Connecting...' : '🔓 Declassify — $9.99'}
+          {loading ? 'Connecting...' : 'Declassify — $9.99'}
         </button>
       </div>
     );
@@ -61,7 +61,7 @@ export function MobileBottomBar({ scanId, isPaid, activeTab = 'dashboard' }: Mob
           activeTab === 'dashboard' ? 'bevel-sunken bg-gs-ink text-gs-paper' : 'bevel-button',
         )}
       >
-        📊 Dashboard
+        Dashboard
       </button>
       <Link
         href={`/chat/${scanId}`}
@@ -70,7 +70,7 @@ export function MobileBottomBar({ scanId, isPaid, activeTab = 'dashboard' }: Mob
           activeTab === 'chat' ? 'bevel-sunken bg-gs-ink text-gs-paper' : 'bevel-button',
         )}
       >
-        💬 Chat
+        Chat
       </Link>
       <Link
         href={`/report/${scanId}`}
@@ -79,7 +79,7 @@ export function MobileBottomBar({ scanId, isPaid, activeTab = 'dashboard' }: Mob
           activeTab === 'report' ? 'bevel-sunken bg-gs-ink text-gs-paper' : 'bevel-button',
         )}
       >
-        📋 Report
+        Report
       </Link>
     </div>
   );

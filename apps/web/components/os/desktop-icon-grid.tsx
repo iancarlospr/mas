@@ -9,32 +9,46 @@ import { BedroomIcon } from './bedroom-icons';
 /* =================================================================
    Chloe's Bedroom OS — Desktop Icon Grid
 
-   Two columns of SVG bedroom object icons.
-   Double-click opens the window. Single-click selects.
-   Hover: glow + scale spring animation.
+   Icons positioned as objects in a bedroom — forced perspective.
+   Each icon has a fixed position that corresponds to where
+   that object would be in the room:
+   - Wall objects (posters, shelf, mirror) → upper zone
+   - Desk/surface objects (phone, diary, magnifier) → middle zone
+   - Floor objects (TV, games, trash) → lower zone
+   - Bed area objects → right side
    ================================================================= */
 
 interface DesktopIconDef {
   id: string;
   label: string;
+  /** Position as percentage from top-left */
+  x: string;
+  y: string;
+  /** Scale factor — objects closer (lower) appear larger */
+  scale?: number;
 }
 
-const LEFT_ICONS: DesktopIconDef[] = [
-  { id: 'about',         label: 'about us' },
-  { id: 'products',      label: 'Products' },
-  { id: 'pricing',       label: 'Pricing' },
-  { id: 'customers',     label: 'customers' },
-  { id: 'chill',         label: 'chill' },
-  { id: 'history',       label: 'MyDocs' },
-  { id: 'chat-launcher', label: 'GhostChat' },
-  { id: 'scan-input',    label: 'Scan.exe' },
-];
+/** Icons positioned as bedroom objects in forced perspective */
+const ROOM_ICONS: DesktopIconDef[] = [
+  // Wall zone — upper area
+  { id: 'about',         label: 'Mirror',      x: '8%',  y: '8%',  scale: 0.85 },
+  { id: 'features',      label: 'Poster',      x: '22%', y: '5%',  scale: 0.8 },
+  { id: 'blog',          label: 'Diary',       x: '38%', y: '10%', scale: 0.85 },
 
-const RIGHT_ICONS: DesktopIconDef[] = [
-  { id: 'features', label: 'Why MAS?' },
-  { id: 'blog',     label: 'Blog' },
-  { id: 'games',    label: 'Games.exe' },
-  { id: 'trash',    label: 'Trash' },
+  // Shelf / mid-wall zone
+  { id: 'history',       label: 'Bookshelf',   x: '5%',  y: '28%', scale: 0.9 },
+  { id: 'customers',     label: 'Photos',      x: '20%', y: '25%', scale: 0.85 },
+
+  // Desk / surface zone — middle area
+  { id: 'scan-input',    label: 'Scan.exe',    x: '15%', y: '48%', scale: 1.0 },
+  { id: 'chat-launcher', label: 'Phone',       x: '35%', y: '50%', scale: 0.95 },
+  { id: 'products',      label: 'Dresser',     x: '55%', y: '42%', scale: 0.9 },
+  { id: 'pricing',       label: 'Piggy Bank',  x: '50%', y: '55%', scale: 0.95 },
+
+  // Floor zone — bottom, larger (closer to "camera")
+  { id: 'chill',         label: 'TV',          x: '8%',  y: '68%', scale: 1.1 },
+  { id: 'games',         label: 'Games',       x: '28%', y: '72%', scale: 1.05 },
+  { id: 'trash',         label: 'Trash',       x: '48%', y: '75%', scale: 1.0 },
 ];
 
 function DesktopIconButton({
@@ -45,14 +59,21 @@ function DesktopIconButton({
   onOpen: (id: string) => void;
 }) {
   const [selected, setSelected] = useState(false);
+  const scale = def.scale ?? 1;
 
   return (
     <button
       className={cn(
-        'flex flex-col items-center gap-1.5 p-gs-2 w-[76px] outline-none rounded-lg transition-all group',
+        'absolute flex flex-col items-center gap-1 p-1.5 outline-none rounded-lg transition-all group',
         'focus-visible:outline-2 focus-visible:outline-gs-base focus-visible:outline-offset-2',
         selected && 'bg-gs-base/10',
       )}
+      style={{
+        left: def.x,
+        top: def.y,
+        transform: `scale(${scale})`,
+        transformOrigin: 'center bottom',
+      }}
       onClick={() => setSelected(true)}
       onDoubleClick={() => {
         soundEffects.play('windowOpen');
@@ -61,17 +82,17 @@ function DesktopIconButton({
       onBlur={() => setSelected(false)}
     >
       <div className={cn(
-        'w-12 h-12 flex items-center justify-center text-gs-base transition-all duration-200',
+        'w-11 h-11 flex items-center justify-center text-gs-base transition-all duration-200',
         'group-hover:scale-110 group-hover:drop-shadow-[0_0_8px_var(--gs-base)]',
       )}>
-        <BedroomIcon windowId={def.id} size={32} />
+        <BedroomIcon windowId={def.id} size={30} />
       </div>
       <span
         className={cn(
-          'font-system text-os-xs text-center leading-tight max-w-full px-1 rounded transition-colors',
+          'font-system text-[9px] text-center leading-tight max-w-[64px] px-0.5 rounded transition-colors whitespace-nowrap',
           selected
             ? 'bg-gs-base/20 text-gs-base'
-            : 'text-gs-light/60 group-hover:text-gs-light/80',
+            : 'text-gs-light/40 group-hover:text-gs-light/70',
         )}
       >
         {def.label}
@@ -89,20 +110,10 @@ export function DesktopIconGrid() {
   );
 
   return (
-    <>
-      {/* Left column */}
-      <div className="absolute left-gs-4 top-gs-4 flex flex-col gap-1 z-icons">
-        {LEFT_ICONS.map((def) => (
-          <DesktopIconButton key={def.id} def={def} onOpen={handleOpen} />
-        ))}
-      </div>
-
-      {/* Right column */}
-      <div className="absolute right-gs-4 top-gs-4 flex flex-col gap-1 z-icons">
-        {RIGHT_ICONS.map((def) => (
-          <DesktopIconButton key={def.id} def={def} onOpen={handleOpen} />
-        ))}
-      </div>
-    </>
+    <div className="absolute inset-0 z-icons">
+      {ROOM_ICONS.map((def) => (
+        <DesktopIconButton key={def.id} def={def} onOpen={handleOpen} />
+      ))}
+    </div>
   );
 }

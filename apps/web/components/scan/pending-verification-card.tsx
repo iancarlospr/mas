@@ -48,7 +48,7 @@ export function PendingVerificationCard({ email, scanUrl, onDismiss }: PendingVe
         <ChloeSprite state="idle" size={32} glowing className="mx-auto mb-gs-4" />
 
         <div className="bevel-sunken bg-gs-paper w-[56px] h-[56px] mx-auto flex items-center justify-center mb-gs-4">
-          <span className="text-[28px]">📧</span>
+          <span className="font-system text-os-base font-bold text-gs-muted">Mail</span>
         </div>
 
         <h2 className="font-system text-os-lg font-bold text-gs-ink mb-gs-2">

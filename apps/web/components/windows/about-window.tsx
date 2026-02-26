@@ -11,7 +11,6 @@ export default function AboutWindow() {
     <div className="p-gs-6 space-y-gs-6 font-data text-data-base text-gs-ink">
       {/* Header */}
       <div className="text-center space-y-gs-2">
-        <div className="text-[48px]">👻</div>
         <h1 className="font-display text-display-base">GhostScan OS</h1>
         <p className="text-gs-muted text-data-sm">Forensic Marketing Intelligence</p>
         <p className="text-data-xs text-gs-muted">Version 1.0 · Build 2026.02</p>

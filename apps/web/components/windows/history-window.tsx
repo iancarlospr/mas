@@ -66,7 +66,7 @@ export default function HistoryWindow() {
   if (!authed) {
     return (
       <div className="p-gs-8 text-center space-y-gs-4">
-        <div className="text-[48px]">🔒</div>
+        <div className="font-system text-os-lg font-bold text-gs-muted">Locked</div>
         <h2 className="font-system text-os-base font-bold">Login Required</h2>
         <p className="font-data text-data-sm text-gs-muted">
           Log in to view your scan history.
@@ -81,7 +81,6 @@ export default function HistoryWindow() {
   if (scans.length === 0) {
     return (
       <div className="p-gs-8 text-center space-y-gs-4">
-        <div className="text-[48px]">📂</div>
         <h2 className="font-system text-os-base font-bold">No scans yet</h2>
         <p className="font-data text-data-sm text-gs-muted">
           Run your first scan to see results here.
@@ -118,7 +117,7 @@ export default function HistoryWindow() {
               className="flex items-center gap-gs-2 px-gs-3 py-gs-2 hover:bg-gs-red/5 border-b border-gs-chrome-dark/20 font-data text-data-sm"
             >
               <span className="flex-1 truncate">
-                🌐 {domain}
+                {domain}
               </span>
               <span className="w-16 text-center flex items-center justify-center gap-1">
                 {scan.marketing_iq_score != null && (

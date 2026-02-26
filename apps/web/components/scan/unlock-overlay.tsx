@@ -122,11 +122,11 @@ export function UnlockOverlay({
           >
             {loading ? (
               <span className="flex items-center gap-gs-2">
-                <span className="animate-blink">⏳</span>
+                <span className="animate-blink">...</span>
                 Connecting...
               </span>
             ) : (
-              <>🔓 Declassify — $9.99</>
+              <>Declassify — $9.99</>
             )}
           </button>
         </div>

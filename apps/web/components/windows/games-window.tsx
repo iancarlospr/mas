@@ -193,7 +193,7 @@ export default function GamesWindow() {
     [grid, gameState],
   );
 
-  const smiley = gameState === 'won' ? '😎' : gameState === 'lost' ? '😵' : '🙂';
+  const smiley = gameState === 'won' ? ':)' : gameState === 'lost' ? ':(' : ':|';
 
   return (
     <div className="p-gs-3 select-none">
@@ -236,12 +236,12 @@ export default function GamesWindow() {
               >
                 {cell.isRevealed
                   ? cell.isMine
-                    ? '👻'
+                    ? '*'
                     : cell.adjacentMines > 0
                       ? <span style={{ color: NUMBER_COLORS[cell.adjacentMines] }}>{cell.adjacentMines}</span>
                       : null
                   : cell.isFlagged
-                    ? '🚩'
+                    ? 'F'
                     : null}
               </button>
             ))}

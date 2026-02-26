@@ -239,7 +239,7 @@ export function ScanInput({
       <Window
         id="new-scan"
         title="New Scan — Enter Target URL"
-        icon={<span className="text-os-sm">🔍</span>}
+        icon={<span className="text-os-sm font-bold">{'>'}</span>}
         variant="dialog"
         isActive
         width={480}
@@ -274,7 +274,7 @@ export function ScanInput({
           {error && (
             <div className="bevel-sunken bg-gs-paper px-gs-3 py-gs-2">
               <p className="font-data text-data-sm text-gs-critical">
-                ⚠ {error}
+                {error}
               </p>
             </div>
           )}
@@ -303,7 +303,7 @@ export function ScanInput({
             >
               {loading ? (
                 <span className="flex items-center gap-gs-2">
-                  <span className="animate-blink">⏳</span>
+                  <span className="animate-blink">...</span>
                   Scanning...
                 </span>
               ) : (

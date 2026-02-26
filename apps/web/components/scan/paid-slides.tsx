@@ -11,10 +11,10 @@ interface PaidSlidesProps {
 }
 
 const SYNTHESIS_SLIDES = [
-  { moduleId: 'M42', label: 'Executive Brief', icon: '📋' },
-  { moduleId: 'M44', label: 'Impact Scenarios', icon: '💰' },
-  { moduleId: 'M43', label: 'Remediation Roadmap', icon: '🗺️' },
-  { moduleId: 'M45', label: 'Stack Analyzer', icon: '✂️' },
+  { moduleId: 'M42', label: 'Executive Brief', icon: '01' },
+  { moduleId: 'M44', label: 'Impact Scenarios', icon: '02' },
+  { moduleId: 'M43', label: 'Remediation Roadmap', icon: '03' },
+  { moduleId: 'M45', label: 'Stack Analyzer', icon: '04' },
 ] as const;
 
 export function PaidSlides({ scanId, isPaid, resultMap }: PaidSlidesProps) {
@@ -33,7 +33,7 @@ export function PaidSlides({ scanId, isPaid, resultMap }: PaidSlidesProps) {
               <span className="font-data text-data-xs text-gs-muted">{moduleId}</span>
               <span className="flex-1 truncate">{label}</span>
               {!isPaid && (
-                <span className="font-system text-os-xs text-gs-red">🔒 Paid</span>
+                <span className="font-system text-os-xs text-gs-red">Paid</span>
               )}
             </div>
 

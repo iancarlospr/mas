@@ -26,22 +26,22 @@ const STEPS = [
 
 const DIFFERENTIATORS = [
   {
-    icon: '🕵️',
+    icon: '01',
     title: 'Unclockable',
     desc: 'Our stealth browser is indistinguishable from a real user. No bot walls, no blocked scans, no cached junk.',
   },
   {
-    icon: '🔬',
+    icon: '02',
     title: 'Forensic depth',
     desc: 'We don\'t just check headers. We execute JavaScript, trigger interactions, audit cookies, probe consent managers.',
   },
   {
-    icon: '🧠',
+    icon: '03',
     title: 'AI synthesis',
     desc: 'Raw data is noise. Gemini Pro synthesizes 45 modules into actionable intelligence you can act on Monday morning.',
   },
   {
-    icon: '⚡',
+    icon: '04',
     title: '90 seconds',
     desc: 'Not hours. Not days. A full forensic analysis in under 90 seconds. Results you can share immediately.',
   },
@@ -75,7 +75,7 @@ export default function FeaturesWindow() {
           {DIFFERENTIATORS.map((d) => (
             <div key={d.title} className="bevel-sunken p-gs-3 space-y-gs-1">
               <div className="flex items-center gap-gs-2">
-                <span className="text-[20px]">{d.icon}</span>
+                <span className="font-data text-data-sm font-bold text-gs-red">{d.icon}</span>
                 <span className="font-system text-os-sm font-bold">{d.title}</span>
               </div>
               <p className="font-data text-data-xs text-gs-muted">{d.desc}</p>

@@ -88,7 +88,7 @@ export function BentoDashboard({ scan }: BentoDashboardProps) {
         {/* ── Dashboard Content ────────────────────────────── */}
         <Window
           id="dashboard"
-          title={`📊 Dashboard — ${scan.domain} — Scanned ${new Date(scan.createdAt).toLocaleDateString()}`}
+          title={`Dashboard — ${scan.domain} — Scanned ${new Date(scan.createdAt).toLocaleDateString()}`}
           isActive
           isMaximized
           showStatusBar
@@ -105,16 +105,16 @@ export function BentoDashboard({ scan }: BentoDashboardProps) {
                   href={`/report/${scan.id}`}
                   className="bevel-button-primary text-os-xs"
                 >
-                  🔓 Declassify — $9.99
+                  Declassify — $9.99
                 </Link>
               )}
               {isPaid && (
                 <div className="flex gap-gs-1">
                   <Link href={`/report/${scan.id}`} className="bevel-button text-os-xs">
-                    📊 Report
+                    Report
                   </Link>
                   <Link href={`/chat/${scan.id}`} className="bevel-button text-os-xs">
-                    💬 Ask Chloé
+                    Ask Chloe
                   </Link>
                 </div>
               )}

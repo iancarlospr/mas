@@ -51,7 +51,7 @@ export function MobilePortraitSummary({
       {/* ── Top Bar ────────────────────────────────────── */}
       <header className="h-[44px] flex items-center px-gs-3 bg-gs-chrome bevel-raised flex-shrink-0 z-10 relative">
         <div className="flex items-center gap-gs-1">
-          <span className="text-os-base">👻</span>
+          <span className="font-display text-os-base text-gs-red">A</span>
           <span className="font-system text-os-sm font-bold text-gs-red">AlphaScan</span>
         </div>
         <span className="flex-1 text-center font-data text-data-xs text-gs-muted truncate px-gs-2">
@@ -247,7 +247,7 @@ function MobileModuleCard({
         <div className="flex-1 min-w-0">
           <span className="font-data text-data-xs text-gs-muted">{moduleId}</span>
           <span className="font-data text-data-sm font-bold text-gs-ink truncate block">
-            {isLocked ? `🔒 ${name}` : name}
+            {isLocked ? `[Locked] ${name}` : name}
           </span>
         </div>
 

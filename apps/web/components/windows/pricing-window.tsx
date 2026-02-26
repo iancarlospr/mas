@@ -93,7 +93,7 @@ export default function PricingWindow() {
             <ul className="space-y-gs-1 text-data-sm">
               {tier.features.map((f) => (
                 <li key={f} className="flex items-start gap-gs-2">
-                  <span className="text-gs-red shrink-0">✓</span>
+                  <span className="text-gs-red shrink-0">&mdash;</span>
                   <span>{f}</span>
                 </li>
               ))}
