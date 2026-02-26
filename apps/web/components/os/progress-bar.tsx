@@ -2,22 +2,17 @@
 
 import { cn } from '@/lib/utils';
 
-/* ═══════════════════════════════════════════════════════════════
-   GhostScan OS — Progress Bar
+/* =================================================================
+   Chloe's Bedroom OS — Progress Bar
 
-   Win95-style segmented progress bar with sunken track
-   and Chloé gradient fill. Also a terminal-style variant
-   using block characters.
-   ═══════════════════════════════════════════════════════════════ */
+   Modern gradient fill with dithered leading edge.
+   Also a terminal-style variant using block characters.
+   ================================================================= */
 
 interface ProgressBarProps {
-  /** Progress value 0-100 */
   value: number;
-  /** Visual variant */
   variant?: 'default' | 'terminal' | 'ghost';
-  /** Show percentage label */
   showLabel?: boolean;
-  /** Height */
   size?: 'sm' | 'md' | 'lg';
   className?: string;
 }
@@ -36,40 +31,27 @@ export function ProgressBar({
   }
 
   const sizeClass = {
-    sm: 'h-[12px]',
-    md: 'h-[18px]',
-    lg: 'h-[24px]',
+    sm: 'h-[6px]',
+    md: 'h-[10px]',
+    lg: 'h-[14px]',
   }[size];
 
   return (
     <div className={cn('flex items-center gap-gs-2', className)}>
-      <div className={cn('bevel-sunken flex-1 bg-gs-paper relative', sizeClass)}>
-        {/* Segmented fill blocks (Win95 style) */}
+      <div className={cn('flex-1 bg-gs-void/60 rounded-full overflow-hidden border border-gs-mid/30', sizeClass)}>
         <div
-          className="absolute inset-[2px] flex gap-px overflow-hidden"
-          style={{ width: `calc(${clampedValue}% - 4px)` }}
-        >
-          {Array.from({ length: Math.ceil(clampedValue / 3) }).map((_, i) => (
-            <div
-              key={i}
-              className={cn(
-                'flex-shrink-0 w-[8px] h-full',
-                variant === 'ghost'
-                  ? 'bg-gs-red'
-                  : 'bg-gs-ink',
-              )}
-              style={
-                variant === 'ghost'
-                  ? { background: 'var(--gs-red)' }
-                  : undefined
-              }
-            />
-          ))}
-        </div>
+          className="h-full rounded-full transition-all duration-500 ease-out"
+          style={{
+            width: `${clampedValue}%`,
+            background: variant === 'ghost'
+              ? 'linear-gradient(90deg, var(--gs-mid), var(--gs-base))'
+              : 'linear-gradient(90deg, var(--gs-mid), var(--gs-base))',
+          }}
+        />
       </div>
 
       {showLabel && (
-        <span className="font-data text-data-xs text-gs-muted min-w-[36px] text-right">
+        <span className="font-data text-data-xs text-gs-mid min-w-[36px] text-right">
           {Math.round(clampedValue)}%
         </span>
       )}
@@ -77,7 +59,6 @@ export function ProgressBar({
   );
 }
 
-/** Terminal-style progress using block characters */
 function TerminalProgress({
   value,
   className,
@@ -90,14 +71,14 @@ function TerminalProgress({
   const emptyBlocks = totalBlocks - filledBlocks;
 
   const bar =
-    '█'.repeat(filledBlocks) + '░'.repeat(emptyBlocks);
+    '\u2588'.repeat(filledBlocks) + '\u2591'.repeat(emptyBlocks);
 
   return (
     <div className={cn('font-data text-data-sm', className)}>
       <span className="text-gs-terminal">[</span>
       <span className="text-gs-terminal">{bar}</span>
       <span className="text-gs-terminal">]</span>
-      <span className="text-gs-muted ml-gs-2">{Math.round(value)}%</span>
+      <span className="text-gs-mid ml-gs-2">{Math.round(value)}%</span>
     </div>
   );
 }

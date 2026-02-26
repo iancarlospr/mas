@@ -3,15 +3,13 @@
 import { forwardRef, type InputHTMLAttributes } from 'react';
 import { cn } from '@/lib/utils';
 
-/* ═══════════════════════════════════════════════════════════════
-   GhostScan OS — Bevel Input
+/* =================================================================
+   Chloe's Bedroom OS — Modern Input
 
-   Win95-style sunken text input with monospace font
-   and blinking cursor aesthetic.
-   ═══════════════════════════════════════════════════════════════ */
+   Rounded border with pink focus ring + backdrop blur.
+   ================================================================= */
 
 interface BevelInputProps extends InputHTMLAttributes<HTMLInputElement> {
-  /** Use full width */
   fullWidth?: boolean;
 }
 
@@ -21,12 +19,13 @@ export const BevelInput = forwardRef<HTMLInputElement, BevelInputProps>(
       <input
         ref={ref}
         className={cn(
-          'bevel-sunken bg-gs-paper px-gs-2 py-gs-1',
-          'font-data text-data-base text-gs-ink',
-          'placeholder:text-gs-muted',
-          'focus:outline-none',
-          'disabled:bg-gs-chrome disabled:text-gs-muted disabled:cursor-default',
-          'min-h-[24px]',
+          'bg-gs-void/60 border border-gs-mid rounded-lg px-gs-3 py-gs-2',
+          'font-data text-data-base text-gs-light',
+          'placeholder:text-gs-mid',
+          'focus:outline-none focus:border-gs-base focus:ring-1 focus:ring-gs-base/30',
+          'disabled:opacity-40 disabled:cursor-default',
+          'min-h-[34px] transition-colors',
+          'backdrop-blur-sm',
           fullWidth && 'w-full',
           className,
         )}

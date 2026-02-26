@@ -4,14 +4,15 @@ import { useState, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { useWindowManager } from '@/lib/window-manager';
 
-/* ═══════════════════════════════════════════════════════════════
-   GhostScan OS — Taskbar
+/* =================================================================
+   Chloe's Bedroom OS — Taskbar
 
-   Win95 bottom taskbar. Connected to WindowManagerProvider.
+   Frosted glass bottom bar. Connected to WindowManagerProvider.
    Left: Start button → opens start menu
-   Center: Open program buttons (shows active windows)
+   Center: Open program buttons (pill style)
    Right: System tray (clock)
-   ═══════════════════════════════════════════════════════════════ */
+   Dither top edge.
+   ================================================================= */
 
 export function Taskbar() {
   const [startOpen, setStartOpen] = useState(false);
@@ -21,36 +22,35 @@ export function Taskbar() {
     setStartOpen((prev) => !prev);
   }, []);
 
-  // All registered windows for the start menu
   const allWindows = Object.values(wm.windows);
   const openPrograms = wm.taskbarWindows;
 
   return (
-    <div className="gs-taskbar h-taskbar bg-gs-chrome bevel-raised flex items-center z-taskbar relative">
+    <div className="gs-taskbar h-taskbar bg-gs-deep/90 backdrop-blur-md flex items-center z-taskbar relative dither-edge-top"
+      style={{ borderTop: '1px solid var(--gs-mid)' }}
+    >
       {/* Start Button */}
       <button
         className={cn(
-          'h-[30px] px-gs-3 mx-gs-1 flex items-center gap-gs-1 font-system text-os-base font-bold',
+          'h-[32px] px-gs-3 mx-gs-2 flex items-center gap-gs-2 font-system text-os-base font-bold rounded-lg transition-all',
           startOpen
-            ? 'bevel-sunken bg-gs-chrome-dark'
-            : 'bevel-raised bg-gs-chrome hover:bg-gs-chrome-dark/30',
+            ? 'bg-gs-base/20 text-gs-base'
+            : 'text-gs-light/80 hover:bg-gs-base/10 hover:text-gs-light',
         )}
         onClick={toggleStart}
       >
-        <span className="text-os-lg">👻</span>
+        <span className="text-gs-base text-os-lg">A</span>
         <span>Start</span>
       </button>
 
       {/* Start Menu */}
       {startOpen && (
-        <div className="absolute bottom-full left-gs-1 mb-0 bg-gs-chrome bevel-raised min-w-[220px] z-start-menu shadow-window">
+        <div className="absolute bottom-full left-gs-2 mb-1 bg-gs-deep/95 backdrop-blur-xl border border-gs-mid rounded-lg min-w-[240px] z-start-menu shadow-window-float animate-slide-up overflow-hidden">
           <div className="flex">
-            {/* Vertical brand strip — solid red */}
-            <div
-              className="w-[28px] flex-shrink-0 flex items-end justify-center pb-gs-2 bg-gs-red"
-            >
+            {/* Vertical brand strip — solid pink */}
+            <div className="w-[32px] flex-shrink-0 flex items-end justify-center pb-gs-3 bg-gs-base">
               <span
-                className="font-system text-os-xs text-white font-bold"
+                className="font-system text-os-xs text-gs-void font-bold"
                 style={{
                   writingMode: 'vertical-rl',
                   textOrientation: 'mixed',
@@ -58,40 +58,38 @@ export function Taskbar() {
                   letterSpacing: '2px',
                 }}
               >
-                GhostScan OS
+                AlphaScan
               </span>
             </div>
 
             {/* Menu items */}
-            <div className="flex-1 py-gs-1">
-              {allWindows.map((win) => (
+            <div className="flex-1 py-1">
+              {allWindows.map((win, i) => (
                 <button
                   key={win.id}
                   className="w-full text-left px-gs-4 py-gs-2 font-system text-os-base
-                             flex items-center gap-gs-3
-                             hover:bg-gs-ink hover:text-gs-paper"
+                             flex items-center gap-gs-3 transition-colors
+                             hover:bg-gs-base/15 hover:text-gs-base text-gs-light/80"
+                  style={{ animationDelay: `${i * 30}ms` }}
                   onClick={() => {
                     wm.openWindow(win.id);
                     setStartOpen(false);
                   }}
                 >
-                  <span className="text-os-lg">{win.icon}</span>
+                  <span className="text-os-lg text-gs-base">{win.icon}</span>
                   <span>{win.title}</span>
                 </button>
               ))}
 
-              <div
-                className="mx-gs-2 my-gs-1 border-t"
-                style={{ borderColor: 'var(--gs-chrome-dark)' }}
-              />
+              <div className="mx-gs-2 my-1 h-px bg-gs-mid/40" />
 
               <button
                 className="w-full text-left px-gs-4 py-gs-2 font-system text-os-base
-                           flex items-center gap-gs-3
-                           hover:bg-gs-ink hover:text-gs-paper"
+                           flex items-center gap-gs-3 transition-colors
+                           hover:bg-gs-base/15 hover:text-gs-base text-gs-light/80"
                 onClick={() => setStartOpen(false)}
               >
-                <span className="text-os-lg">🚪</span>
+                <span className="text-os-lg text-gs-base">{'>'}</span>
                 <span>Log Out</span>
               </button>
             </div>
@@ -100,18 +98,18 @@ export function Taskbar() {
       )}
 
       {/* Separator */}
-      <div className="w-px h-[24px] bg-gs-chrome-dark mx-gs-1" />
+      <div className="w-px h-[24px] bg-gs-mid/40 mx-gs-1" />
 
-      {/* Open Program Buttons */}
-      <div className="flex-1 flex items-center gap-gs-1 px-gs-1 overflow-hidden">
+      {/* Open Program Buttons — pill style */}
+      <div className="flex-1 flex items-center gap-1.5 px-gs-2 overflow-hidden">
         {openPrograms.map((win) => (
           <button
             key={win.id}
             className={cn(
-              'h-[26px] px-gs-3 flex items-center gap-gs-1 font-system text-os-sm truncate max-w-[160px]',
+              'h-[28px] px-gs-3 flex items-center gap-1.5 font-system text-os-sm truncate max-w-[160px] rounded-md transition-all',
               wm.activeWindowId === win.id
-                ? 'bevel-sunken bg-gs-paper'
-                : 'bevel-raised bg-gs-chrome',
+                ? 'bg-gs-base/20 text-gs-base border border-gs-base/30'
+                : 'text-gs-light/60 hover:text-gs-light hover:bg-gs-base/10',
             )}
             onClick={() => {
               if (win.isMinimized) {
@@ -123,15 +121,15 @@ export function Taskbar() {
               }
             }}
           >
-            <span className="text-os-sm">{win.icon}</span>
+            <span className="text-os-sm text-gs-base">{win.icon}</span>
             <span className="truncate">{win.title}</span>
           </button>
         ))}
       </div>
 
       {/* System Tray */}
-      <div className="bevel-sunken flex items-center gap-gs-2 px-gs-2 h-[26px] mr-gs-1">
-        <span className="font-data text-data-xs text-gs-muted">
+      <div className="flex items-center gap-gs-2 px-gs-3 h-[28px] mr-gs-2">
+        <span className="font-data text-data-xs text-gs-mid">
           <TaskbarClock />
         </span>
       </div>
@@ -142,7 +140,6 @@ export function Taskbar() {
 function TaskbarClock() {
   const [time, setTime] = useState('');
 
-  // Hydration-safe: only set time on client
   useState(() => {
     const update = () =>
       setTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));

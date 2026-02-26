@@ -5,28 +5,23 @@ import { cn } from '@/lib/utils';
 import { useWindowManager, useWindowState } from '@/lib/window-manager';
 import { useWindowDrag } from '@/hooks/use-window-drag';
 import { useWindowResize } from '@/hooks/use-window-resize';
-import { Window } from './window';
 
-/* ═══════════════════════════════════════════════════════════════
-   GhostScan OS — Managed Window
+/* =================================================================
+   Chloe's Bedroom OS — Managed Window
 
    A Window that reads its position, size, and z-index from the
    WindowManagerProvider context. Supports drag-to-move and
    edge/corner resize. Used by StaticWindowRenderer for desktop
    icon-triggered windows.
 
-   The plain Window component stays backward-compatible for
-   existing usage in scan sequence, auth dialogs, etc.
-   ═══════════════════════════════════════════════════════════════ */
+   Frosted glass chrome, colored dots, spring animation.
+   ================================================================= */
 
 interface ManagedWindowProps {
   id: string;
   children: ReactNode;
-  /** Additional class names for the window content area */
   contentClassName?: string;
-  /** Whether to show the status bar */
   showStatusBar?: boolean;
-  /** Status bar content */
   statusBarContent?: ReactNode;
 }
 
@@ -44,7 +39,6 @@ export function ManagedWindow({
   const isActive = wm.activeWindowId === id;
   const isMaximized = windowState?.isMaximized ?? false;
 
-  // Drag callbacks
   const getPosition = useCallback(() => {
     if (!windowState) return null;
     return { x: windowState.x, y: windowState.y };
@@ -60,7 +54,6 @@ export function ManagedWindow({
     [wm, id],
   );
 
-  // Resize callbacks
   const getRect = useCallback(() => {
     if (!windowState) return null;
     return {
@@ -102,6 +95,7 @@ export function ManagedWindow({
   return (
     <div
       ref={windowRef}
+      data-active={isActive}
       className={cn(
         'window',
         windowState.variant === 'ghost' && 'window-ghost',
@@ -131,34 +125,32 @@ export function ManagedWindow({
         data-active={isActive}
         onDoubleClick={() => wm.maximizeWindow(id)}
       >
-        <span className="window-titlebar-icon">{windowState.icon}</span>
-        <span className="window-titlebar-text">{windowState.title}</span>
+        {/* Colored dots: close, minimize, maximize (macOS order) */}
         <div className="window-titlebar-buttons">
           <button
             className="window-titlebar-btn"
-            onClick={() => wm.minimizeWindow(id)}
-            aria-label="Minimize"
-            title="Minimize"
-          >
-            ─
-          </button>
-          <button
-            className="window-titlebar-btn"
-            onClick={() => wm.maximizeWindow(id)}
-            aria-label={isMaximized ? 'Restore' : 'Maximize'}
-            title={isMaximized ? 'Restore' : 'Maximize'}
-          >
-            {isMaximized ? '❐' : '□'}
-          </button>
-          <button
-            className="window-titlebar-btn"
+            data-action="close"
             onClick={() => wm.closeWindow(id)}
             aria-label="Close"
             title="Close"
-          >
-            ×
-          </button>
+          />
+          <button
+            className="window-titlebar-btn"
+            data-action="minimize"
+            onClick={() => wm.minimizeWindow(id)}
+            aria-label="Minimize"
+            title="Minimize"
+          />
+          <button
+            className="window-titlebar-btn"
+            data-action="maximize"
+            onClick={() => wm.maximizeWindow(id)}
+            aria-label={isMaximized ? 'Restore' : 'Maximize'}
+            title={isMaximized ? 'Restore' : 'Maximize'}
+          />
         </div>
+        <span className="window-titlebar-icon">{windowState.icon}</span>
+        <span className="window-titlebar-text">{windowState.title}</span>
       </div>
 
       {/* Content */}

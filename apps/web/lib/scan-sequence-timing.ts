@@ -119,7 +119,7 @@ export function scanStatusToAnimationPhase(status: ScanStatus): AnimationPhase {
 
 /* ── ASCII Movie Selection ─────────────────────────────────── */
 
-export type AsciiMovieId = 'rick_roll' | 'short_intro' | 'chloe_animation';
+export type AsciiMovieId = 'rick_roll' | 'a24_intro' | 'chloe_animation' | 'moonlight';
 
 export interface AsciiMovieConfig {
   id: AsciiMovieId;
@@ -138,15 +138,21 @@ export const ASCII_MOVIES: AsciiMovieConfig[] = [
     loop: true,
   },
   {
-    id: 'short_intro',
-    path: '/ascii/short_intro.json',
-    durationSec: 30,
+    id: 'a24_intro',
+    path: '/ascii/a24_intro.json',
+    durationSec: 35,
     loop: false,
   },
   {
     id: 'chloe_animation',
     path: '/ascii/chloe_scan.json',
     durationSec: 27,
+    loop: true,
+  },
+  {
+    id: 'moonlight',
+    path: '/ascii/moonlight.json',
+    durationSec: 60,
     loop: true,
   },
 ];

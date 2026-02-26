@@ -5,11 +5,10 @@ import { useRouter } from 'next/navigation';
 import { ChloeSprite } from '@/components/chloe/chloe-sprite';
 
 /**
- * GhostScan OS — Mobile Gate
+ * Chloe's Bedroom OS — Mobile Gate
  *
  * Screen < 1024px: Show gate with option to "Scan anyway."
- * The desktop OS metaphor requires a large screen.
- * Mobile users can still scan — they just can't use the OS.
+ * Updated to pink monochrome palette.
  */
 
 export function MobileGate({ children }: { children: React.ReactNode }) {
@@ -51,23 +50,23 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="fixed inset-0 bg-gs-paper z-[9999] flex flex-col items-center justify-center p-gs-6">
-      <div className="noise-grain opacity-[0.02]" aria-hidden="true" />
+    <div className="fixed inset-0 bg-gs-void z-[9999] flex flex-col items-center justify-center p-gs-6">
+      <div className="noise-grain opacity-[0.03]" aria-hidden="true" />
 
-      <div className="text-center space-y-gs-6 max-w-sm">
+      <div className="text-center space-y-gs-6 max-w-sm relative">
         <ChloeSprite state="idle" size={128} className="mx-auto" />
 
         <div className="space-y-gs-3">
-          <h1 className="font-display text-display-sm text-gs-ink">
-            GhostScan OS
+          <h1 className="font-display text-display-sm text-gs-base">
+            AlphaScan
           </h1>
-          <p className="font-data text-data-sm text-gs-muted">
+          <p className="font-data text-data-sm text-gs-mid">
             This is a desktop experience. Open on your computer for the full OS.
           </p>
         </div>
 
-        <div className="bevel-raised bg-gs-chrome p-gs-4 space-y-gs-3">
-          <p className="font-system text-os-sm text-gs-ink font-bold">
+        <div className="bg-gs-deep/80 backdrop-blur-md border border-gs-mid rounded-lg p-gs-4 space-y-gs-3">
+          <p className="font-system text-os-sm text-gs-light font-bold">
             Scan anyway?
           </p>
           <form onSubmit={handleScan} className="space-y-gs-2">
@@ -76,21 +75,21 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
               value={scanUrl}
               onChange={(e) => setScanUrl(e.target.value)}
               placeholder="https://example.com"
-              className="w-full bevel-sunken bg-gs-paper px-gs-3 py-gs-2 font-data text-data-sm text-gs-ink outline-none"
+              className="w-full bg-gs-void/60 border border-gs-mid rounded-lg px-gs-3 py-gs-2 font-data text-data-sm text-gs-light outline-none focus:border-gs-base transition-colors"
             />
             <button
               type="submit"
               className="bevel-button-primary w-full"
               disabled={scanning}
             >
-              {scanning ? '⏳ Scanning...' : '▶ Execute Scan'}
+              {scanning ? 'Scanning...' : 'Execute Scan'}
             </button>
           </form>
         </div>
 
         <button
           onClick={() => setDismissed(true)}
-          className="font-data text-data-xs text-gs-muted hover:text-gs-red underline"
+          className="font-data text-data-xs text-gs-mid hover:text-gs-base underline transition-colors"
         >
           Show desktop anyway
         </button>

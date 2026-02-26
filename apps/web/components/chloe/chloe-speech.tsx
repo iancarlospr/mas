@@ -4,53 +4,37 @@ import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 
 /**
- * GhostScan OS — Chloé Speech Bubble
- * ═══════════════════════════════════════
+ * Chloe's Bedroom OS — Chloe Speech Bubble
+ * ==========================================
  *
- * WHAT: A retro pixel-style speech bubble that appears above/beside Chloé.
- * WHY:  Chloé communicates with personality — never generic system messages.
- *       The speech bubble is how she delivers her "High-Fashion Cuntiness"
- *       tone directly to the user (Plan Section 4, Target Audience).
- * HOW:  CSS-only bubble with bevel border, personality font (Permanent Marker),
- *       and a pixel-art tail pointing toward Chloé. Auto-dismisses after
- *       a configurable duration. Three visual variants: normal, alert, ghost.
- *
- * Typography: Uses --font-personality (Permanent Marker) per Plan Section 2.
- * Colors: Body uses --gs-paper, border uses --gs-mid, variants use accent colors.
+ * Frosted glass speech bubble with pink accent border.
+ * Personality font (Permanent Marker) for the message.
  */
 
 export type SpeechVariant = 'normal' | 'alert' | 'ghost';
 
 export interface ChloeSpeechProps {
-  /** The message Chloé is saying */
   message: string;
-  /** Visual variant — affects border/accent color */
   variant?: SpeechVariant;
-  /** Auto-dismiss after this many ms (0 = never dismiss) */
   autoDismissMs?: number;
-  /** Position of the tail/pointer */
   tailPosition?: 'bottom-left' | 'bottom-right' | 'top-left' | 'top-right';
-  /** Whether the bubble is currently visible */
   visible?: boolean;
-  /** Callback when bubble is dismissed */
   onDismiss?: () => void;
-  /** Additional CSS classes */
   className?: string;
 }
 
-/** Variant-specific border colors */
 const VARIANT_STYLES: Record<SpeechVariant, { border: string; glow: string }> = {
   normal: {
-    border: 'var(--gs-chrome-dark)',
+    border: 'var(--gs-mid)',
     glow: 'none',
   },
   alert: {
     border: 'var(--gs-critical)',
-    glow: '0 0 8px oklch(0.55 0.15 25 / 0.3)',
+    glow: '0 0 12px oklch(0.55 0.15 25 / 0.3)',
   },
   ghost: {
-    border: 'var(--gs-red)',
-    glow: '0 0 12px oklch(0.82 0.12 192 / 0.2)',
+    border: 'var(--gs-base)',
+    glow: '0 0 16px oklch(0.82 0.15 340 / 0.2)',
   },
 };
 
@@ -65,7 +49,6 @@ export function ChloeSpeech({
 }: ChloeSpeechProps) {
   const [isShowing, setIsShowing] = useState(visible);
 
-  /* Auto-dismiss timer */
   useEffect(() => {
     setIsShowing(visible);
 
@@ -83,7 +66,6 @@ export function ChloeSpeech({
 
   const style = VARIANT_STYLES[variant];
 
-  /* Tail position CSS */
   const tailIsBottom = tailPosition.startsWith('bottom');
   const tailIsLeft = tailPosition.endsWith('left');
 
@@ -91,33 +73,29 @@ export function ChloeSpeech({
     <div
       className={cn(
         'relative inline-block max-w-[240px]',
-        /* Entry animation */
         'animate-window-open',
         className,
       )}
       role="status"
       aria-live="polite"
     >
-      {/* Bubble body */}
+      {/* Bubble body — frosted glass */}
       <div
-        className="relative px-gs-3 py-gs-2 font-personality text-chloe leading-snug"
+        className="relative px-gs-3 py-gs-2 font-personality text-chloe leading-snug rounded-lg backdrop-blur-md"
         style={{
-          background: 'var(--gs-paper)',
-          border: `2px solid ${style.border}`,
+          background: 'oklch(0.20 0.06 340 / 0.85)',
+          border: `1px solid ${style.border}`,
           boxShadow: `
-            inset 1px 1px 0 var(--gs-paper),
-            inset -1px -1px 0 var(--gs-paper),
-            2px 2px 0 var(--gs-chrome-dark),
+            0 4px 16px oklch(0.10 0.05 340 / 0.4),
             ${style.glow}
           `,
-          color: 'var(--gs-ink)',
-          imageRendering: 'pixelated',
+          color: 'var(--gs-light)',
         }}
       >
         {message}
       </div>
 
-      {/* Pixel-art speech tail (8x8 triangle made of two stacked rectangles) */}
+      {/* Speech tail */}
       <div
         className="absolute"
         style={{
@@ -125,7 +103,6 @@ export function ChloeSpeech({
           [tailIsLeft ? 'left' : 'right']: '16px',
           width: 0,
           height: 0,
-          /* CSS triangle via borders */
           ...(tailIsBottom
             ? {
                 borderLeft: '6px solid transparent',
@@ -139,7 +116,7 @@ export function ChloeSpeech({
               }),
         }}
       />
-      {/* Inner tail (white fill, 1px inset) */}
+      {/* Inner tail (dark fill) */}
       <div
         className="absolute"
         style={{
@@ -151,12 +128,12 @@ export function ChloeSpeech({
             ? {
                 borderLeft: '4px solid transparent',
                 borderRight: '4px solid transparent',
-                borderTop: '6px solid var(--gs-paper)',
+                borderTop: '6px solid oklch(0.20 0.06 340 / 0.85)',
               }
             : {
                 borderLeft: '4px solid transparent',
                 borderRight: '4px solid transparent',
-                borderBottom: '6px solid var(--gs-paper)',
+                borderBottom: '6px solid oklch(0.20 0.06 340 / 0.85)',
               }),
         }}
       />
@@ -165,8 +142,7 @@ export function ChloeSpeech({
 }
 
 /**
- * Convenience wrapper: Shows a speech bubble that types out letter by letter.
- * Used for dramatic moments (scan complete, critical finding).
+ * Typing bubble — types out letter by letter.
  */
 export function ChloeTypingBubble({
   message,
@@ -199,7 +175,7 @@ export function ChloeTypingBubble({
   return (
     <ChloeSpeech
       {...props}
-      message={displayed + (displayed.length < message.length ? '▌' : '')}
+      message={displayed + (displayed.length < message.length ? '\u258C' : '')}
     />
   );
 }

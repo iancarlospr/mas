@@ -1,13 +1,12 @@
 /**
- * GhostScan OS — Chart Configuration
- * ═══════════════════════════════════════
+ * Chloe's Bedroom OS — Chart Configuration
+ * ============================================
  *
- * Palette: "Classified File on Gallery Paper"
- * Charts use ink (primary), red (accent), plus functional traffic lights.
- * No cyan/fuchsia — those are dead.
+ * Palette: Monochromatic Pink (OKLCH hue 340)
+ * Charts use pink primary series + functional traffic lights for data.
  */
 
-/* ── Dimensions & Aspect Ratios ──────────────────────────────── */
+/* -- Dimensions & Aspect Ratios --------------------------------- */
 
 export const CHART_ASPECTS = {
   wide: 3,
@@ -28,18 +27,18 @@ export const CHART_HEIGHTS = {
   printA4Half: 340,
 } as const;
 
-/* ── Tooltip Styling ─────────────────────────────────────────── */
+/* -- Tooltip Styling ------------------------------------------- */
 
 export const TOOLTIP_STYLE: React.CSSProperties = {
-  backgroundColor: 'var(--gs-ink)',
-  border: '2px solid var(--gs-chrome-dark)',
-  borderRadius: '0px',
+  backgroundColor: 'oklch(0.18 0.05 340)',
+  border: '1px solid oklch(0.42 0.09 340)',
+  borderRadius: '8px',
   padding: '8px 12px',
-  boxShadow: '2px 2px 0 var(--gs-chrome-dark)',
+  boxShadow: '0 4px 16px oklch(0.10 0.05 340 / 0.4)',
 };
 
 export const TOOLTIP_LABEL_STYLE: React.CSSProperties = {
-  color: 'var(--gs-paper)',
+  color: 'oklch(0.96 0.04 340)',
   fontFamily: 'var(--font-data)',
   fontWeight: 700,
   fontSize: '13px',
@@ -47,13 +46,13 @@ export const TOOLTIP_LABEL_STYLE: React.CSSProperties = {
 };
 
 export const TOOLTIP_ITEM_STYLE: React.CSSProperties = {
-  color: 'var(--gs-chrome)',
+  color: 'oklch(0.42 0.09 340)',
   fontFamily: 'var(--font-data)',
   fontSize: '12px',
   padding: '2px 0',
 };
 
-/* ── Legend Configuration ─────────────────────────────────────── */
+/* -- Legend Configuration -------------------------------------- */
 
 export const LEGEND_CONFIG = {
   verticalAlign: 'bottom' as const,
@@ -63,7 +62,7 @@ export const LEGEND_CONFIG = {
   wrapperStyle: {
     fontFamily: 'var(--font-data)',
     fontSize: '12px',
-    color: 'var(--gs-muted)',
+    color: 'var(--gs-mid)',
     paddingTop: '16px',
   },
 };
@@ -80,16 +79,16 @@ export const LEGEND_RIGHT_CONFIG = {
   },
 };
 
-/* ── Axis Styling ────────────────────────────────────────────── */
+/* -- Axis Styling --------------------------------------------- */
 
 export const AXIS_STYLE = {
   tick: {
     fontFamily: 'var(--font-data)',
     fontSize: 12,
-    fill: 'var(--gs-muted)',
+    fill: 'var(--gs-mid)',
   },
   axisLine: {
-    stroke: 'var(--gs-chrome-dark)',
+    stroke: 'var(--gs-mid)',
     strokeWidth: 1,
   },
   tickLine: false as const,
@@ -97,11 +96,11 @@ export const AXIS_STYLE = {
 
 export const GRID_STYLE = {
   strokeDasharray: '3 3',
-  stroke: 'var(--gs-chrome-dark)',
+  stroke: 'oklch(0.30 0.06 340)',
   vertical: false,
 };
 
-/* ── Number Formatters ───────────────────────────────────────── */
+/* -- Number Formatters ---------------------------------------- */
 
 export const formatters = {
   thousands: (value: number) =>
@@ -120,7 +119,7 @@ export const formatters = {
   },
 };
 
-/* ── Animation Config ────────────────────────────────────────── */
+/* -- Animation Config ---------------------------------------- */
 
 export const ANIMATION_CONFIG = {
   isAnimationActive: true,
@@ -143,25 +142,25 @@ export const ANIMATION_CONFIG = {
   },
 };
 
-/* ═══════════════════════════════════════════════════════════════
-   Color Palettes — Classified File on Gallery Paper
-   ═══════════════════════════════════════════════════════════════ */
+/* =================================================================
+   Color Palettes — Monochromatic Pink
+   ================================================================= */
 
 /**
  * Primary chart palette — 10 colors.
- * Ink (primary), Red (accent), then functional + warm neutrals.
+ * Pink primary, then functional + complementary desaturated tones.
  */
 export const CHART_PALETTE = [
-  'var(--gs-ink)',          // Primary data series (near-black)
-  'var(--gs-red)',          // Accent (the red)
-  'var(--gs-terminal)',     // Positive / healthy (green)
-  'var(--gs-warning)',      // Caution (amber)
-  'var(--gs-muted)',        // Neutral / baseline
-  'var(--gs-red-dark)',     // Dark red variant
-  '#5B8A72',               // Tertiary (muted sage)
-  '#C17F59',               // Quaternary (warm copper)
-  '#7B6B8A',               // Quinary (dusty plum)
-  '#5A8F8F',               // Senary (teal slate)
+  'var(--gs-base)',          // Primary data series (pink)
+  'var(--gs-bright)',        // Bright pink
+  'var(--gs-terminal)',      // Positive / healthy (green)
+  'var(--gs-warning)',       // Caution (amber)
+  'var(--gs-mid)',           // Neutral / baseline
+  'oklch(0.70 0.18 340)',    // Deep pink variant
+  'oklch(0.65 0.10 200)',    // Muted teal
+  'oklch(0.70 0.10 60)',     // Warm copper
+  'oklch(0.60 0.08 300)',    // Dusty plum
+  'oklch(0.60 0.08 180)',    // Teal slate
 ] as const;
 
 /** Traffic light — the universal health indicator */
@@ -174,33 +173,33 @@ export const TRAFFIC_LIGHT_COLORS = {
 /** Status indicators */
 export const STATUS_COLORS = {
   active: 'var(--gs-terminal)',
-  inactive: 'var(--gs-muted)',
+  inactive: 'var(--gs-mid)',
   degraded: 'var(--gs-warning)',
   error: 'var(--gs-critical)',
-  blocked: 'var(--gs-ink)',
+  blocked: 'var(--gs-void)',
 } as const;
 
 /** Resource type colors */
 export const RESOURCE_COLORS = {
   js: 'var(--gs-warning)',
   css: 'var(--gs-terminal)',
-  images: 'var(--gs-red)',
-  fonts: 'var(--gs-muted)',
-  xhr: 'var(--gs-ink)',
-  other: '#5A8F8F',
+  images: 'var(--gs-base)',
+  fonts: 'var(--gs-mid)',
+  xhr: 'var(--gs-bright)',
+  other: 'oklch(0.60 0.08 180)',
 } as const;
 
 /** Category badge accent colors */
 export const CATEGORY_BADGE_COLORS: Record<string, string> = {
-  analytics: 'var(--gs-ink)',
-  ads: 'var(--gs-red)',
+  analytics: 'var(--gs-base)',
+  ads: 'oklch(0.70 0.18 340)',
   automation: 'var(--gs-terminal)',
   cms: 'var(--gs-warning)',
-  cdn: '#5A8F8F',
-  security: '#5B8A72',
-  ecommerce: '#C17F59',
-  social: '#7B6B8A',
-  other: 'var(--gs-muted)',
+  cdn: 'oklch(0.60 0.08 180)',
+  security: 'oklch(0.65 0.10 200)',
+  ecommerce: 'oklch(0.70 0.10 60)',
+  social: 'oklch(0.60 0.08 300)',
+  other: 'var(--gs-mid)',
 };
 
 /** Score tier colors */
@@ -208,7 +207,7 @@ export const SCORE_TIER_COLORS = {
   critical: 'var(--gs-critical)',
   warning: 'var(--gs-warning)',
   good: 'var(--gs-terminal)',
-  excellent: 'var(--gs-red)',       // Red = excellence in this palette
+  excellent: 'var(--gs-base)',
 } as const;
 
 export function getScoreTierColor(score: number): string {
@@ -220,16 +219,16 @@ export function getScoreTierColor(score: number): string {
 
 /** Traffic source colors */
 export const TRAFFIC_SOURCE_COLORS: Record<string, string> = {
-  Direct: 'var(--gs-ink)',
+  Direct: 'var(--gs-base)',
   'Organic Search': 'var(--gs-terminal)',
-  'Paid Search': 'var(--gs-red)',
+  'Paid Search': 'oklch(0.70 0.18 340)',
   Social: 'var(--gs-warning)',
-  Referral: 'var(--gs-muted)',
-  Email: '#5A8F8F',
-  Display: '#5B8A72',
+  Referral: 'var(--gs-mid)',
+  Email: 'oklch(0.60 0.08 180)',
+  Display: 'oklch(0.65 0.10 200)',
 };
 
-/* ── Margins ─────────────────────────────────────────────────── */
+/* -- Margins --------------------------------------------------- */
 
 export const CHART_MARGINS = {
   bento: { top: 8, right: 8, bottom: 8, left: 8 },
@@ -239,7 +238,7 @@ export const CHART_MARGINS = {
   print: { top: 24, right: 40, bottom: 24, left: 48 },
 } as const;
 
-/* ── PDF Dimensions ──────────────────────────────────────────── */
+/* -- PDF Dimensions ------------------------------------------- */
 
 export const PDF_DIMENSIONS = {
   pageWidth: 794,
@@ -261,39 +260,46 @@ export const PDF_DIMENSIONS = {
 
 /** Print-safe monochrome palette */
 export const PRINT_PALETTE = [
-  'var(--gs-ink)',
-  'var(--gs-muted)',
-  'var(--gs-chrome-dark)',
-  'var(--gs-chrome)',
-  'var(--gs-chrome-light)',
+  'var(--gs-void)',
+  'var(--gs-mid)',
+  'var(--gs-deep)',
+  'var(--gs-base)',
+  'var(--gs-light)',
 ] as const;
 
-/* ═══════════════════════════════════════════════════════════════
+/* =================================================================
    Resolved Values for SVG Inline Styles
-   ═══════════════════════════════════════════════════════════════ */
+   ================================================================= */
 
 export const RESOLVED_COLORS = {
-  ink:         '#1A1A1A',
-  red:         '#E63946',
-  redDark:     '#C1121F',
-  chrome:      '#E8E3DB',
-  chromeDark:  '#D1CBC1',
-  chromeLight: '#F5F0EA',
-  paper:       '#FFFBF5',
-  muted:       '#8B8680',
-  ghost:       '#E0F0FF',
+  void:        '#1E0E18',
+  deep:        '#3A1A2E',
+  mid:         '#6B3A5A',
+  base:        '#FFB2EF',
+  bright:      '#FFCAF3',
+  light:       '#FFF0FA',
   terminal:    'oklch(0.80 0.25 145)',
   critical:    'oklch(0.55 0.22 25)',
   warning:     'oklch(0.78 0.15 75)',
+  /* Backward-compat aliases */
+  ink:         '#1E0E18',
+  red:         '#FFB2EF',
+  redDark:     '#D480C8',
+  chrome:      '#3A1A2E',
+  chromeDark:  '#6B3A5A',
+  chromeLight: '#4A2840',
+  paper:       '#FFF0FA',
+  muted:       '#6B3A5A',
+  ghost:       '#FFB2EF',
 } as const;
 
 /** Cookie category colors */
 export const COOKIE_CATEGORY_COLORS: Record<string, string> = {
   essential:   RESOLVED_COLORS.terminal,
-  functional:  '#5A8F8F',
+  functional:  'oklch(0.60 0.08 180)',
   analytics:   RESOLVED_COLORS.warning,
   advertising: RESOLVED_COLORS.critical,
-  unknown:     RESOLVED_COLORS.muted,
+  unknown:     RESOLVED_COLORS.mid,
 };
 
 /** CWV rating colors */
@@ -308,22 +314,22 @@ export const UTILIZATION_COLORS: Record<string, string> = {
   high:   RESOLVED_COLORS.terminal,
   medium: RESOLVED_COLORS.warning,
   low:    RESOLVED_COLORS.critical,
-  none:   RESOLVED_COLORS.chromeLight,
+  none:   RESOLVED_COLORS.deep,
 };
 
 /** Flow diagram node colors */
 export const FLOW_NODE_COLORS: Record<string, string> = {
-  source:   RESOLVED_COLORS.red,
+  source:   RESOLVED_COLORS.base,
   healthy:  RESOLVED_COLORS.terminal,
   warning:  RESOLVED_COLORS.warning,
   critical: RESOLVED_COLORS.critical,
-  neutral:  RESOLVED_COLORS.muted,
+  neutral:  RESOLVED_COLORS.mid,
 };
 
 /** Scatter quadrant colors */
 export const QUADRANT_COLORS: Record<string, string> = {
   quickWins:   RESOLVED_COLORS.terminal,
-  strategic:   RESOLVED_COLORS.red,
-  lowPriority: RESOLVED_COLORS.muted,
+  strategic:   RESOLVED_COLORS.base,
+  lowPriority: RESOLVED_COLORS.mid,
   avoid:       RESOLVED_COLORS.critical,
 };

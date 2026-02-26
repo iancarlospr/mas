@@ -11,15 +11,11 @@ import { ChloeSpeech } from '@/components/chloe/chloe-speech';
 import { pickRandom, GREETINGS, ERROR_STATES } from '@/lib/chloe-ai-copy';
 
 /**
- * GhostScan OS — Auth Form (Retro OS Dialog)
- * ═══════════════════════════════════════════════
+ * Chloe's Bedroom OS — Auth Form
+ * ================================
  *
- * WHAT: Login/register form redesigned as a Win95 dialog on dark background.
- * WHY:  Auth pages should feel like logging into the GhostScan OS.
- *       You're "outside" the OS, trying to get in (Plan Section 15).
- * HOW:  Window variant="dialog" with bevel inputs/buttons, Chloé greeting,
- *       dark CRT-grain background. ALL auth logic preserved (Supabase auth,
- *       OAuth Google/Apple, magic link, email/password, redirect handling).
+ * Login/register form as a frosted glass dialog on dark background.
+ * You're "outside" the OS, trying to get in.
  */
 
 interface AuthFormProps {
@@ -37,19 +33,17 @@ export function AuthForm({ mode }: AuthFormProps) {
   const searchParams = useSearchParams();
   const supabase = createClient();
 
-  /* Chloé greeting (random, set once on mount) */
   const [greeting] = useState(() =>
     mode === 'login' ? pickRandom(GREETINGS.login) : pickRandom(GREETINGS.register),
   );
 
-  /* Compute return path: scan_url > redirect > /history */
   const scanUrl = searchParams.get('scan_url');
   const redirect = searchParams.get('redirect');
   const returnPath = scanUrl
     ? `/history?auto_scan=${encodeURIComponent(scanUrl)}`
     : redirect ?? '/history';
 
-  /* ── Auth handlers (ALL preserved from original) ─────────── */
+  /* -- Auth handlers ------------------------------------------ */
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -117,21 +111,20 @@ export function AuthForm({ mode }: AuthFormProps) {
     if (err) setError(err.message);
   };
 
-  /* ── Magic link sent state ───────────────────────────────── */
+  /* -- Magic link sent state ---------------------------------- */
   if (magicLinkSent) {
     return (
-      <div className="fixed inset-0 bg-gs-ink flex items-center justify-center">
+      <div className="fixed inset-0 bg-gs-void flex items-center justify-center">
         <div className="noise-grain" aria-hidden="true" />
-        <div className="crt-scanlines" aria-hidden="true" />
         <div className="relative">
           <ChloeSprite state="smug" size={64} glowing className="mx-auto mb-gs-4" />
-          <Window id="magic-link" title="📧 Check Your Email" variant="dialog" isActive width={380}>
+          <Window id="magic-link" title="Check Your Email" variant="dialog" isActive width={380}>
             <div className="p-gs-6 text-center">
-              <p className="font-data text-data-lg text-gs-ink mb-gs-2">
-                Magic link sent to <strong>{email}</strong>
+              <p className="font-data text-data-lg text-gs-light mb-gs-2">
+                Magic link sent to <strong className="text-gs-base">{email}</strong>
               </p>
-              <p className="font-data text-data-sm text-gs-muted mb-gs-4">
-                Click the link in your email to access GhostScan OS.
+              <p className="font-data text-data-sm text-gs-mid mb-gs-4">
+                Click the link in your email to access AlphaScan.
               </p>
               <button
                 onClick={() => setMagicLinkSent(false)}
@@ -146,15 +139,13 @@ export function AuthForm({ mode }: AuthFormProps) {
     );
   }
 
-  /* ── Main auth form ──────────────────────────────────────── */
+  /* -- Main auth form ----------------------------------------- */
   return (
-    <div className="fixed inset-0 bg-gs-ink flex items-center justify-center">
-      {/* CRT atmosphere */}
+    <div className="fixed inset-0 bg-gs-void flex items-center justify-center">
       <div className="noise-grain" aria-hidden="true" />
-      <div className="crt-scanlines" aria-hidden="true" />
 
       <div className="relative">
-        {/* Chloé greeting */}
+        {/* Chloe greeting */}
         <div className="absolute -top-[100px] left-1/2 -translate-x-1/2 flex flex-col items-center">
           <ChloeSprite state="chat" size={64} glowing />
           <ChloeSpeech
@@ -171,8 +162,8 @@ export function AuthForm({ mode }: AuthFormProps) {
           id="auth"
           title={
             mode === 'login'
-              ? 'GhostScan OS — Authentication Required'
-              : 'GhostScan OS — Create Account'
+              ? 'AlphaScan — Authentication Required'
+              : 'AlphaScan — Create Account'
           }
           variant="dialog"
           isActive
@@ -203,16 +194,16 @@ export function AuthForm({ mode }: AuthFormProps) {
 
             {/* Divider */}
             <div className="flex items-center gap-gs-3">
-              <div className="flex-1 h-px bg-gs-muted" />
-              <span className="font-system text-os-xs text-gs-muted">or</span>
-              <div className="flex-1 h-px bg-gs-muted" />
+              <div className="flex-1 h-px bg-gs-mid/40" />
+              <span className="font-system text-os-xs text-gs-mid">or</span>
+              <div className="flex-1 h-px bg-gs-mid/40" />
             </div>
 
             {/* Email/password form */}
             <form onSubmit={handleEmailAuth} className="space-y-gs-3">
               {mode === 'register' && (
                 <div>
-                  <label className="block font-system text-os-xs text-gs-muted mb-gs-1">
+                  <label className="block font-system text-os-xs text-gs-mid mb-gs-1">
                     Name:
                   </label>
                   <BevelInput
@@ -225,7 +216,7 @@ export function AuthForm({ mode }: AuthFormProps) {
                 </div>
               )}
               <div>
-                <label className="block font-system text-os-xs text-gs-muted mb-gs-1">
+                <label className="block font-system text-os-xs text-gs-mid mb-gs-1">
                   Email:
                 </label>
                 <BevelInput
@@ -238,7 +229,7 @@ export function AuthForm({ mode }: AuthFormProps) {
                 />
               </div>
               <div>
-                <label className="block font-system text-os-xs text-gs-muted mb-gs-1">
+                <label className="block font-system text-os-xs text-gs-mid mb-gs-1">
                   Password:
                 </label>
                 <BevelInput
@@ -253,8 +244,8 @@ export function AuthForm({ mode }: AuthFormProps) {
               </div>
 
               {error && (
-                <div className="bevel-sunken bg-gs-critical/10 px-gs-3 py-gs-2">
-                  <p className="font-data text-data-xs text-gs-critical">⚠ {error}</p>
+                <div className="bg-gs-critical/10 border border-gs-critical/30 rounded-lg px-gs-3 py-gs-2">
+                  <p className="font-data text-data-xs text-gs-critical">{error}</p>
                 </div>
               )}
 
@@ -264,30 +255,30 @@ export function AuthForm({ mode }: AuthFormProps) {
                 className="bevel-button-primary w-full text-os-sm"
               >
                 {loading
-                  ? '⏳ Loading...'
+                  ? 'Loading...'
                   : mode === 'login'
-                    ? '▶ Sign In'
-                    : '▶ Create Account'}
+                    ? 'Sign In'
+                    : 'Create Account'}
               </button>
 
               <button
                 type="button"
                 onClick={handleMagicLink}
                 disabled={loading}
-                className="w-full font-data text-data-xs text-gs-red hover:text-gs-red text-center"
+                className="w-full font-data text-data-xs text-gs-base hover:text-gs-bright text-center transition-colors"
               >
                 Send me a magic link instead
               </button>
             </form>
 
             {/* Switch mode link */}
-            <p className="text-center font-data text-data-xs text-gs-muted">
+            <p className="text-center font-data text-data-xs text-gs-mid">
               {mode === 'login' ? (
                 <>
                   New operative?{' '}
                   <Link
                     href={`/register${scanUrl ? `?scan_url=${encodeURIComponent(scanUrl)}` : redirect ? `?redirect=${encodeURIComponent(redirect)}` : ''}`}
-                    className="text-gs-red hover:underline font-bold"
+                    className="text-gs-base hover:text-gs-bright hover:underline font-bold transition-colors"
                   >
                     Create account
                   </Link>
@@ -297,7 +288,7 @@ export function AuthForm({ mode }: AuthFormProps) {
                   Already registered?{' '}
                   <Link
                     href={`/login${scanUrl ? `?scan_url=${encodeURIComponent(scanUrl)}` : redirect ? `?redirect=${encodeURIComponent(redirect)}` : ''}`}
-                    className="text-gs-red hover:underline font-bold"
+                    className="text-gs-base hover:text-gs-bright hover:underline font-bold transition-colors"
                   >
                     Sign in
                   </Link>

@@ -1,13 +1,10 @@
 import type { Config } from 'tailwindcss';
 
 /**
- * GhostScan OS — Tailwind Configuration
+ * Chloe's Bedroom OS — Tailwind Configuration
  *
- * Palette: "Classified File on Gallery Paper"
- * Kruger × MSCHF × Valentino red on warm cream
- *
- * Colors are hex CSS variables (no OKLCH for Tailwind compat).
- * Functional colors (terminal/critical/warning) remain OKLCH in globals.css.
+ * Palette: Monochromatic Pink (OKLCH hue 340)
+ * Anchored on #1E0E18 (void) and #FFB2EF (base)
  */
 
 const config: Config = {
@@ -18,9 +15,16 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      /* ── Colors ──────────────────────────────────────────── */
+      /* -- Colors -------------------------------------------- */
       colors: {
         gs: {
+          void:         'var(--gs-void)',
+          deep:         'var(--gs-deep)',
+          mid:          'var(--gs-mid)',
+          base:         'var(--gs-base)',
+          bright:       'var(--gs-bright)',
+          light:        'var(--gs-light)',
+          /* Backward-compatible aliases */
           paper:        'var(--gs-paper)',
           ink:          'var(--gs-ink)',
           red:          'var(--gs-red)',
@@ -35,43 +39,43 @@ const config: Config = {
           warning:      'var(--gs-warning)',
         },
         /* Semantic aliases */
-        background: 'var(--gs-paper)',
-        surface:    'var(--gs-paper)',
-        border:     'var(--gs-chrome-dark)',
+        background: 'var(--gs-void)',
+        surface:    'var(--gs-deep)',
+        border:     'var(--gs-mid)',
       },
 
-      /* ── Font Families ──────────────────────────────────── */
+      /* -- Font Families ------------------------------------ */
       fontFamily: {
-        display:     ['var(--font-display)', 'Instrument Serif', 'Georgia', 'serif'],
-        system:      ['var(--font-system)', 'Pixelify Sans', 'monospace'],
-        data:        ['var(--font-data)', 'JetBrains Mono', 'monospace'],
+        display:     ['var(--font-display)', 'Barlow Condensed', 'sans-serif'],
+        system:      ['var(--font-system)', 'Geist Mono', 'monospace'],
+        data:        ['var(--font-data)', 'Geist Mono', 'monospace'],
         personality: ['var(--font-personality)', 'Permanent Marker', 'cursive'],
-        mono:        ['var(--font-data)', 'JetBrains Mono', 'monospace'],
+        mono:        ['var(--font-data)', 'Geist Mono', 'monospace'],
       },
 
-      /* ── Font Sizes ─────────────────────────────────────── */
+      /* -- Font Sizes --------------------------------------- */
       fontSize: {
-        /* Display (Instrument Serif) */
-        'display-sm':  ['24px', { lineHeight: '1.1', fontWeight: '400' }],
-        'display-base':['32px', { lineHeight: '1.1', fontWeight: '400' }],
-        'display-lg':  ['48px', { lineHeight: '1.0', fontWeight: '400' }],
-        'display-xl':  ['64px', { lineHeight: '1.0', fontWeight: '400' }],
-        'display-hero':['80px', { lineHeight: '0.95', fontWeight: '400' }],
+        /* Display (Barlow Condensed — viewport-scaled headlines) */
+        'display-sm':  ['clamp(20px, 3vw, 28px)', { lineHeight: '1.1', fontWeight: '700', letterSpacing: '-0.03em' }],
+        'display-base':['clamp(28px, 4vw, 36px)', { lineHeight: '1.1', fontWeight: '700', letterSpacing: '-0.03em' }],
+        'display-lg':  ['clamp(36px, 5vw, 52px)', { lineHeight: '1.0', fontWeight: '700', letterSpacing: '-0.03em' }],
+        'display-xl':  ['clamp(48px, 6vw, 72px)', { lineHeight: '1.0', fontWeight: '800', letterSpacing: '-0.03em' }],
+        'display-hero':['clamp(56px, 8vw, 96px)', { lineHeight: '0.95', fontWeight: '800', letterSpacing: '-0.03em' }],
 
-        /* OS Chrome (Pixelify Sans) */
-        'os-xs':      ['10px', { lineHeight: '1.0' }],
-        'os-sm':      ['12px', { lineHeight: '1.2' }],
-        'os-base':    ['14px', { lineHeight: '1.0' }],
-        'os-lg':      ['16px', { lineHeight: '1.0' }],
-        'os-xl':      ['24px', { lineHeight: '1.0' }],
+        /* OS Chrome (Geist Mono) */
+        'os-xs':      ['10px', { lineHeight: '1.2' }],
+        'os-sm':      ['12px', { lineHeight: '1.3' }],
+        'os-base':    ['13px', { lineHeight: '1.3' }],
+        'os-lg':      ['15px', { lineHeight: '1.2' }],
+        'os-xl':      ['24px', { lineHeight: '1.1' }],
 
-        /* Data (JetBrains Mono) */
-        'data-xs':    ['11px', { lineHeight: '1.4' }],
-        'data-sm':    ['13px', { lineHeight: '1.4' }],
-        'data-base':  ['14px', { lineHeight: '1.5' }],
-        'data-lg':    ['15px', { lineHeight: '1.7' }],
+        /* Data (Geist Mono) */
+        'data-xs':    ['11px', { lineHeight: '1.5' }],
+        'data-sm':    ['12px', { lineHeight: '1.5' }],
+        'data-base':  ['13px', { lineHeight: '1.6' }],
+        'data-lg':    ['15px', { lineHeight: '1.6' }],
         'data-xl':    ['18px', { lineHeight: '1.3', letterSpacing: '-0.01em', fontWeight: '700' }],
-        'data-2xl':   ['24px', { lineHeight: '1.0', letterSpacing: '-0.01em', fontWeight: '700' }],
+        'data-2xl':   ['24px', { lineHeight: '1.1', letterSpacing: '-0.01em', fontWeight: '700' }],
         'data-hero':  ['48px', { lineHeight: '1.0', letterSpacing: '-0.02em', fontWeight: '800' }],
 
         /* Personality (Chloe) */
@@ -80,7 +84,7 @@ const config: Config = {
         'chloe-xl':   ['28px', { lineHeight: '1.2' }],
       },
 
-      /* ── Spacing ────────────────────────────────────────── */
+      /* -- Spacing ------------------------------------------ */
       spacing: {
         'gs-1': '4px',
         'gs-2': '8px',
@@ -92,39 +96,46 @@ const config: Config = {
         'gs-10': '40px',
         'gs-12': '48px',
         'gs-16': '64px',
-        'titlebar': '24px',
-        'menubar':  '28px',
-        'taskbar':  '36px',
-        'statusbar': '22px',
+        'titlebar': '32px',
+        'menubar':  '32px',
+        'taskbar':  '40px',
+        'statusbar': '24px',
       },
 
-      /* ── Shadows ────────────────────────────────────────── */
+      /* -- Shadows ------------------------------------------ */
       boxShadow: {
-        'bevel': 'inset 1px 1px 0 var(--gs-chrome-light), inset -1px -1px 0 var(--gs-muted)',
-        'bevel-sunken': 'inset 1px 1px 0 var(--gs-muted), inset -1px -1px 0 var(--gs-chrome-light)',
-        'window': 'inset 1px 1px 0 var(--gs-chrome-light), inset -1px -1px 0 var(--gs-muted), 4px 4px 0 rgba(0,0,0,0.08)',
-        'window-float': '4px 4px 0 rgba(0,0,0,0.08), 8px 8px 24px rgba(0,0,0,0.06)',
-        'ghost-glow': '0 0 16px rgba(224, 240, 255, 0.2)',
+        'window':      '0 4px 24px oklch(0.10 0.05 340 / 0.4), 0 1px 4px oklch(0.10 0.05 340 / 0.3)',
+        'window-active': '0 0 0 1px oklch(0.82 0.15 340 / 0.15), 0 4px 24px oklch(0.10 0.05 340 / 0.5), 0 0 32px oklch(0.82 0.15 340 / 0.08)',
+        'window-float': '0 8px 32px oklch(0.10 0.05 340 / 0.5)',
+        'ghost-glow':   '0 0 16px oklch(0.82 0.15 340 / 0.2)',
+        'pink-glow':    '0 0 16px oklch(0.82 0.15 340 / 0.3)',
+        'bevel':        '0 1px 3px oklch(0.10 0.05 340 / 0.3)',
+        'bevel-sunken': 'inset 0 1px 3px oklch(0.10 0.05 340 / 0.3)',
       },
 
-      /* ── Border Radius ──────────────────────────────────── */
+      /* -- Border Radius ------------------------------------ */
       borderRadius: {
-        'none': '0px',
-        'gs':   '0px',
-        'pill': '9999px',
-        DEFAULT: '0px',
+        'none':    '0px',
+        'gs':      '8px',
+        'gs-lg':   '12px',
+        'pill':    '9999px',
+        DEFAULT:   '8px',
       },
 
-      /* ── Animations ─────────────────────────────────────── */
+      /* -- Animations --------------------------------------- */
       animation: {
-        'blink': 'blink 1s step-end infinite',
-        'ghost-float': 'ghost-float 3s ease-in-out infinite',
-        'ghost-pulse': 'ghost-pulse 2s ease-in-out infinite',
-        'scan-bar': 'scan-bar 2s linear infinite',
-        'terminal-type': 'terminal-type 0.05s steps(1) forwards',
-        'window-open': 'window-open 0.15s ease-out forwards',
-        'shake': 'shake 0.3s ease-in-out',
-        'laser': 'laser 0.5s ease-out forwards',
+        'blink':           'blink 1s step-end infinite',
+        'ghost-float':     'ghost-float 3s ease-in-out infinite',
+        'ghost-pulse':     'ghost-pulse 2s ease-in-out infinite',
+        'scan-bar':        'scan-bar 2s linear infinite',
+        'terminal-type':   'terminal-type 0.05s steps(1) forwards',
+        'window-open':     'window-open 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
+        'window-close':    'window-close 0.15s ease-in forwards',
+        'shake':           'shake 0.3s ease-in-out',
+        'laser':           'laser 0.5s ease-out forwards',
+        'slide-up':        'slide-up 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
+        'fade-in':         'fade-in 0.2s ease-out forwards',
+        'pink-pulse':      'pink-pulse 2s ease-in-out infinite',
       },
       keyframes: {
         'blink': {
@@ -136,16 +147,20 @@ const config: Config = {
           '50%': { transform: 'translateY(-8px)' },
         },
         'ghost-pulse': {
-          '0%, 100%': { filter: 'drop-shadow(0 0 8px var(--gs-ghost))' },
-          '50%': { filter: 'drop-shadow(0 0 16px var(--gs-ghost)) drop-shadow(0 0 32px rgba(224,240,255,0.2))' },
+          '0%, 100%': { filter: 'drop-shadow(0 0 8px var(--gs-base))' },
+          '50%': { filter: 'drop-shadow(0 0 16px var(--gs-base)) drop-shadow(0 0 32px oklch(0.82 0.15 340 / 0.3))' },
         },
         'scan-bar': {
           '0%': { backgroundPosition: '-200% 0' },
           '100%': { backgroundPosition: '200% 0' },
         },
         'window-open': {
-          '0%': { transform: 'scale(0.95)', opacity: '0' },
+          '0%': { transform: 'scale(0.92)', opacity: '0' },
           '100%': { transform: 'scale(1)', opacity: '1' },
+        },
+        'window-close': {
+          '0%': { transform: 'scale(1)', opacity: '1' },
+          '100%': { transform: 'scale(0.95)', opacity: '0' },
         },
         'shake': {
           '0%, 100%': { transform: 'translateX(0)' },
@@ -156,24 +171,36 @@ const config: Config = {
           '0%': { width: '0', opacity: '0.8' },
           '100%': { width: '100%', opacity: '0' },
         },
+        'slide-up': {
+          '0%': { transform: 'translateY(8px)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
+        'fade-in': {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+        'pink-pulse': {
+          '0%, 100%': { boxShadow: '0 0 8px oklch(0.82 0.15 340 / 0.1)' },
+          '50%': { boxShadow: '0 0 24px oklch(0.82 0.15 340 / 0.25)' },
+        },
       },
 
-      /* ── Z-Index Scale ──────────────────────────────────── */
+      /* -- Z-Index Scale ------------------------------------ */
       zIndex: {
-        'desktop':    '0',
-        'icons':      '10',
-        'window':     '100',
-        'window-max': '500',
-        'dialog':     '600',
-        'chloe':      '700',
-        'menubar':    '800',
-        'start-menu': '850',
-        'taskbar':    '800',
+        'desktop':      '0',
+        'icons':        '10',
+        'window':       '100',
+        'window-max':   '500',
+        'dialog':       '600',
+        'chloe':        '700',
+        'menubar':      '800',
+        'start-menu':   '850',
+        'taskbar':      '800',
         'context-menu': '900',
-        'tooltip':    '950',
-        'noise':      '9997',
-        'vignette':   '9998',
-        'scanlines':  '9999',
+        'tooltip':      '950',
+        'noise':        '9997',
+        'vignette':     '9998',
+        'scanlines':    '9999',
       },
     },
   },

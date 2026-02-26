@@ -20,7 +20,7 @@ import {
 export interface WindowState {
   id: string;
   title: string;
-  icon: string;
+  icon: ReactNode;
   isOpen: boolean;
   isMinimized: boolean;
   isMaximized: boolean;
@@ -37,7 +37,7 @@ export interface WindowState {
 
 export interface WindowConfig {
   title?: string;
-  icon?: string;
+  icon?: ReactNode;
   width?: number;
   height?: number;
   minWidth?: number;

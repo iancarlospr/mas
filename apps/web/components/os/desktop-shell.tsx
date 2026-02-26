@@ -1,44 +1,44 @@
 'use client';
 
-import { useState, useCallback, useEffect, useRef, type ReactNode } from 'react';
+import { useState, useCallback, useEffect, type ReactNode } from 'react';
 import { MenuBar } from './menu-bar';
 import { Taskbar } from './taskbar';
 import { DesktopIconGrid } from './desktop-icon-grid';
 import { StaticWindowRenderer } from './static-window-renderer';
 import { ContextMenu, type ContextMenuItem } from './context-menu';
+import { BedroomWallpaper } from './bedroom-wallpaper';
+import { ChloeScreenmate } from '@/components/chloe/chloe-screenmate';
 import { useWindowManager, type WindowConfig } from '@/lib/window-manager';
+import { BedroomIcon } from './bedroom-icons';
 
-/* ═══════════════════════════════════════════════════════════════
-   GhostScan OS — Desktop Shell
+/* =================================================================
+   Chloe's Bedroom OS — Desktop Shell
 
    The root desktop environment. Renders at the root layout level
    and persists across all Next.js navigations. Contains:
-   - Paper grain texture (subtle, warm)
-   - Menu bar (top, Mac OS 9 style)
-   - Desktop icons (two columns, left + right)
+   - Bedroom wallpaper (subtle illustrated bedroom)
+   - Menu bar (top, frosted glass)
+   - Desktop icons (SVG bedroom objects)
    - Static windows (context-managed, opened by icon double-click)
    - Route-based windows (Next.js children)
-   - Taskbar (bottom, Win95 style)
-   - Context menu (right-click)
+   - Taskbar (bottom, frosted glass)
+   - Context menu (frosted glass)
+   ================================================================= */
 
-   CRT scanlines and vignette are NOT used on the desktop.
-   Those effects are scoped to the scan sequence terminal only.
-   ═══════════════════════════════════════════════════════════════ */
-
-/** Desktop icon window configurations */
+/** Desktop icon window configurations — icons are now SVG IDs */
 const WINDOW_CONFIGS: Record<string, WindowConfig> = {
-  'about':         { title: 'About GhostScan OS',             icon: '📋', width: 600, height: 500 },
-  'products':      { title: 'Products',                       icon: '📁', width: 700, height: 500 },
-  'pricing':       { title: 'Pricing — Choose Your Edition',  icon: '🧮', width: 650, height: 600 },
-  'customers':     { title: 'Customers',                      icon: '👥', width: 400, height: 350 },
-  'chill':         { title: 'chill.mov — ASCII Theater',      icon: '🎬', width: 640, height: 480, variant: 'terminal' },
-  'history':       { title: '📁 My Scans',                    icon: '📚', width: 600, height: 500 },
-  'chat-launcher': { title: '💬 GhostChat',                   icon: '💬', width: 400, height: 400 },
-  'scan-input':    { title: 'Scan.exe — Enter URL',           icon: '🔗', width: 450, height: 280, variant: 'dialog', minHeight: 200 },
-  'features':      { title: '❓ Why AlphaScan?',               icon: '❓', width: 550, height: 450 },
-  'blog':          { title: '📖 Blog — UnderTheStack',        icon: '📖', width: 600, height: 500 },
-  'games':         { title: '🏆 Ghost Sweeper',               icon: '🏆', width: 320, height: 420, minWidth: 320, minHeight: 420 },
-  'trash':         { title: '🗑️ Trash',                       icon: '🗑️', width: 350, height: 250 },
+  'about':         { title: 'About AlphaScan',                 icon: '~', width: 600, height: 500 },
+  'products':      { title: 'Products',                        icon: '~', width: 700, height: 500 },
+  'pricing':       { title: 'Pricing',                         icon: '~', width: 650, height: 600 },
+  'customers':     { title: 'Customers',                       icon: '~', width: 400, height: 350 },
+  'chill':         { title: 'chill.mov',                       icon: '~', width: 640, height: 480, variant: 'terminal' },
+  'history':       { title: 'My Scans',                        icon: '~', width: 600, height: 500 },
+  'chat-launcher': { title: 'GhostChat',                       icon: '~', width: 400, height: 400 },
+  'scan-input':    { title: 'Scan.exe',                        icon: '~', width: 450, height: 280, variant: 'dialog', minHeight: 200 },
+  'features':      { title: 'Why AlphaScan?',                  icon: '~', width: 550, height: 450 },
+  'blog':          { title: 'Blog',                            icon: '~', width: 600, height: 500 },
+  'games':         { title: 'Ghost Sweeper',                   icon: '~', width: 320, height: 420, minWidth: 320, minHeight: 420 },
+  'trash':         { title: 'Trash',                           icon: '~', width: 350, height: 250 },
 };
 
 export function DesktopShell({ children }: { children: ReactNode }) {
@@ -52,7 +52,11 @@ export function DesktopShell({ children }: { children: ReactNode }) {
   // Register all static window configs on mount
   useEffect(() => {
     for (const [id, config] of Object.entries(WINDOW_CONFIGS)) {
-      wm.registerWindow(id, config);
+      // Set icon to the SVG bedroom icon ReactNode
+      wm.registerWindow(id, {
+        ...config,
+        icon: <BedroomIcon windowId={id} size={14} />,
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -70,7 +74,7 @@ export function DesktopShell({ children }: { children: ReactNode }) {
           { label: 'Arrange Icons', onClick: () => setContextMenu(null) },
           { label: 'Properties', onClick: () => setContextMenu(null) },
           { type: 'separator' },
-          { label: 'About GhostScan OS', onClick: () => { wm.openWindow('about'); setContextMenu(null); } },
+          { label: 'About AlphaScan', onClick: () => { wm.openWindow('about'); setContextMenu(null); } },
         ],
       });
     },
@@ -86,13 +90,11 @@ export function DesktopShell({ children }: { children: ReactNode }) {
     function handleKeyDown(e: KeyboardEvent) {
       const meta = e.metaKey || e.ctrlKey;
 
-      // Cmd/Ctrl+N — New Scan
       if (meta && e.key === 'n') {
         e.preventDefault();
         wm.openWindow('scan-input');
       }
 
-      // Alt+F4 — Close active window
       if (e.altKey && e.key === 'F4') {
         e.preventDefault();
         if (wm.activeWindowId) {
@@ -107,13 +109,16 @@ export function DesktopShell({ children }: { children: ReactNode }) {
 
   return (
     <div
-      className="fixed inset-0 flex flex-col bg-gs-paper overflow-hidden select-none"
+      className="fixed inset-0 flex flex-col bg-gs-void overflow-hidden select-none"
       role="application"
-      aria-label="GhostScan OS Desktop"
+      aria-label="AlphaScan Desktop"
       onClick={handleDesktopClick}
       onContextMenu={handleDesktopRightClick}
     >
-      {/* Paper grain texture — barely visible, warm */}
+      {/* Bedroom wallpaper — subtle illustrated background */}
+      <BedroomWallpaper />
+
+      {/* Noise grain texture — barely visible */}
       <div className="noise-grain" aria-hidden="true" />
 
       {/* Menu Bar (top) */}
@@ -129,6 +134,9 @@ export function DesktopShell({ children }: { children: ReactNode }) {
 
         {/* Route-based windows (from Next.js children) */}
         {children}
+
+        {/* Chloe screenmate — living desktop pet */}
+        <ChloeScreenmate active />
       </div>
 
       {/* Taskbar (bottom) */}

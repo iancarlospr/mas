@@ -3,13 +3,14 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useWindowManager } from '@/lib/window-manager';
 
-/* ═══════════════════════════════════════════════════════════════
-   GhostScan OS — Menu Bar
+/* =================================================================
+   Chloe's Bedroom OS — Menu Bar
 
-   Mac OS 9 style top menu bar. Connected to WindowManagerProvider.
+   Frosted glass top bar. Connected to WindowManagerProvider.
    Left: Logo + menu items (File, View, Help)
    Right: Clock
-   ═══════════════════════════════════════════════════════════════ */
+   Dither bottom edge.
+   ================================================================= */
 
 interface MenuItem {
   label: string;
@@ -84,26 +85,26 @@ export function MenuBar() {
   return (
     <div
       ref={menuRef}
-      className="gs-menubar h-menubar flex items-center bg-gs-chrome border-b-2 z-menubar relative"
-      style={{ borderBottomColor: 'var(--gs-chrome-dark)' }}
+      className="gs-menubar h-menubar flex items-center bg-gs-deep/90 backdrop-blur-md z-menubar relative dither-edge"
+      style={{ borderBottom: '1px solid var(--gs-mid)' }}
     >
       <button
-        className="h-full px-gs-3 flex items-center gap-gs-1 font-system text-os-base font-bold
-                   hover:bg-gs-chrome-dark/30"
+        className="h-full px-gs-3 flex items-center gap-gs-2 font-system text-os-base font-bold
+                   hover:bg-gs-base/10 transition-colors"
         onClick={() => wm.openWindow('scan-input')}
       >
-        <span className="text-os-lg">👻</span>
-        <span className="text-gs-red">AlphaScan</span>
+        <span className="text-gs-base text-os-lg">A</span>
+        <span className="text-gs-base">AlphaScan</span>
       </button>
 
       <div className="flex items-center h-full">
         {menus.map((menu) => (
           <div key={menu.label} className="relative h-full">
             <button
-              className={`h-full px-gs-3 font-system text-os-base
+              className={`h-full px-gs-3 font-system text-os-base transition-colors
                 ${openMenu === menu.label
-                  ? 'bg-gs-ink text-gs-paper'
-                  : 'hover:bg-gs-chrome-dark/30'
+                  ? 'bg-gs-base/20 text-gs-base'
+                  : 'text-gs-light/70 hover:text-gs-light hover:bg-gs-base/10'
                 }`}
               onClick={() => handleMenuClick(menu.label)}
               onMouseEnter={() => handleMenuHover(menu.label)}
@@ -112,22 +113,22 @@ export function MenuBar() {
             </button>
 
             {openMenu === menu.label && (
-              <div className="absolute top-full left-0 bg-gs-chrome bevel-raised min-w-[200px] py-gs-1 z-start-menu shadow-window">
+              <div className="absolute top-full left-0 mt-px bg-gs-deep/95 backdrop-blur-xl border border-gs-mid rounded-lg min-w-[220px] py-1 z-start-menu shadow-window-float animate-fade-in">
                 {menu.items.map((item, i) =>
                   item.separator ? (
                     <div
                       key={`sep-${i}`}
-                      className="mx-gs-1 my-gs-1 border-t"
-                      style={{ borderColor: 'var(--gs-chrome-dark)' }}
+                      className="mx-2 my-1 h-px bg-gs-mid/40"
                     />
                   ) : (
                     <button
                       key={item.label}
-                      className={`w-full text-left px-gs-6 py-gs-1 font-system text-os-base flex items-center justify-between
+                      className={`w-full text-left px-4 py-1.5 font-system text-os-base flex items-center justify-between rounded-md mx-1 transition-colors
                         ${item.disabled
-                          ? 'text-gs-muted cursor-default'
-                          : 'hover:bg-gs-ink hover:text-gs-paper'
+                          ? 'text-gs-mid cursor-default'
+                          : 'hover:bg-gs-base/15 hover:text-gs-base'
                         }`}
+                      style={{ width: 'calc(100% - 8px)' }}
                       onClick={() => {
                         if (!item.disabled) {
                           item.onClick?.();
@@ -138,7 +139,7 @@ export function MenuBar() {
                     >
                       <span>{item.label}</span>
                       {item.shortcut && (
-                        <span className="text-os-xs text-gs-muted ml-gs-6">
+                        <span className="text-os-xs text-gs-mid ml-gs-6">
                           {item.shortcut}
                         </span>
                       )}
@@ -152,8 +153,8 @@ export function MenuBar() {
       </div>
 
       <div className="flex-1" />
-      <div className="flex items-center h-full gap-gs-1 pr-gs-2">
-        <div className="bevel-sunken px-gs-2 py-px font-data text-data-xs text-gs-muted">
+      <div className="flex items-center h-full gap-gs-1 pr-gs-3">
+        <div className="px-gs-2 py-1 font-data text-data-xs text-gs-mid">
           <ClockDisplay />
         </div>
       </div>

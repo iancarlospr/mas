@@ -4,37 +4,37 @@ import { useCallback, useState } from 'react';
 import { useWindowManager } from '@/lib/window-manager';
 import { cn } from '@/lib/utils';
 import { soundEffects } from '@/lib/sound-effects';
+import { BedroomIcon } from './bedroom-icons';
 
-/* ═══════════════════════════════════════════════════════════════
-   GhostScan OS — Desktop Icon Grid
+/* =================================================================
+   Chloe's Bedroom OS — Desktop Icon Grid
 
-   Two columns of icons — left column on the left edge,
-   right column on the right edge. Center is empty desktop space.
+   Two columns of SVG bedroom object icons.
    Double-click opens the window. Single-click selects.
-   ═══════════════════════════════════════════════════════════════ */
+   Hover: glow + scale spring animation.
+   ================================================================= */
 
 interface DesktopIconDef {
   id: string;
   label: string;
-  icon: string;
 }
 
 const LEFT_ICONS: DesktopIconDef[] = [
-  { id: 'about',         label: 'about us',     icon: '📋' },
-  { id: 'products',      label: 'Products',     icon: '📁' },
-  { id: 'pricing',       label: 'Pricing',      icon: '🧮' },
-  { id: 'customers',     label: 'customers',    icon: '👥' },
-  { id: 'chill',         label: 'chill',        icon: '🎬' },
-  { id: 'history',       label: 'MyDocs',       icon: '📚' },
-  { id: 'chat-launcher', label: 'GhostChat',    icon: '💬' },
-  { id: 'scan-input',    label: 'Scan.exe',     icon: '🔗' },
+  { id: 'about',         label: 'about us' },
+  { id: 'products',      label: 'Products' },
+  { id: 'pricing',       label: 'Pricing' },
+  { id: 'customers',     label: 'customers' },
+  { id: 'chill',         label: 'chill' },
+  { id: 'history',       label: 'MyDocs' },
+  { id: 'chat-launcher', label: 'GhostChat' },
+  { id: 'scan-input',    label: 'Scan.exe' },
 ];
 
 const RIGHT_ICONS: DesktopIconDef[] = [
-  { id: 'features', label: 'Why MAS?',   icon: '❓' },
-  { id: 'blog',     label: 'Blog',       icon: '📖' },
-  { id: 'games',    label: 'Games.exe',  icon: '🏆' },
-  { id: 'trash',    label: 'Trash',      icon: '🗑️' },
+  { id: 'features', label: 'Why MAS?' },
+  { id: 'blog',     label: 'Blog' },
+  { id: 'games',    label: 'Games.exe' },
+  { id: 'trash',    label: 'Trash' },
 ];
 
 function DesktopIconButton({
@@ -49,9 +49,9 @@ function DesktopIconButton({
   return (
     <button
       className={cn(
-        'flex flex-col items-center gap-gs-1 p-gs-1 w-[72px] outline-none',
-        'focus-visible:outline-1 focus-visible:outline-dotted focus-visible:outline-gs-ink',
-        selected && 'bg-gs-red/15',
+        'flex flex-col items-center gap-1.5 p-gs-2 w-[76px] outline-none rounded-lg transition-all group',
+        'focus-visible:outline-2 focus-visible:outline-gs-base focus-visible:outline-offset-2',
+        selected && 'bg-gs-base/10',
       )}
       onClick={() => setSelected(true)}
       onDoubleClick={() => {
@@ -60,15 +60,18 @@ function DesktopIconButton({
       }}
       onBlur={() => setSelected(false)}
     >
-      <div className="w-12 h-12 flex items-center justify-center text-[32px]">
-        {def.icon}
+      <div className={cn(
+        'w-12 h-12 flex items-center justify-center text-gs-base transition-all duration-200',
+        'group-hover:scale-110 group-hover:drop-shadow-[0_0_8px_var(--gs-base)]',
+      )}>
+        <BedroomIcon windowId={def.id} size={32} />
       </div>
       <span
         className={cn(
-          'font-system text-os-xs text-center leading-tight max-w-full px-gs-1',
+          'font-system text-os-xs text-center leading-tight max-w-full px-1 rounded transition-colors',
           selected
-            ? 'bg-gs-red text-white'
-            : 'text-gs-ink',
+            ? 'bg-gs-base/20 text-gs-base'
+            : 'text-gs-light/60 group-hover:text-gs-light/80',
         )}
       >
         {def.label}
@@ -87,15 +90,15 @@ export function DesktopIconGrid() {
 
   return (
     <>
-      {/* Left column — 16px from left edge, 16px from top */}
-      <div className="absolute left-gs-4 top-gs-4 flex flex-col gap-gs-2 z-icons">
+      {/* Left column */}
+      <div className="absolute left-gs-4 top-gs-4 flex flex-col gap-1 z-icons">
         {LEFT_ICONS.map((def) => (
           <DesktopIconButton key={def.id} def={def} onOpen={handleOpen} />
         ))}
       </div>
 
-      {/* Right column — 16px from right edge, 16px from top */}
-      <div className="absolute right-gs-4 top-gs-4 flex flex-col gap-gs-2 z-icons">
+      {/* Right column */}
+      <div className="absolute right-gs-4 top-gs-4 flex flex-col gap-1 z-icons">
         {RIGHT_ICONS.map((def) => (
           <DesktopIconButton key={def.id} def={def} onOpen={handleOpen} />
         ))}

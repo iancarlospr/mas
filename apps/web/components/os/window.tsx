@@ -4,48 +4,33 @@ import { useCallback, useEffect, useRef, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 import { soundEffects } from '@/lib/sound-effects';
 
-/* ═══════════════════════════════════════════════════════════════
-   GhostScan OS — Window Component
+/* =================================================================
+   Chloe's Bedroom OS — Window Component
 
    The foundational UI unit. Everything is a window.
    4 variants: default, terminal, ghost, dialog
 
-   Win95 chrome: title bar with icon/title/buttons, content area,
-   optional status bar. 3D bevel borders throughout.
-   ═══════════════════════════════════════════════════════════════ */
+   Frosted glass chrome with colored dots (close/min/max).
+   ================================================================= */
 
 export interface WindowProps {
-  /** Unique ID for window manager z-index tracking */
   id: string;
-  /** Window title text */
   title: string;
-  /** Pixel art icon (16x16 or 32x32) shown in title bar */
   icon?: ReactNode;
-  /** Content rendered inside the window */
   children: ReactNode;
-  /** Window dimensions */
   width?: number | string;
   height?: number | string;
-  /** Window variant */
   variant?: 'default' | 'terminal' | 'ghost' | 'dialog';
-  /** Whether this window is the active/focused one */
   isActive?: boolean;
-  /** Whether the window is maximized to fill the desktop */
   isMaximized?: boolean;
-  /** Whether to show the status bar at bottom */
   showStatusBar?: boolean;
-  /** Content for the status bar */
   statusBarContent?: ReactNode;
-  /** Whether the window is currently animating open */
   animateIn?: boolean;
-  /** Callback handlers */
   onClose?: () => void;
   onMinimize?: () => void;
   onMaximize?: () => void;
   onFocus?: () => void;
-  /** Additional class names */
   className?: string;
-  /** Content area class names */
   contentClassName?: string;
 }
 
@@ -72,7 +57,6 @@ export function Window({
   const windowRef = useRef<HTMLDivElement>(null);
   const mountedRef = useRef(false);
 
-  // Play sound on mount (window open) and cleanup (window close)
   useEffect(() => {
     if (!mountedRef.current) {
       mountedRef.current = true;
@@ -93,13 +77,14 @@ export function Window({
       id={`window-${id}`}
       role={variant === 'dialog' ? 'dialog' : 'region'}
       aria-label={title}
+      data-active={isActive}
       onMouseDown={handleFocus}
       className={cn(
         'window',
         variant === 'ghost' && 'window-ghost',
         variant === 'terminal' && 'window-terminal',
         animateIn && 'animate-window-open',
-        isMaximized && 'fixed inset-0 z-[500]',
+        isMaximized && 'fixed inset-0 z-[500] !rounded-none',
         className,
       )}
       style={{
@@ -107,60 +92,58 @@ export function Window({
         height: isMaximized ? '100%' : height,
       }}
     >
-      {/* ── Title Bar ─────────────────────────────────────── */}
+      {/* -- Title Bar ----------------------------------------- */}
       <div
         className="window-titlebar"
         data-active={isActive}
         onDoubleClick={onMaximize}
       >
-        {icon && <span className="window-titlebar-icon">{icon}</span>}
-        <span className="window-titlebar-text">{title}</span>
+        {/* Colored dots: close, minimize, maximize (macOS order) */}
         <div className="window-titlebar-buttons">
+          {onClose && (
+            <button
+              className="window-titlebar-btn"
+              data-action="close"
+              onClick={onClose}
+              aria-label="Close"
+              title="Close"
+            />
+          )}
           {onMinimize && (
             <button
               className="window-titlebar-btn"
+              data-action="minimize"
               onClick={onMinimize}
               aria-label="Minimize"
               title="Minimize"
-            >
-              ─
-            </button>
+            />
           )}
           {onMaximize && (
             <button
               className="window-titlebar-btn"
+              data-action="maximize"
               onClick={onMaximize}
               aria-label={isMaximized ? 'Restore' : 'Maximize'}
               title={isMaximized ? 'Restore' : 'Maximize'}
-            >
-              {isMaximized ? '❐' : '□'}
-            </button>
-          )}
-          {onClose && (
-            <button
-              className="window-titlebar-btn"
-              onClick={onClose}
-              aria-label="Close"
-              title="Close"
-            >
-              ×
-            </button>
+            />
           )}
         </div>
+        {icon && <span className="window-titlebar-icon">{icon}</span>}
+        <span className="window-titlebar-text">{title}</span>
       </div>
 
-      {/* ── Content Area ──────────────────────────────────── */}
+      {/* -- Content Area -------------------------------------- */}
       <div
         className={cn(
           'window-content',
-          variant === 'terminal' && 'bg-gs-ink text-gs-terminal font-data text-data-sm',
+          variant === 'terminal' && 'bg-[#0A0A0A] text-gs-terminal font-data text-data-sm',
           contentClassName,
         )}
       >
         {children}
       </div>
 
-      {/* ── Status Bar ────────────────────────────────────── */}
+      {/* -- Status Bar ---------------------------------------- */}
       {showStatusBar && (
         <div className="window-statusbar">
           {statusBarContent ?? (
@@ -172,20 +155,16 @@ export function Window({
   );
 }
 
-/* ═══════════════════════════════════════════════════════════════
+/* =================================================================
    Sub-components for common window patterns
-   ═══════════════════════════════════════════════════════════════ */
+   ================================================================= */
 
-/** Module sub-panel rendered inside the Dashboard window */
 export interface ModulePanelProps {
   moduleId: string;
   moduleName: string;
   score?: number;
-  /** Traffic light: 'green' | 'amber' | 'red' */
   health?: 'green' | 'amber' | 'red';
-  /** McKinsey-style action title — the key insight sentence */
   actionTitle?: string;
-  /** Whether this is a GhostScan module */
   isGhostModule?: boolean;
   children: ReactNode;
   className?: string;
@@ -210,12 +189,11 @@ export function ModulePanel({
       )}
       id={`module-${moduleId}`}
     >
-      {/* Module header (mini title bar) */}
       <div className="module-panel-header">
-        <span className="font-data text-data-xs text-gs-muted">{moduleId}</span>
+        <span className="font-data text-data-xs text-gs-mid">{moduleId}</span>
         <span className="flex-1 truncate">{moduleName}</span>
         {isGhostModule && (
-          <span className="text-os-xs text-gs-red">👻 GhostScan™</span>
+          <span className="text-os-xs text-gs-base">GhostScan</span>
         )}
         {score != null && (
           <span className={cn(
@@ -237,16 +215,14 @@ export function ModulePanel({
         )}
       </div>
 
-      {/* Action title (the insight) */}
       {actionTitle && (
-        <div className="px-3 py-2 border-b border-gs-chrome-dark/30 bg-gs-paper">
-          <p className="font-data text-data-xl text-gs-ink leading-snug">
+        <div className="px-3 py-2 border-b border-gs-mid/30">
+          <p className="font-data text-data-xl text-gs-light leading-snug">
             {actionTitle}
           </p>
         </div>
       )}
 
-      {/* Module content */}
       <div className="module-panel-content">
         {children}
       </div>
@@ -254,9 +230,7 @@ export function ModulePanel({
   );
 }
 
-/** Dialog variant — centered modal-like window */
 export interface DialogWindowProps extends Omit<WindowProps, 'variant' | 'isMaximized'> {
-  /** Whether to show a backdrop behind the dialog */
   showBackdrop?: boolean;
 }
 
@@ -268,7 +242,7 @@ export function DialogWindow({
     <>
       {showBackdrop && (
         <div
-          className="fixed inset-0 bg-gs-ink/30 z-[590]"
+          className="fixed inset-0 bg-gs-void/60 backdrop-blur-sm z-[590]"
           onClick={props.onClose}
         />
       )}

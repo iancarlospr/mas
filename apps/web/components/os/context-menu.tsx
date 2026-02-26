@@ -2,12 +2,12 @@
 
 import { useEffect, useRef } from 'react';
 
-/* ═══════════════════════════════════════════════════════════════
-   GhostScan OS — Context Menu
+/* =================================================================
+   Chloe's Bedroom OS — Context Menu
 
-   Right-click popup menu. Win95 style with bevel border,
-   separators, and keyboard shortcut hints.
-   ═══════════════════════════════════════════════════════════════ */
+   Frosted glass right-click popup with rounded corners,
+   pink hover tint, and stagger animation.
+   ================================================================= */
 
 export type ContextMenuItem =
   | { type: 'separator' }
@@ -29,7 +29,6 @@ interface ContextMenuProps {
 export function ContextMenu({ x, y, items, onClose }: ContextMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Adjust position to stay within viewport
   useEffect(() => {
     if (!menuRef.current) return;
     const rect = menuRef.current.getBoundingClientRect();
@@ -43,7 +42,6 @@ export function ContextMenu({ x, y, items, onClose }: ContextMenuProps) {
     }
   }, [x, y]);
 
-  // Close on Escape
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
       if (e.key === 'Escape') onClose();
@@ -55,7 +53,7 @@ export function ContextMenu({ x, y, items, onClose }: ContextMenuProps) {
   return (
     <div
       ref={menuRef}
-      className="fixed bg-gs-chrome bevel-raised py-gs-1 min-w-[180px] z-context-menu shadow-window"
+      className="fixed bg-gs-deep/95 backdrop-blur-xl border border-gs-mid rounded-lg py-1 min-w-[200px] z-context-menu shadow-window-float animate-fade-in"
       style={{ left: x, top: y }}
       role="menu"
     >
@@ -64,11 +62,7 @@ export function ContextMenu({ x, y, items, onClose }: ContextMenuProps) {
           return (
             <div
               key={`sep-${i}`}
-              className="mx-gs-1 my-gs-1 h-px"
-              style={{
-                borderTop: '1px solid var(--gs-chrome-dark)',
-                borderBottom: '1px solid var(--gs-paper)',
-              }}
+              className="mx-2 my-1 h-px bg-gs-mid/40"
             />
           );
         }
@@ -76,12 +70,13 @@ export function ContextMenu({ x, y, items, onClose }: ContextMenuProps) {
           <button
             key={item.label}
             role="menuitem"
-            className={`w-full text-left px-gs-6 py-gs-1 font-system text-os-base
-                       flex items-center justify-between
+            className={`w-full text-left px-4 py-1.5 font-system text-os-base
+                       flex items-center justify-between rounded-md mx-1 transition-colors
               ${item.disabled
-                ? 'text-gs-muted cursor-default'
-                : 'hover:bg-gs-ink hover:text-gs-paper'
+                ? 'text-gs-mid cursor-default'
+                : 'hover:bg-gs-base/15 hover:text-gs-base text-gs-light/80'
               }`}
+            style={{ width: 'calc(100% - 8px)' }}
             onClick={() => {
               if (!item.disabled) {
                 item.onClick?.();
@@ -92,7 +87,7 @@ export function ContextMenu({ x, y, items, onClose }: ContextMenuProps) {
           >
             <span>{item.label}</span>
             {item.shortcut && (
-              <span className="text-os-xs text-gs-muted ml-gs-8">
+              <span className="text-os-xs text-gs-mid ml-gs-8">
                 {item.shortcut}
               </span>
             )}

@@ -2,40 +2,47 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ═══════════════════════════════════════════════════════════════
-   GhostScan OS — Design System Foundation
-   Palette: "Classified File on Gallery Paper"
-   Kruger × MSCHF × Valentino red on warm cream
-   ═══════════════════════════════════════════════════════════════ */
+/* =================================================================
+   Chloe's Bedroom OS — Design System Foundation
+   Palette: Monochromatic Pink (OKLCH hue 340)
+   Anchored on #1E0E18 (void) and #FFB2EF (base)
+   ================================================================= */
 
 @layer base {
   :root {
-    /* ── Typography ─────────────────────────────────────────── */
-    --font-display: 'Instrument Serif', Georgia, serif;
-    --font-system: 'Pixelify Sans', 'VT323', monospace;
-    --font-data: 'JetBrains Mono', 'Menlo', monospace;
-    --font-personality: 'Permanent Marker', cursive;
+    /* -- Typography -------------------------------------------- */
+    --font-system: var(--font-geist-mono), 'SF Mono', 'Menlo', monospace;
+    --font-data: var(--font-geist-mono), 'SF Mono', 'Menlo', monospace;
+    --font-display: var(--font-display-face, 'Barlow Condensed'), 'Impact', sans-serif;
+    --font-personality: var(--font-personality-face, 'Permanent Marker'), cursive;
 
-    /* ── Core Palette — Classified File on Gallery Paper ─────
-       One warm cream. One near-black ink. One red that DEMANDS.
-       Plus a 4-tone chrome system for bevels.
-       This is the whole palette. Nothing else. */
-    --gs-paper:        #FFFBF5;   /* Desktop bg, window content — warm cream */
-    --gs-ink:          #1A1A1A;   /* Primary text, borders — near-black */
-    --gs-red:          #E63946;   /* THE accent — buttons, stamps, links, active title bars */
-    --gs-red-dark:     #C1121F;   /* Red hover/active states */
-    --gs-chrome:       #E8E3DB;   /* Inactive title bars, bevel surfaces */
-    --gs-chrome-dark:  #D1CBC1;   /* Bevel shadow edges */
-    --gs-chrome-light: #F5F0EA;   /* Bevel highlight edges */
-    --gs-muted:        #8B8680;   /* Secondary text, disabled states */
-    --gs-ghost:        #E0F0FF;   /* Subtle ghost aura — Chloe glow, very sparingly */
+    /* -- Core Palette -- Monochromatic Pink (OKLCH hue 340) ---- */
+    --gs-void:   #1E0E18;                    /* Deepest dark — desktop bg, dark panels */
+    --gs-deep:   oklch(0.25 0.07 340);       /* Window chrome, taskbar, dark surfaces */
+    --gs-mid:    oklch(0.42 0.09 340);       /* Borders, separators, secondary text */
+    --gs-base:   #FFB2EF;                    /* THE pink — primary UI, icons, Chloe */
+    --gs-bright: oklch(0.88 0.13 340);       /* Active states, hover, glow */
+    --gs-light:  oklch(0.96 0.04 340);       /* Text on dark backgrounds, content areas */
 
-    /* ── Functional Colors (severity only, never decorative) ── */
-    --gs-terminal:    oklch(0.80 0.25 145);   /* CRT phosphor green — scan sequence ONLY */
-    --gs-critical:    oklch(0.55 0.22 25);    /* Red — critical findings in data */
-    --gs-warning:     oklch(0.78 0.15 75);    /* Amber — warnings in data */
+    /* -- Backward-Compatible Aliases ----------------------------
+       Old tokens map to new values so 500+ references keep working.
+       Migration happens incrementally as files are touched. */
+    --gs-paper:        var(--gs-light);
+    --gs-ink:          var(--gs-void);
+    --gs-red:          var(--gs-base);
+    --gs-red-dark:     oklch(0.70 0.18 340);
+    --gs-chrome:       var(--gs-deep);
+    --gs-chrome-dark:  var(--gs-mid);
+    --gs-chrome-light: oklch(0.32 0.08 340);
+    --gs-muted:        var(--gs-mid);
+    --gs-ghost:        var(--gs-base);
 
-    /* ── Spacing ────────────────────────────────────────────── */
+    /* -- Functional Colors (unchanged — DATA, not decoration) -- */
+    --gs-terminal:  oklch(0.80 0.25 145);    /* CRT phosphor green — scan sequence ONLY */
+    --gs-critical:  oklch(0.55 0.22 25);     /* Critical findings */
+    --gs-warning:   oklch(0.78 0.15 75);     /* Warnings */
+
+    /* -- Spacing ----------------------------------------------- */
     --gs-space-1: 4px;
     --gs-space-2: 8px;
     --gs-space-3: 12px;
@@ -43,27 +50,42 @@
     --gs-space-6: 24px;
     --gs-space-8: 32px;
 
-    /* ── Component Heights ─────────────────────────────────── */
-    --gs-titlebar-h: 24px;
-    --gs-menubar-h: 28px;
-    --gs-taskbar-h: 36px;
-    --gs-statusbar-h: 22px;
+    /* -- Component Heights ------------------------------------ */
+    --gs-titlebar-h: 32px;
+    --gs-menubar-h: 32px;
+    --gs-taskbar-h: 40px;
+    --gs-statusbar-h: 24px;
   }
 
   html {
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    image-rendering: -moz-crisp-edges;
-    image-rendering: pixelated;
   }
 
   body {
-    font-family: var(--font-data);
-    color: var(--gs-ink);
-    background-color: var(--gs-paper);
+    font-family: var(--font-system);
+    color: var(--gs-light);
+    background-color: var(--gs-void);
     min-height: 100vh;
     overflow: hidden;
+  }
+
+  /* Selection — pink on deep */
+  ::selection {
+    background: oklch(0.82 0.15 340 / 0.3);
+    color: var(--gs-light);
+  }
+
+  /* Focus rings — consistent pink glow */
+  :focus-visible {
+    outline: 2px solid var(--gs-base);
+    outline-offset: 2px;
+  }
+
+  /* Smooth transitions on interactive elements */
+  a, button, [role="button"], input, select, textarea {
+    transition: color 150ms ease, background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease, transform 100ms ease;
   }
 
   /* Mobile: allow body scroll for non-OS pages */
@@ -72,21 +94,17 @@
       overflow: auto;
       -webkit-overflow-scrolling: touch;
     }
-    .noise-grain { opacity: 0.01 !important; }
   }
 
   /* System font for OS chrome */
   .font-system {
     font-family: var(--font-system);
-    -webkit-font-smoothing: none;
-    -moz-osx-font-smoothing: unset;
-    font-smooth: never;
   }
 
   /* Display font for headlines */
   .font-display {
     font-family: var(--font-display);
-    -webkit-font-smoothing: antialiased;
+    letter-spacing: -0.03em;
   }
 
   /* Personality font for Chloe moments */
@@ -94,143 +112,146 @@
     font-family: var(--font-personality);
   }
 
-  /* Data font (default body) */
+  /* Data font (same as system — Geist Mono everywhere) */
   .font-data {
     font-family: var(--font-data);
   }
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   3D Bevel System — Win95 UI Primitives
-   Now using warm cream chrome palette instead of cold grays.
-   ═══════════════════════════════════════════════════════════════ */
+/* =================================================================
+   Modern UI Components — Frosted Glass + Pink Accents
+   Replaces ALL Win95 bevel primitives.
+   ================================================================= */
 
 @layer components {
-  /* ── Raised Bevel ─────────────────────────────────────────── */
+  /* -- Raised Surface (backward compat stub → modern) --------- */
   .bevel-raised {
-    border: 2px solid;
-    border-color: var(--gs-chrome-light) var(--gs-chrome-dark) var(--gs-chrome-dark) var(--gs-chrome-light);
-    box-shadow:
-      inset 1px 1px 0 var(--gs-chrome-light),
-      inset -1px -1px 0 var(--gs-muted);
+    background: oklch(0.22 0.06 340 / 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--gs-mid);
+    border-radius: 8px;
   }
 
-  /* ── Sunken Bevel ─────────────────────────────────────────── */
+  /* -- Sunken Surface (backward compat stub → modern) --------- */
   .bevel-sunken {
-    border: 2px solid;
-    border-color: var(--gs-chrome-dark) var(--gs-chrome-light) var(--gs-chrome-light) var(--gs-chrome-dark);
-    box-shadow:
-      inset 1px 1px 0 var(--gs-muted),
-      inset -1px -1px 0 var(--gs-chrome-light);
+    background: oklch(0.18 0.05 340 / 0.6);
+    border: 1px solid oklch(0.30 0.06 340);
+    border-radius: 8px;
   }
 
-  /* ── Button ───────────────────────────────────────────────── */
+  /* -- Button ------------------------------------------------- */
   .bevel-button {
-    border: 2px solid;
-    border-color: var(--gs-chrome-light) var(--gs-chrome-dark) var(--gs-chrome-dark) var(--gs-chrome-light);
-    background: var(--gs-chrome);
-    padding: 2px 8px;
+    background: oklch(0.25 0.07 340 / 0.8);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--gs-mid);
+    border-radius: 8px;
+    padding: 6px 14px;
     font-family: var(--font-system);
-    font-size: 14px;
+    font-size: 13px;
+    color: var(--gs-light);
     cursor: pointer;
     user-select: none;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 4px;
-    min-height: 24px;
-    transition: none;
+    gap: 6px;
+    min-height: 32px;
+    transition: background 200ms, border-color 200ms, transform 100ms;
   }
   .bevel-button:hover {
-    background: var(--gs-chrome-light);
+    background: oklch(0.30 0.08 340 / 0.9);
+    border-color: var(--gs-base);
   }
   .bevel-button:active,
   .bevel-button[data-pressed="true"] {
-    border-color: var(--gs-chrome-dark) var(--gs-chrome-light) var(--gs-chrome-light) var(--gs-chrome-dark);
-    box-shadow:
-      inset 1px 1px 0 var(--gs-muted),
-      inset -1px -1px 0 var(--gs-chrome-light);
-    padding: 3px 7px 1px 9px;
+    transform: scale(0.97);
+    background: oklch(0.20 0.06 340 / 0.9);
   }
   .bevel-button:focus-visible {
-    outline: 1px dotted var(--gs-ink);
-    outline-offset: -4px;
+    outline: 2px solid var(--gs-base);
+    outline-offset: 2px;
   }
   .bevel-button:disabled {
-    color: var(--gs-muted);
-    text-shadow: 1px 1px 0 var(--gs-chrome-light);
+    color: var(--gs-mid);
     cursor: default;
+    opacity: 0.5;
   }
 
-  /* ── Primary Button (Solid Red — THE accent) ────────────── */
+  /* -- Primary Button (Solid Pink) ---------------------------- */
   .bevel-button-primary {
-    border: 2px solid;
-    border-color: #FF6B6B var(--gs-red-dark) var(--gs-red-dark) #FF6B6B;
-    background: var(--gs-red);
-    color: white;
-    padding: 4px 12px;
+    background: var(--gs-base);
+    border: 1px solid var(--gs-bright);
+    border-radius: 8px;
+    color: var(--gs-void);
+    padding: 8px 18px;
     font-family: var(--font-system);
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
     cursor: pointer;
     user-select: none;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 4px;
-    min-height: 28px;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-    transition: none;
+    gap: 6px;
+    min-height: 34px;
+    transition: background 200ms, transform 100ms, box-shadow 200ms;
   }
   .bevel-button-primary:hover {
-    background: #EE4B5A;
+    background: var(--gs-bright);
+    box-shadow: 0 0 16px oklch(0.85 0.15 340 / 0.3);
   }
   .bevel-button-primary:active {
-    border-color: var(--gs-red-dark) #FF6B6B #FF6B6B var(--gs-red-dark);
-    padding: 5px 11px 3px 13px;
+    transform: scale(0.97);
   }
 
-  /* ── Window Chrome ────────────────────────────────────────── */
+  /* -- Window Chrome ------------------------------------------ */
   .window {
-    background: var(--gs-chrome);
-    border: 2px solid;
-    border-color: var(--gs-chrome-light) var(--gs-chrome-dark) var(--gs-chrome-dark) var(--gs-chrome-light);
+    background: oklch(0.20 0.06 340 / 0.75);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--gs-mid);
+    border-radius: 12px;
     box-shadow:
-      inset 1px 1px 0 var(--gs-chrome-light),
-      inset -1px -1px 0 var(--gs-muted),
-      4px 4px 0 rgba(0, 0, 0, 0.08),
-      8px 8px 24px rgba(0, 0, 0, 0.06);
+      0 4px 24px oklch(0.10 0.05 340 / 0.4),
+      0 1px 4px oklch(0.10 0.05 340 / 0.3);
     display: flex;
     flex-direction: column;
+    overflow: hidden;
+  }
+
+  .window[data-active="true"] {
+    border-color: var(--gs-base);
+    box-shadow:
+      0 0 0 1px oklch(0.82 0.15 340 / 0.15),
+      0 4px 24px oklch(0.10 0.05 340 / 0.5),
+      0 0 32px oklch(0.82 0.15 340 / 0.08);
   }
 
   .window-titlebar {
     height: var(--gs-titlebar-h);
     display: flex;
     align-items: center;
-    gap: 4px;
-    padding: 2px 3px;
+    gap: 8px;
+    padding: 0 12px;
     font-family: var(--font-system);
-    font-size: 14px;
-    font-weight: 700;
+    font-size: 12px;
+    font-weight: 500;
     user-select: none;
     flex-shrink: 0;
-    /* Inactive state (warm chrome) */
-    background: var(--gs-chrome);
-    color: var(--gs-muted);
+    background: transparent;
+    color: var(--gs-mid);
   }
   .window-titlebar[data-active="true"] {
-    background: var(--gs-red);
-    color: white;
-    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+    color: var(--gs-light);
   }
 
   .window-titlebar-icon {
     width: 16px;
     height: 16px;
     flex-shrink: 0;
-    image-rendering: -moz-crisp-edges;
-    image-rendering: pixelated;
+    color: var(--gs-base);
   }
 
   .window-titlebar-text {
@@ -243,110 +264,122 @@
 
   .window-titlebar-buttons {
     display: flex;
-    gap: 2px;
+    gap: 6px;
     flex-shrink: 0;
   }
 
+  /* macOS-style colored dots */
   .window-titlebar-btn {
-    width: 18px;
-    height: 16px;
-    border: 2px solid;
-    border-color: var(--gs-chrome-light) var(--gs-chrome-dark) var(--gs-chrome-dark) var(--gs-chrome-light);
-    background: var(--gs-chrome);
+    width: 12px;
+    height: 12px;
+    border: none;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: var(--font-system);
-    font-size: 10px;
-    font-weight: 700;
     cursor: pointer;
-    line-height: 1;
     padding: 0;
-    color: var(--gs-ink);
+    font-size: 0;
+    line-height: 0;
+    transition: filter 150ms, transform 150ms;
+  }
+  .window-titlebar-btn:hover {
+    filter: brightness(1.2);
+    transform: scale(1.15);
   }
   .window-titlebar-btn:active {
-    border-color: var(--gs-chrome-dark) var(--gs-chrome-light) var(--gs-chrome-light) var(--gs-chrome-dark);
+    transform: scale(0.9);
+  }
+  .window-titlebar-btn[data-action="close"] {
+    background: #FF5F57;
+  }
+  .window-titlebar-btn[data-action="minimize"] {
+    background: #FEBC2E;
+  }
+  .window-titlebar-btn[data-action="maximize"] {
+    background: #28C840;
+  }
+  /* Inactive window: dim the dots */
+  .window-titlebar:not([data-active="true"]) .window-titlebar-btn {
+    background: var(--gs-mid);
+    opacity: 0.5;
   }
 
   .window-content {
     flex: 1;
-    background: var(--gs-paper);
+    background: oklch(0.18 0.05 340 / 0.5);
     overflow: auto;
-    border: 2px solid;
-    border-color: var(--gs-chrome-dark) var(--gs-chrome-light) var(--gs-chrome-light) var(--gs-chrome-dark);
-    margin: 0 2px 2px 2px;
+    color: var(--gs-light);
+    margin: 0 1px 1px 1px;
+    border-radius: 0 0 11px 11px;
   }
 
   .window-statusbar {
     height: var(--gs-statusbar-h);
     display: flex;
     align-items: center;
-    padding: 0 4px;
+    padding: 0 12px;
     font-family: var(--font-system);
-    font-size: 12px;
-    color: var(--gs-muted);
-    border-top: 2px solid;
-    border-color: var(--gs-chrome-dark) var(--gs-chrome-light) var(--gs-chrome-light) var(--gs-chrome-dark);
+    font-size: 11px;
+    color: var(--gs-mid);
+    border-top: 1px solid oklch(0.30 0.06 340);
     gap: 8px;
     flex-shrink: 0;
-    background: var(--gs-chrome);
+    background: transparent;
   }
   .window-statusbar-section {
     flex: 1;
-    border: 1px solid;
-    border-color: var(--gs-chrome-dark) var(--gs-chrome-light) var(--gs-chrome-light) var(--gs-chrome-dark);
-    padding: 0 4px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 
-  /* ── Terminal Variant (scan sequence context ONLY) ────────── */
+  /* -- Terminal Variant (scan sequence context ONLY) ----------- */
   .window-terminal .window-content {
     background: #0A0A0A;
     color: var(--gs-terminal);
-    font-family: var(--font-data);
+    font-family: 'JetBrains Mono', var(--font-data);
     font-size: 13px;
     line-height: 1.4;
     padding: 8px;
   }
 
-  /* ── Ghost Variant ────────────────────────────────────────── */
+  /* -- Ghost Variant ------------------------------------------ */
   .window-ghost {
     box-shadow:
-      inset 1px 1px 0 var(--gs-chrome-light),
-      inset -1px -1px 0 var(--gs-muted),
-      0 0 20px rgba(224, 240, 255, 0.15),
-      4px 4px 0 rgba(0, 0, 0, 0.08);
+      0 0 24px oklch(0.82 0.15 340 / 0.12),
+      0 4px 24px oklch(0.10 0.05 340 / 0.4);
   }
   .window-ghost .window-titlebar[data-active="true"] {
-    background: var(--gs-red);
+    color: var(--gs-base);
   }
 
-  /* ── Module Sub-Panel ───────────────────────────────────── */
+  /* -- Module Sub-Panel --------------------------------------- */
   .module-panel {
-    border: 2px solid;
-    border-color: var(--gs-chrome-light) var(--gs-chrome-dark) var(--gs-chrome-dark) var(--gs-chrome-light);
-    background: var(--gs-paper);
+    border: 1px solid var(--gs-mid);
+    border-radius: 8px;
+    background: oklch(0.20 0.06 340 / 0.6);
     margin-bottom: 8px;
+    overflow: hidden;
   }
   .module-panel-header {
-    height: 22px;
+    height: 28px;
     display: flex;
     align-items: center;
     gap: 6px;
-    padding: 0 6px;
-    background: var(--gs-chrome);
-    border-bottom: 1px solid var(--gs-chrome-dark);
+    padding: 0 10px;
+    background: oklch(0.22 0.06 340 / 0.8);
+    border-bottom: 1px solid oklch(0.30 0.06 340);
     font-family: var(--font-system);
     font-size: 12px;
-    font-weight: 700;
+    font-weight: 600;
+    color: var(--gs-light);
   }
   .module-panel-content {
     padding: 12px;
   }
 
-  /* ── Redaction Aesthetic (Free Tier Gate) ──────────────────── */
+  /* -- Redaction Aesthetic (Free Tier Gate) -------------------- */
   .redacted {
     position: relative;
     overflow: hidden;
@@ -355,15 +388,20 @@
     content: '';
     position: absolute;
     inset: 0;
+    /* Dithered bars instead of solid black */
     background:
       repeating-linear-gradient(
         0deg,
-        var(--gs-ink) 0px,
-        var(--gs-ink) 14px,
-        transparent 14px,
-        transparent 18px
-      );
-    opacity: 0.85;
+        var(--gs-void) 0px,
+        var(--gs-void) 6px,
+        transparent 6px,
+        transparent 8px
+      ),
+      repeating-conic-gradient(
+        var(--gs-deep) 0% 25%,
+        transparent 0% 50%
+      ) 0 0 / 4px 4px;
+    opacity: 0.9;
     pointer-events: none;
   }
   .redacted-stamp {
@@ -372,10 +410,11 @@
     left: 50%;
     transform: translate(-50%, -50%) rotate(-12deg);
     font-family: var(--font-system);
-    font-size: 24px;
+    font-size: 18px;
     font-weight: 700;
-    color: var(--gs-red);
-    border: 3px solid var(--gs-red);
+    color: var(--gs-base);
+    border: 2px solid var(--gs-base);
+    border-radius: 4px;
     padding: 4px 16px;
     text-transform: uppercase;
     letter-spacing: 4px;
@@ -384,36 +423,29 @@
     opacity: 0.9;
   }
 
-  /* ── Traffic Light Badges ────────────────────────────────── */
-  .traffic-green {
-    color: var(--gs-terminal);
-  }
-  .traffic-amber {
-    color: var(--gs-warning);
-  }
-  .traffic-red {
-    color: var(--gs-critical);
-  }
+  /* -- Traffic Light Badges ----------------------------------- */
+  .traffic-green { color: var(--gs-terminal); }
+  .traffic-amber { color: var(--gs-warning); }
+  .traffic-red   { color: var(--gs-critical); }
   .traffic-dot {
     width: 10px;
     height: 10px;
     border-radius: 50%;
     display: inline-block;
-    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.3);
   }
   .traffic-dot-green { background: var(--gs-terminal); }
   .traffic-dot-amber { background: var(--gs-warning); }
-  .traffic-dot-red { background: var(--gs-critical); }
+  .traffic-dot-red   { background: var(--gs-critical); }
 }
 
-/* ═══════════════════════════════════════════════════════════════
+/* =================================================================
    Atmospheric Effects
    CRT effects scoped to scan-sequence context only.
-   Desktop gets ONLY the subtle paper grain.
-   ═══════════════════════════════════════════════════════════════ */
+   Desktop gets subtle noise.
+   ================================================================= */
 
 @layer utilities {
-  /* ── CRT Scanlines — scan sequence ONLY ──────────────────── */
+  /* -- CRT Scanlines -- scan sequence ONLY -------------------- */
   .crt-scanlines {
     position: fixed;
     inset: 0;
@@ -430,7 +462,7 @@
     mix-blend-mode: multiply;
   }
 
-  /* ── CRT Vignette — scan sequence ONLY ───────────────────── */
+  /* -- CRT Vignette -- scan sequence ONLY --------------------- */
   .crt-vignette {
     position: fixed;
     inset: 0;
@@ -444,44 +476,83 @@
     );
   }
 
-  /* ── Paper Grain (desktop) ──────────────────────────────── */
+  /* -- Noise Grain (desktop) ---------------------------------- */
   .noise-grain {
     position: fixed;
     inset: 0;
     pointer-events: none;
     z-index: 9997;
     contain: strict;
-    opacity: 0.02;
+    opacity: 0.03;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     background-repeat: repeat;
     background-size: 256px 256px;
   }
 
-  /* ── Terminal Text Glow (scan sequence ONLY) ────────────── */
+  /* -- Terminal Text Glow (scan sequence ONLY) ----------------- */
   .terminal-glow {
     text-shadow: 0 0 4px var(--gs-terminal), 0 0 8px oklch(0.80 0.15 145 / 0.3);
   }
 
-  /* ── Ghost Glow (subtle pale blue, Chloe only) ─────────── */
+  /* -- Ghost Glow (pink, Chloe only) -------------------------- */
   .ghost-glow {
-    filter: drop-shadow(0 0 8px var(--gs-ghost)) drop-shadow(0 0 16px rgba(224, 240, 255, 0.2));
+    filter: drop-shadow(0 0 8px var(--gs-base)) drop-shadow(0 0 16px oklch(0.82 0.15 340 / 0.2));
   }
 
-  /* ── Red Accent Text ─────────────────────────────────────── */
+  /* -- Accent Text -------------------------------------------- */
   .text-accent {
-    color: var(--gs-red);
+    color: var(--gs-base);
   }
 
-  /* ── Skeleton Loading ───────────────────────────────────── */
+  /* -- Skeleton Loading --------------------------------------- */
   .skeleton {
     background: linear-gradient(
       90deg,
-      var(--gs-chrome) 0%,
-      var(--gs-chrome-light) 50%,
-      var(--gs-chrome) 100%
+      oklch(0.22 0.06 340) 0%,
+      oklch(0.28 0.07 340) 50%,
+      oklch(0.22 0.06 340) 100%
     );
     background-size: 200% 100%;
     animation: skeleton-slide 1.5s ease-in-out infinite;
+    border-radius: 4px;
+  }
+
+  /* -- Dither Edge (2px checkerboard) ------------------------- */
+  .dither-edge {
+    position: relative;
+  }
+  .dither-edge::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -4px;
+    height: 4px;
+    pointer-events: none;
+    background: repeating-conic-gradient(
+      var(--gs-deep) 0% 25%,
+      transparent 0% 50%
+    ) 0 0 / 2px 2px;
+    opacity: 0.6;
+  }
+
+  /* -- Dither Edge Light (for taskbar top) --------------------- */
+  .dither-edge-top {
+    position: relative;
+  }
+  .dither-edge-top::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -4px;
+    height: 4px;
+    pointer-events: none;
+    background: repeating-conic-gradient(
+      var(--gs-deep) 0% 25%,
+      transparent 0% 50%
+    ) 0 0 / 2px 2px;
+    opacity: 0.6;
   }
 }
 
@@ -490,50 +561,39 @@
   100% { background-position: -200% 0; }
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   Custom Scrollbars — Warm Chrome
-   ═══════════════════════════════════════════════════════════════ */
+/* =================================================================
+   Custom Scrollbars — Thin, Rounded, Pink-Accented
+   ================================================================= */
 
 ::-webkit-scrollbar {
-  width: 16px;
-  height: 16px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--gs-chrome);
-  border: 1px solid var(--gs-chrome-dark);
+  background: var(--gs-deep);
+  border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--gs-chrome);
-  border: 2px solid;
-  border-color: var(--gs-chrome-light) var(--gs-chrome-dark) var(--gs-chrome-dark) var(--gs-chrome-light);
+  background: var(--gs-mid);
+  border-radius: 3px;
   min-height: 24px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--gs-chrome-light);
-}
-::-webkit-scrollbar-thumb:active {
-  border-color: var(--gs-chrome-dark) var(--gs-chrome-light) var(--gs-chrome-light) var(--gs-chrome-dark);
-}
-::-webkit-scrollbar-button {
-  background: var(--gs-chrome);
-  border: 2px solid;
-  border-color: var(--gs-chrome-light) var(--gs-chrome-dark) var(--gs-chrome-dark) var(--gs-chrome-light);
-  height: 16px;
-  width: 16px;
+  background: var(--gs-base);
 }
 ::-webkit-scrollbar-corner {
-  background: var(--gs-chrome);
+  background: var(--gs-deep);
 }
 
 /* Firefox */
 * {
-  scrollbar-width: auto;
-  scrollbar-color: var(--gs-chrome-dark) var(--gs-chrome);
+  scrollbar-width: thin;
+  scrollbar-color: var(--gs-mid) var(--gs-deep);
 }
 
-/* ═══════════════════════════════════════════════════════════════
+/* =================================================================
    Custom Cursors
-   ═══════════════════════════════════════════════════════════════ */
+   ================================================================= */
 
 body {
   cursor: url('/cursors/default.svg') 0 0, default;
@@ -551,9 +611,9 @@ input, textarea, [contenteditable] {
   cursor: url('/cursors/ghost.svg') 8 8, default;
 }
 
-/* ═══════════════════════════════════════════════════════════════
+/* =================================================================
    Reduced Motion
-   ═══════════════════════════════════════════════════════════════ */
+   ================================================================= */
 
 @media (prefers-reduced-motion: reduce) {
   .crt-scanlines,
@@ -571,9 +631,9 @@ input, textarea, [contenteditable] {
   }
 }
 
-/* ═══════════════════════════════════════════════════════════════
+/* =================================================================
    Print Stylesheet
-   ═══════════════════════════════════════════════════════════════ */
+   ================================================================= */
 
 @media print {
   @page {
@@ -609,6 +669,7 @@ input, textarea, [contenteditable] {
     border: none !important;
     box-shadow: none !important;
     background: white !important;
+    border-radius: 0 !important;
   }
   .window-titlebar {
     background: none !important;
@@ -619,12 +680,14 @@ input, textarea, [contenteditable] {
     border: none !important;
     margin: 0 !important;
     overflow: visible !important;
+    border-radius: 0 !important;
   }
 
   .module-panel {
     break-before: page;
     break-inside: avoid;
     border: 1px solid #ddd !important;
+    border-radius: 0 !important;
   }
   .module-panel:first-child {
     break-before: auto;
@@ -654,22 +717,22 @@ input, textarea, [contenteditable] {
   }
 }
 
-/* ═══════════════════════════════════════════════════════════════
+/* =================================================================
    High Contrast Mode
-   ═══════════════════════════════════════════════════════════════ */
+   ================================================================= */
 
 @media (prefers-contrast: high) {
   .window {
-    border-width: 3px;
-    border-color: var(--gs-ink);
+    border-width: 2px;
+    border-color: var(--gs-light);
   }
   .bevel-button {
-    border-color: var(--gs-ink);
+    border-color: var(--gs-light);
   }
   .module-panel {
-    border-color: var(--gs-ink);
+    border-color: var(--gs-light);
   }
   .traffic-dot {
-    border: 1px solid var(--gs-ink);
+    border: 1px solid var(--gs-light);
   }
 }

@@ -1,42 +1,36 @@
 import type { Metadata } from 'next';
-import { Instrument_Serif, Pixelify_Sans, JetBrains_Mono, Permanent_Marker } from 'next/font/google';
+import { GeistMono } from 'geist/font/mono';
+import { Barlow_Condensed, JetBrains_Mono, Permanent_Marker } from 'next/font/google';
 import { PostHogProvider } from '@/components/providers/posthog-provider';
 import { EasterEggs } from '@/components/os/easter-eggs';
 import { DesktopRoot } from '@/components/os/desktop-root';
 import './globals.css';
 
 /**
- * GhostScan OS — Root Layout
+ * Chloe's Bedroom OS — Root Layout
  *
  * The entire app is one persistent Desktop shell.
  * WindowManagerProvider wraps everything for window state.
  * DesktopShell renders at root — persists across all navigations.
  */
 
-const displayFont = Instrument_Serif({
+const displayFont = Barlow_Condensed({
   subsets: ['latin'],
-  variable: '--font-display',
+  variable: '--font-display-face',
   display: 'swap',
-  weight: '400',
+  weight: ['700', '800'],
 });
 
-const systemFont = Pixelify_Sans({
+const terminalFont = JetBrains_Mono({
   subsets: ['latin'],
-  variable: '--font-system',
+  variable: '--font-terminal',
   display: 'swap',
-  weight: ['400', '500', '600', '700'],
-});
-
-const dataFont = JetBrains_Mono({
-  subsets: ['latin'],
-  variable: '--font-data',
-  display: 'swap',
-  weight: ['300', '400', '500', '600', '700', '800'],
+  weight: ['400', '500', '700'],
 });
 
 const personalityFont = Permanent_Marker({
   subsets: ['latin'],
-  variable: '--font-personality',
+  variable: '--font-personality-face',
   display: 'swap',
   weight: '400',
 });
@@ -73,7 +67,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${displayFont.variable} ${systemFont.variable} ${dataFont.variable} ${personalityFont.variable}`}
+      className={`${GeistMono.variable} ${displayFont.variable} ${terminalFont.variable} ${personalityFont.variable}`}
     >
       <body>
         <PostHogProvider>

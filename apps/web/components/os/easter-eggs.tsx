@@ -4,16 +4,10 @@ import { useEffect, useRef, useState } from 'react';
 import { ChloeSprite } from '@/components/chloe/chloe-sprite';
 
 /**
- * GhostScan OS — Easter Eggs
- * ═══════════════════════════════
+ * Chloe's Bedroom OS — Easter Eggs
  *
- * WHAT: Hidden interactions that make the product MSCHF-level memorable.
- * WHY:  These are what separate a good product from an unforgettable one
- *       (Plan Section 8).
- * HOW:
- *   1. Konami code (↑↑↓↓←→←→BA) → Chloe celebration + screen flash
- *   2. Console ASCII art + hiring message (on mount)
- *   3. Provider component to wire into layout
+ * 1. Konami code (up up down down left right left right B A) → Chloe celebration
+ * 2. Console ASCII art + hiring message (on mount)
  */
 
 const KONAMI_SEQUENCE = [
@@ -59,7 +53,7 @@ function logConsoleArt() {
 
   const message = `%c
 ╔══════════════════════════════════════╗
-║  👻 GhostScan OS v2.0              ║
+║  AlphaScan OS v3.0                  ║
 ║                                      ║
 ║  Looking under the hood? Smart.      ║
 ║  We're hiring.                       ║
@@ -70,23 +64,21 @@ function logConsoleArt() {
 
   console.log(
     ghost,
-    'color: #00e5ff; font-size: 10px; font-family: monospace; line-height: 1.2;',
+    'color: #FFB2EF; font-size: 10px; font-family: monospace; line-height: 1.2;',
   );
   console.log(
     message,
-    'color: #e040fb; font-size: 12px; font-family: monospace;',
+    'color: #FFCAF3; font-size: 12px; font-family: monospace;',
   );
 }
 
 export function EasterEggs() {
   const [konamiActive, setKonamiActive] = useState(false);
 
-  // Console ASCII art on mount
   useEffect(() => {
     logConsoleArt();
   }, []);
 
-  // Konami code handler
   useKonamiCode(() => {
     setKonamiActive(true);
     setTimeout(() => setKonamiActive(false), 3000);
@@ -96,14 +88,17 @@ export function EasterEggs() {
 
   return (
     <div className="fixed inset-0 z-[9999] pointer-events-none flex items-center justify-center">
-      {/* Screen flash */}
-      <div className="absolute inset-0 bg-gs-red/20 animate-pulse" />
+      {/* Screen flash — pink pulse */}
+      <div
+        className="absolute inset-0 animate-pulse"
+        style={{ background: 'oklch(0.82 0.15 340 / 0.12)' }}
+      />
 
       {/* Chloe celebrating */}
       <div className="relative animate-bounce">
         <ChloeSprite state="celebrating" size={256} glowing />
         <div className="absolute -bottom-[40px] left-1/2 -translate-x-1/2 whitespace-nowrap">
-          <span className="font-personality text-[24px] text-gs-red">
+          <span className="font-personality text-[24px] text-gs-base drop-shadow-[0_0_12px_var(--gs-base)]">
             You found the secret!
           </span>
         </div>
