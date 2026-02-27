@@ -241,7 +241,7 @@ export function ScanInput({
           type="submit"
           disabled={loading}
           className={cn(
-            'bevel-button-primary min-w-[140px] h-[36px]',
+            'bevel-button-primary h-[36px] flex-1',
             loading && 'cursor-wait',
           )}
           style={{ padding: '0 18px' }}
