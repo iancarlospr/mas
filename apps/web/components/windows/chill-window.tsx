@@ -183,56 +183,57 @@ export default function ChillWindow() {
         )}
       </div>
 
-      {/* Channel bar — bottom control strip */}
-      <div className="flex-shrink-0 border-t border-gs-mid/30 bg-gs-deep/60 px-gs-3 py-gs-2">
-        <div className="flex items-center justify-between">
-          {/* Channel info */}
-          <div className="flex items-center gap-gs-2 min-w-0">
-            <span className="font-data text-data-xs text-gs-base font-bold flex-shrink-0">
-              CH {channel.number}
-            </span>
-            <span className="font-data text-data-xs text-gs-mid truncate">
-              {channel.name}
-            </span>
-            <span className="font-data text-data-xs text-gs-mid/50 truncate hidden sm:block">
-              — {channel.description}
-            </span>
-          </div>
-
-          {/* Channel controls */}
-          <div className="flex items-center gap-1 flex-shrink-0">
-            <button
-              onClick={() => changeChannel('prev')}
-              className="w-7 h-7 flex items-center justify-center rounded text-gs-mid hover:text-gs-base hover:bg-gs-base/10 transition-colors font-data text-data-sm"
-              title="Previous channel"
-            >
-              ◀
-            </button>
-
-            {/* Channel dots */}
-            <div className="flex items-center gap-1 mx-1">
-              {CHANNELS.map((ch, i) => (
-                <button
-                  key={ch.number}
-                  onClick={() => changeChannel(i)}
-                  className={`w-2 h-2 rounded-full transition-all ${
-                    i === channelIndex
-                      ? 'bg-gs-base scale-125'
-                      : 'bg-gs-mid/40 hover:bg-gs-mid'
-                  }`}
-                  title={`CH ${ch.number}: ${ch.name}`}
-                />
-              ))}
-            </div>
-
-            <button
-              onClick={() => changeChannel('next')}
-              className="w-7 h-7 flex items-center justify-center rounded text-gs-mid hover:text-gs-base hover:bg-gs-base/10 transition-colors font-data text-data-sm"
-              title="Next channel"
-            >
-              ▶
-            </button>
-          </div>
+      {/* Channel bar — remote control buttons */}
+      <div className="flex-shrink-0 border-t border-gs-mid/20 bg-[#0A0A0A] px-3 py-2">
+        <div className="flex items-center justify-center gap-2">
+          {CHANNELS.map((ch, i) => {
+            const isActive = i === channelIndex;
+            return (
+              <button
+                key={ch.number}
+                onClick={() => changeChannel(i)}
+                className="flex flex-col items-center gap-0.5 transition-all duration-200 group"
+                style={{
+                  width: '72px',
+                  padding: '6px 4px 5px',
+                  borderRadius: '6px',
+                  background: isActive
+                    ? 'var(--gs-base)'
+                    : 'rgba(255,255,255,0.04)',
+                  border: isActive
+                    ? '1px solid var(--gs-base)'
+                    : '1px solid rgba(255,255,255,0.08)',
+                  boxShadow: isActive
+                    ? '0 0 12px var(--gs-base), 0 0 24px rgba(255,178,239,0.2), inset 0 1px 0 rgba(255,255,255,0.15)'
+                    : 'none',
+                  cursor: 'pointer',
+                }}
+                title={ch.description}
+              >
+                <span
+                  className="font-data font-bold leading-none"
+                  style={{
+                    fontSize: '16px',
+                    color: isActive ? 'var(--gs-void)' : 'var(--gs-mid)',
+                    transition: 'color 0.2s',
+                  }}
+                >
+                  {ch.number}
+                </span>
+                <span
+                  className="font-data leading-none truncate w-full text-center"
+                  style={{
+                    fontSize: '7px',
+                    color: isActive ? 'var(--gs-void)' : 'rgba(255,255,255,0.25)',
+                    letterSpacing: '0.04em',
+                    transition: 'color 0.2s',
+                  }}
+                >
+                  {ch.name}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </div>
     </div>
