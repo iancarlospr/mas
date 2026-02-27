@@ -105,7 +105,7 @@ export function ManagedWindow({
         top: isMaximized ? 0 : windowState.y,
         width: isMaximized ? '100%' : windowState.width,
         height: isMaximized ? '100%' : 'fit-content',
-        maxHeight: isMaximized ? '100%' : '85vh',
+        maxHeight: isMaximized ? '100%' : 'calc(85vh - 44px)',
         zIndex: windowState.zIndex,
       }}
       onMouseDown={handleFocus}

@@ -82,10 +82,14 @@ function randomWindowPosition(winWidth: number): { x: number; y: number } {
   const vw = typeof window !== 'undefined' ? window.innerWidth : 1200;
   const vh = typeof window !== 'undefined' ? window.innerHeight : 800;
 
+  const taskbarH = 44; // --gs-taskbar-h (40px) + 4px dither edge
+  const maxWindowH = Math.floor((vh - taskbarH) * 0.85);
+
   const leftBound = Math.floor(vw * 0.10);
   const rightBound = Math.floor(vw * 0.88) - winWidth;
   const topBound = Math.floor(vh * 0.04);
-  const bottomBound = Math.floor(vh * 0.50);
+  // Bottom bound: ensure even a tall window (maxWindowH) stays above taskbar
+  const bottomBound = Math.max(topBound, vh - taskbarH - maxWindowH);
 
   // Clamp so we always have a valid range
   const minX = leftBound;
