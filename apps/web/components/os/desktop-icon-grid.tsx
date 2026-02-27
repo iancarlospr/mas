@@ -7,15 +7,7 @@ import { soundEffects } from '@/lib/sound-effects';
 import { BedroomIcon } from './bedroom-icons';
 
 /* =================================================================
-   Chloe's Bedroom OS — Desktop Icon Grid
-
-   Icons positioned as objects in a bedroom — forced perspective.
-   Each icon has a fixed position that corresponds to where
-   that object would be in the room:
-   - Wall objects (posters, shelf, mirror) → upper zone
-   - Desk/surface objects (phone, diary, magnifier) → middle zone
-   - Floor objects (TV, games, trash) → lower zone
-   - Bed area objects → right side
+   Desktop Icon Grid — Two vertical columns, centered on anchor points
    ================================================================= */
 
 interface DesktopIconDef {
@@ -27,8 +19,8 @@ interface DesktopIconDef {
 
 /** Desktop icons in two vertical columns — left (primary), right (secondary) */
 const ICON_SPACING = 120; // px between icon centers vertically
-const LEFT_X = '3%';
-const RIGHT_X = '93%';
+const LEFT_X = '5%';
+const RIGHT_X = '95%';
 const START_Y = 24; // px from top
 
 const ROOM_ICONS: DesktopIconDef[] = [
@@ -68,6 +60,7 @@ function DesktopIconButton({
       style={{
         left: def.x,
         top: def.y,
+        transform: 'translateX(-50%)',
       }}
       onClick={() => {
         soundEffects.play('windowOpen');
