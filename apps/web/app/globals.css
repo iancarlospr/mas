@@ -273,7 +273,7 @@
     flex-shrink: 0;
   }
 
-  /* Dots — dark on pink */
+  /* macOS-style colored dots */
   .window-titlebar-btn {
     width: 12px;
     height: 12px;
@@ -286,23 +286,27 @@
     padding: 0;
     font-size: 0;
     line-height: 0;
-    background: var(--gs-void);
-    opacity: 0.3;
-    transition: opacity 150ms, transform 150ms;
+    transition: filter 150ms, transform 150ms;
   }
   .window-titlebar-btn:hover {
-    opacity: 0.6;
+    filter: brightness(1.2);
     transform: scale(1.15);
   }
   .window-titlebar-btn:active {
     transform: scale(0.9);
   }
-  .window-titlebar-btn[data-action="close"]:hover {
+  .window-titlebar-btn[data-action="close"] {
     background: #FF5F57;
-    opacity: 1;
+  }
+  .window-titlebar-btn[data-action="minimize"] {
+    background: #FEBC2E;
+  }
+  .window-titlebar-btn[data-action="maximize"] {
+    background: #28C840;
   }
   .window-titlebar:not([data-active="true"]) .window-titlebar-btn {
-    opacity: 0.2;
+    background: var(--gs-deep);
+    opacity: 0.5;
   }
 
   .window-content {
