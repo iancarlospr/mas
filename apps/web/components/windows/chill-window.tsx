@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { AsciiPlayer } from '@/components/scan/ascii-player';
+import { GhostAnimation } from '@/components/os/ghost-animation';
 
 /* =================================================================
    chill.mov — ASCII Theater / Retro TV
@@ -13,18 +14,20 @@ import { AsciiPlayer } from '@/components/scan/ascii-player';
 interface Channel {
   number: number;
   name: string;
-  path: string;
+  path: string | null;
   loop: boolean;
   description: string;
+  live?: boolean;
 }
 
 const CHANNELS: Channel[] = [
   {
     number: 1,
     name: 'CHLOE TV',
-    path: '/ascii/chloe_scan.json',
+    path: null,
     loop: true,
-    description: 'GhostScan Protocol — Chloe does her thing',
+    live: true,
+    description: 'Chloe does her thing — live animation',
   },
   {
     number: 2,
@@ -133,10 +136,12 @@ export default function ChillWindow() {
         {/* Content: static noise during change, player otherwise */}
         {isChanging ? (
           <StaticNoise />
+        ) : channel.live ? (
+          <GhostAnimation key="ghost-live" />
         ) : (
           <AsciiPlayer
             key={channel.path}
-            moviePath={channel.path}
+            moviePath={channel.path!}
             autoPlay
             loop={channel.loop}
             showSshHint={false}
