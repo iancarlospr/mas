@@ -69,8 +69,7 @@ function DesktopIconButton({
         left: def.x,
         top: def.y,
       }}
-      onClick={() => setSelected(true)}
-      onDoubleClick={() => {
+      onClick={() => {
         soundEffects.play('windowOpen');
         onOpen(def.id);
       }}

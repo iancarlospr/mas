@@ -6,10 +6,7 @@ import Script from 'next/script';
 import { cn, normalizeUrl } from '@/lib/utils';
 import { analytics } from '@/lib/analytics';
 import { soundEffects } from '@/lib/sound-effects';
-import { Window } from '@/components/os/window';
 import { BevelInput } from '@/components/os/bevel-input';
-import { ChloeSprite } from '@/components/chloe/chloe-sprite';
-import { pickRandom, GREETINGS } from '@/lib/chloe-ai-copy';
 
 /**
  * GhostScan OS — Scan Input (Win95 Dialog)
@@ -220,91 +217,69 @@ export function ScanInput({
     );
   }
 
-  /* ── Dialog variant (full Win95 window) ──────────────────── */
+  /* ── Dialog variant (content only — outer window provided by ManagedWindow) ── */
   return (
-    <div className={cn('relative', className)}>
-      {/* Chloé floating beside the dialog */}
-      <div className="absolute -left-[100px] top-1/2 -translate-y-1/2 hidden lg:block">
-        <ChloeSprite state="idle" size={64} glowing />
+    <form onSubmit={handleSubmit} className={cn('p-gs-4 space-y-gs-4', className)}>
+      {/* URL Input */}
+      <div>
+        <label className="block font-system text-os-base mb-gs-1">
+          Target URL:
+        </label>
+        <BevelInput
+          type="text"
+          value={url}
+          onChange={(e) => {
+            setUrl(e.target.value);
+            if (error) setError(null);
+          }}
+          placeholder="https://example.com"
+          disabled={loading}
+          fullWidth
+          autoFocus
+        />
       </div>
 
-      <Window
-        id="new-scan"
-        title="New Scan — Enter Target URL"
-        icon={<span className="text-os-sm font-bold">{'>'}</span>}
-        variant="dialog"
-        isActive
-        width={480}
-        showStatusBar
-        statusBarContent={
-          <div className="window-statusbar-section">
-            {loading ? 'Scanning...' : 'Ready'}
-          </div>
-        }
-      >
-        <form onSubmit={handleSubmit} className="p-gs-4 space-y-gs-4">
-          {/* URL Input */}
-          <div>
-            <label className="block font-system text-os-base mb-gs-1">
-              Target URL:
-            </label>
-            <BevelInput
-              type="text"
-              value={url}
-              onChange={(e) => {
-                setUrl(e.target.value);
-                if (error) setError(null);
-              }}
-              placeholder="https://example.com"
-              disabled={loading}
-              fullWidth
-              autoFocus
-            />
-          </div>
+      {/* Error message */}
+      {error && (
+        <div className="bevel-sunken bg-gs-paper px-gs-3 py-gs-2">
+          <p className="font-data text-data-sm text-gs-critical">
+            {error}
+          </p>
+        </div>
+      )}
 
-          {/* Error message */}
-          {error && (
-            <div className="bevel-sunken bg-gs-paper px-gs-3 py-gs-2">
-              <p className="font-data text-data-sm text-gs-critical">
-                {error}
-              </p>
-            </div>
+      {/* Turnstile widget */}
+      {siteKey && (
+        <>
+          <Script
+            src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+            strategy="afterInteractive"
+            onLoad={renderTurnstile}
+          />
+          <div ref={turnstileContainerRef} />
+        </>
+      )}
+
+      {/* Submit button row */}
+      <div className="flex justify-end gap-gs-2 pt-gs-2">
+        <button
+          type="submit"
+          disabled={loading}
+          className={cn(
+            'bevel-button-primary min-w-[160px]',
+            loading && 'cursor-wait',
           )}
-
-          {/* Turnstile widget */}
-          {siteKey && (
-            <>
-              <Script
-                src="https://challenges.cloudflare.com/turnstile/v0/api.js"
-                strategy="afterInteractive"
-                onLoad={renderTurnstile}
-              />
-              <div ref={turnstileContainerRef} />
-            </>
+        >
+          {loading ? (
+            <span className="flex items-center gap-gs-2">
+              <span className="animate-blink">...</span>
+              Scanning...
+            </span>
+          ) : (
+            '▶ Execute Scan'
           )}
-
-          {/* Submit button row */}
-          <div className="flex justify-end gap-gs-2 pt-gs-2">
-            <button
-              type="submit"
-              disabled={loading}
-              className={cn(
-                'bevel-button-primary min-w-[160px]',
-                loading && 'cursor-wait',
-              )}
-            >
-              {loading ? (
-                <span className="flex items-center gap-gs-2">
-                  <span className="animate-blink">...</span>
-                  Scanning...
-                </span>
-              ) : (
-                '▶ Execute Scan'
-              )}
-            </button>
-          </div>
-        </form>
-      </Window>
-    </div>
+        </button>
+      </div>
+    </form>
   );
 }
