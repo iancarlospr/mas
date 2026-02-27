@@ -216,24 +216,43 @@ export function ScanInput({
 
   /* ── Dialog variant (content only — outer window provided by ManagedWindow) ── */
   return (
-    <form onSubmit={handleSubmit} className={cn('p-gs-4 space-y-gs-4', className)}>
-      {/* URL Input */}
-      <div>
-        <label className="block font-system text-os-base mb-gs-1">
-          Target URL:
-        </label>
-        <BevelInput
-          type="text"
-          value={url}
-          onChange={(e) => {
-            setUrl(e.target.value);
-            if (error) setError(null);
-          }}
-          placeholder="https://example.com"
+    <form onSubmit={handleSubmit} className={cn('p-gs-4 space-y-gs-3', className)}>
+      {/* URL Input + Button — same row */}
+      <div className="flex items-end gap-gs-2">
+        <div className="flex-1">
+          <label className="block font-system text-os-base mb-gs-1">
+            Target URL:
+          </label>
+          <BevelInput
+            type="text"
+            value={url}
+            onChange={(e) => {
+              setUrl(e.target.value);
+              if (error) setError(null);
+            }}
+            placeholder="https://example.com"
+            disabled={loading}
+            fullWidth
+            autoFocus
+          />
+        </div>
+        <button
+          type="submit"
           disabled={loading}
-          fullWidth
-          autoFocus
-        />
+          className={cn(
+            'bevel-button-primary min-w-[140px]',
+            loading && 'cursor-wait',
+          )}
+        >
+          {loading ? (
+            <span className="flex items-center gap-gs-2">
+              <span className="animate-blink">...</span>
+              Scanning...
+            </span>
+          ) : (
+            '▶ Execute Scan'
+          )}
+        </button>
       </div>
 
       {/* Error message */}
@@ -256,27 +275,6 @@ export function ScanInput({
           <div ref={turnstileContainerRef} />
         </>
       )}
-
-      {/* Submit button row */}
-      <div className="flex justify-end gap-gs-2 pt-gs-2">
-        <button
-          type="submit"
-          disabled={loading}
-          className={cn(
-            'bevel-button-primary min-w-[160px]',
-            loading && 'cursor-wait',
-          )}
-        >
-          {loading ? (
-            <span className="flex items-center gap-gs-2">
-              <span className="animate-blink">...</span>
-              Scanning...
-            </span>
-          ) : (
-            '▶ Execute Scan'
-          )}
-        </button>
-      </div>
     </form>
   );
 }
