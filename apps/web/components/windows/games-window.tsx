@@ -14,16 +14,77 @@ const ROWS = 9;
 const COLS = 9;
 const MINES = 10;
 
+/* Pink palette number colors — dim → bright as danger increases */
 const NUMBER_COLORS: Record<number, string> = {
-  1: '#0000FF',
-  2: '#008000',
-  3: '#FF0000',
-  4: '#000080',
-  5: '#800000',
-  6: '#008080',
-  7: '#000000',
-  8: '#808080',
+  1: 'oklch(0.75 0.08 340)',   // soft pink
+  2: 'oklch(0.70 0.12 340)',   // medium pink
+  3: 'oklch(0.65 0.16 340)',   // hot pink
+  4: 'oklch(0.60 0.20 340)',   // deep pink
+  5: 'oklch(0.55 0.18 340)',   // magenta
+  6: 'oklch(0.50 0.15 340)',   // dark magenta
+  7: 'oklch(0.45 0.12 340)',   // deep rose
+  8: 'oklch(0.90 0.05 340)',   // near-white pink
 };
+
+/* ── Inline SVG Components ──────────────────────────────────── */
+
+function GhostMine({ size = 14 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 16 16" fill="none">
+      <path
+        d="M8 1C4.7 1 2 3.5 2 6.5V13l1.5-1.5L5 13l1.5-1.5L8 13l1.5-1.5L11 13l1.5-1.5L14 13V6.5C14 3.5 11.3 1 8 1Z"
+        fill="var(--gs-base)"
+      />
+      <circle cx="6" cy="6.5" r="1.2" fill="var(--gs-void)" />
+      <circle cx="10" cy="6.5" r="1.2" fill="var(--gs-void)" />
+      <ellipse cx="8" cy="9" rx="1" ry="0.6" fill="var(--gs-void)" />
+    </svg>
+  );
+}
+
+function GhostFace({ state }: { state: 'playing' | 'won' | 'lost' }) {
+  return (
+    <svg width={20} height={20} viewBox="0 0 16 16" fill="none">
+      <path
+        d="M8 1C4.7 1 2 3.5 2 6.5V13l1.5-1.5L5 13l1.5-1.5L8 13l1.5-1.5L11 13l1.5-1.5L14 13V6.5C14 3.5 11.3 1 8 1Z"
+        fill="var(--gs-base)"
+      />
+      {state === 'playing' && (
+        <>
+          <circle cx="6" cy="6.5" r="1.2" fill="var(--gs-void)" />
+          <circle cx="10" cy="6.5" r="1.2" fill="var(--gs-void)" />
+        </>
+      )}
+      {state === 'won' && (
+        <>
+          {/* Happy curved eyes ^_^ */}
+          <path d="M4.8 6.5 Q6 5 7.2 6.5" stroke="var(--gs-void)" strokeWidth="1.2" fill="none" strokeLinecap="round" />
+          <path d="M8.8 6.5 Q10 5 11.2 6.5" stroke="var(--gs-void)" strokeWidth="1.2" fill="none" strokeLinecap="round" />
+          <path d="M6.5 9 Q8 10.5 9.5 9" stroke="var(--gs-void)" strokeWidth="0.8" fill="none" strokeLinecap="round" />
+        </>
+      )}
+      {state === 'lost' && (
+        <>
+          {/* X eyes */}
+          <path d="M5 5.5 L7 7.5 M7 5.5 L5 7.5" stroke="var(--gs-void)" strokeWidth="1.2" strokeLinecap="round" />
+          <path d="M9 5.5 L11 7.5 M11 5.5 L9 7.5" stroke="var(--gs-void)" strokeWidth="1.2" strokeLinecap="round" />
+          <ellipse cx="8" cy="9.5" rx="1.2" ry="0.8" fill="var(--gs-void)" />
+        </>
+      )}
+    </svg>
+  );
+}
+
+function FlagIcon({ size = 12 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 12 12" fill="none">
+      <line x1="3" y1="2" x2="3" y2="10" stroke="var(--gs-base)" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M3.5 2 L9 4 L3.5 6Z" fill="var(--gs-base)" />
+    </svg>
+  );
+}
+
+/* ── Game Logic ──────────────────────────────────────────────── */
 
 interface Cell {
   isMine: boolean;
@@ -107,6 +168,8 @@ function checkWin(grid: Cell[][]): boolean {
   }
   return true;
 }
+
+/* ── Component ───────────────────────────────────────────────── */
 
 export default function GamesWindow() {
   const [grid, setGrid] = useState(createEmptyGrid);
@@ -193,27 +256,25 @@ export default function GamesWindow() {
     [grid, gameState],
   );
 
-  const smiley = gameState === 'won' ? ':)' : gameState === 'lost' ? ':(' : ':|';
-
   return (
     <div className="p-gs-3 select-none">
       {/* Header */}
       <div className="flex items-center justify-between mb-gs-2 bevel-sunken p-gs-1">
         {/* Ghost counter */}
-        <div className="font-data text-data-sm font-bold text-gs-red bg-[#0A0A0A] px-gs-2 py-px min-w-[40px] text-center">
+        <div className="font-data text-data-sm font-bold text-gs-base bg-[#0A0A0A] px-gs-2 py-px min-w-[40px] text-center rounded-md">
           {MINES - flagCount}
         </div>
 
         {/* Reset button */}
         <button
-          className="bevel-raised w-8 h-8 flex items-center justify-center text-[18px]"
+          className="bevel-raised w-8 h-8 flex items-center justify-center"
           onClick={reset}
         >
-          {smiley}
+          <GhostFace state={gameState} />
         </button>
 
         {/* Timer */}
-        <div className="font-data text-data-sm font-bold text-gs-red bg-[#0A0A0A] px-gs-2 py-px min-w-[40px] text-center">
+        <div className="font-data text-data-sm font-bold text-gs-base bg-[#0A0A0A] px-gs-2 py-px min-w-[40px] text-center rounded-md">
           {String(timer).padStart(3, '0')}
         </div>
       </div>
@@ -226,7 +287,7 @@ export default function GamesWindow() {
               <button
                 key={c}
                 className={cn(
-                  'w-7 h-7 flex items-center justify-center text-[14px] font-bold font-data',
+                  'w-7 h-7 flex items-center justify-center text-[14px] font-bold font-data rounded-lg',
                   cell.isRevealed
                     ? 'bg-gs-chrome-light border border-gs-chrome-dark/30'
                     : 'bevel-raised bg-gs-chrome',
@@ -236,12 +297,12 @@ export default function GamesWindow() {
               >
                 {cell.isRevealed
                   ? cell.isMine
-                    ? '*'
+                    ? <GhostMine />
                     : cell.adjacentMines > 0
                       ? <span style={{ color: NUMBER_COLORS[cell.adjacentMines] }}>{cell.adjacentMines}</span>
                       : null
                   : cell.isFlagged
-                    ? 'F'
+                    ? <FlagIcon />
                     : null}
               </button>
             ))}
