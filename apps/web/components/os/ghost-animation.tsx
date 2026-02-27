@@ -5,90 +5,130 @@ import { useEffect, useRef, useCallback } from 'react';
 /* =================================================================
    Ghost Animation — Programmatic ASCII animation engine
 
-   Renders a ghost sprite moving across a character grid at 15fps.
-   Ghost floats, dashes, does screen takeovers, leaves trails.
-   All computed in real-time — no JSON frames.
+   Renders Chloe ghost moving across a character grid at 15fps.
+   Ghost shape: rounded top, big eyes, wide body, wavy bottom with tails.
+   Matches the actual Chloe sprite silhouette.
    ================================================================= */
 
-const W = 100;
-const H = 24;
+const W = 120;
+const H = 30;
 const INTERVAL = 67; // ~15fps
 
-// ── Ghost Sprites ──────────────────────────────────────────────
-
-const GHOST_SM: string[] = [
-  '  .:::.  ',
-  ' :: o o::',
-  ' ::  _  ::',
-  '  \':::\' ',
-  '   \': :\'  ',
-];
+// ── Ghost Sprites — matching Chloe's bedsheet ghost shape ──────
+// Rounded dome top, wide body, two big eyes, wavy bottom with 3 tails
 
 const GHOST: string[] = [
-  '      .:::::::.      ',
-  '    .::       ::.    ',
-  '   ::           ::   ',
-  '  ::   ##   ##   ::  ',
-  '  ::             ::  ',
-  '  ::    .---.    ::  ',
-  '   ::           ::   ',
-  '    \'::       ::\'    ',
-  '      \':::.:::\'      ',
-  '        \': :\'        ',
-  '         \':\'         ',
+  '           .::::::::::::.           ',
+  '        .::              ::.        ',
+  '      .::                  ::.      ',
+  '     ::                      ::     ',
+  '    ::                        ::    ',
+  '   ::    .###.      .###.      ::   ',
+  '   ::    #   #      #   #      ::   ',
+  '   ::    # * #      # * #      ::   ',
+  '   ::    #   #      #   #      ::   ',
+  '   ::    \'###\'      \'###\'      ::   ',
+  '   ::                          ::   ',
+  '   ::           ....           ::   ',
+  '   ::                          ::   ',
+  '    ::                        ::    ',
+  '     ::                      ::     ',
+  '      ::                    ::      ',
+  '       ::    ::      ::    ::       ',
+  '        \'::  \'::    ::\'  ::\'        ',
+  '          \'::  \'::::\'  ::\'          ',
+  '            \'::      ::\'            ',
 ];
 
 const GHOST_WINK: string[] = [
-  '      .:::::::.      ',
-  '    .::       ::.    ',
-  '   ::           ::   ',
-  '  ::   --   ##   ::  ',
-  '  ::             ::  ',
-  '  ::    .---.    ::  ',
-  '   ::           ::   ',
-  '    \'::       ::\'    ',
-  '      \':::.:::\'      ',
-  '        \': :\'        ',
-  '         \':\'         ',
+  '           .::::::::::::.           ',
+  '        .::              ::.        ',
+  '      .::                  ::.      ',
+  '     ::                      ::     ',
+  '    ::                        ::    ',
+  '   ::    .###.      .###.      ::   ',
+  '   ::    #   #      #   #      ::   ',
+  '   ::    # - #      # * #      ::   ',
+  '   ::    #   #      #   #      ::   ',
+  '   ::    \'###\'      \'###\'      ::   ',
+  '   ::                          ::   ',
+  '   ::           ....           ::   ',
+  '   ::                          ::   ',
+  '    ::                        ::    ',
+  '     ::                      ::     ',
+  '      ::                    ::      ',
+  '       ::    ::      ::    ::       ',
+  '        \'::  \'::    ::\'  ::\'        ',
+  '          \'::  \'::::\'  ::\'          ',
+  '            \'::      ::\'            ',
 ];
 
-const GHOST_OOH: string[] = [
+const GHOST_HAPPY: string[] = [
+  '           .::::::::::::.           ',
+  '        .::              ::.        ',
+  '      .::                  ::.      ',
+  '     ::                      ::     ',
+  '    ::                        ::    ',
+  '   ::    .###.      .###.      ::   ',
+  '   ::    #   #      #   #      ::   ',
+  '   ::    # ^ #      # ^ #      ::   ',
+  '   ::    #   #      #   #      ::   ',
+  '   ::    \'###\'      \'###\'      ::   ',
+  '   ::                          ::   ',
+  '   ::         .:::::::          ::   ',
+  '   ::                          ::   ',
+  '    ::                        ::    ',
+  '     ::                      ::     ',
+  '      ::                    ::      ',
+  '       ::    ::      ::    ::       ',
+  '        \'::  \'::    ::\'  ::\'        ',
+  '          \'::  \'::::\'  ::\'          ',
+  '            \'::      ::\'            ',
+];
+
+const GHOST_SM: string[] = [
   '      .:::::::.      ',
-  '    .::       ::.    ',
+  '    ::         ::    ',
   '   ::           ::   ',
-  '  ::   OO   OO   ::  ',
-  '  ::             ::  ',
-  '  ::     (O)     ::  ',
+  '  ::  .##. .##.  ::  ',
+  '  ::  # *# # *#  ::  ',
+  '  ::  \'##\' \'##\'  ::  ',
+  '  ::     ..      ::  ',
   '   ::           ::   ',
-  '    \'::       ::\'    ',
-  '      \':::.:::\'      ',
-  '        \': :\'        ',
-  '         \':\'         ',
+  '    ::   :  :  ::    ',
+  '     \':  \'::\'  :\'    ',
+  '       \'::  ::\'      ',
 ];
 
 const GHOST_BIG: string[] = [
-  '             .:::::::::::::::::::::::.             ',
-  '           .::                       ::.           ',
-  '         .::                           ::.         ',
-  '        ::                               ::        ',
-  '       ::                                 ::       ',
-  '      ::      .####.          .####.       ::      ',
-  '      ::      #    #          #    #       ::      ',
-  '      ::      \'####\'          \'####\'       ::      ',
-  '      ::                                   ::      ',
-  '      ::                                   ::      ',
-  '      ::         .:::::::::::.             ::      ',
-  '       ::       ::           ::           ::       ',
-  '        ::       \':::::::::::\'            ::       ',
-  '         \'::                           ::\'         ',
-  '           \'::                       ::\'           ',
-  '             \'::::::::::::::::::::::\'              ',
-  '                  \':            :\'                  ',
-  '                    \':        :\'                    ',
+  '                     .::::::::::::::::::::::.                     ',
+  '                 .::\'                        \'::.                 ',
+  '              .::\'                              \'::.              ',
+  '            ::\'                                    \'::            ',
+  '          ::\'                                        \'::          ',
+  '         ::                                            ::         ',
+  '        ::       .#######.            .#######.         ::        ',
+  '       ::        #       #            #       #          ::       ',
+  '       ::        #   *   #            #   *   #          ::       ',
+  '       ::        #       #            #       #          ::       ',
+  '       ::        \'#######\'            \'#######\'          ::       ',
+  '       ::                                                ::       ',
+  '       ::                  ........                      ::       ',
+  '       ::                                                ::       ',
+  '        ::                                              ::        ',
+  '         ::                                            ::         ',
+  '          ::                                          ::          ',
+  '           ::                                        ::           ',
+  '            ::        ::            ::        ::    ::             ',
+  '             \'::      \'::          ::\'      ::\'  ::\'              ',
+  '               \'::     \'::       ::\'     ::\'  ::\'                 ',
+  '                 \'::     \':::::::\'     ::\'  ::\'                   ',
+  '                   \'::              ::\'                            ',
+  '                     \'::::::::::::\'                               ',
 ];
 
-const SPRITE_W = 21;
-const SPRITE_H = 11;
+const SPRITE_W = 35;
+const SPRITE_H = 20;
 
 // ── Math helpers ───────────────────────────────────────────────
 
@@ -169,8 +209,7 @@ export function GhostAnimation() {
     const trails = trailsRef.current;
     for (let sy = 0; sy < sprite.length; sy++) {
       const row = sprite[sy]!;
-      // Only add edge characters as trails (every other char for perf)
-      for (let sx = 0; sx < row.length; sx += 2) {
+      for (let sx = 0; sx < row.length; sx += 3) {
         if (row[sx] !== ' ') {
           trails.push({
             x: Math.round(px) + sx,
@@ -185,11 +224,10 @@ export function GhostAnimation() {
 
   const addSpeedTrail = useCallback((px: number, py: number, spriteH: number, direction: number) => {
     const trails = trailsRef.current;
-    const chars = direction > 0 ? ['-', '~', '.'] : ['-', '~', '.'];
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 12; i++) {
       const tx = direction > 0 ? px - 2 - i * 3 : px + SPRITE_W + 2 + i * 3;
-      const ty = py + Math.floor(Math.random() * spriteH);
-      trails.push({ x: Math.round(tx), y: Math.round(ty), char: chars[i % chars.length]!, age: 0 });
+      const ty = py + 2 + Math.floor(Math.random() * (spriteH - 4));
+      trails.push({ x: Math.round(tx), y: Math.round(ty), char: i < 4 ? '-' : '~', age: 0 });
     }
   }, []);
 
@@ -235,11 +273,11 @@ export function GhostAnimation() {
   const spawnSparkles = useCallback((cx: number, cy: number, count: number) => {
     for (let i = 0; i < count; i++) {
       particlesRef.current.push({
-        x: cx + (Math.random() - 0.5) * 20,
-        y: cy + (Math.random() - 0.5) * 10,
+        x: cx + (Math.random() - 0.5) * 30,
+        y: cy + (Math.random() - 0.5) * 12,
         vx: (Math.random() - 0.5) * 2,
         vy: (Math.random() - 0.5) * 1,
-        life: Math.floor(Math.random() * 8) + 3,
+        life: Math.floor(Math.random() * 10) + 4,
         char: SPARKLE_CHARS[Math.floor(Math.random() * SPARKLE_CHARS.length)]!,
       });
     }
@@ -250,7 +288,7 @@ export function GhostAnimation() {
     for (let y = 0; y < H; y += 2) {
       if (Math.random() < density) {
         for (let x = 0; x < W; x++) {
-          if (g[y]![x] === ' ' && Math.random() < 0.3) {
+          if (g[y]![x] === ' ' && Math.random() < 0.25) {
             g[y]![x] = Math.random() < 0.5 ? '-' : '~';
           }
         }
@@ -281,8 +319,8 @@ export function GhostAnimation() {
 
     const f = frameRef.current;
     const LOOP = 480; // ~32 seconds at 15fps
-    const t = (f % LOOP) / LOOP; // 0–1 through the loop
-    const sec = t * 32; // 0–32 seconds
+    const t = (f % LOOP) / LOOP;
+    const sec = t * 32;
 
     clearGrid();
 
@@ -296,8 +334,8 @@ export function GhostAnimation() {
     // ── Scene 1: Ghost enters from far left (0–4s) ──────────
     if (sec < 4) {
       const p = sec / 4;
-      gx = lerp(-SPRITE_W - 5, W * 0.38, easeOut(p));
-      gy = H * 0.3 + Math.sin(f * 0.13) * 2.5;
+      gx = lerp(-SPRITE_W - 10, W * 0.35, easeOut(p));
+      gy = H * 0.2 + Math.sin(f * 0.12) * 3;
       showTrail = p < 0.7;
       showSpeedTrail = p < 0.5;
       speedDir = 1;
@@ -305,78 +343,73 @@ export function GhostAnimation() {
     // ── Scene 2: Float around center, looking around (4–9s) ──
     else if (sec < 9) {
       const p = (sec - 4) / 5;
-      gx = W * 0.38 + Math.sin(p * Math.PI * 3) * 12;
-      gy = H * 0.28 + Math.sin(f * 0.1) * 3 + Math.cos(f * 0.07) * 1.5;
-      // Alternate wink every 1.5s
+      gx = W * 0.35 + Math.sin(p * Math.PI * 3) * 15;
+      gy = H * 0.2 + Math.sin(f * 0.1) * 3.5 + Math.cos(f * 0.07) * 2;
       if (Math.floor(sec * 2) % 6 === 0) sprite = GHOST_WINK;
-      if (f % 90 === 0) spawnSparkles(gx + SPRITE_W / 2, gy + SPRITE_H / 2, 5);
+      if (f % 90 === 0) spawnSparkles(gx + SPRITE_W / 2, gy + SPRITE_H / 2, 6);
     }
     // ── Scene 3: Ghost rushes toward camera (9–11s) ──────────
     else if (sec < 11) {
       const p = (sec - 9) / 2;
-      gx = lerp(W * 0.38, W * 0.25, easeInOut(p));
-      gy = lerp(H * 0.28, 2, easeInOut(p));
-      if (p > 0.4) {
-        sprite = GHOST_OOH;
-      }
-      if (p > 0.7) {
-        drawScanlines(0.4);
-      }
+      gx = lerp(W * 0.35, W * 0.22, easeInOut(p));
+      gy = lerp(H * 0.2, 1, easeInOut(p));
+      sprite = GHOST_HAPPY;
+      if (p > 0.7) drawScanlines(0.4);
     }
-    // ── Scene 4: SCREEN TAKEOVER — huge ghost face (11–13.5s) ─
-    else if (sec < 13.5) {
-      const p = (sec - 11) / 2.5;
+    // ── Scene 4: SCREEN TAKEOVER — huge ghost face (11–14s) ──
+    else if (sec < 14) {
+      const p = (sec - 11) / 3;
       sprite = GHOST_BIG;
-      gx = W / 2 - 25;
-      gy = lerp(-5, 3, easeOut(Math.min(p * 1.5, 1)));
-      drawScanlines(0.15);
+      gx = W / 2 - 33;
+      gy = lerp(-6, 3, easeOut(Math.min(p * 1.5, 1)));
+      drawScanlines(0.12);
       if (p < 0.2 || (p > 0.8 && p < 1)) drawStatic(0.04);
-      if (f % 30 === 0) spawnSparkles(W / 2, H / 2, 8);
+      if (f % 25 === 0) spawnSparkles(W / 2, H / 2, 10);
     }
-    // ── Scene 5: Screen clears, ghost is tiny top-right (13.5–15s) ─
-    else if (sec < 15) {
-      const p = (sec - 13.5) / 1.5;
+    // ── Scene 5: Screen clears, ghost is small top-right (14–16s)
+    else if (sec < 16) {
+      const p = (sec - 14) / 2;
       sprite = GHOST_SM;
-      gx = lerp(W / 2, W * 0.82, easeInOut(p));
+      gx = lerp(W / 2, W * 0.78, easeInOut(p));
       gy = lerp(H / 2, 2, easeInOut(p));
-      if (p < 0.3) drawStatic(0.06 * (1 - p / 0.3));
+      if (p < 0.3) drawStatic(0.05 * (1 - p / 0.3));
     }
-    // ── Scene 6: Speed dash right-to-left (15–18s) ───────────
-    else if (sec < 18) {
-      const p = (sec - 15) / 3;
-      gx = lerp(W + 10, -SPRITE_W - 10, easeInOut(p));
-      gy = H * 0.35 + Math.sin(f * 0.2) * 1.5;
+    // ── Scene 6: Speed dash right-to-left (16–19s) ───────────
+    else if (sec < 19) {
+      const p = (sec - 16) / 3;
+      gx = lerp(W + 15, -SPRITE_W - 15, easeInOut(p));
+      gy = H * 0.3 + Math.sin(f * 0.2) * 2;
       showSpeedTrail = true;
       speedDir = -1;
     }
-    // ── Scene 7: Peek from bottom, rise up (18–21s) ──────────
-    else if (sec < 21) {
-      const p = (sec - 18) / 3;
-      gx = W * 0.4 + Math.sin(p * Math.PI) * 8;
-      gy = lerp(H + 3, H * 0.25, easeInOut(p));
+    // ── Scene 7: Peek from bottom, rise up (19–22s) ──────────
+    else if (sec < 22) {
+      const p = (sec - 19) / 3;
+      gx = W * 0.38 + Math.sin(p * Math.PI) * 10;
+      gy = lerp(H + 5, H * 0.18, easeInOut(p));
       if (p > 0.7) sprite = GHOST_WINK;
     }
-    // ── Scene 8: Zigzag across screen (21–26s) ───────────────
-    else if (sec < 26) {
-      const p = (sec - 21) / 5;
-      gx = lerp(W * 0.1, W * 0.75, p) + Math.sin(p * Math.PI * 6) * 10;
-      gy = H * 0.15 + Math.sin(p * Math.PI * 4) * (H * 0.3);
+    // ── Scene 8: Zigzag across screen (22–27s) ───────────────
+    else if (sec < 27) {
+      const p = (sec - 22) / 5;
+      gx = lerp(W * 0.05, W * 0.7, p) + Math.sin(p * Math.PI * 6) * 12;
+      gy = H * 0.1 + Math.sin(p * Math.PI * 4) * (H * 0.3);
       showTrail = true;
-      if (f % 60 === 0) spawnSparkles(gx + SPRITE_W / 2, gy, 4);
+      if (f % 50 === 0) spawnSparkles(gx + SPRITE_W / 2, gy, 5);
     }
-    // ── Scene 9: Ghost pauses center, does "boo" (26–28.5s) ──
-    else if (sec < 28.5) {
-      const p = (sec - 26) / 2.5;
-      gx = W * 0.38 + Math.sin(f * 0.08) * 2;
-      gy = H * 0.3 + Math.cos(f * 0.06) * 1;
-      sprite = GHOST_OOH;
-      if (p > 0.5) spawnSparkles(gx + SPRITE_W / 2, gy - 2, 2);
+    // ── Scene 9: Ghost pauses center, happy (27–29.5s) ────────
+    else if (sec < 29.5) {
+      const p = (sec - 27) / 2.5;
+      gx = W * 0.35 + Math.sin(f * 0.08) * 3;
+      gy = H * 0.2 + Math.cos(f * 0.06) * 1.5;
+      sprite = GHOST_HAPPY;
+      if (p > 0.4) spawnSparkles(gx + SPRITE_W / 2, gy - 2, 3);
     }
-    // ── Scene 10: Exit right fast (28.5–32s) ─────────────────
+    // ── Scene 10: Exit right fast (29.5–32s) ─────────────────
     else {
-      const p = (sec - 28.5) / 3.5;
-      gx = lerp(W * 0.38, W + 20, easeInOut(p));
-      gy = H * 0.3 + Math.sin(f * 0.15) * 2;
+      const p = (sec - 29.5) / 2.5;
+      gx = lerp(W * 0.35, W + 25, easeInOut(p));
+      gy = H * 0.2 + Math.sin(f * 0.15) * 2.5;
       showTrail = p < 0.6;
       showSpeedTrail = true;
       speedDir = 1;
@@ -384,7 +417,6 @@ export function GhostAnimation() {
 
     // ── Compose frame ────────────────────────────────────────
 
-    // Add trails before drawing sprite
     const currX = Math.round(gx);
     const currY = Math.round(gy);
     const moved = Math.abs(currX - prevPosRef.current.x) > 1 || Math.abs(currY - prevPosRef.current.y) > 1;
@@ -421,10 +453,10 @@ export function GhostAnimation() {
       ref={preRef}
       className="font-data leading-none whitespace-pre select-none"
       style={{
-        fontSize: '11px',
+        fontSize: '12px',
         color: 'var(--gs-base)',
         textShadow: '0 0 4px var(--gs-base), 0 0 10px oklch(0.82 0.15 340 / 0.15)',
-        lineHeight: '1.1',
+        lineHeight: '1.15',
       }}
     />
   );
