@@ -184,8 +184,8 @@ export default function ChillWindow() {
       </div>
 
       {/* Channel bar — glowing pill tabs */}
-      <div className="flex-shrink-0 border-t border-gs-mid/20 bg-[#0A0A0A] px-3 py-2">
-        <div className="flex items-center justify-center gap-1.5">
+      <div className="flex-shrink-0 border-t border-gs-mid/20 bg-[#0A0A0A] px-4 py-3">
+        <div className="flex items-center justify-center gap-2">
           {CHANNELS.map((ch, i) => {
             const isActive = i === channelIndex;
             return (
@@ -194,7 +194,7 @@ export default function ChillWindow() {
                 onClick={() => changeChannel(i)}
                 className="font-data leading-none transition-all duration-200"
                 style={{
-                  padding: '5px 14px',
+                  padding: '7px 16px',
                   borderRadius: '100px',
                   fontSize: '11px',
                   fontWeight: isActive ? 600 : 400,
