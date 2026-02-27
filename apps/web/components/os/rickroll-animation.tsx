@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 
 /* =================================================================
    Rick Roll — Chaotic psychedelic ASCII experience.
@@ -209,14 +209,27 @@ const LYRIC_TOTAL = LYRICS.reduce((s, l) => s + l.d, 0);
 
 // ── Core renderer ───────────────────────────────────────────────
 
+// Overlay text position presets
+type OverlayPos = 'right' | 'center-top' | 'center' | 'hidden';
+
+interface OverlayState {
+  line1: string;
+  line2: string;
+  pos: OverlayPos;
+  chorus: boolean;
+}
+
 export function RickRollAnimation() {
   const preRef = useRef<HTMLPreElement>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
   const fRef = useRef(0);
+  const [, setTick] = useState(0);
 
   const render = useCallback(() => {
     const f = fRef.current;
     const g: string[][] = Array.from({ length: H }, () => Array(W).fill(' '));
     const sec = (f / FPS) % LOOP;
+    const overlay: OverlayState = { line1: '', line2: '', pos: 'hidden', chorus: false };
 
     const put = (x: number, y: number, c: string) => {
       const ix = Math.round(x), iy = Math.round(y);
@@ -230,12 +243,6 @@ export function RickRollAnimation() {
           if (row[sx] !== ' ' && Math.random() < fade) put(px + sx, py + sy, row[sx]!);
         }
       }
-    };
-
-    const text = (s: string, cx: number, cy: number, reveal = 1) => {
-      const n = Math.floor(s.length * Math.min(reveal, 1));
-      const sx = Math.round(cx - s.length / 2);
-      for (let i = 0; i < n; i++) if (s[i] !== ' ') put(sx + i, cy, s[i]!);
     };
 
     const lyric = (offset: number): { t: string; p: number } | null => {
@@ -370,24 +377,20 @@ export function RickRollAnimation() {
       const spr = POSES[pi]!;
       const bx = Math.sin(f * 0.05) * 6;
       const by = Math.sin(f * 0.08) * 3;
-      const px = 5 + bx;
-      const py = Math.floor(H / 2 - spr.length / 2) + by;
-      stamp(spr, px, py);
+      stamp(spr, 5 + bx, Math.floor(H / 2 - spr.length / 2) + by);
 
       const l = lyric(6);
       if (l) {
         const chorus = l.t.startsWith('NEVER');
         const n = Math.floor(l.p * l.t.length);
-        const tx = 90;
-        const ty = Math.floor(H / 2);
-        for (let i = 0; i < Math.min(n, W - tx - 2); i++) {
-          if (l.t[i] !== ' ') put(tx + i, ty, l.t[i]!);
-        }
-        if (n < l.t.length && f % 10 < 5) put(tx + n, ty, '█');
+        const revealed = l.t.slice(0, n) + (n < l.t.length && f % 10 < 5 ? '█' : '');
+        overlay.line1 = revealed;
+        overlay.pos = 'right';
+        overlay.chorus = chorus;
         if (chorus) {
           if (f % 8 < 4) border('▓░▒░');
           for (let i = 0; i < 8; i++) {
-            put(tx + Math.random() * 50, ty + (Math.random() - 0.5) * 10,
+            put(90 + Math.random() * 50, H / 2 + (Math.random() - 0.5) * 10,
               CHAOS[Math.floor(Math.random() * CHAOS.length)]!);
           }
         }
@@ -444,7 +447,12 @@ export function RickRollAnimation() {
       }
 
       const l = lyric(6);
-      if (l) text(l.t, W / 2, 2, l.p);
+      if (l) {
+        const n = Math.floor(l.p * l.t.length);
+        overlay.line1 = l.t.slice(0, n);
+        overlay.pos = 'center-top';
+        overlay.chorus = l.t.startsWith('NEVER');
+      }
     }
 
     else if (sec < 47) {
@@ -469,12 +477,10 @@ export function RickRollAnimation() {
       if (l) {
         const chorus = l.t.startsWith('NEVER');
         const n = Math.floor(l.p * l.t.length);
-        const tx = 90;
-        const ty = Math.floor(H / 2);
-        for (let i = 0; i < Math.min(n, W - tx - 2); i++) {
-          if (l.t[i] !== ' ') put(tx + i, ty, l.t[i]!);
-        }
-        if (n < l.t.length && f % 10 < 5) put(tx + n, ty, '█');
+        const revealed = l.t.slice(0, n) + (n < l.t.length && f % 10 < 5 ? '█' : '');
+        overlay.line1 = revealed;
+        overlay.pos = 'right';
+        overlay.chorus = chorus;
         if (chorus) {
           border('█▓▒░▀▄');
           for (let i = 0; i < 12; i++) {
@@ -522,10 +528,18 @@ export function RickRollAnimation() {
         speedLines(lerp(W / 2 - SPRITE_W / 2, W + 20, easeInOut(wp)),
           Math.floor(H / 2 - spr.length / 2), spr.length, 1);
       }
-      if (p > 0.3) text('you just got rickrolled', W / 2, Math.floor(H * 0.38),
-        Math.min((p - 0.3) / 0.25, 1));
-      if (p > 0.5) text('by chloe, with love  <3', W / 2, Math.floor(H * 0.38) + 4,
-        Math.min((p - 0.5) / 0.2, 1));
+      if (p > 0.3) {
+        const tp1 = Math.min((p - 0.3) / 0.25, 1);
+        const msg1 = 'you just got rickrolled';
+        overlay.line1 = msg1.slice(0, Math.floor(tp1 * msg1.length));
+        overlay.pos = 'center';
+      }
+      if (p > 0.5) {
+        const tp2 = Math.min((p - 0.5) / 0.2, 1);
+        const msg2 = 'by chloe, with love  <3';
+        overlay.line2 = msg2.slice(0, Math.floor(tp2 * msg2.length));
+        overlay.pos = 'center';
+      }
       if (p > 0.55) border('░▒▓█');
       if (p > 0.6 && f % 5 === 0) {
         for (let i = 0; i < 8; i++)
@@ -571,7 +585,45 @@ export function RickRollAnimation() {
     }
 
     if (preRef.current) preRef.current.textContent = g.map(r => r.join('')).join('\n');
+
+    // Update overlay
+    if (overlayRef.current) {
+      const el = overlayRef.current;
+      if (overlay.pos === 'hidden' || (!overlay.line1 && !overlay.line2)) {
+        el.style.opacity = '0';
+      } else {
+        el.style.opacity = '1';
+        // Position
+        if (overlay.pos === 'right') {
+          el.style.left = 'auto';
+          el.style.right = '5%';
+          el.style.top = '45%';
+          el.style.transform = 'translateY(-50%)';
+          el.style.textAlign = 'left';
+        } else if (overlay.pos === 'center-top') {
+          el.style.left = '50%';
+          el.style.right = 'auto';
+          el.style.top = '6%';
+          el.style.transform = 'translateX(-50%)';
+          el.style.textAlign = 'center';
+        } else {
+          el.style.left = '50%';
+          el.style.right = 'auto';
+          el.style.top = '38%';
+          el.style.transform = 'translateX(-50%)';
+          el.style.textAlign = 'center';
+        }
+        // Size boost on chorus
+        el.style.fontSize = overlay.chorus ? '22px' : '20px';
+        el.style.fontWeight = overlay.chorus ? '700' : '500';
+        // Content
+        const line2Html = overlay.line2 ? `<br/><span style="margin-top:8px;display:inline-block">${overlay.line2}</span>` : '';
+        el.innerHTML = overlay.line1 + line2Html;
+      }
+    }
+
     fRef.current = f + 1;
+    setTick(t => t + 1);
   }, []);
 
   useEffect(() => {
@@ -580,16 +632,35 @@ export function RickRollAnimation() {
   }, [render]);
 
   return (
-    <pre
-      ref={preRef}
-      className="font-data leading-none whitespace-pre select-none"
-      style={{
-        fontSize: '6.5px',
-        color: 'var(--gs-base)',
-        textShadow: '0 0 5px var(--gs-base), 0 0 15px oklch(0.82 0.15 340 / 0.25)',
-        lineHeight: '1.1',
-      }}
-    />
+    <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}>
+      <pre
+        ref={preRef}
+        className="font-data leading-none whitespace-pre select-none"
+        style={{
+          fontSize: '6.5px',
+          color: 'var(--gs-base)',
+          textShadow: '0 0 5px var(--gs-base), 0 0 15px oklch(0.82 0.15 340 / 0.25)',
+          lineHeight: '1.1',
+        }}
+      />
+      <div
+        ref={overlayRef}
+        className="font-data select-none pointer-events-none"
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          fontSize: '20px',
+          color: 'var(--gs-base)',
+          textShadow: '0 0 8px var(--gs-base), 0 0 20px oklch(0.82 0.15 340 / 0.3), 0 0 40px oklch(0.82 0.15 340 / 0.1)',
+          opacity: 0,
+          transition: 'opacity 0.15s ease',
+          whiteSpace: 'nowrap',
+          letterSpacing: '0.05em',
+          zIndex: 10,
+        }}
+      />
+    </div>
   );
 }
 
