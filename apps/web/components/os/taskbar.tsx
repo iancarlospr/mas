@@ -3,16 +3,32 @@
 import { useState, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { useWindowManager } from '@/lib/window-manager';
+import { BedroomIcon } from './bedroom-icons';
 
 /* =================================================================
-   Chloe's Bedroom OS — Taskbar
-
-   Frosted glass bottom bar. Connected to WindowManagerProvider.
-   Left: Start button → opens start menu
-   Center: Open program buttons (pill style)
-   Right: System tray (clock)
-   Dither top edge.
+   Taskbar — Bottom bar with Start menu, open programs, clock
    ================================================================= */
+
+/** Start menu labels — match the desktop icon labels */
+const START_MENU_LABELS: Record<string, string> = {
+  'history':       'My Scans',
+  'chat-launcher': 'Chat',
+  'scan-input':    'Scan.exe',
+  'products':      'Products',
+  'pricing':       'Pricing',
+  'features':      'Features',
+  'about':         'About',
+  'blog':          'Blog',
+  'customers':     'Reviews',
+  'chill':         'Movies',
+  'games':         'Mini-Games',
+};
+
+/** Order for start menu (left column first, then right) */
+const START_MENU_ORDER = [
+  'history', 'chat-launcher', 'scan-input', 'products', 'pricing', 'features',
+  'about', 'blog', 'customers', 'chill', 'games',
+];
 
 export function Taskbar() {
   const [startOpen, setStartOpen] = useState(false);
@@ -22,7 +38,6 @@ export function Taskbar() {
     setStartOpen((prev) => !prev);
   }, []);
 
-  const allWindows = Object.values(wm.windows);
   const openPrograms = wm.taskbarWindows;
 
   return (
@@ -47,7 +62,7 @@ export function Taskbar() {
       {startOpen && (
         <div className="absolute bottom-full left-gs-2 mb-1 bg-gs-deep/95 backdrop-blur-xl border border-gs-mid rounded-lg min-w-[240px] z-start-menu shadow-window-float animate-slide-up overflow-hidden">
           <div className="flex">
-            {/* Vertical brand strip — solid pink */}
+            {/* Vertical brand strip */}
             <div className="w-[32px] flex-shrink-0 flex items-end justify-center pb-gs-3 bg-gs-base">
               <span
                 className="font-system text-os-xs text-gs-void font-bold"
@@ -64,22 +79,26 @@ export function Taskbar() {
 
             {/* Menu items */}
             <div className="flex-1 py-1">
-              {allWindows.map((win, i) => (
-                <button
-                  key={win.id}
-                  className="w-full text-left px-gs-4 py-gs-2 font-system text-os-base
-                             flex items-center gap-gs-3 transition-colors
-                             hover:bg-gs-base/15 hover:text-gs-base text-gs-light/80"
-                  style={{ animationDelay: `${i * 30}ms` }}
-                  onClick={() => {
-                    wm.openWindow(win.id);
-                    setStartOpen(false);
-                  }}
-                >
-                  <span className="text-os-lg text-gs-base">{win.icon}</span>
-                  <span>{win.title}</span>
-                </button>
-              ))}
+              {START_MENU_ORDER.map((id, i) => {
+                const label = START_MENU_LABELS[id];
+                if (!label) return null;
+                return (
+                  <button
+                    key={id}
+                    className="w-full text-left px-gs-4 py-gs-2 font-system text-os-base
+                               flex items-center gap-gs-3 transition-colors
+                               hover:bg-gs-base/15 hover:text-gs-base text-gs-light/80"
+                    style={{ animationDelay: `${i * 30}ms` }}
+                    onClick={() => {
+                      wm.openWindow(id);
+                      setStartOpen(false);
+                    }}
+                  >
+                    <span className="text-gs-base"><BedroomIcon windowId={id} size={18} /></span>
+                    <span>{label}</span>
+                  </button>
+                );
+              })}
 
               <div className="mx-gs-2 my-1 h-px bg-gs-mid/40" />
 
@@ -87,7 +106,10 @@ export function Taskbar() {
                 className="w-full text-left px-gs-4 py-gs-2 font-system text-os-base
                            flex items-center gap-gs-3 transition-colors
                            hover:bg-gs-base/15 hover:text-gs-base text-gs-light/80"
-                onClick={() => setStartOpen(false)}
+                onClick={() => {
+                  wm.openWindow('trash');
+                  setStartOpen(false);
+                }}
               >
                 <span className="text-os-lg text-gs-base">{'>'}</span>
                 <span>Log Out</span>
@@ -100,7 +122,7 @@ export function Taskbar() {
       {/* Separator */}
       <div className="w-px h-[24px] bg-gs-mid/40 mx-gs-1" />
 
-      {/* Open Program Buttons — pill style */}
+      {/* Open Program Buttons */}
       <div className="flex-1 flex items-center gap-1.5 px-gs-2 overflow-hidden">
         {openPrograms.map((win) => (
           <button
@@ -121,8 +143,8 @@ export function Taskbar() {
               }
             }}
           >
-            <span className="text-os-sm text-gs-base">{win.icon}</span>
-            <span className="truncate">{win.title}</span>
+            <span className="text-gs-base"><BedroomIcon windowId={win.id} size={14} /></span>
+            <span className="truncate">{START_MENU_LABELS[win.id] ?? win.title}</span>
           </button>
         ))}
       </div>
