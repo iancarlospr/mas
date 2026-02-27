@@ -219,7 +219,7 @@ export function ScanInput({
     <form onSubmit={handleSubmit} className={cn('p-gs-4 space-y-gs-3', className)}>
       {/* URL Input + Button — same row */}
       <div className="flex items-end gap-gs-2">
-        <div className="flex-1">
+        <div className="flex-[2]">
           <label className="block font-system text-os-base mb-gs-1">
             Target URL:
           </label>
@@ -234,15 +234,17 @@ export function ScanInput({
             disabled={loading}
             fullWidth
             autoFocus
+            className="!h-[36px] !py-0"
           />
         </div>
         <button
           type="submit"
           disabled={loading}
           className={cn(
-            'bevel-button-primary min-w-[140px]',
+            'bevel-button-primary min-w-[140px] h-[36px]',
             loading && 'cursor-wait',
           )}
+          style={{ padding: '0 18px' }}
         >
           {loading ? (
             <span className="flex items-center gap-gs-2">
