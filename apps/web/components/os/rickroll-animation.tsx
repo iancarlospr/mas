@@ -3,145 +3,162 @@
 import { useEffect, useRef, useCallback } from 'react';
 
 /* =================================================================
-   Rick Roll — Rick dances across the screen, psychedelic takeover,
-   pulsing patterns, lyrics cycling. The longest channel (~90s loop).
-   120x30 grid, 15fps.
+   Rick Roll — Big Rick, full-screen psychedelic takeover,
+   dancing, lyrics. 90s loop. 120x30, 15fps.
    ================================================================= */
 
 const W = 120;
 const H = 30;
 const INTERVAL = 67;
 
-// ── Rick sprite — suit, big hair, arms at side ─────────────────
+// ── Rick sprites — BIG, detailed, matching Chloe quality ───────
 
-const RICK_STAND: string[] = [
-  '     .########.     ',
-  '    ###########     ',
-  '    ###########     ',
-  '     :       :      ',
-  '     : o   o :      ',
-  '     :   >   :      ',
-  '     :  ---  :      ',
-  '      \'::::\'        ',
-  '      :    :        ',
-  '     .:....:        ',
-  '    ::      ::      ',
-  '   ::        ::     ',
-  '   ::        ::     ',
-  '    ##      ##      ',
+const RICK_A: string[] = [
+  '       .##############.       ',
+  '      ##################      ',
+  '     ####################     ',
+  '     ####################     ',
+  '      .:            :.        ',
+  '     ::              ::       ',
+  '     ::  .##.  .##.  ::       ',
+  '     ::  #  #  #  #  ::       ',
+  '     ::  \'##\'  \'##\'  ::       ',
+  '     ::      <>      ::       ',
+  '     ::    \'----\'    ::       ',
+  '      ::            ::        ',
+  '       \'::::::::::::::\'       ',
+  '        ::          ::        ',
+  '       .::..........::        ',
+  '      ::              ::      ',
+  '     ::                ::     ',
+  '    ::                  ::    ',
+  '    ::                  ::    ',
+  '     ##                ##     ',
 ];
 
-const RICK_ARM_UP: string[] = [
-  '     .########.     ',
-  '    ###########     ',
-  '    ###########     ',
-  '     :       :  /   ',
-  '     : ^   ^ : /    ',
-  '     :   >   :/     ',
-  '     :  \\-/  :      ',
-  '      \'::::\'        ',
-  '     /:    :\\       ',
-  '    / :....: \\      ',
-  '   :  :      :  :   ',
-  '   ::        ::     ',
-  '   ::        ::     ',
-  '    ##      ##      ',
+const RICK_B: string[] = [
+  '       .##############.       ',
+  '      ##################      ',
+  '     ####################     ',
+  '     ####################     ',
+  '      .:            :.    /   ',
+  '     ::              ::  /    ',
+  '     ::  .##.  .##.  :: /     ',
+  '     ::  #  #  #  #  ::/      ',
+  '     ::  \'##\'  \'##\'  ::       ',
+  '     ::      <>      ::       ',
+  '     ::    \'\\--/\'    ::       ',
+  '      ::            ::        ',
+  '      /\'::::::::::::\'\\       ',
+  '     /  ::          ::  \\     ',
+  '    :   ::..........::   :    ',
+  '        ::          ::        ',
+  '       ::            ::       ',
+  '      ::    ::::      ::      ',
+  '     ##                ##     ',
+  '                              ',
 ];
 
-const RICK_LEAN_R: string[] = [
-  '        .########.  ',
-  '       ###########  ',
-  '       ###########  ',
-  '        :       :   ',
-  '        : o   - :   ',
-  '        :   >   :   ',
-  '        :  ---  :   ',
-  '         \'::::\'     ',
-  '         :    :     ',
-  '        .:....:     ',
-  '       ::      ::   ',
-  '      ::        ::  ',
-  '     ::          :: ',
-  '    ##          ##  ',
+const RICK_C: string[] = [
+  '  .##############.            ',
+  ' ##################           ',
+  '####################          ',
+  '####################          ',
+  ' .:            :.             ',
+  '::              ::            ',
+  '::  .##.  .##.  ::           ',
+  '::  #  #  #  #  ::           ',
+  '::  \'##\'  \'##\'  ::           ',
+  '::      <>      ::           ',
+  '::    \'----\'    ::           ',
+  ' ::            ::             ',
+  '  \'::::::::::::::\'            ',
+  '   ::          ::             ',
+  '  .::..........::             ',
+  ' ::              ::           ',
+  '::                ::          ',
+  ':                  ::         ',
+  '##                  ##        ',
+  '                              ',
 ];
 
-const RICK_LEAN_L: string[] = [
-  '  .########.        ',
-  '  ###########       ',
-  '  ###########       ',
-  '   :       :        ',
-  '   : -   o :        ',
-  '   :   >   :        ',
-  '   :  ---  :        ',
-  '     \'::::\'         ',
-  '     :    :         ',
-  '     :....:         ',
-  '   ::      ::       ',
-  '  ::        ::      ',
-  ' ::          ::     ',
-  '  ##          ##    ',
+const RICK_D: string[] = [
+  '            .##############.  ',
+  '           ################## ',
+  '          ####################',
+  '          ####################',
+  '             .:            :. ',
+  '            ::              ::',
+  '           ::  .##.  .##.  ::',
+  '           ::  #  #  #  #  ::',
+  '           ::  \'##\'  \'##\'  ::',
+  '           ::      <>      ::',
+  '           ::    \'----\'    ::',
+  '             ::            :: ',
+  '            \'::::::::::::::\'  ',
+  '             ::          ::   ',
+  '             ::..........::   ',
+  '           ::              :: ',
+  '          ::                ::',
+  '         ::                  :',
+  '        ##                  ##',
+  '                              ',
 ];
 
-const RICK_DANCE_1: string[] = [
-  '     .########.     ',
-  '    ###########     ',
-  '    ###########     ',
-  '  \\  :       :  /   ',
-  '   \\ : ^   ^ : /    ',
-  '    \\:   >   :/     ',
-  '     :  \\-/  :      ',
-  '      \'::::\'        ',
-  '     /:    :\\       ',
-  '    / :....: \\      ',
-  '      :      :      ',
-  '     ::      ::     ',
-  '    ::   ::   ::    ',
-  '   ##         ##    ',
+const RICK_DANCE: string[] = [
+  '       .##############.       ',
+  '      ##################      ',
+  '     ####################     ',
+  '     ####################     ',
+  '   \\  .:            :.  /     ',
+  '    \\::              ::/ /    ',
+  '     ::  .##.  .##.  ::/      ',
+  '     ::  #  #  #  #  ::       ',
+  '     ::  \'##\'  \'##\'  ::       ',
+  '     ::      <>      ::       ',
+  '     ::    \'\\--/\'    ::       ',
+  '      ::            ::        ',
+  '      /\'::::::::::::\'\\       ',
+  '     /  ::          ::  \\     ',
+  '        ::..........::        ',
+  '       ::            ::       ',
+  '      ::     ::::     ::      ',
+  '     ##                ##     ',
+  '                              ',
+  '                              ',
 ];
 
-const RICK_DANCE_2: string[] = [
-  '     .########.     ',
-  '    ###########     ',
-  '    ###########     ',
-  '     :       :      ',
-  '     : o   o :      ',
-  '     :   >   :      ',
-  '     :  ---  :      ',
-  '      \'::::\'        ',
-  '   \\  :    :  /     ',
-  '    \\ :....: /      ',
-  '     ::    ::       ',
-  '      ::  ::        ',
-  '     ::    ::       ',
-  '    ##      ##      ',
+const RICK_HUGE: string[] = [
+  '                .############################.                ',
+  '             ################################## .             ',
+  '           ######################################             ',
+  '          ########################################            ',
+  '          ########################################            ',
+  '           .:                                :.               ',
+  '          ::                                  ::              ',
+  '         ::                                    ::             ',
+  '         ::     .######.        .######.       ::             ',
+  '         ::     #      #        #      #       ::             ',
+  '         ::     #  **  #        #  **  #       ::             ',
+  '         ::     #      #        #      #       ::             ',
+  '         ::     \'######\'        \'######\'       ::             ',
+  '         ::                                    ::             ',
+  '         ::              .<>.                  ::             ',
+  '         ::            \'------\'                ::             ',
+  '         ::                                    ::             ',
+  '          ::                                  ::              ',
+  '           \'::                              ::\'               ',
+  '             \'::::::::::::::::::::::::::::::::\'               ',
+  '               ::                          ::                 ',
+  '              .::..........................::                  ',
+  '             ::                              ::               ',
+  '            ::                                ::              ',
+  '           ::                                  ::             ',
+  '          ##                                    ##            ',
 ];
 
-const RICK_BIG: string[] = [
-  '              .################.              ',
-  '           #######################            ',
-  '          #######################             ',
-  '          #######################             ',
-  '           :                   :              ',
-  '           :                   :              ',
-  '           :   .##.     .##.   :              ',
-  '           :   #  #     #  #   :              ',
-  '           :   \'##\'     \'##\'   :              ',
-  '           :        .>.        :              ',
-  '           :       \'---\'       :              ',
-  '           :                   :              ',
-  '            \':::::::::::::::::\'               ',
-  '              :             :                 ',
-  '             .:.............:                 ',
-  '            ::               ::               ',
-  '           ::                 ::              ',
-  '          ::                   ::             ',
-  '          ::                   ::             ',
-  '           ##                 ##              ',
-];
-
-// All poses for cycling
-const POSES = [RICK_STAND, RICK_ARM_UP, RICK_DANCE_1, RICK_DANCE_2, RICK_LEAN_R, RICK_LEAN_L];
-const SPRITE_W = 21;
+const POSES = [RICK_A, RICK_B, RICK_DANCE, RICK_A, RICK_C, RICK_D, RICK_DANCE, RICK_B];
+const SPRITE_W = 30;
 
 // ── Lyrics ─────────────────────────────────────────────────────
 
@@ -157,7 +174,7 @@ const LYRICS = [
   { text: "NEVER GONNA SAY GOODBYE", dur: 3.5 },
   { text: "NEVER GONNA TELL A LIE AND HURT YOU", dur: 4 },
   { text: "We've known each other for so long", dur: 4 },
-  { text: "Your heart's been aching but you're too shy to say it", dur: 4.5 },
+  { text: "Your heart's been aching but you're too shy", dur: 4.5 },
   { text: "Inside we both know what's been going on", dur: 4 },
   { text: "NEVER GONNA GIVE YOU UP", dur: 3.5 },
   { text: "NEVER GONNA LET YOU DOWN", dur: 3.5 },
@@ -167,18 +184,14 @@ const LYRICS = [
   { text: "NEVER GONNA TELL A LIE AND HURT YOU", dur: 4 },
 ];
 
-// ── Particle / effects ─────────────────────────────────────────
+// ── Effects ────────────────────────────────────────────────────
 
 interface Spark {
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  life: number;
-  char: string;
+  x: number; y: number; vx: number; vy: number; life: number; char: string;
 }
 
 const SPARK_CHARS = ['*', '+', '.', ':', '~', '#'];
+const WAVE_CHARS = [' ', '.', ':', '+', '*', '#', '@', '#', '*', '+', ':', '.'];
 
 // ── Main component ─────────────────────────────────────────────
 
@@ -188,9 +201,8 @@ export function RickRollAnimation() {
   const gridRef = useRef<string[][]>([]);
   const sparksRef = useRef<Spark[]>([]);
 
-  const createGrid = useCallback((): string[][] => {
-    return Array.from({ length: H }, () => Array(W).fill(' '));
-  }, []);
+  const createGrid = useCallback((): string[][] =>
+    Array.from({ length: H }, () => Array(W).fill(' ')), []);
 
   const clearGrid = useCallback(() => {
     const g = gridRef.current;
@@ -198,8 +210,7 @@ export function RickRollAnimation() {
   }, []);
 
   const drawChar = useCallback((x: number, y: number, ch: string) => {
-    const gx = Math.round(x);
-    const gy = Math.round(y);
+    const gx = Math.round(x); const gy = Math.round(y);
     if (gx >= 0 && gx < W && gy >= 0 && gy < H) gridRef.current[gy]![gx] = ch;
   }, []);
 
@@ -214,22 +225,20 @@ export function RickRollAnimation() {
 
   const drawText = useCallback((text: string, cx: number, cy: number) => {
     const sx = Math.round(cx - text.length / 2);
-    for (let i = 0; i < text.length; i++) {
-      if (text[i] !== ' ') drawChar(sx + i, cy, text[i]!);
-    }
+    for (let i = 0; i < text.length; i++) if (text[i] !== ' ') drawChar(sx + i, cy, text[i]!);
   }, [drawChar]);
 
-  const typewriter = useCallback((text: string, cx: number, cy: number, progress: number) => {
+  const typewriter = useCallback((text: string, cx: number, cy: number, p: number) => {
     const sx = Math.round(cx - text.length / 2);
-    const reveal = Math.floor(progress * text.length);
-    for (let i = 0; i < reveal; i++) drawChar(sx + i, cy, text[i]!);
+    const n = Math.floor(p * text.length);
+    for (let i = 0; i < n; i++) drawChar(sx + i, cy, text[i]!);
   }, [drawChar]);
 
   const spawnSparks = useCallback((cx: number, cy: number, count: number, spread = 25) => {
     for (let i = 0; i < count; i++) {
       sparksRef.current.push({
         x: cx + (Math.random() - 0.5) * spread,
-        y: cy + (Math.random() - 0.5) * (spread * 0.4),
+        y: cy + (Math.random() - 0.5) * spread * 0.4,
         vx: (Math.random() - 0.5) * 2,
         vy: (Math.random() - 0.5) * 1.2,
         life: Math.floor(Math.random() * 10) + 4,
@@ -248,56 +257,67 @@ export function RickRollAnimation() {
     }
   }, [drawChar]);
 
-  // Psychedelic pulse rings expanding from center
-  const drawPulseRing = useCallback((cx: number, cy: number, radius: number, char: string) => {
-    const steps = Math.floor(radius * 6);
-    for (let i = 0; i < steps; i++) {
-      const angle = (i / steps) * Math.PI * 2;
-      const rx = cx + Math.cos(angle) * radius * 2; // 2x because chars are taller than wide
-      const ry = cy + Math.sin(angle) * radius;
-      drawChar(rx, ry, char);
-    }
-  }, [drawChar]);
-
-  // Concentric expanding pattern
+  // FULL SCREEN psychedelic — fills every cell with wave patterns
   const drawPsychedelic = useCallback((f: number, intensity: number) => {
-    const cx = W / 2;
-    const cy = H / 2;
-    const chars = ['#', '*', '+', ':', '.'];
-    const numRings = Math.floor(intensity * 8);
-    for (let r = 0; r < numRings; r++) {
-      const baseRadius = ((f * 0.3 + r * 4) % 25);
-      const charIdx = r % chars.length;
-      drawPulseRing(cx, cy, baseRadius, chars[charIdx]!);
+    const g = gridRef.current;
+    for (let y = 0; y < H; y++) {
+      for (let x = 0; x < W; x++) {
+        // Multiple overlapping sine waves create moiré patterns
+        const wave1 = Math.sin(x * 0.15 + f * 0.12) * 3;
+        const wave2 = Math.cos(y * 0.3 + f * 0.08) * 2;
+        const wave3 = Math.sin((x + y) * 0.1 - f * 0.15) * 2;
+        const wave4 = Math.cos(Math.sqrt((x - W / 2) ** 2 + (y - H / 2) ** 2) * 0.2 - f * 0.2) * 3;
+        const val = (wave1 + wave2 + wave3 + wave4) / 4;
+        const idx = Math.floor((val + 1) / 2 * (WAVE_CHARS.length - 1));
+        const charIdx = Math.max(0, Math.min(WAVE_CHARS.length - 1, idx));
+        if (Math.random() < intensity) {
+          g[y]![x] = WAVE_CHARS[charIdx]!;
+        }
+      }
     }
-  }, [drawPulseRing]);
+  }, []);
 
-  // Speed trail behind Rick
+  // Radiating starburst from center
+  const drawStarburst = useCallback((f: number, cx: number, cy: number, intensity: number) => {
+    const g = gridRef.current;
+    const chars = ['@', '#', '*', '+', ':', '.'];
+    for (let y = 0; y < H; y++) {
+      for (let x = 0; x < W; x++) {
+        const dx = (x - cx) * 0.5; // aspect ratio correction
+        const dy = y - cy;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const angle = Math.atan2(dy, dx);
+        // Pulsing radial pattern
+        const radial = Math.sin(dist * 0.5 - f * 0.25) * Math.cos(angle * 8 + f * 0.1);
+        if (radial > 0.3 && Math.random() < intensity) {
+          const ci = Math.floor((1 - radial) * chars.length);
+          g[y]![x] = chars[Math.max(0, Math.min(ci, chars.length - 1))]!;
+        }
+      }
+    }
+  }, []);
+
+  // Speed lines
   const drawSpeedLines = useCallback((px: number, py: number, h: number, dir: number) => {
-    for (let i = 0; i < 15; i++) {
+    for (let i = 0; i < 20; i++) {
       const tx = dir > 0 ? px - 2 - i * 2 : px + SPRITE_W + 2 + i * 2;
       const ty = py + 2 + Math.floor(Math.random() * (h - 4));
-      const ch = i < 5 ? '-' : i < 10 ? '~' : '.';
-      drawChar(tx, ty, ch);
+      drawChar(tx, ty, i < 6 ? '=' : i < 12 ? '-' : '~');
     }
   }, [drawChar]);
 
-  // Get current lyric based on time
   const getLyric = useCallback((sec: number, offset: number): { text: string; progress: number } | null => {
     let t = sec - offset;
     if (t < 0) return null;
     for (const lyric of LYRICS) {
-      if (t < lyric.dur) {
-        return { text: lyric.text, progress: Math.min(t / (lyric.dur * 0.6), 1) };
-      }
+      if (t < lyric.dur) return { text: lyric.text, progress: Math.min(t / (lyric.dur * 0.6), 1) };
       t -= lyric.dur;
     }
     return null;
   }, []);
 
-  const renderGrid = useCallback((): string => {
-    return gridRef.current.map(row => row.join('')).join('\n');
-  }, []);
+  const renderGrid = useCallback((): string =>
+    gridRef.current.map(row => row.join('')).join('\n'), []);
 
   // ── Animation loop ─────────────────────────────────────────
 
@@ -305,237 +325,212 @@ export function RickRollAnimation() {
     if (!gridRef.current.length) gridRef.current = createGrid();
 
     const f = frameRef.current;
-    const LOOP = 1350; // 90 seconds at 15fps
-    const localF = f % LOOP;
-    const sec = (localF / LOOP) * 90;
-
-    if (localF === 0) sparksRef.current = [];
+    const LOOP = 1350; // 90s
+    const lf = f % LOOP;
+    const sec = (lf / LOOP) * 90;
+    if (lf === 0) sparksRef.current = [];
 
     clearGrid();
 
-    // ── Phase 0: Dark, dots appear (0–2s) ────────────────────
+    // ── Phase 0: Darkness → dots (0–2s) ──────────────────────
     if (sec < 2) {
-      const count = Math.floor((sec / 2) * 6);
-      for (let i = 0; i < count; i++) {
-        drawChar(W / 2 + (Math.random() - 0.5) * 10, H / 2 + (Math.random() - 0.5) * 4, '.');
-      }
+      const n = Math.floor((sec / 2) * 8);
+      for (let i = 0; i < n; i++)
+        drawChar(W / 2 + (Math.random() - 0.5) * 12, H / 2 + (Math.random() - 0.5) * 5, '.');
     }
 
-    // ── Phase 1: Rick builds up piece by piece (2–6s) ────────
+    // ── Phase 1: Rick builds up (2–6s) ───────────────────────
     else if (sec < 6) {
       const p = (sec - 2) / 4;
-      const sprite = RICK_STAND;
+      const sprite = RICK_A;
       const px = W / 2 - SPRITE_W / 2;
       const py = H / 2 - sprite.length / 2;
-      const totalChars = sprite.reduce((sum, row) => sum + row.replace(/ /g, '').length, 0);
-      const revealCount = Math.floor(easeOut(p) * totalChars);
+      const total = sprite.reduce((s, r) => s + r.replace(/ /g, '').length, 0);
+      const reveal = Math.floor(easeOut(p) * total);
       let count = 0;
       for (let sy = 0; sy < sprite.length; sy++) {
         const row = sprite[sy]!;
         for (let sx = 0; sx < row.length; sx++) {
           if (row[sx] !== ' ') {
             count++;
-            if (count <= revealCount) {
-              drawChar(px + sx, py + sy, row[sx]!);
-            } else if (count <= revealCount + 3) {
-              drawChar(px + sx, py + sy, '*');
-            }
+            if (count <= reveal) drawChar(px + sx, py + sy, row[sx]!);
+            else if (count <= reveal + 4) drawChar(px + sx, py + sy, '*');
           }
         }
       }
-      if (f % 12 === 0 && p > 0.3) spawnSparks(W / 2, H / 2, 3);
+      if (f % 10 === 0 && p > 0.3) spawnSparks(W / 2, H / 2, 4);
       updateSparks();
     }
 
-    // ── Phase 2: Rick at center, lyrics start (6–30s) ────────
+    // ── Phase 2: Rick center-left, first verse + chorus (6–30s)
     else if (sec < 30) {
-      const p = (sec - 6) / 24;
-      // Rick sways gently, pose changes
-      const poseIdx = Math.floor(f / 20) % 3; // cycle stand, arm_up, dance
-      const pose = [RICK_STAND, RICK_ARM_UP, RICK_DANCE_1][poseIdx]!;
-      const px = W * 0.2 + Math.sin(f * 0.04) * 5;
-      const py = H * 0.3 + Math.sin(f * 0.06) * 2;
+      const poseIdx = Math.floor(f / 18) % 4;
+      const pose = [RICK_A, RICK_B, RICK_DANCE, RICK_A][poseIdx]!;
+      const px = W * 0.12 + Math.sin(f * 0.04) * 6;
+      const py = H * 0.2 + Math.sin(f * 0.06) * 2.5;
       drawSprite(pose, px, py);
 
-      // Lyrics on the right
       const lyric = getLyric(sec, 6);
       if (lyric) {
         const isChorus = lyric.text.startsWith('NEVER');
-        const lx = W * 0.6;
-        const ly = H * 0.4;
-        typewriter(lyric.text, lx, ly, lyric.progress);
-        if (isChorus && f % 8 === 0) spawnSparks(lx, ly, 2, 30);
+        typewriter(lyric.text, W * 0.62, H * 0.42, lyric.progress);
+        if (isChorus && f % 6 === 0) spawnSparks(W * 0.62, H * 0.42, 3, 35);
       }
-
-      if (f % 30 === 0) spawnSparks(px + SPRITE_W / 2, py, 2);
+      if (f % 25 === 0) spawnSparks(px + SPRITE_W / 2, py, 2);
       updateSparks();
     }
 
-    // ── Phase 3: Rick dashes across screen L→R (30–34s) ──────
-    else if (sec < 34) {
-      const p = (sec - 30) / 4;
-      const pose = p < 0.5 ? RICK_LEAN_R : RICK_DANCE_2;
+    // ── Phase 3: Rick dashes L→R (30–33s) ────────────────────
+    else if (sec < 33) {
+      const p = (sec - 30) / 3;
+      const pose = RICK_D;
       const px = lerp(-SPRITE_W, W + 10, easeInOut(p));
-      const py = H * 0.35 + Math.sin(f * 0.2) * 2;
+      const py = H * 0.25 + Math.sin(f * 0.2) * 2;
       drawSprite(pose, px, py);
       drawSpeedLines(px, py, pose.length, 1);
       updateSparks();
     }
 
-    // ── Phase 4: PSYCHEDELIC TAKEOVER (34–42s) ───────────────
-    else if (sec < 42) {
-      const p = (sec - 34) / 8;
+    // ── Phase 4: PSYCHEDELIC TAKEOVER (33–44s) ───────────────
+    else if (sec < 44) {
+      const p = (sec - 33) / 11;
+      const fadeIn = Math.min(p * 4, 1);
+      const fadeOut = p > 0.85 ? 1 - (p - 0.85) / 0.15 : 1;
+      const intensity = fadeIn * fadeOut;
 
-      // Expanding pulse rings
-      const ringIntensity = p < 0.2 ? easeOut(p / 0.2) : p > 0.85 ? 1 - (p - 0.85) / 0.15 : 1;
-      drawPsychedelic(localF, ringIntensity);
+      // Full-screen wave patterns
+      drawPsychedelic(lf, intensity * 0.9);
 
-      // Rick big in center
-      if (p > 0.15 && p < 0.85) {
-        const bigP = p < 0.3 ? (p - 0.15) / 0.15 : p > 0.7 ? 1 - (p - 0.7) / 0.15 : 1;
-        const sprite = RICK_BIG;
-        const px = W / 2 - 22;
+      // Starburst overlay
+      if (p > 0.15 && p < 0.75) {
+        drawStarburst(lf, W / 2, H / 2, intensity * 0.5);
+      }
+
+      // Big Rick rises from below
+      if (p > 0.1 && p < 0.85) {
+        const bigP = p < 0.25 ? (p - 0.1) / 0.15 : p > 0.7 ? 1 - (p - 0.7) / 0.15 : 1;
+        const sprite = RICK_HUGE;
+        const px = W / 2 - 29;
         const py = lerp(H + 5, H / 2 - sprite.length / 2, easeOut(Math.min(bigP, 1)));
-        // Draw with random character swaps for psychedelic effect
         for (let sy = 0; sy < sprite.length; sy++) {
           const row = sprite[sy]!;
           for (let sx = 0; sx < row.length; sx++) {
             if (row[sx] !== ' ') {
-              const psychChar = Math.random() < 0.1
+              const glitch = Math.random() < 0.08
                 ? SPARK_CHARS[Math.floor(Math.random() * SPARK_CHARS.length)]!
                 : row[sx]!;
-              drawChar(px + sx, py + sy, psychChar);
+              drawChar(px + sx, py + sy, glitch);
             }
           }
         }
       }
 
-      // Lyrics overlay during takeover
+      // Lyrics overlay
       const lyric = getLyric(sec, 6);
-      if (lyric) {
-        drawText(lyric.text, W / 2, 2);
-      }
+      if (lyric) drawText(lyric.text, W / 2, 1);
 
-      if (f % 6 === 0) spawnSparks(W / 2, H / 2, 5, 50);
+      if (f % 4 === 0) spawnSparks(W / 2, H / 2, 6, 60);
       updateSparks();
     }
 
-    // ── Phase 5: Rick dashes R→L (42–46s) ────────────────────
-    else if (sec < 46) {
-      const p = (sec - 42) / 4;
-      const pose = p < 0.5 ? RICK_LEAN_L : RICK_DANCE_1;
+    // ── Phase 5: Rick dashes R→L (44–47s) ────────────────────
+    else if (sec < 47) {
+      const p = (sec - 44) / 3;
+      const pose = RICK_C;
       const px = lerp(W + 10, -SPRITE_W, easeInOut(p));
-      const py = H * 0.3 + Math.sin(f * 0.2) * 2;
+      const py = H * 0.25 + Math.sin(f * 0.2) * 2;
       drawSprite(pose, px, py);
       drawSpeedLines(px, py, pose.length, -1);
       updateSparks();
     }
 
-    // ── Phase 6: Rick dancing center, second verse (46–70s) ──
+    // ── Phase 6: Energetic dance, second verse (47–70s) ──────
     else if (sec < 70) {
-      const p = (sec - 46) / 24;
-      // More energetic dance — faster pose switching
-      const poseIdx = Math.floor(f / 12) % POSES.length;
+      const poseIdx = Math.floor(f / 10) % POSES.length;
       const pose = POSES[poseIdx]!;
-      const px = W * 0.25 + Math.sin(f * 0.05) * 8;
-      const py = H * 0.25 + Math.sin(f * 0.08) * 3;
+      const px = W * 0.15 + Math.sin(f * 0.06) * 10;
+      const py = H * 0.15 + Math.sin(f * 0.08) * 4;
       drawSprite(pose, px, py);
 
-      // Lyrics continue
       const lyric = getLyric(sec, 6);
       if (lyric) {
         const isChorus = lyric.text.startsWith('NEVER');
-        typewriter(lyric.text, W * 0.63, H * 0.4, lyric.progress);
-        if (isChorus) {
-          // Chorus gets extra sparkles and emphasis
-          if (f % 5 === 0) spawnSparks(W * 0.63, H * 0.4, 3, 35);
-        }
+        typewriter(lyric.text, W * 0.62, H * 0.4, lyric.progress);
+        if (isChorus && f % 4 === 0) spawnSparks(W * 0.62, H * 0.4, 4, 40);
       }
-
-      if (f % 20 === 0) spawnSparks(px + SPRITE_W / 2, py - 1, 2);
+      if (f % 15 === 0) spawnSparks(px + SPRITE_W / 2, py - 1, 3);
       updateSparks();
     }
 
-    // ── Phase 7: Second psychedelic burst (70–76s) ───────────
-    else if (sec < 76) {
-      const p = (sec - 70) / 6;
-      const ringIntensity = p < 0.2 ? easeOut(p / 0.2) : p > 0.8 ? 1 - (p - 0.8) / 0.2 : 1;
-      drawPsychedelic(localF, ringIntensity * 0.8);
+    // ── Phase 7: Second psychedelic + multi-Rick (70–78s) ────
+    else if (sec < 78) {
+      const p = (sec - 70) / 8;
+      const fadeIn = Math.min(p * 3, 1);
+      const fadeOut = p > 0.8 ? 1 - (p - 0.8) / 0.2 : 1;
+      const intensity = fadeIn * fadeOut;
 
-      // Multiple small Ricks at different positions
+      drawPsychedelic(lf, intensity * 0.7);
+      drawStarburst(lf, W / 2, H / 2, intensity * 0.4);
+
+      // 4 Ricks at different positions
       const positions = [
-        { x: W * 0.15, y: H * 0.1 },
-        { x: W * 0.55, y: H * 0.15 },
-        { x: W * 0.35, y: H * 0.5 },
-        { x: W * 0.75, y: H * 0.45 },
+        { x: W * 0.05, y: H * 0.05 },
+        { x: W * 0.55, y: H * 0.02 },
+        { x: W * 0.30, y: H * 0.35 },
+        { x: W * 0.70, y: H * 0.30 },
       ];
-      const poseIdx = Math.floor(f / 8) % POSES.length;
+      const pi = Math.floor(f / 8) % POSES.length;
       for (const pos of positions) {
-        if (Math.random() < ringIntensity) {
-          drawSprite(POSES[poseIdx]!, pos.x, pos.y);
-        }
+        if (Math.random() < intensity) drawSprite(POSES[pi]!, pos.x, pos.y);
       }
 
-      if (f % 4 === 0) spawnSparks(W / 2, H / 2, 4, 60);
+      if (f % 3 === 0) spawnSparks(W / 2, H / 2, 5, 70);
       updateSparks();
     }
 
-    // ── Phase 8: Rick walks off, "you just got rickrolled" (76–85s) ─
-    else if (sec < 85) {
-      const p = (sec - 76) / 9;
+    // ── Phase 8: Rick exits, rickrolled message (78–87s) ─────
+    else if (sec < 87) {
+      const p = (sec - 78) / 9;
 
-      if (p < 0.4) {
-        // Rick walks off right
-        const walkP = p / 0.4;
+      if (p < 0.35) {
+        const walkP = p / 0.35;
         const px = lerp(W * 0.4, W + 15, easeInOut(walkP));
-        const py = H * 0.3;
-        const poseIdx = Math.floor(f / 10) % 2;
-        drawSprite([RICK_STAND, RICK_DANCE_2][poseIdx]!, px, py);
-        drawSpeedLines(px, py, RICK_STAND.length, 1);
+        const py = H * 0.2;
+        const pi = Math.floor(f / 10) % 2;
+        drawSprite([RICK_A, RICK_DANCE][pi]!, px, py);
+        drawSpeedLines(px, py, RICK_A.length, 1);
       }
 
-      if (p > 0.35) {
-        const textP = Math.min((p - 0.35) / 0.25, 1);
-        typewriter('you just got rickrolled', W / 2, H * 0.35, textP);
+      if (p > 0.3) {
+        const tp = Math.min((p - 0.3) / 0.25, 1);
+        typewriter('you just got rickrolled', W / 2, H * 0.35, tp);
       }
-
-      if (p > 0.55) {
-        const textP = Math.min((p - 0.55) / 0.2, 1);
-        typewriter('by chloe, with love  <3', W / 2, H * 0.35 + 3, textP);
+      if (p > 0.5) {
+        const tp = Math.min((p - 0.5) / 0.2, 1);
+        typewriter('by chloe, with love  <3', W / 2, H * 0.35 + 3, tp);
       }
+      if (p > 0.65 && f % 8 === 0) spawnSparks(W / 2, H * 0.35 + 1, 4, 45);
 
-      if (p > 0.7 && f % 10 === 0) spawnSparks(W / 2, H * 0.35 + 1, 3, 40);
-
-      // Fade out at end
       if (p > 0.88) {
         const fade = (p - 0.88) / 0.12;
         const g = gridRef.current;
-        for (let y = 0; y < H; y++) {
-          for (let x = 0; x < W; x++) {
-            if (g[y]![x] !== ' ' && Math.random() < fade * 0.4) g[y]![x] = ' ';
-          }
-        }
+        for (let y = 0; y < H; y++)
+          for (let x = 0; x < W; x++)
+            if (g[y]![x] !== ' ' && Math.random() < fade * 0.5) g[y]![x] = ' ';
       }
-
       updateSparks();
     }
 
-    // ── Phase 9: Hold black (85–90s) ─────────────────────────
+    // ── Phase 9: Pulsing <3 (87–90s) ─────────────────────────
     else {
-      // Single <3 pulses
-      if (Math.sin(f * 0.2) > 0.5) {
-        drawText('<3', W / 2, H / 2);
-      }
+      if (Math.sin(f * 0.2) > 0.3) drawText('<3', W / 2, H / 2);
       updateSparks();
     }
 
-    if (preRef.current) {
-      preRef.current.textContent = renderGrid();
-    }
-
+    if (preRef.current) preRef.current.textContent = renderGrid();
     frameRef.current = f + 1;
   }, [createGrid, clearGrid, drawChar, drawSprite, drawText, typewriter,
-      spawnSparks, updateSparks, drawPsychedelic, drawSpeedLines, getLyric, renderGrid]);
+      spawnSparks, updateSparks, drawPsychedelic, drawStarburst, drawSpeedLines, getLyric, renderGrid]);
 
   useEffect(() => {
     gridRef.current = createGrid();
@@ -557,14 +552,6 @@ export function RickRollAnimation() {
   );
 }
 
-function easeOut(t: number): number {
-  return 1 - Math.pow(1 - t, 3);
-}
-
-function easeInOut(t: number): number {
-  return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-}
-
-function lerp(a: number, b: number, t: number): number {
-  return a + (b - a) * Math.max(0, Math.min(1, t));
-}
+function easeOut(t: number): number { return 1 - Math.pow(1 - t, 3); }
+function easeInOut(t: number): number { return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; }
+function lerp(a: number, b: number, t: number): number { return a + (b - a) * Math.max(0, Math.min(1, t)); }
