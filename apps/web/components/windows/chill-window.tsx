@@ -183,54 +183,40 @@ export default function ChillWindow() {
         )}
       </div>
 
-      {/* Channel bar — remote control buttons */}
+      {/* Channel bar — glowing pill tabs */}
       <div className="flex-shrink-0 border-t border-gs-mid/20 bg-[#0A0A0A] px-3 py-2">
-        <div className="flex items-center justify-center gap-2">
+        <div className="flex items-center justify-center gap-1.5">
           {CHANNELS.map((ch, i) => {
             const isActive = i === channelIndex;
             return (
               <button
                 key={ch.number}
                 onClick={() => changeChannel(i)}
-                className="flex flex-col items-center gap-0.5 transition-all duration-200 group"
+                className="font-data leading-none transition-all duration-200"
                 style={{
-                  width: '72px',
-                  padding: '6px 4px 5px',
-                  borderRadius: '6px',
+                  padding: '5px 14px',
+                  borderRadius: '100px',
+                  fontSize: '11px',
+                  fontWeight: isActive ? 600 : 400,
+                  letterSpacing: '0.03em',
                   background: isActive
                     ? 'var(--gs-base)'
-                    : 'rgba(255,255,255,0.04)',
+                    : 'transparent',
                   border: isActive
                     ? '1px solid var(--gs-base)'
                     : '1px solid rgba(255,255,255,0.08)',
+                  color: isActive
+                    ? 'var(--gs-void)'
+                    : 'var(--gs-mid)',
                   boxShadow: isActive
-                    ? '0 0 12px var(--gs-base), 0 0 24px rgba(255,178,239,0.2), inset 0 1px 0 rgba(255,255,255,0.15)'
+                    ? '0 0 10px var(--gs-base), 0 0 20px rgba(255,178,239,0.15)'
                     : 'none',
                   cursor: 'pointer',
+                  whiteSpace: 'nowrap',
                 }}
                 title={ch.description}
               >
-                <span
-                  className="font-data font-bold leading-none"
-                  style={{
-                    fontSize: '16px',
-                    color: isActive ? 'var(--gs-void)' : 'var(--gs-mid)',
-                    transition: 'color 0.2s',
-                  }}
-                >
-                  {ch.number}
-                </span>
-                <span
-                  className="font-data leading-none truncate w-full text-center"
-                  style={{
-                    fontSize: '7px',
-                    color: isActive ? 'var(--gs-void)' : 'rgba(255,255,255,0.25)',
-                    letterSpacing: '0.04em',
-                    transition: 'color 0.2s',
-                  }}
-                >
-                  {ch.name}
-                </span>
+                {ch.name}
               </button>
             );
           })}
