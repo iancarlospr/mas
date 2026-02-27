@@ -26,7 +26,7 @@ interface DesktopIconDef {
 }
 
 /** Desktop icons in two vertical columns — left (primary), right (secondary) */
-const ICON_SPACING = 80; // px between icon centers vertically
+const ICON_SPACING = 120; // px between icon centers vertically
 const LEFT_X = '3%';
 const RIGHT_X = '93%';
 const START_Y = 24; // px from top
@@ -61,7 +61,7 @@ function DesktopIconButton({
   return (
     <button
       className={cn(
-        'absolute flex flex-col items-center gap-1 p-1.5 outline-none rounded-lg transition-all group',
+        'absolute flex flex-col items-center gap-2 p-2 outline-none rounded-lg transition-all group',
         'focus-visible:outline-2 focus-visible:outline-gs-base focus-visible:outline-offset-2',
         selected && 'bg-gs-base/10',
       )}
@@ -77,14 +77,14 @@ function DesktopIconButton({
       onBlur={() => setSelected(false)}
     >
       <div className={cn(
-        'w-14 h-14 flex items-center justify-center text-gs-base transition-all duration-200',
+        'w-[60px] h-[60px] flex items-center justify-center text-gs-base transition-all duration-200',
         'group-hover:scale-110 group-hover:drop-shadow-[0_0_8px_var(--gs-base)]',
       )}>
-        <BedroomIcon windowId={def.id} size={40} />
+        <BedroomIcon windowId={def.id} size={56} />
       </div>
       <span
         className={cn(
-          'font-system text-[9px] text-center leading-tight max-w-[64px] px-0.5 rounded transition-colors whitespace-nowrap',
+          'font-system text-[13px] text-center leading-tight max-w-[96px] px-0.5 rounded transition-colors whitespace-nowrap',
           selected
             ? 'bg-gs-base/20 text-gs-base'
             : 'text-gs-light/40 group-hover:text-gs-light/70',
