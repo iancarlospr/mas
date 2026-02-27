@@ -231,6 +231,7 @@
 
   .window-titlebar {
     height: var(--gs-titlebar-h);
+    position: relative;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -249,22 +250,16 @@
     color: var(--gs-deep);
   }
 
-  .window-titlebar-icon {
-    width: 16px;
-    height: 16px;
-    flex-shrink: 0;
-    color: var(--gs-void);
-  }
-  .window-titlebar:not([data-active="true"]) .window-titlebar-icon {
-    color: var(--gs-deep);
-  }
-
   .window-titlebar-text {
-    flex: 1;
+    position: absolute;
+    left: 0;
+    right: 0;
+    text-align: center;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    padding: 0 4px;
+    padding: 0 70px;
+    pointer-events: none;
   }
 
   .window-titlebar-buttons {

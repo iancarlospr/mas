@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { useWindowManager } from '@/lib/window-manager';
 import { BedroomIcon } from './bedroom-icons';
@@ -32,11 +32,24 @@ const START_MENU_ORDER = [
 
 export function Taskbar() {
   const [startOpen, setStartOpen] = useState(false);
+  const startRef = useRef<HTMLDivElement>(null);
   const wm = useWindowManager();
 
   const toggleStart = useCallback(() => {
     setStartOpen((prev) => !prev);
   }, []);
+
+  // Close start menu on click outside
+  useEffect(() => {
+    if (!startOpen) return;
+    const handleClick = (e: MouseEvent) => {
+      if (startRef.current && !startRef.current.contains(e.target as Node)) {
+        setStartOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [startOpen]);
 
   const openPrograms = wm.taskbarWindows;
 
@@ -44,22 +57,23 @@ export function Taskbar() {
     <div className="gs-taskbar h-taskbar bg-gs-deep/90 backdrop-blur-md flex items-center z-taskbar relative dither-edge-top"
       style={{ borderTop: '1px solid var(--gs-mid)' }}
     >
-      {/* Start Button */}
-      <button
-        className={cn(
-          'h-[32px] px-gs-3 mx-gs-2 flex items-center gap-gs-2 font-system text-os-base font-bold rounded-lg transition-all',
-          startOpen
-            ? 'bg-gs-base/20 text-gs-base'
-            : 'text-gs-light/80 hover:bg-gs-base/10 hover:text-gs-light',
-        )}
-        onClick={toggleStart}
-      >
-        <span className="text-gs-base text-os-lg">A</span>
-        <span>Start</span>
-      </button>
+      {/* Start Button + Menu wrapper (for click-outside detection) */}
+      <div ref={startRef} className="relative">
+        <button
+          className={cn(
+            'h-[32px] px-gs-3 mx-gs-2 flex items-center gap-gs-2 font-system text-os-base font-bold rounded-lg transition-all',
+            startOpen
+              ? 'bg-gs-base/20 text-gs-base'
+              : 'text-gs-light/80 hover:bg-gs-base/10 hover:text-gs-light',
+          )}
+          onClick={toggleStart}
+        >
+          <span className="text-gs-base text-os-lg">A</span>
+          <span>Start</span>
+        </button>
 
-      {/* Start Menu */}
-      {startOpen && (
+        {/* Start Menu */}
+        {startOpen && (
         <div className="absolute bottom-full left-gs-2 mb-1 bg-gs-deep/95 backdrop-blur-xl border border-gs-mid rounded-lg min-w-[240px] z-start-menu shadow-window-float animate-slide-up overflow-hidden">
           <div className="flex">
             {/* Vertical brand strip */}
@@ -118,6 +132,7 @@ export function Taskbar() {
           </div>
         </div>
       )}
+      </div>
 
       {/* Separator */}
       <div className="w-px h-[24px] bg-gs-mid/40 mx-gs-1" />

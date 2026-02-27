@@ -146,7 +146,6 @@ export function ManagedWindow({
             title={isMaximized ? 'Restore' : 'Maximize'}
           />
         </div>
-        <span className="window-titlebar-icon">{windowState.icon}</span>
         <span className="window-titlebar-text">{windowState.title}</span>
       </div>
 
