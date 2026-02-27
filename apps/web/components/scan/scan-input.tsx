@@ -66,10 +66,7 @@ export function ScanInput({
 
   const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
-  /* ── Chloé greeting (random on mount) ────────────────────── */
-  const [greeting] = useState(() => pickRandom(GREETINGS.firstVisit));
-
-  /* ── Turnstile integration (preserved from original) ─────── */
+  /* ── Turnstile integration ─────── */
 
   const renderTurnstile = useCallback(() => {
     if (!siteKey || !window.turnstile || !turnstileContainerRef.current) return;
