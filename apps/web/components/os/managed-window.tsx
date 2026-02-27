@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, type ReactNode } from 'react';
+import { useCallback, useRef, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 import { useWindowManager, useWindowState } from '@/lib/window-manager';
 import { useWindowDrag } from '@/hooks/use-window-drag';
@@ -9,12 +9,9 @@ import { useWindowResize } from '@/hooks/use-window-resize';
 /* =================================================================
    Chloe's Bedroom OS — Managed Window
 
-   A Window that reads its position, size, and z-index from the
-   WindowManagerProvider context. Supports drag-to-move and
-   edge/corner resize. Used by StaticWindowRenderer for desktop
-   icon-triggered windows.
-
-   Frosted glass chrome, colored dots, spring animation.
+   Height is CSS-driven: fit-content up to 85vh, then scrolls.
+   Width comes from window manager state.
+   No JS measurement hacks — pure CSS layout.
    ================================================================= */
 
 interface ManagedWindowProps {
@@ -36,56 +33,8 @@ export function ManagedWindow({
   const windowState = useWindowState(id);
   const windowRef = useRef<HTMLDivElement>(null);
 
-  const contentRef = useRef<HTMLDivElement>(null);
-  const hasAutoSized = useRef(false);
-
   const isActive = wm.activeWindowId === id;
   const isMaximized = windowState?.isMaximized ?? false;
-
-  // Auto-size: observe content until real content renders (past Suspense fallback),
-  // then snap window to fit and disconnect.
-  useEffect(() => {
-    if (!windowState?.isOpen || hasAutoSized.current || !contentRef.current) return;
-
-    const el = contentRef.current;
-
-    const measure = () => {
-      // Skip measurement if still showing Suspense fallback (tiny content)
-      if (el.scrollHeight < 50) return;
-
-      hasAutoSized.current = true;
-      observer.disconnect();
-
-      const titlebarH = 32;
-      const statusbarH = showStatusBar ? 24 : 0;
-      const chrome = titlebarH + statusbarH + 2;
-
-      const maxW = Math.floor(window.innerWidth * 0.9);
-      const maxH = Math.floor(window.innerHeight * 0.85);
-
-      const fitW = Math.min(Math.max(el.scrollWidth + 2, windowState!.minWidth), maxW);
-      const fitH = Math.min(Math.max(el.scrollHeight + chrome, windowState!.minHeight), maxH);
-
-      wm.resizeWindow(id, fitW, fitH);
-    };
-
-    const observer = new ResizeObserver(() => {
-      requestAnimationFrame(measure);
-    });
-    observer.observe(el);
-
-    // Also try immediately in case content is already rendered
-    requestAnimationFrame(measure);
-
-    return () => observer.disconnect();
-  }, [windowState?.isOpen, id, wm, windowState?.minWidth, windowState?.minHeight, showStatusBar]);
-
-  // Reset when window closes so it re-measures on next open
-  useEffect(() => {
-    if (!windowState?.isOpen) {
-      hasAutoSized.current = false;
-    }
-  }, [windowState?.isOpen]);
 
   const getPosition = useCallback(() => {
     if (!windowState) return null;
@@ -155,7 +104,8 @@ export function ManagedWindow({
         left: isMaximized ? 0 : windowState.x,
         top: isMaximized ? 0 : windowState.y,
         width: isMaximized ? '100%' : windowState.width,
-        height: isMaximized ? '100%' : windowState.height,
+        height: isMaximized ? '100%' : 'fit-content',
+        maxHeight: isMaximized ? '100%' : '85vh',
         zIndex: windowState.zIndex,
       }}
       onMouseDown={handleFocus}
@@ -203,7 +153,6 @@ export function ManagedWindow({
 
       {/* Content */}
       <div
-        ref={contentRef}
         className={cn(
           'window-content',
           windowState.variant === 'terminal' && 'bg-[#0A0A0A] text-gs-terminal font-data text-data-sm',

@@ -306,12 +306,16 @@
   }
 
   .window-content {
-    flex: 1;
+    flex: 1 1 auto;
+    min-height: 0;
     background: oklch(0.13 0.01 340 / 0.5);
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
     color: var(--gs-light);
     margin: 0 1px 1px 1px;
     border-radius: 0 0 11px 11px;
+    overflow-wrap: break-word;
+    word-break: break-word;
   }
 
   .window-statusbar {
