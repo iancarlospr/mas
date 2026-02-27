@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
  * 32x32 pixel art ghost rendered on canvas.
  * Pink monochrome palette with more detail:
  * - Body: near-white pink (#FFF0FA) with shading (#FFCAF3)
- * - Outline: deep pink (#3A1A2E)
+ * - Outline: deep neutral (#1A161A)
  * - Eyes: bright pink (#FFB2EF) with white highlight
  * - Glow: radial #FFB2EF
  * - Blush marks, wisp details, expression nuance
@@ -59,12 +59,12 @@ const C = {
 const CANVAS_COLORS: Record<keyof typeof C, string> = {
   body: '#FFF0FA',
   shade: '#FFCAF3',
-  outline: '#3A1A2E',
+  outline: '#1A161A',
   eyes: '#FFB2EF',
   eyeHighlight: '#FFFFFF',
   glow: '#FFB2EF',
   blush: '#FFD4E8',
-  sleep: '#6B3A5A',
+  sleep: '#4A3844',
   alert: '#FFB84D',
   t: 'transparent',
 };

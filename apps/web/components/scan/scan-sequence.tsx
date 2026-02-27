@@ -7,7 +7,6 @@ import { MatrixRain } from './matrix-rain';
 import { AsciiPlayer } from './ascii-player';
 import { TerminalBoot } from './terminal-boot';
 import { ChloeSprite } from '@/components/chloe/chloe-sprite';
-import { ChloeTypingBubble } from '@/components/chloe/chloe-speech';
 import {
   type AnimationPhase,
   type ScanStatus,
@@ -304,13 +303,6 @@ export function ScanSequence({
           {finalScore != null && (
             <div className="absolute bottom-gs-16 right-gs-16">
               <ChloeSprite state="celebrating" size={128} glowing />
-              <ChloeTypingBubble
-                message={`MarketingIQ™: ${finalScore}. ${finalScoreLabel ?? 'Interesting.'}`}
-                visible
-                variant="ghost"
-                tailPosition="bottom-right"
-                autoDismissMs={8000}
-              />
             </div>
           )}
         </div>

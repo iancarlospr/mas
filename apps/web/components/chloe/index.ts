@@ -10,10 +10,6 @@
 export { ChloeSprite } from './chloe-sprite';
 export type { ChloeState, ChloeSpriteProps } from './chloe-sprite';
 
-// Speech bubble
-export { ChloeSpeech, ChloeTypingBubble } from './chloe-speech';
-export type { ChloeSpeechProps, SpeechVariant } from './chloe-speech';
-
 // Reactions system (context + hook)
 export { ChloeReactionsProvider, useChloeReactions } from './chloe-reactions';
 export type { ChloeReactionEvent } from './chloe-reactions';

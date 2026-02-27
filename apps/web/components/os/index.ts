@@ -14,7 +14,6 @@ export { Desktop } from './desktop';
 export type { DesktopProps, DesktopProgram } from './desktop';
 
 // OS chrome
-export { MenuBar } from './menu-bar';
 export { Taskbar } from './taskbar';
 export { DesktopIcon } from './desktop-icon';
 export { ContextMenu } from './context-menu';

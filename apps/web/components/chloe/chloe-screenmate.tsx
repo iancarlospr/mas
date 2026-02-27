@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { ChloeSprite } from './chloe-sprite';
-import { ChloeSpeech } from './chloe-speech';
 import { useChloeReactions } from './chloe-reactions';
 import { useWindowManager } from '@/lib/window-manager';
 
@@ -272,19 +271,6 @@ export function ChloeScreenmate({
         willChange: 'left, top',
       }}
     >
-      {/* Speech bubble (above Chloe) */}
-      {speech && (
-        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-gs-2 pointer-events-auto">
-          <ChloeSpeech
-            message={speech}
-            variant={speechVariant}
-            visible
-            tailPosition="bottom-left"
-            onDismiss={dismissSpeech}
-          />
-        </div>
-      )}
-
       {/* Shadow beneath Chloe when perched */}
       {isPerched && (
         <div

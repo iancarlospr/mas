@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useCallback, useEffect, type ReactNode } from 'react';
-import { MenuBar } from './menu-bar';
 import { Taskbar } from './taskbar';
 import { DesktopIconGrid } from './desktop-icon-grid';
 import { StaticWindowRenderer } from './static-window-renderer';
@@ -120,9 +119,6 @@ export function DesktopShell({ children }: { children: ReactNode }) {
 
       {/* Noise grain texture — barely visible */}
       <div className="noise-grain" aria-hidden="true" />
-
-      {/* Menu Bar (top) */}
-      <MenuBar />
 
       {/* Desktop Area */}
       <div className="flex-1 relative overflow-hidden">

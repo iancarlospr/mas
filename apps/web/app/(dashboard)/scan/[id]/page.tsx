@@ -7,7 +7,6 @@ import { BentoDashboard } from '@/components/scan/bento-dashboard';
 import { MobileDashboard } from '@/components/scan/mobile-dashboard';
 import { useViewport } from '@/hooks/use-viewport';
 import { ChloeSprite } from '@/components/chloe/chloe-sprite';
-import { ChloeSpeech } from '@/components/chloe/chloe-speech';
 import { Window } from '@/components/os/window';
 import { pickRandom, ERROR_STATES } from '@/lib/chloe-ai-copy';
 import type { ScanWithResults } from '@marketing-alpha/types';
@@ -100,12 +99,6 @@ export default function ScanPage() {
       <div className="fixed inset-0 bg-gs-paper flex items-center justify-center">
         <div className="relative">
           <ChloeSprite state="found" size={64} glowing className="absolute -top-[80px] left-1/2 -translate-x-1/2" />
-          <ChloeSpeech
-            message={pickRandom(ERROR_STATES.authError)}
-            variant="alert"
-            autoDismissMs={0}
-            className="absolute -top-[140px] left-1/2 -translate-x-1/2"
-          />
           <Window id="scan-failed" title="⚠ Scan Failed" variant="dialog" isActive width={440}>
             <div className="p-gs-6 text-center">
               <p className="font-data text-data-lg text-gs-critical font-bold mb-gs-2">

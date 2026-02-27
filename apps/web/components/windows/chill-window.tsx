@@ -62,7 +62,7 @@ function StaticNoise() {
     <pre
       className="font-data text-data-xs leading-none whitespace-pre overflow-hidden select-none"
       style={{
-        color: 'oklch(0.42 0.09 340)',
+        color: 'oklch(0.35 0.05 340)',
         minHeight: '13em',
         opacity: 0.6,
       }}

@@ -7,7 +7,6 @@ import { createClient } from '@/lib/supabase/client';
 import { Window } from '@/components/os/window';
 import { BevelInput } from '@/components/os/bevel-input';
 import { ChloeSprite } from '@/components/chloe/chloe-sprite';
-import { ChloeSpeech } from '@/components/chloe/chloe-speech';
 import { pickRandom, GREETINGS, ERROR_STATES } from '@/lib/chloe-ai-copy';
 
 /**
@@ -148,13 +147,6 @@ export function AuthForm({ mode }: AuthFormProps) {
         {/* Chloe greeting */}
         <div className="absolute -top-[100px] left-1/2 -translate-x-1/2 flex flex-col items-center">
           <ChloeSprite state="chat" size={64} glowing />
-          <ChloeSpeech
-            message={greeting}
-            variant="ghost"
-            tailPosition="bottom-left"
-            autoDismissMs={0}
-            className="mt-gs-2"
-          />
         </div>
 
         {/* Auth dialog window */}

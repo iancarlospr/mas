@@ -4,7 +4,7 @@ import type { Config } from 'tailwindcss';
  * Chloe's Bedroom OS — Tailwind Configuration
  *
  * Palette: Monochromatic Pink (OKLCH hue 340)
- * Anchored on #1E0E18 (void) and #FFB2EF (base)
+ * Anchored on #080808 (void) and #FFB2EF (base)
  */
 
 const config: Config = {
@@ -104,13 +104,13 @@ const config: Config = {
 
       /* -- Shadows ------------------------------------------ */
       boxShadow: {
-        'window':      '0 4px 24px oklch(0.10 0.05 340 / 0.4), 0 1px 4px oklch(0.10 0.05 340 / 0.3)',
-        'window-active': '0 0 0 1px oklch(0.82 0.15 340 / 0.15), 0 4px 24px oklch(0.10 0.05 340 / 0.5), 0 0 32px oklch(0.82 0.15 340 / 0.08)',
-        'window-float': '0 8px 32px oklch(0.10 0.05 340 / 0.5)',
+        'window':      '0 4px 24px oklch(0.08 0.01 340 / 0.4), 0 1px 4px oklch(0.08 0.01 340 / 0.3)',
+        'window-active': '0 0 0 1px oklch(0.82 0.15 340 / 0.15), 0 4px 24px oklch(0.08 0.01 340 / 0.5), 0 0 32px oklch(0.82 0.15 340 / 0.08)',
+        'window-float': '0 8px 32px oklch(0.08 0.01 340 / 0.5)',
         'ghost-glow':   '0 0 16px oklch(0.82 0.15 340 / 0.2)',
         'pink-glow':    '0 0 16px oklch(0.82 0.15 340 / 0.3)',
-        'bevel':        '0 1px 3px oklch(0.10 0.05 340 / 0.3)',
-        'bevel-sunken': 'inset 0 1px 3px oklch(0.10 0.05 340 / 0.3)',
+        'bevel':        '0 1px 3px oklch(0.08 0.01 340 / 0.3)',
+        'bevel-sunken': 'inset 0 1px 3px oklch(0.08 0.01 340 / 0.3)',
       },
 
       /* -- Border Radius ------------------------------------ */

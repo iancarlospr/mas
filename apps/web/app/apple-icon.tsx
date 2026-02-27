@@ -21,7 +21,7 @@ export default async function Icon() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          backgroundColor: '#1E0E18',
+          backgroundColor: '#080808',
           position: 'relative',
         }}
       >
@@ -68,7 +68,7 @@ export default async function Icon() {
             <rect x="4" y="7" width="1" height="1" fill="white"/>
             <rect x="11" y="7" width="1" height="1" fill="white"/>
             {/* Mouth */}
-            <rect x="6" y="10" width="4" height="1" fill="#3A1A2E" opacity="0.3"/>
+            <rect x="6" y="10" width="4" height="1" fill="#1A161A" opacity="0.3"/>
           </svg>
         </div>
 
@@ -80,7 +80,7 @@ export default async function Icon() {
             left: 0,
             right: 0,
             height: '3px',
-            background: 'linear-gradient(90deg, #3A1A2E, #FFB2EF, #3A1A2E)',
+            background: 'linear-gradient(90deg, #1A161A, #FFB2EF, #1A161A)',
           }}
         />
       </div>

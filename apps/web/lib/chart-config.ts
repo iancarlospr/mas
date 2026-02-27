@@ -30,11 +30,11 @@ export const CHART_HEIGHTS = {
 /* -- Tooltip Styling ------------------------------------------- */
 
 export const TOOLTIP_STYLE: React.CSSProperties = {
-  backgroundColor: 'oklch(0.18 0.05 340)',
-  border: '1px solid oklch(0.42 0.09 340)',
+  backgroundColor: 'oklch(0.13 0.01 340)',
+  border: '1px solid oklch(0.35 0.05 340)',
   borderRadius: '8px',
   padding: '8px 12px',
-  boxShadow: '0 4px 16px oklch(0.10 0.05 340 / 0.4)',
+  boxShadow: '0 4px 16px oklch(0.08 0.01 340 / 0.4)',
 };
 
 export const TOOLTIP_LABEL_STYLE: React.CSSProperties = {
@@ -46,7 +46,7 @@ export const TOOLTIP_LABEL_STYLE: React.CSSProperties = {
 };
 
 export const TOOLTIP_ITEM_STYLE: React.CSSProperties = {
-  color: 'oklch(0.42 0.09 340)',
+  color: 'oklch(0.35 0.05 340)',
   fontFamily: 'var(--font-data)',
   fontSize: '12px',
   padding: '2px 0',
@@ -96,7 +96,7 @@ export const AXIS_STYLE = {
 
 export const GRID_STYLE = {
   strokeDasharray: '3 3',
-  stroke: 'oklch(0.30 0.06 340)',
+  stroke: 'oklch(0.22 0.03 340)',
   vertical: false,
 };
 
@@ -156,7 +156,7 @@ export const CHART_PALETTE = [
   'var(--gs-terminal)',      // Positive / healthy (green)
   'var(--gs-warning)',       // Caution (amber)
   'var(--gs-mid)',           // Neutral / baseline
-  'oklch(0.70 0.18 340)',    // Deep pink variant
+  'oklch(0.68 0.16 340)',    // Deep pink variant
   'oklch(0.65 0.10 200)',    // Muted teal
   'oklch(0.70 0.10 60)',     // Warm copper
   'oklch(0.60 0.08 300)',    // Dusty plum
@@ -192,7 +192,7 @@ export const RESOURCE_COLORS = {
 /** Category badge accent colors */
 export const CATEGORY_BADGE_COLORS: Record<string, string> = {
   analytics: 'var(--gs-base)',
-  ads: 'oklch(0.70 0.18 340)',
+  ads: 'oklch(0.68 0.16 340)',
   automation: 'var(--gs-terminal)',
   cms: 'var(--gs-warning)',
   cdn: 'oklch(0.60 0.08 180)',
@@ -221,7 +221,7 @@ export function getScoreTierColor(score: number): string {
 export const TRAFFIC_SOURCE_COLORS: Record<string, string> = {
   Direct: 'var(--gs-base)',
   'Organic Search': 'var(--gs-terminal)',
-  'Paid Search': 'oklch(0.70 0.18 340)',
+  'Paid Search': 'oklch(0.68 0.16 340)',
   Social: 'var(--gs-warning)',
   Referral: 'var(--gs-mid)',
   Email: 'oklch(0.60 0.08 180)',
@@ -272,9 +272,9 @@ export const PRINT_PALETTE = [
    ================================================================= */
 
 export const RESOLVED_COLORS = {
-  void:        '#1E0E18',
-  deep:        '#3A1A2E',
-  mid:         '#6B3A5A',
+  void:        '#080808',
+  deep:        '#1A161A',
+  mid:         '#4A3844',
   base:        '#FFB2EF',
   bright:      '#FFCAF3',
   light:       '#FFF0FA',
@@ -282,14 +282,14 @@ export const RESOLVED_COLORS = {
   critical:    'oklch(0.55 0.22 25)',
   warning:     'oklch(0.78 0.15 75)',
   /* Backward-compat aliases */
-  ink:         '#1E0E18',
+  ink:         '#080808',
   red:         '#FFB2EF',
-  redDark:     '#D480C8',
-  chrome:      '#3A1A2E',
-  chromeDark:  '#6B3A5A',
-  chromeLight: '#4A2840',
+  redDark:     '#C87ABC',
+  chrome:      '#1A161A',
+  chromeDark:  '#4A3844',
+  chromeLight: '#2E242A',
   paper:       '#FFF0FA',
-  muted:       '#6B3A5A',
+  muted:       '#4A3844',
   ghost:       '#FFB2EF',
 } as const;
 

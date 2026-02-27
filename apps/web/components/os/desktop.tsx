@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useCallback, type ReactNode } from 'react';
-import { MenuBar } from './menu-bar';
 import { Taskbar } from './taskbar';
 import { DesktopIcon } from './desktop-icon';
 import { ContextMenu, type ContextMenuItem } from './context-menu';
@@ -99,9 +98,6 @@ export function Desktop({
       <div className="noise-grain" aria-hidden="true" />
       <div className="crt-vignette" aria-hidden="true" />
       <div className="crt-scanlines" aria-hidden="true" />
-
-      {/* ── Menu Bar (Top) ───────────────────────────────── */}
-      <MenuBar />
 
       {/* ── Desktop Area ─────────────────────────────────── */}
       <div className="flex-1 relative overflow-hidden">

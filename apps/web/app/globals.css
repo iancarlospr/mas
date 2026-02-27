@@ -5,7 +5,7 @@
 /* =================================================================
    Chloe's Bedroom OS — Design System Foundation
    Palette: Monochromatic Pink (OKLCH hue 340)
-   Anchored on #1E0E18 (void) and #FFB2EF (base)
+   Anchored on #080808 (void) and #FFB2EF (base)
    ================================================================= */
 
 @layer base {
@@ -17,9 +17,9 @@
     --font-personality: var(--font-personality-face, 'Permanent Marker'), cursive;
 
     /* -- Core Palette -- Monochromatic Pink (OKLCH hue 340) ---- */
-    --gs-void:   #1E0E18;                    /* Deepest dark — desktop bg, dark panels */
-    --gs-deep:   oklch(0.25 0.07 340);       /* Window chrome, taskbar, dark surfaces */
-    --gs-mid:    oklch(0.42 0.09 340);       /* Borders, separators, secondary text */
+    --gs-void:   #080808;                    /* Deepest dark — desktop bg, dark panels */
+    --gs-deep:   oklch(0.18 0.02 340);       /* Window chrome, taskbar, dark surfaces */
+    --gs-mid:    oklch(0.35 0.05 340);       /* Borders, separators, secondary text */
     --gs-base:   #FFB2EF;                    /* THE pink — primary UI, icons, Chloe */
     --gs-bright: oklch(0.88 0.13 340);       /* Active states, hover, glow */
     --gs-light:  oklch(0.96 0.04 340);       /* Text on dark backgrounds, content areas */
@@ -30,10 +30,10 @@
     --gs-paper:        var(--gs-light);
     --gs-ink:          var(--gs-void);
     --gs-red:          var(--gs-base);
-    --gs-red-dark:     oklch(0.70 0.18 340);
+    --gs-red-dark:     oklch(0.68 0.16 340);
     --gs-chrome:       var(--gs-deep);
     --gs-chrome-dark:  var(--gs-mid);
-    --gs-chrome-light: oklch(0.32 0.08 340);
+    --gs-chrome-light: oklch(0.26 0.03 340);
     --gs-muted:        var(--gs-mid);
     --gs-ghost:        var(--gs-base);
 
@@ -126,7 +126,7 @@
 @layer components {
   /* -- Raised Surface (backward compat stub → modern) --------- */
   .bevel-raised {
-    background: oklch(0.22 0.06 340 / 0.85);
+    background: oklch(0.15 0.02 340 / 0.85);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid var(--gs-mid);
@@ -135,14 +135,14 @@
 
   /* -- Sunken Surface (backward compat stub → modern) --------- */
   .bevel-sunken {
-    background: oklch(0.18 0.05 340 / 0.6);
-    border: 1px solid oklch(0.30 0.06 340);
+    background: oklch(0.13 0.01 340 / 0.6);
+    border: 1px solid oklch(0.22 0.03 340);
     border-radius: 8px;
   }
 
   /* -- Button ------------------------------------------------- */
   .bevel-button {
-    background: oklch(0.25 0.07 340 / 0.8);
+    background: oklch(0.18 0.02 340 / 0.8);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     border: 1px solid var(--gs-mid);
@@ -161,13 +161,13 @@
     transition: background 200ms, border-color 200ms, transform 100ms;
   }
   .bevel-button:hover {
-    background: oklch(0.30 0.08 340 / 0.9);
+    background: oklch(0.22 0.03 340 / 0.9);
     border-color: var(--gs-base);
   }
   .bevel-button:active,
   .bevel-button[data-pressed="true"] {
     transform: scale(0.97);
-    background: oklch(0.20 0.06 340 / 0.9);
+    background: oklch(0.14 0.02 340 / 0.9);
   }
   .bevel-button:focus-visible {
     outline: 2px solid var(--gs-base);
@@ -208,14 +208,14 @@
 
   /* -- Window Chrome ------------------------------------------ */
   .window {
-    background: oklch(0.20 0.06 340 / 0.75);
+    background: oklch(0.14 0.02 340 / 0.75);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border: 1px solid var(--gs-mid);
     border-radius: 12px;
     box-shadow:
-      0 4px 24px oklch(0.10 0.05 340 / 0.4),
-      0 1px 4px oklch(0.10 0.05 340 / 0.3);
+      0 4px 24px oklch(0.08 0.01 340 / 0.4),
+      0 1px 4px oklch(0.08 0.01 340 / 0.3);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -225,7 +225,7 @@
     border-color: var(--gs-base);
     box-shadow:
       0 0 0 1px oklch(0.82 0.15 340 / 0.15),
-      0 4px 24px oklch(0.10 0.05 340 / 0.5),
+      0 4px 24px oklch(0.08 0.01 340 / 0.5),
       0 0 32px oklch(0.82 0.15 340 / 0.08);
   }
 
@@ -307,7 +307,7 @@
 
   .window-content {
     flex: 1;
-    background: oklch(0.18 0.05 340 / 0.5);
+    background: oklch(0.13 0.01 340 / 0.5);
     overflow: auto;
     color: var(--gs-light);
     margin: 0 1px 1px 1px;
@@ -322,7 +322,7 @@
     font-family: var(--font-system);
     font-size: 11px;
     color: var(--gs-mid);
-    border-top: 1px solid oklch(0.30 0.06 340);
+    border-top: 1px solid oklch(0.22 0.03 340);
     gap: 8px;
     flex-shrink: 0;
     background: transparent;
@@ -348,7 +348,7 @@
   .window-ghost {
     box-shadow:
       0 0 24px oklch(0.82 0.15 340 / 0.12),
-      0 4px 24px oklch(0.10 0.05 340 / 0.4);
+      0 4px 24px oklch(0.08 0.01 340 / 0.4);
   }
   .window-ghost .window-titlebar[data-active="true"] {
     color: var(--gs-base);
@@ -358,7 +358,7 @@
   .module-panel {
     border: 1px solid var(--gs-mid);
     border-radius: 8px;
-    background: oklch(0.20 0.06 340 / 0.6);
+    background: oklch(0.14 0.02 340 / 0.6);
     margin-bottom: 8px;
     overflow: hidden;
   }
@@ -368,8 +368,8 @@
     align-items: center;
     gap: 6px;
     padding: 0 10px;
-    background: oklch(0.22 0.06 340 / 0.8);
-    border-bottom: 1px solid oklch(0.30 0.06 340);
+    background: oklch(0.15 0.02 340 / 0.8);
+    border-bottom: 1px solid oklch(0.22 0.03 340);
     font-family: var(--font-system);
     font-size: 12px;
     font-weight: 600;
@@ -508,9 +508,9 @@
   .skeleton {
     background: linear-gradient(
       90deg,
-      oklch(0.22 0.06 340) 0%,
-      oklch(0.28 0.07 340) 50%,
-      oklch(0.22 0.06 340) 100%
+      oklch(0.15 0.02 340) 0%,
+      oklch(0.20 0.03 340) 50%,
+      oklch(0.15 0.02 340) 100%
     );
     background-size: 200% 100%;
     animation: skeleton-slide 1.5s ease-in-out infinite;
@@ -591,25 +591,6 @@
   scrollbar-color: var(--gs-mid) var(--gs-deep);
 }
 
-/* =================================================================
-   Custom Cursors
-   ================================================================= */
-
-body {
-  cursor: url('/cursors/default.svg') 0 0, default;
-}
-a, button, [role="button"], .bevel-button, .bevel-button-primary, [cursor="pointer"] {
-  cursor: url('/cursors/pointer.svg') 6 0, pointer;
-}
-input, textarea, [contenteditable] {
-  cursor: url('/cursors/text.svg') 4 8, text;
-}
-.cursor-wait, [data-loading="true"] {
-  cursor: url('/cursors/hourglass.svg') 8 8, wait;
-}
-.cursor-ghost {
-  cursor: url('/cursors/ghost.svg') 8 8, default;
-}
 
 /* =================================================================
    Reduced Motion

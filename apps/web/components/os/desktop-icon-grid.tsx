@@ -21,34 +21,32 @@ import { BedroomIcon } from './bedroom-icons';
 interface DesktopIconDef {
   id: string;
   label: string;
-  /** Position as percentage from top-left */
   x: string;
   y: string;
-  /** Scale factor — objects closer (lower) appear larger */
-  scale?: number;
 }
 
-/** Icons positioned as bedroom objects in forced perspective */
+/** Desktop icons in two vertical columns — left (primary), right (secondary) */
+const ICON_SPACING = 80; // px between icon centers vertically
+const LEFT_X = '3%';
+const RIGHT_X = '93%';
+const START_Y = 24; // px from top
+
 const ROOM_ICONS: DesktopIconDef[] = [
-  // Wall zone — upper area
-  { id: 'about',         label: 'Mirror',      x: '8%',  y: '8%',  scale: 0.85 },
-  { id: 'features',      label: 'Poster',      x: '22%', y: '5%',  scale: 0.8 },
-  { id: 'blog',          label: 'Diary',       x: '38%', y: '10%', scale: 0.85 },
+  // Left column — primary actions
+  { id: 'history',       label: 'My Scans',    x: LEFT_X,  y: `${START_Y + ICON_SPACING * 0}px` },
+  { id: 'chat-launcher', label: 'Chat',        x: LEFT_X,  y: `${START_Y + ICON_SPACING * 1}px` },
+  { id: 'scan-input',    label: 'Scan.exe',    x: LEFT_X,  y: `${START_Y + ICON_SPACING * 2}px` },
+  { id: 'products',      label: 'Products',    x: LEFT_X,  y: `${START_Y + ICON_SPACING * 3}px` },
+  { id: 'pricing',       label: 'Pricing',     x: LEFT_X,  y: `${START_Y + ICON_SPACING * 4}px` },
+  { id: 'features',      label: 'Features',    x: LEFT_X,  y: `${START_Y + ICON_SPACING * 5}px` },
 
-  // Shelf / mid-wall zone
-  { id: 'history',       label: 'Bookshelf',   x: '5%',  y: '28%', scale: 0.9 },
-  { id: 'customers',     label: 'Photos',      x: '20%', y: '25%', scale: 0.85 },
-
-  // Desk / surface zone — middle area
-  { id: 'scan-input',    label: 'Scan.exe',    x: '15%', y: '48%', scale: 1.0 },
-  { id: 'chat-launcher', label: 'Phone',       x: '35%', y: '50%', scale: 0.95 },
-  { id: 'products',      label: 'Dresser',     x: '55%', y: '42%', scale: 0.9 },
-  { id: 'pricing',       label: 'Piggy Bank',  x: '50%', y: '55%', scale: 0.95 },
-
-  // Floor zone — bottom, larger (closer to "camera")
-  { id: 'chill',         label: 'TV',          x: '8%',  y: '68%', scale: 1.1 },
-  { id: 'games',         label: 'Games',       x: '28%', y: '72%', scale: 1.05 },
-  { id: 'trash',         label: 'Trash',       x: '48%', y: '75%', scale: 1.0 },
+  // Right column — secondary
+  { id: 'about',         label: 'About',       x: RIGHT_X, y: `${START_Y + ICON_SPACING * 0}px` },
+  { id: 'blog',          label: 'Blog',        x: RIGHT_X, y: `${START_Y + ICON_SPACING * 1}px` },
+  { id: 'customers',     label: 'Reviews',     x: RIGHT_X, y: `${START_Y + ICON_SPACING * 2}px` },
+  { id: 'chill',         label: 'Movies',      x: RIGHT_X, y: `${START_Y + ICON_SPACING * 3}px` },
+  { id: 'games',         label: 'Mini-Games',  x: RIGHT_X, y: `${START_Y + ICON_SPACING * 4}px` },
+  { id: 'trash',         label: 'Log Out',     x: RIGHT_X, y: `${START_Y + ICON_SPACING * 5}px` },
 ];
 
 function DesktopIconButton({
@@ -59,7 +57,6 @@ function DesktopIconButton({
   onOpen: (id: string) => void;
 }) {
   const [selected, setSelected] = useState(false);
-  const scale = def.scale ?? 1;
 
   return (
     <button
@@ -71,8 +68,6 @@ function DesktopIconButton({
       style={{
         left: def.x,
         top: def.y,
-        transform: `scale(${scale})`,
-        transformOrigin: 'center bottom',
       }}
       onClick={() => setSelected(true)}
       onDoubleClick={() => {
@@ -82,10 +77,10 @@ function DesktopIconButton({
       onBlur={() => setSelected(false)}
     >
       <div className={cn(
-        'w-11 h-11 flex items-center justify-center text-gs-base transition-all duration-200',
+        'w-14 h-14 flex items-center justify-center text-gs-base transition-all duration-200',
         'group-hover:scale-110 group-hover:drop-shadow-[0_0_8px_var(--gs-base)]',
       )}>
-        <BedroomIcon windowId={def.id} size={30} />
+        <BedroomIcon windowId={def.id} size={40} />
       </div>
       <span
         className={cn(

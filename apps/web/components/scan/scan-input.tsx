@@ -9,7 +9,6 @@ import { soundEffects } from '@/lib/sound-effects';
 import { Window } from '@/components/os/window';
 import { BevelInput } from '@/components/os/bevel-input';
 import { ChloeSprite } from '@/components/chloe/chloe-sprite';
-import { ChloeSpeech } from '@/components/chloe/chloe-speech';
 import { pickRandom, GREETINGS } from '@/lib/chloe-ai-copy';
 
 /**
@@ -227,13 +226,6 @@ export function ScanInput({
       {/* Chloé floating beside the dialog */}
       <div className="absolute -left-[100px] top-1/2 -translate-y-1/2 hidden lg:block">
         <ChloeSprite state="idle" size={64} glowing />
-        <ChloeSpeech
-          message={greeting}
-          variant="ghost"
-          tailPosition="top-right"
-          autoDismissMs={0}
-          className="absolute -top-[80px] -left-[40px]"
-        />
       </div>
 
       <Window
