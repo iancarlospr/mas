@@ -240,18 +240,23 @@
     font-weight: 500;
     user-select: none;
     flex-shrink: 0;
-    background: transparent;
-    color: var(--gs-mid);
+    background: var(--gs-base);
+    color: var(--gs-void);
+    border-radius: 11px 11px 0 0;
   }
-  .window-titlebar[data-active="true"] {
-    color: var(--gs-light);
+  .window-titlebar:not([data-active="true"]) {
+    background: var(--gs-mid);
+    color: var(--gs-deep);
   }
 
   .window-titlebar-icon {
     width: 16px;
     height: 16px;
     flex-shrink: 0;
-    color: var(--gs-base);
+    color: var(--gs-void);
+  }
+  .window-titlebar:not([data-active="true"]) .window-titlebar-icon {
+    color: var(--gs-deep);
   }
 
   .window-titlebar-text {
@@ -268,7 +273,7 @@
     flex-shrink: 0;
   }
 
-  /* macOS-style colored dots */
+  /* Dots — dark on pink */
   .window-titlebar-btn {
     width: 12px;
     height: 12px;
@@ -281,28 +286,23 @@
     padding: 0;
     font-size: 0;
     line-height: 0;
-    transition: filter 150ms, transform 150ms;
+    background: var(--gs-void);
+    opacity: 0.3;
+    transition: opacity 150ms, transform 150ms;
   }
   .window-titlebar-btn:hover {
-    filter: brightness(1.2);
+    opacity: 0.6;
     transform: scale(1.15);
   }
   .window-titlebar-btn:active {
     transform: scale(0.9);
   }
-  .window-titlebar-btn[data-action="close"] {
+  .window-titlebar-btn[data-action="close"]:hover {
     background: #FF5F57;
+    opacity: 1;
   }
-  .window-titlebar-btn[data-action="minimize"] {
-    background: #FEBC2E;
-  }
-  .window-titlebar-btn[data-action="maximize"] {
-    background: #28C840;
-  }
-  /* Inactive window: dim the dots */
   .window-titlebar:not([data-active="true"]) .window-titlebar-btn {
-    background: var(--gs-mid);
-    opacity: 0.5;
+    opacity: 0.2;
   }
 
   .window-content {

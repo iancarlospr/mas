@@ -123,7 +123,6 @@ export function ManagedWindow({
         data-active={isActive}
         onDoubleClick={() => wm.maximizeWindow(id)}
       >
-        {/* Colored dots: close, minimize, maximize (macOS order) */}
         <div className="window-titlebar-buttons">
           <button
             className="window-titlebar-btn"
