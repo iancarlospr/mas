@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { AsciiPlayer } from '@/components/scan/ascii-player';
 import { GhostAnimation } from '@/components/os/ghost-animation';
 import { A22Animation } from '@/components/os/a22-animation';
@@ -10,8 +10,9 @@ import { RickRollAnimation } from '@/components/os/rickroll-animation';
 /* =================================================================
    chill.mov — ASCII Theater / Retro TV
 
-   4-channel retro TV experience. Flip channels with ◀ ▶ buttons
-   or number keys 1-4. Static noise between channel changes.
+   4-channel retro TV. Auto-plays sequentially:
+   A22 → Mean Girls → Chloe TV → Rick Roll → loop.
+   Manual channel switching with ◀ ▶ or 1-4.
    ================================================================= */
 
 interface Channel {
@@ -21,32 +22,36 @@ interface Channel {
   loop: boolean;
   description: string;
   live?: boolean;
+  duration: number; // seconds before auto-advancing
 }
 
 const CHANNELS: Channel[] = [
   {
     number: 1,
-    name: 'CHLOE TV',
-    path: null,
-    loop: true,
-    live: true,
-    description: 'Chloe does her thing — live animation',
-  },
-  {
-    number: 2,
     name: 'A22',
     path: null,
     loop: true,
     live: true,
     description: 'A22 Films — a ghostscan film',
+    duration: 32,
   },
   {
-    number: 3,
+    number: 2,
     name: 'MEAN GIRLS',
     path: null,
     loop: true,
     live: true,
     description: 'On Wednesdays we wear pink.',
+    duration: 55,
+  },
+  {
+    number: 3,
+    name: 'CHLOE TV',
+    path: null,
+    loop: true,
+    live: true,
+    description: 'Chloe does her thing — live animation',
+    duration: 40,
   },
   {
     number: 4,
@@ -55,25 +60,26 @@ const CHANNELS: Channel[] = [
     loop: true,
     live: true,
     description: 'You know what this is.',
+    duration: 90,
   },
 ];
 
 function StaticNoise() {
-  // Generate a block of random static characters
-  const chars = '░▒▓█ ·.,:;!|/\\─═╔╗╚╝';
-  const lines = Array.from({ length: 13 }, () =>
-    Array.from({ length: 52 }, () =>
+  const chars = '░▒▓█▀▄▐▌═║╬╠╣╦╩⠿⣿⠇⠋';
+  const lines = Array.from({ length: 55 }, () =>
+    Array.from({ length: 200 }, () =>
       chars[Math.floor(Math.random() * chars.length)]
     ).join('')
   ).join('\n');
 
   return (
     <pre
-      className="font-data text-data-xs leading-none whitespace-pre overflow-hidden select-none"
+      className="font-data leading-none whitespace-pre overflow-hidden select-none"
       style={{
-        color: 'oklch(0.35 0.05 340)',
-        minHeight: '13em',
-        opacity: 0.6,
+        fontSize: '6.5px',
+        color: '#39FF14',
+        textShadow: '0 0 6px #39FF14, 0 0 20px rgba(57,255,20,0.4)',
+        lineHeight: '1.1',
       }}
     >
       {lines}
@@ -84,10 +90,16 @@ function StaticNoise() {
 export default function ChillWindow() {
   const [channelIndex, setChannelIndex] = useState(0);
   const [isChanging, setIsChanging] = useState(false);
+  const [channelKey, setChannelKey] = useState(0); // forces remount on change
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const manualRef = useRef(false); // tracks if user manually switched
+
   const channel = CHANNELS[channelIndex]!;
 
-  const changeChannel = useCallback((direction: 'next' | 'prev' | number) => {
+  const changeChannel = useCallback((direction: 'next' | 'prev' | number, auto = false) => {
+    if (isChanging) return;
     setIsChanging(true);
+    if (!auto) manualRef.current = true;
 
     const nextIndex = typeof direction === 'number'
       ? direction
@@ -98,9 +110,25 @@ export default function ChillWindow() {
     // Brief static noise between channels
     setTimeout(() => {
       setChannelIndex(nextIndex);
+      setChannelKey(k => k + 1);
       setIsChanging(false);
+      manualRef.current = false;
     }, 400);
-  }, [channelIndex]);
+  }, [channelIndex, isChanging]);
+
+  // Auto-advance timer — starts when channel changes
+  useEffect(() => {
+    if (isChanging) return;
+    if (timerRef.current) clearTimeout(timerRef.current);
+
+    timerRef.current = setTimeout(() => {
+      changeChannel('next', true);
+    }, channel.duration * 1000);
+
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, [channelIndex, isChanging, channel.duration, changeChannel]);
 
   // Keyboard channel switching
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
@@ -142,14 +170,14 @@ export default function ChillWindow() {
         {/* Content: static noise during change, player otherwise */}
         {isChanging ? (
           <StaticNoise />
-        ) : channel.number === 1 ? (
-          <GhostAnimation key="ghost-live" />
-        ) : channel.number === 2 ? (
-          <A22Animation key="a22-live" />
-        ) : channel.number === 3 ? (
-          <MeanGirlsAnimation key="meangirls-live" />
-        ) : channel.number === 4 ? (
-          <RickRollAnimation key="rick-live" />
+        ) : channel.name === 'A22' ? (
+          <A22Animation key={`a22-${channelKey}`} />
+        ) : channel.name === 'MEAN GIRLS' ? (
+          <MeanGirlsAnimation key={`mg-${channelKey}`} />
+        ) : channel.name === 'CHLOE TV' ? (
+          <GhostAnimation key={`ghost-${channelKey}`} />
+        ) : channel.name === 'RICK FM' ? (
+          <RickRollAnimation key={`rick-${channelKey}`} />
         ) : (
           <div className="p-gs-4 font-data text-data-sm text-gs-mid">No signal</div>
         )}
