@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react';
 import { AsciiPlayer } from '@/components/scan/ascii-player';
 import { GhostAnimation } from '@/components/os/ghost-animation';
+import { A22Animation } from '@/components/os/a22-animation';
 
 /* =================================================================
    chill.mov — ASCII Theater / Retro TV
@@ -32,8 +33,9 @@ const CHANNELS: Channel[] = [
   {
     number: 2,
     name: 'A22',
-    path: '/ascii/a24_intro.json',
-    loop: false,
+    path: null,
+    loop: true,
+    live: true,
     description: 'A22 Films — a ghostscan film',
   },
   {
@@ -136,8 +138,10 @@ export default function ChillWindow() {
         {/* Content: static noise during change, player otherwise */}
         {isChanging ? (
           <StaticNoise />
-        ) : channel.live ? (
+        ) : channel.number === 1 ? (
           <GhostAnimation key="ghost-live" />
+        ) : channel.number === 2 ? (
+          <A22Animation key="a22-live" />
         ) : (
           <AsciiPlayer
             key={channel.path}
