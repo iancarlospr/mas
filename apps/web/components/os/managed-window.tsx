@@ -37,45 +37,53 @@ export function ManagedWindow({
   const windowRef = useRef<HTMLDivElement>(null);
 
   const contentRef = useRef<HTMLDivElement>(null);
-  const hasMeasured = useRef(false);
+  const hasAutoSized = useRef(false);
 
   const isActive = wm.activeWindowId === id;
   const isMaximized = windowState?.isMaximized ?? false;
 
-  // Auto-size window to fit content on first open
+  // Auto-size: observe content until real content renders (past Suspense fallback),
+  // then snap window to fit and disconnect.
   useEffect(() => {
-    if (!windowState?.isOpen || hasMeasured.current || !contentRef.current) return;
-    hasMeasured.current = true;
+    if (!windowState?.isOpen || hasAutoSized.current || !contentRef.current) return;
 
-    // Wait one frame for content to render
-    requestAnimationFrame(() => {
-      const el = contentRef.current;
-      if (!el) return;
+    const el = contentRef.current;
+
+    const measure = () => {
+      // Skip measurement if still showing Suspense fallback (tiny content)
+      if (el.scrollHeight < 50) return;
+
+      hasAutoSized.current = true;
+      observer.disconnect();
 
       const titlebarH = 32;
       const statusbarH = showStatusBar ? 24 : 0;
-      const chrome = titlebarH + statusbarH + 2; // 2px for borders
-
-      const contentW = el.scrollWidth;
-      const contentH = el.scrollHeight;
+      const chrome = titlebarH + statusbarH + 2;
 
       const maxW = Math.floor(window.innerWidth * 0.9);
       const maxH = Math.floor(window.innerHeight * 0.85);
 
-      const fitW = Math.min(Math.max(contentW + 2, windowState.minWidth), maxW);
-      const fitH = Math.min(Math.max(contentH + chrome, windowState.minHeight), maxH);
+      const fitW = Math.min(Math.max(el.scrollWidth + 2, windowState!.minWidth), maxW);
+      const fitH = Math.min(Math.max(el.scrollHeight + chrome, windowState!.minHeight), maxH);
 
-      // Only resize if measured size differs meaningfully from current
-      if (Math.abs(fitW - windowState.width) > 20 || Math.abs(fitH - windowState.height) > 20) {
-        wm.resizeWindow(id, fitW, fitH);
-      }
+      wm.resizeWindow(id, fitW, fitH);
+    };
+
+    const observer = new ResizeObserver(() => {
+      requestAnimationFrame(measure);
     });
-  }, [windowState?.isOpen, id, wm, windowState?.width, windowState?.height, windowState?.minWidth, windowState?.minHeight, showStatusBar]);
+    observer.observe(el);
 
-  // Reset measurement flag when window closes so it re-measures on next open
+    // Also try immediately in case content is already rendered
+    requestAnimationFrame(measure);
+
+    return () => observer.disconnect();
+  }, [windowState?.isOpen, id, wm, windowState?.minWidth, windowState?.minHeight, showStatusBar]);
+
+  // Reset when window closes so it re-measures on next open
   useEffect(() => {
     if (!windowState?.isOpen) {
-      hasMeasured.current = false;
+      hasAutoSized.current = false;
     }
   }, [windowState?.isOpen]);
 
