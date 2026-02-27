@@ -1,462 +1,655 @@
 'use client';
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 
 /* =================================================================
-   Mean Girls — Animated Quote Reel
-
-   Typewriter reveals, particle transitions between scenes,
-   burn book with page-turn effect, floating sparkles, iconic quotes.
-   120x30 grid, 15fps, ~60s loop.
+   Mean Girls — THE star of the show. Every technique combined.
+   200×55, 6.5px. Block art, box-drawing, braille, stippling,
+   chaos chars, psychedelic fills, VHS glitch, 20px overlay.
+   Ends BIG CRAZY OVER THE TOP GIRLY POP LOUD.
+   55s loop.
    ================================================================= */
 
-const W = 120;
-const H = 30;
-const INTERVAL = 67;
+const W = 200;
+const H = 55;
+const FPS = 15;
+const MS = Math.round(1000 / FPS);
+const LOOP = 55;
 
-// ── Sparkle / particle system ──────────────────────────────────
+// ── ALL character palettes ──────────────────────────────────────
 
-interface Spark {
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  life: number;
-  char: string;
-}
+const BLOCK = ['░', '▒', '▓', '█'];
+const CHAOS = ['$', 'Ñ', '≈', '∞', '◊', '★', '♦', '♪', '◆', '●', '○', '▲', '▼', '◀', '▶'];
+const STIPPLE = ['·', '∘', '◦', '•', '●', '○'];
+const BRAILLE_L = ['⠁', '⠂', '⠄', '⠈', '⠐', '⠠'];
+const BRAILLE_M = ['⠃', '⠅', '⠉', '⠑', '⠡', '⠆'];
+const BRAILLE_D = ['⠇', '⠋', '⠓', '⠣', '⠞', '⠖'];
+const BRAILLE_F = ['⠿', '⡿', '⣿', '⣷', '⣯', '⣟'];
+const GLITCH = ['█', '▓', '░', '▒', '║', '═', '╬', '▌', '▐'];
+const WAVE = [' ', '·', ':', '░', '▒', '▓', '█', '▓', '▒', '░', ':', '·'];
+const HEARTS = ['♥', '♦', '★', '◆', '●', '♪'];
 
-const SPARK_CHARS = ['*', '+', '.', '~', ':', '`'];
-const HEART_CHARS = ['*', '+', '.'];
+// ── Art pieces ──────────────────────────────────────────────────
 
-// ── Scene definitions ──────────────────────────────────────────
-
-interface QuoteScene {
-  lines: string[];
-  attribution: string;
-  art?: string[];    // optional ASCII art below quote
-  artOffsetY?: number;
-}
-
-const SCENES: QuoteScene[] = [
-  {
-    lines: ['"On Wednesdays, we wear pink."'],
-    attribution: '- Karen Smith',
-    art: [
-      '           .::::.           ',
-      '          : .  . :          ',
-      '          :  --  :          ',
-      '          \':    :\'          ',
-      '        .--\'::::\'--.       ',
-      '       :   :    :   :      ',
-      '       :   :    :   :      ',
-    ],
-    artOffsetY: 2,
-  },
-  {
-    lines: ['"That is SO fetch."'],
-    attribution: '- Gretchen Wieners',
-  },
-  {
-    lines: ['"Stop trying to make fetch happen.', ' It\'s NOT going to happen."'],
-    attribution: '- Regina George',
-  },
-  {
-    lines: ['"YOU CAN\'T SIT WITH US!"'],
-    attribution: '- Gretchen Wieners',
-  },
-  {
-    lines: ['"Get in loser,', ' we\'re going scanning."'],
-    attribution: '- Chloe George',
-    art: [
-      '        .---==========---.        ',
-      '       / ::::::::::::::::: \\       ',
-      ' _____/  :   ghostscan   : \\_____',
-      '[_____]__\':::::::::::::::\'__[_____]',
-      '  (O)                         (O) ',
-    ],
-    artOffsetY: 1,
-  },
-  {
-    lines: ['"She doesn\'t even go here!"'],
-    attribution: '- Damian (about your competitor)',
-    art: [
-      '         .::::.         ',
-      '        : o  o :        ',
-      '        :  <>  :        ',
-      '         \'::::\'         ',
-    ],
-    artOffsetY: 2,
-  },
-  {
-    lines: ['"I\'m not a regular ghost,', ' I\'m a cool ghost."'],
-    attribution: '- Chloe (Mrs. George energy)',
-    art: [
-      '       .:::::::.       ',
-      '     .::       ::.     ',
-      '    ::           ::    ',
-      '   ::  .##. .##.  ::   ',
-      '   ::  # *# # *#  ::   ',
-      '   ::  \'##\' \'##\'  ::   ',
-      '   ::     ..      ::   ',
-      '    ::           ::    ',
-      '     ::  :  :  ::      ',
-      '      \':  \'::\'  :\'     ',
-    ],
-    artOffsetY: 0,
-  },
+const HEART: string[] = [
+  '      ▄▓▓▓▓▓▄       ▄▓▓▓▓▓▄      ',
+  '    ▓▓▓▓▓▓▓▓▓▓▓   ▓▓▓▓▓▓▓▓▓▓▓    ',
+  '   ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓   ',
+  '   ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓   ',
+  '    ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓    ',
+  '     ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓     ',
+  '       ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓       ',
+  '         ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓         ',
+  '           ▓▓▓▓▓▓▓▓▓▓▓           ',
+  '             ▓▓▓▓▓▓▓             ',
+  '               ▓▓▓               ',
+  '                ▓                ',
 ];
 
-// ── Burn Book art ──────────────────────────────────────────────
+const CAR: string[] = [
+  '               ▄▄▄▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▄▄▄               ',
+  '            ▄▓▓░░░░░░░░░░░░░░░░░░░░░░░░░░░░░▓▓▄            ',
+  '          ▄▓░░░░░░  g h o s t s c a n  ░░░░░░░░▓▄          ',
+  '        ▓▓░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░▓▓        ',
+  '  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  ',
+  '  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  ',
+  '   ██▓▓▓▓▓██                                 ██▓▓▓▓▓██     ',
+  '    ▀▀▀▀▀▀▀                                   ▀▀▀▀▀▀▀      ',
+];
 
 const BURN_BOOK: string[] = [
-  '     +=-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+     ',
-  '     |                                               |     ',
-  '     |        T H E   B U R N   B O O K             |     ',
-  '     |                                               |     ',
-  '     +=-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+     ',
-  '                                                           ',
-  '              .:::::::::::::::::::::::.                     ',
-  '             ::                       ::                    ',
-  '             ::    ~*~  ~*~  ~*~      ::                    ',
-  '             ::                       ::                    ',
-  '             ::      s e c r e t s    ::                    ',
-  '             ::                       ::                    ',
-  '             ::    ~*~  ~*~  ~*~      ::                    ',
-  '             ::                       ::                    ',
-  '              \'::::::::::::::::::::::\'                      ',
-  '                                                           ',
-  '          property of chloe + regina                       ',
+  '  ╔══════════════════════════════════════════════════════╗  ',
+  '  ║                                                      ║  ',
+  '  ║         T H E   B U R N   B O O K                   ║  ',
+  '  ║                                                      ║  ',
+  '  ║     ┌──────────────────────────────────┐             ║  ',
+  '  ║     │  ⣿⣿⣿    s e c r e t s    ⣿⣿⣿  │             ║  ',
+  '  ║     │  ⠿⠿⠿      i n s i d e     ⠿⠿⠿  │             ║  ',
+  '  ║     │  ⣷⣷⣷                      ⣷⣷⣷  │             ║  ',
+  '  ║     └──────────────────────────────────┘             ║  ',
+  '  ║                                                      ║  ',
+  '  ║          p r o p e r t y   o f                       ║  ',
+  '  ║       c h l o e  +  r e g i n a                      ║  ',
+  '  ║                                                      ║  ',
+  '  ╚══════════════════════════════════════════════════════╝  ',
 ];
 
-// ── "MEAN GIRLS" title letters ─────────────────────────────────
-
-const TITLE_ART: string[] = [
-  '#   # ##### .#.  #   #    .####. # ####. #     .####.',
-  '## ## #     #   # ##  #   #      # #   # #    #      ',
-  '# # # ####  ##### # # #   # .## # ####\' #     ####. ',
-  '#   # #     #   # #  ##    \'#  # # # \'#  #         # ',
-  '#   # ##### #   # #   #   .####\' # #  ## ##### ####\' ',
+const GHOST_SM: string[] = [
+  '        ▄▓▓▓▓▓▓▓▓▓▓▓▓▄        ',
+  '      ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓      ',
+  '     ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓     ',
+  '    ▓▓▓▓  ████▓▓  ████▓▓▓▓▓    ',
+  '    ▓▓▓▓  █░█░▓▓  █░█░▓▓▓▓▓    ',
+  '    ▓▓▓▓  ████▓▓  ████▓▓▓▓▓    ',
+  '    ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓    ',
+  '    ▓▓▓▓▓▓  ▄▄▄▄  ▓▓▓▓▓▓▓▓    ',
+  '     ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓     ',
+  '      ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓      ',
+  '     ▓▓  ▀▄  ▓▓  ▀▄  ▓▓▓      ',
+  '      ▀▄  ▀▓▓  ▀▄  ▀▓          ',
 ];
 
-// ── The Limit box ──────────────────────────────────────────────
+// ── Finale catchphrases ─────────────────────────────────────────
 
-const LIMIT_BOX: string[] = [
-  '.---------------------------------------------.',
-  '|  THE LIMIT DOES NOT EXIST                    |',
-  '|                                              |',
-  '|  ...and neither does the number of           |',
-  '|  tracking scripts on your website.           |',
-  '|                                              |',
-  '|  run a scan. find out.                       |',
-  '\'---------------------------------------------\'',
+const CATCHPHRASES = [
+  'that\'s so fetch',
+  'YOU CAN\'T SIT WITH US!',
+  'she doesn\'t even go here!',
+  'on wednesdays we wear pink',
+  'get in loser',
+  'the limit does not exist',
+  'i\'m a cool ghost',
+  'SO fetch',
+  'YOU CAN\'T SIT WITH US!',
+  'chloe x regina forever',
 ];
 
-// ── Main component ─────────────────────────────────────────────
+// ── Overlay ─────────────────────────────────────────────────────
+
+type OverlayPos = 'right' | 'center-top' | 'center' | 'center-bottom' | 'hidden';
+
+interface OverlayState {
+  line1: string;
+  line2: string;
+  pos: OverlayPos;
+  size: number;
+  weight: number;
+}
+
+// ── Main component ──────────────────────────────────────────────
 
 export function MeanGirlsAnimation() {
   const preRef = useRef<HTMLPreElement>(null);
-  const frameRef = useRef(0);
-  const gridRef = useRef<string[][]>([]);
-  const sparksRef = useRef<Spark[]>([]);
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const fRef = useRef(0);
+  const [, setTick] = useState(0);
 
-  const createGrid = useCallback((): string[][] => {
-    return Array.from({ length: H }, () => Array(W).fill(' '));
-  }, []);
+  const render = useCallback(() => {
+    const f = fRef.current;
+    const g: string[][] = Array.from({ length: H }, () => Array(W).fill(' '));
+    const sec = (f / FPS) % LOOP;
+    const overlay: OverlayState = { line1: '', line2: '', pos: 'hidden', size: 20, weight: 500 };
 
-  const clearGrid = useCallback(() => {
-    const g = gridRef.current;
-    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) g[y]![x] = ' ';
-  }, []);
+    const put = (x: number, y: number, c: string) => {
+      const ix = Math.round(x), iy = Math.round(y);
+      if (ix >= 0 && ix < W && iy >= 0 && iy < H) g[iy]![ix] = c;
+    };
 
-  const drawChar = useCallback((x: number, y: number, ch: string) => {
-    const gx = Math.round(x);
-    const gy = Math.round(y);
-    if (gx >= 0 && gx < W && gy >= 0 && gy < H) gridRef.current[gy]![gx] = ch;
-  }, []);
-
-  const drawTextAt = useCallback((text: string, x: number, y: number) => {
-    for (let i = 0; i < text.length; i++) {
-      if (text[i] !== undefined) drawChar(x + i, y, text[i]!);
-    }
-  }, [drawChar]);
-
-  const drawCentered = useCallback((text: string, y: number) => {
-    drawTextAt(text, Math.round(W / 2 - text.length / 2), y);
-  }, [drawTextAt]);
-
-  const drawSprite = useCallback((sprite: string[], cx: number, cy: number) => {
-    for (let sy = 0; sy < sprite.length; sy++) {
-      const row = sprite[sy]!;
-      const sx = Math.round(cx - row.length / 2);
-      for (let i = 0; i < row.length; i++) {
-        if (row[i] !== ' ') drawChar(sx + i, cy + sy, row[i]!);
-      }
-    }
-  }, [drawChar]);
-
-  // Typewriter: reveals text char by char based on progress (0-1)
-  const typewriter = useCallback((text: string, x: number, y: number, progress: number) => {
-    const reveal = Math.floor(progress * text.length);
-    for (let i = 0; i < reveal; i++) {
-      if (text[i] !== undefined) drawChar(x + i, y, text[i]!);
-    }
-    // Blinking cursor at reveal position
-    if (reveal < text.length && Math.floor(frameRef.current / 4) % 2 === 0) {
-      drawChar(x + reveal, y, '_');
-    }
-  }, [drawChar]);
-
-  const spawnSparks = useCallback((cx: number, cy: number, count: number, spread = 20) => {
-    for (let i = 0; i < count; i++) {
-      sparksRef.current.push({
-        x: cx + (Math.random() - 0.5) * spread,
-        y: cy + (Math.random() - 0.5) * (spread * 0.4),
-        vx: (Math.random() - 0.5) * 1.5,
-        vy: (Math.random() - 0.5) * 0.8,
-        life: Math.floor(Math.random() * 12) + 4,
-        char: SPARK_CHARS[Math.floor(Math.random() * SPARK_CHARS.length)]!,
-      });
-    }
-  }, []);
-
-  const spawnHearts = useCallback((cx: number, cy: number, count: number) => {
-    for (let i = 0; i < count; i++) {
-      sparksRef.current.push({
-        x: cx + (Math.random() - 0.5) * 40,
-        y: cy + (Math.random() - 0.5) * 15,
-        vx: (Math.random() - 0.5) * 0.5,
-        vy: -Math.random() * 0.4 - 0.1,
-        life: Math.floor(Math.random() * 18) + 8,
-        char: HEART_CHARS[Math.floor(Math.random() * HEART_CHARS.length)]!,
-      });
-    }
-  }, []);
-
-  const updateSparks = useCallback(() => {
-    const parts = sparksRef.current;
-    for (let i = parts.length - 1; i >= 0; i--) {
-      const p = parts[i]!;
-      p.x += p.vx;
-      p.y += p.vy;
-      p.life--;
-      if (p.life <= 0) { parts.splice(i, 1); continue; }
-      drawChar(p.x, p.y, p.char);
-    }
-  }, [drawChar]);
-
-  // Dissolve transition: scatter all non-space chars
-  const dissolveGrid = useCallback((intensity: number) => {
-    const g = gridRef.current;
-    for (let y = 0; y < H; y++) {
-      for (let x = 0; x < W; x++) {
-        if (g[y]![x] !== ' ' && Math.random() < intensity) {
-          // Scatter into spark
-          sparksRef.current.push({
-            x, y,
-            vx: (Math.random() - 0.5) * 3,
-            vy: (Math.random() - 0.5) * 2,
-            life: Math.floor(Math.random() * 6) + 2,
-            char: g[y]![x]!,
-          });
-          g[y]![x] = ' ';
+    const stamp = (spr: string[], px: number, py: number, fade = 1) => {
+      for (let sy = 0; sy < spr.length; sy++) {
+        const row = spr[sy]!;
+        for (let sx = 0; sx < row.length; sx++) {
+          if (row[sx] !== ' ' && Math.random() < fade) put(px + sx, py + sy, row[sx]!);
         }
       }
-    }
-  }, []);
+    };
 
-  const renderGrid = useCallback((): string => {
-    return gridRef.current.map(row => row.join('')).join('\n');
-  }, []);
+    // ── Effect library ──────────────────────────────────────
 
-  // ── Animation loop ─────────────────────────────────────────
-
-  const animate = useCallback(() => {
-    if (!gridRef.current.length) gridRef.current = createGrid();
-
-    const f = frameRef.current;
-    const LOOP = 900; // 60 seconds at 15fps
-    const localF = f % LOOP;
-    const sec = (localF / LOOP) * 60;
-
-    if (localF === 0) sparksRef.current = [];
-
-    clearGrid();
-
-    // ── Intro: Title (0–5s) ──────────────────────────────────
-    if (sec < 5) {
-      const p = sec / 5;
-      if (p < 0.6) {
-        // Typewriter the title
-        const titleY = 10;
-        for (let i = 0; i < TITLE_ART.length; i++) {
-          const line = TITLE_ART[i]!;
-          const reveal = Math.floor((p / 0.6) * line.length);
-          const sx = Math.round(W / 2 - line.length / 2);
-          for (let c = 0; c < reveal; c++) {
-            if (line[c] !== ' ') drawChar(sx + c, titleY + i, line[c]!);
-          }
-        }
-      } else {
-        // Hold full title
-        const titleY = 10;
-        for (let i = 0; i < TITLE_ART.length; i++) {
-          const line = TITLE_ART[i]!;
-          const sx = Math.round(W / 2 - line.length / 2);
-          for (let c = 0; c < line.length; c++) {
-            if (line[c] !== ' ') {
-              const shimmer = Math.random() < 0.03;
-              drawChar(sx + c, titleY + i, shimmer ? '*' : line[c]!);
-            }
-          }
-        }
-        if (f % 15 === 0) spawnSparks(W / 2, 12, 4, 50);
+    const stippleRain = (intensity: number, downward = true) => {
+      for (let i = 0; i < Math.floor(intensity * 60); i++) {
+        const x = Math.random() * W;
+        const y = downward ? (f * 0.5 + Math.random() * H * 2) % H : Math.random() * H;
+        put(x, y, STIPPLE[Math.floor(Math.random() * STIPPLE.length)]!);
       }
-      // Dissolve at end
-      if (p > 0.88) dissolveGrid((p - 0.88) / 0.12 * 0.3);
-      updateSparks();
-    }
+    };
 
-    // ── Burn Book (5–10s) ────────────────────────────────────
-    else if (sec < 10) {
-      const p = (sec - 5) / 5;
-      // Book "opens" — reveal line by line
-      const revealLines = Math.floor(easeOut(Math.min(p * 1.5, 1)) * BURN_BOOK.length);
-      const bookY = Math.round(H / 2 - BURN_BOOK.length / 2);
-      for (let i = 0; i < revealLines; i++) {
-        const line = BURN_BOOK[i]!;
-        const sx = Math.round(W / 2 - line.length / 2);
-        for (let c = 0; c < line.length; c++) {
-          if (line[c] !== ' ') drawChar(sx + c, bookY + i, line[c]!);
+    const heartRain = (intensity: number) => {
+      for (let i = 0; i < Math.floor(intensity * 30); i++) {
+        const x = Math.random() * W;
+        const y = (f * 0.3 + i * 7.3) % H;
+        put(x, y, HEARTS[Math.floor(Math.random() * HEARTS.length)]!);
+      }
+    };
+
+    const shimmer = (intensity: number) => {
+      for (let i = 0; i < Math.floor(intensity * 30); i++) {
+        put(Math.random() * W, Math.random() * H,
+          BRAILLE_L[Math.floor(Math.random() * BRAILLE_L.length)]!);
+      }
+    };
+
+    const psycheFill = (intensity: number) => {
+      for (let y = 0; y < H; y++) {
+        for (let x = 0; x < W; x++) {
+          if (Math.random() > intensity) continue;
+          const w1 = Math.sin(x * 0.09 + f * 0.08);
+          const w2 = Math.cos(y * 0.2 + f * 0.06);
+          const w3 = Math.sin((x + y) * 0.06 - f * 0.1);
+          const w4 = Math.cos(Math.sqrt(((x - W / 2) * 0.3) ** 2 + (y - H / 2) ** 2) * 0.15 - f * 0.12);
+          const val = (w1 + w2 + w3 + w4 + 4) / 8;
+          const idx = Math.floor(val * (WAVE.length - 1));
+          let ch = WAVE[Math.max(0, Math.min(idx, WAVE.length - 1))]!;
+          if (Math.random() < 0.06) ch = CHAOS[Math.floor(Math.random() * CHAOS.length)]!;
+          if (Math.random() < 0.04) ch = HEARTS[Math.floor(Math.random() * HEARTS.length)]!;
+          g[y]![x] = ch;
         }
       }
-      if (f % 20 === 0 && p > 0.3) spawnHearts(W / 2, H / 2, 3);
-      if (p > 0.88) dissolveGrid((p - 0.88) / 0.12 * 0.3);
-      updateSparks();
-    }
+    };
 
-    // ── Quote scenes (10–52s) — 7 quotes, ~6s each ───────────
-    else if (sec < 52) {
-      const quoteTime = sec - 10;
-      const QUOTE_DUR = 6;
-      const sceneIdx = Math.min(Math.floor(quoteTime / QUOTE_DUR), SCENES.length - 1);
-      const scene = SCENES[sceneIdx]!;
-      const sceneP = (quoteTime - sceneIdx * QUOTE_DUR) / QUOTE_DUR;
-
-      // Typewriter the quote lines
-      const quoteStartY = scene.art ? 6 : Math.round(H / 2 - scene.lines.length);
-      const typeP = Math.min(sceneP / 0.5, 1); // first 50% of scene for typing
-
-      for (let li = 0; li < scene.lines.length; li++) {
-        const line = scene.lines[li]!;
-        const lineDelay = li * 0.15;
-        const lineP = Math.max(0, Math.min((typeP - lineDelay) / (1 - lineDelay), 1));
-        const x = 8;
-        typewriter(line, x, quoteStartY + li * 2, lineP);
-      }
-
-      // Attribution fades in after quote
-      if (sceneP > 0.5) {
-        const attrP = (sceneP - 0.5) / 0.2;
-        const text = scene.attribution;
-        const ax = W - text.length - 6;
-        const ay = quoteStartY + scene.lines.length * 2 + (scene.art ? scene.art.length + (scene.artOffsetY ?? 0) + 2 : 2);
-        if (attrP >= 1) {
-          drawTextAt(text, ax, Math.min(ay, H - 2));
-        } else {
-          const reveal = Math.floor(attrP * text.length);
-          for (let i = 0; i < reveal; i++) drawChar(ax + i, Math.min(ay, H - 2), text[i]!);
-        }
-      }
-
-      // Draw art if present
-      if (scene.art && sceneP > 0.35) {
-        const artP = Math.min((sceneP - 0.35) / 0.3, 1);
-        const artY = quoteStartY + scene.lines.length * 2 + (scene.artOffsetY ?? 0);
-        for (let i = 0; i < scene.art.length; i++) {
-          const line = scene.art[i]!;
-          const reveal = Math.floor(artP * line.length);
-          const sx = Math.round(W / 2 - line.length / 2);
-          for (let c = 0; c < reveal; c++) {
-            if (line[c] !== ' ') drawChar(sx + c, artY + i, line[c]!);
+    const starburst = (cx: number, cy: number, intensity: number) => {
+      for (let y = 0; y < H; y++) {
+        for (let x = 0; x < W; x++) {
+          const dx = (x - cx) * 0.3;
+          const dy = y - cy;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          const angle = Math.atan2(dy, dx);
+          const v = Math.sin(dist * 0.35 - f * 0.15) * Math.cos(angle * 10 + f * 0.08);
+          if (v > 0.25 && Math.random() < intensity) {
+            g[y]![x] = BLOCK[Math.floor((1 - v) * BLOCK.length)]!;
           }
         }
       }
+    };
 
-      // Sparkles on each scene
-      if (f % 25 === 0) spawnSparks(W / 2, H / 2, 2, 60);
-
-      // Dissolve transition between scenes
-      if (sceneP > 0.9) dissolveGrid((sceneP - 0.9) / 0.1 * 0.4);
-
-      updateSparks();
-    }
-
-    // ── "The Limit Does Not Exist" box (52–58s) ──────────────
-    else if (sec < 58) {
-      const p = (sec - 52) / 6;
-      const boxY = Math.round(H / 2 - LIMIT_BOX.length / 2);
-
-      if (p < 0.4) {
-        // Build box line by line
-        const revealLines = Math.floor(easeOut(p / 0.4) * LIMIT_BOX.length);
-        for (let i = 0; i < revealLines; i++) {
-          const line = LIMIT_BOX[i]!;
-          drawCentered(line, boxY + i);
-        }
-      } else if (p < 0.85) {
-        // Hold
-        for (let i = 0; i < LIMIT_BOX.length; i++) {
-          drawCentered(LIMIT_BOX[i]!, boxY + i);
-        }
-        // Shimmer on the border chars
-        const g = gridRef.current;
-        for (let y = boxY; y < boxY + LIMIT_BOX.length; y++) {
+    const vhsGlitch = (intensity: number) => {
+      for (let y = 0; y < H; y++) {
+        if (Math.random() < intensity * 0.15) {
+          const shift = Math.floor((Math.random() - 0.5) * 20);
+          const row = [...g[y]!];
           for (let x = 0; x < W; x++) {
-            if ((g[y]![x] === '.' || g[y]![x] === '-' || g[y]![x] === '|' || g[y]![x] === '\'') && Math.random() < 0.04) {
-              g[y]![x] = '*';
+            const sx = x - shift;
+            g[y]![x] = (sx >= 0 && sx < W) ? row[sx]! : GLITCH[Math.floor(Math.random() * GLITCH.length)]!;
+          }
+        }
+      }
+    };
+
+    const pinkStatic = (intensity: number) => {
+      for (let y = 0; y < H; y++)
+        for (let x = 0; x < W; x++)
+          if (Math.random() < intensity)
+            g[y]![x] = BLOCK[Math.floor(Math.random() * BLOCK.length)]!;
+    };
+
+    const border = (pattern: string) => {
+      for (let x = 0; x < W; x++) {
+        put(x, 0, pattern[x % pattern.length]!);
+        put(x, H - 1, pattern[(x + 2) % pattern.length]!);
+      }
+      for (let y = 0; y < H; y++) {
+        put(0, y, pattern[y % pattern.length]!);
+        put(W - 1, y, pattern[(y + 1) % pattern.length]!);
+      }
+    };
+
+    const dissolve = (intensity: number) => {
+      for (let y = 0; y < H; y++)
+        for (let x = 0; x < W; x++)
+          if (g[y]![x] !== ' ' && Math.random() < intensity) g[y]![x] = ' ';
+    };
+
+    // ═══════════════════════════════════════════════════════════
+    // SCENES
+    // ═══════════════════════════════════════════════════════════
+
+    if (sec < 4) {
+      // ── TITLE: MEAN GIRLS — stippling hearts + block border ─
+      const p = sec / 4;
+      // Stippling heart rain builds up
+      stippleRain(easeOut(p) * 0.6);
+      heartRain(easeOut(p) * 0.3);
+      // Block hearts float
+      if (p > 0.2) {
+        const hx = Math.floor(W / 2 - 17);
+        const hy = Math.floor(H / 2 + 2);
+        stamp(HEART, hx, hy, Math.min((p - 0.2) / 0.3, 1) * 0.7);
+      }
+      if (p > 0.4) border('♥•◆★');
+      // Title overlay
+      if (p > 0.1) {
+        overlay.line1 = 'MEAN GIRLS';
+        overlay.pos = 'center-top';
+        overlay.size = 28;
+        overlay.weight = 700;
+      }
+      if (p > 0.9) dissolve((p - 0.9) / 0.1 * 0.5);
+    }
+
+    else if (sec < 8) {
+      // ── BURN BOOK — box-drawing + braille ─────────────────
+      const p = (sec - 4) / 4;
+      shimmer(0.15);
+      const revealLines = Math.floor(easeOut(Math.min(p * 1.5, 1)) * BURN_BOOK.length);
+      const by = Math.floor(H / 2 - BURN_BOOK.length / 2);
+      for (let i = 0; i < revealLines; i++) {
+        const row = BURN_BOOK[i]!;
+        const bx = Math.floor(W / 2 - row.length / 2);
+        for (let c = 0; c < row.length; c++) {
+          if (row[c] !== ' ') put(bx + c, by + i, row[c]!);
+        }
+      }
+      if (p > 0.3) heartRain(0.15);
+      if (p > 0.9) dissolve((p - 0.9) / 0.1 * 0.4);
+    }
+
+    else if (sec < 12) {
+      // ── "On Wednesdays we wear pink" — stippling hearts ───
+      const p = (sec - 8) / 4;
+      stippleRain(0.4);
+      heartRain(0.2);
+      shimmer(0.1);
+      // Scattered block hearts
+      for (let i = 0; i < 3; i++) {
+        const hx = W * 0.15 + i * W * 0.3 + Math.sin(f * 0.04 + i * 2) * 10;
+        const hy = H * 0.5 + Math.sin(f * 0.06 + i) * 5;
+        stamp(HEART, hx, hy, 0.3);
+      }
+      const tp = Math.min(p / 0.4, 1);
+      const msg = '"On Wednesdays, we wear pink."';
+      overlay.line1 = msg.slice(0, Math.floor(tp * msg.length)) + (tp < 1 && f % 10 < 5 ? '█' : '');
+      overlay.line2 = p > 0.5 ? '- Karen Smith' : '';
+      overlay.pos = 'center';
+      overlay.size = 22;
+      if (p > 0.9) dissolve((p - 0.9) / 0.1 * 0.4);
+    }
+
+    else if (sec < 15) {
+      // ── "That is SO fetch" — braille pulse ────────────────
+      const p = (sec - 12) / 3;
+      // Braille texture pulses from center
+      const pulse = Math.sin(f * 0.15) * 0.5 + 0.5;
+      for (let y = 0; y < H; y++) {
+        for (let x = 0; x < W; x++) {
+          const dx = (x - W / 2) * 0.3;
+          const dy = y - H / 2;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < pulse * 30 + 5 && Math.random() < 0.15) {
+            const pool = dist < 10 ? BRAILLE_F : dist < 20 ? BRAILLE_D : BRAILLE_M;
+            g[y]![x] = pool[Math.floor(Math.random() * pool.length)]!;
+          }
+        }
+      }
+      const tp = Math.min(p / 0.35, 1);
+      overlay.line1 = '"That is SO fetch."'.slice(0, Math.floor(tp * 19)) + (tp < 1 && f % 10 < 5 ? '█' : '');
+      overlay.line2 = p > 0.45 ? '- Gretchen Wieners' : '';
+      overlay.pos = 'center';
+      if (p > 0.9) dissolve((p - 0.9) / 0.1 * 0.4);
+    }
+
+    else if (sec < 19) {
+      // ── "Stop trying to make fetch happen" — VHS glitch ───
+      const p = (sec - 15) / 4;
+      // Aggressive VHS + static
+      pinkStatic(0.08 + p * 0.05);
+      vhsGlitch(0.3 + p * 0.3);
+      if (f % 6 < 3) border('█▓▒░');
+      const msg1 = '"Stop trying to make fetch happen.';
+      const msg2 = ' It\'s NOT going to happen."';
+      const tp1 = Math.min(p / 0.3, 1);
+      const tp2 = Math.max(0, Math.min((p - 0.3) / 0.25, 1));
+      overlay.line1 = msg1.slice(0, Math.floor(tp1 * msg1.length)) + (tp1 < 1 && f % 10 < 5 ? '█' : '');
+      if (tp2 > 0) overlay.line2 = msg2.slice(0, Math.floor(tp2 * msg2.length));
+      overlay.pos = 'center';
+      overlay.weight = 700;
+      if (p > 0.65) {
+        overlay.line2 = '- Regina George';
+      }
+      if (p > 0.9) dissolve((p - 0.9) / 0.1 * 0.5);
+    }
+
+    else if (sec < 23) {
+      // ── "YOU CAN'T SIT WITH US!" — EXPLOSION ─────────────
+      const p = (sec - 19) / 4;
+      const fadeIn = Math.min(p * 4, 1);
+      const fadeOut = p > 0.85 ? 1 - (p - 0.85) / 0.15 : 1;
+      const intensity = fadeIn * fadeOut;
+
+      pinkStatic(intensity * 0.4);
+      starburst(W / 2, H / 2, intensity * 0.5);
+      vhsGlitch(intensity * 0.6);
+      if (intensity > 0.3) border('█▓▒░♥★◆');
+      // Chaos everywhere
+      for (let i = 0; i < Math.floor(intensity * 30); i++) {
+        put(Math.random() * W, Math.random() * H,
+          [...CHAOS, ...HEARTS][Math.floor(Math.random() * (CHAOS.length + HEARTS.length))]!);
+      }
+      overlay.line1 = '"YOU CAN\'T SIT WITH US!"';
+      overlay.pos = 'center';
+      overlay.size = 26;
+      overlay.weight = 700;
+      overlay.line2 = p > 0.5 ? '- Gretchen Wieners' : '';
+    }
+
+    else if (sec < 28) {
+      // ── "Get in loser" — car + speed lines ────────────────
+      const p = (sec - 23) / 5;
+      shimmer(0.1);
+      // Car drives in from left
+      const carX = lerp(-60, Math.floor(W / 2 - 30), easeOut(Math.min(p * 1.5, 1)));
+      const carY = Math.floor(H / 2 - CAR.length / 2) + 5;
+      stamp(CAR, carX, carY);
+      // Speed lines behind car
+      if (p > 0.2) {
+        for (let i = 0; i < 20; i++) {
+          const lx = carX - 4 - i * 5;
+          const ly = carY + 2 + Math.floor(Math.random() * CAR.length);
+          const ch = i < 5 ? '█' : i < 10 ? '▓' : i < 16 ? '▒' : '░';
+          put(lx, ly, ch);
+        }
+      }
+      const tp = Math.min(p / 0.3, 1);
+      const msg1 = '"Get in loser,';
+      const msg2 = ' we\'re going scanning."';
+      overlay.line1 = msg1.slice(0, Math.floor(tp * msg1.length)) + (tp < 1 && f % 10 < 5 ? '█' : '');
+      if (p > 0.35) {
+        const tp2 = Math.min((p - 0.35) / 0.25, 1);
+        overlay.line2 = msg2.slice(0, Math.floor(tp2 * msg2.length));
+      }
+      if (p > 0.7) overlay.line2 = '- Chloe George';
+      overlay.pos = 'center-top';
+      if (p > 0.9) dissolve((p - 0.9) / 0.1 * 0.4);
+    }
+
+    else if (sec < 31) {
+      // ── "She doesn't even go here!" — stippling portrait ──
+      const p = (sec - 28) / 3;
+      // Stippled face silhouette
+      for (let y = 0; y < H; y++) {
+        for (let x = 0; x < W; x++) {
+          const dx = (x - W / 2) * 0.4;
+          const dy = (y - H / 2) * 0.9;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          // Head circle
+          if (dist < 14 && Math.random() < 0.25) {
+            put(x, y, STIPPLE[Math.floor(dist / 14 * STIPPLE.length)]!);
+          }
+          // Body
+          if (dy > 8 && Math.abs(dx) < 10 + (dy - 8) * 0.5 && Math.random() < 0.2) {
+            put(x, y, STIPPLE[Math.floor(Math.random() * 3)]!);
+          }
+        }
+      }
+      const tp = Math.min(p / 0.35, 1);
+      const msg = '"She doesn\'t even go here!"';
+      overlay.line1 = msg.slice(0, Math.floor(tp * msg.length)) + (tp < 1 && f % 10 < 5 ? '█' : '');
+      overlay.line2 = p > 0.5 ? '- Damian' : '';
+      overlay.pos = 'center-top';
+      if (p > 0.9) dissolve((p - 0.9) / 0.1 * 0.4);
+    }
+
+    else if (sec < 35) {
+      // ── "I'm not a regular ghost" — ghost sprite ──────────
+      const p = (sec - 31) / 4;
+      shimmer(0.2);
+      const spr = GHOST_SM;
+      const gx = Math.floor(W / 2 - 15) + Math.sin(f * 0.06) * 8;
+      const gy = Math.floor(H / 2 - spr.length / 2) + Math.sin(f * 0.09) * 3;
+      stamp(spr, gx, gy);
+      // Floating chaos around ghost
+      if (f % 6 === 0) {
+        for (let i = 0; i < 3; i++)
+          put(gx + 15 + (Math.random() - 0.5) * 40, gy + 6 + (Math.random() - 0.5) * 15,
+            HEARTS[Math.floor(Math.random() * HEARTS.length)]!);
+      }
+      const tp = Math.min(p / 0.3, 1);
+      const msg1 = '"I\'m not a regular ghost,';
+      const msg2 = ' I\'m a cool ghost."';
+      overlay.line1 = msg1.slice(0, Math.floor(tp * msg1.length)) + (tp < 1 && f % 10 < 5 ? '█' : '');
+      if (p > 0.35) {
+        const tp2 = Math.min((p - 0.35) / 0.2, 1);
+        overlay.line2 = msg2.slice(0, Math.floor(tp2 * msg2.length));
+      }
+      if (p > 0.7) overlay.line2 = '- Chloe (Mrs. George energy)';
+      overlay.pos = 'center-top';
+      if (p > 0.9) dissolve((p - 0.9) / 0.1 * 0.4);
+    }
+
+    else if (sec < 39) {
+      // ── "The Limit Does Not Exist" — box-drawing elegant ──
+      const p = (sec - 35) / 4;
+      shimmer(0.1);
+      // Elegant box-drawing frame
+      const frameW = 70;
+      const frameH = 14;
+      const fx = Math.floor(W / 2 - frameW / 2);
+      const fy = Math.floor(H / 2 - frameH / 2);
+      const revealP = easeOut(Math.min(p * 2, 1));
+      const revealX = Math.floor(revealP * frameW);
+      const revealY = Math.floor(revealP * frameH);
+      // Top border
+      for (let x = 0; x < revealX; x++) {
+        put(fx + x, fy, x === 0 ? '╔' : x === frameW - 1 ? '╗' : '═');
+        put(fx + x, fy + frameH - 1, x === 0 ? '╚' : x === frameW - 1 ? '╝' : '═');
+      }
+      // Side borders
+      for (let y = 1; y < revealY - 1; y++) {
+        put(fx, fy + y, '║');
+        put(fx + frameW - 1, fy + y, '║');
+      }
+      // Braille interior fill
+      if (p > 0.3) {
+        const fillP = Math.min((p - 0.3) / 0.3, 1);
+        for (let y = 1; y < frameH - 1; y++) {
+          for (let x = 1; x < frameW - 1; x++) {
+            if (Math.random() < fillP * 0.15) {
+              put(fx + x, fy + y, BRAILLE_L[Math.floor(Math.random() * BRAILLE_L.length)]!);
             }
           }
         }
-        if (f % 18 === 0) spawnSparks(W / 2, boxY + 4, 3, 40);
-      } else {
-        dissolveGrid((p - 0.85) / 0.15 * 0.5);
       }
-      updateSparks();
+      const tp = Math.min(p / 0.35, 1);
+      const msg = '"The limit does not exist."';
+      overlay.line1 = msg.slice(0, Math.floor(tp * msg.length)) + (tp < 1 && f % 10 < 5 ? '█' : '');
+      overlay.line2 = p > 0.5 ? '...and neither does the number of tracking scripts on your website.' : '';
+      overlay.pos = 'center';
+      if (p > 0.9) dissolve((p - 0.9) / 0.1 * 0.4);
     }
 
-    // ── Fade to black (58–60s) ───────────────────────────────
+    else if (sec < 52) {
+      // ═════════════════════════════════════════════════════════
+      // FINALE — BIG CRAZY OVER THE TOP GIRLY POP LOUD
+      // ═════════════════════════════════════════════════════════
+      const p = (sec - 39) / 13;
+
+      // Escalating intensity
+      const intensity = Math.min(p * 2, 1);
+
+      // Layer 1: Psychedelic wave fill (builds from 0%)
+      if (p > 0.05) psycheFill(Math.min((p - 0.05) * 1.5, 1) * 0.85);
+
+      // Layer 2: Starburst overlay (builds from 15%)
+      if (p > 0.15) starburst(W / 2, H / 2, Math.min((p - 0.15) * 2, 1) * 0.4);
+
+      // Layer 3: VHS glitch (builds from 25%)
+      if (p > 0.25) vhsGlitch(Math.min((p - 0.25) * 2, 1) * 0.6);
+
+      // Layer 4: Heart rain (constant)
+      heartRain(intensity * 0.5);
+
+      // Layer 5: Stippling overlay (builds from 35%)
+      if (p > 0.35) stippleRain(Math.min((p - 0.35) * 2, 1) * 0.4);
+
+      // Layer 6: Block art hearts pulsing (from 40%)
+      if (p > 0.4) {
+        const heartBeat = Math.sin(f * 0.2) * 0.5 + 0.5;
+        if (heartBeat > 0.3) {
+          const hx1 = W * 0.2 + Math.sin(f * 0.03) * 15;
+          const hx2 = W * 0.65 + Math.cos(f * 0.04) * 15;
+          stamp(HEART, hx1, H * 0.3, heartBeat * 0.6);
+          stamp(HEART, hx2, H * 0.35, heartBeat * 0.5);
+        }
+      }
+
+      // Layer 7: Chaos chars EVERYWHERE (from 50%)
+      if (p > 0.5) {
+        const chaosCount = Math.floor((p - 0.5) * 60);
+        for (let i = 0; i < chaosCount; i++) {
+          put(Math.random() * W, Math.random() * H,
+            [...CHAOS, ...HEARTS, ...BRAILLE_F][Math.floor(Math.random() * (CHAOS.length + HEARTS.length + BRAILLE_F.length))]!);
+        }
+      }
+
+      // Layer 8: Border cycling through ALL char sets
+      if (p > 0.3) {
+        const patterns = ['█▓▒░', '♥★◆♪', '═║╬╠', '⣿⠿⠇⠁', '●•◦·'];
+        const pi = Math.floor(f / 4) % patterns.length;
+        border(patterns[pi]!);
+      }
+
+      // PEAK (75-90%): everything at max + braille texture flood
+      if (p > 0.75 && p < 0.9) {
+        for (let y = 0; y < H; y++) {
+          for (let x = 0; x < W; x++) {
+            if (g[y]![x] === ' ' && Math.random() < 0.15) {
+              g[y]![x] = BRAILLE_D[Math.floor(Math.random() * BRAILLE_D.length)]!;
+            }
+          }
+        }
+      }
+
+      // Fade out (90-100%)
+      if (p > 0.9) {
+        const fade = (p - 0.9) / 0.1;
+        dissolve(fade * 0.7);
+      }
+
+      // Overlay: cycling catchphrases
+      const catchIdx = Math.floor(f / 12) % CATCHPHRASES.length;
+      const isLast = p > 0.85;
+      overlay.line1 = isLast ? 'chloe x regina forever' : CATCHPHRASES[catchIdx]!;
+      overlay.pos = 'center';
+      overlay.size = isLast ? 24 : (CATCHPHRASES[catchIdx]!.startsWith('YOU') ? 26 : 20);
+      overlay.weight = isLast ? 300 : (CATCHPHRASES[catchIdx]!.startsWith('YOU') ? 700 : 500);
+    }
+
     else {
-      updateSparks();
+      // ── Fade to black ─────────────────────────────────────
+      const p = (sec - 52) / 3;
+      shimmer((1 - p) * 0.1);
+      if (p < 0.5) {
+        overlay.line1 = 'chloe x regina forever';
+        overlay.pos = 'center';
+        overlay.size = 22;
+        overlay.weight = 300;
+      }
     }
 
-    if (preRef.current) {
-      preRef.current.textContent = renderGrid();
+    // ── Render ──────────────────────────────────────────────
+
+    if (preRef.current) preRef.current.textContent = g.map(r => r.join('')).join('\n');
+
+    if (overlayRef.current) {
+      const el = overlayRef.current;
+      if (overlay.pos === 'hidden' || !overlay.line1) {
+        el.style.opacity = '0';
+      } else {
+        el.style.opacity = '1';
+        el.style.left = '50%';
+        el.style.right = 'auto';
+        el.style.textAlign = 'center';
+        el.style.transform = 'translateX(-50%)';
+        if (overlay.pos === 'center-top') el.style.top = '8%';
+        else if (overlay.pos === 'center-bottom') el.style.top = '75%';
+        else el.style.top = '42%';
+        el.style.fontSize = `${overlay.size}px`;
+        el.style.fontWeight = String(overlay.weight);
+        const line2Html = overlay.line2 ? `<br/><span style="margin-top:6px;display:inline-block;font-size:16px;font-weight:300;letter-spacing:0.08em">${overlay.line2}</span>` : '';
+        el.innerHTML = overlay.line1 + line2Html;
+      }
     }
 
-    frameRef.current = f + 1;
-  }, [createGrid, clearGrid, drawChar, drawTextAt, drawCentered, drawSprite,
-      typewriter, spawnSparks, spawnHearts, updateSparks, dissolveGrid, renderGrid]);
+    fRef.current = f + 1;
+    setTick(t => t + 1);
+  }, []);
 
   useEffect(() => {
-    gridRef.current = createGrid();
-    const id = setInterval(animate, INTERVAL);
+    const id = setInterval(render, MS);
     return () => clearInterval(id);
-  }, [animate, createGrid]);
+  }, [render]);
 
   return (
-    <pre
-      ref={preRef}
-      className="font-data leading-none whitespace-pre select-none"
-      style={{
-        fontSize: '12px',
-        color: 'var(--gs-base)',
-        textShadow: '0 0 4px var(--gs-base), 0 0 10px oklch(0.82 0.15 340 / 0.15)',
-        lineHeight: '1.15',
-      }}
-    />
+    <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}>
+      <pre
+        ref={preRef}
+        className="font-data leading-none whitespace-pre select-none"
+        style={{
+          fontSize: '6.5px',
+          color: 'var(--gs-base)',
+          textShadow: '0 0 5px var(--gs-base), 0 0 15px oklch(0.82 0.15 340 / 0.2)',
+          lineHeight: '1.1',
+        }}
+      />
+      <div
+        ref={overlayRef}
+        className="font-data select-none pointer-events-none"
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          fontSize: '20px',
+          color: 'var(--gs-base)',
+          textShadow: '0 0 8px var(--gs-base), 0 0 20px oklch(0.82 0.15 340 / 0.3), 0 0 40px oklch(0.82 0.15 340 / 0.1)',
+          opacity: 0,
+          transition: 'opacity 0.15s ease',
+          whiteSpace: 'nowrap',
+          letterSpacing: '0.05em',
+          zIndex: 10,
+        }}
+      />
+    </div>
   );
 }
 
-function easeOut(t: number): number {
-  return 1 - Math.pow(1 - t, 3);
-}
+function easeOut(t: number): number { return 1 - (1 - t) ** 3; }
+function lerp(a: number, b: number, t: number): number { return a + (b - a) * Math.max(0, Math.min(1, t)); }
