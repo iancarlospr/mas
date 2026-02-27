@@ -123,7 +123,7 @@ export default function ChillWindow() {
       onKeyDown={handleKeyDown}
     >
       {/* Screen area */}
-      <div className="flex-1 overflow-hidden relative p-gs-2">
+      <div className="flex-1 overflow-hidden relative flex items-center justify-center">
         {/* CRT curve overlay */}
         <div
           className="absolute inset-0 pointer-events-none z-10 rounded-lg"

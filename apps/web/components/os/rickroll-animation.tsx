@@ -632,7 +632,7 @@ export function RickRollAnimation() {
   }, [render]);
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}>
+    <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <pre
         ref={preRef}
         className="font-data leading-none whitespace-pre select-none"
