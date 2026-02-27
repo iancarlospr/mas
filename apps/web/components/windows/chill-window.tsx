@@ -5,6 +5,7 @@ import { AsciiPlayer } from '@/components/scan/ascii-player';
 import { GhostAnimation } from '@/components/os/ghost-animation';
 import { A22Animation } from '@/components/os/a22-animation';
 import { MeanGirlsAnimation } from '@/components/os/meangirls-animation';
+import { RickRollAnimation } from '@/components/os/rickroll-animation';
 
 /* =================================================================
    chill.mov — ASCII Theater / Retro TV
@@ -50,8 +51,9 @@ const CHANNELS: Channel[] = [
   {
     number: 4,
     name: 'RICK FM',
-    path: '/ascii/rick_roll.json',
+    path: null,
     loop: true,
+    live: true,
     description: 'You know what this is.',
   },
 ];
@@ -146,14 +148,10 @@ export default function ChillWindow() {
           <A22Animation key="a22-live" />
         ) : channel.number === 3 ? (
           <MeanGirlsAnimation key="meangirls-live" />
+        ) : channel.number === 4 ? (
+          <RickRollAnimation key="rick-live" />
         ) : (
-          <AsciiPlayer
-            key={channel.path}
-            moviePath={channel.path!}
-            autoPlay
-            loop={channel.loop}
-            showSshHint={false}
-          />
+          <div className="p-gs-4 font-data text-data-sm text-gs-mid">No signal</div>
         )}
       </div>
 
