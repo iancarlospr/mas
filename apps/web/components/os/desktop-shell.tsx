@@ -31,7 +31,7 @@ const WINDOW_CONFIGS: Record<string, WindowConfig> = {
   'products':      { title: 'Products',                        icon: '~', width: 560, height: 400 },
   'pricing':       { title: 'Pricing',                         icon: '~', width: 700, height: 500 },
   'customers':     { title: 'Reviews',                         icon: '~', width: 420, height: 340 },
-  'chill':         { title: 'chill.mov',                       icon: '~', width: 800, height: 500, variant: 'terminal' },
+  'chill':         { title: 'chill.mov',                       icon: '~', width: 850, height: 500, variant: 'terminal' },
   'history':       { title: 'My Scans',                        icon: '~', width: 600, height: 400 },
   'chat-launcher': { title: 'GhostChat',                       icon: '~', width: 420, height: 380 },
   'scan-input':    { title: 'Scan.exe',                        icon: '~', width: 420, height: 240, variant: 'dialog' },
