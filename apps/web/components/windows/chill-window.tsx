@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react';
 import { AsciiPlayer } from '@/components/scan/ascii-player';
 import { GhostAnimation } from '@/components/os/ghost-animation';
 import { A22Animation } from '@/components/os/a22-animation';
+import { MeanGirlsAnimation } from '@/components/os/meangirls-animation';
 
 /* =================================================================
    chill.mov — ASCII Theater / Retro TV
@@ -41,8 +42,9 @@ const CHANNELS: Channel[] = [
   {
     number: 3,
     name: 'MEAN GIRLS',
-    path: '/ascii/moonlight.json',
+    path: null,
     loop: true,
+    live: true,
     description: 'On Wednesdays we wear pink.',
   },
   {
@@ -142,6 +144,8 @@ export default function ChillWindow() {
           <GhostAnimation key="ghost-live" />
         ) : channel.number === 2 ? (
           <A22Animation key="a22-live" />
+        ) : channel.number === 3 ? (
+          <MeanGirlsAnimation key="meangirls-live" />
         ) : (
           <AsciiPlayer
             key={channel.path}
