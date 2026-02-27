@@ -1,489 +1,511 @@
 'use client';
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 
 /* =================================================================
-   A22 Films — Cinematic Intro Animation
-
-   Particles stream in from edges, converge to form "A22",
-   hold with shimmer, "FILMS" fades in, dissolve to "presents",
-   then "a ghostscan film" with Chloe peek. Full 32s loop.
+   A22 Films — Boutique studio intro. 200×55, 6.5px.
+   Opens with FULL SCREEN pink ▒▓█ TV glitch.
+   Logo constructs via box-drawing wireframe + braille fill.
    ================================================================= */
 
-const W = 120;
-const H = 30;
-const INTERVAL = 67; // ~15fps
+const W = 200;
+const H = 55;
+const FPS = 15;
+const MS = Math.round(1000 / FPS);
+const LOOP = 32;
 
-// ── Letter definitions (9 rows × 8 cols binary grids) ──────────
+// ── Character sets ──────────────────────────────────────────────
+
+const STATIC = ['░', '▒', '▓', '█'];
+const GLITCH = ['█', '▓', '░', '▒', '║', '═', '╬', '╠', '╣', '╦', '╩', '▌', '▐'];
+const BRAILLE_LIGHT = ['⠁', '⠂', '⠄', '⠈', '⠐', '⠠'];
+const BRAILLE_MED = ['⠃', '⠅', '⠉', '⠑', '⠡', '⠆', '⠊', '⠒', '⠢'];
+const BRAILLE_DENSE = ['⠇', '⠋', '⠓', '⠣', '⠞', '⠖', '⠚', '⠲', '⠦', '⠴'];
+const BRAILLE_FULL = ['⠿', '⡿', '⣿', '⣷', '⣯', '⣟', '⡷', '⢿'];
+
+// ── Letter definitions (11 rows × 10 cols) ──────────────────────
 
 const L_A = [
-  [0,0,0,1,1,0,0,0],
-  [0,0,1,1,1,1,0,0],
-  [0,1,1,0,0,1,1,0],
-  [0,1,0,0,0,0,1,0],
-  [1,1,0,0,0,0,1,1],
-  [1,1,1,1,1,1,1,1],
-  [1,1,0,0,0,0,1,1],
-  [1,1,0,0,0,0,1,1],
-  [1,1,0,0,0,0,1,1],
+  [0,0,0,0,1,1,0,0,0,0],
+  [0,0,0,1,1,1,1,0,0,0],
+  [0,0,1,1,0,0,1,1,0,0],
+  [0,1,1,0,0,0,0,1,1,0],
+  [1,1,0,0,0,0,0,0,1,1],
+  [1,1,0,0,0,0,0,0,1,1],
+  [1,1,1,1,1,1,1,1,1,1],
+  [1,1,0,0,0,0,0,0,1,1],
+  [1,1,0,0,0,0,0,0,1,1],
+  [1,1,0,0,0,0,0,0,1,1],
+  [1,1,0,0,0,0,0,0,1,1],
 ];
 
 const L_2 = [
-  [0,1,1,1,1,1,1,0],
-  [1,1,0,0,0,0,1,1],
-  [0,0,0,0,0,0,1,1],
-  [0,0,0,0,0,1,1,0],
-  [0,0,0,1,1,1,0,0],
-  [0,0,1,1,0,0,0,0],
-  [0,1,1,0,0,0,0,0],
-  [1,1,0,0,0,0,0,0],
-  [1,1,1,1,1,1,1,1],
+  [0,1,1,1,1,1,1,1,1,0],
+  [1,1,0,0,0,0,0,0,1,1],
+  [0,0,0,0,0,0,0,0,1,1],
+  [0,0,0,0,0,0,0,1,1,0],
+  [0,0,0,0,0,0,1,1,0,0],
+  [0,0,0,0,0,1,1,0,0,0],
+  [0,0,0,0,1,1,0,0,0,0],
+  [0,0,0,1,1,0,0,0,0,0],
+  [0,0,1,1,0,0,0,0,0,0],
+  [0,1,1,0,0,0,0,0,0,0],
+  [1,1,1,1,1,1,1,1,1,1],
 ];
 
-// Each pixel rendered as "##" (2 chars wide). Letters 16 chars wide each.
-// A22 total: 16 + 5 + 16 + 5 + 16 = 58 chars. Centered in 120 = offset 31.
-const LETTER_W = 16;
-const LETTER_GAP = 5;
-const LETTERS_TOTAL_W = LETTER_W * 3 + LETTER_GAP * 2;
-const LETTERS_X = Math.floor((W - LETTERS_TOTAL_W) / 2);
-const LETTERS_Y = 8; // vertical offset for letters
+// Each pixel: 4 chars wide × 2 lines tall
+const PX_W = 4;
+const PX_H = 2;
+const LETTER_PX_COLS = 10;
+const LETTER_PX_ROWS = 11;
+const LETTER_CHAR_W = LETTER_PX_COLS * PX_W; // 40
+const LETTER_CHAR_H = LETTER_PX_ROWS * PX_H; // 22
+const GAP = 8;
+const TOTAL_W = LETTER_CHAR_W * 3 + GAP * 2; // 136
+const OFFSET_X = Math.floor((W - TOTAL_W) / 2);
+const OFFSET_Y = Math.floor((H - LETTER_CHAR_H) / 2);
 
-// ── Particle system ────────────────────────────────────────────
+// ── Overlay ─────────────────────────────────────────────────────
 
-interface Particle {
-  tx: number; // target
-  ty: number;
-  x: number;  // current
-  y: number;
-  settled: boolean;
-  scattered: boolean;
-  sx: number; // scatter velocity
-  sy: number;
-  delay: number; // frames before moving
-  char: string;
+type OverlayPos = 'center-top' | 'center' | 'hidden';
+
+interface OverlayState {
+  line1: string;
+  line2: string;
+  pos: OverlayPos;
+  big: boolean;
 }
 
-function buildTargets(): { tx: number; ty: number }[] {
-  const targets: { tx: number; ty: number }[] = [];
-  const letters = [L_A, L_2, L_2];
+// ── Helpers ─────────────────────────────────────────────────────
 
-  for (let li = 0; li < 3; li++) {
-    const letter = letters[li]!;
-    const baseX = LETTERS_X + li * (LETTER_W + LETTER_GAP);
-    for (let row = 0; row < letter.length; row++) {
-      for (let col = 0; col < letter[row]!.length; col++) {
-        if (letter[row]![col]) {
-          // Each pixel = "##" (2 chars)
-          targets.push({ tx: baseX + col * 2, ty: LETTERS_Y + row });
-          targets.push({ tx: baseX + col * 2 + 1, ty: LETTERS_Y + row });
-        }
-      }
-    }
+function isEdge(grid: number[][], row: number, col: number): boolean {
+  if (!grid[row]?.[col]) return false;
+  const dirs = [[-1,0],[1,0],[0,-1],[0,1]];
+  for (const [dr, dc] of dirs) {
+    const nr = row + dr!, nc = col + dc!;
+    if (nr < 0 || nr >= grid.length || nc < 0 || nc >= grid[0]!.length || !grid[nr]![nc]) return true;
   }
-  return targets;
+  return false;
 }
 
-function createParticles(): Particle[] {
-  const targets = buildTargets();
-  return targets.map((t, i) => {
-    // Start from random edge
-    const edge = Math.floor(Math.random() * 4);
-    let x: number, y: number;
-    if (edge === 0) { x = Math.random() * W; y = -5; }         // top
-    else if (edge === 1) { x = Math.random() * W; y = H + 5; } // bottom
-    else if (edge === 2) { x = -5; y = Math.random() * H; }    // left
-    else { x = W + 5; y = Math.random() * H; }                 // right
+function getBoxChar(grid: number[][], row: number, col: number): string {
+  const u = row > 0 && !!grid[row - 1]?.[col];
+  const d = row < grid.length - 1 && !!grid[row + 1]?.[col];
+  const l = col > 0 && !!grid[row]![col - 1];
+  const r = col < grid[0]!.length - 1 && !!grid[row]![col + 1];
 
-    return {
-      tx: t.tx,
-      ty: t.ty,
-      x,
-      y,
-      settled: false,
-      scattered: false,
-      sx: (Math.random() - 0.5) * 4,
-      sy: (Math.random() - 0.5) * 3,
-      delay: Math.floor(i * 0.15 + Math.random() * 15),
-      char: '#',
-    };
-  });
+  if (u && d && l && r) return '╬';
+  if (u && d && r) return '╠';
+  if (u && d && l) return '╣';
+  if (u && l && r) return '╩';
+  if (d && l && r) return '╦';
+  if (u && d) return '║';
+  if (l && r) return '═';
+  if (d && r) return '╔';
+  if (d && l) return '╗';
+  if (u && r) return '╚';
+  if (u && l) return '╝';
+  if (u || d) return '║';
+  if (l || r) return '═';
+  return '╬';
 }
 
-// ── Ghost sprite for the "ghostscan film" reveal ───────────────
-
-const GHOST_PEEK: string[] = [
-  '     .:::::::.     ',
-  '   .::       ::.   ',
-  '  ::           ::  ',
-  ' ::  .##. .##.  :: ',
-  ' ::  # *# # *#  :: ',
-  ' ::  \'##\' \'##\'  :: ',
-  ' ::     ..      :: ',
-  '  ::           ::  ',
-  '   ::  :  :  ::    ',
-  '    \':  \'::\'  :\'   ',
-  '      \'::  ::\'     ',
-];
-
-// ── Sparkle / ambient particles ────────────────────────────────
-
-interface Spark {
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  life: number;
-  char: string;
-}
-
-const SPARK_CHARS = ['*', '+', '.', ':', '~', '`'];
-
-// ── Main component ─────────────────────────────────────────────
+// ── Main component ──────────────────────────────────────────────
 
 export function A22Animation() {
   const preRef = useRef<HTMLPreElement>(null);
-  const frameRef = useRef(0);
-  const gridRef = useRef<string[][]>([]);
-  const particlesRef = useRef<Particle[]>([]);
-  const sparksRef = useRef<Spark[]>([]);
-  const initRef = useRef(false);
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const fRef = useRef(0);
+  const [, setTick] = useState(0);
 
-  const createGrid = useCallback((): string[][] => {
-    return Array.from({ length: H }, () => Array(W).fill(' '));
-  }, []);
+  const render = useCallback(() => {
+    const f = fRef.current;
+    const g: string[][] = Array.from({ length: H }, () => Array(W).fill(' '));
+    const sec = (f / FPS) % LOOP;
+    const overlay: OverlayState = { line1: '', line2: '', pos: 'hidden', big: false };
 
-  const clearGrid = useCallback(() => {
-    const g = gridRef.current;
-    for (let y = 0; y < H; y++) {
-      for (let x = 0; x < W; x++) {
-        g[y]![x] = ' ';
-      }
-    }
-  }, []);
+    const put = (x: number, y: number, c: string) => {
+      const ix = Math.round(x), iy = Math.round(y);
+      if (ix >= 0 && ix < W && iy >= 0 && iy < H) g[iy]![ix] = c;
+    };
 
-  const drawChar = useCallback((x: number, y: number, ch: string) => {
-    const gx = Math.round(x);
-    const gy = Math.round(y);
-    if (gx >= 0 && gx < W && gy >= 0 && gy < H) {
-      gridRef.current[gy]![gx] = ch;
-    }
-  }, []);
+    // ── Render a letter at position using specific style ────
+    const drawLetter = (
+      grid: number[][],
+      ox: number, oy: number,
+      mode: 'wireframe' | 'braille' | 'full',
+      progress: number // 0-1 how much to reveal
+    ) => {
+      const totalPx = LETTER_PX_ROWS * LETTER_PX_COLS;
+      const revealCount = Math.floor(progress * totalPx);
+      let count = 0;
 
-  const drawText = useCallback((text: string, cx: number, cy: number) => {
-    const startX = Math.round(cx - text.length / 2);
-    for (let i = 0; i < text.length; i++) {
-      drawChar(startX + i, cy, text[i]!);
-    }
-  }, [drawChar]);
+      for (let row = 0; row < LETTER_PX_ROWS; row++) {
+        for (let col = 0; col < LETTER_PX_COLS; col++) {
+          if (!grid[row]![col]) continue;
+          count++;
+          if (count > revealCount) continue;
 
-  const drawSprite = useCallback((sprite: string[], px: number, py: number) => {
-    for (let sy = 0; sy < sprite.length; sy++) {
-      const row = sprite[sy]!;
-      for (let sx = 0; sx < row.length; sx++) {
-        if (row[sx] !== ' ') {
-          drawChar(px + sx, py + sy, row[sx]!);
-        }
-      }
-    }
-  }, [drawChar]);
+          const px = ox + col * PX_W;
+          const py = oy + row * PX_H;
+          const edge = isEdge(grid, row, col);
 
-  const drawLensFlare = useCallback((cx: number, cy: number, width: number, intensity: number) => {
-    const chars = ['=', '#', '*', '+', '-', '.'];
-    for (let dx = -width; dx <= width; dx++) {
-      const dist = Math.abs(dx) / width;
-      const charIdx = Math.min(Math.floor(dist * chars.length), chars.length - 1);
-      if (Math.random() < intensity * (1 - dist * 0.7)) {
-        drawChar(cx + dx, cy, chars[charIdx]!);
-      }
-      // Subtle vertical bleed
-      if (dist < 0.3 && Math.random() < intensity * 0.3) {
-        drawChar(cx + dx, cy - 1, '.');
-        drawChar(cx + dx, cy + 1, '.');
-      }
-    }
-  }, [drawChar]);
+          for (let dy = 0; dy < PX_H; dy++) {
+            for (let dx = 0; dx < PX_W; dx++) {
+              const cx = px + dx;
+              const cy = py + dy;
 
-  const drawScanline = useCallback((y: number, progress: number) => {
-    const g = gridRef.current;
-    const endX = Math.floor(progress * W);
-    for (let x = 0; x < endX; x++) {
-      if (g[y]![x] === ' ') {
-        g[y]![x] = x > endX - 3 ? '#' : x > endX - 8 ? '-' : '.';
-      }
-    }
-  }, []);
+              if (mode === 'wireframe' || (mode === 'full' && edge)) {
+                // Box-drawing for edges
+                if (edge) {
+                  const boxCh = getBoxChar(grid, row, col);
+                  // Top/bottom of pixel block get horizontal chars, sides get vertical
+                  if (dy === 0 && dx === 0) put(cx, cy, boxCh);
+                  else if (dy === 0) put(cx, cy, '═');
+                  else if (dx === 0) put(cx, cy, '║');
+                  else if (dy === PX_H - 1 && dx === PX_W - 1) put(cx, cy, boxCh === '╔' ? '╝' : boxCh === '╗' ? '╚' : boxCh === '╚' ? '╗' : boxCh === '╝' ? '╔' : '╬');
+                  else put(cx, cy, mode === 'full' ? '═' : ' ');
+                } else if (mode === 'wireframe') {
+                  // Interior during wireframe — mostly empty
+                  if (Math.random() < 0.03) put(cx, cy, BRAILLE_LIGHT[Math.floor(Math.random() * BRAILLE_LIGHT.length)]!);
+                }
+              }
 
-  const spawnSparks = useCallback((cx: number, cy: number, count: number) => {
-    for (let i = 0; i < count; i++) {
-      sparksRef.current.push({
-        x: cx + (Math.random() - 0.5) * 30,
-        y: cy + (Math.random() - 0.5) * 10,
-        vx: (Math.random() - 0.5) * 1.5,
-        vy: (Math.random() - 0.5) * 0.8,
-        life: Math.floor(Math.random() * 12) + 4,
-        char: SPARK_CHARS[Math.floor(Math.random() * SPARK_CHARS.length)]!,
-      });
-    }
-  }, []);
-
-  const updateSparks = useCallback(() => {
-    const parts = sparksRef.current;
-    for (let i = parts.length - 1; i >= 0; i--) {
-      const p = parts[i]!;
-      p.x += p.vx;
-      p.y += p.vy;
-      p.life--;
-      if (p.life <= 0) { parts.splice(i, 1); continue; }
-      drawChar(p.x, p.y, p.char);
-    }
-  }, [drawChar]);
-
-  const renderGrid = useCallback((): string => {
-    return gridRef.current.map(row => row.join('')).join('\n');
-  }, []);
-
-  // ── Animation loop ─────────────────────────────────────────
-
-  const animate = useCallback(() => {
-    if (!gridRef.current.length) gridRef.current = createGrid();
-    if (!initRef.current) {
-      particlesRef.current = createParticles();
-      initRef.current = true;
-    }
-
-    const f = frameRef.current;
-    const LOOP = 480; // 32 seconds
-    const localF = f % LOOP;
-    const sec = (localF / LOOP) * 32;
-
-    // Reset particles at loop start
-    if (localF === 0) {
-      particlesRef.current = createParticles();
-      sparksRef.current = [];
-    }
-
-    clearGrid();
-
-    const particles = particlesRef.current;
-
-    // ── Phase 0: Dark, pulsing dot (0–2s) ────────────────────
-    if (sec < 2) {
-      const pulse = Math.sin(f * 0.3) * 0.5 + 0.5;
-      const ch = pulse > 0.6 ? '#' : pulse > 0.3 ? '+' : '.';
-      drawChar(W / 2, H / 2, ch);
-      if (pulse > 0.7) {
-        drawChar(W / 2 - 1, H / 2, '.');
-        drawChar(W / 2 + 1, H / 2, '.');
-      }
-    }
-
-    // ── Phase 1: Lens flare (2–3.5s) ─────────────────────────
-    else if (sec < 3.5) {
-      const p = (sec - 2) / 1.5;
-      const flareW = Math.floor(easeOut(p) * 55);
-      const intensity = p < 0.7 ? easeOut(p / 0.7) : 1 - (p - 0.7) / 0.3;
-      drawLensFlare(W / 2, H / 2, flareW, intensity * 0.9);
-    }
-
-    // ── Phase 2: Particles converge to form A22 (3.5–9s) ─────
-    else if (sec < 9) {
-      const elapsed = Math.floor((sec - 3.5) * 15); // frames since phase start
-      for (const p of particles) {
-        if (p.settled) {
-          // Shimmer settled chars
-          const shimmer = Math.random() < 0.03;
-          drawChar(p.tx, p.ty, shimmer ? '+' : p.char);
-          continue;
-        }
-        if (elapsed < p.delay) {
-          // Still waiting — draw as flying spark
-          if (Math.random() < 0.5) drawChar(p.x, p.y, '.');
-          continue;
-        }
-        // Move toward target
-        const speed = 0.12;
-        const dx = p.tx - p.x;
-        const dy = p.ty - p.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 1.5) {
-          p.x = p.tx;
-          p.y = p.ty;
-          p.settled = true;
-          drawChar(p.tx, p.ty, p.char);
-          // Spark on settle
-          if (Math.random() < 0.3) spawnSparks(p.tx, p.ty, 1);
-        } else {
-          p.x += dx * speed + (Math.random() - 0.5) * 0.5;
-          p.y += dy * speed + (Math.random() - 0.5) * 0.3;
-          drawChar(p.x, p.y, dist < 5 ? '*' : dist < 15 ? '+' : '.');
-        }
-      }
-      updateSparks();
-    }
-
-    // ── Phase 3: A22 holds, FILMS appears (9–14s) ────────────
-    else if (sec < 14) {
-      const p = (sec - 9) / 5;
-      // Draw settled letters with shimmer
-      for (const pt of particles) {
-        if (!pt.scattered) {
-          const shimmer = Math.random() < 0.04;
-          drawChar(pt.tx, pt.ty, shimmer ? (Math.random() < 0.5 ? '*' : '+') : pt.char);
-        }
-      }
-      // "FILMS" fades in
-      if (p > 0.15) {
-        const filmsAlpha = Math.min((p - 0.15) / 0.3, 1);
-        const text = 'F  I  L  M  S';
-        const startX = Math.round(W / 2 - text.length / 2);
-        for (let i = 0; i < text.length; i++) {
-          if (text[i] !== ' ' && Math.random() < filmsAlpha) {
-            drawChar(startX + i, LETTERS_Y + 11, text[i]!);
-          }
-        }
-      }
-      // Divider line sweeps at p ~0.5
-      if (p > 0.45 && p < 0.65) {
-        const lineP = (p - 0.45) / 0.2;
-        drawScanline(LETTERS_Y + 10, lineP);
-      }
-      // Ambient sparkles
-      if (f % 20 === 0) spawnSparks(W / 2, LETTERS_Y + 5, 3);
-      updateSparks();
-    }
-
-    // ── Phase 4: Scatter / dissolve (14–16.5s) ───────────────
-    else if (sec < 16.5) {
-      const p = (sec - 14) / 2.5;
-      // Trigger scatter on first frame
-      if (p < 0.05) {
-        for (const pt of particles) {
-          pt.scattered = true;
-          pt.sx = (Math.random() - 0.5) * 6;
-          pt.sy = (Math.random() - 0.5) * 4;
-        }
-      }
-      for (const pt of particles) {
-        pt.x = pt.tx + pt.sx * p * 30;
-        pt.y = pt.ty + pt.sy * p * 30;
-        const alpha = 1 - p;
-        if (Math.random() < alpha) {
-          const ch = alpha > 0.6 ? '#' : alpha > 0.3 ? '+' : '.';
-          drawChar(pt.x, pt.y, ch);
-        }
-      }
-      updateSparks();
-    }
-
-    // ── Phase 5: "presents" (16.5–19.5s) ─────────────────────
-    else if (sec < 19.5) {
-      const p = (sec - 16.5) / 3;
-      if (p < 0.2) {
-        // Fade in char by char
-        const text = 'p r e s e n t s';
-        const reveal = Math.floor(p / 0.2 * text.length);
-        drawText(text.substring(0, reveal), W / 2, H / 2);
-      } else if (p < 0.85) {
-        drawText('p r e s e n t s', W / 2, H / 2);
-      } else {
-        // Fade out
-        const fade = (p - 0.85) / 0.15;
-        const text = 'p r e s e n t s';
-        const startX = Math.round(W / 2 - text.length / 2);
-        for (let i = 0; i < text.length; i++) {
-          if (text[i] !== ' ' && Math.random() > fade) {
-            drawChar(startX + i, H / 2, text[i]!);
-          }
-        }
-      }
-    }
-
-    // ── Phase 6: Dark pause (19.5–20.5s) ─────────────────────
-    else if (sec < 20.5) {
-      // Empty — dramatic pause
-    }
-
-    // ── Phase 7: "a ghostscan film" + ghost peek (20.5–27s) ──
-    else if (sec < 27) {
-      const p = (sec - 20.5) / 6.5;
-
-      // Text fades in
-      if (p > 0.05) {
-        const textAlpha = Math.min((p - 0.05) / 0.2, 1);
-        const text = 'a   g h o s t s c a n   f i l m';
-        const startX = Math.round(W / 2 - text.length / 2);
-        for (let i = 0; i < text.length; i++) {
-          if (text[i] !== ' ' && Math.random() < textAlpha) {
-            drawChar(startX + i, H / 2 - 4, text[i]!);
-          }
-        }
-      }
-
-      // Ghost enters from below
-      if (p > 0.3) {
-        const ghostP = (p - 0.3) / 0.4;
-        const ghostY = lerp(H + 2, H / 2 - 1, easeOut(Math.min(ghostP, 1)));
-        const ghostX = W / 2 - 10 + Math.sin(f * 0.08) * 2;
-        drawSprite(GHOST_PEEK, ghostX, ghostY);
-
-        if (f % 30 === 0 && ghostP > 0.5) {
-          spawnSparks(ghostX + 10, ghostY, 4);
-        }
-      }
-
-      // Fade everything out at end
-      if (p > 0.85) {
-        const fade = (p - 0.85) / 0.15;
-        const g = gridRef.current;
-        for (let y = 0; y < H; y++) {
-          for (let x = 0; x < W; x++) {
-            if (g[y]![x] !== ' ' && Math.random() < fade) {
-              g[y]![x] = ' ';
+              if (mode === 'braille' || (mode === 'full' && !edge)) {
+                // Braille for interiors
+                if (!edge || mode === 'braille') {
+                  const depth = Math.random();
+                  if (depth < 0.3) put(cx, cy, BRAILLE_FULL[Math.floor(Math.random() * BRAILLE_FULL.length)]!);
+                  else if (depth < 0.6) put(cx, cy, BRAILLE_DENSE[Math.floor(Math.random() * BRAILLE_DENSE.length)]!);
+                  else if (depth < 0.85) put(cx, cy, BRAILLE_MED[Math.floor(Math.random() * BRAILLE_MED.length)]!);
+                  else put(cx, cy, BRAILLE_LIGHT[Math.floor(Math.random() * BRAILLE_LIGHT.length)]!);
+                }
+              }
             }
           }
         }
       }
+    };
 
-      updateSparks();
+    // ── Full screen pink static ─────────────────────────────
+    const pinkStatic = (intensity: number) => {
+      for (let y = 0; y < H; y++) {
+        for (let x = 0; x < W; x++) {
+          if (Math.random() < intensity) {
+            g[y]![x] = STATIC[Math.floor(Math.random() * STATIC.length)]!;
+          }
+        }
+      }
+    };
+
+    // ── VHS tracking glitch ─────────────────────────────────
+    const vhsGlitch = (intensity: number) => {
+      for (let y = 0; y < H; y++) {
+        if (Math.random() < intensity * 0.2) {
+          const shift = Math.floor((Math.random() - 0.5) * 20);
+          const row = [...g[y]!];
+          for (let x = 0; x < W; x++) {
+            const sx = x - shift;
+            g[y]![x] = (sx >= 0 && sx < W) ? row[sx]! : GLITCH[Math.floor(Math.random() * GLITCH.length)]!;
+          }
+        }
+      }
+    };
+
+    const border = (pattern: string) => {
+      for (let x = 0; x < W; x++) {
+        put(x, 0, pattern[x % pattern.length]!);
+        put(x, H - 1, pattern[(x + 2) % pattern.length]!);
+      }
+      for (let y = 0; y < H; y++) {
+        put(0, y, pattern[y % pattern.length]!);
+        put(W - 1, y, pattern[(y + 1) % pattern.length]!);
+      }
+    };
+
+    // ═══════════════════════════════════════════════════════════
+    // SCENES (32s, no loop — holds black at end)
+    // ═══════════════════════════════════════════════════════════
+
+    if (sec < 3) {
+      // ── FULL SCREEN PINK GLITCH — in your face ────────────
+      const p = sec / 3;
+      // Entire screen is ▒▓█
+      pinkStatic(1.0);
+      // Heavy VHS tracking
+      vhsGlitch(0.8);
+      // Occasional full-line █ bars
+      for (let y = 0; y < H; y++) {
+        if (Math.random() < 0.12) {
+          const ch = STATIC[Math.floor(Math.random() * STATIC.length)]!;
+          for (let x = 0; x < W; x++) g[y]![x] = ch;
+        }
+      }
+      // Border pulses
+      if (f % 4 < 2) border('█▓▒░');
+      // Start clearing from center in last second
+      if (p > 0.65) {
+        const clearP = (p - 0.65) / 0.35;
+        const radius = clearP * Math.max(W, H);
+        for (let y = 0; y < H; y++) {
+          for (let x = 0; x < W; x++) {
+            const dx = (x - W / 2) * 0.5;
+            const dy = y - H / 2;
+            if (Math.sqrt(dx * dx + dy * dy) < radius * 0.3) {
+              if (Math.random() < clearP * 0.7) g[y]![x] = ' ';
+            }
+          }
+        }
+      }
     }
 
-    // ── Phase 8: Hold black until loop (27–32s) ──────────────
-    // else: empty
-
-    if (preRef.current) {
-      preRef.current.textContent = renderGrid();
+    else if (sec < 5) {
+      // ── Static retreats to edges, center clears ───────────
+      const p = (sec - 3) / 2;
+      const clearRadius = easeOut(p) * 50;
+      pinkStatic(1 - p * 0.7);
+      // Clear center
+      for (let y = 0; y < H; y++) {
+        for (let x = 0; x < W; x++) {
+          const dx = (x - W / 2) * 0.5;
+          const dy = y - H / 2;
+          if (Math.sqrt(dx * dx + dy * dy) < clearRadius) {
+            if (Math.random() < p) g[y]![x] = ' ';
+          }
+        }
+      }
+      vhsGlitch(0.3 * (1 - p));
+      // Faint braille particles float in cleared area
+      if (p > 0.4) {
+        const count = Math.floor((p - 0.4) * 20);
+        for (let i = 0; i < count; i++) {
+          put(W / 2 + (Math.random() - 0.5) * 60, H / 2 + (Math.random() - 0.5) * 20,
+            BRAILLE_LIGHT[Math.floor(Math.random() * BRAILLE_LIGHT.length)]!);
+        }
+      }
     }
 
-    frameRef.current = f + 1;
-  }, [createGrid, clearGrid, drawChar, drawText, drawSprite, drawLensFlare,
-      drawScanline, spawnSparks, updateSparks, renderGrid]);
+    else if (sec < 9) {
+      // ── Wireframe constructs A22 ──────────────────────────
+      const p = (sec - 5) / 4;
+      // A builds 0-0.33, first 2 builds 0.33-0.66, second 2 builds 0.66-1
+      const aP = Math.min(p / 0.33, 1);
+      const t1P = Math.max(0, Math.min((p - 0.25) / 0.33, 1));
+      const t2P = Math.max(0, Math.min((p - 0.5) / 0.33, 1));
+
+      drawLetter(L_A, OFFSET_X, OFFSET_Y, 'wireframe', easeOut(aP));
+      drawLetter(L_2, OFFSET_X + LETTER_CHAR_W + GAP, OFFSET_Y, 'wireframe', easeOut(t1P));
+      drawLetter(L_2, OFFSET_X + (LETTER_CHAR_W + GAP) * 2, OFFSET_Y, 'wireframe', easeOut(t2P));
+
+      // Residual static at edges
+      for (let y = 0; y < H; y++) {
+        for (let x = 0; x < W; x++) {
+          if ((x < 8 || x > W - 8 || y < 3 || y > H - 3) && Math.random() < 0.05 * (1 - p)) {
+            g[y]![x] = STATIC[Math.floor(Math.random() * STATIC.length)]!;
+          }
+        }
+      }
+    }
+
+    else if (sec < 12) {
+      // ── Braille texture fills in ──────────────────────────
+      const p = (sec - 9) / 3;
+      // Draw wireframe fully first
+      drawLetter(L_A, OFFSET_X, OFFSET_Y, 'wireframe', 1);
+      drawLetter(L_2, OFFSET_X + LETTER_CHAR_W + GAP, OFFSET_Y, 'wireframe', 1);
+      drawLetter(L_2, OFFSET_X + (LETTER_CHAR_W + GAP) * 2, OFFSET_Y, 'wireframe', 1);
+      // Overlay braille fill progressively
+      const fillP = easeOut(p);
+      drawLetter(L_A, OFFSET_X, OFFSET_Y, 'braille', fillP);
+      drawLetter(L_2, OFFSET_X + LETTER_CHAR_W + GAP, OFFSET_Y, 'braille', Math.max(0, fillP - 0.1));
+      drawLetter(L_2, OFFSET_X + (LETTER_CHAR_W + GAP) * 2, OFFSET_Y, 'braille', Math.max(0, fillP - 0.2));
+    }
+
+    else if (sec < 17) {
+      // ── Full logo holds + FILMS appears ───────────────────
+      const p = (sec - 12) / 5;
+      drawLetter(L_A, OFFSET_X, OFFSET_Y, 'full', 1);
+      drawLetter(L_2, OFFSET_X + LETTER_CHAR_W + GAP, OFFSET_Y, 'full', 1);
+      drawLetter(L_2, OFFSET_X + (LETTER_CHAR_W + GAP) * 2, OFFSET_Y, 'full', 1);
+
+      // Subtle braille shimmer around letters
+      if (f % 3 === 0) {
+        for (let i = 0; i < 6; i++) {
+          put(OFFSET_X + Math.random() * TOTAL_W, OFFSET_Y + Math.random() * LETTER_CHAR_H,
+            BRAILLE_MED[Math.floor(Math.random() * BRAILLE_MED.length)]!);
+        }
+      }
+
+      // Divider line
+      if (p > 0.15) {
+        const lineP = Math.min((p - 0.15) / 0.15, 1);
+        const lineY = OFFSET_Y + LETTER_CHAR_H + 2;
+        const lineStart = Math.floor(W / 2 - TOTAL_W / 2 * lineP);
+        const lineEnd = Math.floor(W / 2 + TOTAL_W / 2 * lineP);
+        for (let x = lineStart; x < lineEnd; x++) put(x, lineY, '═');
+      }
+
+      // FILMS text overlay
+      if (p > 0.25) {
+        const tp = Math.min((p - 0.25) / 0.2, 1);
+        const msg = 'F  I  L  M  S';
+        overlay.line1 = msg.slice(0, Math.floor(tp * msg.length));
+        overlay.pos = 'center';
+      }
+    }
+
+    else if (sec < 19.5) {
+      // ── Dissolve — letters scatter into braille dust ──────
+      const p = (sec - 17) / 2.5;
+      const letters = [L_A, L_2, L_2];
+      const offsets = [0, LETTER_CHAR_W + GAP, (LETTER_CHAR_W + GAP) * 2];
+
+      for (let li = 0; li < 3; li++) {
+        const grid = letters[li]!;
+        for (let row = 0; row < LETTER_PX_ROWS; row++) {
+          for (let col = 0; col < LETTER_PX_COLS; col++) {
+            if (!grid[row]![col]) continue;
+            const px = OFFSET_X + offsets[li]! + col * PX_W;
+            const py = OFFSET_Y + row * PX_H;
+            // Scatter outward
+            const angle = Math.atan2(row - LETTER_PX_ROWS / 2, col - LETTER_PX_COLS / 2);
+            const dist = p * (10 + Math.random() * 20);
+            const sx = px + Math.cos(angle) * dist * 2;
+            const sy = py + Math.sin(angle) * dist;
+            const fade = 1 - p;
+            if (Math.random() < fade) {
+              const ch = fade > 0.6 ? BRAILLE_FULL[Math.floor(Math.random() * BRAILLE_FULL.length)]!
+                : fade > 0.3 ? BRAILLE_MED[Math.floor(Math.random() * BRAILLE_MED.length)]!
+                : BRAILLE_LIGHT[Math.floor(Math.random() * BRAILLE_LIGHT.length)]!;
+              put(sx, sy, ch);
+            }
+          }
+        }
+      }
+    }
+
+    else if (sec < 22) {
+      // ── "presents" ────────────────────────────────────────
+      const p = (sec - 19.5) / 2.5;
+      const fadeIn = Math.min(p * 4, 1);
+      const fadeOut = p > 0.8 ? 1 - (p - 0.8) / 0.2 : 1;
+
+      if (fadeIn * fadeOut > 0.1) {
+        overlay.line1 = 'p r e s e n t s';
+        overlay.pos = 'center';
+      }
+
+      // Ambient braille dust
+      const count = Math.floor(fadeIn * fadeOut * 15);
+      for (let i = 0; i < count; i++) {
+        put(W / 2 + (Math.random() - 0.5) * 80, H / 2 + (Math.random() - 0.5) * 20,
+          BRAILLE_LIGHT[Math.floor(Math.random() * BRAILLE_LIGHT.length)]!);
+      }
+    }
+
+    else if (sec < 23.5) {
+      // ── Dark pause ────────────────────────────────────────
+      // Minimal floating braille
+      for (let i = 0; i < 5; i++) {
+        put(Math.random() * W, Math.random() * H,
+          BRAILLE_LIGHT[Math.floor(Math.random() * BRAILLE_LIGHT.length)]!);
+      }
+    }
+
+    else if (sec < 29) {
+      // ── "a ghostscan film" ────────────────────────────────
+      const p = (sec - 23.5) / 5.5;
+
+      if (p > 0.05) {
+        const tp = Math.min((p - 0.05) / 0.2, 1);
+        const msg = 'a  g h o s t s c a n  f i l m';
+        overlay.line1 = msg.slice(0, Math.floor(tp * msg.length));
+        overlay.pos = 'center';
+      }
+
+      // Braille shimmer ambient
+      const count = Math.floor(8);
+      for (let i = 0; i < count; i++) {
+        put(W / 2 + (Math.random() - 0.5) * 100, H / 2 + (Math.random() - 0.5) * 30,
+          BRAILLE_MED[Math.floor(Math.random() * BRAILLE_MED.length)]!);
+      }
+
+      // Fade out
+      if (p > 0.85) {
+        overlay.line1 = '';
+        overlay.pos = 'hidden';
+      }
+    }
+
+    // else: hold black
+
+    // ── Render ──────────────────────────────────────────────
+
+    if (preRef.current) preRef.current.textContent = g.map(r => r.join('')).join('\n');
+
+    if (overlayRef.current) {
+      const el = overlayRef.current;
+      if (overlay.pos === 'hidden' || !overlay.line1) {
+        el.style.opacity = '0';
+      } else {
+        el.style.opacity = '1';
+        el.style.left = '50%';
+        el.style.right = 'auto';
+        if (overlay.pos === 'center-top') {
+          el.style.top = '8%';
+        } else {
+          el.style.top = sec >= 12 && sec < 17 ? '72%' : '48%';
+        }
+        el.style.transform = 'translateX(-50%)';
+        el.style.textAlign = 'center';
+        el.style.fontSize = overlay.big ? '28px' : '20px';
+        el.style.fontWeight = '300';
+        el.style.letterSpacing = '0.15em';
+        el.innerHTML = overlay.line1;
+      }
+    }
+
+    fRef.current = f + 1;
+    setTick(t => t + 1);
+  }, []);
 
   useEffect(() => {
-    gridRef.current = createGrid();
-    const id = setInterval(animate, INTERVAL);
+    const id = setInterval(render, MS);
     return () => clearInterval(id);
-  }, [animate, createGrid]);
+  }, [render]);
 
   return (
-    <pre
-      ref={preRef}
-      className="font-data leading-none whitespace-pre select-none"
-      style={{
-        fontSize: '12px',
-        color: 'var(--gs-base)',
-        textShadow: '0 0 4px var(--gs-base), 0 0 10px oklch(0.82 0.15 340 / 0.15)',
-        lineHeight: '1.15',
-      }}
-    />
+    <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}>
+      <pre
+        ref={preRef}
+        className="font-data leading-none whitespace-pre select-none"
+        style={{
+          fontSize: '6.5px',
+          color: 'var(--gs-base)',
+          textShadow: '0 0 5px var(--gs-base), 0 0 12px oklch(0.82 0.15 340 / 0.2)',
+          lineHeight: '1.1',
+        }}
+      />
+      <div
+        ref={overlayRef}
+        className="font-data select-none pointer-events-none"
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          fontSize: '20px',
+          color: 'var(--gs-base)',
+          textShadow: '0 0 8px var(--gs-base), 0 0 20px oklch(0.82 0.15 340 / 0.3), 0 0 40px oklch(0.82 0.15 340 / 0.1)',
+          opacity: 0,
+          transition: 'opacity 0.2s ease',
+          whiteSpace: 'nowrap',
+          letterSpacing: '0.15em',
+          fontWeight: 300,
+          zIndex: 10,
+        }}
+      />
+    </div>
   );
 }
 
-// ── Helpers ────────────────────────────────────────────────────
-
-function easeOut(t: number): number {
-  return 1 - Math.pow(1 - t, 3);
-}
-
-function lerp(a: number, b: number, t: number): number {
-  return a + (b - a) * Math.max(0, Math.min(1, t));
-}
+function easeOut(t: number): number { return 1 - (1 - t) ** 3; }
