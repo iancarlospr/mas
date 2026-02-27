@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useRef, type ReactNode } from 'react';
+import { useCallback, useEffect, useRef, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 import { useWindowManager, useWindowState } from '@/lib/window-manager';
 import { useWindowDrag } from '@/hooks/use-window-drag';
@@ -36,8 +36,48 @@ export function ManagedWindow({
   const windowState = useWindowState(id);
   const windowRef = useRef<HTMLDivElement>(null);
 
+  const contentRef = useRef<HTMLDivElement>(null);
+  const hasMeasured = useRef(false);
+
   const isActive = wm.activeWindowId === id;
   const isMaximized = windowState?.isMaximized ?? false;
+
+  // Auto-size window to fit content on first open
+  useEffect(() => {
+    if (!windowState?.isOpen || hasMeasured.current || !contentRef.current) return;
+    hasMeasured.current = true;
+
+    // Wait one frame for content to render
+    requestAnimationFrame(() => {
+      const el = contentRef.current;
+      if (!el) return;
+
+      const titlebarH = 32;
+      const statusbarH = showStatusBar ? 24 : 0;
+      const chrome = titlebarH + statusbarH + 2; // 2px for borders
+
+      const contentW = el.scrollWidth;
+      const contentH = el.scrollHeight;
+
+      const maxW = Math.floor(window.innerWidth * 0.9);
+      const maxH = Math.floor(window.innerHeight * 0.85);
+
+      const fitW = Math.min(Math.max(contentW + 2, windowState.minWidth), maxW);
+      const fitH = Math.min(Math.max(contentH + chrome, windowState.minHeight), maxH);
+
+      // Only resize if measured size differs meaningfully from current
+      if (Math.abs(fitW - windowState.width) > 20 || Math.abs(fitH - windowState.height) > 20) {
+        wm.resizeWindow(id, fitW, fitH);
+      }
+    });
+  }, [windowState?.isOpen, id, wm, windowState?.width, windowState?.height, windowState?.minWidth, windowState?.minHeight, showStatusBar]);
+
+  // Reset measurement flag when window closes so it re-measures on next open
+  useEffect(() => {
+    if (!windowState?.isOpen) {
+      hasMeasured.current = false;
+    }
+  }, [windowState?.isOpen]);
 
   const getPosition = useCallback(() => {
     if (!windowState) return null;
@@ -155,6 +195,7 @@ export function ManagedWindow({
 
       {/* Content */}
       <div
+        ref={contentRef}
         className={cn(
           'window-content',
           windowState.variant === 'terminal' && 'bg-[#0A0A0A] text-gs-terminal font-data text-data-sm',

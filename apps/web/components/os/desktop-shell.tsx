@@ -25,19 +25,20 @@ import { BedroomIcon } from './bedroom-icons';
    ================================================================= */
 
 /** Desktop icon window configurations — icons are now SVG IDs */
+/** Initial sizes — auto-sizer will snap to actual content on open */
 const WINDOW_CONFIGS: Record<string, WindowConfig> = {
-  'about':         { title: 'About AlphaScan',                 icon: '~', width: 580, height: 520 },
-  'products':      { title: 'Products',                        icon: '~', width: 620, height: 480 },
-  'pricing':       { title: 'Pricing',                         icon: '~', width: 820, height: 620 },
-  'customers':     { title: 'Reviews',                         icon: '~', width: 480, height: 380 },
+  'about':         { title: 'About AlphaScan',                 icon: '~', width: 500, height: 400 },
+  'products':      { title: 'Products',                        icon: '~', width: 560, height: 400 },
+  'pricing':       { title: 'Pricing',                         icon: '~', width: 700, height: 500 },
+  'customers':     { title: 'Reviews',                         icon: '~', width: 420, height: 340 },
   'chill':         { title: 'chill.mov',                       icon: '~', width: 640, height: 480, variant: 'terminal' },
-  'history':       { title: 'My Scans',                        icon: '~', width: 680, height: 520 },
-  'chat-launcher': { title: 'GhostChat',                       icon: '~', width: 480, height: 460 },
-  'scan-input':    { title: 'Scan.exe',                        icon: '~', width: 460, height: 260, variant: 'dialog', minHeight: 220 },
-  'features':      { title: 'Why AlphaScan?',                  icon: '~', width: 620, height: 540 },
-  'blog':          { title: 'Blog',                            icon: '~', width: 520, height: 320 },
-  'games':         { title: 'Ghost Sweeper',                   icon: '~', width: 320, height: 440, minWidth: 320, minHeight: 440 },
-  'trash':         { title: 'Log Out',                         icon: '~', width: 360, height: 260 },
+  'history':       { title: 'My Scans',                        icon: '~', width: 600, height: 400 },
+  'chat-launcher': { title: 'GhostChat',                       icon: '~', width: 420, height: 380 },
+  'scan-input':    { title: 'Scan.exe',                        icon: '~', width: 420, height: 240, variant: 'dialog' },
+  'features':      { title: 'Why AlphaScan?',                  icon: '~', width: 540, height: 400 },
+  'blog':          { title: 'Blog',                            icon: '~', width: 460, height: 280 },
+  'games':         { title: 'Ghost Sweeper',                   icon: '~', width: 320, height: 420, minWidth: 320, minHeight: 420 },
+  'trash':         { title: 'Log Out',                         icon: '~', width: 340, height: 240 },
 };
 
 export function DesktopShell({ children }: { children: ReactNode }) {
