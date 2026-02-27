@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 
 /* ═══════════════════════════════════════════════════════════════
@@ -81,6 +81,131 @@ function FlagIcon({ size = 12 }: { size?: number }) {
       <line x1="3" y1="2" x2="3" y2="10" stroke="var(--gs-base)" strokeWidth="1.5" strokeLinecap="round" />
       <path d="M3.5 2 L9 4 L3.5 6Z" fill="var(--gs-base)" />
     </svg>
+  );
+}
+
+/* ── Jumpscare Overlay ───────────────────────────────────────── */
+
+const SCARE_CHARS = '░▒▓█▀▄▐▌$@#%&*!?~';
+const GHOST_SPRITE = [
+  '                ▓▓▓▓▓▓▓▓▓▓▓▓                ',
+  '            ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓            ',
+  '          ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓          ',
+  '        ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓        ',
+  '       ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓       ',
+  '      ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓      ',
+  '      ▓▓▓▓▓▓░░░░▓▓▓▓▓▓▓▓▓▓░░░░▓▓▓▓▓▓▓▓      ',
+  '      ▓▓▓▓▓░░████░░▓▓▓▓▓▓░░████░░▓▓▓▓▓▓      ',
+  '      ▓▓▓▓▓░░████░░▓▓▓▓▓▓░░████░░▓▓▓▓▓▓      ',
+  '      ▓▓▓▓▓▓░░░░▓▓▓▓▓▓▓▓▓▓░░░░▓▓▓▓▓▓▓▓      ',
+  '      ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓      ',
+  '      ▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓      ',
+  '      ▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░▓▓▓▓▓▓▓▓▓▓      ',
+  '      ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓      ',
+  '      ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓      ',
+  '      ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓      ',
+  '      ▓▓▓▓  ▓▓▓▓▓▓  ▓▓▓▓▓▓  ▓▓▓▓▓▓  ▓▓      ',
+  '      ▓▓      ▓▓▓▓    ▓▓▓▓    ▓▓▓▓      ▓▓   ',
+];
+
+function JumpscareOverlay({ onDone }: { onDone: () => void }) {
+  const preRef = useRef<HTMLPreElement>(null);
+  const frameRef = useRef(0);
+  const startRef = useRef(Date.now());
+
+  useEffect(() => {
+    const DURATION = 1800; // ms
+    const W = 48;
+    const H = 20;
+
+    const render = () => {
+      if (!preRef.current) return;
+      const elapsed = Date.now() - startRef.current;
+      if (elapsed > DURATION) {
+        onDone();
+        return;
+      }
+
+      const f = frameRef.current++;
+      const progress = elapsed / DURATION;
+      const intensity = progress < 0.15 ? 1 : progress < 0.7 ? 0.3 : 1 - ((progress - 0.7) / 0.3);
+      const lines: string[] = [];
+
+      for (let y = 0; y < H; y++) {
+        let row = '';
+        const spriteLine = GHOST_SPRITE[y] ?? '';
+        for (let x = 0; x < W; x++) {
+          const spriteChar = spriteLine[x];
+          if (spriteChar && spriteChar !== ' ') {
+            // Ghost body — flicker between block chars
+            if (Math.random() < 0.15) {
+              row += SCARE_CHARS[Math.floor(Math.random() * SCARE_CHARS.length)];
+            } else {
+              row += spriteChar;
+            }
+          } else if (Math.random() < intensity * 0.6) {
+            // Psychedelic background noise
+            const wave = Math.sin(x * 0.3 + f * 0.5) * Math.cos(y * 0.4 + f * 0.3);
+            if (wave > 0.3) {
+              row += SCARE_CHARS[Math.floor(Math.random() * SCARE_CHARS.length)];
+            } else {
+              row += ' ';
+            }
+          } else {
+            row += ' ';
+          }
+        }
+        lines.push(row);
+      }
+
+      preRef.current.textContent = lines.join('\n');
+    };
+
+    const id = setInterval(render, 50);
+    render();
+    return () => clearInterval(id);
+  }, [onDone]);
+
+  return (
+    <div
+      className="absolute inset-0 z-50 flex items-center justify-center overflow-hidden"
+      style={{
+        background: '#0A0A0A',
+        animation: 'scare-shake 100ms infinite',
+      }}
+    >
+      <style>{`
+        @keyframes scare-shake {
+          0% { transform: translate(0, 0); }
+          25% { transform: translate(-3px, 2px); }
+          50% { transform: translate(2px, -3px); }
+          75% { transform: translate(-2px, -1px); }
+          100% { transform: translate(3px, 1px); }
+        }
+      `}</style>
+      <pre
+        ref={preRef}
+        className="font-data leading-none whitespace-pre select-none"
+        style={{
+          fontSize: '14px',
+          lineHeight: '1.15',
+          color: 'var(--gs-base)',
+          textShadow: '0 0 8px var(--gs-base), 0 0 25px rgba(255,178,239,0.6)',
+        }}
+      />
+      <div
+        className="absolute font-data font-bold text-center"
+        style={{
+          fontSize: '28px',
+          bottom: '15%',
+          color: 'var(--gs-base)',
+          textShadow: '0 0 12px var(--gs-base), 0 0 30px rgba(255,178,239,0.8)',
+          letterSpacing: '0.15em',
+        }}
+      >
+        BOO!
+      </div>
+    </div>
   );
 }
 
@@ -176,6 +301,7 @@ export default function GamesWindow() {
   const [gameState, setGameState] = useState<GameState>('playing');
   const [firstClick, setFirstClick] = useState(true);
   const [timer, setTimer] = useState(0);
+  const [showScare, setShowScare] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const flagCount = grid.flat().filter((c) => c.isFlagged).length;
@@ -198,6 +324,7 @@ export default function GamesWindow() {
     setGameState('playing');
     setFirstClick(true);
     setTimer(0);
+    setShowScare(false);
   }, [stopTimer]);
 
   const handleClick = useCallback(
@@ -227,6 +354,7 @@ export default function GamesWindow() {
         }
         setGrid(newGrid);
         setGameState('lost');
+        setShowScare(true);
         stopTimer();
         return;
       }
@@ -257,9 +385,12 @@ export default function GamesWindow() {
   );
 
   return (
-    <div className="p-gs-3 select-none">
+    <div className="p-gs-3 select-none flex flex-col items-center relative overflow-hidden">
+      {/* Jumpscare */}
+      {showScare && <JumpscareOverlay onDone={() => setShowScare(false)} />}
+
       {/* Header */}
-      <div className="flex items-center justify-between mb-gs-2 bevel-sunken p-gs-1">
+      <div className="flex items-center justify-between mb-gs-2 bevel-sunken p-gs-1 w-full max-w-[280px]">
         {/* Ghost counter */}
         <div className="font-data text-data-sm font-bold text-gs-base bg-[#0A0A0A] px-gs-2 py-px min-w-[40px] text-center rounded-md">
           {MINES - flagCount}
@@ -280,9 +411,9 @@ export default function GamesWindow() {
       </div>
 
       {/* Grid */}
-      <div className="bevel-sunken p-px inline-block">
+      <div className="inline-flex flex-col" style={{ gap: '1px' }}>
         {grid.map((row, r) => (
-          <div key={r} className="flex">
+          <div key={r} className="flex" style={{ gap: '1px' }}>
             {row.map((cell, c) => (
               <button
                 key={c}
