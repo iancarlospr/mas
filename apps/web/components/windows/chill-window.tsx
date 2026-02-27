@@ -35,10 +35,10 @@ const CHANNELS: Channel[] = [
   },
   {
     number: 3,
-    name: 'MOONLIGHT',
+    name: 'MEAN GIRLS',
     path: '/ascii/moonlight.json',
     loop: true,
-    description: 'Moonlight (2016) — "Who is you, Chiron?"',
+    description: 'On Wednesdays we wear pink.',
   },
   {
     number: 4,
