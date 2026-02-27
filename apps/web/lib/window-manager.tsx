@@ -68,16 +68,23 @@ type WindowAction =
   | { type: 'MOVE_RESIZE'; id: string; x: number; y: number; width: number; height: number };
 
 const INITIAL_Z_INDEX = 100;
-const CASCADE_OFFSET_X = 32;
-const CASCADE_OFFSET_Y = 32;
-const CASCADE_START_X = 80;
-const CASCADE_START_Y = 40;
+
+/** Random position in the center zone between icon columns */
+function randomWindowPosition(): { x: number; y: number } {
+  const vw = typeof window !== 'undefined' ? window.innerWidth : 1200;
+  const vh = typeof window !== 'undefined' ? window.innerHeight : 800;
+  // Center zone: 18%–70% horizontal, 5%–40% vertical
+  const x = Math.floor(vw * 0.18 + Math.random() * vw * 0.52);
+  const y = Math.floor(vh * 0.05 + Math.random() * vh * 0.35);
+  return { x, y };
+}
 
 function windowReducer(state: WindowManagerState, action: WindowAction): WindowManagerState {
   switch (action.type) {
     case 'REGISTER': {
       if (state.windows[action.id]) return state;
       const { config } = action;
+      const pos = randomWindowPosition();
       const win: WindowState = {
         id: action.id,
         title: config.title ?? action.id,
@@ -85,8 +92,8 @@ function windowReducer(state: WindowManagerState, action: WindowAction): WindowM
         isOpen: config.startOpen ?? false,
         isMinimized: false,
         isMaximized: false,
-        x: CASCADE_START_X + state.openCount * CASCADE_OFFSET_X,
-        y: CASCADE_START_Y + state.openCount * CASCADE_OFFSET_Y,
+        x: pos.x,
+        y: pos.y,
         width: config.width ?? 600,
         height: config.height ?? 400,
         minWidth: config.minWidth ?? 300,
@@ -114,7 +121,7 @@ function windowReducer(state: WindowManagerState, action: WindowAction): WindowM
       const existing = state.windows[action.id];
       if (!existing) return state;
       const nextZ = state.nextZIndex;
-      const cascadeN = state.openCount;
+      const openPos = randomWindowPosition();
       return {
         ...state,
         windows: {
@@ -123,8 +130,8 @@ function windowReducer(state: WindowManagerState, action: WindowAction): WindowM
             ...existing,
             isOpen: true,
             isMinimized: false,
-            x: existing.isOpen ? existing.x : CASCADE_START_X + cascadeN * CASCADE_OFFSET_X,
-            y: existing.isOpen ? existing.y : CASCADE_START_Y + cascadeN * CASCADE_OFFSET_Y,
+            x: existing.isOpen ? existing.x : openPos.x,
+            y: existing.isOpen ? existing.y : openPos.y,
             zIndex: nextZ,
           },
         },
