@@ -69,13 +69,32 @@ type WindowAction =
 
 const INITIAL_Z_INDEX = 100;
 
-/** Random position in the center zone between icon columns */
-function randomWindowPosition(): { x: number; y: number } {
+/**
+ * Random position in the safe zone between icon columns.
+ * Accounts for window width so the right edge never overlaps right icons,
+ * and the window never goes off-screen.
+ *
+ * Icon columns: left ~0-10%, right ~88-100%
+ * Safe zone for window left edge: 10% to (88% - windowWidth)
+ * Vertical: 4% to (65% - rough window height estimate)
+ */
+function randomWindowPosition(winWidth: number): { x: number; y: number } {
   const vw = typeof window !== 'undefined' ? window.innerWidth : 1200;
   const vh = typeof window !== 'undefined' ? window.innerHeight : 800;
-  // Center zone: 18%–70% horizontal, 5%–40% vertical
-  const x = Math.floor(vw * 0.18 + Math.random() * vw * 0.52);
-  const y = Math.floor(vh * 0.05 + Math.random() * vh * 0.35);
+
+  const leftBound = Math.floor(vw * 0.10);
+  const rightBound = Math.floor(vw * 0.88) - winWidth;
+  const topBound = Math.floor(vh * 0.04);
+  const bottomBound = Math.floor(vh * 0.50);
+
+  // Clamp so we always have a valid range
+  const minX = leftBound;
+  const maxX = Math.max(minX, rightBound);
+  const minY = topBound;
+  const maxY = Math.max(minY, bottomBound);
+
+  const x = Math.floor(minX + Math.random() * (maxX - minX));
+  const y = Math.floor(minY + Math.random() * (maxY - minY));
   return { x, y };
 }
 
@@ -84,7 +103,8 @@ function windowReducer(state: WindowManagerState, action: WindowAction): WindowM
     case 'REGISTER': {
       if (state.windows[action.id]) return state;
       const { config } = action;
-      const pos = randomWindowPosition();
+      const w = config.width ?? 600;
+      const pos = randomWindowPosition(w);
       const win: WindowState = {
         id: action.id,
         title: config.title ?? action.id,
@@ -121,7 +141,7 @@ function windowReducer(state: WindowManagerState, action: WindowAction): WindowM
       const existing = state.windows[action.id];
       if (!existing) return state;
       const nextZ = state.nextZIndex;
-      const openPos = randomWindowPosition();
+      const openPos = randomWindowPosition(existing.width);
       return {
         ...state,
         windows: {
