@@ -34,7 +34,7 @@ const WINDOW_CONFIGS: Record<string, WindowConfig> = {
   'chill':         { title: 'chill.mov',                       icon: '~', width: 820, height: 500, variant: 'terminal' },
   'history':       { title: 'My Scans',                        icon: '~', width: 600, height: 400 },
   'chat-launcher': { title: 'GhostChat',                       icon: '~', width: 420, height: 380 },
-  'scan-input':    { title: 'Scan.exe',                        icon: '~', width: 600, height: 200, variant: 'dialog' },
+  'scan-input':    { title: 'Scan.exe',                        icon: '~', width: 600, height: 280, variant: 'dialog' },
   'features':      { title: 'Why AlphaScan?',                  icon: '~', width: 540, height: 400 },
   'blog':          { title: 'Blog',                            icon: '~', width: 460, height: 280 },
   'games':         { title: 'Ghost Sweeper',                   icon: '~', width: 320, height: 420, minWidth: 320, minHeight: 420 },
