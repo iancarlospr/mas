@@ -185,8 +185,8 @@ export default function ChillWindow() {
 
       {/* Channel bar — glowing pill tabs */}
       <div
-        className="flex-shrink-0 border-t border-gs-mid/20 bg-[#0A0A0A]"
-        style={{ padding: '10px 16px 10px' }}
+        className="flex-shrink-0 border-t border-gs-mid/20 bg-[#0A0A0A] flex items-center justify-center"
+        style={{ height: '44px' }}
       >
         <div className="flex items-center justify-center gap-2">
           {CHANNELS.map((ch, i) => {
