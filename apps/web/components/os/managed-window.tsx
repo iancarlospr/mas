@@ -45,9 +45,14 @@ function DitherTitlebar({ active }: { active: boolean }) {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const r = active ? 255 : 74;
-    const g = active ? 178 : 56;
-    const b = active ? 239 : 68;
+    // Read actual titlebar color from DOM so dither always matches
+    const titlebar = container.parentElement?.querySelector('.window-titlebar');
+    let r = active ? 255 : 74, g = active ? 178 : 56, b = active ? 239 : 68;
+    if (titlebar) {
+      const bg = getComputedStyle(titlebar).backgroundColor;
+      const match = bg.match(/(\d+),\s*(\d+),\s*(\d+)/);
+      if (match) { r = +match[1]!; g = +match[2]!; b = +match[3]!; }
+    }
 
     const imageData = ctx.createImageData(cols, rows);
     const data = imageData.data;
