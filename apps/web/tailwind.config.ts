@@ -129,7 +129,7 @@ const config: Config = {
         'ghost-pulse':     'ghost-pulse 2s ease-in-out infinite',
         'scan-bar':        'scan-bar 2s linear infinite',
         'terminal-type':   'terminal-type 0.05s steps(1) forwards',
-        'window-open':     'window-open 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
+        'window-open':     'window-open 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards',
         'window-close':    'window-close 0.15s ease-in forwards',
         'shake':           'shake 0.3s ease-in-out',
         'laser':           'laser 0.5s ease-out forwards',
@@ -155,7 +155,9 @@ const config: Config = {
           '100%': { backgroundPosition: '200% 0' },
         },
         'window-open': {
-          '0%': { transform: 'scale(0.92)', opacity: '0' },
+          '0%': { transform: 'scale(0.08)', opacity: '0' },
+          '40%': { opacity: '1' },
+          '75%': { transform: 'scale(1.02)' },
           '100%': { transform: 'scale(1)', opacity: '1' },
         },
         'window-close': {

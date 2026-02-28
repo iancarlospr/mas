@@ -52,12 +52,25 @@ export function DesktopShell({ children }: { children: ReactNode }) {
   // Register all static window configs on mount
   useEffect(() => {
     for (const [id, config] of Object.entries(WINDOW_CONFIGS)) {
-      // Set icon to the SVG bedroom icon ReactNode
       wm.registerWindow(id, {
         ...config,
         icon: <BedroomIcon windowId={id} size={14} />,
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Open Scan.exe centered after registration
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      wm.openWindow('scan-input');
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const w = WINDOW_CONFIGS['scan-input']!.width ?? 600;
+      const h = WINDOW_CONFIGS['scan-input']!.height ?? 380;
+      wm.moveWindow('scan-input', Math.round((vw - w) / 2), Math.round(vh * 0.05));
+    }, 100);
+    return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

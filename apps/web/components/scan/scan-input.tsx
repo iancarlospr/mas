@@ -232,31 +232,97 @@ export function ScanInput({
   /* ── Dialog variant (content only — outer window provided by ManagedWindow) ── */
   return (
     <form onSubmit={handleSubmit} className={cn('p-gs-4 space-y-gs-3', className)}>
-      {/* URL Input + Button — same row */}
+      <style>{`
+        @keyframes border-sweep {
+          0% { background-position: 0% 50%; }
+          8% { background-position: 30% 50%; }
+          12% { background-position: 25% 50%; }
+          16% { background-position: 35% 50%; }
+          20% { background-position: 28% 50%; }
+          35% { background-position: 55% 50%; }
+          40% { background-position: 50% 50%; }
+          44% { background-position: 58% 50%; }
+          48% { background-position: 52% 50%; }
+          55% { background-position: 60% 50%; }
+          65% { background-position: 80% 50%; }
+          70% { background-position: 75% 50%; }
+          74% { background-position: 82% 50%; }
+          85% { background-position: 100% 50%; }
+          90% { background-position: 95% 50%; }
+          95% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        @keyframes input-shine {
+          0% { left: -30%; }
+          100% { left: 130%; }
+        }
+        .scan-input-glow {
+          position: relative;
+          border-radius: 10px;
+          padding: 3px;
+          background: linear-gradient(
+            90deg,
+            rgba(255,178,239,0.3) 0%,
+            rgba(255,178,239,0.3) 40%,
+            var(--gs-base) 50%,
+            rgba(255,178,239,0.3) 60%,
+            rgba(255,178,239,0.3) 100%
+          );
+          background-size: 300% 100%;
+          animation: border-sweep 30s linear infinite;
+        }
+        .scan-input-shine {
+          position: relative;
+          overflow: hidden;
+        }
+        .scan-input-shine::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -30%;
+          width: 15%;
+          height: 100%;
+          background: linear-gradient(
+            90deg,
+            transparent 0%,
+            rgba(255,255,255,0.12) 30%,
+            rgba(255,255,255,0.22) 50%,
+            rgba(255,255,255,0.12) 70%,
+            transparent 100%
+          );
+          animation: input-shine 8s ease-in-out infinite;
+          pointer-events: none;
+          border-radius: inherit;
+        }
+      `}</style>
+
+      {/* URL Input + Button */}
       <div className="flex items-end gap-gs-2">
         <div className="flex-1 min-w-0">
           <label className="block font-system text-os-base mb-gs-1">
             Target URL:
           </label>
-          <BevelInput
-            type="text"
-            value={url}
-            onChange={(e) => {
-              setUrl(e.target.value);
-              if (error) setError(null);
-            }}
-            placeholder="https://example.com"
-            disabled={loading}
-            fullWidth
-            autoFocus
-            className="!h-[36px] !py-0"
-          />
+          <div className="scan-input-glow scan-input-shine rounded-lg">
+            <BevelInput
+              type="text"
+              value={url}
+              onChange={(e) => {
+                setUrl(e.target.value);
+                if (error) setError(null);
+              }}
+              placeholder="https://example.com"
+              disabled={loading}
+              fullWidth
+              autoFocus
+              className="!h-[36px] !py-0 !text-gs-void !bg-gs-light/90 !placeholder:text-gs-mid !border-0 !ring-0 !rounded-[7px]"
+            />
+          </div>
         </div>
         <button
           type="submit"
           disabled={loading}
           className={cn(
-            'bevel-button-primary h-[36px] whitespace-nowrap flex-shrink-0',
+            'bevel-button-primary h-[42px] whitespace-nowrap flex-shrink-0 text-[14px]',
             loading && 'cursor-wait',
           )}
           style={{ padding: '0 18px' }}

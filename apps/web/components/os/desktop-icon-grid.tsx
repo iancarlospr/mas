@@ -52,6 +52,7 @@ function DesktopIconButton({
 
   return (
     <button
+      data-icon-id={def.id}
       className={cn(
         'absolute flex flex-col items-center gap-2 p-2 outline-none rounded-lg transition-all group',
         'focus-visible:outline-2 focus-visible:outline-gs-base focus-visible:outline-offset-2',

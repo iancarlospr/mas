@@ -74,7 +74,8 @@ const CANVAS_COLORS: Record<keyof typeof C, string> = {
 type PixelColor = keyof typeof C | null;
 type PixelGrid = PixelColor[][];
 
-const GRID_SIZE = 32;
+const GRID_W = 32;
+const GRID_H = 42;
 
 function getStateGrid(state: ChloeState, frame: number): PixelGrid {
   const _ = null;
@@ -85,7 +86,7 @@ function getStateGrid(state: ChloeState, frame: number): PixelGrid {
   const h: PixelColor = 'eyeHighlight';
   const l: PixelColor = 'blush';
 
-  // 32x32 base ghost body — more detailed bedsheet ghost
+  // 32x42 base ghost body — tall feminine bedsheet ghost
   const baseBody: PixelGrid = [
     /* 00 */ [_,_,_,_,_,_,_,_,_,_,_,o,o,o,o,o,o,o,o,o,o,_,_,_,_,_,_,_,_,_,_,_],
     /* 01 */ [_,_,_,_,_,_,_,_,_,o,o,b,b,b,b,b,b,b,b,b,b,o,o,_,_,_,_,_,_,_,_,_],
@@ -109,19 +110,46 @@ function getStateGrid(state: ChloeState, frame: number): PixelGrid {
     /* 19 */ [_,_,o,b,b,b,b,b,b,b,b,b,b,o,o,o,o,o,o,b,b,b,b,b,b,b,b,b,b,o,_,_],
     /* 20 */ [_,_,o,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,o,_,_],
     /* 21 */ [_,_,o,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,o,_,_],
-    /* 22 */ [_,_,o,b,b,b,b,b,b,b,s,b,b,b,b,b,b,b,b,b,b,s,b,b,b,b,b,b,b,o,_,_],
-    /* 23 */ [_,_,o,b,b,b,b,b,b,b,b,s,b,b,b,b,b,b,b,b,s,b,b,b,b,b,b,b,b,o,_,_],
-    /* 24 */ [_,_,o,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,o,_,_],
-    /* 25 */ [_,_,o,b,b,b,b,o,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,o,b,b,b,b,o,_,_],
-    /* 26 */ [_,_,_,o,b,b,o,_,o,b,b,b,b,b,b,b,b,b,b,b,b,b,b,o,_,o,b,b,o,_,_,_],
-    /* 27 */ [_,_,_,_,o,o,_,_,_,o,b,b,b,b,b,b,b,b,b,b,b,b,o,_,_,_,o,o,_,_,_,_],
-    /* 28 */ [_,_,_,_,_,_,_,_,_,_,o,b,b,b,b,b,b,b,b,b,b,o,_,_,_,_,_,_,_,_,_,_],
-    /* 29 */ [_,_,_,_,_,_,_,_,_,_,_,o,o,b,b,b,b,b,b,o,o,_,_,_,_,_,_,_,_,_,_,_],
-    /* 30 */ [_,_,_,_,_,_,_,_,_,_,_,_,_,o,o,o,o,o,o,_,_,_,_,_,_,_,_,_,_,_,_,_],
-    /* 31 */ [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],
+    /* 22 */ [_,_,o,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,o,_,_],
+    /* 23 */ [_,_,o,b,b,b,b,b,b,b,s,b,b,b,b,b,b,b,b,b,b,s,b,b,b,b,b,b,b,o,_,_],
+    /* 24 */ [_,_,o,b,b,b,b,b,b,b,b,s,b,b,b,b,b,b,b,b,s,b,b,b,b,b,b,b,b,o,_,_],
+    /* 25 */ [_,_,o,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,o,_,_],
+    /* 26 */ [_,_,o,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,o,_,_],
+    /* 27 */ [_,_,o,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,o,_,_],
+    /* 28 */ [_,_,o,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,o,_,_],
+    /* 29 */ [_,_,o,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,o,_,_],
+    /* 30 */ [_,_,o,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,o,_,_],
+    /* 31 */ [_,_,o,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,o,_,_],
+    /* 32 */ [_,_,o,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,o,_,_],
+    /* 33 */ [_,_,o,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,o,_,_],
+    /* 34 */ [_,_,o,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,o,_,_],
+    /* 35 */ [_,_,o,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,o,_,_],
+    /* 36 */ [_,_,o,b,b,b,s,b,b,b,b,b,b,s,b,b,b,b,s,b,b,b,b,b,b,s,b,b,b,o,_,_],
+    /* 37 */ [_,_,o,b,b,s,b,b,b,o,b,b,s,b,b,b,o,s,b,b,b,o,b,b,s,b,b,b,o,_,_,_],
+    /* 38 */ [_,_,_,o,s,b,b,o,_,_,o,s,b,b,o,_,_,o,b,b,o,_,_,o,b,b,o,o,_,_,_,_],
+    /* 39 */ [_,_,_,_,o,b,o,_,_,_,_,o,b,o,_,_,_,_,o,o,_,_,_,_,o,o,_,_,_,_,_,_],
+    /* 40 */ [_,_,_,_,_,o,_,_,_,_,_,_,o,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],
+    /* 41 */ [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],
   ];
 
   const grid = baseBody.map(row => [...row]);
+
+  // Animate wavy bottom — shift tail rows (36-40) based on frame
+  const waveOffset = [0, 1, 1, 0, -1, -1, 0, 1][frame % 8]!;
+  for (let r = 36; r <= 40; r++) {
+    if (!grid[r]) continue;
+    const row = grid[r]!;
+    const shift = waveOffset * (r >= 39 ? 2 : 1); // tips sway more
+    if (shift === 0) continue;
+    const newRow: PixelColor[] = new Array(GRID_W).fill(null);
+    for (let c = 0; c < GRID_W; c++) {
+      const src = c - shift;
+      if (src >= 0 && src < GRID_W) {
+        newRow[c] = row[src]!;
+      }
+    }
+    grid[r] = newRow;
+  }
 
   switch (state) {
     case 'idle': {
@@ -245,7 +273,8 @@ export function ChloeSprite({
   className,
 }: ChloeSpriteProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const scale = size / GRID_SIZE;
+  const scale = size / GRID_W;
+  const canvasH = Math.round(GRID_H * scale);
   const animClass = STATE_ANIMATIONS[state] ?? '';
 
   const grid = useMemo(() => getStateGrid(state, frame), [state, frame]);
@@ -257,7 +286,7 @@ export function ChloeSprite({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    ctx.clearRect(0, 0, GRID_SIZE, GRID_SIZE);
+    ctx.clearRect(0, 0, GRID_W, GRID_H);
 
     for (let y = 0; y < grid.length; y++) {
       const row = grid[y]!;
@@ -280,18 +309,18 @@ export function ChloeSprite({
         animClass,
         className,
       )}
-      style={{ width: size, height: size }}
+      style={{ width: size, height: canvasH }}
       role="img"
       aria-label={`Chloe the ghost — ${state}`}
     >
       <canvas
         ref={canvasRef}
-        width={GRID_SIZE}
-        height={GRID_SIZE}
+        width={GRID_W}
+        height={GRID_H}
         className="absolute top-0 left-0"
         style={{
           width: size,
-          height: size,
+          height: canvasH,
           imageRendering: 'pixelated',
           transform: flipped ? 'scaleX(-1)' : undefined,
         }}

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { ChloeSprite } from './chloe-sprite';
 import { useChloeReactions } from './chloe-reactions';
 import { useWindowManager } from '@/lib/window-manager';
@@ -30,9 +31,144 @@ interface ChloeScreenmateProps {
   active?: boolean;
 }
 
-const IDLE_TIMEOUT_MS = 45_000;
-const IDLE_ACTION_INTERVAL_MS = 10_000;
-const WANDER_RANGE_PX = 180;
+/* -- Laser beam constants ------------------------------------- */
+const LASER_ZAPS_ICON_INTERVAL = 5_000;
+const LASER_ZAP_DURATION = 800;
+
+function LaserBeams({ ghostRef, targetPos, zapTargetRef }: {
+  ghostRef: React.RefObject<HTMLDivElement | null>;
+  targetPos: { x: number; y: number } | null;
+  zapTargetRef: React.RefObject<{ x: number; y: number } | null>;
+}) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef<number>(0);
+  const hueRef = useRef(0);
+  const targetRef = useRef(targetPos);
+  targetRef.current = targetPos;
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const draw = () => {
+      const target = zapTargetRef.current ?? targetRef.current;
+      if (!target || !ghostRef.current) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        rafRef.current = requestAnimationFrame(draw);
+        return;
+      }
+
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      // Get the actual canvas inside the sprite — it moves with the float animation
+      const spriteCanvas = ghostRef.current.querySelector('canvas');
+      if (!spriteCanvas) {
+        rafRef.current = requestAnimationFrame(draw);
+        return;
+      }
+      const ghostRect = spriteCanvas.getBoundingClientRect();
+      const eyeLX = ghostRect.left + (18 / 64) * ghostRect.width;
+      const eyeRX = ghostRect.left + (42 / 64) * ghostRect.width;
+      const eyeY = ghostRect.top + (26 / 84) * ghostRect.height;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      hueRef.current = (hueRef.current + 2) % 360;
+      const orbPulse = 1 + Math.sin(hueRef.current * 0.1) * 0.25;
+
+      // Draw tapered beams FIRST (behind eyes) — wide at eye, narrow at target
+      for (const eyeX of [eyeLX, eyeRX]) {
+        const dx = target.x - eyeX;
+        const dy = target.y - eyeY;
+        const len = Math.sqrt(dx * dx + dy * dy);
+        if (len < 1) continue;
+
+        // Perpendicular direction for beam width
+        const px = -dy / len;
+        const py = dx / len;
+
+        // Pulsing girth
+        const pulse = 1 + Math.sin(hueRef.current * 0.08) * 0.3;
+        const widthAtEye = 7 * pulse;
+        const widthAtTarget = 1.5;
+
+        // Rainbow gradient — flows FROM the ghost (reversed)
+        const gradient = ctx.createLinearGradient(eyeX, eyeY, target.x, target.y);
+        for (let i = 0; i <= 6; i++) {
+          gradient.addColorStop(i / 6, `hsl(${(hueRef.current - i * 50 + 360) % 360}, 100%, 65%)`);
+        }
+
+        // Outer glow (wider taper)
+        ctx.fillStyle = gradient;
+        ctx.globalAlpha = 0.2;
+        ctx.beginPath();
+        ctx.moveTo(eyeX + px * (widthAtEye + 3), eyeY + py * (widthAtEye + 3));
+        ctx.lineTo(eyeX - px * (widthAtEye + 3), eyeY - py * (widthAtEye + 3));
+        ctx.lineTo(target.x - px * (widthAtTarget + 2), target.y - py * (widthAtTarget + 2));
+        ctx.lineTo(target.x + px * (widthAtTarget + 2), target.y + py * (widthAtTarget + 2));
+        ctx.closePath();
+        ctx.fill();
+
+        // Core beam (tapered polygon)
+        ctx.globalAlpha = 0.8;
+        ctx.beginPath();
+        ctx.moveTo(eyeX + px * widthAtEye, eyeY + py * widthAtEye);
+        ctx.lineTo(eyeX - px * widthAtEye, eyeY - py * widthAtEye);
+        ctx.lineTo(target.x - px * widthAtTarget, target.y - py * widthAtTarget);
+        ctx.lineTo(target.x + px * widthAtTarget, target.y + py * widthAtTarget);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.globalAlpha = 1;
+      }
+
+      // Draw eye orbs ON TOP of beams
+      for (const eyeX of [eyeLX, eyeRX]) {
+        // Large outer halo
+        const halo = ctx.createRadialGradient(eyeX, eyeY, 0, eyeX, eyeY, 16 * orbPulse);
+        halo.addColorStop(0, `hsla(${hueRef.current}, 100%, 85%, 0.6)`);
+        halo.addColorStop(0.3, `hsla(${(hueRef.current + 60) % 360}, 100%, 70%, 0.3)`);
+        halo.addColorStop(0.6, `hsla(${(hueRef.current + 120) % 360}, 100%, 60%, 0.1)`);
+        halo.addColorStop(1, 'transparent');
+        ctx.fillStyle = halo;
+        ctx.beginPath();
+        ctx.arc(eyeX, eyeY, 16 * orbPulse, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Bright core
+        const core = ctx.createRadialGradient(eyeX, eyeY, 0, eyeX, eyeY, 6 * orbPulse);
+        core.addColorStop(0, `hsla(${hueRef.current}, 100%, 95%, 1)`);
+        core.addColorStop(0.5, `hsla(${hueRef.current}, 100%, 80%, 0.9)`);
+        core.addColorStop(1, `hsla(${(hueRef.current + 40) % 360}, 100%, 65%, 0.4)`);
+        ctx.fillStyle = core;
+        ctx.beginPath();
+        ctx.arc(eyeX, eyeY, 6 * orbPulse, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      rafRef.current = requestAnimationFrame(draw);
+    };
+
+    rafRef.current = requestAnimationFrame(draw);
+    return () => cancelAnimationFrame(rafRef.current);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ghostRef]);
+
+  return createPortal(
+    <canvas
+      ref={canvasRef}
+      className="pointer-events-none"
+      style={{ position: 'fixed', inset: 0, zIndex: 9999 }}
+    />,
+    document.body,
+  );
+}
+
+const IDLE_TIMEOUT_MS = 57_000;
+const IDLE_ACTION_INTERVAL_MS = 57_000;
+const WANDER_RANGE_PX = 300;
 const DRAG_ANNOYED_COUNT = 2;
 const DRAG_AMUSED_COUNT = 5;
 const PERCH_PROBABILITY = 0.35;
@@ -62,21 +198,71 @@ export function ChloeScreenmate({
   const dragCountRef = useRef(0);
   const dragStartRef = useRef({ x: 0, y: 0 });
   const prevWindowCountRef = useRef(0);
-  const frameRef = useRef(0);
+  const [animFrame, setAnimFrame] = useState(0);
+  const [laserTarget, setLaserTarget] = useState<{ x: number; y: number } | null>(null);
+  const zapTargetRef = useRef<{ x: number; y: number } | null>(null);
+  const [zapActive, setZapActive] = useState(false); // just for re-render trigger
+  const laserTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const ghostSpriteRef = useRef<HTMLDivElement>(null);
 
   /* -- Initialize position to bottom-right of desktop --------- */
   useEffect(() => {
     if (initialized) return;
     const x = initialX ?? Math.max(100, window.innerWidth - 200);
-    const y = initialY ?? Math.max(100, window.innerHeight - 200);
+    const y = initialY ?? Math.max(100, window.innerHeight - 180);
     setPosition({ x, y });
     setInitialized(true);
   }, [initialized, initialX, initialY]);
 
-  /* -- Blink animation frame counter -------------------------- */
+  /* -- Roam every 57s: dart around viewport then settle to bottom */
+  useEffect(() => {
+    const roam = () => {
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+
+      // 3 fast random positions across viewport
+      const darts = [
+        { x: 100 + Math.random() * (vw - 200), y: 60 + Math.random() * (vh * 0.5) },
+        { x: 100 + Math.random() * (vw - 200), y: 60 + Math.random() * (vh * 0.5) },
+        { x: 100 + Math.random() * (vw - 200), y: 60 + Math.random() * (vh * 0.5) },
+      ];
+      // Final settle position at bottom
+      const settle = { x: 120 + Math.random() * (vw - 240), y: vh - 120 - Math.random() * 80 };
+
+      setIsPerched(false);
+
+      // Dart 1
+      setPosition(prev => { setFlipped(darts[0]!.x < prev.x); return darts[0]!; });
+
+      // Dart 2
+      setTimeout(() => {
+        setPosition(prev => { setFlipped(darts[1]!.x < prev.x); return darts[1]!; });
+      }, 2000);
+
+      // Dart 3
+      setTimeout(() => {
+        setPosition(prev => { setFlipped(darts[2]!.x < prev.x); return darts[2]!; });
+      }, 4000);
+
+      // Settle to bottom
+      setTimeout(() => {
+        setPosition(prev => { setFlipped(settle.x < prev.x); return settle; });
+      }, 6000);
+    };
+
+    const timer = setTimeout(roam, 57_000);
+    const interval = setInterval(roam, 57_000);
+
+    return () => {
+      clearTimeout(timer);
+      clearInterval(interval);
+    };
+  }, []);
+
+  /* -- Animation frame counter (blink + wave) ----------------- */
   useEffect(() => {
     const interval = setInterval(() => {
-      frameRef.current = (frameRef.current + 1) % 8;
+      setAnimFrame(f => (f + 1) % 8);
     }, 500);
     return () => clearInterval(interval);
   }, []);
@@ -252,6 +438,185 @@ export function ChloeScreenmate({
     setIsDragging(false);
   }, []);
 
+  /* -- Laser eyes: target scan input or random icons ---------- */
+  // Laser is OFF by default — only fires during sweep events
+  const wmRef = useRef(wm);
+  wmRef.current = wm;
+
+  // Input sweep — fires at 22s, repeats every 22s if scan window still open
+  useEffect(() => {
+    const doSweepAnim = (startX: number, startY: number, sweepWidth: number, onDone: () => void) => {
+      const sweepDuration = 1200;
+      const sweepStart = Date.now();
+
+      const animate = () => {
+        const elapsed = Date.now() - sweepStart;
+        const t = Math.min(elapsed / sweepDuration, 1);
+
+        if (t < 0.7) {
+          const p = t / 0.7;
+          const eased = p * (2 - p);
+          zapTargetRef.current = { x: startX + eased * sweepWidth, y: startY };
+        } else if (t < 1) {
+          const p = (t - 0.7) / 0.3;
+          const eased = p * p;
+          zapTargetRef.current = {
+            x: startX + sweepWidth + eased * 30,
+            y: startY - eased * 50,
+          };
+        } else {
+          zapTargetRef.current = null;
+          onDone();
+          return;
+        }
+        requestAnimationFrame(animate);
+      };
+
+      requestAnimationFrame(animate);
+    };
+
+    const doSweep = () => {
+      const scanWin = wmRef.current.windows['scan-input'];
+      const scanOpen = scanWin?.isOpen && !scanWin.isMinimized;
+
+      if (scanOpen) {
+        // Sweep the URL input
+        const inputEl = document.querySelector('#window-scan-input input[type="text"]');
+        if (!inputEl) return;
+        const rect = inputEl.getBoundingClientRect();
+        const startX = rect.left;
+        const startY = rect.top + rect.height / 2;
+
+        setLaserTarget({ x: rect.left + rect.width / 2, y: startY });
+        setTimeout(() => {
+          doSweepAnim(startX, startY, rect.width * 0.9, () => setLaserTarget(null));
+        }, 500);
+      } else {
+        // Sweep a random icon
+        const icons = document.querySelectorAll<HTMLElement>('[data-icon-id]');
+        if (icons.length === 0) return;
+        const icon = icons[Math.floor(Math.random() * icons.length)]!;
+        const rect = icon.getBoundingClientRect();
+        const startX = rect.left - 40;
+        const startY = rect.top + rect.height / 2;
+
+        setLaserTarget({ x: rect.left + rect.width / 2, y: startY });
+        setTimeout(() => {
+          doSweepAnim(startX, startY, 200, () => setLaserTarget(null));
+        }, 500);
+      }
+    };
+
+    const firstTimer = setTimeout(doSweep, 22_000);
+    const repeatId = setInterval(doSweep, 22_000);
+
+    return () => {
+      clearTimeout(firstTimer);
+      clearInterval(repeatId);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Pricing window — laser the "Unlock Results" button 3s after open
+  const pricingFiredRef = useRef(false);
+  useEffect(() => {
+    const pricingWin = wm.windows['pricing'];
+    if (pricingWin?.isOpen && !pricingWin.isMinimized && !pricingFiredRef.current) {
+      pricingFiredRef.current = true;
+      const timer = setTimeout(() => {
+        // Find "Unlock Results" button by text
+        const buttons = document.querySelectorAll('#window-pricing button');
+        let unlockBtn: HTMLElement | null = null;
+        buttons.forEach(b => {
+          if (b.textContent?.trim() === 'Unlock Results') unlockBtn = b as HTMLElement;
+        });
+        if (!unlockBtn) { setLaserTarget(null); return; }
+        const btn = unlockBtn as HTMLElement;
+
+        const rect = btn.getBoundingClientRect();
+        const startX = rect.left - 20;
+        const startY = rect.top + rect.height / 2;
+
+        setLaserTarget({ x: rect.left + rect.width / 2, y: startY });
+        setTimeout(() => {
+          const sweepDuration = 1200;
+          const sweepStart = Date.now();
+          const animate = () => {
+            const elapsed = Date.now() - sweepStart;
+            const t = Math.min(elapsed / sweepDuration, 1);
+            if (t < 0.7) {
+              const p = t / 0.7;
+              const eased = p * (2 - p);
+              zapTargetRef.current = { x: startX + eased * (rect.width + 40), y: startY };
+            } else if (t < 1) {
+              const p = (t - 0.7) / 0.3;
+              const eased = p * p;
+              zapTargetRef.current = { x: startX + rect.width + 40 + eased * 30, y: startY - eased * 50 };
+            } else {
+              zapTargetRef.current = null;
+              setLaserTarget(null);
+              return;
+            }
+            requestAnimationFrame(animate);
+          };
+          requestAnimationFrame(animate);
+        }, 500);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+    if (!pricingWin?.isOpen) {
+      pricingFiredRef.current = false; // reset when closed so it fires again next open
+    }
+  }, [wm.windows]);
+
+  // Random icon zaps — only fire when laser is active (during a sweep event)
+  const laserActiveRef = useRef(false);
+  laserActiveRef.current = !!laserTarget;
+
+  useEffect(() => {
+    laserTimerRef.current = setInterval(() => {
+      if (!laserActiveRef.current) return;
+
+      const icons = document.querySelectorAll<HTMLElement>('[data-icon-id]');
+      if (icons.length === 0) return;
+      const icon = icons[Math.floor(Math.random() * icons.length)]!;
+      const rect = icon.getBoundingClientRect();
+      const startX = rect.left - 80;
+      const startY = rect.top + rect.height / 2;
+
+      const sweepDuration = 1200;
+      const sweepStart = Date.now();
+
+      const animateZap = () => {
+        const elapsed = Date.now() - sweepStart;
+        const t = Math.min(elapsed / sweepDuration, 1);
+
+        if (t < 0.7) {
+          const p = t / 0.7;
+          const eased = p * (2 - p);
+          zapTargetRef.current = { x: startX + eased * 200, y: startY };
+        } else if (t < 1) {
+          const p = (t - 0.7) / 0.3;
+          const eased = p * p;
+          zapTargetRef.current = {
+            x: startX + 200 + eased * 30,
+            y: startY - eased * 50,
+          };
+        } else {
+          zapTargetRef.current = null;
+          return;
+        }
+        requestAnimationFrame(animateZap);
+      };
+
+      requestAnimationFrame(animateZap);
+    }, LASER_ZAPS_ICON_INTERVAL);
+
+    return () => {
+      if (laserTimerRef.current) clearInterval(laserTimerRef.current);
+    };
+  }, []);
+
   /* -- Double-click: random quip ------------------------------ */
   const handleDoubleClick = useCallback(() => {
     triggerReaction({ type: 'idle-quip' });
@@ -261,6 +626,7 @@ export function ChloeScreenmate({
 
   return (
     <div
+      ref={ghostSpriteRef}
       className="absolute z-chloe pointer-events-none"
       style={{
         left: position.x,
@@ -296,13 +662,16 @@ export function ChloeScreenmate({
         }}
       >
         <ChloeSprite
-          state={state}
+          state={laserTarget ? 'scanning' : state}
           size={64}
           glowing
           flipped={flipped}
-          frame={frameRef.current}
+          frame={laserTarget ? 0 : animFrame}
         />
       </div>
+
+      {/* Laser beams — canvas portal at page root, reads ghost position via rAF */}
+      <LaserBeams ghostRef={ghostSpriteRef} targetPos={laserTarget} zapTargetRef={zapTargetRef} />
     </div>
   );
 }

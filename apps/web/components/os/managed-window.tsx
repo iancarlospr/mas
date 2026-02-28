@@ -1,10 +1,82 @@
 'use client';
 
-import { useCallback, useRef, type ReactNode } from 'react';
+import { useCallback, useRef, useMemo, useEffect, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 import { useWindowManager, useWindowState } from '@/lib/window-manager';
 import { useWindowDrag } from '@/hooks/use-window-drag';
 import { useWindowResize } from '@/hooks/use-window-resize';
+
+/* Bayer 8x8 threshold matrix */
+const BAYER8 = [
+  [ 0,32, 8,40, 2,34,10,42],
+  [48,16,56,24,50,18,58,26],
+  [12,44, 4,36,14,46, 6,38],
+  [60,28,52,20,62,30,54,22],
+  [ 3,35,11,43, 1,33, 9,41],
+  [51,19,59,27,49,17,57,25],
+  [15,47, 7,39,13,45, 5,37],
+  [63,31,55,23,61,29,53,21],
+];
+
+const DITHER_HEIGHT = 40;
+
+function DitherTitlebar({ active }: { active: boolean }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const container = containerRef.current;
+    if (!canvas || !container) return;
+
+    const w = container.offsetWidth;
+    if (w === 0) return;
+
+    const scale = 2;
+    const cols = Math.ceil(w / scale);
+    const rows = Math.ceil(DITHER_HEIGHT / scale);
+
+    canvas.width = cols;
+    canvas.height = rows;
+    canvas.style.width = w + 'px';
+    canvas.style.height = DITHER_HEIGHT + 'px';
+    canvas.style.imageRendering = 'pixelated';
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const r = active ? 255 : 74;
+    const g = active ? 178 : 56;
+    const b = active ? 239 : 68;
+
+    const imageData = ctx.createImageData(cols, rows);
+    const data = imageData.data;
+
+    for (let y = 0; y < rows; y++) {
+      const gradient = 1.0 - (y / rows);
+
+      for (let x = 0; x < cols; x++) {
+        const threshold = BAYER8[y % 8]![x % 8]! / 64;
+        const idx = (y * cols + x) * 4;
+
+        if (gradient > threshold) {
+          data[idx] = r;
+          data[idx + 1] = g;
+          data[idx + 2] = b;
+          data[idx + 3] = 255;
+        }
+      }
+    }
+
+    ctx.putImageData(imageData, 0, 0);
+  }, [active]);
+
+  return (
+    <div ref={containerRef} className="flex-shrink-0 overflow-hidden" style={{ height: DITHER_HEIGHT }}>
+      <canvas ref={canvasRef} />
+    </div>
+  );
+}
 
 /* =================================================================
    Chloe's Bedroom OS — Managed Window
@@ -85,6 +157,22 @@ export function ManagedWindow({
     isMaximized,
   });
 
+  // Compute transform-origin from desktop icon position (macOS-style open)
+  const transformOrigin = useMemo(() => {
+    if (isMaximized || !windowState) return undefined;
+    // Find the icon button on the desktop
+    const iconEl = document.querySelector(`[data-icon-id="${id}"]`);
+    if (!iconEl) return undefined;
+    const iconRect = iconEl.getBoundingClientRect();
+    const iconCenterX = iconRect.left + iconRect.width / 2;
+    const iconCenterY = iconRect.top + iconRect.height / 2;
+    // Origin relative to window's top-left
+    const ox = iconCenterX - windowState.x;
+    const oy = iconCenterY - windowState.y;
+    return `${ox}px ${oy}px`;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, windowState?.x, windowState?.y, isMaximized]);
+
   if (!windowState || !windowState.isOpen || windowState.isMinimized) {
     return null;
   }
@@ -107,6 +195,7 @@ export function ManagedWindow({
         height: isMaximized ? '100%' : 'fit-content',
         maxHeight: isMaximized ? '100%' : 'calc(85vh - 44px)',
         zIndex: windowState.zIndex,
+        transformOrigin: transformOrigin,
       }}
       onMouseDown={handleFocus}
       role="region"
@@ -148,6 +237,9 @@ export function ManagedWindow({
         </div>
         <span className="window-titlebar-text">{windowState.title}</span>
       </div>
+
+      {/* Dither strip — only on Scan.exe window */}
+      {id === 'scan-input' && <DitherTitlebar active={isActive} />}
 
       {/* Content */}
       <div
