@@ -88,7 +88,7 @@ export default function ScanInputWindow() {
             marginTop: '6px',
           }}
         >
-          Let's fix that.
+          Let&apos;s fix that.
         </p>
       </div>
 
