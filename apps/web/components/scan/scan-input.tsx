@@ -86,7 +86,7 @@ export function ScanInput({
           turnstileTokenRef.current = null;
         },
         theme: 'dark',
-        size: 'compact',
+        size: 'normal',
       },
     );
   }, [siteKey]);
