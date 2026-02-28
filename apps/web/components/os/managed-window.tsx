@@ -54,6 +54,9 @@ function DitherTitlebar({ active }: { active: boolean }) {
       if (match) { r = +match[1]!; g = +match[2]!; b = +match[3]!; }
     }
 
+    // Window body color (dark bg)
+    const br = 18, bg2 = 15, bb = 19; // approx oklch(0.13 0.01 340)
+
     const imageData = ctx.createImageData(cols, rows);
     const data = imageData.data;
 
@@ -68,8 +71,12 @@ function DitherTitlebar({ active }: { active: boolean }) {
           data[idx] = r;
           data[idx + 1] = g;
           data[idx + 2] = b;
-          data[idx + 3] = 255;
+        } else {
+          data[idx] = br;
+          data[idx + 1] = bg2;
+          data[idx + 2] = bb;
         }
+        data[idx + 3] = 255;
       }
     }
 
