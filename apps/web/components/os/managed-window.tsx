@@ -80,7 +80,15 @@ function DitherTitlebar({ active }: { active: boolean }) {
   }, [active]);
 
   return (
-    <div ref={containerRef} className="flex-shrink-0 overflow-hidden" style={{ height: DITHER_HEIGHT }}>
+    <div
+      ref={containerRef}
+      className="flex-shrink-0 overflow-hidden"
+      style={{
+        height: DITHER_HEIGHT,
+        marginTop: -1,
+        background: active ? '#FFB2EF' : 'rgb(76, 48, 67)',
+      }}
+    >
       <canvas ref={canvasRef} />
     </div>
   );
