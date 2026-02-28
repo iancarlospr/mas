@@ -207,7 +207,22 @@ export function ScanInput({
               strategy="afterInteractive"
               onLoad={renderTurnstile}
             />
-            <div ref={turnstileContainerRef} className="mt-gs-3" />
+            <div
+              className="mt-gs-3 flex justify-center"
+              style={{
+                opacity: 0.5,
+                transform: 'scale(0.85)',
+                transformOrigin: 'center',
+                filter: 'grayscale(0.3) brightness(0.8)',
+                borderRadius: '10px',
+                overflow: 'hidden',
+                transition: 'opacity 300ms',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.8'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.opacity = '0.5'; }}
+            >
+              <div ref={turnstileContainerRef} />
+            </div>
           </>
         )}
       </form>
@@ -266,7 +281,7 @@ export function ScanInput({
         </div>
       )}
 
-      {/* Turnstile widget */}
+      {/* Turnstile widget — styled to blend with OS theme */}
       {siteKey && (
         <>
           <Script
@@ -274,7 +289,22 @@ export function ScanInput({
             strategy="afterInteractive"
             onLoad={renderTurnstile}
           />
-          <div ref={turnstileContainerRef} />
+          <div
+            className="flex justify-center"
+            style={{
+              opacity: 0.5,
+              transform: 'scale(0.85)',
+              transformOrigin: 'center',
+              filter: 'grayscale(0.3) brightness(0.8)',
+              borderRadius: '10px',
+              overflow: 'hidden',
+              transition: 'opacity 300ms',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.8'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.opacity = '0.5'; }}
+          >
+            <div ref={turnstileContainerRef} />
+          </div>
         </>
       )}
     </form>
