@@ -22,7 +22,7 @@ export const BevelInput = forwardRef<HTMLInputElement, BevelInputProps>(
           'bg-gs-void/60 border border-gs-mid rounded-lg px-gs-3 py-gs-2',
           'font-data text-data-base text-white',
           'placeholder:text-gs-mid',
-          'caret-current select-text',
+          '[caret-color:currentColor] select-text',
           'focus:outline-none focus:border-gs-base focus:ring-1 focus:ring-gs-base/30',
           'disabled:opacity-40 disabled:cursor-default',
           'min-h-[34px] transition-colors',
