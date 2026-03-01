@@ -28,6 +28,8 @@ const FeaturesWindow = lazy(() => import('@/components/windows/features-window')
 const BlogWindow = lazy(() => import('@/components/windows/blog-window'));
 const GamesWindow = lazy(() => import('@/components/windows/games-window'));
 const TrashWindow = lazy(() => import('@/components/windows/trash-window'));
+const AuthWindow = lazy(() => import('@/components/windows/auth-window'));
+const ProfileWindow = lazy(() => import('@/components/windows/profile-window'));
 
 const WINDOW_COMPONENTS: Record<string, React.ComponentType> = {
   'about': AboutWindow,
@@ -42,6 +44,8 @@ const WINDOW_COMPONENTS: Record<string, React.ComponentType> = {
   'blog': BlogWindow,
   'games': GamesWindow,
   'trash': TrashWindow,
+  'auth': AuthWindow,
+  'profile': ProfileWindow,
 };
 
 function WindowLoadingFallback() {

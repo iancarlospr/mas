@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
+import { useAuth } from '@/lib/auth-context';
+import { useWindowManager } from '@/lib/window-manager';
 
 /* ═══════════════════════════════════════════════════════════════
    My Scans — Window Content
@@ -27,35 +29,33 @@ function getScoreColor(score: number): string {
 }
 
 export default function HistoryWindow() {
+  const { user, loading: authLoading, isAuthenticated } = useAuth();
+  const wm = useWindowManager();
   const [scans, setScans] = useState<ScanRow[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [authed, setAuthed] = useState(false);
+  const [dataLoading, setDataLoading] = useState(true);
 
   useEffect(() => {
+    if (!user) {
+      setDataLoading(false);
+      return;
+    }
+
     async function load() {
       const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-
-      if (!user) {
-        setLoading(false);
-        return;
-      }
-
-      setAuthed(true);
       const { data } = await supabase
         .from('scans')
         .select('id, url, marketing_iq_score, status, tier, created_at')
-        .eq('user_id', user.id)
+        .eq('user_id', user!.id)
         .order('created_at', { ascending: false })
         .limit(50);
 
       setScans(data ?? []);
-      setLoading(false);
+      setDataLoading(false);
     }
     load();
-  }, []);
+  }, [user?.id]);
 
-  if (loading) {
+  if (authLoading || dataLoading) {
     return (
       <div className="p-gs-6 flex items-center justify-center h-full">
         <span className="font-system text-os-base text-gs-muted animate-blink">Loading...</span>
@@ -63,7 +63,7 @@ export default function HistoryWindow() {
     );
   }
 
-  if (!authed) {
+  if (!isAuthenticated) {
     return (
       <div className="p-gs-8 text-center space-y-gs-4">
         <div className="font-system text-os-lg font-bold text-gs-muted">Locked</div>
@@ -71,9 +71,9 @@ export default function HistoryWindow() {
         <p className="font-data text-data-sm text-gs-muted">
           Log in to view your scan history.
         </p>
-        <Link href="/login" className="bevel-button-primary inline-block">
+        <button onClick={() => wm.openWindow('auth')} className="bevel-button-primary">
           Log In
-        </Link>
+        </button>
       </div>
     );
   }

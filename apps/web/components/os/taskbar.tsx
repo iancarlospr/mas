@@ -1,8 +1,11 @@
 'use client';
 
 import { useState, useCallback, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useWindowManager } from '@/lib/window-manager';
+import { useAuth } from '@/lib/auth-context';
+import { createClient } from '@/lib/supabase/client';
 import { BedroomIcon } from './bedroom-icons';
 
 /* =================================================================
@@ -22,6 +25,8 @@ const START_MENU_LABELS: Record<string, string> = {
   'customers':     'Reviews',
   'chill':         'Movies',
   'games':         'Mini-Games',
+  'profile':       'Profile',
+  'auth':          'Log In',
 };
 
 /** Order for start menu (left column first, then right) */
@@ -34,6 +39,8 @@ export function Taskbar() {
   const [startOpen, setStartOpen] = useState(false);
   const startRef = useRef<HTMLDivElement>(null);
   const wm = useWindowManager();
+  const { isAuthenticated } = useAuth();
+  const router = useRouter();
 
   const toggleStart = useCallback(() => {
     setStartOpen((prev) => !prev);
@@ -116,18 +123,50 @@ export function Taskbar() {
 
               <div className="mx-gs-2 my-1 h-px bg-gs-mid/40" />
 
-              <button
-                className="w-full text-left px-gs-4 py-gs-2 font-system text-os-base
-                           flex items-center gap-gs-3 transition-colors
-                           hover:bg-gs-base/15 hover:text-gs-base text-gs-light/80"
-                onClick={() => {
-                  wm.openWindow('trash');
-                  setStartOpen(false);
-                }}
-              >
-                <span className="text-os-lg text-gs-base">{'>'}</span>
-                <span>Log Out</span>
-              </button>
+              {isAuthenticated ? (
+                <>
+                  <button
+                    className="w-full text-left px-gs-4 py-gs-2 font-system text-os-base
+                               flex items-center gap-gs-3 transition-colors
+                               hover:bg-gs-base/15 hover:text-gs-base text-gs-light/80"
+                    onClick={() => {
+                      wm.openWindow('profile');
+                      setStartOpen(false);
+                    }}
+                  >
+                    <span className="text-gs-base"><BedroomIcon windowId="profile" size={18} /></span>
+                    <span>Profile</span>
+                  </button>
+                  <button
+                    className="w-full text-left px-gs-4 py-gs-2 font-system text-os-base
+                               flex items-center gap-gs-3 transition-colors
+                               hover:bg-gs-base/15 hover:text-gs-base text-gs-light/80"
+                    onClick={async () => {
+                      setStartOpen(false);
+                      const supabase = createClient();
+                      await supabase.auth.signOut();
+                      router.push('/');
+                      router.refresh();
+                    }}
+                  >
+                    <span className="text-gs-base"><BedroomIcon windowId="trash" size={18} /></span>
+                    <span>Log Out</span>
+                  </button>
+                </>
+              ) : (
+                <button
+                  className="w-full text-left px-gs-4 py-gs-2 font-system text-os-base
+                             flex items-center gap-gs-3 transition-colors
+                             hover:bg-gs-base/15 hover:text-gs-base text-gs-light/80"
+                  onClick={() => {
+                    wm.openWindow('auth');
+                    setStartOpen(false);
+                  }}
+                >
+                  <span className="text-gs-base"><BedroomIcon windowId="auth" size={18} /></span>
+                  <span>Log In</span>
+                </button>
+              )}
             </div>
           </div>
         </div>

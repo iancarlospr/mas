@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const tokenHash = searchParams.get('token_hash');
   const type = searchParams.get('type') as 'signup' | 'magiclink' | 'recovery' | null;
-  const redirectTo = searchParams.get('redirect_to') ?? '/history';
+  const redirectTo = searchParams.get('redirect_to') ?? '/';
 
   if (!tokenHash || !type) {
     return NextResponse.redirect(new URL('/auth/error?message=invalid_link', origin));

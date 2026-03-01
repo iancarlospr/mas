@@ -39,6 +39,8 @@ const WINDOW_CONFIGS: Record<string, WindowConfig> = {
   'blog':          { title: 'Blog',                            icon: '~', width: 460, height: 280 },
   'games':         { title: 'Ghost Sweeper',                   icon: '~', width: 320, height: 420, minWidth: 320, minHeight: 420 },
   'trash':         { title: 'Log Out',                         icon: '~', width: 340, height: 240 },
+  'auth':          { title: 'auth.exe',                       icon: '~', width: 440, height: 480, variant: 'dialog' },
+  'profile':       { title: 'Profile',                        icon: '~', width: 480, height: 520 },
 };
 
 export function DesktopShell({ children }: { children: ReactNode }) {

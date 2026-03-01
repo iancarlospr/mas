@@ -33,6 +33,8 @@ export interface WindowState {
   zIndex: number;
   variant: 'default' | 'terminal' | 'ghost' | 'dialog';
   isRouteWindow?: boolean;
+  /** Data passed when opening — consumed by window content, cleared on close */
+  openData?: Record<string, unknown>;
 }
 
 export interface WindowConfig {
@@ -58,7 +60,7 @@ interface WindowManagerState {
 type WindowAction =
   | { type: 'REGISTER'; id: string; config: WindowConfig }
   | { type: 'UNREGISTER'; id: string }
-  | { type: 'OPEN'; id: string }
+  | { type: 'OPEN'; id: string; data?: Record<string, unknown> }
   | { type: 'CLOSE'; id: string }
   | { type: 'MINIMIZE'; id: string }
   | { type: 'MAXIMIZE'; id: string }
@@ -157,6 +159,7 @@ function windowReducer(state: WindowManagerState, action: WindowAction): WindowM
             x: existing.isOpen ? existing.x : openPos.x,
             y: existing.isOpen ? existing.y : openPos.y,
             zIndex: nextZ,
+            openData: action.data ?? existing.openData,
           },
         },
         activeWindowId: action.id,
@@ -177,6 +180,7 @@ function windowReducer(state: WindowManagerState, action: WindowAction): WindowM
             isOpen: false,
             isMinimized: false,
             isMaximized: false,
+            openData: undefined,
           },
         },
         activeWindowId: state.activeWindowId === action.id ? null : state.activeWindowId,
@@ -287,7 +291,7 @@ interface WindowManagerContextValue {
 
   registerWindow(id: string, config: WindowConfig): void;
   unregisterWindow(id: string): void;
-  openWindow(id: string): void;
+  openWindow(id: string, data?: Record<string, unknown>): void;
   closeWindow(id: string): void;
   minimizeWindow(id: string): void;
   maximizeWindow(id: string): void;
@@ -319,8 +323,8 @@ export function WindowManagerProvider({ children }: { children: ReactNode }) {
     dispatch({ type: 'UNREGISTER', id });
   }, []);
 
-  const openWindow = useCallback((id: string) => {
-    dispatch({ type: 'OPEN', id });
+  const openWindow = useCallback((id: string, data?: Record<string, unknown>) => {
+    dispatch({ type: 'OPEN', id, data });
   }, []);
 
   const closeWindow = useCallback((id: string) => {

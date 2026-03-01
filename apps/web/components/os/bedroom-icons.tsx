@@ -13,6 +13,8 @@ import {
   BookOpenText,
   Gamepad2,
   Trash2,
+  LogIn,
+  UserCircle,
 } from 'lucide-react';
 import type { LucideProps } from 'lucide-react';
 
@@ -33,6 +35,8 @@ const BEDROOM_ICONS: Record<string, React.FC<LucideProps>> = {
   'blog':          BookOpenText,
   'games':         Gamepad2,
   'trash':         Trash2,
+  'auth':          LogIn,
+  'profile':       UserCircle,
 };
 
 /**

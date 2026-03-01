@@ -1,7 +1,8 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useMemo } from 'react';
 import { useWindowManager } from '@/lib/window-manager';
+import { useAuth } from '@/lib/auth-context';
 import { cn } from '@/lib/utils';
 import { soundEffects } from '@/lib/sound-effects';
 import { BedroomIcon } from './bedroom-icons';
@@ -23,7 +24,8 @@ const LEFT_X = '5%';
 const RIGHT_X = '95%';
 const START_Y = 24; // px from top
 
-const ROOM_ICONS: DesktopIconDef[] = [
+/** Static icons — the last right-column slot is dynamic (see below) */
+const STATIC_ICONS: DesktopIconDef[] = [
   // Left column — primary actions
   { id: 'history',       label: 'My Scans',    x: LEFT_X,  y: `${START_Y + ICON_SPACING * 0}px` },
   { id: 'chat-launcher', label: 'Chat',        x: LEFT_X,  y: `${START_Y + ICON_SPACING * 1}px` },
@@ -38,7 +40,7 @@ const ROOM_ICONS: DesktopIconDef[] = [
   { id: 'customers',     label: 'Reviews',     x: RIGHT_X, y: `${START_Y + ICON_SPACING * 2}px` },
   { id: 'chill',         label: 'Movies',      x: RIGHT_X, y: `${START_Y + ICON_SPACING * 3}px` },
   { id: 'games',         label: 'Mini-Games',  x: RIGHT_X, y: `${START_Y + ICON_SPACING * 4}px` },
-  { id: 'trash',         label: 'Log Out',     x: RIGHT_X, y: `${START_Y + ICON_SPACING * 5}px` },
+  // Slot 5 (right column bottom) is dynamic — see DesktopIconGrid
 ];
 
 function DesktopIconButton({
@@ -91,15 +93,24 @@ function DesktopIconButton({
 
 export function DesktopIconGrid() {
   const { openWindow } = useWindowManager();
+  const { isAuthenticated } = useAuth();
 
   const handleOpen = useCallback(
     (id: string) => openWindow(id),
     [openWindow],
   );
 
+  // Dynamic bottom-right icon: Profile (logged in) or Log In (logged out)
+  const icons = useMemo(() => {
+    const dynamicIcon: DesktopIconDef = isAuthenticated
+      ? { id: 'profile', label: 'Profile', x: RIGHT_X, y: `${START_Y + ICON_SPACING * 5}px` }
+      : { id: 'auth',    label: 'Log In',  x: RIGHT_X, y: `${START_Y + ICON_SPACING * 5}px` };
+    return [...STATIC_ICONS, dynamicIcon];
+  }, [isAuthenticated]);
+
   return (
     <div className="absolute inset-0 z-icons">
-      {ROOM_ICONS.map((def) => (
+      {icons.map((def) => (
         <DesktopIconButton key={def.id} def={def} onOpen={handleOpen} />
       ))}
     </div>

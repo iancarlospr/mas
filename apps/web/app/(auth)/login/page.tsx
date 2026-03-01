@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { AuthForm } from '@/components/auth/auth-form';
+import { AuthRouteOrchestrator } from '@/components/auth/auth-route-orchestrator';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 export default function LoginPage() {
   return (
     <Suspense>
-      <AuthForm mode="login" />
+      <AuthRouteOrchestrator mode="login" />
     </Suspense>
   );
 }
