@@ -71,10 +71,10 @@
     overflow: hidden;
   }
 
-  /* Selection — pink on deep */
+  /* Selection — strong pink bg, white text for readability */
   ::selection {
-    background: oklch(0.82 0.15 340 / 0.3);
-    color: var(--gs-light);
+    background: oklch(0.65 0.2 340 / 0.5);
+    color: #fff;
   }
 
   /* Focus rings — consistent pink glow */
