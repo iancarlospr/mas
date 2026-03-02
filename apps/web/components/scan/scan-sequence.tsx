@@ -228,7 +228,7 @@ export function ScanSequence({
 
   /* ── Render ──────────────────────────────────────────────── */
   return (
-    <div className="fixed inset-0 z-[1000] bg-gs-ink overflow-hidden">
+    <div className="fixed inset-0 z-[10000] bg-gs-ink overflow-hidden">
       {/* ── Phase 0: Matrix Intro ────────────────────────── */}
       {currentPhase === 0 && (
         <div className="absolute inset-0 flex items-center justify-center">
