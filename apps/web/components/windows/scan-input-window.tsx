@@ -98,7 +98,7 @@ export default function ScanInputWindow() {
           className="font-data"
           style={{
             fontSize: '11px',
-            letterSpacing: '0.18em',
+            letterSpacing: '0.08em',
             textTransform: 'uppercase',
             color: 'var(--gs-mid)',
           }}
