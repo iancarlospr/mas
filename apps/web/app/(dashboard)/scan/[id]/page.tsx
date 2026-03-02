@@ -1,36 +1,34 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { ScanProgress } from '@/components/scan/scan-progress';
 import { BentoDashboard } from '@/components/scan/bento-dashboard';
 import { MobileDashboard } from '@/components/scan/mobile-dashboard';
 import { useViewport } from '@/hooks/use-viewport';
 import { ChloeSprite } from '@/components/chloe/chloe-sprite';
 import { Window } from '@/components/os/window';
-import { pickRandom, ERROR_STATES } from '@/lib/chloe-ai-copy';
 import type { ScanWithResults } from '@marketing-alpha/types';
 import { analytics } from '@/lib/analytics';
 
 /**
- * GhostScan OS — Scan Page
- * ═══════════════════════════
+ * GhostScan OS — Scan Page (Route Fallback)
+ * ═══════════════════════════════════════════════
  *
- * WHAT: The main scan route — handles loading, in-progress (Hollywood Hack),
- *       failed, and complete (Desktop Dashboard) states.
- * WHY:  This is the entry point to the scan experience (Plan Section 5, 6).
- * HOW:  Fetches scan data, renders ScanProgress during scanning (which
- *       drives the full Hollywood Hack sequence), then BentoDashboard
- *       (which renders the Desktop OS) when complete.
- *
- * All states now use GhostScan OS visual language.
+ * Desktop users are redirected to the OS desktop with ?open_scan={id},
+ * which opens a managed window. This page remains for:
+ * - Mobile users (full-page dashboard)
+ * - Direct URL access (bookmarks, shared links, email)
+ * - Search engine crawlers
  */
 
 export default function ScanPage() {
   const { id } = useParams<{ id: string }>();
   const viewport = useViewport();
+  const router = useRouter();
   const [scan, setScan] = useState<ScanWithResults | null>(null);
   const [loading, setLoading] = useState(true);
+  const [redirecting, setRedirecting] = useState(false);
 
   const fetchScan = useCallback(async () => {
     const res = await fetch(`/api/scans/${id}`);
@@ -45,8 +43,16 @@ export default function ScanPage() {
     fetchScan();
   }, [fetchScan]);
 
-  /* ── Loading state ───────────────────────────────────────── */
-  if (loading) {
+  // Desktop users: redirect to desktop OS with scan window
+  useEffect(() => {
+    if (viewport === 'desktop' && !loading) {
+      setRedirecting(true);
+      router.replace(`/?open_scan=${id}`);
+    }
+  }, [viewport, loading, id, router]);
+
+  /* ── Loading / redirecting state ───────────────────────────── */
+  if (loading || redirecting) {
     return (
       <div className="fixed inset-0 bg-gs-ink flex items-center justify-center">
         <div className="text-center">
@@ -63,7 +69,7 @@ export default function ScanPage() {
   if (!scan) {
     return (
       <div className="fixed inset-0 bg-gs-paper flex items-center justify-center">
-        <Window id="not-found" title="⚠ Error" variant="dialog" isActive width={400}>
+        <Window id="not-found" title="Error" variant="dialog" isActive width={400}>
           <div className="p-gs-6 text-center">
             <ChloeSprite state="found" size={64} glowing className="mx-auto" />
             <h1 className="font-system text-os-lg text-gs-ink mt-gs-4 mb-gs-2">
@@ -78,7 +84,7 @@ export default function ScanPage() {
     );
   }
 
-  /* ── In-progress → Hollywood Hack sequence ───────────────── */
+  /* ── In-progress → Hollywood Hack sequence (mobile only now) ── */
   if (scan.status !== 'complete' && scan.status !== 'failed' && scan.status !== 'cancelled') {
     return (
       <ScanProgress
@@ -99,7 +105,7 @@ export default function ScanPage() {
       <div className="fixed inset-0 bg-gs-paper flex items-center justify-center">
         <div className="relative">
           <ChloeSprite state="found" size={64} glowing className="absolute -top-[80px] left-1/2 -translate-x-1/2" />
-          <Window id="scan-failed" title="⚠ Scan Failed" variant="dialog" isActive width={440}>
+          <Window id="scan-failed" title="Scan Failed" variant="dialog" isActive width={440}>
             <div className="p-gs-6 text-center">
               <p className="font-data text-data-lg text-gs-critical font-bold mb-gs-2">
                 Scan Could Not Complete
@@ -117,9 +123,6 @@ export default function ScanPage() {
     );
   }
 
-  /* ── Complete → Dashboard (mobile or desktop) ───────────── */
-  if (viewport === 'mobile') {
-    return <MobileDashboard scan={scan} />;
-  }
-  return <BentoDashboard scan={scan} />;
+  /* ── Complete → Mobile Dashboard (desktop was redirected above) */
+  return <MobileDashboard scan={scan} />;
 }

@@ -3,6 +3,7 @@
 import type { ReactNode } from 'react';
 import { WindowManagerProvider } from '@/lib/window-manager';
 import { AuthProvider } from '@/lib/auth-context';
+import { ScanOrchestratorProvider } from '@/lib/scan-orchestrator';
 import { ChloeReactionsProvider } from '@/components/chloe/chloe-reactions';
 import { DesktopShell } from './desktop-shell';
 import { MobileGate } from './mobile-gate';
@@ -19,13 +20,15 @@ export function DesktopRoot({ children }: { children: ReactNode }) {
   return (
     <WindowManagerProvider>
       <AuthProvider>
-        <ChloeReactionsProvider>
-          <MobileGate>
-            <DesktopShell>
-              {children}
-            </DesktopShell>
-          </MobileGate>
-        </ChloeReactionsProvider>
+        <ScanOrchestratorProvider>
+          <ChloeReactionsProvider>
+            <MobileGate>
+              <DesktopShell>
+                {children}
+              </DesktopShell>
+            </MobileGate>
+          </ChloeReactionsProvider>
+        </ScanOrchestratorProvider>
       </AuthProvider>
     </WindowManagerProvider>
   );

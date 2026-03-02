@@ -8,6 +8,7 @@ import { ContextMenu, type ContextMenuItem } from './context-menu';
 import { BedroomWallpaper } from './bedroom-wallpaper';
 import { ChloeScreenmate } from '@/components/chloe/chloe-screenmate';
 import { useWindowManager, type WindowConfig } from '@/lib/window-manager';
+import { useScanOrchestrator } from '@/lib/scan-orchestrator';
 import { BedroomIcon } from './bedroom-icons';
 
 /* =================================================================
@@ -45,6 +46,7 @@ const WINDOW_CONFIGS: Record<string, WindowConfig> = {
 
 export function DesktopShell({ children }: { children: ReactNode }) {
   const wm = useWindowManager();
+  const orchestrator = useScanOrchestrator();
   const [contextMenu, setContextMenu] = useState<{
     x: number;
     y: number;
@@ -121,6 +123,28 @@ export function DesktopShell({ children }: { children: ReactNode }) {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [wm]);
+
+  // Handle URL params: ?payment_success={scanId} or ?open_scan={scanId}
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+
+    const paymentScanId = params.get('payment_success');
+    if (paymentScanId) {
+      window.history.replaceState({}, '', '/');
+      // Delay to give Stripe webhook time to update tier
+      setTimeout(() => {
+        orchestrator.openScanWindow(paymentScanId, '');
+      }, 1500);
+      return;
+    }
+
+    const openScanId = params.get('open_scan');
+    if (openScanId) {
+      window.history.replaceState({}, '', '/');
+      orchestrator.openScanWindow(openScanId, '');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div

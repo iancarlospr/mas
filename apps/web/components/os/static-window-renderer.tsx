@@ -5,17 +5,17 @@ import { useWindowManager } from '@/lib/window-manager';
 import { ManagedWindow } from './managed-window';
 
 /* ═══════════════════════════════════════════════════════════════
-   GhostScan OS — Static Window Renderer
+   GhostScan OS — Window Renderer
 
-   Reads all windows from WindowManagerProvider context.
-   For each open, non-minimized, non-route window, renders the
-   corresponding content component inside a ManagedWindow.
+   Renders two kinds of windows:
+   1. Static — fixed ID, hardcoded in WINDOW_COMPONENTS map
+   2. Dynamic — runtime IDs (e.g., scan-{uuid}), resolved via
+      componentType field in WindowState
 
-   Content components are lazy-loaded — they contain marketing
-   copy and heavy components that shouldn't block initial load.
+   Content components are lazy-loaded to avoid blocking initial load.
    ═══════════════════════════════════════════════════════════════ */
 
-// Lazy-loaded window content components
+// Lazy-loaded static window content components
 const AboutWindow = lazy(() => import('@/components/windows/about-window'));
 const ProductsWindow = lazy(() => import('@/components/windows/products-window'));
 const PricingWindow = lazy(() => import('@/components/windows/pricing-window'));
@@ -31,6 +31,11 @@ const TrashWindow = lazy(() => import('@/components/windows/trash-window'));
 const AuthWindow = lazy(() => import('@/components/windows/auth-window'));
 const ProfileWindow = lazy(() => import('@/components/windows/profile-window'));
 
+// Lazy-loaded dynamic window content components (resolved by componentType)
+const ScanReportWindow = lazy(() => import('@/components/windows/scan-report-window'));
+const PaymentWindow = lazy(() => import('@/components/windows/payment-window'));
+
+/** Static windows — keyed by exact window ID */
 const WINDOW_COMPONENTS: Record<string, React.ComponentType> = {
   'about': AboutWindow,
   'products': ProductsWindow,
@@ -46,6 +51,12 @@ const WINDOW_COMPONENTS: Record<string, React.ComponentType> = {
   'trash': TrashWindow,
   'auth': AuthWindow,
   'profile': ProfileWindow,
+};
+
+/** Dynamic windows — keyed by componentType, accepts windowId prop */
+const DYNAMIC_WINDOW_COMPONENTS: Record<string, React.ComponentType<{ windowId: string }>> = {
+  'scan-report': ScanReportWindow,
+  'payment': PaymentWindow,
 };
 
 function WindowLoadingFallback() {
@@ -66,16 +77,33 @@ export function StaticWindowRenderer() {
       {visibleWindows
         .filter((w) => !w.isRouteWindow)
         .map((w) => {
-          const ContentComponent = WINDOW_COMPONENTS[w.id];
-          if (!ContentComponent) return null;
+          // Static window — exact ID match
+          const StaticComponent = WINDOW_COMPONENTS[w.id];
+          if (StaticComponent) {
+            return (
+              <ManagedWindow key={w.id} id={w.id}>
+                <Suspense fallback={<WindowLoadingFallback />}>
+                  <StaticComponent />
+                </Suspense>
+              </ManagedWindow>
+            );
+          }
 
-          return (
-            <ManagedWindow key={w.id} id={w.id}>
-              <Suspense fallback={<WindowLoadingFallback />}>
-                <ContentComponent />
-              </Suspense>
-            </ManagedWindow>
-          );
+          // Dynamic window — resolve by componentType
+          const DynamicComponent = w.componentType
+            ? DYNAMIC_WINDOW_COMPONENTS[w.componentType]
+            : undefined;
+          if (DynamicComponent) {
+            return (
+              <ManagedWindow key={w.id} id={w.id}>
+                <Suspense fallback={<WindowLoadingFallback />}>
+                  <DynamicComponent windowId={w.id} />
+                </Suspense>
+              </ManagedWindow>
+            );
+          }
+
+          return null;
         })}
     </>
   );

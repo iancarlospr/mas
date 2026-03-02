@@ -91,8 +91,8 @@ export async function POST(request: NextRequest) {
     mode: 'payment',
     payment_method_types: ['card'],
     line_items: [{ price: priceId, quantity: 1 }],
-    success_url: `${request.nextUrl.origin}/scan/${scanId}?payment=success`,
-    cancel_url: `${request.nextUrl.origin}/scan/${scanId}?payment=cancelled`,
+    success_url: `${request.nextUrl.origin}/?payment_success=${scanId}`,
+    cancel_url: `${request.nextUrl.origin}/`,
     client_reference_id: user.id,
     metadata: {
       product,

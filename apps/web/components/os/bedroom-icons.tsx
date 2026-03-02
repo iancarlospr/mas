@@ -15,6 +15,7 @@ import {
   Trash2,
   LogIn,
   UserCircle,
+  FileSearch,
 } from 'lucide-react';
 import type { LucideProps } from 'lucide-react';
 
@@ -43,16 +44,32 @@ const BEDROOM_ICONS: Record<string, React.FC<LucideProps>> = {
  * Get the Lucide icon for a window ID.
  * Falls back to a generic dot if the ID isn't mapped.
  */
+/** Map componentType prefixes to icons for dynamic windows */
+const DYNAMIC_ICONS: Record<string, React.FC<LucideProps>> = {
+  'scan-': FileSearch,
+  'payment-': CircleDollarSign,
+};
+
 export function BedroomIcon({ windowId, size = 24, className }: { windowId: string; size?: number; className?: string }) {
+  // Static window — exact match
   const IconComponent = BEDROOM_ICONS[windowId];
-  if (!IconComponent) {
-    return (
-      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className={className}>
-        <circle cx="12" cy="12" r="3" />
-      </svg>
-    );
+  if (IconComponent) {
+    return <IconComponent size={size} strokeWidth={1.5} className={className} />;
   }
-  return <IconComponent size={size} strokeWidth={1.5} className={className} />;
+
+  // Dynamic window — match by prefix
+  for (const [prefix, Icon] of Object.entries(DYNAMIC_ICONS)) {
+    if (windowId.startsWith(prefix)) {
+      return <Icon size={size} strokeWidth={1.5} className={className} />;
+    }
+  }
+
+  // Fallback
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className={className}>
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  );
 }
 
 export { BEDROOM_ICONS };

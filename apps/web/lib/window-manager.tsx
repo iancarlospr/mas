@@ -33,6 +33,8 @@ export interface WindowState {
   zIndex: number;
   variant: 'default' | 'terminal' | 'ghost' | 'dialog';
   isRouteWindow?: boolean;
+  /** Component type for dynamic windows (e.g., 'scan-report', 'payment') */
+  componentType?: string;
   /** Data passed when opening — consumed by window content, cleared on close */
   openData?: Record<string, unknown>;
 }
@@ -48,6 +50,8 @@ export interface WindowConfig {
   isRouteWindow?: boolean;
   /** Start open instead of closed */
   startOpen?: boolean;
+  /** Component type for dynamic windows — tells renderer which component to use */
+  componentType?: string;
 }
 
 interface WindowManagerState {
@@ -67,7 +71,8 @@ type WindowAction =
   | { type: 'FOCUS'; id: string }
   | { type: 'MOVE'; id: string; x: number; y: number }
   | { type: 'RESIZE'; id: string; width: number; height: number }
-  | { type: 'MOVE_RESIZE'; id: string; x: number; y: number; width: number; height: number };
+  | { type: 'MOVE_RESIZE'; id: string; x: number; y: number; width: number; height: number }
+  | { type: 'UPDATE_WINDOW'; id: string; updates: Partial<Pick<WindowState, 'title' | 'icon'>> };
 
 const INITIAL_Z_INDEX = 100;
 
@@ -127,6 +132,7 @@ function windowReducer(state: WindowManagerState, action: WindowAction): WindowM
         zIndex: INITIAL_Z_INDEX,
         variant: config.variant ?? 'default',
         isRouteWindow: config.isRouteWindow,
+        componentType: config.componentType,
       };
       return {
         ...state,
@@ -171,6 +177,17 @@ function windowReducer(state: WindowManagerState, action: WindowAction): WindowM
     case 'CLOSE': {
       const win = state.windows[action.id];
       if (!win) return state;
+      // Dynamic windows (those with componentType) are fully unregistered on close
+      // to prevent memory leaks from accumulating scan-{uuid} entries
+      if (win.componentType) {
+        const { [action.id]: _, ...rest } = state.windows;
+        return {
+          ...state,
+          windows: rest,
+          activeWindowId: state.activeWindowId === action.id ? null : state.activeWindowId,
+          openCount: Math.max(0, state.openCount - 1),
+        };
+      }
       return {
         ...state,
         windows: {
@@ -278,6 +295,21 @@ function windowReducer(state: WindowManagerState, action: WindowAction): WindowM
       };
     }
 
+    case 'UPDATE_WINDOW': {
+      const win = state.windows[action.id];
+      if (!win) return state;
+      return {
+        ...state,
+        windows: {
+          ...state.windows,
+          [action.id]: {
+            ...win,
+            ...action.updates,
+          },
+        },
+      };
+    }
+
     default:
       return state;
   }
@@ -299,6 +331,7 @@ interface WindowManagerContextValue {
   moveWindow(id: string, x: number, y: number): void;
   resizeWindow(id: string, width: number, height: number): void;
   moveResizeWindow(id: string, x: number, y: number, width: number, height: number): void;
+  updateWindow(id: string, updates: Partial<Pick<WindowState, 'title' | 'icon'>>): void;
 
   visibleWindows: WindowState[];
   openWindows: WindowState[];
@@ -358,6 +391,13 @@ export function WindowManagerProvider({ children }: { children: ReactNode }) {
     [],
   );
 
+  const updateWindow = useCallback(
+    (id: string, updates: Partial<Pick<WindowState, 'title' | 'icon'>>) => {
+      dispatch({ type: 'UPDATE_WINDOW', id, updates });
+    },
+    [],
+  );
+
   const visibleWindows = useMemo(
     () =>
       Object.values(state.windows)
@@ -393,6 +433,7 @@ export function WindowManagerProvider({ children }: { children: ReactNode }) {
       moveWindow,
       resizeWindow,
       moveResizeWindow,
+      updateWindow,
       visibleWindows,
       openWindows,
       taskbarWindows,
@@ -410,6 +451,7 @@ export function WindowManagerProvider({ children }: { children: ReactNode }) {
       moveWindow,
       resizeWindow,
       moveResizeWindow,
+      updateWindow,
       visibleWindows,
       openWindows,
       taskbarWindows,

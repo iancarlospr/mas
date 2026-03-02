@@ -1,12 +1,13 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { ScanInput } from '@/components/scan/scan-input';
 import { FakeScanProgress } from '@/components/scan/fake-scan-progress';
 import { SignupWall } from '@/components/scan/signup-wall';
 import { PendingVerificationCard } from '@/components/scan/pending-verification-card';
+import { useScanOrchestrator } from '@/lib/scan-orchestrator';
+import { useWindowManager } from '@/lib/window-manager';
 import { analytics } from '@/lib/analytics';
 
 type FlowState = 'idle' | 'fakeLoading' | 'gated';
@@ -39,7 +40,8 @@ export function HeroScanFlow() {
   const [capturedUrl, setCapturedUrl] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [pendingVerification, setPendingVerification] = useState<PendingVerification | null>(null);
-  const router = useRouter();
+  const orchestrator = useScanOrchestrator();
+  const wm = useWindowManager();
 
   useEffect(() => {
     const supabase = createClient();
@@ -73,9 +75,11 @@ export function HeroScanFlow() {
           throw new Error(errorMsg);
         }
 
-        const { scanId } = await res.json();
-        analytics.scanStarted(new URL(url).hostname, 'full');
-        router.push(`/scan/${scanId}`);
+        const { scanId, cached } = await res.json();
+        const domain = new URL(url).hostname;
+        analytics.scanStarted(domain, 'full');
+        wm.closeWindow('scan-input');
+        orchestrator.startScan(scanId, domain, cached);
       } else {
         // Anonymous user — fake loading → signup wall
         setCapturedUrl(url);
@@ -83,7 +87,7 @@ export function HeroScanFlow() {
         analytics.signupWallShown(new URL(url).hostname);
       }
     },
-    [isAuthenticated, router],
+    [isAuthenticated, orchestrator, wm],
   );
 
   const domain = capturedUrl ? new URL(capturedUrl).hostname.replace(/^www\./, '') : '';

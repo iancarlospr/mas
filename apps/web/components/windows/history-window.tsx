@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import Link from 'next/link';
+import { useEffect, useState, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/auth-context';
 import { useWindowManager } from '@/lib/window-manager';
+import { useScanOrchestrator } from '@/lib/scan-orchestrator';
 
 /* ═══════════════════════════════════════════════════════════════
    My Scans — Window Content
@@ -31,8 +31,18 @@ function getScoreColor(score: number): string {
 export default function HistoryWindow() {
   const { user, loading: authLoading, isAuthenticated } = useAuth();
   const wm = useWindowManager();
+  const orchestrator = useScanOrchestrator();
   const [scans, setScans] = useState<ScanRow[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
+
+  const handleScanClick = useCallback((scanId: string, domain: string, status: string) => {
+    if (status === 'complete' || status === 'failed' || status === 'cancelled') {
+      orchestrator.openScanWindow(scanId, domain);
+    } else {
+      // In-progress scan — reconnect to Hollywood Hack
+      orchestrator.startScan(scanId, domain);
+    }
+  }, [orchestrator]);
 
   useEffect(() => {
     if (!user) {
@@ -111,10 +121,10 @@ export default function HistoryWindow() {
           }
 
           return (
-            <Link
+            <button
               key={scan.id}
-              href={`/scan/${scan.id}`}
-              className="flex items-center gap-gs-2 px-gs-3 py-gs-2 hover:bg-gs-red/5 border-b border-gs-chrome-dark/20 font-data text-data-sm"
+              onClick={() => handleScanClick(scan.id, domain, scan.status)}
+              className="flex items-center gap-gs-2 px-gs-3 py-gs-2 hover:bg-gs-red/5 border-b border-gs-chrome-dark/20 font-data text-data-sm w-full text-left cursor-pointer"
             >
               <span className="flex-1 truncate">
                 {domain}
@@ -146,7 +156,7 @@ export default function HistoryWindow() {
               <span className="w-24 text-right text-data-xs text-gs-muted">
                 {new Date(scan.created_at).toLocaleDateString()}
               </span>
-            </Link>
+            </button>
           );
         })}
       </div>
