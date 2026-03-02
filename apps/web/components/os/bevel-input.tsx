@@ -14,15 +14,15 @@ interface BevelInputProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 export const BevelInput = forwardRef<HTMLInputElement, BevelInputProps>(
-  function BevelInput({ className, fullWidth, ...props }, ref) {
+  function BevelInput({ className, fullWidth, style, ...props }, ref) {
     return (
       <input
         ref={ref}
         className={cn(
           'bg-gs-void/60 border border-gs-mid rounded-lg px-gs-3 py-gs-2',
-          'font-data text-data-base text-white',
+          'font-data text-[13px] leading-[1.6]',
           'placeholder:text-gs-mid',
-          '[caret-color:currentColor] select-text',
+          'select-text',
           'focus:outline-none focus:border-gs-base focus:ring-1 focus:ring-gs-base/30',
           'disabled:opacity-40 disabled:cursor-default',
           'min-h-[34px] transition-colors',
@@ -30,6 +30,7 @@ export const BevelInput = forwardRef<HTMLInputElement, BevelInputProps>(
           fullWidth && 'w-full',
           className,
         )}
+        style={{ color: '#fff', caretColor: 'currentColor', ...style }}
         {...props}
       />
     );
