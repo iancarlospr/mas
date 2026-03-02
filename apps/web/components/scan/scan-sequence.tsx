@@ -214,7 +214,7 @@ export function ScanSequence({
           {/* Matrix rain background */}
           {showMatrixRain && (
             <div className="absolute inset-0">
-              <MatrixRain fontSize={16} fadeOpacity={0.04} speed={1.2} />
+              <MatrixRain fontSize={16} fadeOpacity={0.03} speed={0.3} />
             </div>
           )}
 
