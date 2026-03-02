@@ -91,6 +91,13 @@ export function TerminalBoot({
       lines = generateCachedBootLines(domain, score);
     } else if (variant === 'synthesis' && score != null && scoreLabel && moduleCount) {
       lines = generateSynthesisLines(moduleCount, score, scoreLabel);
+    } else if (variant === 'synthesis') {
+      /* Score not ready yet — show waiting state, not boot fallback */
+      lines = [
+        { type: 'scan', text: 'Cross-referencing market intelligence...', delayMs: 0 },
+        { type: 'ghost', text: 'Chloé is analyzing the data...', delayMs: 1500 },
+        { type: 'scan', text: 'Waiting for final results...', delayMs: 3000 },
+      ];
     } else {
       lines = generateBootLines(domain);
     }
