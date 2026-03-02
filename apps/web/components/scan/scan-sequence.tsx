@@ -64,7 +64,7 @@ interface ScanSequenceProps {
 const INTRO_LINES = [
   '> hello, {userName}',
   '> knock knock...',
-  '> follow the white rabbit',
+  '> follow the white ghost',
   '> initiating GhostScan protocol...',
 ];
 
