@@ -284,10 +284,6 @@ export function ScanSequence({
           <div className="flex-shrink-0 p-gs-2 border-t border-gs-chrome-dark">
             <ProgressBar value={progress} variant="terminal" />
           </div>
-          {/* Chloé watching the movie */}
-          <div className="absolute bottom-gs-8 left-gs-8 animate-ghost-float z-10">
-            <ChloeSprite state="idle" size={64} glowing />
-          </div>
         </div>
       )}
 
