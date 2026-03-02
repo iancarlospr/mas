@@ -51,7 +51,7 @@ export default function ScanInputWindow() {
   return (
     <div className="p-gs-4 flex flex-col items-center">
       {/* ASCII Title */}
-      <div className="flex justify-center" style={{ marginTop: '8px' }}>
+      <div className="flex justify-center" style={{ marginTop: '16px' }}>
         <pre
           className="font-data leading-none whitespace-pre select-none text-center"
           style={{
@@ -103,7 +103,7 @@ export default function ScanInputWindow() {
             color: 'var(--gs-mid)',
           }}
         >
-          one scan. diagnose your website. zero retainers.
+          MarTech breakdown. Strategic insights. Actionable recommendations.
         </p>
         <CurvedArrow />
       </div>
