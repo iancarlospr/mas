@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import type { ScanWithResults } from '@marketing-alpha/types';
 import { useWindowManager, useWindowState } from '@/lib/window-manager';
 import { ScanDashboardContent } from '@/components/scan/scan-dashboard-content';
@@ -20,13 +20,14 @@ interface ScanReportWindowProps {
 }
 
 export default function ScanReportWindow({ windowId }: ScanReportWindowProps) {
-  const wm = useWindowManager();
+  const { updateWindow } = useWindowManager();
   const windowState = useWindowState(windowId);
   const scanId = windowState?.openData?.scanId as string | undefined;
 
   const [scan, setScan] = useState<ScanWithResults | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const hasFetched = useRef(false);
 
   const fetchScan = useCallback(async () => {
     if (!scanId) return;
@@ -41,22 +42,24 @@ export default function ScanReportWindow({ windowId }: ScanReportWindowProps) {
       }
       const data: ScanWithResults = await res.json();
       setScan(data);
-
-      // Update window title to domain
-      wm.updateWindow(windowId, {
+      updateWindow(windowId, {
         title: `${data.domain} — Scanned ${new Date(data.createdAt).toLocaleDateString()}`,
       });
     } catch {
       setError('Failed to load scan data.');
     }
     setLoading(false);
-  }, [scanId, windowId, wm]);
+  }, [scanId, windowId, updateWindow]);
 
+  // Fetch once on mount (or when scanId changes)
   useEffect(() => {
-    fetchScan();
-  }, [fetchScan]);
+    if (scanId && !hasFetched.current) {
+      hasFetched.current = true;
+      fetchScan();
+    }
+  }, [scanId, fetchScan]);
 
-  // Re-fetch when openData changes (e.g., after payment success)
+  // Re-fetch after payment success
   const paymentSuccess = windowState?.openData?.paymentSuccess;
   useEffect(() => {
     if (paymentSuccess) {
