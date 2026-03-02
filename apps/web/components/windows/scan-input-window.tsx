@@ -84,7 +84,7 @@ export default function ScanInputWindow() {
           style={{
             fontSize: '32px',
             lineHeight: '1.2',
-            letterSpacing: '-0.02em',
+            letterSpacing: '-0.06em',
             color: 'var(--gs-base)',
             marginTop: '6px',
           }}
