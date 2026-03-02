@@ -256,28 +256,15 @@ export function ScanSequence({
 
       {/* ── Phase 2: ASCII Movie ─────────────────────────── */}
       {currentPhase === 2 && (
-        <div className="absolute inset-0 flex">
-          {/* ASCII movie (main area) */}
-          <div className="flex-1 flex items-center justify-center bg-gs-ink p-gs-4">
-            <AsciiPlayer
-              moviePath={asciiMovie.current.path}
-              autoPlay
-              loop={asciiMovie.current.loop}
-              showSshHint
-              className="max-w-[700px]"
-            />
-          </div>
-
-          {/* Side terminal showing real module progress */}
-          <div className="w-[300px] border-l border-gs-chrome-dark">
-            <TerminalBoot
-              domain={domain}
-              progress={progress}
-              variant="boot"
-              externalLines={sseBootLines}
-              className="h-full"
-            />
-          </div>
+        <div className="absolute inset-0 flex items-center justify-center bg-gs-ink">
+          {/* ASCII movie (full width) */}
+          <AsciiPlayer
+            moviePath={asciiMovie.current.path}
+            autoPlay
+            loop={asciiMovie.current.loop}
+            showSshHint
+            className="max-w-[700px]"
+          />
 
           {/* Chloé watching the movie */}
           <div className="absolute bottom-gs-8 left-gs-8 animate-ghost-float">
