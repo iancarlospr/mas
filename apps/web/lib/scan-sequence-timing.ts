@@ -213,7 +213,7 @@ export function generateBootLines(targetDomain: string): BootLine[] {
     { type: 'ghost', text: `Stealth profile loaded. Google referrer set.`, delayMs: 9800 },
     { type: 'ok', text: `Bot wall detection: MONITORING`, delayMs: 10200 },
     { type: 'scan', text: `Rendering ${targetDomain}...`, delayMs: 10800 },
-    { type: 'ghost', text: `ugh, this part is boring babe. watch my movie instead 🍿`, delayMs: 12000 },
+    { type: 'ghost', text: `ugh, this part is boring babe. watch my movie instead`, delayMs: 12000 },
   ];
 }
 
