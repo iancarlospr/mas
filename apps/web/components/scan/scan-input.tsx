@@ -180,7 +180,7 @@ export function ScanInput({
                 setUrl(e.target.value);
                 if (error) setError(null);
               }}
-              placeholder="https://example.com"
+              placeholder="Enter URL (nike.com)"
               disabled={loading}
               fullWidth
               autoFocus
@@ -310,7 +310,7 @@ export function ScanInput({
                 setUrl(e.target.value);
                 if (error) setError(null);
               }}
-              placeholder="https://example.com"
+              placeholder="Enter URL (nike.com)"
               disabled={loading}
               fullWidth
               autoFocus

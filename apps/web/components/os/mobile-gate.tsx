@@ -74,7 +74,7 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
               type="url"
               value={scanUrl}
               onChange={(e) => setScanUrl(e.target.value)}
-              placeholder="https://example.com"
+              placeholder="Enter URL (nike.com)"
               className="w-full bg-gs-light/90 border border-gs-mid rounded-lg px-gs-3 py-gs-2 font-data text-[12px] leading-[1.5] outline-none focus:border-gs-base transition-colors select-text"
               style={{ color: 'var(--gs-void)', caretColor: 'currentColor' }}
             />
