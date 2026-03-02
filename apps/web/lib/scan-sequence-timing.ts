@@ -56,8 +56,8 @@ export const PHASE_CONFIGS: Record<0 | 1 | 2 | 3, PhaseConfig> = {
   0: {
     phase: 0,
     label: 'Initiation',
-    minDurationMs: 2000,
-    maxDurationMs: 4000,
+    minDurationMs: 5000,
+    maxDurationMs: 7000,
     content: 'matrix-intro',
     background: 'black',
   },
