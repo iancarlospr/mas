@@ -180,7 +180,7 @@ export function ScanInput({
                 setUrl(e.target.value);
                 if (error) setError(null);
               }}
-              placeholder="Enter URL (nike.com)"
+              placeholder="Enter URL: nike.com"
               disabled={loading}
               fullWidth
               autoFocus
@@ -299,9 +299,6 @@ export function ScanInput({
       {/* URL Input + Button */}
       <div className="flex items-end gap-gs-2">
         <div className="flex-1 min-w-0">
-          <label className="block font-system text-os-base mb-gs-1">
-            Target URL:
-          </label>
           <div className="scan-input-glow scan-input-shine rounded-lg">
             <BevelInput
               type="text"
@@ -310,7 +307,7 @@ export function ScanInput({
                 setUrl(e.target.value);
                 if (error) setError(null);
               }}
-              placeholder="Enter URL (nike.com)"
+              placeholder="Enter URL: nike.com"
               disabled={loading}
               fullWidth
               autoFocus
@@ -333,7 +330,7 @@ export function ScanInput({
               Scanning...
             </span>
           ) : (
-            '▶ Execute Scan'
+            '▶ Start GhostScan'
           )}
         </button>
       </div>

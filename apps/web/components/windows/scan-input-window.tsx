@@ -49,7 +49,7 @@ function CurvedArrow() {
 
 export default function ScanInputWindow() {
   return (
-    <div className="p-gs-4 flex flex-col items-center">
+    <div className="p-gs-4 flex flex-col items-center h-full">
       {/* ASCII Title */}
       <div className="flex justify-center" style={{ marginTop: '16px' }}>
         <pre
@@ -94,7 +94,7 @@ export default function ScanInputWindow() {
       </div>
 
       {/* Nudge CTA + Arrow */}
-      <div className="flex flex-col items-center select-none" style={{ marginTop: '60px', marginBottom: '20px' }}>
+      <div className="flex flex-col items-center select-none" style={{ marginTop: 'auto', marginBottom: '8px' }}>
         <p
           className="font-data"
           style={{
