@@ -4,16 +4,18 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { soundEffects } from '@/lib/sound-effects';
 import { MatrixRain } from './matrix-rain';
-import { AsciiPlayer } from './ascii-player';
 import { TerminalBoot } from './terminal-boot';
 import { ChloeSprite } from '@/components/chloe/chloe-sprite';
+import { A22Animation } from '@/components/os/a22-animation';
+import { MeanGirlsAnimation } from '@/components/os/meangirls-animation';
+import { GhostAnimation } from '@/components/os/ghost-animation';
+import { RickRollAnimation } from '@/components/os/rickroll-animation';
 import {
   type AnimationPhase,
   type ScanStatus,
   type BootLine,
   PHASE_CONFIGS,
   scanStatusToAnimationPhase,
-  selectAsciiMovie,
   moduleCompleteBootLine,
 } from '@/lib/scan-sequence-timing';
 
@@ -58,6 +60,33 @@ interface ScanSequenceProps {
   onComplete: () => void;
   /** User's display name (for Matrix intro text) */
   userName?: string;
+}
+
+/** Channel rotation for Phase 2 — same sequence as chill.mov TV */
+const SCAN_CHANNELS = [
+  { name: 'A22', Component: A22Animation, duration: 32 },
+  { name: 'MEAN GIRLS', Component: MeanGirlsAnimation, duration: 55 },
+  { name: 'CHLOE TV', Component: GhostAnimation, duration: 40 },
+  { name: 'RICK FM', Component: RickRollAnimation, duration: 90 },
+];
+
+function ScanMovieRotation() {
+  const [index, setIndex] = useState(0);
+  const channel = SCAN_CHANNELS[index % SCAN_CHANNELS.length]!;
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIndex((i) => (i + 1) % SCAN_CHANNELS.length);
+    }, channel.duration * 1000);
+    return () => clearTimeout(timer);
+  }, [index, channel.duration]);
+
+  const { Component } = channel;
+  return (
+    <div className="h-full flex items-center justify-center">
+      <Component key={`scan-movie-${index}`} />
+    </div>
+  );
 }
 
 /** Matrix intro text lines (Phase 0) — typed out one at a time */
@@ -198,7 +227,6 @@ export function ScanSequence({
   }, [scanStatus, onComplete]);
 
   /* ── ASCII movie selection ───────────────────────────────── */
-  const asciiMovie = useRef(selectAsciiMovie(isFirstScan));
 
   /* ── Don't render if sequence is done ────────────────────── */
   if (currentPhase === 'complete' || currentPhase === 'skipped') {
@@ -256,18 +284,10 @@ export function ScanSequence({
 
       {/* ── Phase 2: ASCII Movie ─────────────────────────── */}
       {currentPhase === 2 && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gs-ink">
-          {/* ASCII movie (full width) */}
-          <AsciiPlayer
-            moviePath={asciiMovie.current.path}
-            autoPlay
-            loop={asciiMovie.current.loop}
-            showSshHint
-            className="max-w-[700px]"
-          />
-
+        <div className="absolute inset-0 bg-[#0A0A0A] overflow-hidden">
+          <ScanMovieRotation />
           {/* Chloé watching the movie */}
-          <div className="absolute bottom-gs-8 left-gs-8 animate-ghost-float">
+          <div className="absolute bottom-gs-8 left-gs-8 animate-ghost-float z-10">
             <ChloeSprite state="idle" size={64} glowing />
           </div>
         </div>
