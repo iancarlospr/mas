@@ -166,23 +166,15 @@ export function ScanSequence({
 
     const ssePhase = scanStatusToAnimationPhase(scanStatus);
 
-    /* If scan is complete, go to reveal then complete */
+    /* Scan complete → skip everything, open the report */
     if (ssePhase === 'complete') {
-      if (currentPhase < 3) {
-        setCurrentPhase(3);
-        phaseStartRef.current = Date.now();
-
-        /* After synthesis reveal, trigger complete */
-        soundEffects.play('boot');
-        setTimeout(() => {
-          setCurrentPhase('complete');
-          onComplete();
-        }, finalScore != null ? 11000 : 3000);
-      }
+      soundEffects.play('boot');
+      setCurrentPhase('complete');
+      onComplete();
       return;
     }
 
-    /* Check if we should advance based on time + SSE phase */
+    /* Advance through Phase 0 → 1 → 2 based on time + SSE */
     const phaseConfig = PHASE_CONFIGS[currentPhase];
     if (!phaseConfig) return;
 
@@ -191,18 +183,18 @@ export function ScanSequence({
 
     /* Advance if min duration passed AND SSE suggests higher phase */
     if (elapsed >= phaseConfig.minDurationMs && sseWantsHigherPhase) {
-      const nextPhase = Math.min(currentPhase + 1, 3) as 0 | 1 | 2 | 3;
+      const nextPhase = Math.min(currentPhase + 1, 2) as 0 | 1 | 2;
       setCurrentPhase(nextPhase);
       phaseStartRef.current = Date.now();
     }
 
-    /* Force-advance if max duration exceeded */
-    if (elapsed >= phaseConfig.maxDurationMs && currentPhase < 3) {
-      const nextPhase = (currentPhase + 1) as 0 | 1 | 2 | 3;
+    /* Force-advance if max duration exceeded (cap at Phase 2 — movie loops until done) */
+    if (elapsed >= phaseConfig.maxDurationMs && currentPhase < 2) {
+      const nextPhase = (currentPhase + 1) as 0 | 1 | 2;
       setCurrentPhase(nextPhase);
       phaseStartRef.current = Date.now();
     }
-  }, [currentPhase, scanStatus, finalScore, onComplete]);
+  }, [currentPhase, scanStatus, onComplete]);
 
   /* ── Inject SSE module completions as boot lines ─────────── */
   useEffect(() => {
@@ -299,27 +291,7 @@ export function ScanSequence({
         </div>
       )}
 
-      {/* ── Phase 3: Synthesis Reveal ────────────────────── */}
-      {currentPhase === 3 && (
-        <div className="absolute inset-0">
-          <TerminalBoot
-            domain={domain}
-            progress={progress}
-            variant="synthesis"
-            score={finalScore}
-            scoreLabel={finalScoreLabel}
-            moduleCount={moduleCount}
-            className="h-full"
-          />
-
-          {/* Chloé celebrating */}
-          {finalScore != null && (
-            <div className="absolute bottom-gs-16 right-gs-16">
-              <ChloeSprite state="celebrating" size={128} glowing />
-            </div>
-          )}
-        </div>
-      )}
+      {/* Phase 3 removed — movie plays until scan completes, then report opens */}
 
       {/* ── Skip Button (always visible, bottom-right) ───── */}
       {(scanStatus === 'complete' || scanStatus === 'failed') && !isSkipping && (
