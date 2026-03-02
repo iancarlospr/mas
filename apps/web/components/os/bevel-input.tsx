@@ -19,18 +19,17 @@ export const BevelInput = forwardRef<HTMLInputElement, BevelInputProps>(
       <input
         ref={ref}
         className={cn(
-          'bg-[#1a1a1a] border border-gs-mid rounded-lg px-gs-3 py-gs-2',
+          'bg-gs-light/90 border border-gs-mid rounded-lg px-gs-3 py-gs-2',
           'font-data text-[13px] leading-[1.6]',
           'placeholder:text-gs-mid',
           'select-text',
           'focus:outline-none focus:border-gs-base focus:ring-1 focus:ring-gs-base/30',
           'disabled:opacity-40 disabled:cursor-default',
           'min-h-[34px] transition-colors',
-          'backdrop-blur-sm',
           fullWidth && 'w-full',
           className,
         )}
-        style={{ color: '#fff', caretColor: 'currentColor', ...style }}
+        style={{ color: 'var(--gs-void)', caretColor: 'currentColor', ...style }}
         {...props}
       />
     );
