@@ -16,7 +16,7 @@ import { useScanOrchestrator } from '@/lib/scan-orchestrator';
 interface ScanRow {
   id: string;
   url: string;
-  marketing_iq_score: number | null;
+  marketing_iq: number | null;
   status: string;
   tier: string;
   created_at: string;
@@ -54,7 +54,7 @@ export default function HistoryWindow() {
       const supabase = createClient();
       const { data } = await supabase
         .from('scans')
-        .select('id, url, marketing_iq_score, status, tier, created_at')
+        .select('id, url, marketing_iq, status, tier, created_at')
         .eq('user_id', user!.id)
         .order('created_at', { ascending: false })
         .limit(50);
@@ -130,10 +130,10 @@ export default function HistoryWindow() {
                 {domain}
               </span>
               <span className="w-16 text-center flex items-center justify-center gap-1">
-                {scan.marketing_iq_score != null && (
+                {scan.marketing_iq != null && (
                   <>
-                    <span className={`traffic-dot w-2 h-2 ${getScoreColor(scan.marketing_iq_score)}`} />
-                    <span>{scan.marketing_iq_score}</span>
+                    <span className={`traffic-dot w-2 h-2 ${getScoreColor(scan.marketing_iq)}`} />
+                    <span>{scan.marketing_iq}</span>
                   </>
                 )}
               </span>
