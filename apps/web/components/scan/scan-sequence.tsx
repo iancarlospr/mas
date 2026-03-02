@@ -10,6 +10,7 @@ import { A22Animation } from '@/components/os/a22-animation';
 import { MeanGirlsAnimation } from '@/components/os/meangirls-animation';
 import { GhostAnimation } from '@/components/os/ghost-animation';
 import { RickRollAnimation } from '@/components/os/rickroll-animation';
+import { ProgressBar } from '@/components/os/progress-bar';
 import {
   type AnimationPhase,
   type ScanStatus,
@@ -284,8 +285,14 @@ export function ScanSequence({
 
       {/* ── Phase 2: ASCII Movie ─────────────────────────── */}
       {currentPhase === 2 && (
-        <div className="absolute inset-0 bg-[#0A0A0A] overflow-hidden">
-          <ScanMovieRotation />
+        <div className="absolute inset-0 bg-[#0A0A0A] overflow-hidden flex flex-col">
+          <div className="flex-1 overflow-hidden">
+            <ScanMovieRotation />
+          </div>
+          {/* Progress bar at bottom */}
+          <div className="flex-shrink-0 p-gs-2 border-t border-gs-chrome-dark">
+            <ProgressBar value={progress} variant="terminal" />
+          </div>
           {/* Chloé watching the movie */}
           <div className="absolute bottom-gs-8 left-gs-8 animate-ghost-float z-10">
             <ChloeSprite state="idle" size={64} glowing />
