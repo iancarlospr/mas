@@ -34,15 +34,33 @@ export default function HistoryWindow() {
   const orchestrator = useScanOrchestrator();
   const [scans, setScans] = useState<ScanRow[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const handleScanClick = useCallback((scanId: string, domain: string, status: string) => {
     if (status === 'complete' || status === 'failed' || status === 'cancelled') {
       orchestrator.openScanWindow(scanId, domain);
     } else {
-      // In-progress scan — reconnect to Hollywood Hack
       orchestrator.startScan(scanId, domain);
     }
   }, [orchestrator]);
+
+  const handleDelete = useCallback(async (e: React.MouseEvent, scanId: string) => {
+    e.stopPropagation();
+    if (deletingId) return;
+    setDeletingId(scanId);
+    try {
+      const res = await fetch(`/api/scans/${scanId}`, { method: 'DELETE' });
+      if (res.ok) {
+        setScans((prev) => prev.filter((s) => s.id !== scanId));
+        // Close the scan window if it's open
+        const windowId = `scan-${scanId}`;
+        if (wm.windows[windowId]?.isOpen) {
+          wm.closeWindow(windowId);
+        }
+      }
+    } catch { /* ignore */ }
+    setDeletingId(null);
+  }, [deletingId, wm]);
 
   useEffect(() => {
     if (!user) {
@@ -108,6 +126,7 @@ export default function HistoryWindow() {
         <span className="w-20 text-center">Status</span>
         <span className="w-16 text-center">Tier</span>
         <span className="w-24 text-right">Date</span>
+        <span className="w-8" />
       </div>
 
       {/* Scan rows */}
@@ -155,6 +174,16 @@ export default function HistoryWindow() {
               </span>
               <span className="w-24 text-right text-data-xs text-gs-muted">
                 {new Date(scan.created_at).toLocaleDateString()}
+              </span>
+              <span className="w-8 flex justify-center">
+                <button
+                  onClick={(e) => handleDelete(e, scan.id)}
+                  disabled={deletingId === scan.id}
+                  className="text-gs-muted hover:text-gs-critical transition-colors text-data-xs"
+                  title="Delete scan"
+                >
+                  {deletingId === scan.id ? '...' : 'x'}
+                </button>
               </span>
             </button>
           );

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { isValidUUID } from '@/lib/utils';
 
 export async function GET(
@@ -63,4 +63,52 @@ export async function GET(
     })),
     marketingIqResult: scan.marketing_iq_result,
   });
+}
+
+export async function DELETE(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const { id } = await params;
+  if (!isValidUUID(id)) {
+    return NextResponse.json({ error: 'Invalid scan ID' }, { status: 400 });
+  }
+
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+  }
+
+  // Verify ownership
+  const { data: scan } = await supabase
+    .from('scans')
+    .select('id, user_id, cache_source')
+    .eq('id', id)
+    .single();
+
+  if (!scan || scan.user_id !== user.id) {
+    return NextResponse.json({ error: 'Scan not found' }, { status: 404 });
+  }
+
+  // Use service client to bypass RLS for delete
+  const serviceClient = createServiceClient();
+
+  // Nullify cache_source on any scans that reference this one
+  await serviceClient
+    .from('scans')
+    .update({ cache_source: null })
+    .eq('cache_source', id);
+
+  // Delete the scan (module_results cascade automatically)
+  const { error } = await serviceClient
+    .from('scans')
+    .delete()
+    .eq('id', id);
+
+  if (error) {
+    return NextResponse.json({ error: 'Failed to delete scan' }, { status: 500 });
+  }
+
+  return NextResponse.json({ deleted: true });
 }
