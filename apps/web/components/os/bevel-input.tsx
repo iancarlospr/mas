@@ -20,7 +20,7 @@ export const BevelInput = forwardRef<HTMLInputElement, BevelInputProps>(
         ref={ref}
         className={cn(
           'bg-gs-light/90 border border-gs-mid rounded-lg px-gs-3 py-gs-2',
-          'font-data text-[13px] leading-[1.6]',
+          'font-data',
           'placeholder:text-gs-mid',
           'select-text',
           'focus:outline-none focus:border-gs-base focus:ring-1 focus:ring-gs-base/30',
