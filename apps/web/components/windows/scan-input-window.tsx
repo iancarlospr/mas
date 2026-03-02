@@ -93,8 +93,11 @@ export default function ScanInputWindow() {
         </p>
       </div>
 
+      {/* Spacer between headline and CTA */}
+      <div style={{ height: '120px' }} />
+
       {/* Nudge CTA + Arrow */}
-      <div className="flex flex-col items-center select-none" style={{ marginTop: 'auto', marginBottom: '8px' }}>
+      <div className="flex flex-col items-center select-none" style={{ marginBottom: '8px' }}>
         <p
           className="font-data"
           style={{
