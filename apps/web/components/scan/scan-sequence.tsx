@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { cn } from '@/lib/utils';
 import { soundEffects } from '@/lib/sound-effects';
 import { MatrixRain } from './matrix-rain';
@@ -227,7 +228,9 @@ export function ScanSequence({
   }
 
   /* ── Render ──────────────────────────────────────────────── */
-  return (
+  if (typeof document === 'undefined') return null;
+
+  return createPortal(
     <div className="fixed inset-0 z-[10000] bg-gs-ink overflow-hidden">
       {/* ── Phase 0: Matrix Intro ────────────────────────── */}
       {currentPhase === 0 && (
@@ -310,6 +313,7 @@ export function ScanSequence({
           }}
         />
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
