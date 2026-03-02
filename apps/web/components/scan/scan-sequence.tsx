@@ -95,7 +95,7 @@ const INTRO_LINES = [
   '> hello, {userName}',
   '> knock knock...',
   '> follow the white ghost',
-  '> initiating GhostScan protocol...',
+  '> initiating GhostScan™ protocol...',
 ];
 
 export function ScanSequence({
