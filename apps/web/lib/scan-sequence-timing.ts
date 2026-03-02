@@ -56,8 +56,8 @@ export const PHASE_CONFIGS: Record<0 | 1 | 2 | 3, PhaseConfig> = {
   0: {
     phase: 0,
     label: 'Initiation',
-    minDurationMs: 5000,
-    maxDurationMs: 7000,
+    minDurationMs: 10000,
+    maxDurationMs: 12000,
     content: 'matrix-intro',
     background: 'black',
   },
@@ -222,7 +222,7 @@ export function generateBootLines(targetDomain: string): BootLine[] {
 export function moduleCompleteBootLine(moduleId: string, moduleName: string): BootLine {
   return {
     type: 'ok',
-    text: `${moduleId} ${moduleName}: EXTRACTED`,
+    text: `${moduleName}: EXTRACTED`,
     delayMs: 0, // Immediate — triggered by SSE event
   };
 }
