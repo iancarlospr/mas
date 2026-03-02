@@ -42,18 +42,26 @@ function getPendingVerification(): PendingVerification | null {
   }
 }
 
+/** Check if a date string falls on the same calendar day as now (local time) */
 function isSameDay(dateStr: string): boolean {
   const d = new Date(dateStr);
   const now = new Date();
-  return d.getFullYear() === now.getFullYear()
-    && d.getMonth() === now.getMonth()
-    && d.getDate() === now.getDate();
+  // Compare using local calendar dates (toDateString gives "Mon Mar 02 2026")
+  return d.toDateString() === now.toDateString();
+}
+
+/** Hours since a given date — more precise than days for recent scans */
+function hoursSince(dateStr: string): number {
+  return (Date.now() - new Date(dateStr).getTime()) / (1000 * 60 * 60);
 }
 
 function daysSince(dateStr: string): number {
   const d = new Date(dateStr);
   const now = new Date();
-  return Math.floor((now.getTime() - d.getTime()) / (1000 * 60 * 60 * 24));
+  // Use local calendar dates to count days
+  const dLocal = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const nowLocal = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  return Math.round((nowLocal.getTime() - dLocal.getTime()) / (1000 * 60 * 60 * 24));
 }
 
 export function HeroScanFlow() {
@@ -141,8 +149,8 @@ export function HeroScanFlow() {
         // Check for existing recent scan of this domain
         const existing = await checkExistingScan(url);
 
-        if (existing && isSameDay(existing.created_at)) {
-          // Same day — just open the existing report, no new scan
+        if (existing && (isSameDay(existing.created_at) || hoursSince(existing.created_at) < 12)) {
+          // Same day (or < 12h old) — just open the existing report, no new scan
           wm.closeWindow('scan-input');
           orchestrator.openScanWindow(existing.id, existing.domain);
           return;
@@ -211,12 +219,13 @@ export function HeroScanFlow() {
     const scoreText = existingScan.marketing_iq != null
       ? ` (MarketingIQ: ${existingScan.marketing_iq})`
       : '';
+    const timeLabel = days <= 0 ? 'earlier today' : days === 1 ? 'yesterday' : `${days} days ago`;
 
     return (
       <div className="w-full space-y-gs-3">
         <div className="bevel-sunken bg-gs-paper p-gs-4">
           <p className="font-system text-os-sm font-bold" style={{ color: 'var(--gs-void)' }}>
-            You scanned {existingScan.domain} {days === 1 ? 'yesterday' : `${days} days ago`}{scoreText}
+            You scanned {existingScan.domain} {timeLabel}{scoreText}
           </p>
           <p className="font-data text-data-xs mt-gs-1" style={{ color: 'var(--gs-mid)' }}>
             Want to view the existing report or run a fresh scan?
