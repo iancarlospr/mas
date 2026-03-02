@@ -77,6 +77,21 @@
     color: #fff;
   }
 
+  /* Text inputs — light bg, dark text, visible caret everywhere */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="url"],
+  input[type="search"],
+  input[type="tel"],
+  input[type="number"],
+  textarea {
+    color: var(--gs-void);
+    caret-color: currentColor;
+    user-select: text;
+    -webkit-user-select: text;
+  }
+
   /* Focus rings — consistent pink glow */
   :focus-visible {
     outline: 2px solid var(--gs-base);
