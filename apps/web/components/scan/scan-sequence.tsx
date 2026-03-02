@@ -277,7 +277,6 @@ export function ScanSequence({
             isCached={isCached}
             score={finalScore}
             variant="boot"
-            externalLines={sseBootLines}
             className="h-full"
           />
         </div>
