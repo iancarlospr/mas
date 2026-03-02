@@ -330,7 +330,7 @@ export function ScanInput({
               Scanning...
             </span>
           ) : (
-            '▶ Start GhostScan'
+            '▶ Start GhostScan™'
           )}
         </button>
       </div>
