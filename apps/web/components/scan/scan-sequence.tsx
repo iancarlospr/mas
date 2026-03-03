@@ -62,6 +62,8 @@ interface ScanSequenceProps {
   onComplete: () => void;
   /** User's display name (for Matrix intro text) */
   userName?: string;
+  /** Pause the sequence (freezes all phase timers) — used for auth gate */
+  paused?: boolean;
 }
 
 /** Channel rotation for Phase 2 — same sequence as chill.mov TV */
@@ -111,6 +113,7 @@ export function ScanSequence({
   moduleCount,
   onComplete,
   userName = 'operative',
+  paused = false,
 }: ScanSequenceProps) {
   /* ── State ───────────────────────────────────────────────── */
   const [currentPhase, setCurrentPhase] = useState<AnimationPhase>(0);
@@ -124,7 +127,7 @@ export function ScanSequence({
 
   /* ── Phase 0: Matrix Intro ───────────────────────────────── */
   useEffect(() => {
-    if (currentPhase !== 0) return;
+    if (currentPhase !== 0 || paused) return;
 
     /* Abbreviated sequence for cached scans */
     if (isCached) {
@@ -158,10 +161,11 @@ export function ScanSequence({
       clearTimeout(chloeTimer);
       clearTimeout(advanceTimer);
     };
-  }, [currentPhase, isCached]);
+  }, [currentPhase, isCached, paused]);
 
   /* ── Phase transitions based on time + SSE status ────────── */
   useEffect(() => {
+    if (paused) return;
     if (currentPhase === 'complete' || currentPhase === 'skipped') return;
     if (typeof currentPhase !== 'number') return;
 

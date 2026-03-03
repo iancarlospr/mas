@@ -1,17 +1,16 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { normalizeUrl } from '@/lib/utils';
 import { ScanInput } from '@/components/scan/scan-input';
-import { FakeScanProgress } from '@/components/scan/fake-scan-progress';
-import { SignupWall } from '@/components/scan/signup-wall';
 import { PendingVerificationCard } from '@/components/scan/pending-verification-card';
 import { useScanOrchestrator } from '@/lib/scan-orchestrator';
 import { useWindowManager } from '@/lib/window-manager';
+import { useAuth } from '@/lib/auth-context';
 import { analytics } from '@/lib/analytics';
 
-type FlowState = 'idle' | 'fakeLoading' | 'gated' | 'existing-prompt';
+type FlowState = 'idle' | 'waiting-auth' | 'existing-prompt';
 
 interface PendingVerification {
   email: string;
@@ -46,11 +45,10 @@ function getPendingVerification(): PendingVerification | null {
 function isSameDay(dateStr: string): boolean {
   const d = new Date(dateStr);
   const now = new Date();
-  // Compare using local calendar dates (toDateString gives "Mon Mar 02 2026")
   return d.toDateString() === now.toDateString();
 }
 
-/** Hours since a given date — more precise than days for recent scans */
+/** Hours since a given date */
 function hoursSince(dateStr: string): number {
   return (Date.now() - new Date(dateStr).getTime()) / (1000 * 60 * 60);
 }
@@ -58,7 +56,6 @@ function hoursSince(dateStr: string): number {
 function daysSince(dateStr: string): number {
   const d = new Date(dateStr);
   const now = new Date();
-  // Use local calendar dates to count days
   const dLocal = new Date(d.getFullYear(), d.getMonth(), d.getDate());
   const nowLocal = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   return Math.round((nowLocal.getTime() - dLocal.getTime()) / (1000 * 60 * 60 * 24));
@@ -68,29 +65,72 @@ export function HeroScanFlow() {
   const [state, setState] = useState<FlowState>('idle');
   const [capturedUrl, setCapturedUrl] = useState('');
   const [capturedToken, setCapturedToken] = useState('');
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const { isAuthenticated, loading: authLoading } = useAuth();
   const [pendingVerification, setPendingVerification] = useState<PendingVerification | null>(null);
   const [existingScan, setExistingScan] = useState<ExistingScan | null>(null);
   const orchestrator = useScanOrchestrator();
   const wm = useWindowManager();
+  const authListenerRef = useRef(false);
 
+  // Check for pending verification on mount (logged-out users only)
   useEffect(() => {
+    if (isAuthenticated === false) {
+      setPendingVerification(getPendingVerification());
+    } else if (isAuthenticated === true) {
+      try { localStorage.removeItem('alphascan_pending_verification'); } catch { /* */ }
+    }
+  }, [isAuthenticated]);
+
+  // Listen for auth state change while waiting for registration
+  useEffect(() => {
+    if (state !== 'waiting-auth' || authListenerRef.current) return;
+    authListenerRef.current = true;
+
     const supabase = createClient();
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setIsAuthenticated(!!user);
-      if (user) {
-        try { localStorage.removeItem('alphascan_pending_verification'); } catch { /* */ }
-      } else {
-        setPendingVerification(getPendingVerification());
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session?.user && capturedUrl) {
+        // User just registered/logged in — close auth window, resume sequence, fire backend
+        wm.closeWindow('auth');
+        orchestrator.resumeVisualSequence();
+
+        try {
+          const res = await fetch('/api/scans', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url: capturedUrl, turnstileToken: capturedToken }),
+          });
+
+          if (res.ok) {
+            const { scanId, cached } = await res.json();
+            const domain = new URL(capturedUrl).hostname;
+            analytics.scanStarted(domain, 'full');
+            // Transition from visual-only to real scan (SSE takes over)
+            orchestrator.connectScan(scanId, domain, cached);
+          } else {
+            // Scan creation failed — cancel sequence
+            orchestrator.cancelVisualSequence();
+          }
+        } catch {
+          orchestrator.cancelVisualSequence();
+        }
+
+        setState('idle');
+        authListenerRef.current = false;
+        subscription.unsubscribe();
       }
     });
-  }, []);
+
+    return () => {
+      subscription.unsubscribe();
+      authListenerRef.current = false;
+    };
+  }, [state, capturedUrl, capturedToken, orchestrator, wm]);
 
   /** Check if the user has a recent scan for this domain */
   const checkExistingScan = useCallback(async (url: string): Promise<ExistingScan | null> => {
     const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return null;
+    const { data: { user: currentUser } } = await supabase.auth.getUser();
+    if (!currentUser) return null;
 
     let domain: string;
     try {
@@ -99,14 +139,13 @@ export function HeroScanFlow() {
       return null;
     }
 
-    // Look for completed scans of this domain in the last 7 days
     const weekAgo = new Date();
     weekAgo.setDate(weekAgo.getDate() - 7);
 
     const { data } = await supabase
       .from('scans')
       .select('id, domain, created_at, marketing_iq')
-      .eq('user_id', user.id)
+      .eq('user_id', currentUser.id)
       .eq('domain', domain)
       .eq('status', 'complete')
       .gte('created_at', weekAgo.toISOString())
@@ -119,7 +158,7 @@ export function HeroScanFlow() {
     return null;
   }, []);
 
-  /** Run a new scan (POST /api/scans + start Hollywood Hack) */
+  /** Run a new scan (POST /api/scans + start Hollywood Hack with SSE) */
   const runNewScan = useCallback(async (url: string, turnstileToken: string) => {
     const res = await fetch('/api/scans', {
       method: 'POST',
@@ -145,19 +184,19 @@ export function HeroScanFlow() {
 
   const handleCapture = useCallback(
     async (url: string, turnstileToken: string) => {
+      const domain = new URL(normalizeUrl(url)).hostname.replace(/^www\./, '');
+
       if (isAuthenticated) {
-        // Check for existing recent scan of this domain
+        // Authenticated user — check for existing recent scan
         const existing = await checkExistingScan(url);
 
         if (existing && (isSameDay(existing.created_at) || hoursSince(existing.created_at) < 12)) {
-          // Same day (or < 12h old) — just open the existing report, no new scan
           wm.closeWindow('scan-input');
           orchestrator.openScanWindow(existing.id, existing.domain);
           return;
         }
 
         if (existing) {
-          // Same week — ask the user
           setCapturedUrl(url);
           setCapturedToken(turnstileToken);
           setExistingScan(existing);
@@ -168,10 +207,22 @@ export function HeroScanFlow() {
         // No recent scan — proceed normally
         await runNewScan(url, turnstileToken);
       } else {
-        // Anonymous user — fake loading → signup wall
+        // ── Unauthenticated user ──
+        // 1. Start the Hollywood Hack visuals immediately (no backend)
+        // 2. After 2s, pause sequence and open auth window
+        // 3. On registration → resume sequence + fire real backend scan
         setCapturedUrl(url);
-        setState('fakeLoading');
-        analytics.signupWallShown(new URL(url).hostname);
+        setCapturedToken(turnstileToken);
+        wm.closeWindow('scan-input');
+        orchestrator.startVisualSequence(domain);
+        analytics.signupWallShown(domain);
+
+        // After 2 seconds: pause sequence and show auth window
+        setTimeout(() => {
+          orchestrator.pauseVisualSequence();
+          wm.openWindow('auth');
+          setState('waiting-auth');
+        }, 2000);
       }
     },
     [isAuthenticated, checkExistingScan, runNewScan, orchestrator, wm],
@@ -180,7 +231,7 @@ export function HeroScanFlow() {
   const domain = capturedUrl ? (() => { try { return new URL(normalizeUrl(capturedUrl)).hostname.replace(/^www\./, ''); } catch { return capturedUrl; } })() : '';
 
   // Show "check your email" card if user signed up but hasn't verified yet
-  if (pendingVerification && isAuthenticated === false) {
+  if (pendingVerification && !authLoading && !isAuthenticated) {
     return (
       <PendingVerificationCard
         email={pendingVerification.email}
@@ -190,26 +241,6 @@ export function HeroScanFlow() {
           setPendingVerification(null);
         }}
       />
-    );
-  }
-
-  if (state === 'fakeLoading') {
-    return (
-      <div className="w-full">
-        <FakeScanProgress
-          url={capturedUrl}
-          onGateReached={() => setState('gated')}
-        />
-      </div>
-    );
-  }
-
-  if (state === 'gated') {
-    return (
-      <div className="w-full relative">
-        <FakeScanProgress url={capturedUrl} onGateReached={() => {}} />
-        <SignupWall domain={domain} scanUrl={capturedUrl} />
-      </div>
     );
   }
 
@@ -261,7 +292,7 @@ export function HeroScanFlow() {
   return (
     <ScanInput
       variant="dialog"
-      onCapture={isAuthenticated != null ? handleCapture : undefined}
+      onCapture={!authLoading ? handleCapture : undefined}
     />
   );
 }
