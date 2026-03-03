@@ -235,7 +235,7 @@ export function ScanSequence({
   if (typeof document === 'undefined') return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-[10000] bg-gs-ink overflow-hidden">
+    <div className={`fixed inset-0 bg-gs-ink overflow-hidden ${paused ? 'z-[5]' : 'z-[10000]'}`}>
       {/* ── Phase 0: Matrix Intro ────────────────────────── */}
       {currentPhase === 0 && (
         <div className="absolute inset-0 flex items-center justify-center">
