@@ -94,19 +94,25 @@ export async function POST(request: NextRequest) {
     ? `${request.nextUrl.origin}/?payment_success=${scanId}`
     : `${request.nextUrl.origin}/?credits_purchased=true`;
 
-  const session = await getStripe().checkout.sessions.create({
-    mode: 'payment',
-    payment_method_types: ['card'],
-    line_items: [{ price: priceId, quantity: 1 }],
-    success_url: successUrl,
-    cancel_url: `${request.nextUrl.origin}/`,
-    client_reference_id: user.id,
-    metadata: {
-      product,
-      scanId: scanId ?? '',
-      userId: user.id,
-    },
-  });
+  let session;
+  try {
+    session = await getStripe().checkout.sessions.create({
+      mode: 'payment',
+      payment_method_types: ['card'],
+      line_items: [{ price: priceId, quantity: 1 }],
+      success_url: successUrl,
+      cancel_url: `${request.nextUrl.origin}/`,
+      client_reference_id: user.id,
+      metadata: {
+        product,
+        scanId: scanId ?? '',
+        userId: user.id,
+      },
+    });
+  } catch (err) {
+    console.error('[checkout] Stripe session creation failed:', err);
+    return NextResponse.json({ error: 'Payment service unavailable' }, { status: 502 });
+  }
 
   // Record pending payment
   await supabase.from('payments').insert({
