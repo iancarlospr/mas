@@ -100,6 +100,7 @@ export async function POST(request: NextRequest) {
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: successUrl,
       cancel_url: `${request.nextUrl.origin}/`,
+      customer_email: user.email ?? undefined,
       client_reference_id: user.id,
       metadata: {
         product,
