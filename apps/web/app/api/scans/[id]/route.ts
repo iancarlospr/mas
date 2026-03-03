@@ -11,16 +11,17 @@ export async function GET(
     return NextResponse.json({ error: 'Invalid scan ID' }, { status: 400 });
   }
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
 
-  // Fetch scan
-  const { data: scan, error } = await supabase
-    .from('scans')
-    .select('*')
-    .eq('id', id)
-    .single();
+  // Parallelize auth + scan fetch (independent queries)
+  const [authResult, scanResult] = await Promise.all([
+    supabase.auth.getUser(),
+    supabase.from('scans').select('*').eq('id', id).single(),
+  ]);
 
-  if (error || !scan) {
+  const user = authResult.data.user;
+  const scan = scanResult.data;
+
+  if (scanResult.error || !scan) {
     return NextResponse.json({ error: 'Scan not found' }, { status: 404 });
   }
 
@@ -39,7 +40,7 @@ export async function GET(
     .eq('scan_id', sourceId)
     .order('module_id');
 
-  return NextResponse.json({
+  const responseBody = {
     id: scan.id,
     userId: scan.user_id,
     url: scan.url,
@@ -62,7 +63,15 @@ export async function GET(
       error: r.error,
     })),
     marketingIqResult: scan.marketing_iq_result,
-  });
+  };
+
+  // Completed scans don't change — allow browser caching
+  const headers: Record<string, string> = {};
+  if (scan.status === 'complete') {
+    headers['Cache-Control'] = 'private, max-age=300, stale-while-revalidate=3600';
+  }
+
+  return NextResponse.json(responseBody, { headers });
 }
 
 export async function DELETE(

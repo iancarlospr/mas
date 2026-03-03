@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useRef, useMemo, useEffect, type ReactNode } from 'react';
+import { useCallback, useRef, useMemo, useEffect, useState, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 import { useWindowManager, useWindowState } from '@/lib/window-manager';
 import { useWindowDrag } from '@/hooks/use-window-drag';
@@ -189,6 +189,20 @@ export function ManagedWindow({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, windowState?.x, windowState?.y, isMaximized]);
 
+  // Track whether the open animation has already played
+  const [hasAnimated, setHasAnimated] = useState(false);
+  useEffect(() => {
+    if (windowState?.isOpen && !windowState.isMinimized && !hasAnimated) {
+      // Mark as animated after the animation completes (~600ms)
+      const timer = setTimeout(() => setHasAnimated(true), 700);
+      return () => clearTimeout(timer);
+    }
+    // Reset when window is closed so it re-animates next time it opens
+    if (!windowState?.isOpen) {
+      setHasAnimated(false);
+    }
+  }, [windowState?.isOpen, windowState?.isMinimized, hasAnimated]);
+
   if (!windowState || !windowState.isOpen || windowState.isMinimized) {
     return null;
   }
@@ -201,7 +215,7 @@ export function ManagedWindow({
         'window',
         windowState.variant === 'ghost' && 'window-ghost',
         windowState.variant === 'terminal' && 'window-terminal',
-        'animate-window-open',
+        !hasAnimated && 'animate-window-open',
       )}
       style={{
         position: 'absolute',
@@ -251,7 +265,9 @@ export function ManagedWindow({
             title={isMaximized ? 'Restore' : 'Maximize'}
           />
         </div>
-        <span className="window-titlebar-text">{windowState.title}</span>
+        {id !== 'scan-input' && (
+          <span className="window-titlebar-text">{windowState.title}</span>
+        )}
       </div>
 
       {/* Dither strip — only on Scan.exe window */}

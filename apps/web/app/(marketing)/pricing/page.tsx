@@ -2,6 +2,8 @@ import { PricingCards } from '@/components/marketing/pricing-cards';
 import { ChloeSprite } from '@/components/chloe/chloe-sprite';
 import type { Metadata } from 'next';
 
+export const revalidate = 86400;
+
 /**
  * GhostScan OS — Pricing Page
  * ═══════════════════════════════
@@ -14,7 +16,7 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Pricing — GhostScan OS',
-  description: 'Free forensic scan. Full intelligence dossier for $9.99.',
+  description: 'Free MarTech scan. Full forensic intelligence from $24.99.',
 };
 
 export default function PricingPage() {
@@ -61,7 +63,7 @@ export default function PricingPage() {
                 },
                 {
                   q: 'What does the Alpha Brief unlock?',
-                  a: 'The full executive intelligence dossier: remediation PRD with timeline, ROI simulator & cost cutter analysis, 15 Chloe chat questions, and a shareable report link. One-time $9.99 — no subscription.',
+                  a: 'The full 45-module forensic scan, executive brief, remediation PRD, ROI simulator, stack analyzer, PDF export, and 25 GhostChat credits. One-time $24.99 — no subscription.',
                 },
                 {
                   q: 'Do credits expire?',

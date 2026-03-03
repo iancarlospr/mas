@@ -31,13 +31,14 @@ export async function sendScanCompleteEmail(to: string, scanId: string, domain: 
 
 export async function sendPaymentReceiptEmail(
   to: string,
-  product: 'alpha_brief' | 'chat_activation' | 'chat_credits',
+  product: string,
   amountCents: number,
 ) {
   const productNames: Record<string, string> = {
     alpha_brief: 'Alpha Brief',
-    chat_activation: 'Chat Activation',
-    chat_credits: 'Chat Credits',
+    alpha_brief_plus: 'Alpha Brief Plus',
+    chat_credits_15: 'Chat Credits (15)',
+    chat_credits: 'Chat Credits (100)',
   };
   const productName = productNames[product] ?? product;
   const amount = (amountCents / 100).toFixed(2);

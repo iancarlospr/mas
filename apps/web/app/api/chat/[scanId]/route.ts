@@ -346,18 +346,13 @@ export async function POST(
       role: 'assistant',
       content: assistantResponse,
     }),
-    supabase
-      .from('chat_credits')
-      .update({
-        remaining: credits.remaining - 1,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('user_id', user.id),
+    // Atomic decrement — prevents double-spend race condition
+    supabase.rpc('decrement_chat_credits', { p_user_id: user.id, p_amount: 1 }),
   ]);
 
   return NextResponse.json({
     message: assistantResponse,
-    creditsRemaining: credits.remaining - 1,
+    creditsRemaining: Math.max(0, credits.remaining - 1),
   });
 }
 
@@ -378,32 +373,20 @@ export async function GET(
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
   }
 
-  // Verify scan ownership
-  const { data: scan } = await supabase
-    .from('scans')
-    .select('id, user_id')
-    .eq('id', scanId)
-    .single();
+  // Parallelize scan ownership, messages, and credits (all independent after auth)
+  const [scanResult, messagesResult, creditsResult] = await Promise.all([
+    supabase.from('scans').select('id, user_id').eq('id', scanId).single(),
+    supabase.from('chat_messages').select('id, role, content, created_at')
+      .eq('scan_id', scanId).eq('user_id', user.id).order('created_at', { ascending: true }),
+    supabase.from('chat_credits').select('remaining').eq('user_id', user.id).single(),
+  ]);
 
-  if (!scan || scan.user_id !== user.id) {
+  if (!scanResult.data || scanResult.data.user_id !== user.id) {
     return NextResponse.json({ error: 'Scan not found' }, { status: 404 });
   }
 
-  const { data: messages } = await supabase
-    .from('chat_messages')
-    .select('id, role, content, created_at')
-    .eq('scan_id', scanId)
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: true });
-
-  const { data: credits } = await supabase
-    .from('chat_credits')
-    .select('remaining')
-    .eq('user_id', user.id)
-    .single();
-
   return NextResponse.json({
-    messages: messages ?? [],
-    creditsRemaining: credits?.remaining ?? 0,
+    messages: messagesResult.data ?? [],
+    creditsRemaining: creditsResult.data?.remaining ?? 0,
   });
 }

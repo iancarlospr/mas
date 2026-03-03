@@ -45,7 +45,7 @@ export function AutoScanTrigger() {
     fetch('/api/scans', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url, turnstileToken: '' }),
+      body: JSON.stringify({ url, turnstileToken: '', autoScan: true }),
     })
       .then(async (res) => {
         if (!res.ok) {

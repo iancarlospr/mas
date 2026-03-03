@@ -16,6 +16,7 @@ import { detectAndHandleBotWall } from '../ghostscan/bot-wall-detector.js';
 import { detectMixedContent } from '../utils/mixed-content-detector.js';
 import { fetchWithRetry } from '../utils/http.js';
 import { getRegistrableDomain } from '../utils/url.js';
+import { assertUrlSafe } from '../utils/url-safety.js';
 import { updateScanStatus, upsertModuleResult } from '../services/supabase.js';
 import { calculateModuleScore } from '../utils/scoring.js';
 import type { DOMForensics, NavigatorSnapshot } from './types.js';
@@ -27,6 +28,12 @@ const logger = pino({ name: 'module-runner' });
 const CRUX_TIMEOUT = 20_000;
 const MOBILE_NAV_TIMEOUT = 25_000;
 const CWV_STABILIZATION_DELAY = 2_000;
+
+/**
+ * Modules available on the free tier. Only MarTech & Infrastructure.
+ * All other modules require a paid tier.
+ */
+const FREE_TIER_MODULES: ReadonlySet<string> = new Set(['M02', 'M07', 'M20']);
 
 /**
  * Placeholder module execute function for modules not yet implemented.
@@ -136,6 +143,15 @@ export class ModuleRunner {
    * Extracted as a shared helper to avoid duplicating the referer construction
    * across browser, ghostscan, and mobile phases.
    */
+  /**
+   * Filter modules for free tier — only allow FREE_TIER_MODULES.
+   * Paid tier gets all modules unfiltered.
+   */
+  private filterForTier(modules: ModuleDefinition[]): ModuleDefinition[] {
+    if (this.tier !== 'full') return modules;
+    return modules.filter((m) => FREE_TIER_MODULES.has(m.id));
+  }
+
   private getGoogleReferer(): string {
     return `https://www.google.com/search?q=${encodeURIComponent(
       new URL(this.context.url).hostname.replace(/^www\./, ''),
@@ -274,7 +290,8 @@ export class ModuleRunner {
    * Phase 1: Passive modules run in parallel with Promise.allSettled.
    */
   private async runPassivePhase(): Promise<void> {
-    const modules = getModulesForPhaseAndTier('passive', this.tier);
+    const modules = this.filterForTier(getModulesForPhaseAndTier('passive', this.tier));
+    if (modules.length === 0) return;
     logger.info({ moduleCount: modules.length }, 'Running passive phase');
 
     const promises = modules.map((mod) =>
@@ -288,7 +305,7 @@ export class ModuleRunner {
    * Phase 2: Browser modules run sequentially on a shared Playwright page.
    */
   private async runBrowserPhase(): Promise<void> {
-    const modules = getModulesForPhaseAndTier('browser', this.tier);
+    const modules = this.filterForTier(getModulesForPhaseAndTier('browser', this.tier));
     if (modules.length === 0) return;
 
     logger.info({ moduleCount: modules.length }, 'Running browser phase');
@@ -656,7 +673,7 @@ export class ModuleRunner {
    * rendered DOM and re-execute any errored passive modules.
    */
   private async retryFailedPassiveModules(page: Page): Promise<void> {
-    const passiveModules = getModulesForPhaseAndTier('passive', this.tier);
+    const passiveModules = this.filterForTier(getModulesForPhaseAndTier('passive', this.tier));
     const failedPassive = passiveModules.filter(mod => {
       const result = this.context.previousResults.get(mod.id);
       return result?.status === 'error';
@@ -693,7 +710,7 @@ export class ModuleRunner {
    * Phase 3: GhostScan modules continue on the same page, run sequentially.
    */
   private async runGhostScanPhase(): Promise<void> {
-    const modules = getModulesForPhaseAndTier('ghostscan', this.tier);
+    const modules = this.filterForTier(getModulesForPhaseAndTier('ghostscan', this.tier));
     if (modules.length === 0) return;
 
     logger.info({ moduleCount: modules.length }, 'Running ghostscan phase');
@@ -736,7 +753,7 @@ export class ModuleRunner {
    * Phase 4: External modules run in parallel.
    */
   private async runExternalPhase(): Promise<void> {
-    const modules = getModulesForPhaseAndTier('external', this.tier);
+    const modules = this.filterForTier(getModulesForPhaseAndTier('external', this.tier));
     if (modules.length === 0) return;
 
     logger.info({ moduleCount: modules.length }, 'Running external phase');
@@ -754,7 +771,7 @@ export class ModuleRunner {
    * This gives M06/M06b a clean network signal and real paid-page data.
    */
   private async runPaidMediaPhase(): Promise<void> {
-    const modules = getModulesForPhaseAndTier('paid-media', this.tier);
+    const modules = this.filterForTier(getModulesForPhaseAndTier('paid-media', this.tier));
     if (modules.length === 0) return;
 
     logger.info({ moduleCount: modules.length }, 'Running paid-media phase');
@@ -802,6 +819,9 @@ export class ModuleRunner {
       networkCollector.attach(page);
       const consoleCollector = new ConsoleCollector();
       consoleCollector.attach(page);
+
+      // SSRF protection: paidUrl comes from M21 ad extraction (untrusted)
+      assertUrlSafe(paidUrl);
 
       // Navigate with Google referrer
       const referer = `https://www.google.com/search?q=${encodeURIComponent(
@@ -870,7 +890,7 @@ export class ModuleRunner {
    * then M42-M45 run sequentially (each depends on prior results).
    */
   private async runSynthesisPhase(): Promise<void> {
-    const allSynthesis = getModulesForPhaseAndTier('synthesis', this.tier);
+    const allSynthesis = this.filterForTier(getModulesForPhaseAndTier('synthesis', this.tier));
     if (allSynthesis.length === 0) return;
 
     logger.info({ moduleCount: allSynthesis.length }, 'Running synthesis phase');

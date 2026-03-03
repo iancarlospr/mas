@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { verifyShareToken } from '@/lib/report/share';
 import { engineFetch } from '@/lib/engine';
+import { rateLimit } from '@/lib/rate-limit';
 import { isValidUUID } from '@/lib/utils';
 
 export async function GET(
@@ -16,6 +17,17 @@ export async function GET(
   // Auth: either logged-in owner OR valid share token
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
+
+  // Rate limit authenticated users
+  if (user) {
+    const rl = rateLimit(`pdf:${user.id}`, 10, 300_000);
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: 'Too many requests' },
+        { status: 429, headers: { 'Retry-After': String(Math.ceil((rl.resetAt - Date.now()) / 1000)) } },
+      );
+    }
+  }
   const shareToken = request.nextUrl.searchParams.get('share');
 
   const serviceClient = createServiceClient();

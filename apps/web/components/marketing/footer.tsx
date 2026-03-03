@@ -17,7 +17,7 @@ const footerLinks = {
   ],
   Company: [
     { href: '/about', label: 'About' },
-    { href: 'mailto:support@marketingalphascan.com', label: 'Contact' },
+    { href: '#', label: 'info@marketingalphascan.com' },
   ],
   Legal: [
     { href: '/privacy', label: 'Privacy' },

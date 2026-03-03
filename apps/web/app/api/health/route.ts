@@ -1,31 +1,37 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { engineFetch } from '@/lib/engine';
 
-export async function GET() {
-  const engineUrl = process.env.ENGINE_URL ?? '(not set)';
-  const hmacSet = !!process.env.ENGINE_HMAC_SECRET;
-
-  let engineStatus = 'unknown';
-  let engineError = null;
+export async function GET(request: NextRequest) {
+  let engineOk = false;
+  let engineError: string | null = null;
   try {
     const res = await engineFetch('/engine/health');
-    engineStatus = `${res.status} ${res.statusText}`;
+    engineOk = res.ok;
     if (!res.ok) {
       engineError = await res.text().catch(() => null);
     }
   } catch (err: unknown) {
-    engineStatus = 'fetch_failed';
     engineError = err instanceof Error ? err.message : String(err);
   }
 
+  // Public: minimal status (no internal architecture details)
+  const isAdmin = request.headers.get('x-admin-token') === process.env.ADMIN_TOKEN;
+
+  if (!isAdmin) {
+    return NextResponse.json({
+      status: 'ok',
+      engine: engineOk ? 'ok' : 'degraded',
+    });
+  }
+
+  // Admin: full diagnostics
   return NextResponse.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
     engine: {
-      url: engineUrl,
-      hmacSecretSet: hmacSet,
-      hmacSecretLength: (process.env.ENGINE_HMAC_SECRET ?? '').length,
-      status: engineStatus,
+      url: process.env.ENGINE_URL ?? '(not set)',
+      hmacSecretSet: !!process.env.ENGINE_HMAC_SECRET,
+      status: engineOk ? 'ok' : 'error',
       error: engineError,
     },
   });

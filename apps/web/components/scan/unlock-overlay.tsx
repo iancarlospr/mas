@@ -11,7 +11,7 @@ import { soundEffects } from '@/lib/sound-effects';
  *
  * WHAT: Replaces the old frosted glass blur with a classified document
  *       redaction aesthetic — black bars over data, CLASSIFIED stamp,
- *       and a "Declassify — $9.99" bevel button.
+ *       and an "Unlock — from $24.99" bevel button.
  * WHY:  The frosted glass was generic SaaS. The redaction aesthetic
  *       matches the dossier/intelligence brand and creates urgency
  *       through concealment rather than blur (Plan Sections 6, 19).
@@ -44,11 +44,30 @@ export function UnlockOverlay({
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  /** Trigger Stripe checkout */
+  /** Try to unlock with existing scan credits, fall back to Stripe */
   const handleDeclassify = useCallback(async () => {
     setLoading(true);
     soundEffects.play('buttonClick');
     try {
+      // First try to use an existing scan credit
+      const unlockRes = await fetch(`/api/scans/${scanId}/unlock`, {
+        method: 'POST',
+      });
+
+      if (unlockRes.ok) {
+        // Credit used — scan is upgrading, reload will pick up the new status
+        soundEffects.play('unlock');
+        window.location.reload();
+        return;
+      }
+
+      // 402 = no credits, fall through to Stripe checkout
+      if (unlockRes.status !== 402) {
+        setLoading(false);
+        return;
+      }
+
+      // No credits — redirect to Stripe
       const res = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -126,7 +145,7 @@ export function UnlockOverlay({
                 Connecting...
               </span>
             ) : (
-              <>Declassify — $9.99</>
+              <>Unlock — from $24.99</>
             )}
           </button>
         </div>

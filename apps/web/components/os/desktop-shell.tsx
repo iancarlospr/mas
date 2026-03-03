@@ -28,10 +28,10 @@ import { BedroomIcon } from './bedroom-icons';
 /** Desktop icon window configurations — icons are now SVG IDs */
 /** Initial sizes — auto-sizer will snap to actual content on open */
 const WINDOW_CONFIGS: Record<string, WindowConfig> = {
-  'about':         { title: 'About AlphaScan',                 icon: '~', width: 500, height: 400 },
-  'products':      { title: 'Products',                        icon: '~', width: 560, height: 400 },
-  'pricing':       { title: 'Pricing',                         icon: '~', width: 700, height: 500 },
-  'customers':     { title: 'Reviews',                         icon: '~', width: 420, height: 340 },
+  'about':         { title: 'About AlphaScan',                 icon: '~', width: 480, height: 520 },
+  'products':      { title: 'Products',                        icon: '~', width: 560, height: 520 },
+  'pricing':       { title: 'Pricing',                         icon: '~', width: 700, height: 560 },
+  'customers':     { title: 'Reviews',                         icon: '~', width: 440, height: 560 },
   'chill':         { title: 'chill.mov',                       icon: '~', width: 820, height: 500, variant: 'terminal' },
   'history':       { title: 'My Scans',                        icon: '~', width: 600, height: 400 },
   'chat-launcher': { title: 'GhostChat',                       icon: '~', width: 420, height: 380 },
@@ -135,6 +135,15 @@ export function DesktopShell({ children }: { children: ReactNode }) {
       setTimeout(() => {
         orchestrator.openScanWindow(paymentScanId, '');
       }, 1500);
+      return;
+    }
+
+    // Credits purchased from pricing page (no specific scan)
+    const creditsPurchased = params.get('credits_purchased');
+    if (creditsPurchased) {
+      window.history.replaceState({}, '', '/');
+      // Open scan-input so user can use their credits
+      wm.openWindow('scan-input');
       return;
     }
 

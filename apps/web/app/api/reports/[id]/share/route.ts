@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { generateShareToken } from '@/lib/report/share';
+import { rateLimit } from '@/lib/rate-limit';
 import { isValidUUID } from '@/lib/utils';
 
 /** POST /api/reports/:id/share — generate a shareable report URL */
@@ -17,6 +18,14 @@ export async function POST(
 
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const rl = rateLimit(`share:${user.id}`, 10, 60_000);
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { error: 'Too many requests' },
+      { status: 429, headers: { 'Retry-After': String(Math.ceil((rl.resetAt - Date.now()) / 1000)) } },
+    );
   }
 
   // Verify scan exists and is paid

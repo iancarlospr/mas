@@ -1,6 +1,8 @@
 import { ChloeSprite } from '@/components/chloe/chloe-sprite';
 import type { Metadata } from 'next';
 
+export const revalidate = 86400;
+
 /**
  * GhostScan OS — About Page
  * ═══════════════════════════════
@@ -22,8 +24,8 @@ const techStack = [
   { label: 'Forensic Modules', value: '42' },
   { label: 'Scan Time', value: '~90 seconds' },
   { label: 'Detection Engine', value: 'GhostScan v2.0' },
-  { label: 'AI Synthesis', value: 'Gemini 2.5 Pro' },
-  { label: 'Market Intelligence', value: 'DataForSEO' },
+  { label: 'AI Synthesis', value: 'Proprietary LLM Pipeline' },
+  { label: 'Market Intelligence', value: 'Third-Party APIs' },
   { label: 'Browser Engine', value: 'Patchright (Chromium)' },
   { label: 'Scoring System', value: 'MarketingIQ 0-100' },
   { label: 'Output Format', value: 'Dashboard + PDF + Chat' },
@@ -157,7 +159,7 @@ export default function AboutPage() {
                 {
                   phase: 'Phase 5',
                   title: 'AI Synthesis',
-                  desc: 'Gemini-powered analysis — editorial insights, remediation roadmaps, ROI modeling, executive briefs.',
+                  desc: 'AI-powered analysis — editorial insights, remediation roadmaps, ROI modeling, executive briefs.',
                 },
               ].map((phase) => (
                 <div key={phase.phase} className="flex gap-gs-4">

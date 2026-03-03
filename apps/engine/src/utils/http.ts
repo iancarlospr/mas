@@ -1,4 +1,5 @@
 import pino from 'pino';
+import { assertUrlSafeWithDns } from './url-safety.js';
 
 const logger = pino({ name: 'http-util' });
 
@@ -101,6 +102,9 @@ async function fetchWithRedirects(
   let currentUrl = url;
 
   for (let i = 0; i <= options.maxRedirects; i++) {
+    // SSRF protection: validate URL before each fetch (catches redirect-to-private-IP)
+    await assertUrlSafeWithDns(currentUrl);
+
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), options.timeout);
 

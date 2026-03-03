@@ -1,26 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getStripe } from '@/lib/stripe';
+import { rateLimit } from '@/lib/rate-limit';
 import { z } from 'zod';
 
 const CheckoutSchema = z.object({
-  product: z.enum(['alpha_brief', 'chat_activation', 'chat_credits']),
-  scanId: z.string().uuid(),
+  product: z.enum(['alpha_brief', 'alpha_brief_plus', 'chat_credits_15', 'chat_credits']),
+  scanId: z.string().uuid().optional(),
 });
 
 function getPriceMap() {
   return {
     alpha_brief: process.env.STRIPE_ALPHA_BRIEF_PRICE_ID!,
-    chat_activation: process.env.STRIPE_CHAT_ACTIVATION_PRICE_ID!,
+    alpha_brief_plus: process.env.STRIPE_ALPHA_BRIEF_PLUS_PRICE_ID!,
+    chat_credits_15: process.env.STRIPE_CHAT_ACTIVATION_PRICE_ID!,
     chat_credits: process.env.STRIPE_CHAT_CREDITS_PRICE_ID!,
   };
 }
 
 const AMOUNT_MAP: Record<string, number> = {
-  alpha_brief: 999,
-  chat_activation: 100,
+  alpha_brief: 2499,
+  alpha_brief_plus: 3495,
+  chat_credits_15: 100,
   chat_credits: 499,
 };
+
+/** Products that upgrade the scan tier from free to paid */
+const UPGRADE_PRODUCTS = new Set(['alpha_brief', 'alpha_brief_plus']);
 
 export async function POST(request: NextRequest) {
   const supabase = await createClient();
@@ -28,6 +34,14 @@ export async function POST(request: NextRequest) {
 
   if (!user) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+  }
+
+  const rl = rateLimit(`checkout:${user.id}`, 5, 60_000);
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { error: 'Too many requests' },
+      { status: 429, headers: { 'Retry-After': String(Math.ceil((rl.resetAt - Date.now()) / 1000)) } },
+    );
   }
 
   const body = await request.json();
@@ -43,60 +57,53 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Product not configured' }, { status: 500 });
   }
 
-  // Verify scan ownership
-  const { data: scan } = await supabase
-    .from('scans')
-    .select('id, user_id, tier, status')
-    .eq('id', scanId)
-    .single();
-
-  if (!scan || (scan.user_id && scan.user_id !== user.id)) {
-    return NextResponse.json({ error: 'Scan not found' }, { status: 404 });
-  }
-
-  if (product === 'alpha_brief' && scan.tier === 'paid') {
-    return NextResponse.json({ error: 'Scan is already upgraded' }, { status: 400 });
-  }
-
-  if (product === 'chat_activation') {
-    // Require paid scan for chat activation
-    if (scan.tier !== 'paid') {
-      return NextResponse.json({ error: 'Alpha Brief required before chat activation' }, { status: 400 });
+  // Chat credits always require a scanId (tied to a paid scan)
+  if (product === 'chat_credits_15' || product === 'chat_credits') {
+    if (!scanId) {
+      return NextResponse.json({ error: 'Scan ID required for chat credits' }, { status: 400 });
     }
+  }
 
-    // Prevent double activation — user must not already have credits
-    const { data: existingCredits } = await supabase
-      .from('chat_credits')
-      .select('remaining')
-      .eq('user_id', user.id)
+  // If scanId provided, verify ownership and validate
+  if (scanId) {
+    const { data: scan } = await supabase
+      .from('scans')
+      .select('id, user_id, tier, status')
+      .eq('id', scanId)
       .single();
 
-    if (existingCredits) {
-      return NextResponse.json({ error: 'Chat already activated' }, { status: 400 });
+    if (!scan || (scan.user_id && scan.user_id !== user.id)) {
+      return NextResponse.json({ error: 'Scan not found' }, { status: 404 });
     }
-  }
 
-  if (product === 'chat_credits') {
-    // Require paid scan for chat top-up
-    if (scan.tier !== 'paid') {
+    if (UPGRADE_PRODUCTS.has(product) && scan.tier === 'paid') {
+      return NextResponse.json({ error: 'Scan is already upgraded' }, { status: 400 });
+    }
+
+    if ((product === 'chat_credits_15' || product === 'chat_credits') && scan.tier !== 'paid') {
       return NextResponse.json({ error: 'Alpha Brief required for chat credits' }, { status: 400 });
     }
+
+    if (scan.status === 'failed' || scan.status === 'cancelled') {
+      return NextResponse.json({ error: 'Cannot purchase for a failed scan' }, { status: 400 });
+    }
   }
 
-  if (scan.status === 'failed' || scan.status === 'cancelled') {
-    return NextResponse.json({ error: 'Cannot purchase for a failed scan' }, { status: 400 });
-  }
+  // Success URL: open the scan report if scanId exists, otherwise just go home
+  const successUrl = scanId
+    ? `${request.nextUrl.origin}/?payment_success=${scanId}`
+    : `${request.nextUrl.origin}/?credits_purchased=true`;
 
   const session = await getStripe().checkout.sessions.create({
     mode: 'payment',
     payment_method_types: ['card'],
     line_items: [{ price: priceId, quantity: 1 }],
-    success_url: `${request.nextUrl.origin}/?payment_success=${scanId}`,
+    success_url: successUrl,
     cancel_url: `${request.nextUrl.origin}/`,
     client_reference_id: user.id,
     metadata: {
       product,
-      scanId,
+      scanId: scanId ?? '',
       userId: user.id,
     },
   });
@@ -104,7 +111,7 @@ export async function POST(request: NextRequest) {
   // Record pending payment
   await supabase.from('payments').insert({
     user_id: user.id,
-    scan_id: scanId,
+    scan_id: scanId ?? null,
     stripe_session_id: session.id,
     product,
     amount_cents: AMOUNT_MAP[product] ?? 0,

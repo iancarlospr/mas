@@ -191,7 +191,7 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
             onClick={handleDeclassify}
             className="bevel-button-primary text-os-xs"
           >
-            Declassify — $9.99
+            Unlock — from $24.99
           </button>
         )}
         {isPaid && (

@@ -1,4 +1,5 @@
 import { parse as parseDomain } from 'tldts';
+import { assertUrlSafe } from './url-safety.js';
 
 export interface ParsedDomain {
   hostname: string;
@@ -133,6 +134,9 @@ export async function probeUrl(
   timeoutMs: number = 5_000,
 ): Promise<{ exists: boolean; status: number; body?: string }> {
   try {
+    // SSRF protection
+    assertUrlSafe(url);
+
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
 

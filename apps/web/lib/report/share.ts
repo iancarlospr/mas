@@ -4,9 +4,11 @@
  */
 import { SignJWT, jwtVerify } from 'jose';
 
-const SECRET = new TextEncoder().encode(
-  process.env.REPORT_SHARE_SECRET ?? process.env.ENGINE_HMAC_SECRET ?? 'dev-share-secret',
-);
+const shareSecret = process.env.REPORT_SHARE_SECRET ?? process.env.ENGINE_HMAC_SECRET;
+if (!shareSecret) {
+  throw new Error('[share] Neither REPORT_SHARE_SECRET nor ENGINE_HMAC_SECRET is set');
+}
+const SECRET = new TextEncoder().encode(shareSecret);
 
 interface SharePayload {
   scanId: string;

@@ -5,13 +5,8 @@ import { cn } from '@/lib/utils';
  * GhostScan OS — Pricing Cards (Retro Software Editions)
  * ═══════════════════════════════════════════════════════════
  *
- * WHAT: Pricing tiers rendered as retro software edition boxes.
- * WHY:  Old cards were generic SaaS. Now they match the GhostScan OS
- *       brand — bevel borders, system font, pixel art vibes.
- *       Think "Standard Edition" vs "Pro Edition" physical box art
- *       (Plan Section 14).
- * HOW:  Bevel-raised cards, JetBrains Mono prices, retro checkbox
- *       checklist. All content/pricing data preserved.
+ * 3-tier pricing: Free, Alpha Brief, Alpha Brief Plus.
+ * Chat credits sold separately as add-ons (not in main grid).
  */
 
 const tiers = [
@@ -20,55 +15,63 @@ const tiers = [
     edition: 'Standard Edition',
     price: 'Free',
     originalPrice: null,
-    description: 'Complete marketing audit — 42 forensic modules.',
+    description: 'MarTech infrastructure analysis — 3 modules.',
     cta: 'Register Free',
     ctaHref: '/register',
     features: [
-      'All 42 scan modules',
-      'GhostScan™ active probing',
-      'Dashboard with all findings',
-      'Per-module AI insights',
-      'PPC landing page audit',
-      'DataForSEO market intelligence',
+      'CMS & Infrastructure detection',
+      'MarTech Orchestration audit',
+      'Ecommerce/SaaS detection',
+      'Full results — no redaction',
+    ],
+    highlighted: false,
+  },
+  {
+    name: 'Alpha Brief',
+    edition: 'Professional Edition',
+    price: '$24.99',
+    originalPrice: null,
+    description: 'Full 45-module forensic scan + AI executive brief.',
+    cta: 'Get Alpha Brief',
+    ctaHref: '/register',
+    features: [
+      '1 full forensic scan (45 modules)',
+      'Executive Brief + PRD',
+      'Impact Scenarios + Stack Analyzer',
+      'PDF export + shareable link',
+      '25 GhostChat™ credits',
     ],
     highlighted: true,
   },
   {
-    name: 'Alpha Brief™',
-    edition: 'Professional Edition',
-    price: '$9.99',
-    originalPrice: '$29.99',
-    description: 'Executive intelligence dossier. The full receipts.',
-    cta: 'Declassify',
+    name: 'Alpha Brief Plus',
+    edition: 'Enterprise Edition',
+    price: '$34.95',
+    originalPrice: null,
+    description: 'Everything + agents + deep analysis.',
+    cta: 'Get Alpha Brief Plus',
     ctaHref: '/register',
     features: [
-      'Everything in Standard',
-      'Alpha Brief™ executive report',
-      'Remediation PRD with timeline',
-      'ROI simulator & cost cutter',
-      '15 Chloé chat questions',
-      'Shareable report link',
+      '3 full forensic scans (45 modules)',
+      'Everything in Alpha Brief',
+      '200 GhostChat™ credits',
+      'Deploy AI agents on your data',
+      'Priority scan queue',
     ],
     highlighted: false,
   },
 ];
 
-const addOn = {
-  name: 'Chat Credits',
-  price: '$4.99',
-  description: '100 additional questions for Chloé. She knows more than she lets on.',
-};
-
 export function PricingCards() {
   return (
     <div className="space-y-gs-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-gs-6 max-w-3xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-gs-6 max-w-4xl mx-auto">
         {tiers.map((tier) => (
           <div
             key={tier.name}
             className={cn(
               'relative bevel-raised bg-gs-chrome p-gs-6 flex flex-col',
-              tier.highlighted && 'shadow-ghost-glow',
+              tier.highlighted && 'shadow-ghost-glow border-2 border-gs-red',
             )}
           >
             {/* Edition label */}
@@ -130,23 +133,6 @@ export function PricingCards() {
             </Link>
           </div>
         ))}
-      </div>
-
-      {/* Chat Credits add-on */}
-      <div className="max-w-md mx-auto bevel-raised bg-gs-chrome p-gs-6 text-center">
-        <span className="font-system text-os-xs text-gs-muted uppercase tracking-wider">
-          Add-on
-        </span>
-        <h3 className="font-system text-os-lg font-bold text-gs-ink mt-gs-1">
-          {addOn.name}
-        </h3>
-        <p className="font-data text-data-sm text-gs-muted mt-gs-1 mb-gs-3">
-          {addOn.description}
-        </p>
-        <span className="font-data text-data-2xl font-bold text-gs-ink">
-          {addOn.price}
-        </span>
-        <span className="font-data text-data-xs text-gs-muted ml-gs-2">one-time</span>
       </div>
     </div>
   );

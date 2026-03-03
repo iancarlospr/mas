@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { isValidUUID } from '@/lib/utils';
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
@@ -12,11 +12,36 @@ export async function GET(
   }
   const supabase = await createClient();
 
+  // Auth: verify ownership before opening stream
+  const { data: { user } } = await supabase.auth.getUser();
+  const { data: scanOwner } = await supabase
+    .from('scans')
+    .select('user_id')
+    .eq('id', id)
+    .single();
+
+  if (!scanOwner) {
+    return NextResponse.json({ error: 'Scan not found' }, { status: 404 });
+  }
+  // Allow if user owns the scan OR scan has no owner (anonymous/cached)
+  if (scanOwner.user_id && (!user || scanOwner.user_id !== user.id)) {
+    return NextResponse.json({ error: 'Scan not found' }, { status: 404 });
+  }
+
+  const signal = request.signal;
   const encoder = new TextEncoder();
   let lastStatus = '';
   let lastModuleCount = 0;
   let closed = false;
   let consecutiveErrors = 0;
+
+  const cleanup = (interval: ReturnType<typeof setInterval>, controller: ReadableStreamDefaultController) => {
+    clearInterval(interval);
+    if (!closed) {
+      closed = true;
+      try { controller.close(); } catch { /* already closed */ }
+    }
+  };
 
   const stream = new ReadableStream({
     async start(controller) {
@@ -29,14 +54,17 @@ export async function GET(
         }
       };
 
-      // Poll every 2 seconds
-      const interval = setInterval(async () => {
-        if (closed) {
-          clearInterval(interval);
+      // Adaptive polling: 2s during active scan, 5s near completion
+      let pollInterval = 2000;
+
+      const poll = async () => {
+        if (closed || signal.aborted) {
+          cleanup(interval, controller);
           return;
         }
 
         try {
+          // Single combined query: scan status + module count check
           const { data: scan } = await supabase
             .from('scans')
             .select('status, marketing_iq')
@@ -45,32 +73,34 @@ export async function GET(
 
           if (!scan) {
             send({ type: 'error', scanId: id, error: 'Scan not found' });
-            clearInterval(interval);
-            closed = true;
-            controller.close();
+            cleanup(interval, controller);
             return;
           }
 
-          const { data: modules } = await supabase
+          // Only fetch full module results when we detect new completions
+          const { count } = await supabase
             .from('module_results')
-            .select('module_id, status, score')
+            .select('*', { count: 'exact', head: true })
             .eq('scan_id', id)
             .in('status', ['success', 'partial', 'error']);
 
-          const currentModules = modules ?? [];
+          const currentCount = count ?? 0;
 
           // Send status update if changed
           if (scan.status !== lastStatus) {
             lastStatus = scan.status;
-            send({
-              type: 'status',
-              scanId: id,
-              status: scan.status,
-            });
+            send({ type: 'status', scanId: id, status: scan.status });
           }
 
-          // Send new module completions
-          if (currentModules.length > lastModuleCount) {
+          // Only fetch full module data when count changes (avoids transferring all rows every poll)
+          if (currentCount > lastModuleCount) {
+            const { data: modules } = await supabase
+              .from('module_results')
+              .select('module_id, status, score')
+              .eq('scan_id', id)
+              .in('status', ['success', 'partial', 'error']);
+
+            const currentModules = modules ?? [];
             const newModules = currentModules.slice(lastModuleCount);
             for (const mod of newModules) {
               send({
@@ -83,6 +113,13 @@ export async function GET(
               });
             }
             lastModuleCount = currentModules.length;
+
+            // Adaptive: slow down polling when near completion (>80% done)
+            if (currentModules.length > 36 && pollInterval === 2000) {
+              pollInterval = 5000;
+              clearInterval(interval);
+              interval = setInterval(poll, pollInterval);
+            }
           }
 
           consecutiveErrors = 0;
@@ -95,38 +132,31 @@ export async function GET(
               marketingIq: scan.marketing_iq,
               progress: 100,
             });
-            clearInterval(interval);
-            closed = true;
-            controller.close();
+            cleanup(interval, controller);
           } else if (scan.status === 'failed' || scan.status === 'cancelled') {
-            send({
-              type: 'error',
-              scanId: id,
-              error: `Scan ${scan.status}`,
-            });
-            clearInterval(interval);
-            closed = true;
-            controller.close();
+            send({ type: 'error', scanId: id, error: `Scan ${scan.status}` });
+            cleanup(interval, controller);
           }
         } catch (err) {
           console.error(`[stream/${id}] Poll error:`, err);
           consecutiveErrors++;
           if (consecutiveErrors >= 3) {
             send({ type: 'error', scanId: id, error: 'Connection lost. Please refresh.' });
-            clearInterval(interval);
-            closed = true;
-            controller.close();
+            cleanup(interval, controller);
           }
         }
-      }, 2000);
+      };
+
+      let interval = setInterval(poll, pollInterval);
+
+      // Detect client disconnect
+      signal.addEventListener('abort', () => cleanup(interval, controller), { once: true });
 
       // Timeout after 10 minutes
       setTimeout(() => {
         if (!closed) {
-          clearInterval(interval);
           send({ type: 'error', scanId: id, error: 'Scan timed out' });
-          closed = true;
-          controller.close();
+          cleanup(interval, controller);
         }
       }, 600_000);
     },

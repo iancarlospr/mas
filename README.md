@@ -47,7 +47,7 @@
 
 ### One scan. Diagnose your website. Zero retainers.
 
-**The marketing audit you'd pay an agency $5,000 for — delivered in 90 seconds.**
+**The marketing audit you'd pay an agency $5,000 for — delivered in seconds.**
 
 [![CI](https://github.com/iancarlospr/mas/actions/workflows/ci.yml/badge.svg)](https://github.com/iancarlospr/mas/actions)
 [![TypeScript](https://img.shields.io/badge/typescript-strict-blue?logo=typescript)](https://www.typescriptlang.org/)

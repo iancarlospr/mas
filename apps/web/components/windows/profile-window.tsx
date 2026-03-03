@@ -25,8 +25,9 @@ interface PaymentRow {
 
 const PRODUCT_LABELS: Record<string, string> = {
   alpha_brief: 'Alpha Brief',
-  chat_credits: 'Chat Credits',
-  chat_activation: 'Chat Activation',
+  alpha_brief_plus: 'Alpha Brief Plus',
+  chat_credits_15: 'Chat Credits (15)',
+  chat_credits: 'Chat Credits (100)',
 };
 
 function formatCents(cents: number): string {

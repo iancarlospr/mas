@@ -60,8 +60,7 @@ export function ReportPaywall({ scanId }: ReportPaywallProps) {
         </li>
       </ul>
       <div className="flex items-center justify-center gap-gs-2 mb-gs-6">
-        <span className="font-data text-data-sm text-gs-muted line-through">$29.99</span>
-        <span className="font-data text-data-hero text-gs-ink">$9.99</span>
+        <span className="font-data text-data-hero text-gs-ink">$24.99</span>
         <span className="font-data text-data-xs text-gs-muted">one-time</span>
       </div>
       <button
@@ -69,7 +68,7 @@ export function ReportPaywall({ scanId }: ReportPaywallProps) {
         disabled={loading}
         className="bevel-button-primary text-os-base px-gs-8 disabled:opacity-50"
       >
-        {loading ? '⏳ Redirecting...' : 'Declassify — $9.99'}
+        {loading ? 'Redirecting...' : 'Unlock — $24.99'}
       </button>
     </div>
   );

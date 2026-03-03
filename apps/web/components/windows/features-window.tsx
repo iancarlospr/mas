@@ -38,7 +38,7 @@ const DIFFERENTIATORS = [
   {
     icon: '03',
     title: 'AI synthesis',
-    desc: 'Raw data is noise. Gemini Pro synthesizes 45 modules into actionable intelligence you can act on Monday morning.',
+    desc: 'Raw data is noise. AI synthesizes 45 modules into actionable intelligence you can act on Monday morning.',
   },
   {
     icon: '04',
@@ -49,7 +49,7 @@ const DIFFERENTIATORS = [
 
 export default function FeaturesWindow() {
   return (
-    <div className="p-gs-6 space-y-gs-8">
+    <div className="px-gs-6 pt-gs-3 pb-gs-6 space-y-gs-6">
       {/* Execution Protocol */}
       <div className="space-y-gs-4">
         <h1 className="font-display text-display-sm">Execution Protocol</h1>

@@ -57,27 +57,30 @@ async function processScanJob(
       modulesFailed = fullResult.modulesFailed;
     }
 
-    // Calculate MarketingIQ from all module results
-    const moduleResults = Array.from(results.values());
-    const marketingIqResult = calculateMarketingIQ(moduleResults);
+    // Calculate MarketingIQ from all module results (skip for free tier — only 3 modules, score meaningless)
+    let marketingIqScore: number | null = null;
+    if (tier === 'paid') {
+      const moduleResults = Array.from(results.values());
+      const marketingIqResult = calculateMarketingIQ(moduleResults);
+      marketingIqScore = marketingIqResult.final;
 
-    // Persist MarketingIQ score
-    try {
-      await updateScanMarketingIQ(
-        scanId,
-        marketingIqResult.final,
-        marketingIqResult as unknown as Record<string, unknown>,
-      );
-    } catch (error) {
-      logger.error(
-        { scanId, error: (error as Error).message },
-        'Failed to update MarketingIQ',
-      );
+      try {
+        await updateScanMarketingIQ(
+          scanId,
+          marketingIqResult.final,
+          marketingIqResult as unknown as Record<string, unknown>,
+        );
+      } catch (error) {
+        logger.error(
+          { scanId, error: (error as Error).message },
+          'Failed to update MarketingIQ',
+        );
+      }
     }
 
     // Mark scan as complete
     await updateScanStatus(scanId, 'complete', {
-      marketing_iq: marketingIqResult.final,
+      ...(marketingIqScore != null ? { marketing_iq: marketingIqScore } : {}),
     });
 
     const duration = Date.now() - startTime;
@@ -85,7 +88,7 @@ async function processScanJob(
     logger.info(
       {
         scanId,
-        marketingIq: marketingIqResult.final,
+        marketingIq: marketingIqScore,
         modulesCompleted,
         modulesFailed,
         duration,
@@ -96,7 +99,7 @@ async function processScanJob(
     return {
       scanId,
       status: 'complete',
-      marketingIq: marketingIqResult.final,
+      marketingIq: marketingIqScore,
       modulesCompleted,
       modulesFailed,
       duration,

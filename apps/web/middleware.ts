@@ -2,8 +2,21 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { updateSession } from '@/lib/supabase/middleware';
 
 // Geo-blocked countries (application-level fallback for Cloudflare)
+// Sanctioned nations + active war zones with no customer base (March 2026)
 const BLOCKED_COUNTRIES = new Set([
+  // Original list
   'IN', 'PK', 'CN', 'RU', 'PH', 'NG', 'BD', 'VN', 'KP', 'IR', 'MM', 'KH', 'LA',
+  // Sanctioned + active conflict zones
+  'AF', // Afghanistan (Taliban, sanctioned)
+  'BY', // Belarus (sanctioned, proxy for RU)
+  'CF', // Central African Republic (civil war)
+  'CU', // Cuba (sanctioned)
+  'LY', // Libya (civil war)
+  'SD', // Sudan (civil war)
+  'SO', // Somalia (Al-Shabaab insurgency)
+  'SS', // South Sudan (civil war)
+  'SY', // Syria (active conflict, sanctioned)
+  'YE', // Yemen (active war)
 ]);
 
 // Staging gate — remove when ready to launch publicly

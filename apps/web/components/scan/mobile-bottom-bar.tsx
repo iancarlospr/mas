@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 
 /**
  * GhostScan Mobile — Bottom Bar
- * Free tier: full-width "Declassify $9.99" CTA.
+ * Free tier: full-width "Unlock — from $24.99" CTA.
  * Paid tier: Dashboard | Chat | Report navigation.
  */
 interface MobileBottomBarProps {
@@ -47,7 +47,7 @@ export function MobileBottomBar({ scanId, isPaid, activeTab = 'dashboard' }: Mob
             loading && 'cursor-wait opacity-70',
           )}
         >
-          {loading ? 'Connecting...' : 'Declassify — $9.99'}
+          {loading ? 'Connecting...' : 'Unlock — from $24.99'}
         </button>
       </div>
     );
