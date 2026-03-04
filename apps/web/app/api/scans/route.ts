@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Auto-scan bypass: only allowed if user signed in within last 60 seconds
-  // (post-email-verification flow). Still rate-limited to 4/day.
+  // (post-email-verification flow). This is the user's free scan.
   let skipTurnstile = false;
   if (autoScan && user.last_sign_in_at) {
     const signInAge = Date.now() - new Date(user.last_sign_in_at).getTime();

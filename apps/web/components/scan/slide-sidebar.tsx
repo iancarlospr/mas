@@ -8,6 +8,9 @@ import { TRAFFIC_LIGHT_COLORS } from '@/lib/chart-config';
 
 /* ── Category grouping ─────────────────────────────────────────── */
 
+/** Categories available on the free tier (MarTech & Infrastructure). */
+export const FREE_CATEGORIES = new Set(['overview', 'martech_infrastructure']);
+
 export const CATEGORY_META: {
   key: ScoreCategory | 'overview' | 'paid_executive' | 'paid_roi' | 'paid_roadmap' | 'paid_costcutter';
   label: string;
@@ -106,7 +109,7 @@ export function SlideSidebar({ resultMap, isPaid, activeSlideId, onNavigate }: S
 
             if (visibleModules.length === 0) return null;
 
-            const isLockedSection = cat.paidOnly && !isPaid;
+            const isLockedSection = !isPaid && (cat.paidOnly || !FREE_CATEGORIES.has(cat.key));
 
             return (
               <div key={cat.key} className="mb-2">
@@ -125,8 +128,8 @@ export function SlideSidebar({ resultMap, isPaid, activeSlideId, onNavigate }: S
                   {cat.label}
                 </div>
 
-                {/* Module items */}
-                {!cat.paidOnly &&
+                {/* Module items — hidden for locked categories */}
+                {!isLockedSection &&
                   visibleModules.map((mId) => {
                     const slideId = mId === 'overview' ? 'slide-overview' : `slide-${mId}`;
                     const isActive = activeSlideId === slideId;

@@ -1,4 +1,5 @@
 import { SupabaseClient } from '@supabase/supabase-js';
+import { createServiceClient } from '@/lib/supabase/server';
 import { engineFetch } from '@/lib/engine';
 
 interface CreateScanOpts {
@@ -14,31 +15,86 @@ export interface CreateScanResult {
   cached: boolean;
 }
 
+/** Absolute daily rate limit — abuse protection, applies to ALL tiers. */
+const DAILY_ABUSE_LIMIT = 10;
+
 /**
  * Shared scan creation logic used by both the POST /api/scans route
  * and the /auth/confirm route (auto-scan after email verification).
  *
- * Throws on rate-limit, DB, or engine errors with a descriptive message.
+ * Scan gating logic:
+ *   1. If user has scan_credits → deduct 1, create scan with tier='paid'
+ *   2. If user has ZERO completed real scans → free scan, tier='full' (3 MarTech modules)
+ *   3. Otherwise → 402 "Purchase a scan to continue"
+ *
+ * Throws on rate-limit, credit, DB, or engine errors with a descriptive message.
  */
 export async function createScan(opts: CreateScanOpts): Promise<CreateScanResult> {
   const { supabase, userId, url, ip, countryCode } = opts;
+  const service = createServiceClient();
 
   const domain = new URL(url).hostname.replace(/^www\./, '').toLowerCase();
-  const tier = 'full';
 
-  // ---------- Rate limit (4/day) ----------
+  // ---------- Abuse protection (10/day absolute) ----------
   const dayStart = new Date();
   dayStart.setUTCHours(0, 0, 0, 0);
 
-  const { count } = await supabase
+  const { count: dailyCount } = await supabase
     .from('scans')
     .select('id', { count: 'exact', head: true })
     .eq('user_id', userId)
     .gte('created_at', dayStart.toISOString());
 
-  const limit = 4;
-  if ((count ?? 0) >= limit) {
-    throw new ScanError('Daily scan limit reached', 429, { limit, used: count });
+  if ((dailyCount ?? 0) >= DAILY_ABUSE_LIMIT) {
+    throw new ScanError('Daily scan limit reached. Try again tomorrow.', 429, {
+      limit: DAILY_ABUSE_LIMIT,
+      used: dailyCount,
+    });
+  }
+
+  // ---------- Credit check → determine tier ----------
+  let tier: 'full' | 'paid' = 'full';
+  let usedCredit = false;
+
+  // Check if user has scan credits (from Alpha Brief / Alpha Brief Plus purchase)
+  const { data: credits } = await service
+    .from('scan_credits')
+    .select('remaining')
+    .eq('user_id', userId)
+    .single();
+
+  if (credits && credits.remaining > 0) {
+    // Has credits → deduct 1, scan as paid (all modules)
+    const { error: decrError } = await service
+      .rpc('decrement_scan_credits', { p_user_id: userId, p_amount: 1 });
+
+    if (!decrError) {
+      tier = 'paid';
+      usedCredit = true;
+    }
+    // If decrement fails (race condition — someone else used the last credit),
+    // fall through to free tier logic below
+  }
+
+  if (!usedCredit) {
+    // No credits available — check if user has already used their 1 free scan
+    const { count: realScanCount } = await supabase
+      .from('scans')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', userId)
+      .is('cache_source', null)
+      .in('status', ['queued', 'complete', 'passive', 'browser', 'ghostscan', 'external', 'synthesis']);
+
+    if ((realScanCount ?? 0) > 0) {
+      // Already used free scan, no credits remaining
+      throw new ScanError(
+        'You\'ve used your free scan. Purchase Alpha Brief to unlock full scans.',
+        402,
+        { reason: 'no_credits' },
+      );
+    }
+    // First scan ever → free tier (3 MarTech modules)
+    tier = 'full';
   }
 
   // ---------- Cache check (24h same domain) ----------
@@ -106,6 +162,12 @@ export async function createScan(opts: CreateScanOpts): Promise<CreateScanResult
       .from('scans')
       .update({ status: 'failed' })
       .eq('id', scan.id);
+
+    // Refund credit if engine failed and we deducted one
+    if (usedCredit) {
+      await service.rpc('add_scan_credits', { p_user_id: userId, p_amount: 1 });
+    }
+
     throw new ScanError('Scan engine unavailable', 503);
   }
 
@@ -115,7 +177,7 @@ export async function createScan(opts: CreateScanOpts): Promise<CreateScanResult
     action: 'scan_created',
     resource: scan.id,
     ip_address: ip,
-    metadata: { url, domain, tier, cached: false },
+    metadata: { url, domain, tier, cached: false, usedCredit },
   }).then(({ error: auditErr }) => {
     if (auditErr) console.error('[scan-service] Audit log failed:', auditErr);
   });
