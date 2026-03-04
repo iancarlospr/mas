@@ -123,11 +123,23 @@ export function HeroScanFlow() {
       }
     });
 
-    // Fallback: when user switches back to this tab, check if they verified in the other tab
+    // Fallback: when user switches back to this tab, refresh session and check auth.
+    // The verification happened in another tab — cookies are shared but the JS client
+    // needs to pick up the new session via refreshSession() or getSession().
     const handleVisibility = async () => {
       if (document.visibilityState !== 'visible') return;
-      const { data: { user: freshUser } } = await supabase.auth.getUser();
-      if (freshUser) {
+      // Try to pick up the session from the other tab via cookie
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        authListenerRef.current = false;
+        subscription.unsubscribe();
+        document.removeEventListener('visibilitychange', handleVisibility);
+        await resumeScan();
+        return;
+      }
+      // If getSession didn't work, try refreshing
+      const { data: { user: refreshedUser } } = await supabase.auth.refreshSession();
+      if (refreshedUser) {
         authListenerRef.current = false;
         subscription.unsubscribe();
         document.removeEventListener('visibilitychange', handleVisibility);
