@@ -22,12 +22,16 @@ const DAILY_ABUSE_LIMIT = 10;
  * Shared scan creation logic used by both the POST /api/scans route
  * and the /auth/confirm route (auto-scan after email verification).
  *
- * Scan gating logic:
- *   1. If user has scan_credits → deduct 1, create scan with tier='paid'
- *   2. If user has ZERO completed real scans → free scan, tier='full' (3 MarTech modules)
- *   3. Otherwise → 402 "Purchase a scan to continue"
+ * Single code path — every scan deducts 1 from scan_credits:
+ *   - New users start with 1 credit (DB trigger on signup)
+ *   - Purchasing Alpha Brief / Plus adds more credits
+ *   - remaining > 0 after deduction → paid scan (all modules)
+ *   - remaining = 0 after deduction → free scan (MarTech only)
+ *   - Deduction fails → 402 "no credits"
  *
- * Throws on rate-limit, credit, DB, or engine errors with a descriptive message.
+ * Atomic: decrement_scan_credits RPC prevents race conditions.
+ * Immune to scan deletion: credits are separate from scan records.
+ * Immune to audit_log state: audit_log is observability only.
  */
 export async function createScan(opts: CreateScanOpts): Promise<CreateScanResult> {
   const { supabase, userId, url, ip, countryCode } = opts;
@@ -52,51 +56,22 @@ export async function createScan(opts: CreateScanOpts): Promise<CreateScanResult
     });
   }
 
-  // ---------- Credit check → determine tier ----------
-  let tier: 'full' | 'paid' = 'full';
-  let usedCredit = false;
+  // ---------- Deduct 1 scan credit (atomic) ----------
+  const { data: newRemaining, error: decrError } = await service
+    .rpc('decrement_scan_credits', { p_user_id: userId, p_amount: 1 });
 
-  // Check if user has scan credits (from Alpha Brief / Alpha Brief Plus purchase)
-  const { data: credits } = await service
-    .from('scan_credits')
-    .select('remaining')
-    .eq('user_id', userId)
-    .single();
-
-  if (credits && credits.remaining > 0) {
-    // Has credits → deduct 1, scan as paid (all modules)
-    const { error: decrError } = await service
-      .rpc('decrement_scan_credits', { p_user_id: userId, p_amount: 1 });
-
-    if (!decrError) {
-      tier = 'paid';
-      usedCredit = true;
-    }
-    // If decrement fails (race condition — someone else used the last credit),
-    // fall through to free tier logic below
+  if (decrError) {
+    throw new ScanError(
+      'You\'ve used your free scan. Purchase Alpha Brief to unlock full scans.',
+      402,
+      { reason: 'no_credits' },
+    );
   }
 
-  if (!usedCredit) {
-    // No credits available — check if user has already used their 1 free scan.
-    // Query audit_log (immutable, service-role only) instead of scans table —
-    // users can delete scans but can't delete audit entries.
-    const { count: auditCount } = await service
-      .from('audit_log')
-      .select('id', { count: 'exact', head: true })
-      .eq('user_id', userId)
-      .eq('action', 'scan_created');
-
-    if ((auditCount ?? 0) > 0) {
-      // Already used free scan, no credits remaining
-      throw new ScanError(
-        'You\'ve used your free scan. Purchase Alpha Brief to unlock full scans.',
-        402,
-        { reason: 'no_credits' },
-      );
-    }
-    // First scan ever → free tier (3 MarTech modules)
-    tier = 'full';
-  }
+  // Determine tier from remaining credits AFTER deduction:
+  // - remaining > 0 → user had 2+ credits (purchased), scan as paid (all modules)
+  // - remaining = 0 → user had exactly 1 credit (free scan), scan as free (MarTech only)
+  const tier: 'full' | 'paid' = (newRemaining as number) > 0 ? 'paid' : 'full';
 
   // ---------- Cache check (24h same domain) ----------
   const { data: cached } = await supabase
@@ -127,13 +102,13 @@ export async function createScan(opts: CreateScanOpts): Promise<CreateScanResult
       .select('id')
       .single();
 
-    // Audit log — uses service client (audit_log is service-role only)
+    // Audit log — observability only, never used for authorization
     service.from('audit_log').insert({
       user_id: userId,
       action: 'scan_created',
       resource: newScan?.id ?? cached.id,
       ip_address: ip,
-      metadata: { url, domain, tier, cached: true, usedCredit },
+      metadata: { url, domain, tier, cached: true },
     }).then(({ error: auditErr }) => {
       if (auditErr) console.error('[scan-service] Audit log failed:', auditErr);
     });
@@ -157,6 +132,8 @@ export async function createScan(opts: CreateScanOpts): Promise<CreateScanResult
     .single();
 
   if (error || !scan) {
+    // Refund the credit we just deducted
+    await service.rpc('add_scan_credits', { p_user_id: userId, p_amount: 1 });
     throw new ScanError('Failed to create scan', 500);
   }
 
@@ -175,21 +152,18 @@ export async function createScan(opts: CreateScanOpts): Promise<CreateScanResult
       .update({ status: 'failed' })
       .eq('id', scan.id);
 
-    // Refund credit if engine failed and we deducted one
-    if (usedCredit) {
-      await service.rpc('add_scan_credits', { p_user_id: userId, p_amount: 1 });
-    }
-
+    // Refund the credit
+    await service.rpc('add_scan_credits', { p_user_id: userId, p_amount: 1 });
     throw new ScanError('Scan engine unavailable', 503);
   }
 
-  // ---------- Audit log (fire-and-forget, service client — audit_log is service-role only) ----------
+  // ---------- Audit log — observability only ----------
   service.from('audit_log').insert({
     user_id: userId,
     action: 'scan_created',
     resource: scan.id,
     ip_address: ip,
-    metadata: { url, domain, tier, cached: false, usedCredit },
+    metadata: { url, domain, tier, cached: false },
   }).then(({ error: auditErr }) => {
     if (auditErr) console.error('[scan-service] Audit log failed:', auditErr);
   });
