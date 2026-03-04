@@ -222,7 +222,7 @@ export function ManagedWindow({
         'window',
         windowState.variant === 'ghost' && 'window-ghost',
         windowState.variant === 'terminal' && 'window-terminal',
-        !hasAnimated && 'animate-window-open',
+        !hasAnimated && !isAuthGate && 'animate-window-open',
       )}
       style={{
         position: isAuthGate ? 'fixed' : 'absolute',
