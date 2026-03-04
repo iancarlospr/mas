@@ -81,15 +81,15 @@ function CreditIndicator() {
   return (
     <div
       className="font-data select-none text-center"
-      style={{ fontSize: '11px', marginBottom: '6px' }}
+      style={{ fontSize: '11px', marginBottom: '2px' }}
     >
       {remaining > 0 ? (
         <span style={{ color: 'var(--gs-mid)' }}>
-          ⬡ {remaining} scan{remaining !== 1 ? 's' : ''} remaining
+          ⚡ {remaining} scan{remaining !== 1 ? 's' : ''} remaining
         </span>
       ) : (
         <span style={{ color: 'var(--gs-mid)' }}>
-          ⬡ 0 scans remaining —{' '}
+          ⚡ 0 scans remaining —{' '}
           <button
             onClick={() => wm.openWindow('pricing')}
             className="underline hover:text-gs-base transition-colors"
