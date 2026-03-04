@@ -10,7 +10,7 @@ import { useWindowManager } from '@/lib/window-manager';
 import { useAuth } from '@/lib/auth-context';
 import { analytics } from '@/lib/analytics';
 
-type FlowState = 'idle' | 'existing-prompt';
+type FlowState = 'idle' | 'existing-prompt' | 'no-credits';
 
 interface PendingVerification {
   email: string;
@@ -110,6 +110,17 @@ export function HeroScanFlow() {
     });
 
     if (!res.ok) {
+      // Handle 402 — no credits
+      if (res.status === 402) {
+        try {
+          const data = await res.json();
+          if (data.reason === 'no_credits') {
+            setState('no-credits');
+            return;
+          }
+        } catch { /* non-JSON */ }
+      }
+
       let errorMsg = 'Failed to start scan';
       try {
         const data = await res.json();
@@ -176,6 +187,35 @@ export function HeroScanFlow() {
           setPendingVerification(null);
         }}
       />
+    );
+  }
+
+  if (state === 'no-credits') {
+    return (
+      <div className="w-full space-y-gs-3">
+        <div className="bevel-sunken bg-gs-paper p-gs-4 text-center">
+          <p className="font-system text-os-sm font-bold" style={{ color: 'var(--gs-void)' }}>
+            You&apos;ve used your free scan
+          </p>
+          <p className="font-data text-data-xs mt-gs-1" style={{ color: 'var(--gs-mid)' }}>
+            Upgrade to unlock unlimited scans + AI-powered insights.
+          </p>
+        </div>
+        <div className="flex flex-col gap-gs-2">
+          <button
+            onClick={() => wm.openWindow('pricing')}
+            className="bevel-button-primary text-os-sm w-full"
+          >
+            View Plans
+          </button>
+          <button
+            onClick={() => setState('idle')}
+            className="font-data text-data-xs text-gs-mid hover:text-gs-light transition-colors"
+          >
+            Back
+          </button>
+        </div>
+      </div>
     );
   }
 

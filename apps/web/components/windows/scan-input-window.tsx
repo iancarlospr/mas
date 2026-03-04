@@ -1,6 +1,9 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
+import { useAuth } from '@/lib/auth-context';
+import { useWindowManager } from '@/lib/window-manager';
 import { HeroScanFlow } from '@/components/scan/hero-scan-flow';
 
 /* ═══════════════════════════════════════════════════════════════
@@ -43,6 +46,59 @@ function CurvedArrow() {
       >
         &#8595;
       </span>
+    </div>
+  );
+}
+
+function CreditIndicator() {
+  const { user, isAuthenticated } = useAuth();
+  const wm = useWindowManager();
+  const [remaining, setRemaining] = useState<number | null>(null);
+  const [scanCount, setScanCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!isAuthenticated || !user) return;
+
+    async function load() {
+      const supabase = createClient();
+      const [creditsRes, scansRes] = await Promise.all([
+        supabase.from('scan_credits').select('remaining').eq('user_id', user!.id).maybeSingle(),
+        supabase.from('scans').select('id', { count: 'exact', head: true }).eq('user_id', user!.id),
+      ]);
+      setRemaining(creditsRes.data?.remaining ?? 0);
+      setScanCount(scansRes.count ?? 0);
+    }
+
+    load();
+  }, [isAuthenticated, user]);
+
+  // Not authenticated or still loading
+  if (!isAuthenticated || remaining == null || scanCount == null) return null;
+
+  // First visit: 1 credit, never scanned — don't confuse new users
+  if (remaining === 1 && scanCount === 0) return null;
+
+  return (
+    <div
+      className="font-data select-none text-center"
+      style={{ fontSize: '11px', marginBottom: '6px' }}
+    >
+      {remaining > 0 ? (
+        <span style={{ color: 'var(--gs-mid)' }}>
+          ⬡ {remaining} scan{remaining !== 1 ? 's' : ''} remaining
+        </span>
+      ) : (
+        <span style={{ color: 'var(--gs-mid)' }}>
+          ⬡ 0 scans remaining —{' '}
+          <button
+            onClick={() => wm.openWindow('pricing')}
+            className="underline hover:text-gs-base transition-colors"
+            style={{ color: 'var(--gs-base)' }}
+          >
+            Upgrade
+          </button>
+        </span>
+      )}
     </div>
   );
 }
@@ -111,6 +167,8 @@ export default function ScanInputWindow() {
         </p>
         <CurvedArrow />
       </div>
+
+      <CreditIndicator />
 
       <div className="w-full">
         <HeroScanFlow />

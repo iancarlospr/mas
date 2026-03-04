@@ -43,6 +43,7 @@ export default function ProfileWindow() {
   const [scanCount, setScanCount] = useState<number | null>(null);
   const [payments, setPayments] = useState<PaymentRow[]>([]);
   const [chatCredits, setChatCredits] = useState<number | null>(null);
+  const [scanCredits, setScanCredits] = useState<number | null>(null);
   const [dataLoading, setDataLoading] = useState(true);
 
   // Edit name
@@ -70,7 +71,7 @@ export default function ProfileWindow() {
     async function loadData() {
       const supabase = createClient();
 
-      const [scansRes, paymentsRes, creditsRes] = await Promise.all([
+      const [scansRes, paymentsRes, creditsRes, scanCreditsRes] = await Promise.all([
         supabase
           .from('scans')
           .select('id', { count: 'exact', head: true })
@@ -86,11 +87,17 @@ export default function ProfileWindow() {
           .select('remaining')
           .eq('user_id', user!.id)
           .maybeSingle(),
+        supabase
+          .from('scan_credits')
+          .select('remaining')
+          .eq('user_id', user!.id)
+          .maybeSingle(),
       ]);
 
       setScanCount(scansRes.count ?? 0);
       setPayments((paymentsRes.data as PaymentRow[] | null) ?? []);
       setChatCredits(creditsRes.data?.remaining ?? null);
+      setScanCredits(scanCreditsRes.data?.remaining ?? null);
       setDataLoading(false);
     }
 
@@ -350,6 +357,26 @@ export default function ProfileWindow() {
             ))}
           </div>
         )}
+      </div>
+
+      {/* Scan Credits */}
+      <div className="p-gs-6 space-y-gs-3 border-b border-gs-mid/20">
+        <h3 className="font-system text-os-sm font-bold text-gs-light">Scan Credits</h3>
+        {dataLoading ? (
+          <p className="font-data text-data-sm text-gs-muted animate-blink">Loading...</p>
+        ) : scanCredits != null && scanCredits > 0 ? (
+          <p className="font-data text-data-base text-gs-light">
+            <span className="text-gs-base font-bold">{scanCredits}</span> credit{scanCredits !== 1 ? 's' : ''} remaining
+          </p>
+        ) : (
+          <p className="font-data text-data-sm text-gs-muted">No scan credits remaining.</p>
+        )}
+        <button
+          onClick={() => wm.openWindow('pricing')}
+          className="bevel-button text-os-sm"
+        >
+          Buy More Scans
+        </button>
       </div>
 
       {/* Chat Credits */}
