@@ -48,7 +48,8 @@ export default function AuthWindow() {
 
   const supabase = createClient();
 
-  const returnPath = '/';
+  const isScanGate = openData?.scanGate === true;
+  const returnPath = isScanGate ? '/?scan_gate=true' : '/';
 
   /* -- Handlers ------------------------------------------------ */
 

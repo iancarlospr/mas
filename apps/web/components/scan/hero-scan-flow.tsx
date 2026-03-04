@@ -81,6 +81,34 @@ export function HeroScanFlow() {
     }
   }, [isAuthenticated]);
 
+  // Resume scan after user authenticates (via sign-in, cross-tab verification, or tab refocus)
+  const resumeScan = useCallback(async () => {
+    if (!capturedUrl) return;
+    wm.closeWindow('auth');
+    orchestrator.resumeVisualSequence();
+
+    try {
+      const res = await fetch('/api/scans', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: capturedUrl, turnstileToken: capturedToken }),
+      });
+
+      if (res.ok) {
+        const { scanId, cached } = await res.json();
+        const domain = new URL(capturedUrl).hostname;
+        analytics.scanStarted(domain, 'full');
+        orchestrator.connectScan(scanId, domain, cached);
+      } else {
+        orchestrator.cancelVisualSequence();
+      }
+    } catch {
+      orchestrator.cancelVisualSequence();
+    }
+
+    setState('idle');
+  }, [capturedUrl, capturedToken, orchestrator, wm]);
+
   // Listen for auth state change while waiting for registration
   useEffect(() => {
     if (state !== 'waiting-auth' || authListenerRef.current) return;
@@ -88,43 +116,32 @@ export function HeroScanFlow() {
 
     const supabase = createClient();
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session?.user && capturedUrl) {
-        // User just registered/logged in — close auth, resume sequence, fire backend
-        wm.closeWindow('auth');
-        orchestrator.resumeVisualSequence();
-
-        try {
-          const res = await fetch('/api/scans', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ url: capturedUrl, turnstileToken: capturedToken }),
-          });
-
-          if (res.ok) {
-            const { scanId, cached } = await res.json();
-            const domain = new URL(capturedUrl).hostname;
-            analytics.scanStarted(domain, 'full');
-            // Transition from visual-only to real scan (SSE takes over)
-            orchestrator.connectScan(scanId, domain, cached);
-          } else {
-            // Scan creation failed — cancel sequence
-            orchestrator.cancelVisualSequence();
-          }
-        } catch {
-          orchestrator.cancelVisualSequence();
-        }
-
-        setState('idle');
+      if (event === 'SIGNED_IN' && session?.user) {
         authListenerRef.current = false;
         subscription.unsubscribe();
+        await resumeScan();
       }
     });
 
+    // Fallback: when user switches back to this tab, check if they verified in the other tab
+    const handleVisibility = async () => {
+      if (document.visibilityState !== 'visible') return;
+      const { data: { user: freshUser } } = await supabase.auth.getUser();
+      if (freshUser) {
+        authListenerRef.current = false;
+        subscription.unsubscribe();
+        document.removeEventListener('visibilitychange', handleVisibility);
+        await resumeScan();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
     return () => {
       subscription.unsubscribe();
+      document.removeEventListener('visibilitychange', handleVisibility);
       authListenerRef.current = false;
     };
-  }, [state, capturedUrl, capturedToken, orchestrator, wm]);
+  }, [state, resumeScan]);
 
   /** Check if the user has a recent scan for this domain */
   const checkExistingScan = useCallback(async (url: string): Promise<ExistingScan | null> => {
@@ -220,7 +237,7 @@ export function HeroScanFlow() {
         // After 2 seconds: pause sequence and open auth window (portaled above sequence)
         setTimeout(() => {
           orchestrator.pauseVisualSequence();
-          wm.openWindow('auth', { tab: 'register' });
+          wm.openWindow('auth', { tab: 'register', scanGate: true });
           setState('waiting-auth');
         }, 2000);
       }

@@ -38,5 +38,20 @@ export async function GET(request: NextRequest) {
     }).catch(() => {});
   }
 
+  // Scan gate: user verified in a new tab — show "go back" page instead of full desktop
+  const finalUrl = new URL(redirectTo, origin);
+  if (finalUrl.searchParams.get('scan_gate') === 'true') {
+    return new NextResponse(
+      `<!DOCTYPE html><html><head><title>Verified!</title>
+      <style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#080808;color:#fff;font-family:system-ui}
+      .c{text-align:center;max-width:440px;padding:2rem}h1{font-size:1.5rem;margin-bottom:.5rem;color:#FFB2EF}p{color:#888;font-size:.9rem;margin-top:.5rem}
+      .close{margin-top:1.5rem;color:#FFB2EF;font-size:.85rem;cursor:pointer;text-decoration:underline;background:none;border:none;font-family:inherit}</style></head>
+      <body><div class="c"><h1>You&apos;re verified, babe!</h1><p>Now go back to the other tab &mdash; your scan is waiting.</p>
+      <button class="close" onclick="window.close()">Close this tab</button>
+      <p style="color:#555;font-size:.75rem;margin-top:1rem">If this tab doesn&apos;t close, just switch back manually.</p></div></body></html>`,
+      { status: 200, headers: { 'content-type': 'text/html' } },
+    );
+  }
+
   return NextResponse.redirect(new URL(redirectTo, origin));
 }
