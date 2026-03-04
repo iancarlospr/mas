@@ -39,10 +39,10 @@ export async function GET(request: NextRequest) {
       }),
     }).catch(() => {});
 
-    // Show "go back" page + set cross-tab localStorage flag.
-    // The scan orchestrator polls for this flag every second when a visual
+    // Show "go back" page + set verification cookie (shared across tabs).
+    // The scan orchestrator polls for this cookie every second when a visual
     // sequence is paused waiting for auth. The old tab detects it and resumes.
-    return new NextResponse(
+    const response = new NextResponse(
       `<!DOCTYPE html><html><head><title>Verified!</title>
       <style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#080808;color:#fff;font-family:system-ui}
       .c{text-align:center;max-width:440px;padding:2rem}h1{font-size:1.5rem;margin-bottom:.5rem;color:#FFB2EF}p{color:#888;font-size:.9rem;margin-top:.5rem}
@@ -53,6 +53,14 @@ export async function GET(request: NextRequest) {
       <script>try{localStorage.setItem('alphascan_email_verified','true')}catch(e){}</script></body></html>`,
       { status: 200, headers: { 'content-type': 'text/html' } },
     );
+    // Non-httpOnly cookie so JS can read it. Short-lived (5 min).
+    response.cookies.set('alphascan_verified', 'true', {
+      path: '/',
+      maxAge: 300,
+      secure: true,
+      sameSite: 'lax',
+    });
+    return response;
   }
 
   // Magic link / recovery — redirect normally

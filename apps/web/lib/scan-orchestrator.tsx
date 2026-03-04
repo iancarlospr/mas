@@ -17,19 +17,7 @@ import { ScanSequence } from '@/components/scan/scan-sequence';
 import { analytics } from '@/lib/analytics';
 import type { ScanStatus } from '@marketing-alpha/types';
 
-/**
- * GhostScan OS — Scan Orchestrator
- * ═══════════════════════════════════
- *
- * Manages the scan lifecycle within the desktop OS:
- * 1. Start scan → Hollywood Hack sequence (full-screen, portaled)
- * 2. On complete → open scan report as a managed window
- * 3. Open existing scans from history as windows
- * 4. Visual-only sequence for unauthenticated users (pauses for auth gate)
- * 5. Cross-tab auth detection → resume sequence + fire backend scan
- *
- * Mounted at the desktop shell level — persists across window open/close.
- */
+const VERIFIED_KEY = 'alphascan_email_verified';
 
 interface ActiveScan {
   scanId: string;
@@ -37,21 +25,16 @@ interface ActiveScan {
   isCached?: boolean;
 }
 
-/** Visual-only sequence (no backend, for unauthenticated users) */
 interface VisualSequence {
   domain: string;
   paused: boolean;
-  /** Captured URL + turnstile token for firing the scan after auth */
   capturedUrl: string;
   capturedToken: string;
 }
 
-const VERIFIED_KEY = 'alphascan_email_verified';
-
 interface ScanOrchestratorValue {
   startScan(scanId: string, domain: string, isCached?: boolean): void;
   openScanWindow(scanId: string, domain: string): void;
-  /** Start visual-only sequence with captured scan params for later */
   startVisualSequence(domain: string, capturedUrl: string, capturedToken: string): void;
   pauseVisualSequence(): void;
   resumeVisualSequence(): void;
@@ -63,12 +46,70 @@ interface ScanOrchestratorValue {
 
 const ScanOrchestratorContext = createContext<ScanOrchestratorValue | null>(null);
 
+/**
+ * Standalone polling component — mounts when visual sequence is paused,
+ * polls localStorage every second for the verification flag.
+ * When found: closes auth, resumes sequence, fires backend scan.
+ * No useEffect deps. No event listeners. Just a setInterval.
+ */
+function AuthGatePoller({
+  capturedUrl,
+  capturedToken,
+  domain,
+  onVerified,
+}: {
+  capturedUrl: string;
+  capturedToken: string;
+  domain: string;
+  onVerified: (scanId: string, domain: string, cached: boolean) => void;
+}) {
+  const firedRef = useRef(false);
+
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      if (firedRef.current) return;
+
+      const flag = localStorage.getItem(VERIFIED_KEY);
+      if (flag !== 'true') {
+        // Also check cookie (set by confirm route)
+        if (!document.cookie.includes('alphascan_verified=true')) return;
+      }
+
+      firedRef.current = true;
+      clearInterval(interval);
+      try { localStorage.removeItem(VERIFIED_KEY); } catch { /* */ }
+      // Clear cookie too
+      document.cookie = 'alphascan_verified=; path=/; max-age=0';
+
+      try {
+        const res = await fetch('/api/scans', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: capturedUrl, turnstileToken: capturedToken, autoScan: true }),
+        });
+
+        if (res.ok) {
+          const { scanId, cached } = await res.json();
+          analytics.scanStarted(new URL(capturedUrl).hostname, 'full');
+          onVerified(scanId, domain, cached);
+        } else {
+          onVerified('', domain, false); // signal failure
+        }
+      } catch {
+        onVerified('', domain, false);
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps -- intentionally stable, reads from refs/localStorage
+
+  return null; // renders nothing
+}
+
 export function ScanOrchestratorProvider({ children }: { children: ReactNode }) {
   const wm = useWindowManager();
   const [activeScan, setActiveScan] = useState<ActiveScan | null>(null);
   const [visualSequence, setVisualSequence] = useState<VisualSequence | null>(null);
-  const resumingRef = useRef(false);
-  // Stable ref for wm.closeWindow — avoids putting `wm` in useEffect deps
   const closeWindowRef = useRef(wm.closeWindow);
   closeWindowRef.current = wm.closeWindow;
 
@@ -131,71 +172,18 @@ export function ScanOrchestratorProvider({ children }: { children: ReactNode }) 
     setVisualSequence(null);
   }, []);
 
-  // ── Cross-tab auth detection ─────────────────────────────────────────
-  // Poll localStorage every second while sequence is paused. When the
-  // verification tab sets the flag, we detect it and resume.
-  // Also handles same-tab sign-in (password login without email verify).
-  useEffect(() => {
-    if (!visualSequence?.paused) return;
-    if (resumingRef.current) return;
-
-    const { capturedUrl, capturedToken, domain } = visualSequence;
-
-    const fireBackendScan = async () => {
-      if (resumingRef.current) return;
-      resumingRef.current = true;
-
-      try { localStorage.removeItem(VERIFIED_KEY); } catch { /* */ }
-      closeWindowRef.current('auth');
-      setVisualSequence((prev) => prev ? { ...prev, paused: false } : null);
-
-      try {
-        const res = await fetch('/api/scans', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url: capturedUrl, turnstileToken: capturedToken, autoScan: true }),
-        });
-
-        if (res.ok) {
-          const { scanId, cached } = await res.json();
-          analytics.scanStarted(new URL(capturedUrl).hostname, 'full');
-          setVisualSequence(null);
-          setActiveScan({ scanId, domain, isCached: cached });
-        } else {
-          setVisualSequence(null);
-        }
-      } catch {
-        setVisualSequence(null);
-      }
-
-      resumingRef.current = false;
-    };
-
-    // Poll every second — check localStorage flag + Supabase session
-    const supabase = createClient();
-    const pollInterval = setInterval(async () => {
-      if (resumingRef.current) return;
-
-      // Check localStorage flag (set by verification tab)
-      if (localStorage.getItem(VERIFIED_KEY) === 'true') {
-        clearInterval(pollInterval);
-        await fireBackendScan();
-        return;
-      }
-
-      // Check Supabase session (handles same-tab password login)
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        clearInterval(pollInterval);
-        await fireBackendScan();
-      }
-    }, 1000);
-
-    return () => {
-      clearInterval(pollInterval);
-    };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [visualSequence?.paused, visualSequence?.capturedUrl, visualSequence?.capturedToken, visualSequence?.domain]);
+  // Called by AuthGatePoller when verification detected
+  const handleAuthVerified = useCallback((scanId: string, domain: string, cached: boolean) => {
+    closeWindowRef.current('auth');
+    if (scanId) {
+      // Success — transition to real scan with SSE
+      setVisualSequence(null);
+      setActiveScan({ scanId, domain, isCached: cached });
+    } else {
+      // Failed — cancel everything
+      setVisualSequence(null);
+    }
+  }, []);
 
   const value = useMemo<ScanOrchestratorValue>(
     () => ({
@@ -233,6 +221,16 @@ export function ScanOrchestratorProvider({ children }: { children: ReactNode }) 
           completedModules={[]}
           onComplete={() => {}}
           paused={visualSequence.paused}
+        />
+      )}
+      {/* Polls for cross-tab verification — only mounts when sequence is paused */}
+      {visualSequence?.paused && (
+        <AuthGatePoller
+          key="auth-poller"
+          capturedUrl={visualSequence.capturedUrl}
+          capturedToken={visualSequence.capturedToken}
+          domain={visualSequence.domain}
+          onVerified={handleAuthVerified}
         />
       )}
     </ScanOrchestratorContext.Provider>
