@@ -38,9 +38,15 @@ export async function GET(request: NextRequest) {
     }).catch(() => {});
   }
 
-  // Scan gate: user verified in a new tab — show "go back" page instead of full desktop
+  // Scan gate: user verified in a new tab — show "go back" page instead of full desktop.
+  // Pass session tokens via localStorage so the original tab can establish a session
+  // without relying on server-set cookies surviving a raw NextResponse(html).
   const finalUrl = new URL(redirectTo, origin);
   if (finalUrl.searchParams.get('scan_gate') === 'true') {
+    const { data: { session } } = await supabase.auth.getSession();
+    const at = session?.access_token ?? '';
+    const rt = session?.refresh_token ?? '';
+
     return new NextResponse(
       `<!DOCTYPE html><html><head><title>Verified!</title>
       <style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#080808;color:#fff;font-family:system-ui}
@@ -49,7 +55,7 @@ export async function GET(request: NextRequest) {
       <body><div class="c"><h1>You&apos;re verified, babe!</h1><p>Now go back to the other tab &mdash; your scan is waiting.</p>
       <button class="close" onclick="window.close()">Close this tab</button>
       <p style="color:#555;font-size:.75rem;margin-top:1rem">If this tab doesn&apos;t close, just switch back manually.</p></div>
-      <script>try{localStorage.setItem('alphascan_email_verified','true')}catch(e){}</script></body></html>`,
+      <script>try{localStorage.setItem('alphascan_email_verified','true');localStorage.setItem('alphascan_at','${at}');localStorage.setItem('alphascan_rt','${rt}')}catch(e){}</script></body></html>`,
       { status: 200, headers: { 'content-type': 'text/html' } },
     );
   }

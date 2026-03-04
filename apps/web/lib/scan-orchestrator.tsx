@@ -77,13 +77,26 @@ function AuthGatePoller({
 
       firedRef.current = true;
       clearInterval(interval);
+
+      // Read session tokens passed from verification tab via localStorage.
+      // Server-side cookies from verifyOtp() may not survive a raw NextResponse(html),
+      // so tokens are explicitly passed through localStorage and set via setSession().
+      const at = localStorage.getItem('alphascan_at') ?? '';
+      const rt = localStorage.getItem('alphascan_rt') ?? '';
+
       try { localStorage.removeItem(VERIFIED_KEY); } catch { /* */ }
+      try { localStorage.removeItem('alphascan_at'); } catch { /* */ }
+      try { localStorage.removeItem('alphascan_rt'); } catch { /* */ }
       document.cookie = 'alphascan_verified=; path=/; max-age=0';
 
-      // Pick up the session from the verification tab — cookies are shared
-      // but the browser Supabase client caches "no session" in memory.
       const supabase = createClient();
-      await supabase.auth.refreshSession();
+      if (at && rt) {
+        // Establish the session from verification tab tokens
+        await supabase.auth.setSession({ access_token: at, refresh_token: rt });
+      } else {
+        // Fallback: try reading session from cookies (may work if cookies were set)
+        await supabase.auth.refreshSession();
+      }
 
       try {
         const res = await fetch('/api/scans', {
