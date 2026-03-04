@@ -132,10 +132,9 @@ export function ScanOrchestratorProvider({ children }: { children: ReactNode }) 
   }, []);
 
   // ── Cross-tab auth detection ─────────────────────────────────────────
-  // When the visual sequence is paused (waiting for auth), listen for the
-  // verification signal from the other tab via localStorage. This effect
-  // lives HERE (not in HeroScanFlow) because it persists after scan-input
-  // window is closed.
+  // Poll localStorage every second while sequence is paused. When the
+  // verification tab sets the flag, we detect it and resume.
+  // Also handles same-tab sign-in (password login without email verify).
   useEffect(() => {
     if (!visualSequence?.paused) return;
     if (resumingRef.current) return;
@@ -148,11 +147,8 @@ export function ScanOrchestratorProvider({ children }: { children: ReactNode }) 
 
       try { localStorage.removeItem(VERIFIED_KEY); } catch { /* */ }
       closeWindowRef.current('auth');
-
-      // Resume the visual sequence
       setVisualSequence((prev) => prev ? { ...prev, paused: false } : null);
 
-      // Fire the real backend scan
       try {
         const res = await fetch('/api/scans', {
           method: 'POST',
@@ -175,41 +171,28 @@ export function ScanOrchestratorProvider({ children }: { children: ReactNode }) 
       resumingRef.current = false;
     };
 
+    // Poll every second — check localStorage flag + Supabase session
     const supabase = createClient();
+    const pollInterval = setInterval(async () => {
+      if (resumingRef.current) return;
 
-    // 1. Supabase auth state change (same-tab sign-in, e.g. password login)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' && session?.user) {
-        fireBackendScan();
-      }
-    });
-
-    // 2. storage event — fires when ANOTHER tab writes to localStorage
-    const handleStorage = (e: StorageEvent) => {
-      if (e.key === VERIFIED_KEY && e.newValue === 'true') {
-        fireBackendScan();
-      }
-    };
-    window.addEventListener('storage', handleStorage);
-
-    // 3. visibilitychange — fallback when user manually switches back
-    const handleVisibility = async () => {
-      if (document.visibilityState !== 'visible') return;
+      // Check localStorage flag (set by verification tab)
       if (localStorage.getItem(VERIFIED_KEY) === 'true') {
+        clearInterval(pollInterval);
         await fireBackendScan();
         return;
       }
+
+      // Check Supabase session (handles same-tab password login)
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
+        clearInterval(pollInterval);
         await fireBackendScan();
       }
-    };
-    document.addEventListener('visibilitychange', handleVisibility);
+    }, 1000);
 
     return () => {
-      subscription.unsubscribe();
-      window.removeEventListener('storage', handleStorage);
-      document.removeEventListener('visibilitychange', handleVisibility);
+      clearInterval(pollInterval);
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visualSequence?.paused, visualSequence?.capturedUrl, visualSequence?.capturedToken, visualSequence?.domain]);
