@@ -86,12 +86,12 @@ function CreditIndicator() {
       <div
         className="flex items-center justify-center"
         style={{
-          background: 'rgba(255, 214, 10, 0.15)',
+          background: 'rgba(0, 200, 255, 0.12)',
           borderRight: '1px solid rgba(255,178,239,0.2)',
           padding: '3px 8px',
         }}
       >
-        <span style={{ fontSize: '13px', filter: 'drop-shadow(0 0 3px rgba(255,214,10,0.6))' }}>⚡</span>
+        <span style={{ fontSize: '13px', filter: 'drop-shadow(0 0 3px rgba(0,200,255,0.5))' }}>⚡</span>
       </div>
       {/* Text portion — pink tinted */}
       <div
@@ -113,7 +113,7 @@ function CreditIndicator() {
   );
 
   return (
-    <div className="flex justify-center select-none" style={{ marginTop: '0px', marginBottom: '6px' }}>
+    <div className="flex justify-center select-none" style={{ marginBottom: '4px' }}>
       {hasCredits ? pill : (
         <button
           onClick={() => wm.openWindow('pricing')}
@@ -192,9 +192,8 @@ export default function ScanInputWindow() {
         <CurvedArrow />
       </div>
 
-      <CreditIndicator />
-
       <div className="w-full">
+        <CreditIndicator />
         <HeroScanFlow />
       </div>
     </div>
