@@ -78,26 +78,40 @@ function CreditIndicator() {
   // First visit: 1 credit, never scanned — don't confuse new users
   if (remaining === 1 && scanCount === 0) return null;
 
+  const hasCredits = remaining > 0;
+
   return (
-    <div
-      className="font-data select-none text-center"
-      style={{ fontSize: '11px', marginTop: '8px', marginBottom: '0px' }}
-    >
-      {remaining > 0 ? (
-        <span style={{ color: 'var(--gs-mid)' }}>
-          <span style={{ fontSize: '14px', verticalAlign: '-1px' }}>⚡</span> {remaining} scan{remaining !== 1 ? 's' : ''} remaining
-        </span>
+    <div className="flex justify-center select-none" style={{ marginTop: '6px', marginBottom: '4px' }}>
+      {hasCredits ? (
+        <div
+          className="font-data inline-flex items-center gap-[5px] rounded-full"
+          style={{
+            fontSize: '12px',
+            padding: '4px 12px',
+            background: 'rgba(255,178,239,0.08)',
+            border: '1px solid rgba(255,178,239,0.15)',
+            color: 'var(--gs-mid)',
+          }}
+        >
+          <span style={{ fontSize: '13px' }}>⚡</span>
+          <span><span style={{ color: 'var(--gs-base)', fontWeight: 600 }}>{remaining}</span> scan{remaining !== 1 ? 's' : ''} remaining</span>
+        </div>
       ) : (
-        <span style={{ color: 'var(--gs-mid)' }}>
-          <span style={{ fontSize: '14px', verticalAlign: '-1px' }}>⚡</span> 0 scans remaining —{' '}
-          <button
-            onClick={() => wm.openWindow('pricing')}
-            className="underline hover:text-gs-base transition-colors"
-            style={{ color: 'var(--gs-base)' }}
-          >
-            Upgrade
-          </button>
-        </span>
+        <button
+          onClick={() => wm.openWindow('pricing')}
+          className="font-data inline-flex items-center gap-[5px] rounded-full transition-all hover:border-gs-base/40"
+          style={{
+            fontSize: '12px',
+            padding: '4px 12px',
+            background: 'rgba(255,178,239,0.08)',
+            border: '1px solid rgba(255,178,239,0.15)',
+            color: 'var(--gs-mid)',
+            cursor: 'pointer',
+          }}
+        >
+          <span style={{ fontSize: '13px' }}>⚡</span>
+          <span>0 remaining — <span style={{ color: 'var(--gs-base)', fontWeight: 600 }}>Upgrade</span></span>
+        </button>
       )}
     </div>
   );
