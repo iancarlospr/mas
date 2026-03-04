@@ -39,34 +39,19 @@ export async function GET(request: NextRequest) {
       }),
     }).catch(() => {});
 
-    // Pass session tokens to the original tab via localStorage.
-    // Server-side cookies set by verifyOtp() may not survive a raw
-    // NextResponse(html) — so we explicitly hand the tokens to the
-    // client through the inline script. The original tab's AuthGatePoller
-    // picks them up and calls setSession() to establish a valid session.
-    const { data: { session } } = await supabase.auth.getSession();
-    const at = session?.access_token ?? '';
-    const rt = session?.refresh_token ?? '';
-
-    const response = new NextResponse(
+    // Show "go back" page. The original tab's AuthGatePoller detects
+    // verification by polling signInWithPassword() every 3s — works
+    // cross-browser and cross-device, no localStorage/cookie needed.
+    return new NextResponse(
       `<!DOCTYPE html><html><head><title>Verified!</title>
       <style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#080808;color:#fff;font-family:system-ui}
       .c{text-align:center;max-width:440px;padding:2rem}h1{font-size:1.5rem;margin-bottom:.5rem;color:#FFB2EF}p{color:#888;font-size:.9rem;margin-top:.5rem}
       .close{margin-top:1.5rem;color:#FFB2EF;font-size:.85rem;cursor:pointer;text-decoration:underline;background:none;border:none;font-family:inherit}</style></head>
       <body><div class="c"><h1>You&apos;re verified, babe!</h1><p>Now go back to the other tab &mdash; your scan is waiting.</p>
       <button class="close" onclick="window.close()">Close this tab</button>
-      <p style="color:#555;font-size:.75rem;margin-top:1rem">If this tab doesn&apos;t close, just switch back manually.</p></div>
-      <script>try{localStorage.setItem('alphascan_email_verified','true');localStorage.setItem('alphascan_at','${at}');localStorage.setItem('alphascan_rt','${rt}')}catch(e){}</script></body></html>`,
+      <p style="color:#555;font-size:.75rem;margin-top:1rem">If this tab doesn&apos;t close, just switch back manually.</p></div></body></html>`,
       { status: 200, headers: { 'content-type': 'text/html' } },
     );
-    // Non-httpOnly cookie so JS can read it. Short-lived (5 min).
-    response.cookies.set('alphascan_verified', 'true', {
-      path: '/',
-      maxAge: 300,
-      secure: true,
-      sameSite: 'lax',
-    });
-    return response;
   }
 
   // Magic link / recovery — redirect normally
