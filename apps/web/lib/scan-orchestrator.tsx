@@ -68,6 +68,9 @@ export function ScanOrchestratorProvider({ children }: { children: ReactNode }) 
   const [activeScan, setActiveScan] = useState<ActiveScan | null>(null);
   const [visualSequence, setVisualSequence] = useState<VisualSequence | null>(null);
   const resumingRef = useRef(false);
+  // Stable ref for wm.closeWindow — avoids putting `wm` in useEffect deps
+  const closeWindowRef = useRef(wm.closeWindow);
+  closeWindowRef.current = wm.closeWindow;
 
   const openScanWindow = useCallback(
     (scanId: string, domain: string) => {
@@ -144,7 +147,7 @@ export function ScanOrchestratorProvider({ children }: { children: ReactNode }) 
       resumingRef.current = true;
 
       try { localStorage.removeItem(VERIFIED_KEY); } catch { /* */ }
-      wm.closeWindow('auth');
+      closeWindowRef.current('auth');
 
       // Resume the visual sequence
       setVisualSequence((prev) => prev ? { ...prev, paused: false } : null);
@@ -208,7 +211,8 @@ export function ScanOrchestratorProvider({ children }: { children: ReactNode }) 
       window.removeEventListener('storage', handleStorage);
       document.removeEventListener('visibilitychange', handleVisibility);
     };
-  }, [visualSequence?.paused, visualSequence?.capturedUrl, visualSequence?.capturedToken, visualSequence?.domain, wm]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visualSequence?.paused, visualSequence?.capturedUrl, visualSequence?.capturedToken, visualSequence?.domain]);
 
   const value = useMemo<ScanOrchestratorValue>(
     () => ({
