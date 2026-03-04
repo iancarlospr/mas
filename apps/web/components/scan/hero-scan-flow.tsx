@@ -123,27 +123,40 @@ export function HeroScanFlow() {
       }
     });
 
-    // Fallback: when user switches back to this tab, refresh session and check auth.
-    // The verification happened in another tab — cookies are shared but the JS client
-    // needs to pick up the new session via refreshSession() or getSession().
+    // Cross-tab detection: the verification tab sets a localStorage flag.
+    // We listen for both the storage event (fires immediately across tabs)
+    // and visibilitychange (fallback when user manually switches back).
+    const VERIFIED_KEY = 'alphascan_email_verified';
+
+    const handleVerified = async () => {
+      try { localStorage.removeItem(VERIFIED_KEY); } catch { /* */ }
+      authListenerRef.current = false;
+      subscription.unsubscribe();
+      document.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('storage', handleStorage);
+      await resumeScan();
+    };
+
+    // storage event fires when ANOTHER tab writes to localStorage
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === VERIFIED_KEY && e.newValue === 'true') {
+        handleVerified();
+      }
+    };
+    window.addEventListener('storage', handleStorage);
+
+    // Fallback: when user manually switches back, check localStorage + auth
     const handleVisibility = async () => {
       if (document.visibilityState !== 'visible') return;
-      // Try to pick up the session from the other tab via cookie
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        authListenerRef.current = false;
-        subscription.unsubscribe();
-        document.removeEventListener('visibilitychange', handleVisibility);
-        await resumeScan();
+      // Check our own flag first (most reliable)
+      if (localStorage.getItem(VERIFIED_KEY) === 'true') {
+        await handleVerified();
         return;
       }
-      // If getSession didn't work, try refreshing
-      const { data: { user: refreshedUser } } = await supabase.auth.refreshSession();
-      if (refreshedUser) {
-        authListenerRef.current = false;
-        subscription.unsubscribe();
-        document.removeEventListener('visibilitychange', handleVisibility);
-        await resumeScan();
+      // Also try Supabase session refresh as last resort
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        await handleVerified();
       }
     };
     document.addEventListener('visibilitychange', handleVisibility);
@@ -151,6 +164,7 @@ export function HeroScanFlow() {
     return () => {
       subscription.unsubscribe();
       document.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('storage', handleStorage);
       authListenerRef.current = false;
     };
   }, [state, resumeScan]);
