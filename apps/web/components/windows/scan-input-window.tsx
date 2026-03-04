@@ -81,7 +81,7 @@ function CreditIndicator() {
   return (
     <div
       className="font-data select-none text-center"
-      style={{ fontSize: '11px', marginBottom: '2px' }}
+      style={{ fontSize: '11px', marginTop: '8px', marginBottom: '0px' }}
     >
       {remaining > 0 ? (
         <span style={{ color: 'var(--gs-mid)' }}>
