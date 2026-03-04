@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { normalizeUrl } from '@/lib/utils';
 import { ScanInput } from '@/components/scan/scan-input';
@@ -10,7 +10,7 @@ import { useWindowManager } from '@/lib/window-manager';
 import { useAuth } from '@/lib/auth-context';
 import { analytics } from '@/lib/analytics';
 
-type FlowState = 'idle' | 'waiting-auth' | 'existing-prompt';
+type FlowState = 'idle' | 'existing-prompt';
 
 interface PendingVerification {
   email: string;
@@ -25,7 +25,6 @@ interface ExistingScan {
   marketing_iq: number | null;
 }
 
-/** Read the pending-verification flag from localStorage (24h TTL). */
 function getPendingVerification(): PendingVerification | null {
   try {
     const raw = localStorage.getItem('alphascan_pending_verification');
@@ -41,14 +40,10 @@ function getPendingVerification(): PendingVerification | null {
   }
 }
 
-/** Check if a date string falls on the same calendar day as now (local time) */
 function isSameDay(dateStr: string): boolean {
-  const d = new Date(dateStr);
-  const now = new Date();
-  return d.toDateString() === now.toDateString();
+  return new Date(dateStr).toDateString() === new Date().toDateString();
 }
 
-/** Hours since a given date */
 function hoursSince(dateStr: string): number {
   return (Date.now() - new Date(dateStr).getTime()) / (1000 * 60 * 60);
 }
@@ -70,110 +65,19 @@ export function HeroScanFlow() {
   const [existingScan, setExistingScan] = useState<ExistingScan | null>(null);
   const orchestrator = useScanOrchestrator();
   const wm = useWindowManager();
-  const authListenerRef = useRef(false);
 
-  // Check for pending verification on mount (logged-out users only)
   useEffect(() => {
     if (isAuthenticated === false) {
       setPendingVerification(getPendingVerification());
-    } else if (isAuthenticated === true) {
+    } else if (isAuthenticated) {
       try { localStorage.removeItem('alphascan_pending_verification'); } catch { /* */ }
     }
   }, [isAuthenticated]);
 
-  // Resume scan after user authenticates (via sign-in, cross-tab verification, or tab refocus)
-  const resumeScan = useCallback(async () => {
-    if (!capturedUrl) return;
-    wm.closeWindow('auth');
-    orchestrator.resumeVisualSequence();
-
-    try {
-      const res = await fetch('/api/scans', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: capturedUrl, turnstileToken: capturedToken, autoScan: true }),
-      });
-
-      if (res.ok) {
-        const { scanId, cached } = await res.json();
-        const domain = new URL(capturedUrl).hostname;
-        analytics.scanStarted(domain, 'full');
-        orchestrator.connectScan(scanId, domain, cached);
-      } else {
-        orchestrator.cancelVisualSequence();
-      }
-    } catch {
-      orchestrator.cancelVisualSequence();
-    }
-
-    setState('idle');
-  }, [capturedUrl, capturedToken, orchestrator, wm]);
-
-  // Listen for auth state change while waiting for registration
-  useEffect(() => {
-    if (state !== 'waiting-auth' || authListenerRef.current) return;
-    authListenerRef.current = true;
-
-    const supabase = createClient();
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session?.user) {
-        authListenerRef.current = false;
-        subscription.unsubscribe();
-        await resumeScan();
-      }
-    });
-
-    // Cross-tab detection: the verification tab sets a localStorage flag.
-    // We listen for both the storage event (fires immediately across tabs)
-    // and visibilitychange (fallback when user manually switches back).
-    const VERIFIED_KEY = 'alphascan_email_verified';
-
-    const handleVerified = async () => {
-      try { localStorage.removeItem(VERIFIED_KEY); } catch { /* */ }
-      authListenerRef.current = false;
-      subscription.unsubscribe();
-      document.removeEventListener('visibilitychange', handleVisibility);
-      window.removeEventListener('storage', handleStorage);
-      await resumeScan();
-    };
-
-    // storage event fires when ANOTHER tab writes to localStorage
-    const handleStorage = (e: StorageEvent) => {
-      if (e.key === VERIFIED_KEY && e.newValue === 'true') {
-        handleVerified();
-      }
-    };
-    window.addEventListener('storage', handleStorage);
-
-    // Fallback: when user manually switches back, check localStorage + auth
-    const handleVisibility = async () => {
-      if (document.visibilityState !== 'visible') return;
-      // Check our own flag first (most reliable)
-      if (localStorage.getItem(VERIFIED_KEY) === 'true') {
-        await handleVerified();
-        return;
-      }
-      // Also try Supabase session refresh as last resort
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        await handleVerified();
-      }
-    };
-    document.addEventListener('visibilitychange', handleVisibility);
-
-    return () => {
-      subscription.unsubscribe();
-      document.removeEventListener('visibilitychange', handleVisibility);
-      window.removeEventListener('storage', handleStorage);
-      authListenerRef.current = false;
-    };
-  }, [state, resumeScan]);
-
-  /** Check if the user has a recent scan for this domain */
   const checkExistingScan = useCallback(async (url: string): Promise<ExistingScan | null> => {
     const supabase = createClient();
-    const { data: { user: currentUser } } = await supabase.auth.getUser();
-    if (!currentUser) return null;
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return null;
 
     let domain: string;
     try {
@@ -188,20 +92,16 @@ export function HeroScanFlow() {
     const { data } = await supabase
       .from('scans')
       .select('id, domain, created_at, marketing_iq')
-      .eq('user_id', currentUser.id)
+      .eq('user_id', user.id)
       .eq('domain', domain)
       .eq('status', 'complete')
       .gte('created_at', weekAgo.toISOString())
       .order('created_at', { ascending: false })
       .limit(1);
 
-    if (data && data.length > 0) {
-      return data[0] as ExistingScan;
-    }
-    return null;
+    return data && data.length > 0 ? data[0] as ExistingScan : null;
   }, []);
 
-  /** Run a new scan (POST /api/scans + start Hollywood Hack with SSE) */
   const runNewScan = useCallback(async (url: string, turnstileToken: string) => {
     const res = await fetch('/api/scans', {
       method: 'POST',
@@ -230,7 +130,6 @@ export function HeroScanFlow() {
       const domain = new URL(normalizeUrl(url)).hostname.replace(/^www\./, '');
 
       if (isAuthenticated) {
-        // Authenticated user — check for existing recent scan
         const existing = await checkExistingScan(url);
 
         if (existing && (isSameDay(existing.created_at) || hoursSince(existing.created_at) < 12)) {
@@ -247,33 +146,26 @@ export function HeroScanFlow() {
           return;
         }
 
-        // No recent scan — proceed normally
         await runNewScan(url, turnstileToken);
       } else {
         // ── Unauthenticated user ──
-        // 1. Start the Hollywood Hack visuals immediately (no backend)
-        // 2. After 2s, pause sequence and open auth window
-        // 3. On registration → resume sequence + fire real backend scan
-        setCapturedUrl(url);
-        setCapturedToken(turnstileToken);
+        // 1. Close scan-input window
+        // 2. Start visual sequence (orchestrator stores captured URL/token)
+        // 3. After 2s → pause + open auth window
+        // 4. Orchestrator handles cross-tab detection + backend scan firing
         wm.closeWindow('scan-input');
-        orchestrator.startVisualSequence(domain);
+        orchestrator.startVisualSequence(domain, url, turnstileToken);
         analytics.signupWallShown(domain);
 
-        // After 2 seconds: pause sequence and open auth window (portaled above sequence)
         setTimeout(() => {
           orchestrator.pauseVisualSequence();
           wm.openWindow('auth', { tab: 'register', scanGate: true });
-          setState('waiting-auth');
         }, 2000);
       }
     },
     [isAuthenticated, checkExistingScan, runNewScan, orchestrator, wm],
   );
 
-  const domain = capturedUrl ? (() => { try { return new URL(normalizeUrl(capturedUrl)).hostname.replace(/^www\./, ''); } catch { return capturedUrl; } })() : '';
-
-  // Show "check your email" card if user signed up but hasn't verified yet
   if (pendingVerification && !authLoading && !isAuthenticated) {
     return (
       <PendingVerificationCard
@@ -287,7 +179,6 @@ export function HeroScanFlow() {
     );
   }
 
-  // Existing scan prompt — same domain scanned this week
   if (state === 'existing-prompt' && existingScan) {
     const days = daysSince(existingScan.created_at);
     const scoreText = existingScan.marketing_iq != null
@@ -330,8 +221,6 @@ export function HeroScanFlow() {
     );
   }
 
-  // Idle — show normal scan input
-  // Wait for auth check before rendering to avoid flash
   return (
     <ScanInput
       variant="dialog"

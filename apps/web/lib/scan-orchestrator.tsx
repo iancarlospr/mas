@@ -5,12 +5,16 @@ import {
   useContext,
   useState,
   useCallback,
+  useEffect,
+  useRef,
   useMemo,
   type ReactNode,
 } from 'react';
+import { createClient } from '@/lib/supabase/client';
 import { useWindowManager } from '@/lib/window-manager';
 import { ScanProgress } from '@/components/scan/scan-progress';
 import { ScanSequence } from '@/components/scan/scan-sequence';
+import { analytics } from '@/lib/analytics';
 import type { ScanStatus } from '@marketing-alpha/types';
 
 /**
@@ -22,8 +26,9 @@ import type { ScanStatus } from '@marketing-alpha/types';
  * 2. On complete → open scan report as a managed window
  * 3. Open existing scans from history as windows
  * 4. Visual-only sequence for unauthenticated users (pauses for auth gate)
+ * 5. Cross-tab auth detection → resume sequence + fire backend scan
  *
- * Mounted at the desktop shell level, above ChloeReactionsProvider.
+ * Mounted at the desktop shell level — persists across window open/close.
  */
 
 interface ActiveScan {
@@ -36,26 +41,23 @@ interface ActiveScan {
 interface VisualSequence {
   domain: string;
   paused: boolean;
+  /** Captured URL + turnstile token for firing the scan after auth */
+  capturedUrl: string;
+  capturedToken: string;
 }
 
+const VERIFIED_KEY = 'alphascan_email_verified';
+
 interface ScanOrchestratorValue {
-  /** Start the Hollywood Hack sequence for a scan (SSE + full-screen animation) */
   startScan(scanId: string, domain: string, isCached?: boolean): void;
-  /** Open a completed scan in a managed window */
   openScanWindow(scanId: string, domain: string): void;
-  /** Start the Hollywood Hack visuals ONLY — no backend. For unauth users. */
-  startVisualSequence(domain: string): void;
-  /** Pause the visual-only sequence (for auth gate) */
+  /** Start visual-only sequence with captured scan params for later */
+  startVisualSequence(domain: string, capturedUrl: string, capturedToken: string): void;
   pauseVisualSequence(): void;
-  /** Resume the visual-only sequence (auth completed) */
   resumeVisualSequence(): void;
-  /** Stop the visual-only sequence and transition to real scan */
   connectScan(scanId: string, domain: string, isCached?: boolean): void;
-  /** Cancel the visual-only sequence (user didn't register) */
   cancelVisualSequence(): void;
-  /** Currently active scan (in Hollywood Hack phase), null if none */
   activeScanId: string | null;
-  /** Whether a visual-only sequence is active */
   isVisualSequenceActive: boolean;
 }
 
@@ -65,26 +67,21 @@ export function ScanOrchestratorProvider({ children }: { children: ReactNode }) 
   const wm = useWindowManager();
   const [activeScan, setActiveScan] = useState<ActiveScan | null>(null);
   const [visualSequence, setVisualSequence] = useState<VisualSequence | null>(null);
+  const resumingRef = useRef(false);
 
   const openScanWindow = useCallback(
     (scanId: string, domain: string) => {
       const windowId = `scan-${scanId}`;
-
-      // If already open, just focus it
       if (wm.windows[windowId]?.isOpen) {
         wm.focusWindow(windowId);
         return;
       }
-
-      // Register dynamic window
       wm.registerWindow(windowId, {
         title: domain || 'Loading...',
         width: 900,
         height: 600,
         componentType: 'scan-report',
       });
-
-      // Open with scanId in openData, then maximize
       wm.openWindow(windowId, { scanId });
       wm.maximizeWindow(windowId);
     },
@@ -107,9 +104,8 @@ export function ScanOrchestratorProvider({ children }: { children: ReactNode }) 
     [openScanWindow],
   );
 
-  // Visual-only sequence (no backend)
-  const startVisualSequence = useCallback((domain: string) => {
-    setVisualSequence({ domain, paused: false });
+  const startVisualSequence = useCallback((domain: string, capturedUrl: string, capturedToken: string) => {
+    setVisualSequence({ domain, paused: false, capturedUrl, capturedToken });
   }, []);
 
   const pauseVisualSequence = useCallback(() => {
@@ -120,7 +116,6 @@ export function ScanOrchestratorProvider({ children }: { children: ReactNode }) 
     setVisualSequence((prev) => prev ? { ...prev, paused: false } : null);
   }, []);
 
-  // Transition from visual-only to real scan (user just registered)
   const connectScan = useCallback(
     (scanId: string, domain: string, isCached?: boolean) => {
       setVisualSequence(null);
@@ -132,6 +127,88 @@ export function ScanOrchestratorProvider({ children }: { children: ReactNode }) 
   const cancelVisualSequence = useCallback(() => {
     setVisualSequence(null);
   }, []);
+
+  // ── Cross-tab auth detection ─────────────────────────────────────────
+  // When the visual sequence is paused (waiting for auth), listen for the
+  // verification signal from the other tab via localStorage. This effect
+  // lives HERE (not in HeroScanFlow) because it persists after scan-input
+  // window is closed.
+  useEffect(() => {
+    if (!visualSequence?.paused) return;
+    if (resumingRef.current) return;
+
+    const { capturedUrl, capturedToken, domain } = visualSequence;
+
+    const fireBackendScan = async () => {
+      if (resumingRef.current) return;
+      resumingRef.current = true;
+
+      try { localStorage.removeItem(VERIFIED_KEY); } catch { /* */ }
+      wm.closeWindow('auth');
+
+      // Resume the visual sequence
+      setVisualSequence((prev) => prev ? { ...prev, paused: false } : null);
+
+      // Fire the real backend scan
+      try {
+        const res = await fetch('/api/scans', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: capturedUrl, turnstileToken: capturedToken, autoScan: true }),
+        });
+
+        if (res.ok) {
+          const { scanId, cached } = await res.json();
+          analytics.scanStarted(new URL(capturedUrl).hostname, 'full');
+          setVisualSequence(null);
+          setActiveScan({ scanId, domain, isCached: cached });
+        } else {
+          setVisualSequence(null);
+        }
+      } catch {
+        setVisualSequence(null);
+      }
+
+      resumingRef.current = false;
+    };
+
+    const supabase = createClient();
+
+    // 1. Supabase auth state change (same-tab sign-in, e.g. password login)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session?.user) {
+        fireBackendScan();
+      }
+    });
+
+    // 2. storage event — fires when ANOTHER tab writes to localStorage
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === VERIFIED_KEY && e.newValue === 'true') {
+        fireBackendScan();
+      }
+    };
+    window.addEventListener('storage', handleStorage);
+
+    // 3. visibilitychange — fallback when user manually switches back
+    const handleVisibility = async () => {
+      if (document.visibilityState !== 'visible') return;
+      if (localStorage.getItem(VERIFIED_KEY) === 'true') {
+        await fireBackendScan();
+        return;
+      }
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        await fireBackendScan();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    return () => {
+      subscription.unsubscribe();
+      window.removeEventListener('storage', handleStorage);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
+  }, [visualSequence?.paused, visualSequence?.capturedUrl, visualSequence?.capturedToken, visualSequence?.domain, wm]);
 
   const value = useMemo<ScanOrchestratorValue>(
     () => ({
@@ -151,7 +228,6 @@ export function ScanOrchestratorProvider({ children }: { children: ReactNode }) 
   return (
     <ScanOrchestratorContext.Provider value={value}>
       {children}
-      {/* Active Hollywood Hack sequence — portals to document.body via ScanSequence */}
       {activeScan && (
         <ScanProgress
           key={activeScan.scanId}
@@ -161,7 +237,6 @@ export function ScanOrchestratorProvider({ children }: { children: ReactNode }) 
           onComplete={() => handleScanComplete(activeScan.scanId, activeScan.domain)}
         />
       )}
-      {/* Visual-only sequence for unauthenticated users — no SSE, just the animation */}
       {visualSequence && (
         <ScanSequence
           key="visual-sequence"
@@ -169,7 +244,7 @@ export function ScanOrchestratorProvider({ children }: { children: ReactNode }) 
           scanStatus={'queued' as ScanStatus}
           progress={0}
           completedModules={[]}
-          onComplete={() => {/* visual-only never completes on its own */}}
+          onComplete={() => {}}
           paused={visualSequence.paused}
         />
       )}
