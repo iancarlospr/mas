@@ -78,14 +78,15 @@ export async function createScan(opts: CreateScanOpts): Promise<CreateScanResult
 
   if (!usedCredit) {
     // No credits available — check if user has already used their 1 free scan.
-    // Count ALL scans (including cached) — a cached scan still delivers results.
-    const { count: scanCount } = await supabase
-      .from('scans')
+    // Query audit_log (immutable, service-role only) instead of scans table —
+    // users can delete scans but can't delete audit entries.
+    const { count: auditCount } = await service
+      .from('audit_log')
       .select('id', { count: 'exact', head: true })
       .eq('user_id', userId)
-      .in('status', ['queued', 'complete', 'passive', 'browser', 'ghostscan', 'external', 'synthesis']);
+      .eq('action', 'scan_created');
 
-    if ((scanCount ?? 0) > 0) {
+    if ((auditCount ?? 0) > 0) {
       // Already used free scan, no credits remaining
       throw new ScanError(
         'You\'ve used your free scan. Purchase Alpha Brief to unlock full scans.',
