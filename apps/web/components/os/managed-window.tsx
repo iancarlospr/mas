@@ -1,8 +1,10 @@
 'use client';
 
 import { useCallback, useRef, useMemo, useEffect, useState, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { cn } from '@/lib/utils';
 import { useWindowManager, useWindowState } from '@/lib/window-manager';
+import { useScanOrchestrator } from '@/lib/scan-orchestrator';
 import { useWindowDrag } from '@/hooks/use-window-drag';
 import { useWindowResize } from '@/hooks/use-window-resize';
 
@@ -119,6 +121,7 @@ export function ManagedWindow({
 }: ManagedWindowProps) {
   const wm = useWindowManager();
   const windowState = useWindowState(id);
+  const orchestrator = useScanOrchestrator();
   const windowRef = useRef<HTMLDivElement>(null);
 
   const isActive = wm.activeWindowId === id;
@@ -207,10 +210,14 @@ export function ManagedWindow({
     return null;
   }
 
-  return (
+  // Auth gate: when the visual sequence is active, portal the auth window
+  // above the sequence (z-10001) so it appears on top of the frozen matrix rain
+  const isAuthGate = id === 'auth' && orchestrator.isVisualSequenceActive;
+
+  const windowEl = (
     <div
       ref={windowRef}
-      data-active={isActive}
+      data-active={isActive || isAuthGate}
       className={cn(
         'window',
         windowState.variant === 'ghost' && 'window-ghost',
@@ -218,14 +225,15 @@ export function ManagedWindow({
         !hasAnimated && 'animate-window-open',
       )}
       style={{
-        position: 'absolute',
-        left: isMaximized ? 0 : windowState.x,
-        top: isMaximized ? 0 : windowState.y,
+        position: isAuthGate ? 'fixed' : 'absolute',
+        left: isAuthGate ? '50%' : isMaximized ? 0 : windowState.x,
+        top: isAuthGate ? '50%' : isMaximized ? 0 : windowState.y,
+        transform: isAuthGate ? 'translate(-50%, -50%)' : undefined,
         width: isMaximized ? '100%' : windowState.width,
         height: isMaximized ? '100%' : 'fit-content',
         maxHeight: isMaximized ? '100%' : 'calc(85vh - 44px)',
-        zIndex: windowState.zIndex,
-        transformOrigin: transformOrigin,
+        zIndex: isAuthGate ? 10001 : windowState.zIndex,
+        transformOrigin: isAuthGate ? undefined : transformOrigin,
       }}
       onMouseDown={handleFocus}
       role="region"
@@ -294,4 +302,11 @@ export function ManagedWindow({
       )}
     </div>
   );
+
+  // Portal auth window to document.body when it needs to appear above the scan sequence
+  if (isAuthGate && typeof document !== 'undefined') {
+    return createPortal(windowEl, document.body);
+  }
+
+  return windowEl;
 }
