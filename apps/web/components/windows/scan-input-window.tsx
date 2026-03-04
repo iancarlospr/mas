@@ -80,37 +80,47 @@ function CreditIndicator() {
 
   const hasCredits = remaining > 0;
 
-  return (
-    <div className="flex justify-center select-none" style={{ marginTop: '6px', marginBottom: '4px' }}>
-      {hasCredits ? (
-        <div
-          className="font-data inline-flex items-center gap-[5px] rounded-full"
-          style={{
-            fontSize: '12px',
-            padding: '4px 12px',
-            background: 'rgba(255,178,239,0.08)',
-            border: '1px solid rgba(255,178,239,0.15)',
-            color: 'var(--gs-mid)',
-          }}
-        >
-          <span style={{ fontSize: '13px' }}>⚡</span>
+  const pill = (
+    <div className="inline-flex items-stretch rounded-full overflow-hidden" style={{ border: '1px solid rgba(255,178,239,0.2)' }}>
+      {/* ⚡ corner — bright electric yellow */}
+      <div
+        className="flex items-center justify-center"
+        style={{
+          background: 'rgba(255, 214, 10, 0.15)',
+          borderRight: '1px solid rgba(255,178,239,0.2)',
+          padding: '3px 8px',
+        }}
+      >
+        <span style={{ fontSize: '13px', filter: 'drop-shadow(0 0 3px rgba(255,214,10,0.6))' }}>⚡</span>
+      </div>
+      {/* Text portion — pink tinted */}
+      <div
+        className="font-data flex items-center"
+        style={{
+          fontSize: '12px',
+          padding: '3px 10px',
+          background: 'rgba(255,178,239,0.08)',
+          color: 'var(--gs-mid)',
+        }}
+      >
+        {hasCredits ? (
           <span><span style={{ color: 'var(--gs-base)', fontWeight: 600 }}>{remaining}</span> scan{remaining !== 1 ? 's' : ''} remaining</span>
-        </div>
-      ) : (
+        ) : (
+          <span>0 remaining — <span style={{ color: 'var(--gs-base)', fontWeight: 600 }}>Upgrade</span></span>
+        )}
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="flex justify-center select-none" style={{ marginTop: '0px', marginBottom: '6px' }}>
+      {hasCredits ? pill : (
         <button
           onClick={() => wm.openWindow('pricing')}
-          className="font-data inline-flex items-center gap-[5px] rounded-full transition-all hover:border-gs-base/40"
-          style={{
-            fontSize: '12px',
-            padding: '4px 12px',
-            background: 'rgba(255,178,239,0.08)',
-            border: '1px solid rgba(255,178,239,0.15)',
-            color: 'var(--gs-mid)',
-            cursor: 'pointer',
-          }}
+          className="transition-opacity hover:opacity-80"
+          style={{ cursor: 'pointer' }}
         >
-          <span style={{ fontSize: '13px' }}>⚡</span>
-          <span>0 remaining — <span style={{ color: 'var(--gs-base)', fontWeight: 600 }}>Upgrade</span></span>
+          {pill}
         </button>
       )}
     </div>
