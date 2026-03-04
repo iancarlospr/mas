@@ -5,9 +5,11 @@
 -- Trigger function: insert scan_credits(user_id, remaining=1) on new user
 CREATE OR REPLACE FUNCTION grant_free_scan_credit()
 RETURNS TRIGGER
-LANGUAGE plpgsql SECURITY DEFINER AS $$
+LANGUAGE plpgsql SECURITY DEFINER
+SET search_path = public
+AS $$
 BEGIN
-  INSERT INTO scan_credits (user_id, remaining, updated_at)
+  INSERT INTO public.scan_credits (user_id, remaining, updated_at)
   VALUES (NEW.id, 1, now())
   ON CONFLICT (user_id) DO NOTHING;  -- idempotent: don't overwrite if row exists
   RETURN NEW;
