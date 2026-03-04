@@ -17,8 +17,6 @@ import { ScanSequence } from '@/components/scan/scan-sequence';
 import { analytics } from '@/lib/analytics';
 import type { ScanStatus } from '@marketing-alpha/types';
 
-const VERIFIED_KEY = 'alphascan_email_verified';
-
 interface ActiveScan {
   scanId: string;
   domain: string;
@@ -40,6 +38,8 @@ interface ScanOrchestratorValue {
   resumeVisualSequence(): void;
   connectScan(scanId: string, domain: string, isCached?: boolean): void;
   cancelVisualSequence(): void;
+  /** Called by auth window after signUp() to pass credentials for server-side polling */
+  setGateCredentials(email: string, password: string): void;
   activeScanId: string | null;
   isVisualSequenceActive: boolean;
 }
@@ -47,56 +47,51 @@ interface ScanOrchestratorValue {
 const ScanOrchestratorContext = createContext<ScanOrchestratorValue | null>(null);
 
 /**
- * Standalone polling component — mounts when visual sequence is paused,
- * polls localStorage every second for the verification flag.
- * When found: closes auth, resumes sequence, fires backend scan.
- * No useEffect deps. No event listeners. Just a setInterval.
+ * Polls for email verification by attempting signInWithPassword() every 3 seconds.
+ * Works cross-browser and cross-device — no localStorage or cookie dependency.
+ *
+ * When Supabase returns "Email not confirmed" → keep polling.
+ * When signIn succeeds → session established, fire the scan.
  */
 function AuthGatePoller({
   capturedUrl,
   capturedToken,
   domain,
+  credentialsRef,
   onVerified,
 }: {
   capturedUrl: string;
   capturedToken: string;
   domain: string;
+  credentialsRef: React.RefObject<{ email: string; password: string } | null>;
   onVerified: (scanId: string, domain: string, cached: boolean) => void;
 }) {
   const firedRef = useRef(false);
 
   useEffect(() => {
+    const supabase = createClient();
+
     const interval = setInterval(async () => {
       if (firedRef.current) return;
 
-      const flag = localStorage.getItem(VERIFIED_KEY);
-      if (flag !== 'true') {
-        // Also check cookie (set by confirm route)
-        if (!document.cookie.includes('alphascan_verified=true')) return;
+      const creds = credentialsRef.current;
+      if (!creds) return; // credentials not yet set by auth window
+
+      // Try signing in — if email is confirmed, this returns a session.
+      // If not confirmed, Supabase returns "Email not confirmed" error.
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: creds.email,
+        password: creds.password,
+      });
+
+      if (signInError) {
+        // Not yet verified — keep polling
+        return;
       }
 
+      // Session established — fire the scan
       firedRef.current = true;
       clearInterval(interval);
-
-      // Read session tokens passed from verification tab via localStorage.
-      // Server-side cookies from verifyOtp() may not survive a raw NextResponse(html),
-      // so tokens are explicitly passed through localStorage and set via setSession().
-      const at = localStorage.getItem('alphascan_at') ?? '';
-      const rt = localStorage.getItem('alphascan_rt') ?? '';
-
-      try { localStorage.removeItem(VERIFIED_KEY); } catch { /* */ }
-      try { localStorage.removeItem('alphascan_at'); } catch { /* */ }
-      try { localStorage.removeItem('alphascan_rt'); } catch { /* */ }
-      document.cookie = 'alphascan_verified=; path=/; max-age=0';
-
-      const supabase = createClient();
-      if (at && rt) {
-        // Establish the session from verification tab tokens
-        await supabase.auth.setSession({ access_token: at, refresh_token: rt });
-      } else {
-        // Fallback: try reading session from cookies (may work if cookies were set)
-        await supabase.auth.refreshSession();
-      }
 
       try {
         const res = await fetch('/api/scans', {
@@ -110,17 +105,17 @@ function AuthGatePoller({
           analytics.scanStarted(new URL(capturedUrl).hostname, 'full');
           onVerified(scanId, domain, cached);
         } else {
-          onVerified('', domain, false); // signal failure
+          onVerified('', domain, false);
         }
       } catch {
         onVerified('', domain, false);
       }
-    }, 1000);
+    }, 3000);
 
     return () => clearInterval(interval);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps -- intentionally stable, reads from refs/localStorage
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps -- stable refs, reads from credentialsRef
 
-  return null; // renders nothing
+  return null;
 }
 
 export function ScanOrchestratorProvider({ children }: { children: ReactNode }) {
@@ -129,6 +124,14 @@ export function ScanOrchestratorProvider({ children }: { children: ReactNode }) 
   const [visualSequence, setVisualSequence] = useState<VisualSequence | null>(null);
   const closeWindowRef = useRef(wm.closeWindow);
   closeWindowRef.current = wm.closeWindow;
+
+  // Credentials ref — set by auth window after signUp(), read by AuthGatePoller.
+  // Using a ref (not state) so credentials never appear in React DevTools.
+  const gateCredentialsRef = useRef<{ email: string; password: string } | null>(null);
+
+  const setGateCredentials = useCallback((email: string, password: string) => {
+    gateCredentialsRef.current = { email, password };
+  }, []);
 
   const openScanWindow = useCallback(
     (scanId: string, domain: string) => {
@@ -166,6 +169,7 @@ export function ScanOrchestratorProvider({ children }: { children: ReactNode }) 
   );
 
   const startVisualSequence = useCallback((domain: string, capturedUrl: string, capturedToken: string) => {
+    gateCredentialsRef.current = null; // reset from any previous attempt
     setVisualSequence({ domain, paused: false, capturedUrl, capturedToken });
   }, []);
 
@@ -191,13 +195,12 @@ export function ScanOrchestratorProvider({ children }: { children: ReactNode }) 
 
   // Called by AuthGatePoller when verification detected
   const handleAuthVerified = useCallback((scanId: string, domain: string, cached: boolean) => {
+    gateCredentialsRef.current = null; // clear credentials
     closeWindowRef.current('auth');
     if (scanId) {
-      // Success — transition to real scan with SSE
       setVisualSequence(null);
       setActiveScan({ scanId, domain, isCached: cached });
     } else {
-      // Failed — cancel everything
       setVisualSequence(null);
     }
   }, []);
@@ -211,10 +214,11 @@ export function ScanOrchestratorProvider({ children }: { children: ReactNode }) 
       resumeVisualSequence,
       connectScan,
       cancelVisualSequence,
+      setGateCredentials,
       activeScanId: activeScan?.scanId ?? null,
       isVisualSequenceActive: visualSequence != null,
     }),
-    [startScan, openScanWindow, startVisualSequence, pauseVisualSequence, resumeVisualSequence, connectScan, cancelVisualSequence, activeScan?.scanId, visualSequence],
+    [startScan, openScanWindow, startVisualSequence, pauseVisualSequence, resumeVisualSequence, connectScan, cancelVisualSequence, setGateCredentials, activeScan?.scanId, visualSequence],
   );
 
   return (
@@ -240,13 +244,13 @@ export function ScanOrchestratorProvider({ children }: { children: ReactNode }) 
           paused={visualSequence.paused}
         />
       )}
-      {/* Polls for cross-tab verification — only mounts when sequence is paused */}
       {visualSequence?.paused && (
         <AuthGatePoller
           key="auth-poller"
           capturedUrl={visualSequence.capturedUrl}
           capturedToken={visualSequence.capturedToken}
           domain={visualSequence.domain}
+          credentialsRef={gateCredentialsRef}
           onVerified={handleAuthVerified}
         />
       )}

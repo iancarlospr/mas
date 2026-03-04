@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/auth-context';
 import { useWindowManager, useWindowState } from '@/lib/window-manager';
+import { useScanOrchestrator } from '@/lib/scan-orchestrator';
 import { BevelInput } from '@/components/os/bevel-input';
 import { ResendVerificationButton } from '@/app/(auth)/verify/resend-button';
 import { cn } from '@/lib/utils';
@@ -20,6 +21,7 @@ type AuthTab = 'sign-in' | 'register' | 'magic-link-sent' | 'verify-email';
 export default function AuthWindow() {
   const { isAuthenticated } = useAuth();
   const wm = useWindowManager();
+  const orchestrator = useScanOrchestrator();
   const winState = useWindowState('auth');
   const openData = winState?.openData;
 
@@ -69,6 +71,11 @@ export default function AuthWindow() {
           },
         });
         if (err) throw err;
+        // Pass credentials to AuthGatePoller so it can poll via signInWithPassword().
+        // Works even if verification happens on a different device/browser.
+        if (isScanGate) {
+          orchestrator.setGateCredentials(email, password);
+        }
         setTab('verify-email');
       } else {
         const { error: err } = await supabase.auth.signInWithPassword({ email, password });
