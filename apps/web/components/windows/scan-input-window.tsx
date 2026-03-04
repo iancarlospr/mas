@@ -162,7 +162,7 @@ export default function ScanInputWindow() {
       <div style={{ height: '120px' }} />
 
       {/* Nudge CTA + Arrow */}
-      <div className="flex flex-col items-center select-none" style={{ marginBottom: '8px' }}>
+      <div className="flex flex-col items-center select-none" style={{ marginBottom: '16px' }}>
         <p
           className="font-data"
           style={{
