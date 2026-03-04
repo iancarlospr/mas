@@ -91,7 +91,7 @@ export function HeroScanFlow() {
       const res = await fetch('/api/scans', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: capturedUrl, turnstileToken: capturedToken }),
+        body: JSON.stringify({ url: capturedUrl, turnstileToken: capturedToken, autoScan: true }),
       });
 
       if (res.ok) {
