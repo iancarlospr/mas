@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { cn } from '@/lib/utils';
 import { soundEffects } from '@/lib/sound-effects';
@@ -64,6 +64,8 @@ interface ScanSequenceProps {
   userName?: string;
   /** Pause the sequence (freezes all phase timers) — used for auth gate */
   paused?: boolean;
+  /** Overlay content rendered on top of the frozen sequence (e.g., auth form) */
+  overlay?: ReactNode;
 }
 
 /** Channel rotation for Phase 2 — same sequence as chill.mov TV */
@@ -114,6 +116,7 @@ export function ScanSequence({
   onComplete,
   userName = 'operative',
   paused = false,
+  overlay,
 }: ScanSequenceProps) {
   /* ── State ───────────────────────────────────────────────── */
   const [currentPhase, setCurrentPhase] = useState<AnimationPhase>(0);
@@ -235,7 +238,7 @@ export function ScanSequence({
   if (typeof document === 'undefined') return null;
 
   return createPortal(
-    <div className={`fixed inset-0 bg-gs-ink overflow-hidden ${paused ? 'z-[5]' : 'z-[10000]'}`}>
+    <div className="fixed inset-0 z-[10000] bg-gs-ink overflow-hidden">
       {/* ── Phase 0: Matrix Intro ────────────────────────── */}
       {currentPhase === 0 && (
         <div className="absolute inset-0 flex items-center justify-center">
@@ -317,6 +320,13 @@ export function ScanSequence({
           }}
         />
       </div>
+
+      {/* Auth gate overlay — rendered on top of frozen sequence */}
+      {overlay && paused && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center">
+          {overlay}
+        </div>
+      )}
     </div>,
     document.body,
   );

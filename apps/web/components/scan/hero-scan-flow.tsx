@@ -5,6 +5,8 @@ import { createClient } from '@/lib/supabase/client';
 import { normalizeUrl } from '@/lib/utils';
 import { ScanInput } from '@/components/scan/scan-input';
 import { PendingVerificationCard } from '@/components/scan/pending-verification-card';
+import { AuthForm } from '@/components/auth/auth-form';
+import { Window } from '@/components/os/window';
 import { useScanOrchestrator } from '@/lib/scan-orchestrator';
 import { useWindowManager } from '@/lib/window-manager';
 import { useAuth } from '@/lib/auth-context';
@@ -89,8 +91,7 @@ export function HeroScanFlow() {
     const supabase = createClient();
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session?.user && capturedUrl) {
-        // User just registered/logged in — close auth window, resume sequence, fire backend
-        wm.closeWindow('auth');
+        // User just registered/logged in — resume sequence (removes overlay), fire backend
         orchestrator.resumeVisualSequence();
 
         try {
@@ -217,10 +218,13 @@ export function HeroScanFlow() {
         orchestrator.startVisualSequence(domain);
         analytics.signupWallShown(domain);
 
-        // After 2 seconds: pause sequence and show auth window
+        // After 2 seconds: pause sequence and show auth form as overlay
         setTimeout(() => {
-          orchestrator.pauseVisualSequence();
-          wm.openWindow('auth');
+          orchestrator.pauseVisualSequence(
+            <Window id="auth-gate" title="auth.exe" variant="dialog" className="w-[440px]" isActive>
+              <AuthForm mode="register" />
+            </Window>
+          );
           setState('waiting-auth');
         }, 2000);
       }

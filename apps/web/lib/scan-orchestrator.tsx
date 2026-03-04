@@ -36,6 +36,7 @@ interface ActiveScan {
 interface VisualSequence {
   domain: string;
   paused: boolean;
+  overlay: ReactNode | null;
 }
 
 interface ScanOrchestratorValue {
@@ -45,9 +46,9 @@ interface ScanOrchestratorValue {
   openScanWindow(scanId: string, domain: string): void;
   /** Start the Hollywood Hack visuals ONLY — no backend. For unauth users. */
   startVisualSequence(domain: string): void;
-  /** Pause the visual-only sequence (for auth gate overlay) */
-  pauseVisualSequence(): void;
-  /** Resume the visual-only sequence (auth completed) */
+  /** Pause the visual-only sequence and show overlay (for auth gate) */
+  pauseVisualSequence(overlay: ReactNode): void;
+  /** Resume the visual-only sequence (auth completed, overlay removed) */
   resumeVisualSequence(): void;
   /** Stop the visual-only sequence and transition to real scan */
   connectScan(scanId: string, domain: string, isCached?: boolean): void;
@@ -109,15 +110,15 @@ export function ScanOrchestratorProvider({ children }: { children: ReactNode }) 
 
   // Visual-only sequence (no backend)
   const startVisualSequence = useCallback((domain: string) => {
-    setVisualSequence({ domain, paused: false });
+    setVisualSequence({ domain, paused: false, overlay: null });
   }, []);
 
-  const pauseVisualSequence = useCallback(() => {
-    setVisualSequence((prev) => prev ? { ...prev, paused: true } : null);
+  const pauseVisualSequence = useCallback((overlay: ReactNode) => {
+    setVisualSequence((prev) => prev ? { ...prev, paused: true, overlay } : null);
   }, []);
 
   const resumeVisualSequence = useCallback(() => {
-    setVisualSequence((prev) => prev ? { ...prev, paused: false } : null);
+    setVisualSequence((prev) => prev ? { ...prev, paused: false, overlay: null } : null);
   }, []);
 
   // Transition from visual-only to real scan (user just registered)
@@ -171,6 +172,7 @@ export function ScanOrchestratorProvider({ children }: { children: ReactNode }) 
           completedModules={[]}
           onComplete={() => {/* visual-only never completes on its own */}}
           paused={visualSequence.paused}
+          overlay={visualSequence.overlay}
         />
       )}
     </ScanOrchestratorContext.Provider>
