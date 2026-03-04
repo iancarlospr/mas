@@ -231,7 +231,7 @@ export function ScanInput({
 
   /* ── Dialog variant (content only — outer window provided by ManagedWindow) ── */
   return (
-    <form onSubmit={handleSubmit} className={cn('p-gs-4 space-y-gs-3', className)}>
+    <form onSubmit={handleSubmit} className={cn('px-gs-4 pb-gs-4 pt-gs-1 space-y-gs-3', className)}>
       <style>{`
         @keyframes border-sweep {
           0% { background-position: 0% 50%; }
