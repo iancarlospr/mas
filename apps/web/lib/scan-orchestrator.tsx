@@ -78,8 +78,12 @@ function AuthGatePoller({
       firedRef.current = true;
       clearInterval(interval);
       try { localStorage.removeItem(VERIFIED_KEY); } catch { /* */ }
-      // Clear cookie too
       document.cookie = 'alphascan_verified=; path=/; max-age=0';
+
+      // Pick up the session from the verification tab — cookies are shared
+      // but the browser Supabase client caches "no session" in memory.
+      const supabase = createClient();
+      await supabase.auth.refreshSession();
 
       try {
         const res = await fetch('/api/scans', {
