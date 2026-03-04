@@ -47,12 +47,17 @@ interface ScanOrchestratorValue {
 const ScanOrchestratorContext = createContext<ScanOrchestratorValue | null>(null);
 
 /**
- * Polls for email verification by attempting signInWithPassword() every 3 seconds.
+ * Polls for email verification by attempting signInWithPassword() every 5 seconds.
  * Works cross-browser and cross-device — no localStorage or cookie dependency.
  *
- * When Supabase returns "Email not confirmed" → keep polling.
- * When signIn succeeds → session established, fire the scan.
+ * Security hardening:
+ * - 5s interval (not 3s) — gentler on Supabase auth rate limits
+ * - Max 60 attempts (5 min timeout) — prevents indefinite polling
+ * - Credentials cleared from ref immediately after success or timeout
  */
+const POLL_INTERVAL_MS = 5000;
+const MAX_POLL_ATTEMPTS = 60; // 60 × 5s = 5 minutes
+
 function AuthGatePoller({
   capturedUrl,
   capturedToken,
@@ -63,19 +68,31 @@ function AuthGatePoller({
   capturedUrl: string;
   capturedToken: string;
   domain: string;
-  credentialsRef: React.RefObject<{ email: string; password: string } | null>;
+  credentialsRef: React.MutableRefObject<{ email: string; password: string } | null>;
   onVerified: (scanId: string, domain: string, cached: boolean) => void;
 }) {
   const firedRef = useRef(false);
 
   useEffect(() => {
     const supabase = createClient();
+    let attempts = 0;
 
     const interval = setInterval(async () => {
       if (firedRef.current) return;
 
       const creds = credentialsRef.current;
       if (!creds) return; // credentials not yet set by auth window
+
+      attempts++;
+
+      // Timeout: stop polling after MAX_POLL_ATTEMPTS
+      if (attempts > MAX_POLL_ATTEMPTS) {
+        firedRef.current = true;
+        clearInterval(interval);
+        credentialsRef.current = null;
+        onVerified('', domain, false);
+        return;
+      }
 
       // Try signing in — if email is confirmed, this returns a session.
       // If not confirmed, Supabase returns "Email not confirmed" error.
@@ -89,9 +106,10 @@ function AuthGatePoller({
         return;
       }
 
-      // Session established — fire the scan
+      // Session established — clear credentials immediately, fire the scan
       firedRef.current = true;
       clearInterval(interval);
+      credentialsRef.current = null;
 
       try {
         const res = await fetch('/api/scans', {
@@ -110,9 +128,12 @@ function AuthGatePoller({
       } catch {
         onVerified('', domain, false);
       }
-    }, 3000);
+    }, POLL_INTERVAL_MS);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      credentialsRef.current = null; // clear on unmount too
+    };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps -- stable refs, reads from credentialsRef
 
   return null;
