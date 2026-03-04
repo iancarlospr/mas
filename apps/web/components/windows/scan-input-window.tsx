@@ -80,47 +80,32 @@ function CreditIndicator() {
 
   const hasCredits = remaining > 0;
 
-  const pill = (
-    <div className="inline-flex items-stretch rounded-full overflow-hidden" style={{ border: '1px solid rgba(255,178,239,0.2)' }}>
-      {/* ⚡ corner — bright electric yellow */}
-      <div
-        className="flex items-center justify-center"
-        style={{
-          background: 'rgba(0, 200, 255, 0.12)',
-          borderRight: '1px solid rgba(255,178,239,0.2)',
-          padding: '3px 8px',
-        }}
-      >
-        <span style={{ fontSize: '13px', filter: 'drop-shadow(0 0 3px rgba(0,200,255,0.5))' }}>⚡</span>
-      </div>
-      {/* Text portion — pink tinted */}
-      <div
-        className="font-data flex items-center"
-        style={{
-          fontSize: '12px',
-          padding: '3px 10px',
-          background: 'rgba(255,178,239,0.08)',
-          color: 'var(--gs-mid)',
-        }}
-      >
-        {hasCredits ? (
-          <span><span style={{ color: 'var(--gs-base)', fontWeight: 600 }}>{remaining}</span> scan{remaining !== 1 ? 's' : ''} remaining</span>
-        ) : (
-          <span>0 remaining — <span style={{ color: 'var(--gs-base)', fontWeight: 600 }}>Upgrade</span></span>
-        )}
-      </div>
-    </div>
+  const content = hasCredits ? (
+    <span><span style={{ color: 'var(--gs-base)', fontWeight: 600 }}>{remaining}</span> scan{remaining !== 1 ? 's' : ''} remaining</span>
+  ) : (
+    <span>0 scans remaining — <span style={{ color: 'var(--gs-base)', fontWeight: 600 }}>Upgrade</span></span>
   );
 
+  const pillClass = "font-data inline-flex items-center rounded-full";
+  const pillStyle = {
+    fontSize: '11px',
+    padding: '3px 10px',
+    background: 'rgba(255,178,239,0.08)',
+    border: '1px solid rgba(255,178,239,0.15)',
+    color: 'var(--gs-mid)',
+  };
+
   return (
-    <div className="flex justify-center select-none" style={{ marginBottom: '4px' }}>
-      {hasCredits ? pill : (
+    <div className="flex justify-center select-none" style={{ marginBottom: '2px' }}>
+      {hasCredits ? (
+        <div className={pillClass} style={pillStyle}>{content}</div>
+      ) : (
         <button
           onClick={() => wm.openWindow('pricing')}
-          className="transition-opacity hover:opacity-80"
-          style={{ cursor: 'pointer' }}
+          className={`${pillClass} transition-opacity hover:opacity-80`}
+          style={{ ...pillStyle, cursor: 'pointer' }}
         >
-          {pill}
+          {content}
         </button>
       )}
     </div>
@@ -177,7 +162,7 @@ export default function ScanInputWindow() {
       <div style={{ height: '120px' }} />
 
       {/* Nudge CTA + Arrow */}
-      <div className="flex flex-col items-center select-none" style={{ marginBottom: '8px' }}>
+      <div className="flex flex-col items-center select-none" style={{ marginBottom: '20px' }}>
         <p
           className="font-data"
           style={{
