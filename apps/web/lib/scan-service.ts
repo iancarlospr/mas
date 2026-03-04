@@ -77,15 +77,15 @@ export async function createScan(opts: CreateScanOpts): Promise<CreateScanResult
   }
 
   if (!usedCredit) {
-    // No credits available — check if user has already used their 1 free scan
-    const { count: realScanCount } = await supabase
+    // No credits available — check if user has already used their 1 free scan.
+    // Count ALL scans (including cached) — a cached scan still delivers results.
+    const { count: scanCount } = await supabase
       .from('scans')
       .select('id', { count: 'exact', head: true })
       .eq('user_id', userId)
-      .is('cache_source', null)
       .in('status', ['queued', 'complete', 'passive', 'browser', 'ghostscan', 'external', 'synthesis']);
 
-    if ((realScanCount ?? 0) > 0) {
+    if ((scanCount ?? 0) > 0) {
       // Already used free scan, no credits remaining
       throw new ScanError(
         'You\'ve used your free scan. Purchase Alpha Brief to unlock full scans.',
