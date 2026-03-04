@@ -221,7 +221,7 @@ export function HeroScanFlow() {
         // After 2 seconds: pause sequence and show auth form as overlay
         setTimeout(() => {
           orchestrator.pauseVisualSequence(
-            <Window id="auth-gate" title="auth.exe" variant="dialog" className="w-[440px]" isActive>
+            <Window id="auth-gate" title="auth.exe" variant="dialog" width={440} height={480} isActive>
               <AuthForm mode="register" />
             </Window>
           );
