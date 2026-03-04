@@ -30,6 +30,12 @@ interface VisualSequence {
   capturedToken: string;
 }
 
+interface GateIdentity {
+  userId: string;
+  email: string;
+  password: string;
+}
+
 interface ScanOrchestratorValue {
   startScan(scanId: string, domain: string, isCached?: boolean): void;
   openScanWindow(scanId: string, domain: string): void;
@@ -38,8 +44,8 @@ interface ScanOrchestratorValue {
   resumeVisualSequence(): void;
   connectScan(scanId: string, domain: string, isCached?: boolean): void;
   cancelVisualSequence(): void;
-  /** Called by auth window after signUp() to pass credentials for server-side polling */
-  setGateCredentials(email: string, password: string): void;
+  /** Called by auth window after signUp() to pass identity for verification polling */
+  setGateIdentity(userId: string, email: string, password: string): void;
   activeScanId: string | null;
   isVisualSequenceActive: boolean;
 }
@@ -47,13 +53,18 @@ interface ScanOrchestratorValue {
 const ScanOrchestratorContext = createContext<ScanOrchestratorValue | null>(null);
 
 /**
- * Polls for email verification by attempting signInWithPassword() every 5 seconds.
- * Works cross-browser and cross-device — no localStorage or cookie dependency.
+ * Polls GET /api/auth/check-verified?userId=<uuid> every 5 seconds to detect
+ * email verification. Works cross-browser and cross-device.
  *
- * Security hardening:
- * - 5s interval (not 3s) — gentler on Supabase auth rate limits
- * - Max 60 attempts (5 min timeout) — prevents indefinite polling
- * - Credentials cleared from ref immediately after success or timeout
+ * When confirmed: signs in with stored credentials to establish a session,
+ * then fires the scan. Credentials held only in a ref (not state/localStorage),
+ * cleared immediately after use.
+ *
+ * Security:
+ * - Polls a read-only endpoint (no auth attempt logs in Supabase)
+ * - No passwords sent over the wire during polling — only userId (UUID)
+ * - Max 60 attempts (5 min timeout) prevents indefinite polling
+ * - Credentials cleared from ref on success, timeout, or unmount
  */
 const POLL_INTERVAL_MS = 5000;
 const MAX_POLL_ATTEMPTS = 60; // 60 × 5s = 5 minutes
@@ -62,54 +73,61 @@ function AuthGatePoller({
   capturedUrl,
   capturedToken,
   domain,
-  credentialsRef,
+  identityRef,
   onVerified,
 }: {
   capturedUrl: string;
   capturedToken: string;
   domain: string;
-  credentialsRef: React.MutableRefObject<{ email: string; password: string } | null>;
+  identityRef: React.MutableRefObject<GateIdentity | null>;
   onVerified: (scanId: string, domain: string, cached: boolean) => void;
 }) {
   const firedRef = useRef(false);
 
   useEffect(() => {
-    const supabase = createClient();
     let attempts = 0;
 
     const interval = setInterval(async () => {
       if (firedRef.current) return;
 
-      const creds = credentialsRef.current;
-      if (!creds) return; // credentials not yet set by auth window
+      const identity = identityRef.current;
+      if (!identity) return; // identity not yet set by auth window
 
       attempts++;
 
-      // Timeout: stop polling after MAX_POLL_ATTEMPTS
       if (attempts > MAX_POLL_ATTEMPTS) {
         firedRef.current = true;
         clearInterval(interval);
-        credentialsRef.current = null;
+        identityRef.current = null;
         onVerified('', domain, false);
         return;
       }
 
-      // Try signing in — if email is confirmed, this returns a session.
-      // If not confirmed, Supabase returns "Email not confirmed" error.
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email: creds.email,
-        password: creds.password,
-      });
-
-      if (signInError) {
-        // Not yet verified — keep polling
-        return;
+      // Lightweight check — no auth attempt, no Supabase rate limit concern
+      try {
+        const res = await fetch(`/api/auth/check-verified?userId=${identity.userId}`);
+        if (!res.ok) return;
+        const { confirmed } = await res.json();
+        if (!confirmed) return;
+      } catch {
+        return; // network error — retry next interval
       }
 
-      // Session established — clear credentials immediately, fire the scan
+      // Email confirmed — sign in to establish session, then fire scan
       firedRef.current = true;
       clearInterval(interval);
-      credentialsRef.current = null;
+
+      const supabase = createClient();
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: identity.email,
+        password: identity.password,
+      });
+      identityRef.current = null; // clear credentials immediately
+
+      if (signInError) {
+        onVerified('', domain, false);
+        return;
+      }
 
       try {
         const res = await fetch('/api/scans', {
@@ -132,9 +150,9 @@ function AuthGatePoller({
 
     return () => {
       clearInterval(interval);
-      credentialsRef.current = null; // clear on unmount too
+      identityRef.current = null;
     };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps -- stable refs, reads from credentialsRef
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps -- stable refs
 
   return null;
 }
@@ -146,12 +164,12 @@ export function ScanOrchestratorProvider({ children }: { children: ReactNode }) 
   const closeWindowRef = useRef(wm.closeWindow);
   closeWindowRef.current = wm.closeWindow;
 
-  // Credentials ref — set by auth window after signUp(), read by AuthGatePoller.
+  // Identity ref — userId for polling, email+password for one-time signIn after confirmation.
   // Using a ref (not state) so credentials never appear in React DevTools.
-  const gateCredentialsRef = useRef<{ email: string; password: string } | null>(null);
+  const gateIdentityRef = useRef<GateIdentity | null>(null);
 
-  const setGateCredentials = useCallback((email: string, password: string) => {
-    gateCredentialsRef.current = { email, password };
+  const setGateIdentity = useCallback((userId: string, email: string, password: string) => {
+    gateIdentityRef.current = { userId, email, password };
   }, []);
 
   const openScanWindow = useCallback(
@@ -190,7 +208,7 @@ export function ScanOrchestratorProvider({ children }: { children: ReactNode }) 
   );
 
   const startVisualSequence = useCallback((domain: string, capturedUrl: string, capturedToken: string) => {
-    gateCredentialsRef.current = null; // reset from any previous attempt
+    gateIdentityRef.current = null;
     setVisualSequence({ domain, paused: false, capturedUrl, capturedToken });
   }, []);
 
@@ -214,9 +232,8 @@ export function ScanOrchestratorProvider({ children }: { children: ReactNode }) 
     setVisualSequence(null);
   }, []);
 
-  // Called by AuthGatePoller when verification detected
   const handleAuthVerified = useCallback((scanId: string, domain: string, cached: boolean) => {
-    gateCredentialsRef.current = null; // clear credentials
+    gateIdentityRef.current = null;
     closeWindowRef.current('auth');
     if (scanId) {
       setVisualSequence(null);
@@ -235,11 +252,11 @@ export function ScanOrchestratorProvider({ children }: { children: ReactNode }) 
       resumeVisualSequence,
       connectScan,
       cancelVisualSequence,
-      setGateCredentials,
+      setGateIdentity,
       activeScanId: activeScan?.scanId ?? null,
       isVisualSequenceActive: visualSequence != null,
     }),
-    [startScan, openScanWindow, startVisualSequence, pauseVisualSequence, resumeVisualSequence, connectScan, cancelVisualSequence, setGateCredentials, activeScan?.scanId, visualSequence],
+    [startScan, openScanWindow, startVisualSequence, pauseVisualSequence, resumeVisualSequence, connectScan, cancelVisualSequence, setGateIdentity, activeScan?.scanId, visualSequence],
   );
 
   return (
@@ -271,7 +288,7 @@ export function ScanOrchestratorProvider({ children }: { children: ReactNode }) 
           capturedUrl={visualSequence.capturedUrl}
           capturedToken={visualSequence.capturedToken}
           domain={visualSequence.domain}
-          credentialsRef={gateCredentialsRef}
+          identityRef={gateIdentityRef}
           onVerified={handleAuthVerified}
         />
       )}

@@ -62,7 +62,7 @@ export default function AuthWindow() {
 
     try {
       if (tab === 'register') {
-        const { error: err } = await supabase.auth.signUp({
+        const { data, error: err } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -71,10 +71,11 @@ export default function AuthWindow() {
           },
         });
         if (err) throw err;
-        // Pass credentials to AuthGatePoller so it can poll via signInWithPassword().
-        // Works even if verification happens on a different device/browser.
-        if (isScanGate) {
-          orchestrator.setGateCredentials(email, password);
+        // Pass userId + credentials to AuthGatePoller.
+        // Poller checks /api/auth/check-verified?userId=<uuid> (no auth logs).
+        // On confirmation, signs in once with credentials to establish session.
+        if (isScanGate && data.user) {
+          orchestrator.setGateIdentity(data.user.id, email, password);
         }
         setTab('verify-email');
       } else {
