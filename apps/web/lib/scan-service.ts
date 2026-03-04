@@ -127,6 +127,17 @@ export async function createScan(opts: CreateScanOpts): Promise<CreateScanResult
       .select('id')
       .single();
 
+    // Audit log — uses service client (audit_log is service-role only)
+    service.from('audit_log').insert({
+      user_id: userId,
+      action: 'scan_created',
+      resource: newScan?.id ?? cached.id,
+      ip_address: ip,
+      metadata: { url, domain, tier, cached: true, usedCredit },
+    }).then(({ error: auditErr }) => {
+      if (auditErr) console.error('[scan-service] Audit log failed:', auditErr);
+    });
+
     return { scanId: newScan?.id ?? cached.id, cached: true };
   }
 
@@ -172,8 +183,8 @@ export async function createScan(opts: CreateScanOpts): Promise<CreateScanResult
     throw new ScanError('Scan engine unavailable', 503);
   }
 
-  // ---------- Audit log (fire-and-forget) ----------
-  supabase.from('audit_log').insert({
+  // ---------- Audit log (fire-and-forget, service client — audit_log is service-role only) ----------
+  service.from('audit_log').insert({
     user_id: userId,
     action: 'scan_created',
     resource: scan.id,
