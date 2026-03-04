@@ -220,7 +220,7 @@ export function HeroScanFlow() {
         // After 2 seconds: pause sequence and open auth window (portaled above sequence)
         setTimeout(() => {
           orchestrator.pauseVisualSequence();
-          wm.openWindow('auth');
+          wm.openWindow('auth', { tab: 'register' });
           setState('waiting-auth');
         }, 2000);
       }
