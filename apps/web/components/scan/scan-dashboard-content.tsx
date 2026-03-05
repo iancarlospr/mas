@@ -4,7 +4,12 @@ import { useRef, useState, useMemo, useCallback } from 'react';
 import type { ScanWithResults, ModuleResult } from '@marketing-alpha/types';
 import { useWindowManager } from '@/lib/window-manager';
 import { CATEGORY_META, MODULE_NAMES, FREE_CATEGORIES } from './slide-sidebar';
-import { OverviewSlide } from './overview-slide';
+import { TitleSlide } from './slides/title-slide';
+import { VerdictSlide } from './slides/verdict-slide';
+import { OverviewExecSlide } from './slides/overview-exec-slide';
+import { FindingsSlide } from './slides/findings-slide';
+import { CategoryIntroSlide } from './slides/category-intro-slide';
+import { M01Slide } from './slides/m01-slide';
 import { ModuleSlide } from './module-slide';
 import { PaidSlides } from './paid-slides';
 import { cn } from '@/lib/utils';
@@ -175,8 +180,13 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
       </div>
 
       {/* Scrollable Module Content */}
-      <div ref={contentRef} className="flex-1 p-gs-4 space-y-gs-3 overflow-y-auto">
-        {!activeCategory && <OverviewSlide scan={scan} />}
+      <div ref={contentRef} className="flex-1 p-gs-4 space-y-gs-3 overflow-y-auto" style={{ background: '#ffffff' }}>
+        {!activeCategory && <TitleSlide scan={scan} />}
+        {!activeCategory && <VerdictSlide scan={scan} />}
+        {!activeCategory && <OverviewExecSlide scan={scan} />}
+        {!activeCategory && <FindingsSlide scan={scan} />}
+        {!activeCategory && <CategoryIntroSlide scan={scan} category="security_compliance" />}
+        {!activeCategory && <M01Slide scan={scan} />}
 
         {/* Locked category placeholder */}
         {isActiveCategoryLocked && (
