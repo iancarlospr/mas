@@ -135,7 +135,7 @@ export function TitleSlide({ scan }: TitleSlideProps) {
         {/* -- LEFT PANEL (3/5) -- */}
         <div
           className="flex flex-col"
-          style={{ width: '58%', padding: '5% 4% 4% 5%' }}
+          style={{ width: '58%', padding: '1.5% 3% 1.5% 3.5%' }}
         >
           {/* Top: Brand + subtitle tight together */}
           <div>
@@ -227,7 +227,7 @@ export function TitleSlide({ scan }: TitleSlideProps) {
         {/* -- RIGHT PANEL (2/5) -- */}
         <div
           className="flex items-center justify-center"
-          style={{ width: '42%', padding: '3%', overflow: 'visible' }}
+          style={{ width: '42%', padding: '1.5% 3.5% 1.5% 2%', overflow: 'visible' }}
         >
           <ScoreVisual
             score={score}

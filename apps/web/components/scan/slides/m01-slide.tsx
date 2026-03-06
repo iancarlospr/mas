@@ -103,7 +103,7 @@ export function M01Slide({ scan }: { scan: ScanWithResults }) {
       className="slide-card relative overflow-hidden select-none"
       style={{ aspectRatio: '14 / 8.5', background: 'var(--gs-void)', borderRadius: '2px', containerType: 'inline-size' }}
     >
-      <div className="relative z-10 h-full flex flex-col overflow-hidden" style={{ padding: '3% 4.5% 2%' }}>
+      <div className="relative z-10 h-full flex flex-col overflow-hidden" style={{ padding: '1.5% 3.5% 1%' }}>
 
         {/* ═══ Module bar ═══ */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.15em', flexShrink: 0 }}>

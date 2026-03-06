@@ -1,14 +1,14 @@
 import { Worker, type Job } from 'bullmq';
 import { getRedisConnection } from './connection.js';
 import { SCAN_QUEUE_NAME, type ScanJobData, type ScanJobResult } from './scan-queue.js';
-import type { ModuleResult } from '@marketing-alpha/types';
+import type { ModuleId, ModuleResult } from '@marketing-alpha/types';
 import { ModuleRunner } from '../modules/runner.js';
 import {
   updateScanStatus,
   updateScanMarketingIQ,
   getModuleResults,
 } from '../services/supabase.js';
-import { calculateMarketingIQ } from '../utils/scoring.js';
+import { calculateMarketingIQFromSynthesis } from '../utils/scoring.js';
 import { clearTrafficCache } from '../services/dataforseo.js';
 import pino from 'pino';
 
@@ -57,11 +57,12 @@ async function processScanJob(
       modulesFailed = fullResult.modulesFailed;
     }
 
-    // Calculate MarketingIQ from all module results (skip for free tier — only 3 modules, score meaningless)
+    // Calculate MarketingIQ from M41 AI synthesis scores (all tiers — M41 runs for everyone)
     let marketingIqScore: number | null = null;
-    if (tier === 'paid') {
-      const moduleResults = Array.from(results.values());
-      const marketingIqResult = calculateMarketingIQ(moduleResults);
+    const m41Result = results.get('M41' as ModuleId);
+    if (m41Result?.status === 'success' && m41Result.data) {
+      const m41Data = m41Result.data as unknown as import('@marketing-alpha/types').M41Data;
+      const marketingIqResult = calculateMarketingIQFromSynthesis(m41Data);
       marketingIqScore = marketingIqResult.final;
 
       try {

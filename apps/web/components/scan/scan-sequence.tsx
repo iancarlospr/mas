@@ -95,7 +95,7 @@ function ScanMovieRotation() {
 
 /** Matrix intro text lines (Phase 0) — typed out one at a time */
 const INTRO_LINES = [
-  '> hello, {userName}',
+  '> hello',
   '> knock knock...',
   '> follow the white ghost',
   '> initiating GhostScan™ protocol...',

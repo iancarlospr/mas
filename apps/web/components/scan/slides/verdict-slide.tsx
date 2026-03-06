@@ -81,7 +81,7 @@ export function VerdictSlide({ scan }: VerdictSlideProps) {
       {/* Layer 4: Content */}
       <div
         className="absolute inset-0 flex flex-col items-center justify-center text-center"
-        style={{ zIndex: 4, padding: '8% 12%' }}
+        style={{ zIndex: 4, padding: '2% 8%' }}
       >
         {/* Overline */}
         <p

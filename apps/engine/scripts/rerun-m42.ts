@@ -98,7 +98,16 @@ async function main() {
   }
 
   const synthesis = (result.data as any).synthesis;
-  console.log('\n=== verdict_headline ===');
+
+  // SAFETY: abort if AI failed and returned fallback
+  if (!synthesis?.executive_brief || synthesis.executive_brief.includes('could not be generated')) {
+    console.error('AI synthesis failed (got fallback). NOT overwriting DB.');
+    process.exit(1);
+  }
+
+  console.log('\n=== synthesis_headline ===');
+  console.log(synthesis.synthesis_headline);
+  console.log('\n=== verdict_headline (Galloway) ===');
   console.log(synthesis.verdict_headline);
   console.log('\n=== executive_brief (first 300 chars) ===');
   console.log(synthesis.executive_brief?.slice(0, 300));

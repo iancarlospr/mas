@@ -124,7 +124,7 @@ export function FindingsSlide({ scan }: FindingsSlideProps) {
         <div
           style={{
             flex: '1 1 0',
-            padding: '4.5% 5% 3%',
+            padding: '1.5% 3.5% 1%',
             display: 'flex',
             gap: '4%',
             alignItems: 'flex-start',
@@ -220,7 +220,7 @@ export function FindingsSlide({ scan }: FindingsSlideProps) {
                 key={i}
                 style={{
                   flex: 1,
-                  padding: '3% 4%',
+                  padding: '1.5% 3.5%',
                   borderRight: i === 0 ? '1px solid rgba(255,178,239,0.06)' : 'none',
                 }}
               >
@@ -292,7 +292,7 @@ export function FindingsSlide({ scan }: FindingsSlideProps) {
         {competitiveContext && (
           <div
             style={{
-              padding: '2% 5%',
+              padding: '1% 3.5%',
               borderTop: '1px solid rgba(255,178,239,0.06)',
               background: 'rgba(255,178,239,0.015)',
             }}

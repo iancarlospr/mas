@@ -64,7 +64,7 @@ export function CategoryIntroSlide({ scan, category }: CategoryIntroSlideProps) 
     >
       <div
         className="relative z-10 h-full flex flex-col"
-        style={{ padding: '5% 5%', width: '55%' }}
+        style={{ padding: '1.5% 3.5%', width: '55%' }}
       >
         {/* Overline */}
         <p
