@@ -301,7 +301,9 @@ function isRetryableError(error: Error): boolean {
     message.includes('econnreset') ||
     message.includes('etimedout') ||
     message.includes('econnrefused') ||
-    message.includes('fetch failed')
+    message.includes('fetch failed') ||
+    message.includes('not valid json') ||
+    message.includes('unexpected end of json')
   );
 }
 
