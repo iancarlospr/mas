@@ -110,6 +110,7 @@ export function ScanProgress({
   const [marketingIq, setMarketingIq] = useState<number | undefined>();
   const [sequenceComplete, setSequenceComplete] = useState(false);
   const eventSourceRef = useRef<EventSource | null>(null);
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   /* ── SSE connection (unchanged logic from original) ──────── */
   useEffect(() => {
@@ -164,10 +165,35 @@ export function ScanProgress({
 
     es.onerror = () => {
       es.close();
+      eventSourceRef.current = null;
+      // SSE dropped — start HTTP polling fallback
+      pollRef.current = setInterval(async () => {
+        try {
+          const res = await fetch(`/api/scans/${scanId}`);
+          if (!res.ok) return;
+          const scan = await res.json();
+          if (scan.status === 'complete') {
+            if (pollRef.current) clearInterval(pollRef.current);
+            setStatus('complete');
+            setProgress(100);
+            if (scan.marketingIq != null) setMarketingIq(scan.marketingIq);
+            soundEffects.play('scanComplete');
+          } else if (scan.status === 'failed' || scan.status === 'cancelled') {
+            if (pollRef.current) clearInterval(pollRef.current);
+            setError(scan.error ?? 'Scan failed');
+          } else {
+            if (scan.progress != null) setProgress(scan.progress);
+            if (scan.status) setStatus(scan.status);
+          }
+        } catch {
+          // Network error — keep polling
+        }
+      }, 3000);
     };
 
     return () => {
       es.close();
+      if (pollRef.current) clearInterval(pollRef.current);
     };
   }, [scanId]);
 
