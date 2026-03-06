@@ -9,6 +9,7 @@
 import type { Page } from 'patchright';
 import type { NetworkCollector, CapturedRequest, CapturedResponse } from './network.js';
 import { getRegistrableDomain } from './url.js';
+import { lookupToolByDomain } from '../data/tool-registry.js';
 
 // ---------------------------------------------------------------------------
 // Exported types
@@ -136,31 +137,9 @@ function classifyDomain(domain: string): ProfileCategory {
 // Domain -> tool name mapping
 // ---------------------------------------------------------------------------
 
-const TOOL_NAME_PATTERNS: Array<{ pattern: RegExp; tool: string }> = [
-  { pattern: /google-analytics\.com|analytics\.google\.com/, tool: 'Google Analytics' },
-  { pattern: /googletagmanager\.com/, tool: 'Google Tag Manager' },
-  { pattern: /segment\.(io|com)|cdn\.segment\.com/, tool: 'Segment' },
-  { pattern: /amplitude\.com/, tool: 'Amplitude' },
-  { pattern: /mixpanel\.com/, tool: 'Mixpanel' },
-  { pattern: /hotjar\.com/, tool: 'Hotjar' },
-  { pattern: /clarity\.ms/, tool: 'Microsoft Clarity' },
-  { pattern: /fullstory\.com/, tool: 'FullStory' },
-  { pattern: /doubleclick\.net|googlesyndication\.com|googleadservices\.com/, tool: 'Google Ads' },
-  { pattern: /connect\.facebook\.net|facebook\.net/, tool: 'Meta' },
-  { pattern: /hubspot\.com|hs-analytics\.net|hs-scripts\.com/, tool: 'HubSpot' },
-  { pattern: /intercom\.io|intercomcdn\.com/, tool: 'Intercom' },
-  { pattern: /drift\.com/, tool: 'Drift' },
-  { pattern: /crisp\.chat/, tool: 'Crisp' },
-  { pattern: /cdn\.cookielaw\.org/, tool: 'OneTrust' },
-  { pattern: /fonts\.googleapis\.com|fonts\.gstatic\.com/, tool: 'Google Fonts' },
-  { pattern: /use\.typekit\.net/, tool: 'Adobe Fonts' },
-];
-
 function resolveToolName(domain: string): string | null {
-  for (const { pattern, tool } of TOOL_NAME_PATTERNS) {
-    if (pattern.test(domain)) return tool;
-  }
-  return null;
+  const result = lookupToolByDomain(domain);
+  return result?.name ?? null;
 }
 
 // ---------------------------------------------------------------------------

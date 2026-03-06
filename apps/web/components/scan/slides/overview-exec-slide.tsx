@@ -1,8 +1,8 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
 import type { ScanWithResults, ModuleResult } from '@marketing-alpha/types';
 import { CATEGORY_DISPLAY_NAMES, type ScoreCategory } from '@marketing-alpha/types';
+import { aggregateDetectedTools } from '@/lib/detected-tools';
 
 /**
  * Overview / Executive Summary Slide (Slide 2)
@@ -24,18 +24,6 @@ import { CATEGORY_DISPLAY_NAMES, type ScoreCategory } from '@marketing-alpha/typ
  *   --rpt-meta:      ~10-12px                  (badges, labels, captions)
  *   --rpt-overline:  ~10-11px                  (domain, section nums)
  */
-
-// ── Bayer dither matrix ───────────────────────────────────────────────
-const BAYER8 = [
-  [ 0,32, 8,40, 2,34,10,42],
-  [48,16,56,24,50,18,58,26],
-  [12,44, 4,36,14,46, 6,38],
-  [60,28,52,20,62,30,54,22],
-  [ 3,35,11,43, 1,33, 9,41],
-  [51,19,59,27,49,17,57,25],
-  [15,47, 7,39,13,45, 5,37],
-  [63,31,55,23,61,29,53,21],
-];
 
 // ── Report type scale (container-relative with vw fallback) ───────────
 const T = {
@@ -81,20 +69,11 @@ interface KeyFinding {
   urgency: string;
 }
 
-interface TechStackSummary {
-  analytics: string[];
-  advertising: string[];
-  automation: string[];
-  cms_hosting: string[];
-  security: string[];
-  other: string[];
-}
-
 interface M42Synthesis {
+  synthesis_headline?: string;
   verdict_headline?: string;
   executive_brief: string;
   key_findings: KeyFinding[];
-  tech_stack_summary: TechStackSummary;
   category_assessments: Record<string, unknown>;
   competitive_context: string;
 }
@@ -138,8 +117,8 @@ export function OverviewExecSlide({ scan }: OverviewExecSlideProps) {
     ? (m42?.data?.['synthesis'] as M42Synthesis | undefined) ?? null
     : null;
 
-  // Verdict headline
-  const headline = synthesis?.verdict_headline ?? null;
+  // Synthesis headline (serious executive take — distinct from Galloway verdict on slide 2)
+  const headline = synthesis?.synthesis_headline ?? synthesis?.verdict_headline ?? null;
 
   // Executive brief
   const briefText = (() => {
@@ -162,15 +141,18 @@ export function OverviewExecSlide({ scan }: OverviewExecSlideProps) {
   // Key findings (paid only)
   const keyFindings = synthesis?.key_findings ?? [];
 
-  // Tech stack (compact, for left panel bottom)
-  const techStack = (() => {
-    if (synthesis?.tech_stack_summary) return synthesis.tech_stack_summary;
-    const ts = businessContext?.techStack;
-    if (!ts) return null;
-    const infra = [ts.cms, ts.framework, ts.cdn, ts.hosting].filter(Boolean) as string[];
-    if (infra.length === 0) return null;
-    return { infrastructure: infra } as Partial<TechStackSummary>;
-  })();
+  // Tech stack — aggregated from standardized detectedTools on each module result
+  const aggregated = aggregateDetectedTools(scan.moduleResults);
+
+  // Fallback for older scans without detectedTools: use M42's tech_stack_summary
+  const detectedTools: Array<{ name: string }> = aggregated.length > 0
+    ? aggregated
+    : (() => {
+        const m42tech = (m42?.data?.['synthesis'] as Record<string, unknown> | undefined)?.['tech_stack_summary'] as Record<string, string[]> | undefined;
+        if (!m42tech) return [];
+        const names = Object.values(m42tech).flat().filter(Boolean);
+        return [...new Set(names)].map(name => ({ name }));
+      })();
 
   return (
     <div
@@ -199,7 +181,7 @@ export function OverviewExecSlide({ scan }: OverviewExecSlideProps) {
         {/* ── LEFT PANEL (~55%) — About + Index ── */}
         <div
           className="flex flex-col"
-          style={{ width: '50%', padding: '4.5% 3% 4% 5%' }}
+          style={{ width: '50%', padding: '1.5% 2.5% 1% 3.5%' }}
         >
           {/* About This Audit */}
           <h3
@@ -336,8 +318,8 @@ export function OverviewExecSlide({ scan }: OverviewExecSlideProps) {
             })}
           </div>
 
-          {/* Tech Stack (compact) */}
-          {techStack && (
+          {/* Detected Stack (extracted from raw module data) */}
+          {detectedTools.length > 0 && (
             <div style={{ marginTop: 'auto' }}>
               <h3
                 className="font-display uppercase"
@@ -352,26 +334,22 @@ export function OverviewExecSlide({ scan }: OverviewExecSlideProps) {
                 Detected Stack
               </h3>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4em' }}>
-                {Object.entries(techStack)
-                  .filter(([, tools]) => tools && (tools as string[]).length > 0)
-                  .flatMap(([, tools]) => tools as string[])
-                  .slice(0, 12)
-                  .map((tool) => (
-                    <span
-                      key={tool}
-                      className="font-data"
-                      style={{
-                        fontSize: T.meta,
-                        color: 'var(--gs-light)',
-                        padding: '0.2em 0.6em',
-                        borderRadius: '3px',
-                        background: 'rgba(255,178,239,0.06)',
-                        border: '1px solid rgba(255,178,239,0.08)',
-                      }}
-                    >
-                      {tool}
-                    </span>
-                  ))}
+                {detectedTools.map((t) => (
+                  <span
+                    key={t.name}
+                    className="font-data"
+                    style={{
+                      fontSize: T.meta,
+                      color: 'var(--gs-light)',
+                      padding: '0.2em 0.6em',
+                      borderRadius: '3px',
+                      background: 'rgba(255,178,239,0.06)',
+                      border: '1px solid rgba(255,178,239,0.08)',
+                    }}
+                  >
+                    {t.name}
+                  </span>
+                ))}
               </div>
             </div>
           )}
@@ -389,25 +367,9 @@ export function OverviewExecSlide({ scan }: OverviewExecSlideProps) {
         {/* ── RIGHT PANEL (~45%) — Headline + Brief + Findings + URL ── */}
         <div
           className="flex flex-col"
-          style={{ width: '50%', padding: '4.5% 5% 4% 3.5%' }}
+          style={{ width: '50%', padding: '1.5% 3.5% 1% 2.5%' }}
         >
-          {/* Verdict Headline (paid, from M42) — top of panel */}
-          {headline && (
-            <h2
-              className="font-display"
-              style={{
-                fontSize: T.headline,
-                fontWeight: 600,
-                lineHeight: 1.15,
-                color: 'var(--gs-light)',
-                marginBottom: '0.7em',
-              }}
-            >
-              &ldquo;{headline}&rdquo;
-            </h2>
-          )}
-
-          {/* Executive Brief */}
+          {/* Executive Brief — headline flows into body */}
           <h3
             className="font-display uppercase"
             style={{
@@ -415,7 +377,7 @@ export function OverviewExecSlide({ scan }: OverviewExecSlideProps) {
               fontWeight: 600,
               letterSpacing: '0.15em',
               color: 'var(--gs-base)',
-              marginBottom: '0.5em',
+              marginBottom: '0.6em',
             }}
           >
             Executive Brief
@@ -430,6 +392,23 @@ export function OverviewExecSlide({ scan }: OverviewExecSlideProps) {
               marginBottom: '1.5em',
             }}
           >
+            {headline && (
+              <p
+                className="font-display"
+                style={{
+                  fontSize: 'clamp(14px, 1.8cqi, 19px)',
+                  fontWeight: 600,
+                  lineHeight: 1.35,
+                  color: 'var(--gs-light)',
+                  opacity: 1,
+                  marginBottom: '0.7em',
+                  borderLeft: '2px solid var(--gs-base)',
+                  paddingLeft: '0.7em',
+                }}
+              >
+                {headline}
+              </p>
+            )}
             {briefText.split('\n').map((para, i) => (
               <p key={i} style={{ marginBottom: i < briefText.split('\n').length - 1 ? '0.65em' : 0 }}>
                 {para}
@@ -505,71 +484,6 @@ export function OverviewExecSlide({ scan }: OverviewExecSlideProps) {
         </div>
       </div>
 
-      <DitherStrip />
-    </div>
-  );
-}
-
-// ── Dither Strip ──────────────────────────────────────────────────────
-
-function DitherStrip() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    const container = containerRef.current;
-    if (!canvas || !container) return;
-
-    const w = container.offsetWidth;
-    const h = container.offsetHeight;
-    if (w === 0 || h === 0) return;
-
-    const px = 2;
-    const cols = Math.ceil(w / px);
-    const rows = Math.ceil(h / px);
-
-    canvas.width = cols;
-    canvas.height = rows;
-    canvas.style.width = w + 'px';
-    canvas.style.height = h + 'px';
-    canvas.style.imageRendering = 'pixelated';
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const imageData = ctx.createImageData(cols, rows);
-    const data = imageData.data;
-    const r = 255, g = 178, b = 239;
-
-    for (let y = 0; y < rows; y++) {
-      const yRatio = y / rows;
-      const vDensity = Math.min(0.35, Math.pow(yRatio, 2));
-      for (let x = 0; x < cols; x++) {
-        const xRatio = x / cols;
-        const hFade = 1.0 - Math.pow(1.0 - xRatio, 1.4) * 0.85;
-        const intensity = vDensity * hFade * 0.5;
-        const threshold = (BAYER8[y % 8]![x % 8]!) / 64;
-        const idx = (y * cols + x) * 4;
-        if (intensity > threshold) {
-          data[idx] = r;
-          data[idx + 1] = g;
-          data[idx + 2] = b;
-          data[idx + 3] = Math.round(intensity * 255 * 0.6);
-        }
-      }
-    }
-
-    ctx.putImageData(imageData, 0, 0);
-  }, []);
-
-  return (
-    <div
-      ref={containerRef}
-      className="absolute bottom-0 left-0 right-0 pointer-events-none"
-      style={{ height: '60px', zIndex: 5 }}
-    >
-      <canvas ref={canvasRef} />
     </div>
   );
 }

@@ -11,6 +11,31 @@
  *   m05?.toolNames  // string[] — type-checked!
  */
 
+// ── DetectedTool — standardized tool/technology detection across modules ──
+
+export type DetectedToolCategory =
+  | 'analytics' | 'tag_manager' | 'advertising'
+  | 'crm_marketing_automation' | 'cms' | 'framework'
+  | 'cdn' | 'hosting' | 'ecommerce' | 'payment'
+  | 'auth' | 'chat_support' | 'session_replay'
+  | 'ab_testing' | 'error_monitoring' | 'accessibility'
+  | 'consent' | 'security' | 'email' | 'dns'
+  | 'social' | 'push_notifications' | 'other';
+
+export type DetectedToolEvidenceType =
+  | 'script' | 'network' | 'cookie' | 'storage'
+  | 'header' | 'dns' | 'dom' | 'global'
+  | 'meta' | 'fingerprint' | 'api';
+
+export interface DetectedTool {
+  name: string;
+  category: DetectedToolCategory;
+  confidence: number;
+  source: string;
+  evidenceType: DetectedToolEvidenceType;
+  identifier?: string;
+}
+
 // ── M01: DNS & Security ─────────────────────────────────────────────────
 
 export interface M01Data {

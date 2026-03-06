@@ -19,6 +19,7 @@ import { getRegistrableDomain } from '../utils/url.js';
 import { assertUrlSafe } from '../utils/url-safety.js';
 import { updateScanStatus, upsertModuleResult } from '../services/supabase.js';
 import { calculateModuleScore } from '../utils/scoring.js';
+import { extractDetectedTools } from '../utils/tool-extractor.js';
 import type { DOMForensics, NavigatorSnapshot } from './types.js';
 import pino from 'pino';
 
@@ -1013,6 +1014,12 @@ export class ModuleRunner {
 
     // Ensure duration is set
     result.duration = Date.now() - startTime;
+
+    // Enrich result with standardized detected tools
+    const detectedTools = extractDetectedTools(mod.id, result.data);
+    if (detectedTools.length > 0) {
+      result.data.detectedTools = detectedTools;
+    }
 
     // Store result in context for downstream modules
     this.context.previousResults.set(mod.id, result);
