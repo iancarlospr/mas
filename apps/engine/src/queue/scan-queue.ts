@@ -39,7 +39,7 @@ export function getScanQueue(): Queue<ScanJobData, ScanJobResult> {
   const connection = getRedisConnection();
 
   const queueOptions: QueueOptions = {
-    connection,
+    connection: connection as QueueOptions['connection'],
     defaultJobOptions: {
       removeOnComplete: {
         age: 86_400, // 24 hours

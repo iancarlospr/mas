@@ -1,4 +1,4 @@
-import { Worker, type Job } from 'bullmq';
+import { Worker, type Job, type WorkerOptions } from 'bullmq';
 import { getRedisConnection } from './connection.js';
 import { SCAN_QUEUE_NAME, type ScanJobData, type ScanJobResult } from './scan-queue.js';
 import type { ModuleId, ModuleResult } from '@marketing-alpha/types';
@@ -152,7 +152,7 @@ export function startScanWorker(): Worker<ScanJobData, ScanJobResult> {
     SCAN_QUEUE_NAME,
     processScanJob,
     {
-      connection,
+      connection: connection as WorkerOptions['connection'],
       concurrency: 1,
       stalledInterval: 60_000,    // Check for stalled jobs every 60s
       lockDuration: 600_000,      // Job lock held for 10 minutes

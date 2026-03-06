@@ -2,7 +2,7 @@
 
 import type { ScanWithResults, ModuleResult } from '@marketing-alpha/types';
 import { CATEGORY_DISPLAY_NAMES, type ScoreCategory } from '@marketing-alpha/types';
-import { aggregateDetectedTools } from '@/lib/detected-tools';
+import { aggregateDetectedTools, mergeWithAITools } from '@/lib/detected-tools';
 
 /**
  * Overview / Executive Summary Slide (Slide 2)
@@ -141,18 +141,9 @@ export function OverviewExecSlide({ scan }: OverviewExecSlideProps) {
   // Key findings (paid only)
   const keyFindings = synthesis?.key_findings ?? [];
 
-  // Tech stack — aggregated from standardized detectedTools on each module result
-  const aggregated = aggregateDetectedTools(scan.moduleResults);
-
-  // Fallback for older scans without detectedTools: use M42's tech_stack_summary
-  const detectedTools: Array<{ name: string }> = aggregated.length > 0
-    ? aggregated
-    : (() => {
-        const m42tech = (m42?.data?.['synthesis'] as Record<string, unknown> | undefined)?.['tech_stack_summary'] as Record<string, string[]> | undefined;
-        if (!m42tech) return [];
-        const names = Object.values(m42tech).flat().filter(Boolean);
-        return [...new Set(names)].map(name => ({ name }));
-      })();
+  // Tech stack — deterministic detectedTools merged with AI-identified tools from M42
+  const deterministic = aggregateDetectedTools(scan.moduleResults);
+  const detectedTools = mergeWithAITools(deterministic, m42?.data as Record<string, unknown> | undefined);
 
   return (
     <div

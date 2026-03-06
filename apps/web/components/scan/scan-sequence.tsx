@@ -169,37 +169,44 @@ export function ScanSequence({
     if (currentPhase === 'complete' || currentPhase === 'skipped') return;
     if (typeof currentPhase !== 'number') return;
 
-    const ssePhase = scanStatusToAnimationPhase(scanStatus);
+    const check = () => {
+      const ssePhase = scanStatusToAnimationPhase(scanStatus);
 
-    /* Scan complete → skip everything, open the report */
-    if (ssePhase === 'complete') {
-      soundEffects.play('boot');
-      setCurrentPhase('complete');
-      onComplete();
-      return;
-    }
+      /* Scan complete → skip everything, open the report */
+      if (ssePhase === 'complete') {
+        soundEffects.play('boot');
+        setCurrentPhase('complete');
+        onComplete();
+        return;
+      }
 
-    /* Advance through Phase 0 → 1 → 2 based on time + SSE */
-    const phaseConfig = PHASE_CONFIGS[currentPhase];
-    if (!phaseConfig) return;
+      /* Advance through Phase 0 → 1 → 2 based on time + SSE */
+      const phaseConfig = PHASE_CONFIGS[currentPhase];
+      if (!phaseConfig) return;
 
-    const elapsed = Date.now() - phaseStartRef.current;
-    const sseWantsHigherPhase = typeof ssePhase === 'number' && ssePhase > currentPhase;
+      const elapsed = Date.now() - phaseStartRef.current;
+      const sseWantsHigherPhase = typeof ssePhase === 'number' && ssePhase > currentPhase;
 
-    /* Advance if min duration passed AND SSE suggests higher phase */
-    if (elapsed >= phaseConfig.minDurationMs && sseWantsHigherPhase) {
-      const nextPhase = Math.min(currentPhase + 1, 2) as 0 | 1 | 2;
-      setCurrentPhase(nextPhase);
-      phaseStartRef.current = Date.now();
-    }
+      /* Advance if min duration passed AND SSE suggests higher phase */
+      if (elapsed >= phaseConfig.minDurationMs && sseWantsHigherPhase) {
+        const nextPhase = Math.min(currentPhase + 1, 2) as 0 | 1 | 2;
+        setCurrentPhase(nextPhase);
+        phaseStartRef.current = Date.now();
+        return;
+      }
 
-    /* Force-advance if max duration exceeded (cap at Phase 2 — movie loops until done) */
-    if (elapsed >= phaseConfig.maxDurationMs && currentPhase < 2) {
-      const nextPhase = (currentPhase + 1) as 0 | 1 | 2;
-      setCurrentPhase(nextPhase);
-      phaseStartRef.current = Date.now();
-    }
-  }, [currentPhase, scanStatus, onComplete]);
+      /* Force-advance if max duration exceeded (cap at Phase 2 — movie loops until done) */
+      if (elapsed >= phaseConfig.maxDurationMs && currentPhase < 2) {
+        const nextPhase = (currentPhase + 1) as 0 | 1 | 2;
+        setCurrentPhase(nextPhase);
+        phaseStartRef.current = Date.now();
+      }
+    };
+
+    check();
+    const interval = setInterval(check, 1000);
+    return () => clearInterval(interval);
+  }, [currentPhase, scanStatus, onComplete, paused]);
 
   /* ── Inject SSE module completions as boot lines ─────────── */
   useEffect(() => {

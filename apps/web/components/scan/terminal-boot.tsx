@@ -141,7 +141,7 @@ export function TerminalBoot({
       {/* Terminal output area */}
       <div
         ref={scrollRef}
-        className="flex-1 overflow-y-auto p-gs-3 space-y-[2px]"
+        className="flex-1 overflow-y-auto overflow-x-hidden p-gs-3 space-y-[2px]"
         style={{
           scrollBehavior: 'smooth',
         }}
