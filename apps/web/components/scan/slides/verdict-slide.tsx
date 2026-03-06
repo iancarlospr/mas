@@ -94,7 +94,7 @@ export function VerdictSlide({ scan }: VerdictSlideProps) {
             textShadow: '0 0 20px rgba(255,178,239,0.4)',
           }}
         >
-          AlphaScan Verdict
+          AlphaScan Verdict by Prof G.
         </p>
 
         {/* Headline */}
@@ -111,6 +111,20 @@ export function VerdictSlide({ scan }: VerdictSlideProps) {
         >
           &ldquo;{displayText}&rdquo;
         </h2>
+
+        {/* Attribution */}
+        <p
+          className="font-data"
+          style={{
+            fontSize: 'clamp(9px, 1.1cqi, 13px)',
+            color: 'rgba(255,255,255,0.45)',
+            marginTop: '1.2em',
+            whiteSpace: 'nowrap',
+            lineHeight: 1.4,
+          }}
+        >
+          — Scott &ldquo;YT Professor, The Most Relevant Person in Marketing, Best-Selling Author, and with More Followers Than Your CMO&rdquo;
+        </p>
       </div>
     </div>
   );

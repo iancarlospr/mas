@@ -73,7 +73,14 @@ You have the complete output from 40+ individual module analyses organized by ca
 
 METHODOLOGY:
 1. READ all module analyses grouped by category.
-2. WRITE a verdict_headline: 8-15 words, punchy, blunt, no period. This is the pull quote that goes on the cover page. Examples: "A Mid-Tier Stack Bleeding Data Through Measurement Gaps", "Enterprise-Grade Infrastructure Undermined by Privacy Blind Spots", "Strong Foundation, Zero Post-Cookie Strategy". It should capture the single most important takeaway.
+2. WRITE a verdict_headline: 8-15 words, no period. This is the pull quote on the cover page. It MUST do TWO things:
+   A) Reference the SPECIFIC problems or strengths the audit actually found — translated into plain English. If the scan found tracking without consent, say that. If email security is broken, say that. If ads are misconfigured, say that. The headline is ABOUT the real findings.
+   B) Deliver it in Scott Galloway's voice — the way he talks on Prof G Pod. Plain English, zero marketing jargon or acronyms. He talks about MONEY, BRAND, CONSEQUENCES, and HUMAN BEHAVIOR. A CEO understands it in 2 seconds.
+   WRONG: "Missing Consent Mode and Server-Side Tag Infrastructure" (jargon, not Galloway)
+   WRONG: "A Fortune 500 Running Marketing Like a Startup" (generic, doesn't mention findings)
+   RIGHT: "They Track You Before Asking and Lose Half Their Ad Data Doing It" (specific finding + Galloway voice)
+   RIGHT: "Spending $40M on Ads While Their Own Website Can't Tell Who Clicked" (specific finding + Galloway voice)
+   RIGHT for good scans: "They Actually Ask Before Tracking and Measure What They Spend — Wild Concept"
 3. For EACH category: write a 3-5 sentence assessment summarizing the state of that area. Identify the top 1-3 issues and any strengths worth acknowledging.
 4. SYNTHESIZE across categories to identify exactly 3 KEY FINDINGS — these must be CROSS-MODULE THEMES, not repetitions of individual module findings.
    Example: "Systemic tracking infrastructure gaps" spanning M05 (no consent mode) + M06 (missing enhanced conversions) + M12 (tracking before consent) is ONE finding that synthesizes a theme across modules.
@@ -106,7 +113,7 @@ Respond in valid JSON matching the provided schema.
 EXAMPLE — Here is an abbreviated ideal output. Match this level of synthesis quality:
 
 {
-  "verdict_headline": "A Mid-Tier Stack Bleeding Data Through Measurement Gaps",
+  "verdict_headline": "They Track You Before Asking and Lose Half Their Ad Data Doing It",
   "category_assessments": {
     "security_compliance": {
       "category_name": "Security & Compliance",
@@ -324,7 +331,7 @@ ${categorySections.join('\n\n')}
 </website_data>
 
 Produce your executive synthesis as valid JSON matching the schema. Ensure:
-- verdict_headline is 8-15 words, punchy, blunt, no period — the single most important takeaway
+- verdict_headline is 8-15 words, Scott Galloway voice — plain English, zero jargon, zero marketing acronyms, no period
 - category_assessments has an entry for each of the ${categoryGroups.length} categories above
 - Exactly 3 key_findings that synthesize THEMES across multiple modules
 - executive_brief is 200-300 words in 3 paragraphs
