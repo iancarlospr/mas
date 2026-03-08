@@ -71,6 +71,7 @@ ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 RUN ./node_modules/.bin/patchright install chromium
 
 # Copy built JavaScript from build stage
+COPY --from=builder /app/packages/types/dist/ packages/types/dist/
 COPY --from=builder /app/apps/engine/dist/ apps/engine/dist/
 
 # Copy data files (fingerprints, domain databases)
