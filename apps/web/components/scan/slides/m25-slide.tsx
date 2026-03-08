@@ -62,10 +62,6 @@ export function M25Slide({ scan }: { scan: ScanWithResults }) {
   const mod = getModuleResult(scan, 'M25');
   const raw = (mod?.data as Record<string, unknown> | undefined) ?? null;
 
-  if (!syn && (!mod || mod.status === 'skipped' || mod.status === 'error')) {
-    return <SkippedSlide moduleName="Traffic by Country" scan={scan} sourceLabel="Source: Geographic traffic distribution, country-level analytics" />;
-  }
-
   const findings = syn?.key_findings ?? [];
   const recs = syn?.recommendations ?? [];
   const scores = syn?.score_breakdown ?? [];
@@ -93,7 +89,6 @@ export function M25Slide({ scan }: { scan: ScanWithResults }) {
 
   const maxShare = Math.max(...countriesWithShare.map(c => c.sharePct), 1);
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const trafficMap = useMemo(() => {
     const m = new Map<string, { name: string; sharePct: number; etv: number }>();
     for (const c of countriesWithShare) {
@@ -120,6 +115,10 @@ export function M25Slide({ scan }: { scan: ScanWithResults }) {
   }, []);
 
   const handleMouseLeave = useCallback(() => setTooltip(null), []);
+
+  if (!syn && (!mod || mod.status === 'skipped' || mod.status === 'error')) {
+    return <SkippedSlide moduleName="Traffic by Country" scan={scan} sourceLabel="Source: Geographic traffic distribution, country-level analytics" />;
+  }
 
   return (
     <SlideShell

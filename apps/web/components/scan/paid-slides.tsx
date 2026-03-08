@@ -96,6 +96,9 @@ function ExecutiveBriefContent({ data }: { data: Record<string, unknown> }) {
 
 function ROIContent({ data }: { data: Record<string, unknown> }) {
   const roi = data['roi'] as Record<string, unknown> | undefined;
+  const scenarios = (roi?.['scenarios'] as Array<Record<string, unknown>>) ?? [];
+  const methodology = (roi?.['methodology'] as string) ?? '';
+  const [activeId, setActiveId] = useState<string>('moderate');
 
   // Graceful fallback: engine marks fallback data with _fallback flag
   if (!roi || roi['_fallback']) {
@@ -105,10 +108,6 @@ function ROIContent({ data }: { data: Record<string, unknown> }) {
       </div>
     );
   }
-
-  const scenarios = (roi['scenarios'] as Array<Record<string, unknown>>) ?? [];
-  const methodology = (roi['methodology'] as string) ?? '';
-  const [activeId, setActiveId] = useState<string>('moderate');
 
   const active = scenarios.find(s => s['id'] === activeId) ?? scenarios[1] ?? scenarios[0];
 
