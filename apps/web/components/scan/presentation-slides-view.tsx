@@ -107,6 +107,8 @@ export function PresentationSlidesView({ scan, autoPrint = false }: { scan: Scan
               -webkit-print-color-adjust: exact !important;
               print-color-adjust: exact !important;
               color-adjust: exact !important;
+              box-shadow: revert !important;
+              text-shadow: revert !important;
             }
             html, body {
               background: #080808 !important;
