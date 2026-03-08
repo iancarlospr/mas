@@ -38,14 +38,14 @@ const BAYER8 = [
 // ── Report type scale (container-relative with fallback) ──────────────
 const T = {
   brand:     'clamp(5px, 0.75cqi, 8px)',     // ASCII art
-  subtitle:  'clamp(10px, 1.2cqi, 13px)',     // "Marketing Technology Audit"
+  subtitle:  'clamp(12px, 1.3cqi, 15px)',     // "Marketing Technology Audit"
   domain:    'clamp(36px, 5.5cqi, 68px)',     // Domain headline
-  urlPath:   'clamp(10px, 1.2cqi, 14px)',     // Path below domain
+  urlPath:   'clamp(12px, 1.3cqi, 15px)',     // Path below domain
   scoreLabel:'clamp(22px, 3.2cqi, 42px)',     // "Marketing Leader" etc
-  metaLabel: 'clamp(9px, 1cqi, 11px)',        // Meta pill labels
-  metaValue: 'clamp(11px, 1.3cqi, 14px)',     // Meta pill values
+  metaLabel: 'clamp(12px, 1.2cqi, 14px)',     // Meta pill labels
+  metaValue: 'clamp(12px, 1.3cqi, 14px)',     // Meta pill values
   scoreNum:  'clamp(60px, 10cqi, 130px)',     // Big score number
-  scoreSub:  'clamp(9px, 1cqi, 12px)',        // "MarketingIQ" under score
+  scoreSub:  'clamp(12px, 1.2cqi, 14px)',     // "MarketingIQ" under score
   pending:   'clamp(14px, 1.8cqi, 20px)',     // "Pending" fallback
 } as const;
 
@@ -56,16 +56,9 @@ function getScoreColor(score: number): string {
 }
 
 const CATEGORY_SHORT_LABELS: Record<string, string> = {
-  security_compliance: 'SEC',
-  analytics_measurement: 'ANA',
-  performance_experience: 'PRF',
   seo_content: 'SEO',
   paid_media: 'PPC',
-  paid_media_attribution: 'PPC',
   martech_infrastructure: 'MarTech',
-  martech_efficiency: 'MarTech',
-  brand_presence: 'BRD',
-  market_intelligence: 'MKT',
 };
 
 interface TitleSlideProps {
@@ -503,35 +496,59 @@ function ScoreVisual({
 
 /* -- Category label positioned around the ring -- */
 
+let categoryLabelIdCounter = 0;
+
 function CategoryLabel({
   cx, cy, r, angleDeg, label, score, color,
 }: {
   cx: number; cy: number; r: number; angleDeg: number;
   label: string; score: number; color: string;
 }) {
-  const rad = ((angleDeg - 90) * Math.PI) / 180;
-  const x = cx + r * Math.cos(rad);
-  const y = cy + r * Math.sin(rad);
+  if (!label) return null;
 
-  // Flip text for bottom half so it reads correctly
-  const rotate = angleDeg > 180 ? angleDeg + 180 : angleDeg;
+  // Flip text on the left side so it reads outside-in like the others
+  const flip = angleDeg > 180 && angleDeg <= 270;
+  const arcSpan = 30; // degrees the text arc covers
+  const halfSpan = arcSpan / 2;
+
+  let startDeg: number;
+  let endDeg: number;
+  if (flip) {
+    startDeg = angleDeg + halfSpan;
+    endDeg = angleDeg - halfSpan;
+  } else {
+    startDeg = angleDeg - halfSpan;
+    endDeg = angleDeg + halfSpan;
+  }
+
+  const toRad = (deg: number) => ((deg - 90) * Math.PI) / 180;
+  const x1 = cx + r * Math.cos(toRad(startDeg));
+  const y1 = cy + r * Math.sin(toRad(startDeg));
+  const x2 = cx + r * Math.cos(toRad(endDeg));
+  const y2 = cy + r * Math.sin(toRad(endDeg));
+  const sweep = flip ? 0 : 1;
+
+  const pathId = `cat-arc-${categoryLabelIdCounter++}`;
 
   return (
-    <text
-      x={x} y={y}
-      textAnchor="middle"
-      dominantBaseline="central"
-      transform={`rotate(${rotate}, ${x}, ${y})`}
-      style={{
-        fontSize: '9px',
-        fontFamily: 'var(--font-data)',
-        fill: color,
-        opacity: 0.6,
-        letterSpacing: '0.08em',
-      }}
-    >
-      {label} {score}
-    </text>
+    <>
+      <defs>
+        <path id={pathId} d={`M ${x1} ${y1} A ${r} ${r} 0 0 ${sweep} ${x2} ${y2}`} />
+      </defs>
+      <text
+        style={{
+          fontSize: '9px',
+          fontFamily: 'var(--font-data)',
+          fill: color,
+          opacity: 0.6,
+          letterSpacing: '0.08em',
+        }}
+      >
+        <textPath href={`#${pathId}`} startOffset="50%" textAnchor="middle">
+          {label} {score}
+        </textPath>
+      </text>
+    </>
   );
 }
 

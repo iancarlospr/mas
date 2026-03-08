@@ -14,9 +14,9 @@
 
 import { registerModuleExecutor } from '../runner.js';
 import type { ModuleContext } from '../types.js';
-import type { ModuleResult, ModuleId, Signal, Checkpoint } from '@marketing-alpha/types';
+import type { ModuleResult, ModuleId, Signal, Checkpoint, DetectedTool } from '@marketing-alpha/types';
 import { createCheckpoint } from '../../utils/signals.js';
-import { callFlash } from '../../services/gemini.js';
+import { callPro } from '../../services/gemini.js';
 import { z } from 'zod';
 
 // ─── Output schema ──────────────────────────────────────────────────────
@@ -123,33 +123,31 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
   const checkpoints: Checkpoint[] = [];
   const data: Record<string, unknown> = {};
 
-  // Collect all tool signals across modules
-  const allSignals = [...ctx.previousResults.values()].flatMap(r => r.signals ?? []);
-  const toolSignals = allSignals.filter(s => s.confidence >= 0.5);
+  // Collect DetectedTools from all module results (same source as Overview slide)
+  const allDetectedTools: DetectedTool[] = [];
+  for (const [, result] of ctx.previousResults) {
+    const tools = (result.data as Record<string, unknown>)?.['detectedTools'] as DetectedTool[] | undefined;
+    if (tools && Array.isArray(tools)) {
+      for (const t of tools) {
+        allDetectedTools.push(t);
+      }
+    }
+  }
+
+  // Deduplicate by name (keep highest confidence)
+  const bestByName = new Map<string, DetectedTool>();
+  for (const t of allDetectedTools) {
+    if (!t.name) continue;
+    const key = t.name.toLowerCase();
+    const existing = bestByName.get(key);
+    if (!existing || t.confidence > existing.confidence) {
+      bestByName.set(key, t);
+    }
+  }
+  const uniqueToolEntries = [...bestByName.values()].sort((a, b) => b.confidence - a.confidence);
 
   // Determine company tier from tech stack sophistication
-  const uniqueTools = new Set(toolSignals.map(s => s.name));
-  const companyTier = uniqueTools.size > 15 ? 'enterprise' : uniqueTools.size > 7 ? 'mid-market' : 'startup';
-
-  // Build tool activity status from module data
-  const toolsDetected = toolSignals.map(s => ({
-    name: s.name,
-    type: s.type,
-    category: s.category,
-    confidence: s.confidence,
-    evidence: s.evidence,
-    sourceModule: findSourceModule(s, ctx),
-  }));
-
-  // Deduplicate by name
-  const uniqueToolEntries = Object.values(
-    toolsDetected.reduce<Record<string, typeof toolsDetected[number]>>((acc, t) => {
-      if (!acc[t.name] || t.confidence > acc[t.name]!.confidence) {
-        acc[t.name] = t;
-      }
-      return acc;
-    }, {}),
-  );
+  const companyTier = uniqueToolEntries.length > 15 ? 'enterprise' : uniqueToolEntries.length > 7 ? 'mid-market' : 'startup';
 
   // Get M41 business context if available
   const m41Result = ctx.previousResults.get('M41' as ModuleId);
@@ -167,20 +165,44 @@ ${businessContext ? `## Business Context
 ${(businessContext['ecommerce'] as Record<string, unknown> | undefined)?.['platform'] ? `- Ecommerce: ${(businessContext['ecommerce'] as Record<string, unknown>)['platform']}` : ''}
 ${(businessContext['scale'] as Record<string, unknown> | undefined)?.['totalTraffic'] ? `- Monthly traffic: ${(businessContext['scale'] as Record<string, unknown>)['totalTraffic']}` : ''}` : '## Business Context: Not available (infer from stack)'}
 
-### All Detected Tools (from M05, M06, M07, M08, M09, M20)
-${JSON.stringify(uniqueToolEntries, null, 2)}
+### All Detected Tools (standardized extraction from M01–M20)
+${JSON.stringify(uniqueToolEntries.map(t => ({ name: t.name, category: t.category, confidence: t.confidence, source: t.source, evidenceType: t.evidenceType })), null, 2)}
 </website_data>
 
-Analyze this stack and produce:
-1. currentStack: categorize all tools, count active/abandoned/redundant, write a 1-2 sentence assessment
-2. abandonedTools: list tools with evidence of inactivity
-3. redundancies: identify tools with overlapping primary functions
-4. leanStack: minimum viable stack — what to keep, what to remove, and why
-5. optimalStack: best-in-class stack — current tools + gap fills + upgrades
+Analyze this stack and produce valid JSON matching this exact structure:
 
-Respond in valid JSON.`;
+{
+  "currentStack": {
+    "totalTools": 0,
+    "activeTools": 0,
+    "abandonedTools": 0,
+    "redundantPairs": 0,
+    "categories": [{ "name": "Analytics", "tools": ["GA4", "..."] }],
+    "assessment": "1-2 sentence assessment"
+  },
+  "abandonedTools": [{ "tool": "ToolName", "evidence": "why abandoned", "sourceModule": "M05", "recommendation": "remove or reconfigure" }],
+  "redundancies": [{ "tools": ["Tool1", "Tool2"], "function": "what they overlap on", "recommendation": "keep X, remove Y", "rationale": "why", "effortToConsolidate": "S" }],
+  "leanStack": {
+    "description": "minimum viable stack rationale",
+    "tools": [{ "tool": "ToolName", "purpose": "what it does", "replaces": ["OldTool"], "rationale": "why keep" }],
+    "removals": [{ "tool": "ToolName", "reason": "why remove" }],
+    "totalToolsAfter": 0,
+    "keyBenefit": "one sentence benefit"
+  },
+  "optimalStack": {
+    "description": "best-in-class rationale",
+    "tools": [{ "tool": "ToolName", "purpose": "role", "isCurrentlyDetected": true, "rationale": "why" }],
+    "gaps": [{ "capability": "missing capability", "recommendation": "add ToolName", "rationale": "why needed" }],
+    "upgrades": [{ "currentTool": "OldTool", "suggestedTool": "BetterTool", "rationale": "why upgrade" }],
+    "totalToolsAfter": 0,
+    "keyBenefit": "one sentence benefit"
+  },
+  "methodology": "2-3 sentences about how this analysis was performed"
+}
 
-    const result = await callFlash(prompt, ToolAnalyzerSchema, {
+IMPORTANT: Every field shown above is REQUIRED. Do not omit any fields. effortToConsolidate must be "S", "M", or "L".`;
+
+    const result = await callPro(prompt, ToolAnalyzerSchema, {
       systemInstruction: SYSTEM_PROMPT,
       temperature: 0.3,
       maxTokens: 6144,
@@ -211,7 +233,7 @@ Respond in valid JSON.`;
       evidence: `Stack analysis: ${uniqueToolEntries.length} tools detected, ${validatedRedundancies.length} redundancies, ${validatedAbandoned.length} abandoned, lean=${result.data.leanStack.totalToolsAfter} tools, optimal=${result.data.optimalStack.totalToolsAfter} tools`,
     }));
   } catch (error) {
-    data.stackAnalysis = buildFallbackAnalysis(uniqueToolEntries);
+    data.stackAnalysis = buildFallbackAnalysis(uniqueToolEntries.map(t => ({ name: t.name, category: t.category })));
 
     checkpoints.push(createCheckpoint({
       id: 'm45-stack', name: 'Stack Analysis', weight: 0.5,
@@ -223,16 +245,7 @@ Respond in valid JSON.`;
   return { moduleId: 'M45' as ModuleId, status: 'success', data, signals, score: null, checkpoints, duration: 0 };
 };
 
-function findSourceModule(signal: Signal, ctx: ModuleContext): string {
-  for (const [id, result] of ctx.previousResults) {
-    if (result.signals.some(s => s.name === signal.name && s.type === signal.type)) {
-      return id;
-    }
-  }
-  return 'unknown';
-}
-
-function buildFallbackAnalysis(tools: Array<{ name: string; type: string; category: string }>) {
+function buildFallbackAnalysis(tools: Array<{ name: string; category: string }>) {
   const categories = new Map<string, string[]>();
   for (const t of tools) {
     const cat = t.category || 'Other';

@@ -11,16 +11,22 @@ import type { ModuleContext } from '../src/modules/types.js';
 // Side-effect imports to register module executors
 import { execute as m41Execute } from '../src/modules/synthesis/m41-module-synthesis.js';
 import { execute as m42Execute } from '../src/modules/synthesis/m42-final-synthesis.js';
+import { execute as m43Execute } from '../src/modules/synthesis/m43-prd-generation.js';
+import { execute as m44Execute } from '../src/modules/synthesis/m44-roi-simulator.js';
+import { execute as m45Execute } from '../src/modules/synthesis/m45-cost-cutter.js';
 
 const EXECUTORS: Record<string, (ctx: ModuleContext) => Promise<ModuleResult>> = {
   M41: m41Execute,
   M42: m42Execute,
+  M43: m43Execute,
+  M44: m44Execute,
+  M45: m45Execute,
 };
 
 const scanId = process.argv[2];
 const requestedModules = process.argv.slice(3);
 if (!scanId) {
-  console.error('Usage: npx tsx --env-file=.env scripts/rerun-synthesis.ts <scanId> [M41|M42]');
+  console.error('Usage: npx tsx --env-file=.env scripts/rerun-synthesis.ts <scanId> [M41|M42|M43|M44|M45]');
   console.error('Default: re-runs M41 then M42');
   process.exit(1);
 }
@@ -127,6 +133,26 @@ async function main() {
       const synth = (result.data as any).synthesis;
       console.log(`verdict_headline: ${synth?.verdict_headline}`);
       console.log(`executive_brief: ${synth?.executive_brief?.slice(0, 200)}...`);
+    } else if (moduleId === 'M45') {
+      const stack = (result.data as any).stackAnalysis;
+      const current = stack?.currentStack;
+      console.log(`M45: ${current?.totalTools} tools, ${current?.redundantPairs} redundant, ${current?.abandonedTools} abandoned`);
+      console.log(`Assessment: ${current?.assessment}`);
+      console.log(`Lean: ${stack?.leanStack?.totalToolsAfter} tools — ${stack?.leanStack?.keyBenefit}`);
+      console.log(`Optimal: ${stack?.optimalStack?.totalToolsAfter} tools — ${stack?.optimalStack?.keyBenefit}`);
+      if (stack?.optimalStack?.gaps?.length > 0) {
+        console.log(`Gaps: ${stack.optimalStack.gaps.map((g: any) => g.capability).join(', ')}`);
+      }
+    } else if (moduleId === 'M44') {
+      const roi = (result.data as any).roi;
+      if (roi?._fallback) {
+        console.log('M44: fallback (no AI scenarios)');
+      } else {
+        const mod = roi?.scenarios?.find((s: any) => s.id === 'moderate');
+        console.log(`M44 headline: ${roi?.headline}`);
+        console.log(`M44 moderate: $${mod?.totalMonthlyImpact?.toLocaleString()}/mo ($${mod?.totalAnnualImpact?.toLocaleString()}/yr)`);
+        console.log(`M44 score: ${roi?.scoreImprovement?.current} → ${roi?.scoreImprovement?.estimated}`);
+      }
     }
 
     // Upsert

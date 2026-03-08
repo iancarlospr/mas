@@ -40,6 +40,8 @@ interface ModuleSlideProps {
   actionTitle?: string;
   /** Whether this is a GhostScan module (M09-M12) */
   isGhostModule?: boolean;
+  /** AI-generated score from M41 (takes priority over checkpoint score) */
+  aiScore?: number;
 }
 
 /* ── Helpers (preserved from original) ─────────────────────── */
@@ -81,8 +83,10 @@ export function ModuleSlide({
   isPaid,
   actionTitle,
   isGhostModule = false,
+  aiScore,
 }: ModuleSlideProps) {
-  const light = result?.score != null ? getTrafficLight(result.score) : undefined;
+  const effectiveScore = aiScore ?? null;
+  const light = effectiveScore != null ? getTrafficLight(effectiveScore) : undefined;
   const isError = result?.status === 'error';
   const health = light === 'green' ? 'green' : light === 'yellow' ? 'amber' : light === 'red' ? 'red' : undefined;
 
@@ -111,7 +115,7 @@ export function ModuleSlide({
       <ModulePanel
         moduleId={moduleId}
         moduleName={moduleName}
-        score={result?.score ?? undefined}
+        score={effectiveScore ?? undefined}
         health={health}
         actionTitle={actionTitle}
         isGhostModule={isGhostModule}

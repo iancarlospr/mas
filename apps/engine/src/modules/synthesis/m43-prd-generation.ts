@@ -17,44 +17,37 @@
 import { registerModuleExecutor } from '../runner.js';
 import type { ModuleContext } from '../types.js';
 import type { ModuleResult, ModuleId, Signal, Checkpoint } from '@marketing-alpha/types';
-import { CATEGORY_DISPLAY_NAMES, CATEGORY_MODULES } from '@marketing-alpha/types';
-import type { ScoreCategory } from '@marketing-alpha/types';
 import { createCheckpoint } from '../../utils/signals.js';
-import { callPro } from '../../services/gemini.js';
+import { callProRaw } from '../../services/gemini.js';
 import { createHash } from 'node:crypto';
-import { z } from 'zod';
 import pino from 'pino';
 
 const logger = pino({ name: 'm43-prd' });
 
-// ─── Output schema ──────────────────────────────────────────────────────
+// ─── Output type ────────────────────────────────────────────────────────
 
-const M43OutputSchema = z.object({
-  markdown: z.string(),
-  metadata: z.object({
-    title: z.string(),
-    businessName: z.string(),
-    scanDate: z.string(),
-    totalFindings: z.number(),
-    p0Count: z.number(),
-    p1Count: z.number(),
-    p2Count: z.number(),
-    p3Count: z.number(),
-    estimatedTimelineWeeks: z.number(),
-  }),
-});
-
-type M43Output = z.infer<typeof M43OutputSchema>;
+interface M43Output {
+  markdown: string;
+  metadata: {
+    title: string;
+    businessName: string;
+    scanDate: string;
+    totalFindings: number;
+    p0Count: number;
+    p1Count: number;
+    p2Count: number;
+    p3Count: number;
+    estimatedTimelineWeeks: number;
+  };
+}
 
 // ─── System prompt ──────────────────────────────────────────────────────
 
 const SYSTEM_PROMPT = `You are a Principal Consultant at a top-tier management consulting firm writing a remediation plan for a client's marketing technology stack. You have the complete findings from a forensic audit organized by module and category.
 
-OUTPUT FORMAT: Return a JSON object with two fields:
-1. "markdown" — the full remediation document in markdown
-2. "metadata" — structured metadata about the document
+OUTPUT FORMAT: Return ONLY the markdown document. No JSON wrapping, no code fences, no preamble — just the raw markdown content starting with the # heading.
 
-THE MARKDOWN DOCUMENT must follow this structure:
+THE DOCUMENT must follow this structure:
 
 # Remediation Plan
 ## [Business Name] — Marketing Technology Audit
@@ -160,7 +153,7 @@ RULES:
    - Format: > [chat icon] [natural suggestion with a specific example question]
    - Example: > 💬 This configuration varies by hosting provider. The AI Assistant can guide you through the exact steps — try: "Walk me through setting up server-side GTM on our Vercel setup"
 
-Respond in valid JSON with "markdown" and "metadata" fields.`;
+Return ONLY the markdown. No JSON, no code fences.`;
 
 const M43_PROMPT_VERSION = createHash('sha256')
   .update(SYSTEM_PROMPT)
@@ -420,25 +413,61 @@ ${m45Data['alternatives'] ? `### Recommended Alternatives\n${JSON.stringify(m45D
 ${m45Data['totalAnnualWaste'] ? `### Total Annual Waste from Tool Redundancy: $${(m45Data['totalAnnualWaste'] as number).toLocaleString()}` : ''}
 </website_data>
 ` : ''}
-Generate the remediation plan document. The metadata.businessName should be "${businessName}" and metadata.scanDate should be "${scanDate}".`;
+Generate the full remediation plan document for ${businessName}, scan date ${scanDate}. Return raw markdown only.`;
 
-    const result = await callPro(prompt, M43OutputSchema, {
+    // Phase 1: Raw markdown generation (no JSON wrapping)
+    const result = await callProRaw(prompt, {
       systemInstruction: SYSTEM_PROMPT,
       temperature: 0.4,
+      maxTokens: 65536,
     });
+
+    const markdown = result.data.trim();
+
+    // Phase 2: Parse metadata deterministically from markdown + context
+    const countHeadingsInSection = (md: string, sectionPattern: RegExp): number => {
+      const match = md.match(sectionPattern);
+      if (!match) return 0;
+      const sectionText = match[1] ?? '';
+      return (sectionText.match(/^### /gm) || []).length;
+    };
+
+    // Extract per-priority heading counts from the generated markdown
+    const p0Generated = countHeadingsInSection(markdown, /## Immediate Actions.*?\n([\s\S]*?)(?=\n## (?!#)|$)/);
+    const p1Generated = countHeadingsInSection(markdown, /## This Week.*?\n([\s\S]*?)(?=\n## (?!#)|$)/);
+    const p2Generated = countHeadingsInSection(markdown, /## This Month.*?\n([\s\S]*?)(?=\n## (?!#)|$)/);
+    const p3Generated = countHeadingsInSection(markdown, /## Backlog.*?\n([\s\S]*?)(?=\n## (?!#)|$)/);
+
+    // Estimate timeline: based on priority distribution
+    const estimatedWeeks = findings.p0.length > 3 ? 12 : findings.p0.length > 0 ? 8 : 4;
+
+    const m43Output: M43Output = {
+      markdown,
+      metadata: {
+        title: `Remediation Plan — ${businessName}`,
+        businessName,
+        scanDate,
+        totalFindings,
+        p0Count: p0Generated || findings.p0.length,
+        p1Count: p1Generated || findings.p1.length,
+        p2Count: p2Generated || findings.p2.length,
+        p3Count: p3Generated || findings.p3.length,
+        estimatedTimelineWeeks: estimatedWeeks,
+      },
+    };
 
     logger.info(
       {
         tokens: result.tokensUsed.total,
         totalFindings,
         p0: findings.p0.length,
-        markdownLength: result.data.markdown.length,
+        markdownLength: markdown.length,
       },
       'M43 remediation plan generated',
     );
 
     const data = {
-      ...result.data,
+      ...m43Output,
       promptVersion: M43_PROMPT_VERSION,
     };
 
@@ -447,7 +476,7 @@ Generate the remediation plan document. The metadata.businessName should be "${b
       name: 'Remediation Plan',
       weight: 0.5,
       health: 'excellent',
-      evidence: `Generated remediation plan: ${totalFindings} findings (${findings.p0.length} P0, ${findings.p1.length} P1), ${result.data.markdown.length} chars`,
+      evidence: `Generated remediation plan: ${totalFindings} findings (${findings.p0.length} P0, ${findings.p1.length} P1), ${markdown.length} chars`,
     }));
 
     return {

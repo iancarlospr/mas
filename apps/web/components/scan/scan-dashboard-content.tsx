@@ -1,9 +1,9 @@
 'use client';
 
-import { useRef, useState, useMemo, useCallback } from 'react';
-import type { ScanWithResults, ModuleResult } from '@marketing-alpha/types';
+import { useRef, useState, useMemo, useCallback, useEffect } from 'react';
+import type { ScanWithResults } from '@marketing-alpha/types';
 import { useWindowManager } from '@/lib/window-manager';
-import { CATEGORY_META, MODULE_NAMES, FREE_CATEGORIES } from './slide-sidebar';
+import { FREE_CATEGORIES } from './slide-sidebar';
 import { TitleSlide } from './slides/title-slide';
 import { VerdictSlide } from './slides/verdict-slide';
 import { OverviewExecSlide } from './slides/overview-exec-slide';
@@ -53,7 +53,6 @@ import { M30Slide } from './slides/m30-slide';
 import { M31Slide } from './slides/m31-slide';
 import { M33Slide } from './slides/m33-slide';
 import { M36Slide } from './slides/m36-slide';
-import { ModuleSlide } from './module-slide';
 import { M45Slide } from './slides/m45-slide';
 import { M43Slide } from './slides/m43-slide';
 import { ClosingSlide } from './slides/closing-slide';
@@ -63,28 +62,35 @@ import { cn } from '@/lib/utils';
  * GhostScan OS — Scan Dashboard Content
  * ═══════════════════════════════════════════
  *
- * Reusable dashboard content — category tabs, module slides, status bar.
+ * Reusable dashboard content — scroll-nav tabs, module slides, status bar.
  * Used by both BentoDashboard (route fallback) and ScanReportWindow (managed window).
  * Does NOT include any window chrome — the caller provides that.
  */
 
-const PAID_MODULES = new Set(['M43', 'M44', 'M45']);
-const HIDDEN_MODULES = new Set(['M41', 'M42']);
-// Modules rendered via custom or AIModuleSlide (not the generic ModuleSlide)
-const CUSTOM_SLIDE_MODULES = new Set([
-  'M01', 'M12', 'M40',
-  'M05', 'M06', 'M06b', 'M08', 'M09',
-  'M03', 'M10', 'M11', 'M13', 'M14',
-  'M04', 'M15', 'M26', 'M34', 'M39',
-  'M21', 'M28', 'M29',
-  'M02', 'M07', 'M20',
-  'M16', 'M17', 'M18', 'M19', 'M22', 'M23', 'M37', 'M38',
-  'M24', 'M25', 'M27', 'M30', 'M31', 'M33', 'M36',
-]);
+// ── Nav tab definitions ─────────────────────────────────────────
+interface NavTab {
+  key: string;
+  label: string;
+  targetId: string;
+  paidOnly?: boolean;
+  /** Category key for score lookup (matches marketingIqResult.categories) */
+  categoryKey?: string;
+}
 
-const GHOST_MODULES = new Set(['M09', 'M10', 'M11', 'M12']);
-
-// FREE_CATEGORIES imported from slide-sidebar.tsx
+const NAV_TABS: NavTab[] = [
+  { key: 'about', label: 'About', targetId: 'nav-about' },
+  { key: 'stack-analyzer', label: 'Stack', targetId: 'nav-stack-analyzer', paidOnly: true },
+  { key: 'findings', label: 'Findings', targetId: 'nav-findings' },
+  { key: 'security', label: 'Security', targetId: 'nav-security', categoryKey: 'security_compliance' },
+  { key: 'analytics', label: 'Analytics', targetId: 'nav-analytics', categoryKey: 'analytics_measurement' },
+  { key: 'performance', label: 'Performance', targetId: 'nav-performance', categoryKey: 'performance_experience' },
+  { key: 'seo', label: 'SEO', targetId: 'nav-seo', categoryKey: 'seo_content' },
+  { key: 'paid-media', label: 'Paid', targetId: 'nav-paid-media', categoryKey: 'paid_media' },
+  { key: 'martech', label: 'MarTech', targetId: 'nav-martech', categoryKey: 'martech_infrastructure' },
+  { key: 'brand', label: 'Brand', targetId: 'nav-brand', categoryKey: 'brand_presence' },
+  { key: 'market-intel', label: 'Market', targetId: 'nav-market-intel', categoryKey: 'market_intelligence' },
+  { key: 'prd', label: 'PRD', targetId: 'nav-prd', paidOnly: true },
+];
 
 interface ScanDashboardContentProps {
   scan: ScanWithResults;
@@ -92,56 +98,82 @@ interface ScanDashboardContentProps {
 
 export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
   const wm = useWindowManager();
-  const resultMap = useMemo(
-    () => new Map<string, ModuleResult>(scan.moduleResults.map((r) => [r.moduleId, r])),
-    [scan.moduleResults],
-  );
   const isPaid = scan.tier === 'paid';
 
-  // M41 AI scores — used instead of checkpoint scores on slides
-  const aiScores = useMemo(() => {
-    const m41 = resultMap.get('M41');
-    const sums = (m41?.data?.['moduleSummaries'] as Record<string, { module_score?: number }> | undefined) ?? {};
+  // AI synthesis category scores — single source of truth
+  const categoryScoreMap = useMemo(() => {
+    const cats = scan.marketingIqResult?.categories as { category: string; score: number }[] | undefined;
     const map = new Map<string, number>();
-    for (const [moduleId, summary] of Object.entries(sums)) {
-      if (summary.module_score != null) map.set(moduleId, summary.module_score);
+    if (cats) {
+      for (const c of cats) map.set(c.category, c.score);
     }
     return map;
-  }, [resultMap]);
-
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
-
-  const moduleSlideIds = useMemo(() => {
-    const ids: string[] = [];
-    for (const cat of CATEGORY_META) {
-      if (cat.paidOnly) continue;
-      // Free tier: only show MarTech & Infrastructure modules
-      if (!isPaid && !FREE_CATEGORIES.has(cat.key)) continue;
-      for (const mId of cat.modules) {
-        if (mId === 'overview') continue;
-        if (HIDDEN_MODULES.has(mId)) continue;
-        const r = resultMap.get(mId);
-        if (r && r.status !== 'skipped') {
-          ids.push(mId);
-        }
-      }
-    }
-    return ids;
-  }, [resultMap, isPaid]);
-
-  const filteredModuleIds = useMemo(() => {
-    if (!activeCategory) return moduleSlideIds;
-    const cat = CATEGORY_META.find((c) => c.key === activeCategory);
-    if (!cat) return moduleSlideIds;
-    const catModules = new Set(cat.modules);
-    return moduleSlideIds.filter((id) => catModules.has(id));
-  }, [activeCategory, moduleSlideIds]);
+  }, [scan.marketingIqResult]);
 
   const contentRef = useRef<HTMLDivElement>(null);
+  const tabBarRef = useRef<HTMLDivElement>(null);
+  const [activeTabKey, setActiveTabKey] = useState('about');
 
-  const handleCategoryClick = useCallback((catId: string | null) => {
-    setActiveCategory((prev) => (prev === catId ? null : catId));
+  // Visible tabs based on paid status
+  const visibleTabs = useMemo(
+    () => NAV_TABS.filter((t) => !t.paidOnly || isPaid),
+    [isPaid],
+  );
+
+  // ── Scroll to section on tab click ──
+  const handleTabClick = useCallback((tab: NavTab) => {
+    const container = contentRef.current;
+    if (!container) return;
+    const el = container.querySelector(`#${tab.targetId}`);
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setActiveTabKey(tab.key);
   }, []);
+
+  // ── IntersectionObserver — track which section is visible ──
+  useEffect(() => {
+    const container = contentRef.current;
+    if (!container) return;
+
+    const anchors = visibleTabs
+      .map((t) => container.querySelector(`#${t.targetId}`))
+      .filter((el): el is Element => el != null);
+
+    if (anchors.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        // Find the first intersecting entry (topmost visible section)
+        let topEntry: IntersectionObserverEntry | null = null;
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          if (!topEntry || entry.boundingClientRect.top < topEntry.boundingClientRect.top) {
+            topEntry = entry;
+          }
+        }
+        if (topEntry) {
+          const id = topEntry.target.id;
+          const tab = visibleTabs.find((t) => t.targetId === id);
+          if (tab) setActiveTabKey(tab.key);
+        }
+      },
+      {
+        root: container,
+        rootMargin: '-10% 0px -60% 0px',
+        threshold: 0,
+      },
+    );
+
+    for (const anchor of anchors) observer.observe(anchor);
+    return () => observer.disconnect();
+  }, [visibleTabs, isPaid]);
+
+  // ── Score helper — uses the same synthesis scores as the title slide circle ──
+  const getCategoryScore = useCallback((tab: NavTab): number | null => {
+    if (!tab.categoryKey) return null;
+    const score = categoryScoreMap.get(tab.categoryKey);
+    return score != null ? Math.round(score) : null;
+  }, [categoryScoreMap]);
 
   const handleDeclassify = useCallback(() => {
     const paymentId = `payment-${scan.id}`;
@@ -171,196 +203,170 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
     wm.openWindow('chat-launcher', { scanId: scan.id });
   }, [wm, scan.id]);
 
-  // Is the active category locked (non-free, non-paid scan)?
-  const isActiveCategoryLocked = !isPaid
-    && activeCategory != null
-    && !FREE_CATEGORIES.has(activeCategory)
-    && !CATEGORY_META.find((c) => c.key === activeCategory)?.paidOnly;
-
   return (
     <div className="flex flex-col h-full">
-      {/* Category Tab Bar */}
-      <div className="bg-gs-chrome border-b border-gs-chrome-dark px-gs-2 py-gs-1 flex items-center gap-gs-1 overflow-x-auto flex-shrink-0">
-        <button
-          className={cn(
-            'bevel-button text-os-xs whitespace-nowrap',
-            !activeCategory && 'bevel-sunken bg-gs-paper',
-          )}
-          onClick={() => handleCategoryClick(null)}
-        >
-          All
-        </button>
-        {CATEGORY_META.filter((c) => !c.paidOnly).map((cat) => {
-          const isActive = activeCategory === cat.key;
-          const isLocked = !isPaid && !FREE_CATEGORIES.has(cat.key);
-          const catModules = cat.modules.filter(
-            (m) => m !== 'overview' && !HIDDEN_MODULES.has(m),
-          );
-          const scores = catModules
-            .map((m) => resultMap.get(m)?.score)
-            .filter((s): s is number => s != null);
-          const avgScore =
-            scores.length > 0
-              ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
-              : null;
+      {/* ── Category Nav Bar ── */}
+      <div
+        ref={tabBarRef}
+        data-no-print
+        className="flex items-stretch flex-shrink-0"
+        style={{
+          height: 32,
+          background: 'oklch(0.10 0.01 340 / 0.9)',
+          backdropFilter: 'blur(8px)',
+          borderBottom: '1px solid oklch(0.20 0.02 340 / 0.6)',
+        }}
+      >
+        {visibleTabs.map((tab) => {
+          const isActive = activeTabKey === tab.key;
+          const isLocked = !isPaid && tab.categoryKey != null && !FREE_CATEGORIES.has(tab.categoryKey);
+          const avgScore = getCategoryScore(tab);
+          const dotColor = avgScore != null
+            ? avgScore >= 70 ? 'var(--gs-terminal)' : avgScore >= 40 ? 'var(--gs-warning)' : 'var(--gs-critical)'
+            : undefined;
 
           return (
             <button
-              key={cat.key}
+              key={tab.key}
+              data-tab-key={tab.key}
+              onClick={() => handleTabClick(tab)}
               className={cn(
-                'bevel-button text-os-xs whitespace-nowrap flex items-center gap-gs-1',
-                isActive && 'bevel-sunken bg-gs-paper',
-                isLocked && 'opacity-60',
+                'relative flex-1 flex items-center justify-center gap-1 transition-colors',
+                'font-data text-[10px] tracking-[0.04em] uppercase whitespace-nowrap',
+                isActive
+                  ? 'text-gs-light'
+                  : 'text-gs-mid hover:text-gs-light',
+                isLocked && 'opacity-35',
               )}
-              onClick={() => handleCategoryClick(cat.key)}
             >
               {isLocked && (
-                <svg className="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                <svg className="w-2.5 h-2.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
                 </svg>
               )}
-              <span>{cat.label}</span>
-              {!isLocked && avgScore != null && (
-                <>
-                  <span
-                    className={cn(
-                      'font-data font-bold',
-                      avgScore >= 70
-                        ? 'text-gs-terminal'
-                        : avgScore >= 40
-                          ? 'text-gs-warning'
-                          : 'text-gs-critical',
-                    )}
-                  >
-                    {avgScore}
-                  </span>
-                  <span
-                    className={cn(
-                      'traffic-dot',
-                      avgScore >= 70
-                        ? 'traffic-dot-green'
-                        : avgScore >= 40
-                          ? 'traffic-dot-amber'
-                          : 'traffic-dot-red',
-                    )}
-                  />
-                </>
+              <span>{tab.label}</span>
+              {!isLocked && dotColor && (
+                <span
+                  className="inline-block w-1 h-1 rounded-full flex-shrink-0"
+                  style={{ backgroundColor: dotColor }}
+                />
+              )}
+              {/* Active indicator */}
+              {isActive && (
+                <span
+                  className="absolute bottom-0 left-1/4 right-1/4"
+                  style={{ height: 2, background: 'var(--gs-base)', borderRadius: '1px 1px 0 0' }}
+                />
               )}
             </button>
           );
         })}
       </div>
 
-      {/* Scrollable Module Content */}
+      {/* ── Scrollable Module Content ── */}
       <div ref={contentRef} className="flex-1 p-gs-4 space-y-gs-3 overflow-y-auto" style={{ background: '#ffffff' }}>
-        {!activeCategory && <TitleSlide scan={scan} />}
-        {!activeCategory && <VerdictSlide scan={scan} />}
-        {!activeCategory && <OverviewExecSlide scan={scan} />}
-        {!activeCategory && isPaid && <M45Slide scan={scan} />}
-        {!activeCategory && <FindingsSlide scan={scan} />}
-        {/* ── Category 1: Security & Compliance ── */}
-        {!activeCategory && <CategoryIntroSlide scan={scan} category="security_compliance" />}
-        {!activeCategory && <M01Slide scan={scan} />}
-        {!activeCategory && <M12Slide scan={scan} />}
-        {!activeCategory && <M40Slide scan={scan} />}
+        <TitleSlide scan={scan} />
+        <VerdictSlide scan={scan} />
+        <div id="nav-about">
+          <OverviewExecSlide scan={scan} />
+        </div>
 
-        {/* ── Category 2: Analytics & Measurement ── */}
-        {!activeCategory && <CategoryIntroSlide scan={scan} category="analytics_measurement" />}
-        {!activeCategory && <M05Slide scan={scan} />}
-        {!activeCategory && <M06Slide scan={scan} />}
-        {!activeCategory && <M06bSlide scan={scan} />}
-        {!activeCategory && <M08Slide scan={scan} />}
-        {!activeCategory && <M09Slide scan={scan} />}
-
-        {/* ── Category 3: Performance & Experience ── */}
-        {!activeCategory && <CategoryIntroSlide scan={scan} category="performance_experience" />}
-        {!activeCategory && <M03Slide scan={scan} />}
-        {!activeCategory && <M13Slide scan={scan} />}
-        {!activeCategory && <M14Slide scan={scan} />}
-        {!activeCategory && <M10Slide scan={scan} />}
-        {!activeCategory && <M11Slide scan={scan} />}
-
-        {/* ── Category 4: SEO & Content ── */}
-        {!activeCategory && <CategoryIntroSlide scan={scan} category="seo_content" />}
-        {!activeCategory && <M04Slide scan={scan} />}
-        {!activeCategory && <M15Slide scan={scan} />}
-        {!activeCategory && <M26Slide scan={scan} />}
-        {!activeCategory && <M34Slide scan={scan} />}
-        {!activeCategory && <M39Slide scan={scan} />}
-
-        {/* ── Category 5: Paid Media ── */}
-        {!activeCategory && <CategoryIntroSlide scan={scan} category="paid_media" />}
-        {!activeCategory && <M21Slide scan={scan} />}
-        {!activeCategory && <M28Slide scan={scan} />}
-        {!activeCategory && <M29Slide scan={scan} />}
-
-        {/* ── Category 6: MarTech & Infrastructure ── */}
-        {!activeCategory && <CategoryIntroSlide scan={scan} category="martech_infrastructure" />}
-        {!activeCategory && <M02Slide scan={scan} />}
-        {!activeCategory && <M07Slide scan={scan} />}
-        {!activeCategory && <M20Slide scan={scan} />}
-
-        {/* ── Category 7: Brand & Digital Presence ── */}
-        {!activeCategory && <CategoryIntroSlide scan={scan} category="brand_presence" />}
-        {!activeCategory && <M16Slide scan={scan} />}
-        {!activeCategory && <M17Slide scan={scan} />}
-        {!activeCategory && <M18M19Slide scan={scan} />}
-        {!activeCategory && <M22M23Slide scan={scan} />}
-        {!activeCategory && <M37Slide scan={scan} />}
-        {!activeCategory && <M38Slide scan={scan} />}
-
-        {/* ── Category 8: Market Intelligence ── */}
-        {!activeCategory && <CategoryIntroSlide scan={scan} category="market_intelligence" />}
-        {!activeCategory && <M24Slide scan={scan} />}
-        {!activeCategory && <M25Slide scan={scan} />}
-        {!activeCategory && <M27Slide scan={scan} />}
-        {!activeCategory && <M30Slide scan={scan} />}
-        {!activeCategory && <M31Slide scan={scan} />}
-        {!activeCategory && <M33Slide scan={scan} />}
-        {!activeCategory && <M36Slide scan={scan} />}
-
-        {/* ── M43: Remediation Roadmap ── */}
-        {!activeCategory && isPaid && <M43Slide scan={scan} />}
-
-        {/* ── Closing slide (back cover) ── */}
-        {!activeCategory && <ClosingSlide scan={scan} />}
-
-        {/* Locked category placeholder */}
-        {isActiveCategoryLocked && (
-          <div className="module-panel relative w-full overflow-hidden">
-            <div className="flex flex-col items-center justify-center py-16 px-gs-6 text-center">
-              <svg className="w-10 h-10 text-gs-muted/40 mb-gs-3" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-              </svg>
-              <p className="font-system text-os-sm font-bold text-gs-light mb-gs-1">
-                {CATEGORY_META.find((c) => c.key === activeCategory)?.label ?? 'Category'} — Locked
-              </p>
-              <p className="font-data text-data-xs text-gs-muted mb-gs-4 max-w-xs">
-                This category requires a full scan. Your free scan includes MarTech & Infrastructure only.
-              </p>
-              <button
-                onClick={handleDeclassify}
-                className="bevel-button-primary text-os-sm"
-              >
-                Unlock All Modules — from $24.99
-              </button>
-            </div>
+        {isPaid && (
+          <div id="nav-stack-analyzer">
+            <M45Slide scan={scan} />
           </div>
         )}
 
-        {!isActiveCategoryLocked && filteredModuleIds.filter((mId) => !CUSTOM_SLIDE_MODULES.has(mId)).map((mId) => (
-          <ModuleSlide
-            key={mId}
-            moduleId={mId}
-            moduleName={MODULE_NAMES[mId] ?? mId}
-            result={resultMap.get(mId) ?? null}
-            scanId={scan.id}
-            isPaid={!isPaid && PAID_MODULES.has(mId)}
-            isGhostModule={GHOST_MODULES.has(mId)}
-            aiScore={aiScores.get(mId)}
-          />
-        ))}
+        <div id="nav-findings">
+          <FindingsSlide scan={scan} />
+        </div>
 
+        {/* ── Category 1: Security & Compliance ── */}
+        <div id="nav-security">
+          <CategoryIntroSlide scan={scan} category="security_compliance" />
+        </div>
+        <M01Slide scan={scan} />
+        <M12Slide scan={scan} />
+        <M40Slide scan={scan} />
+
+        {/* ── Category 2: Analytics & Measurement ── */}
+        <div id="nav-analytics">
+          <CategoryIntroSlide scan={scan} category="analytics_measurement" />
+        </div>
+        <M05Slide scan={scan} />
+        <M06Slide scan={scan} />
+        <M06bSlide scan={scan} />
+        <M08Slide scan={scan} />
+        <M09Slide scan={scan} />
+
+        {/* ── Category 3: Performance & Experience ── */}
+        <div id="nav-performance">
+          <CategoryIntroSlide scan={scan} category="performance_experience" />
+        </div>
+        <M03Slide scan={scan} />
+        <M13Slide scan={scan} />
+        <M14Slide scan={scan} />
+        <M10Slide scan={scan} />
+        <M11Slide scan={scan} />
+
+        {/* ── Category 4: SEO & Content ── */}
+        <div id="nav-seo">
+          <CategoryIntroSlide scan={scan} category="seo_content" />
+        </div>
+        <M04Slide scan={scan} />
+        <M15Slide scan={scan} />
+        <M26Slide scan={scan} />
+        <M34Slide scan={scan} />
+        <M39Slide scan={scan} />
+
+        {/* ── Category 5: Paid Media ── */}
+        <div id="nav-paid-media">
+          <CategoryIntroSlide scan={scan} category="paid_media" />
+        </div>
+        <M21Slide scan={scan} />
+        <M28Slide scan={scan} />
+        <M29Slide scan={scan} />
+
+        {/* ── Category 6: MarTech & Infrastructure ── */}
+        <div id="nav-martech">
+          <CategoryIntroSlide scan={scan} category="martech_infrastructure" />
+        </div>
+        <M02Slide scan={scan} />
+        <M07Slide scan={scan} />
+        <M20Slide scan={scan} />
+
+        {/* ── Category 7: Brand & Digital Presence ── */}
+        <div id="nav-brand">
+          <CategoryIntroSlide scan={scan} category="brand_presence" />
+        </div>
+        <M16Slide scan={scan} />
+        <M17Slide scan={scan} />
+        <M18M19Slide scan={scan} />
+        <M22M23Slide scan={scan} />
+        <M37Slide scan={scan} />
+        <M38Slide scan={scan} />
+
+        {/* ── Category 8: Market Intelligence ── */}
+        <div id="nav-market-intel">
+          <CategoryIntroSlide scan={scan} category="market_intelligence" />
+        </div>
+        <M24Slide scan={scan} />
+        <M25Slide scan={scan} />
+        <M27Slide scan={scan} />
+        <M30Slide scan={scan} />
+        <M31Slide scan={scan} />
+        <M33Slide scan={scan} />
+        <M36Slide scan={scan} />
+
+        {/* ── M43: PRD ── */}
+        {isPaid && (
+          <div id="nav-prd">
+            <M43Slide scan={scan} />
+          </div>
+        )}
+
+        {/* ── Closing slide (back cover) ── */}
+        <ClosingSlide scan={scan} />
       </div>
 
       {/* Status Bar */}
@@ -389,8 +395,9 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
               PRD &darr;
             </button>
             <span className="text-gs-mid" style={{ fontSize: '11px' }}>&middot;</span>
-            <button onClick={handleAskChloe} className="text-gs-base hover:text-gs-bright transition-colors" style={{ fontSize: '11px', fontFamily: 'var(--font-system)' }}>
-              Ask Chloe
+            <button onClick={handleAskChloe} className="text-gs-base hover:text-gs-bright transition-colors flex items-center gap-1" style={{ fontSize: '11px', fontFamily: 'var(--font-system)' }}>
+              Ask Chlo&eacute;
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
             </button>
           </div>
         )}

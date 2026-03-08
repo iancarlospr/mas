@@ -632,7 +632,18 @@ export async function getSerpResults(
 
   const response = await dataForSeoPost(endpoint, [payload]);
 
-  return response.tasks?.[0]?.result?.[0] ?? null;
+  const task = response.tasks?.[0];
+  const result = task?.result?.[0] as Record<string, unknown> | undefined;
+
+  logger.info({
+    endpoint,
+    keyword,
+    taskStatus: task?.status_code,
+    taskMessage: task?.status_message,
+    resultItemCount: (result?.['items'] as unknown[] | undefined)?.length ?? 0,
+  }, 'SERP results received');
+
+  return result ?? null;
 }
 
 /**

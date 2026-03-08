@@ -105,8 +105,9 @@ ${categoryScores ? `Category Scores:\n${categoryScores.map((c: Record<string, un
     if (['M41', 'M42'].includes(moduleId)) continue; // Handled in other layers
 
     const summary = moduleSummaries?.[moduleId] as Record<string, unknown> | undefined;
+    const aiScore = (summary?.['module_score'] as number | undefined) ?? null;
 
-    moduleDataSections.push(`### ${moduleId} (Score: ${result.score ?? 'N/A'}/100)
+    moduleDataSections.push(`### ${moduleId} (Score: ${aiScore ?? 'N/A'}/100)
 ${summary?.['executive_summary'] ?? summary?.['summary'] ?? ''}
 ${result.checkpoints?.length ? `Key Findings:\n${result.checkpoints.map(cp => `  - [${cp.health.toUpperCase()}] ${cp.name}: ${cp.evidence}`).join('\n')}` : ''}
 Data: ${JSON.stringify(result.data)}`);

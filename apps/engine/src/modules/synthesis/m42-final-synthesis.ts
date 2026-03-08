@@ -82,11 +82,21 @@ METHODOLOGY:
       RIGHT: "Mature Stack, Broken Measurement — Half the Ad Budget Is Flying Blind"
       RIGHT: "Strong Security Foundation Undermined by Pre-Consent Tracking and Missing Attribution"
       RIGHT for good scans: "Well-Instrumented Stack With Minor Gaps in Competitive Intelligence"
-   B) verdict_headline: 8-15 words, no period. The Scott Galloway funny take. Same findings as synthesis_headline but delivered in Galloway's voice from the Prof G Pod. Plain English, zero jargon. He talks about MONEY, BRAND, CONSEQUENCES, and HUMAN BEHAVIOR. Irreverent, sharp, a little mean.
-      WRONG: "A Fortune 500 Running Marketing Like a Startup" (generic, no findings)
-      RIGHT: "They Track You Before Asking and Lose Half Their Ad Data Doing It" (specific + Galloway)
-      RIGHT: "Spending $40M on Ads While Their Own Website Can't Tell Who Clicked" (specific + Galloway)
-      RIGHT for good scans: "They Actually Ask Before Tracking and Measure What They Spend — Wild Concept"
+   B) verdict_headline: 8-18 words, no period. This is Scott Galloway from the Prof G Pod roasting this company's marketing stack. Focus ONLY on SEO, Paid Media, and MarTech findings — ignore security, performance, brand, and market intel for this headline.
+      VOICE: You ARE Galloway. Talk about MONEY BEING LIT ON FIRE, CEOS WHO DON'T UNDERSTAND THE INTERNET, COMPANIES SUBSIDIZING GOOGLE'S EARNINGS CALL. Use his cadence — short declarative punches, then a twist. Sometimes it's a dad joke that lands. Sometimes it's genuinely mean. Always specific to what the audit found.
+      GALLOWAY PATTERNS TO USE:
+      - The "they're paying for X while Y" structure (his favorite)
+      - The deadpan obvious observation ("Here's an idea — maybe know who's clicking your ads")
+      - The corporate roast ("The CFO approved this budget?")
+      - The dad-joke-meets-capitalism bit ("Their SEO strategy is hoping Google feels generous")
+      WRONG: "A Fortune 500 Running Marketing Like a Startup" (generic, no findings, not funny)
+      WRONG: "Digital Marketing Needs Improvement Across Key Areas" (boring, could be anyone)
+      RIGHT: "Spending $40M on Ads While Their Own Website Can't Tell Who Clicked" (specific, money, Galloway)
+      RIGHT: "Their SEO Plan Is Apparently Just Vibes and a Prayer to the Google Gods"
+      RIGHT: "Paying Google Twice Because Nobody Set Up Conversion Tracking — Classic"
+      RIGHT: "They Have 14 MarTech Tools and None of Them Talk to Each Other"
+      RIGHT for good scans: "They Actually Measure Their Ad Spend — Someone Give the CMO a Raise"
+      RIGHT for good scans: "Solid Stack, Clean Data, Working Attribution — Is This Company Real?"
 3. For EACH category: write a 3-5 sentence assessment summarizing the state of that area. Identify the top 1-3 issues and any strengths worth acknowledging.
 4. SYNTHESIZE across categories to identify exactly 3 KEY FINDINGS — these must be CROSS-MODULE THEMES, not repetitions of individual module findings.
    Example: "Systemic tracking infrastructure gaps" spanning M05 (no consent mode) + M06 (missing enhanced conversions) + M12 (tracking before consent) is ONE finding that synthesizes a theme across modules.

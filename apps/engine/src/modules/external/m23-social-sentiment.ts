@@ -131,7 +131,6 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
       type: 'organic',
       depth: 15,
       locationCode: location.locationCode,
-      timeRange: 'y',
     }) as Record<string, unknown> | null;
 
     const items = result ? (result['items'] as Array<Record<string, unknown>>) ?? [] : [];

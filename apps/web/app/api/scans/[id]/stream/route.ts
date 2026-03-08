@@ -96,7 +96,7 @@ export async function GET(
           if (currentCount > lastModuleCount) {
             const { data: modules } = await supabase
               .from('module_results')
-              .select('module_id, status, score')
+              .select('module_id, status')
               .eq('scan_id', id)
               .in('status', ['success', 'partial', 'error']);
 
@@ -108,7 +108,6 @@ export async function GET(
                 scanId: id,
                 moduleId: mod.module_id,
                 moduleStatus: mod.status,
-                moduleScore: mod.score,
                 progress: Math.round((currentModules.length / 45) * 100),
               });
             }

@@ -14,7 +14,7 @@ import { registerModuleExecutor } from '../runner.js';
 import type { ModuleContext } from '../types.js';
 import type { ModuleResult, ModuleId, Signal, Checkpoint, CheckpointHealth } from '@marketing-alpha/types';
 import { createSignal, createCheckpoint, infoCheckpoint } from '../../utils/signals.js';
-import { getTrafficAnalyticsOverview } from '../../services/dataforseo.js';
+import { getDomainRankOverview } from '../../services/dataforseo.js';
 
 const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
   const signals: Signal[] = [];
@@ -24,9 +24,18 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
   const domain = new URL(ctx.url).hostname.replace('www.', '');
 
   try {
-    const overview = await getTrafficAnalyticsOverview(domain) as Record<string, unknown> | null;
+    const result = await getDomainRankOverview(domain, 50) as {
+      total_count?: number;
+      items?: Array<{
+        location_code?: number;
+        metrics?: {
+          organic?: { etv?: number; count?: number; estimated_paid_traffic_cost?: number };
+          paid?: { etv?: number; count?: number };
+        };
+      }>;
+    } | null;
 
-    if (!overview) {
+    if (!result || !result.items?.length) {
       checkpoints.push(createCheckpoint({
         id: 'm24-data', name: 'Traffic Data', weight: 0.5,
         health: 'warning', evidence: 'No traffic data available from DataForSEO for this domain',
@@ -34,16 +43,18 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
       return { moduleId: 'M24' as ModuleId, status: 'success', data, signals, score: null, checkpoints, duration: 0 };
     }
 
-    data.overview = overview;
+    // Aggregate across all countries for global totals
+    let organicTraffic = 0;
+    let paidTraffic = 0;
+    let organicKeywords = 0;
+    let paidKeywords = 0;
 
-    const metrics = overview['metrics'] as Record<string, Record<string, number>> | undefined;
-    const organic = metrics?.['organic'] ?? {};
-    const paid = metrics?.['paid'] ?? {};
-
-    const organicTraffic = organic['etv'] ?? 0; // estimated traffic volume
-    const paidTraffic = paid['etv'] ?? 0;
-    const organicKeywords = organic['count'] ?? 0;
-    const paidKeywords = paid['count'] ?? 0;
+    for (const item of result.items) {
+      organicTraffic += item.metrics?.organic?.etv ?? 0;
+      paidTraffic += item.metrics?.paid?.etv ?? 0;
+      organicKeywords += item.metrics?.organic?.count ?? 0;
+      paidKeywords += item.metrics?.paid?.count ?? 0;
+    }
 
     data.organicTraffic = organicTraffic;
     data.paidTraffic = paidTraffic;

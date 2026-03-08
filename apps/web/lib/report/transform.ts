@@ -7,7 +7,6 @@ import type {
   CategoryScore,
   MarketingIQResult,
   ScoreCategory,
-  CATEGORY_WEIGHTS,
   ReportData,
   ReportCategoryScore,
   Finding,

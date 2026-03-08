@@ -366,7 +366,10 @@ export function M43Slide({ scan, printMode }: { scan: ScanWithResults; printMode
                   width: 'fit-content',
                 }}
               >
-                Ask Chloe
+                <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                </svg>
+                Ask Chlo&eacute;
               </span>
             ) : (
               <button
@@ -389,7 +392,10 @@ export function M43Slide({ scan, printMode }: { scan: ScanWithResults; printMode
                   transition: 'all 0.2s',
                 }}
               >
-                Ask Chloe
+                <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                </svg>
+                Ask Chlo&eacute;
               </button>
             )}
           </div>
@@ -478,7 +484,7 @@ export function M43Slide({ scan, printMode }: { scan: ScanWithResults; printMode
                   <span
                     className="font-display uppercase"
                     style={{
-                      display: 'inline-flex',
+                      display: 'flex',
                       alignItems: 'center',
                       gap: '0.4em',
                       padding: '0.55em 2em',
@@ -489,10 +495,9 @@ export function M43Slide({ scan, printMode }: { scan: ScanWithResults; printMode
                       letterSpacing: '0.1em',
                       borderRadius: '3px',
                       boxShadow: '0 0 20px rgba(255,178,239,0.25), 0 4px 12px rgba(0,0,0,0.3)',
-                      justifyContent: 'center',
                     }}
                   >
-                    <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
                       <line x1="12" y1="5" x2="12" y2="19" />
                       <polyline points="19 12 12 19 5 12" />
                     </svg>
@@ -505,9 +510,8 @@ export function M43Slide({ scan, printMode }: { scan: ScanWithResults; printMode
                     rel="noopener noreferrer"
                     className="font-display uppercase m43-cta-primary"
                     style={{
-                      display: 'inline-flex',
+                      display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'center',
                       gap: '0.4em',
                       padding: '0.55em 2em',
                       background: 'var(--gs-base)',
@@ -521,7 +525,7 @@ export function M43Slide({ scan, printMode }: { scan: ScanWithResults; printMode
                       transition: 'all 0.2s',
                     }}
                   >
-                    <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
                       <line x1="12" y1="5" x2="12" y2="19" />
                       <polyline points="19 12 12 19 5 12" />
                     </svg>
@@ -529,14 +533,12 @@ export function M43Slide({ scan, printMode }: { scan: ScanWithResults; printMode
                   </a>
                 )}
 
-                {/* Secondary: Download Presentation */}
                 {printMode ? (
                   <span
                     className="font-display uppercase"
                     style={{
-                      display: 'inline-flex',
+                      display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'center',
                       gap: '0.4em',
                       padding: '0.55em 2em',
                       border: '1px solid rgba(255,178,239,0.2)',
@@ -548,11 +550,11 @@ export function M43Slide({ scan, printMode }: { scan: ScanWithResults; printMode
                       background: 'transparent',
                     }}
                   >
-                    <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
                       <line x1="12" y1="5" x2="12" y2="19" />
                       <polyline points="19 12 12 19 5 12" />
                     </svg>
-                    Download Slides
+                    Download This Presentation
                   </span>
                 ) : (
                   <a
@@ -561,9 +563,8 @@ export function M43Slide({ scan, printMode }: { scan: ScanWithResults; printMode
                     rel="noopener noreferrer"
                     className="font-display uppercase m43-cta-secondary"
                     style={{
-                      display: 'inline-flex',
+                      display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'center',
                       gap: '0.4em',
                       padding: '0.55em 2em',
                       border: '1px solid rgba(255,178,239,0.2)',
@@ -577,11 +578,11 @@ export function M43Slide({ scan, printMode }: { scan: ScanWithResults; printMode
                       transition: 'all 0.2s',
                     }}
                   >
-                    <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
                       <line x1="12" y1="5" x2="12" y2="19" />
                       <polyline points="19 12 12 19 5 12" />
                     </svg>
-                    Download Slides
+                    Download This Presentation
                   </a>
                 )}
               </div>

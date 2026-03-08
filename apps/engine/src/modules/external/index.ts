@@ -22,3 +22,4 @@ import './m36-google-shopping.js';
 import './m37-review-velocity.js';
 import './m38-local-pack.js';
 import './m39-sitemap.js';
+import './m40-subdomain-enumeration.js';

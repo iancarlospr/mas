@@ -23,8 +23,6 @@ export type {
   ScanProgressEvent,
 } from '@marketing-alpha/types';
 
-export { HEALTH_MULTIPLIERS, CATEGORY_WEIGHTS } from '@marketing-alpha/types';
-
 import type { Page } from 'patchright';
 import type { NetworkCollector, RedirectChainEntry } from '../utils/network.js';
 import type { ConsoleCollector } from '../utils/console-collector.js';

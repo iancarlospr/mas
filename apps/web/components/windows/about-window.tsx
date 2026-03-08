@@ -100,7 +100,6 @@ const CATEGORIES: ModuleCategory[] = [
       { id: 'M41', name: 'Module AI Synthesis' },
       { id: 'M42', name: 'Executive Brief' },
       { id: 'M43', name: 'PRD Generation' },
-      { id: 'M44', name: 'Impact Scenarios' },
       { id: 'M45', name: 'Stack Analyzer' },
     ],
   },

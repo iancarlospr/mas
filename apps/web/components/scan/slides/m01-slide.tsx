@@ -18,13 +18,14 @@ import type { ScanWithResults, ModuleResult } from '@marketing-alpha/types';
 interface M41Summary {
   analysis?: string;
   executive_summary?: string;
+  module_score?: number;
   key_findings?: Array<{ finding: string; severity: string; evidence: string }>;
   recommendations?: Array<{ action: string; priority: string }>;
   score_breakdown?: Array<{ criterion: string; score: number; weight: number }>;
 }
 interface DkimEntry { selector: string; record: string }
 
-function spfH(q: string | null) { return q === '-all' ? 'good' : q === '~all' ? 'warning' : 'critical' as const; }
+function spfH(q: string | null) { return q === '-all' || q === '-' ? 'good' : q === '~all' || q === '~' ? 'warning' : q === '+all' || q === '+' || q === '?all' || q === '?' ? 'critical' : q ? 'warning' : 'critical' as const; }
 function dkimH(e: DkimEntry[], b: number | null) { return !e?.length ? 'critical' : b != null && b < 1024 ? 'warning' : 'good' as const; }
 function dmarcH(p: string | null) { return p === 'reject' ? 'good' : p === 'quarantine' ? 'warning' : 'critical' as const; }
 
@@ -79,7 +80,6 @@ export function M01Slide({ scan }: { scan: ScanWithResults }) {
   const raw = (m01?.data as Record<string, unknown> | undefined) ?? MOCK_M01;
   if (!syn && !raw) return null;
 
-  const analysis = syn?.analysis ?? syn?.executive_summary ?? '';
   const findings = syn?.key_findings ?? [];
   const recs = syn?.recommendations ?? [];
   const scores = (syn?.score_breakdown?.length ? syn.score_breakdown : MOCK_M41?.score_breakdown) ?? [];
@@ -96,7 +96,8 @@ export function M01Slide({ scan }: { scan: ScanWithResults }) {
   const ms = hasDmarc ? dmarcH(dmarcP) : 'critical';
 
   const headline = findings.length > 0 ? findings[0]!.finding : 'Email authentication chain requires attention';
-  const modScore = m01?.score ?? null;
+  const analysis = syn?.executive_summary ?? syn?.analysis ?? '';
+  const modScore = syn?.module_score ?? m01?.score ?? null;
 
   return (
     <div
@@ -106,9 +107,9 @@ export function M01Slide({ scan }: { scan: ScanWithResults }) {
       <div className="relative z-10 h-full flex flex-col overflow-hidden" style={{ padding: '1.5% 3.5% 1%' }}>
 
         {/* ═══ Module bar ═══ */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.15em', flexShrink: 0 }}>
-          <span className="font-data uppercase" style={{ fontSize: 'clamp(11px, 1.3cqi, 14px)', letterSpacing: '0.18em', color: 'var(--gs-base)' }}>
-            Security &amp; Compliance — M01
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.5em', flexShrink: 0 }}>
+          <span className="font-display uppercase" style={{ fontSize: 'clamp(12px, 1.4cqi, 15px)', letterSpacing: '0.18em', color: 'var(--gs-base)' }}>
+            DNS &amp; Security Headers
           </span>
           {modScore != null && (
             <span className="font-data tabular-nums" style={{ fontSize: 'clamp(13px, 1.5cqi, 17px)', fontWeight: 700, color: scoreC(modScore) }}>
@@ -118,7 +119,7 @@ export function M01Slide({ scan }: { scan: ScanWithResults }) {
         </div>
 
         {/* ═══ Action headline ═══ */}
-        <h2 className="font-display" style={{ fontSize: 'clamp(17px, 2.2cqi, 26px)', fontWeight: 600, lineHeight: 1.2, color: 'var(--gs-light)', marginBottom: '0.6em', flexShrink: 0 }}>
+        <h2 className="font-display" style={{ fontSize: 'clamp(20px, 2.8cqi, 32px)', fontWeight: 700, lineHeight: 1.15, color: 'var(--gs-light)', marginBottom: '0.6em', flexShrink: 0, borderLeft: '3px solid var(--gs-base)', paddingLeft: '0.6em' }}>
           {headline}
         </h2>
 
@@ -127,18 +128,44 @@ export function M01Slide({ scan }: { scan: ScanWithResults }) {
           display: 'flex', alignItems: 'center', gap: '0', marginBottom: '0.8em', flexShrink: 0,
           padding: '0.6em 0', borderTop: '1px solid rgba(255,178,239,0.06)', borderBottom: '1px solid rgba(255,178,239,0.06)',
         }}>
-          <ChainItem label="SPF" desc="Sender Policy Framework — authorized mail servers" why="Without it, anyone can send email as your domain. Spam filters flag you." status={ss} detail={spfQ ?? (spfRec ? 'present' : 'missing')} />
+          <ChainItem
+            label="SPF" desc="Who can send email as you"
+            status={ss} detail={spfQ ?? (spfRec ? 'present' : 'missing')}
+            why={ss === 'good'
+              ? '✓ Hard fail (-all) — only your approved servers can send email as your brand. Fakes get rejected.'
+              : ss === 'warning'
+                ? '~ Soft fail (~all) — unapproved senders are flagged but not blocked. Your marketing emails land, but so might fakes.'
+                : '✗ Missing or misconfigured — anyone can send email pretending to be your brand. Your campaigns may land in spam.'}
+          />
           <ChainConnector />
-          <ChainItem label="DKIM" desc="DomainKeys — cryptographic email signature" why="Proves your marketing emails weren't tampered with in transit. Required by Gmail and Yahoo." status={ds} detail={dkimE.length > 0 ? `${dkimB ?? '?'}-bit` : 'not found'} />
+          <ChainItem
+            label="DKIM" desc="Proof your emails are legit"
+            status={ds} detail={dkimE.length > 0 ? `${dkimB ?? '?'}-bit` : 'not found'}
+            why={ds === 'good'
+              ? `✓ Valid ${dkimB ?? ''}-bit signature — your emails are cryptographically signed. Gmail and Yahoo trust them.`
+              : ds === 'warning'
+                ? `~ Weak key (${dkimB}-bit) — signed but the key is too short. Modern standards require 2048-bit. Upgrade before providers stop accepting it.`
+                : '✗ No signature found — your marketing emails have no proof of authenticity. Gmail and Yahoo may deprioritize or reject them.'}
+          />
           <ChainConnector />
-          <ChainItem label="DMARC" desc="Domain Authentication — spoofing enforcement policy" why="Tells inboxes to reject fakes. Without it, phishing emails using your brand land in customer inboxes." status={ms} detail={dmarcP ?? 'missing'} />
+          <ChainItem
+            label="DMARC" desc="What happens to fakes"
+            status={ms} detail={dmarcP ?? 'missing'}
+            why={ms === 'good'
+              ? '✓ Policy: reject — spoofed emails using your domain are blocked outright. Maximum brand protection.'
+              : ms === 'warning'
+                ? '~ Policy: quarantine — fakes go to spam instead of inbox. Good, but "reject" is stronger.'
+                : dmarcP === 'none'
+                  ? '✗ Policy: none (monitor only) — you can SEE spoofing attempts but nothing blocks them. Phishing emails using your brand still land in customer inboxes.'
+                  : '✗ No DMARC record — no spoofing protection at all. Anyone can impersonate your brand via email.'}
+          />
         </div>
 
-        {/* ═══ Analysis — full width ═══ */}
+        {/* ═══ Executive Summary ═══ */}
         {analysis && (
           <div style={{ marginBottom: '0.7em', flexShrink: 0 }}>
-            <h4 className="font-display uppercase" style={{ fontSize: 'clamp(9px, 1cqi, 11px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.3em' }}>
-              Analysis
+            <h4 className="font-display uppercase" style={{ fontSize: 'clamp(12px, 1.3cqi, 14px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.3em' }}>
+              Executive Summary
             </h4>
             <p className="font-data" style={{ fontSize: 'clamp(12px, 1.35cqi, 15px)', lineHeight: 1.6, color: 'var(--gs-light)', opacity: 0.85 }}>
               {analysis}
@@ -151,20 +178,20 @@ export function M01Slide({ scan }: { scan: ScanWithResults }) {
 
           {/* Findings */}
           <div style={{ flex: 1, overflow: 'hidden' }}>
-            <h4 className="font-display uppercase" style={{ fontSize: 'clamp(9px, 1cqi, 11px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.4em' }}>
+            <h4 className="font-display uppercase" style={{ fontSize: 'clamp(12px, 1.3cqi, 14px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.4em' }}>
               Key Findings
             </h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35em' }}>
               {findings.map((f, i) => (
                 <div key={i} style={{ display: 'flex', gap: '0.4em', alignItems: 'flex-start' }}>
                   <span className="font-data uppercase flex-shrink-0" style={{
-                    fontSize: 'clamp(9px, 1cqi, 11px)', padding: '0.1em 0.3em', borderRadius: '2px',
+                    fontSize: 'clamp(12px, 1.3cqi, 14px)', padding: '0.1em 0.3em', borderRadius: '2px',
                     background: `color-mix(in srgb, ${sc(f.severity)} 15%, transparent)`, color: sc(f.severity),
                     marginTop: '0.15em', fontWeight: 600,
                   }}>
                     {f.severity === 'critical' ? 'CRIT' : f.severity === 'warning' ? 'WARN' : f.severity === 'positive' ? 'GOOD' : 'INFO'}
                   </span>
-                  <p className="font-data" style={{ fontSize: 'clamp(11px, 1.25cqi, 14px)', color: 'var(--gs-light)', lineHeight: 1.4 }}>
+                  <p className="font-data" style={{ fontSize: 'clamp(12px, 1.35cqi, 15px)', color: 'var(--gs-light)', lineHeight: 1.4 }}>
                     {f.finding}
                   </p>
                 </div>
@@ -177,20 +204,20 @@ export function M01Slide({ scan }: { scan: ScanWithResults }) {
 
           {/* Recommendations */}
           <div style={{ flex: 1, overflow: 'hidden' }}>
-            <h4 className="font-display uppercase" style={{ fontSize: 'clamp(9px, 1cqi, 11px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.4em' }}>
+            <h4 className="font-display uppercase" style={{ fontSize: 'clamp(12px, 1.3cqi, 14px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.4em' }}>
               Recommendations
             </h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35em' }}>
               {recs.map((r, i) => (
                 <div key={i} style={{ display: 'flex', gap: '0.4em', alignItems: 'flex-start' }}>
                   <span className="font-data uppercase flex-shrink-0" style={{
-                    fontSize: 'clamp(9px, 1cqi, 11px)', padding: '0.1em 0.3em', borderRadius: '2px',
+                    fontSize: 'clamp(12px, 1.3cqi, 14px)', padding: '0.1em 0.3em', borderRadius: '2px',
                     background: 'rgba(255,178,239,0.08)', color: 'var(--gs-base)',
                     marginTop: '0.15em', fontWeight: 600,
                   }}>
                     {r.priority}
                   </span>
-                  <p className="font-data" style={{ fontSize: 'clamp(11px, 1.25cqi, 14px)', color: 'var(--gs-light)', lineHeight: 1.4 }}>
+                  <p className="font-data" style={{ fontSize: 'clamp(12px, 1.35cqi, 15px)', color: 'var(--gs-light)', lineHeight: 1.4 }}>
                     {r.action}
                   </p>
                 </div>
@@ -204,19 +231,19 @@ export function M01Slide({ scan }: { scan: ScanWithResults }) {
           {/* Score Breakdown */}
           {scores.length > 0 && (
             <div style={{ flex: 1, overflow: 'hidden' }}>
-              <h4 className="font-display uppercase" style={{ fontSize: 'clamp(9px, 1cqi, 11px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.4em' }}>
+              <h4 className="font-display uppercase" style={{ fontSize: 'clamp(12px, 1.3cqi, 14px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.4em' }}>
                 Score Breakdown
               </h4>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3em' }}>
                 {scores.map((s, i) => (
                   <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.5em' }}>
-                    <span className="font-data" style={{ fontSize: 'clamp(11px, 1.25cqi, 14px)', color: 'var(--gs-light)', flex: 1 }}>
+                    <span className="font-data" style={{ fontSize: 'clamp(12px, 1.35cqi, 15px)', color: 'var(--gs-light)', flex: 1 }}>
                       {s.criterion}
                     </span>
                     <div style={{ width: '50px', height: '4px', background: 'rgba(255,255,255,0.06)', borderRadius: '2px', overflow: 'hidden', flexShrink: 0 }}>
                       <div style={{ width: `${s.score}%`, height: '100%', background: scoreC(s.score), borderRadius: '2px' }} />
                     </div>
-                    <span className="font-data tabular-nums" style={{ fontSize: 'clamp(11px, 1.25cqi, 14px)', fontWeight: 600, color: scoreC(s.score), minWidth: '2em', textAlign: 'right' }}>
+                    <span className="font-data tabular-nums" style={{ fontSize: 'clamp(12px, 1.35cqi, 15px)', fontWeight: 600, color: scoreC(s.score), minWidth: '2em', textAlign: 'right' }}>
                       {s.score}
                     </span>
                   </div>
@@ -228,10 +255,10 @@ export function M01Slide({ scan }: { scan: ScanWithResults }) {
 
         {/* ═══ Footnote ═══ */}
         <div style={{ padding: '0.6em 0 0', display: 'flex', justifyContent: 'space-between', flexShrink: 0 }}>
-          <span className="font-data" style={{ fontSize: 'clamp(9px, 0.95cqi, 11px)', color: 'var(--gs-mid)', opacity: 0.4 }}>
+          <span className="font-data" style={{ fontSize: 'clamp(12px, 1.2cqi, 14px)', color: 'var(--gs-mid)', opacity: 0.4 }}>
             Source: DNS TXT records (SPF, DKIM, DMARC), HTTP headers, TLS handshake
           </span>
-          <span className="font-data" style={{ fontSize: 'clamp(9px, 0.95cqi, 11px)', color: 'var(--gs-mid)', opacity: 0.4 }}>
+          <span className="font-data" style={{ fontSize: 'clamp(12px, 1.2cqi, 14px)', color: 'var(--gs-mid)', opacity: 0.4 }}>
             {scan.domain} — AlphaScan
           </span>
         </div>
@@ -252,7 +279,7 @@ function ChainItem({ label, desc, why, status, detail }: { label: string; desc: 
       </span>
       {/* Label + desc + detail + why */}
       <div>
-        <p className="font-data" style={{ fontSize: 'clamp(9px, 0.95cqi, 11px)', color: 'var(--gs-mid)', lineHeight: 1.3, marginBottom: '0.1em' }}>
+        <p className="font-data" style={{ fontSize: 'clamp(12px, 1.2cqi, 14px)', color: 'var(--gs-mid)', lineHeight: 1.3, marginBottom: '0.1em' }}>
           {desc}
         </p>
         <div style={{ marginBottom: '0.2em' }}>
@@ -263,7 +290,7 @@ function ChainItem({ label, desc, why, status, detail }: { label: string; desc: 
             {detail}
           </span>
         </div>
-        <p className="font-data" style={{ fontSize: 'clamp(9px, 0.95cqi, 11px)', color: 'var(--gs-mid)', lineHeight: 1.4, opacity: 0.7 }}>
+        <p className="font-data" style={{ fontSize: 'clamp(12px, 1.2cqi, 14px)', color: 'var(--gs-mid)', lineHeight: 1.4, opacity: 0.7 }}>
           {why}
         </p>
       </div>

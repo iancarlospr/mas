@@ -19,10 +19,11 @@ const T = {
   heroFinding:  'clamp(22px, 3.2cqi, 36px)',
   heroImpact:   'clamp(13px, 1.5cqi, 17px)',
   heroDetail:   'clamp(12px, 1.35cqi, 15px)',
-  subFinding:   'clamp(14px, 1.8cqi, 20px)',
-  subImpact:    'clamp(11px, 1.25cqi, 14px)',
-  badge:        'clamp(9px, 1cqi, 11px)',
-  context:      'clamp(11px, 1.25cqi, 14px)',
+  subFinding:   'clamp(15px, 2cqi, 22px)',
+  subDetail:    'clamp(12px, 1.3cqi, 14px)',
+  subImpact:    'clamp(12px, 1.3cqi, 14px)',
+  badge:        'clamp(12px, 1.2cqi, 14px)',
+  context:      'clamp(12px, 1.25cqi, 14px)',
   number:       'clamp(40px, 5.5cqi, 68px)',
 } as const;
 
@@ -118,17 +119,30 @@ export function FindingsSlide({ scan }: FindingsSlideProps) {
         containerType: 'inline-size',
       }}
     >
-      <div className="relative z-10 h-full flex flex-col">
+      <div className="relative z-10 h-full flex flex-col" style={{ paddingBottom: 'clamp(16px, 2.8cqi, 28px)' }}>
 
-        {/* ── TOP: Hero Finding (~55%) ── */}
+        {/* ── Section title ── */}
+        <h3
+          className="font-display uppercase"
+          style={{
+            fontSize: 'clamp(12px, 1.6cqi, 16px)',
+            fontWeight: 600,
+            letterSpacing: '0.15em',
+            color: 'var(--gs-base)',
+            padding: '1.5% 3.5% 0',
+          }}
+        >
+          Key Findings
+        </h3>
+
+        {/* ── TOP: Hero Finding ── */}
         <div
           style={{
-            flex: '1 1 0',
-            padding: '1.5% 3.5% 1%',
+            flex: '0 0 auto',
+            padding: '0.8% 3.5% 0',
             display: 'flex',
             gap: '4%',
             alignItems: 'flex-start',
-            borderBottom: '1px solid rgba(255,178,239,0.06)',
           }}
         >
           {/* Big number */}
@@ -205,12 +219,15 @@ export function FindingsSlide({ scan }: FindingsSlideProps) {
           </div>
         </div>
 
-        {/* ── BOTTOM: Two supporting findings side by side (~35%) ── */}
+        {/* ── BOTTOM: Two supporting findings side by side ── */}
         <div
           style={{
-            flex: '0 0 auto',
+            flex: '1 1 0',
+            minHeight: 0,
             display: 'flex',
             gap: '1px',
+            borderTop: '1px solid rgba(255,178,239,0.06)',
+            marginTop: '12%',
           }}
         >
           {supporting.map((f, i) => {
@@ -220,20 +237,20 @@ export function FindingsSlide({ scan }: FindingsSlideProps) {
                 key={i}
                 style={{
                   flex: 1,
-                  padding: '1.5% 3.5%',
+                  padding: '2.5% 3.5%',
                   borderRight: i === 0 ? '1px solid rgba(255,178,239,0.06)' : 'none',
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '3%' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '3%', height: '100%' }}>
                   {/* Number */}
                   <span
                     className="font-data tabular-nums flex-shrink-0"
                     style={{
-                      fontSize: T.subFinding,
+                      fontSize: T.number,
                       fontWeight: 700,
                       color: u.text,
-                      opacity: 0.2,
-                      lineHeight: 1,
+                      opacity: 0.15,
+                      lineHeight: 0.85,
                     }}
                   >
                     {String(i + 2).padStart(2, '0')}
@@ -250,7 +267,7 @@ export function FindingsSlide({ scan }: FindingsSlideProps) {
                         borderRadius: '3px',
                         background: u.bg,
                         color: u.text,
-                        marginBottom: '0.5em',
+                        marginBottom: '0.6em',
                       }}
                     >
                       {f.urgency.replace(/_/g, ' ')}
@@ -264,11 +281,24 @@ export function FindingsSlide({ scan }: FindingsSlideProps) {
                         fontWeight: 600,
                         lineHeight: 1.25,
                         color: 'var(--gs-light)',
-                        marginBottom: '0.4em',
+                        marginBottom: '0.5em',
                       }}
                     >
                       {f.finding}
                     </h4>
+
+                    {/* Detail */}
+                    <p
+                      className="font-data"
+                      style={{
+                        fontSize: T.subDetail,
+                        lineHeight: 1.6,
+                        color: 'var(--gs-mid)',
+                        marginBottom: '0.5em',
+                      }}
+                    >
+                      {f.detail}
+                    </p>
 
                     {/* Impact */}
                     <p
@@ -276,7 +306,8 @@ export function FindingsSlide({ scan }: FindingsSlideProps) {
                       style={{
                         fontSize: T.subImpact,
                         lineHeight: 1.5,
-                        color: 'var(--gs-mid)',
+                        color: 'var(--gs-light)',
+                        opacity: 0.85,
                       }}
                     >
                       {f.business_impact}
@@ -292,7 +323,7 @@ export function FindingsSlide({ scan }: FindingsSlideProps) {
         {competitiveContext && (
           <div
             style={{
-              padding: '1% 3.5%',
+              padding: '1.2% 3.5% 1.5%',
               borderTop: '1px solid rgba(255,178,239,0.06)',
               background: 'rgba(255,178,239,0.015)',
             }}
@@ -312,6 +343,33 @@ export function FindingsSlide({ scan }: FindingsSlideProps) {
         )}
       </div>
 
+      {/* Brand strip */}
+      <div
+        className="absolute left-0 right-0 bottom-0 overflow-hidden"
+        style={{
+          background: 'var(--gs-base)',
+          height: 'clamp(16px, 2.8cqi, 28px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <pre
+          className="font-data leading-none whitespace-pre select-none"
+          style={{
+            fontSize: 'clamp(1.5px, 0.25cqi, 3px)',
+            lineHeight: '1.1',
+            color: '#080808',
+          }}
+        >
+{` █████╗ ██╗     ██████╗ ██╗  ██╗ █████╗     ███████╗ ██████╗ █████╗ ███╗   ██╗
+██╔══██╗██║     ██╔══██╗██║  ██║██╔══██╗    ██╔════╝██╔════╝██╔══██╗████╗  ██║
+███████║██║     ██████╔╝███████║███████║    ███████╗██║     ███████║██╔██╗ ██║
+██╔══██║██║     ██╔═══╝ ██╔══██║██╔══██║    ╚════██║██║     ██╔══██║██║╚██╗██║
+██║  ██║███████╗██║     ██║  ██║██║  ██║    ███████║╚██████╗██║  ██║██║ ╚████║
+╚═╝  ╚═╝╚══════╝╚═╝     ╚═╝  ╚═╝╚═╝  ╚═╝    ╚══════╝ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═══╝`}
+        </pre>
+      </div>
     </div>
   );
 }

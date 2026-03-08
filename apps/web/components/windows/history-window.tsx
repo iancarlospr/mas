@@ -120,13 +120,14 @@ export default function HistoryWindow() {
   return (
     <div className="h-full flex flex-col">
       {/* Column headers */}
-      <div className="flex items-center gap-gs-2 px-gs-3 py-gs-1 bg-gs-chrome border-b border-gs-chrome-dark font-system text-os-xs text-gs-muted">
+      <div className="flex items-center gap-gs-2 px-gs-3 py-gs-2 bg-gs-chrome border-b border-gs-chrome-dark font-system text-os-xs" style={{ color: 'var(--gs-light)', opacity: 0.6 }}>
         <span className="flex-1">Domain</span>
-        <span className="w-16 text-center">Score</span>
-        <span className="w-20 text-center">Status</span>
-        <span className="w-16 text-center">Tier</span>
-        <span className="w-24 text-right">Date</span>
-        <span className="w-8" />
+        <span className="w-14 text-center">Score</span>
+        <span className="w-6 text-center" />
+        <span className="w-14 text-center">Tier</span>
+        <span className="w-28 text-center">Export</span>
+        <span className="w-16 text-right">Date</span>
+        <span className="w-6" />
       </div>
 
       {/* Scan rows */}
@@ -140,15 +141,18 @@ export default function HistoryWindow() {
           }
 
           return (
-            <button
+            <div
               key={scan.id}
+              role="button"
+              tabIndex={0}
               onClick={() => handleScanClick(scan.id, domain, scan.status)}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleScanClick(scan.id, domain, scan.status); } }}
               className="flex items-center gap-gs-2 px-gs-3 py-gs-2 hover:bg-gs-red/5 border-b border-gs-chrome-dark/20 font-data text-data-sm w-full text-left cursor-pointer"
             >
               <span className="flex-1 truncate">
                 {domain}
               </span>
-              <span className="w-16 text-center flex items-center justify-center gap-1">
+              <span className="w-14 text-center flex items-center justify-center gap-1">
                 {scan.marketing_iq != null && (
                   <>
                     <span className={`traffic-dot w-2 h-2 ${getScoreColor(scan.marketing_iq)}`} />
@@ -156,26 +160,52 @@ export default function HistoryWindow() {
                   </>
                 )}
               </span>
-              <span className="w-20 text-center">
-                <span className={`font-system text-os-xs px-gs-1 ${
-                  scan.status === 'complete' ? 'text-gs-terminal' :
-                  scan.status === 'failed' ? 'text-gs-critical' :
-                  'text-gs-warning'
-                }`}>
-                  {scan.status}
-                </span>
+              <span className="w-6 text-center" title={scan.status}>
+                {scan.status === 'complete' ? (
+                  <svg className="w-3.5 h-3.5 inline-block text-gs-terminal" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
+                ) : scan.status === 'failed' ? (
+                  <svg className="w-3.5 h-3.5 inline-block text-gs-critical" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
+                ) : (
+                  <svg className="w-3.5 h-3.5 inline-block text-gs-warning animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round"><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>
+                )}
               </span>
-              <span className="w-16 text-center">
-                <span className={`font-system text-os-xs px-gs-1 bevel-raised ${
-                  scan.tier === 'paid' ? 'bg-gs-red text-white' : 'bg-gs-chrome'
-                }`}>
+              <span className="w-14 text-center">
+                <span
+                  className="font-system text-os-xs px-gs-1 bevel-raised"
+                  style={scan.tier === 'paid'
+                    ? { background: 'var(--gs-base)', color: 'var(--gs-void)', fontWeight: 700 }
+                    : {}}
+                >
                   {scan.tier === 'paid' ? 'PRO' : 'FREE'}
                 </span>
               </span>
-              <span className="w-24 text-right text-data-xs text-gs-muted">
-                {new Date(scan.created_at).toLocaleDateString()}
+              <span className="w-28 text-center flex items-center justify-center gap-1 whitespace-nowrap">
+                {scan.tier === 'paid' && scan.status === 'complete' && (
+                  <>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); window.open(`/api/reports/${scan.id}/presentation`, '_blank'); }}
+                      className="text-gs-base hover:text-gs-bright transition-colors"
+                      title="Download Slides"
+                      style={{ fontSize: '11px', fontFamily: 'var(--font-system)' }}
+                    >
+                      Slides&nbsp;&darr;
+                    </button>
+                    <span className="text-gs-mid" style={{ fontSize: '11px' }}>&middot;</span>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); window.open(`/api/reports/${scan.id}/prd`, '_blank'); }}
+                      className="text-gs-base hover:text-gs-bright transition-colors"
+                      title="Download PRD"
+                      style={{ fontSize: '11px', fontFamily: 'var(--font-system)' }}
+                    >
+                      PRD&nbsp;&darr;
+                    </button>
+                  </>
+                )}
               </span>
-              <span className="w-8 flex justify-center">
+              <span className="w-16 text-right text-data-xs text-gs-muted">
+                {new Date(scan.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+              </span>
+              <span className="w-6 flex justify-center">
                 <button
                   onClick={(e) => handleDelete(e, scan.id)}
                   disabled={deletingId === scan.id}
@@ -185,7 +215,7 @@ export default function HistoryWindow() {
                   {deletingId === scan.id ? '...' : 'x'}
                 </button>
               </span>
-            </button>
+            </div>
           );
         })}
       </div>

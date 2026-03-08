@@ -16,9 +16,10 @@
 
 import { registerModuleExecutor } from '../runner.js';
 import type { ModuleContext } from '../types.js';
-import type { ModuleResult, ModuleId, Signal, Checkpoint } from '@marketing-alpha/types';
+import type { ModuleResult, ModuleId, Signal, Checkpoint, M41Data } from '@marketing-alpha/types';
 import { createCheckpoint } from '../../utils/signals.js';
-import { callFlash } from '../../services/gemini.js';
+import { calculateMarketingIQFromSynthesis } from '../../utils/scoring.js';
+import { callPro } from '../../services/gemini.js';
 import { z } from 'zod';
 
 // ─── Output schema ──────────────────────────────────────────────────────
@@ -96,7 +97,7 @@ RULES:
    Compliance risk goes in the separate complianceRisk object, NOT in scenario areas.
 7. When data is insufficient for a category, set monthlyImpact to 0 and confidence to "low". Never fabricate traffic or spend data that was not provided.
 8. totalMonthlyImpact must equal the sum of all impactAreas[].monthlyImpact. totalAnnualImpact must equal totalMonthlyImpact * 12.
-9. scoreImprovement.current should reflect the MarketingIQ score from the audit (if available in findings). scoreImprovement.estimated should be the projected score after fixing P0+P1 issues (a reasonable uplift, not 100).
+9. scoreImprovement.current MUST use the MarketingIQ score provided in the data (under "### MarketingIQ Score"). scoreImprovement.estimated should be the projected score after fixing P0+P1 issues (a reasonable uplift, not 100).
 10. methodology must be 2-3 sentences explaining that these are benchmark-based projections derived from industry research, not measured values from the client's actual revenue or conversion data. Be honest about the limitations.
 11. Scenarios must be ordered: conservative < moderate < aggressive for totalMonthlyImpact.
 
@@ -116,6 +117,20 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
 
   const m42Data = m42Result.data as Record<string, unknown>;
   const synthesis = (m42Data['synthesis'] as Record<string, unknown>) ?? {};
+
+  // Get M41 data for rich per-module AI analysis + MarketingIQ score
+  const m41Result = ctx.previousResults.get('M41' as ModuleId);
+  const m41Data = m41Result?.data as M41Data | undefined;
+  const m41Summaries = m41Data?.moduleSummaries as Record<string, Record<string, unknown>> | undefined;
+
+  // Calculate MarketingIQ score
+  let marketingIQScore: number | null = null;
+  if (m41Data) {
+    try {
+      const iqResult = calculateMarketingIQFromSynthesis(m41Data);
+      marketingIQScore = iqResult.final;
+    } catch { /* score unavailable */ }
+  }
 
   // Get traffic data from M24
   const m24Result = ctx.previousResults.get('M24' as ModuleId);
@@ -141,8 +156,35 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
   const inpValue = m03Data?.['inp'] as number | undefined;
   const clsValue = m03Data?.['cls'] as number | undefined;
 
-  // Get module findings for specific categories
+  // Build rich module findings from M41 AI analysis, falling back to raw checkpoints
+  const MODULE_LABELS: Record<string, string> = {
+    M03: 'Performance', M05: 'Analytics', M06: 'Attribution', M08: 'Tag Governance',
+    M12: 'Compliance', M24: 'Market Intelligence', M27: 'Rankings', M28: 'Keywords',
+  };
+
   const getModuleFindings = (moduleId: string) => {
+    // Try M41 rich synthesis first (executive summary + key findings, NOT full analysis)
+    const m41Summary = m41Summaries?.[moduleId];
+    if (m41Summary) {
+      const parts: string[] = [];
+      const score = m41Summary['module_score'] as number | undefined;
+      if (score != null) parts.push(`Score: ${score}/100`);
+
+      // Use executive_summary (concise) instead of full analysis (500-1500 words)
+      const execSummary = m41Summary['executive_summary'] as string | undefined;
+      if (execSummary) parts.push(execSummary);
+
+      const findings = m41Summary['key_findings'] as Array<Record<string, unknown>> | undefined;
+      if (findings?.length) {
+        parts.push('Key Findings:\n' + findings.map(f =>
+          `- [${f['severity']}] ${f['finding']}`
+        ).join('\n'));
+      }
+
+      return parts.join('\n');
+    }
+
+    // Fallback to raw checkpoints
     const result = ctx.previousResults.get(moduleId as ModuleId);
     if (!result) return 'Module not available';
     return JSON.stringify({
@@ -155,9 +197,16 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
   };
 
   try {
+    const moduleDataSections = Object.entries(MODULE_LABELS).map(([id, label]) =>
+      `### ${label} (${id})\n${getModuleFindings(id)}`
+    ).join('\n\n');
+
     const prompt = `## Domain: ${ctx.url}
 
 <website_data>
+### MarketingIQ Score
+Current score: ${marketingIQScore ?? 'unavailable'}/100
+
 ### Traffic Intelligence
 Monthly visits: ${monthlyVisits ?? 'unavailable'}
 Bounce rate: ${bounceRate ?? 'unavailable'}
@@ -170,33 +219,46 @@ LCP: ${lcpValue ?? 'unavailable'}ms
 INP: ${inpValue ?? 'unavailable'}ms
 CLS: ${clsValue ?? 'unavailable'}
 
-### Analytics Issues (M05)
-${getModuleFindings('M05')}
+${moduleDataSections}
 
-### Attribution Issues (M06)
-${getModuleFindings('M06')}
+### Key Findings (from M42 Synthesis)
+${JSON.stringify(synthesis['key_findings'] ?? [])}
 
-### Tag Governance Issues (M08)
-${getModuleFindings('M08')}
-
-### Compliance Issues (M12)
-${getModuleFindings('M12')}
-
-### Critical Findings (from M42)
-${JSON.stringify(synthesis['critical_findings'] ?? [])}
+### Executive Brief (from M42)
+${(synthesis['executive_brief'] as string) ?? 'unavailable'}
 </website_data>
 
-Produce the impact scenarios as valid JSON with:
-- scenarios: array of 3 objects (conservative, moderate, aggressive), each with id, label, description, impactAreas (tracking, attribution, performance, redundancy), totalMonthlyImpact, totalAnnualImpact, keyAssumptions
-- complianceRisk: { annualExposureLow, annualExposureHigh, riskFactors, applicableRegulations, confidence }
-- scoreImprovement: { current, estimated }
-- headline: one-line summary
-- methodology: 2-3 sentences on approach and limitations`;
+Produce the impact scenarios as valid JSON matching this exact structure:
 
-    const result = await callFlash(prompt, ImpactScenariosSchema, {
+{
+  "scenarios": [
+    {
+      "id": "conservative",
+      "label": "Conservative",
+      "description": "...",
+      "impactAreas": [
+        { "id": "tracking", "title": "Tracking Gaps", "monthlyImpact": 0, "assumptions": ["..."], "calculationSteps": ["step 1", "step 2"], "sourceModules": ["M05", "M08"], "confidence": "high" },
+        { "id": "attribution", "title": "Attribution Waste", "monthlyImpact": 0, "assumptions": ["..."], "calculationSteps": ["..."], "sourceModules": ["M06", "M28"], "confidence": "medium" },
+        { "id": "performance", "title": "Performance Impact", "monthlyImpact": 0, "assumptions": ["..."], "calculationSteps": ["..."], "sourceModules": ["M03", "M13"], "confidence": "medium" },
+        { "id": "redundancy", "title": "Tool Redundancy", "monthlyImpact": 0, "assumptions": ["..."], "calculationSteps": ["..."], "sourceModules": ["M07"], "confidence": "low" }
+      ],
+      "totalMonthlyImpact": 0,
+      "totalAnnualImpact": 0,
+      "keyAssumptions": ["..."]
+    }
+  ],
+  "complianceRisk": { "annualExposureLow": 0, "annualExposureHigh": 0, "riskFactors": ["..."], "applicableRegulations": ["..."], "confidence": "medium" },
+  "scoreImprovement": { "current": 0, "estimated": 0 },
+  "headline": "...",
+  "methodology": "..."
+}
+
+IMPORTANT: Each impactArea MUST have all 7 fields: id, title, monthlyImpact, assumptions (array), calculationSteps (array of strings), sourceModules (array), confidence. Repeat this structure for all 3 scenarios (conservative, moderate, aggressive).`;
+
+    const result = await callPro(prompt, ImpactScenariosSchema, {
       systemInstruction: SYSTEM_PROMPT,
       temperature: 0.3,
-      maxTokens: 6144,
+      maxTokens: 8192,
     });
 
     // Ensure scenarios are ordered by impact (conservative < moderate < aggressive)
@@ -214,7 +276,7 @@ Produce the impact scenarios as valid JSON with:
       evidence: `3 impact scenarios generated. Moderate estimate: ${totalDisplay}`,
     }));
   } catch (error) {
-    data.roi = buildFallbackScenarios(ctx.url, monthlyVisits);
+    data.roi = buildFallbackScenarios(ctx.url);
 
     checkpoints.push(createCheckpoint({
       id: 'm44-scenarios', name: 'Impact Scenarios', weight: 0.5,
@@ -228,8 +290,7 @@ Produce the impact scenarios as valid JSON with:
 
 // ─── Fallback ───────────────────────────────────────────────────────────
 
-function buildFallbackScenarios(url: string, monthlyVisits?: number) {
-  const visits = monthlyVisits ?? 5000;
+function buildFallbackScenarios(url: string) {
   const emptyAreas = [
     { id: 'tracking', title: 'Tracking Gaps', monthlyImpact: 0, assumptions: [], calculationSteps: ['Insufficient data for calculation'], sourceModules: ['M05', 'M08'], confidence: 'low' as const },
     { id: 'attribution', title: 'Attribution Waste', monthlyImpact: 0, assumptions: [], calculationSteps: ['Insufficient data for calculation'], sourceModules: ['M06', 'M28'], confidence: 'low' as const },
@@ -248,6 +309,7 @@ function buildFallbackScenarios(url: string, monthlyVisits?: number) {
   });
 
   return {
+    _fallback: true,
     scenarios: [
       makeScenario('conservative', 'Conservative'),
       makeScenario('moderate', 'Moderate'),
@@ -261,7 +323,7 @@ function buildFallbackScenarios(url: string, monthlyVisits?: number) {
       confidence: 'low' as const,
     },
     scoreImprovement: { current: 0, estimated: 0 },
-    headline: `Impact scenarios for ${url} require AI synthesis. Estimated ${visits.toLocaleString()} monthly visits.`,
+    headline: `Impact scenarios for ${url} could not be generated.`,
     methodology: 'Fallback mode — AI generation was unavailable. No financial projections could be calculated.',
   };
 }

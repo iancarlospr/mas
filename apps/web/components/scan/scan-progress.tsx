@@ -91,7 +91,6 @@ const MODULE_NAMES: Record<string, string> = {
 interface CompletedModule {
   id: string;
   name: string;
-  score: number | null;
 }
 
 export function ScanProgress({
@@ -135,10 +134,6 @@ export function ScanProgress({
 
       if (data.type === 'module' && data.moduleId) {
         soundEffects.play('moduleComplete');
-        // Critical finding sound when module score < 30
-        if (data.moduleScore != null && data.moduleScore < 30) {
-          soundEffects.play('criticalFound');
-        }
         setCompletedModules((prev) => {
           if (prev.some((m) => m.id === data.moduleId)) return prev;
           return [
@@ -146,7 +141,6 @@ export function ScanProgress({
             {
               id: data.moduleId!,
               name: MODULE_NAMES[data.moduleId!] ?? data.moduleId!,
-              score: data.moduleScore ?? null,
             },
           ];
         });

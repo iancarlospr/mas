@@ -18,7 +18,6 @@ import { fetchWithRetry } from '../utils/http.js';
 import { getRegistrableDomain } from '../utils/url.js';
 import { assertUrlSafe } from '../utils/url-safety.js';
 import { updateScanStatus, upsertModuleResult } from '../services/supabase.js';
-import { calculateModuleScore } from '../utils/scoring.js';
 import { extractDetectedTools } from '../utils/tool-extractor.js';
 import type { DOMForensics, NavigatorSnapshot } from './types.js';
 import pino from 'pino';
@@ -975,11 +974,6 @@ export class ModuleRunner {
           this.safeExecute(executor, mod.id),
           this.createTimeout(mod.timeout, mod.id),
         ]);
-
-        // Calculate score from checkpoints if not already set
-        if (result.score === null && result.checkpoints.length > 0) {
-          result.score = calculateModuleScore(result.checkpoints);
-        }
 
         // Success -- break retry loop
         if (result.status === 'success' || result.status === 'partial') {

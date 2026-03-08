@@ -152,19 +152,31 @@ async function fetchNews(
         timeRange: 'y', // past year
       }) as Record<string, unknown> | null;
 
-      const items = result ? (result['items'] as Array<Record<string, unknown>>) ?? [] : [];
+      const rawItems = result ? (result['items'] as Array<Record<string, unknown>>) ?? [] : [];
 
-      for (const item of items) {
+      // Flatten: top_stories contain nested items[] with actual articles
+      const flatItems: Array<Record<string, unknown>> = [];
+      for (const item of rawItems) {
+        if (item['type'] === 'top_stories' && Array.isArray(item['items'])) {
+          for (const sub of item['items'] as Array<Record<string, unknown>>) {
+            flatItems.push(sub);
+          }
+        } else {
+          flatItems.push(item);
+        }
+      }
+
+      for (const item of flatItems) {
         const url = (item['url'] as string ?? '').slice(0, 500);
-        if (seenUrls.has(url)) continue;
+        if (!url || seenUrls.has(url)) continue;
         seenUrls.add(url);
 
         allItems.push({
           title: (item['title'] as string ?? '').slice(0, 200),
-          snippet: (item['snippet'] as string ?? '').slice(0, 300),
-          source: (item['source'] as string) ?? '',
+          snippet: (item['snippet'] as string ?? item['description'] as string ?? '').slice(0, 300),
+          source: (item['source'] as string ?? item['domain'] as string) ?? '',
           url,
-          date: (item['date'] as string) ?? '',
+          date: (item['date'] as string ?? item['time_published'] as string) ?? '',
         });
       }
     } catch (err) {

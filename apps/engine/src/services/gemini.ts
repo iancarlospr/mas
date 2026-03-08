@@ -286,6 +286,85 @@ export async function generateText(
 }
 
 /**
+ * Call Gemini Pro for raw text generation with retry logic.
+ * No JSON wrapping, no Zod validation — returns plain text.
+ * Used for large free-form outputs (e.g., M43 remediation plan markdown).
+ */
+export async function callProRaw(
+  prompt: string,
+  options?: {
+    systemInstruction?: string;
+    temperature?: number;
+    maxTokens?: number;
+    retries?: number;
+    retryDelay?: number;
+  },
+): Promise<GenerateResult<string>> {
+  const retries = options?.retries ?? DEFAULT_RETRIES;
+  const retryDelay = options?.retryDelay ?? DEFAULT_RETRY_DELAY;
+  const temperature = options?.temperature ?? 0.4;
+  const maxTokens = options?.maxTokens ?? 16384;
+
+  const client = getClient();
+  const modelId = MODELS.pro;
+
+  const modelConfig: Record<string, unknown> = { model: modelId };
+  if (options?.systemInstruction) {
+    (modelConfig as { systemInstruction?: string }).systemInstruction = options.systemInstruction;
+  }
+
+  const generativeModel = client.getGenerativeModel(
+    modelConfig as { model: string; systemInstruction?: string },
+  );
+
+  let lastError: Error | null = null;
+
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    if (attempt > 0) {
+      const delay = retryDelay * Math.pow(2, attempt - 1);
+      logger.info({ attempt, delay, model: modelId }, 'Retrying Gemini raw call');
+      await sleep(delay);
+    }
+
+    try {
+      const result = await generativeModel.generateContent({
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        generationConfig: {
+          temperature,
+          maxOutputTokens: maxTokens,
+        },
+      });
+
+      const response = result.response;
+      const text = response.text();
+      const usage = response.usageMetadata;
+
+      const tokensUsed = {
+        prompt: usage?.promptTokenCount ?? 0,
+        completion: usage?.candidatesTokenCount ?? 0,
+        total: usage?.totalTokenCount ?? 0,
+      };
+
+      logger.debug({ model: modelId, tokensUsed, textLength: text.length }, 'Gemini raw call successful');
+
+      return { data: text, model: modelId, tokensUsed };
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+      const retryable = isRetryableError(lastError);
+
+      if (!retryable) {
+        logger.warn({ error: lastError.message, model: modelId, attempt }, 'Non-retryable Gemini raw error');
+        throw lastError;
+      }
+
+      logger.warn({ error: lastError.message, model: modelId, attempt }, 'Gemini raw call failed, will retry');
+    }
+  }
+
+  throw lastError ?? new Error(`Gemini raw call failed after ${retries + 1} attempts`);
+}
+
+/**
  * Check if an error is retryable (429, 503, network errors).
  */
 function isRetryableError(error: Error): boolean {

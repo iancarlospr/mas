@@ -29,11 +29,11 @@ import { aggregateDetectedTools, mergeWithAITools } from '@/lib/detected-tools';
 const T = {
   headline: 'clamp(22px, 3.6cqi, 36px)',
   section:  'clamp(12px, 1.6cqi, 16px)',
-  body:     'clamp(11px, 1.35cqi, 14px)',
+  body:     'clamp(12px, 1.35cqi, 14px)',
   index:    'clamp(12px, 1.45cqi, 15px)',
-  meta:     'clamp(9px, 1.1cqi, 12px)',
-  overline: 'clamp(9px, 1.05cqi, 11px)',
-  badge:    'clamp(8px, 0.95cqi, 10px)',
+  meta:     'clamp(10px, 1cqi, 12px)',
+  overline: 'clamp(12px, 1.2cqi, 14px)',
+  badge:    'clamp(12px, 1.1cqi, 13px)',
 } as const;
 
 // Legacy category keys from older scans
@@ -53,27 +53,11 @@ function getScoreColor(s: number): string {
   return 'var(--gs-critical)';
 }
 
-// ── Urgency badge colors ──────────────────────────────────────────────
-const URGENCY_STYLES: Record<string, { bg: string; text: string }> = {
-  immediate:    { bg: 'rgba(255,80,80,0.15)',   text: 'var(--gs-critical)' },
-  this_week:    { bg: 'rgba(255,200,0,0.12)',   text: 'var(--gs-warning)' },
-  this_month:   { bg: 'rgba(255,178,239,0.12)', text: 'var(--gs-base)' },
-  this_quarter: { bg: 'rgba(255,255,255,0.06)', text: 'var(--gs-mid)' },
-};
-
 // ── Types ─────────────────────────────────────────────────────────────
-interface KeyFinding {
-  finding: string;
-  modules: string[];
-  business_impact: string;
-  urgency: string;
-}
-
 interface M42Synthesis {
   synthesis_headline?: string;
   verdict_headline?: string;
   executive_brief: string;
-  key_findings: KeyFinding[];
   category_assessments: Record<string, unknown>;
   competitive_context: string;
 }
@@ -105,7 +89,6 @@ export function OverviewExecSlide({ scan }: OverviewExecSlideProps) {
     (r) => r.status === 'success' || r.status === 'partial',
   ).length;
   const categories = scan.marketingIqResult?.categories ?? [];
-  const score = scan.marketingIq;
 
   // M41 data
   const m41 = resultMap.get('M41');
@@ -138,9 +121,6 @@ export function OverviewExecSlide({ scan }: OverviewExecSlideProps) {
     return parts.join(' ');
   })();
 
-  // Key findings (paid only)
-  const keyFindings = synthesis?.key_findings ?? [];
-
   // Tech stack — deterministic detectedTools merged with AI-identified tools from M42
   const deterministic = aggregateDetectedTools(scan.moduleResults);
   const detectedTools = mergeWithAITools(deterministic, m42?.data as Record<string, unknown> | undefined);
@@ -167,314 +147,283 @@ export function OverviewExecSlide({ scan }: OverviewExecSlideProps) {
         }}
       />
 
-      <div className="relative z-10 h-full flex">
+      <div className="relative z-10 h-full flex flex-col" style={{ paddingBottom: 'clamp(16px, 2.8cqi, 28px)' }}>
 
-        {/* ── LEFT PANEL (~55%) — About + Index ── */}
-        <div
-          className="flex flex-col"
-          style={{ width: '50%', padding: '1.5% 2.5% 1% 3.5%' }}
-        >
-          {/* About This Audit */}
-          <h3
-            className="font-display uppercase"
-            style={{
-              fontSize: T.section,
-              fontWeight: 600,
-              letterSpacing: '0.15em',
-              color: 'var(--gs-base)',
-              marginBottom: '0.6em',
-            }}
-          >
-            About This Audit
-          </h3>
+        {/* ── TOP: Two-column layout ── */}
+        <div className="flex flex-1 min-h-0">
+
+          {/* ── LEFT PANEL (~50%) — About + Index ── */}
           <div
-            className="font-data"
-            style={{
-              fontSize: T.body,
-              lineHeight: 1.7,
-              color: 'var(--gs-mid)',
-              marginBottom: '1.8em',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '1.4em',
-            }}
+            className="flex flex-col"
+            style={{ width: '50%', padding: '1.5% 2.5% 0 3.5%' }}
           >
-            <p>
-              This is a <span style={{ color: 'var(--gs-light)' }}>forensic marketing technology audit</span> of{' '}
-              <span style={{ color: 'var(--gs-light)' }}>{scan.domain}</span>.
-              A stealth browser loaded the live site — with full JavaScript execution,
-              real Chrome TLS fingerprints, and bot-wall bypass — then ran{' '}
-              <span style={{ color: 'var(--gs-light)' }}>{moduleCount} independent diagnostic modules</span> across
-              five sequential phases: passive HTTP analysis, browser-rendered page inspection,
-              deep interaction probing, third-party API enrichment, and AI-powered synthesis.
-            </p>
-            <p>
-              Every module produces scored checkpoints rated{' '}
-              <span style={{ color: 'var(--gs-terminal)' }}>excellent</span>,{' '}
-              <span style={{ color: 'var(--gs-terminal)' }}>good</span>,{' '}
-              <span style={{ color: 'var(--gs-warning)' }}>warning</span>, or{' '}
-              <span style={{ color: 'var(--gs-critical)' }}>critical</span> — with
-              evidence captured directly from the site&apos;s HTTP headers, DOM, network requests,
-              cookies, data layers, console output, and third-party vendor APIs.
-              Module scores are weighted by category into a
-              single <span style={{ color: 'var(--gs-light)' }}>MarketingIQ™</span> score (0–100).
-            </p>
-            <p>
-              The report is organized into <span style={{ color: 'var(--gs-light)' }}>8 categories</span> listed
-              below. Each contains per-module findings with raw evidence, health ratings,
-              and actionable recommendations.{' '}
-              {isPaid
-                ? 'The final sections contain AI-synthesized strategic analysis: an executive brief, prioritized remediation roadmap, ROI impact projections, and cost optimization opportunities — generated from the complete dataset of all module findings.'
-                : 'The paid report adds AI-synthesized strategic analysis: executive brief, remediation roadmap, ROI projections, and cost optimization — generated from the full module dataset.'}
-            </p>
+            {/* About This Audit */}
+            <h3
+              className="font-display uppercase"
+              style={{
+                fontSize: T.section,
+                fontWeight: 600,
+                letterSpacing: '0.15em',
+                color: 'var(--gs-base)',
+                marginBottom: '0.6em',
+              }}
+            >
+              About This Audit
+            </h3>
+            <div
+              className="font-data"
+              style={{
+                fontSize: T.body,
+                lineHeight: 1.7,
+                color: 'var(--gs-mid)',
+                marginBottom: '1.8em',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '1.4em',
+              }}
+            >
+              <p>
+                This is a <span style={{ color: 'var(--gs-light)' }}>forensic marketing technology audit</span> of{' '}
+                <span style={{ color: 'var(--gs-light)' }}>{scan.domain}</span>.
+                A stealth browser loaded the live site — with full JavaScript execution,
+                real Chrome TLS fingerprints, and bot-wall bypass — then ran{' '}
+                <span style={{ color: 'var(--gs-light)' }}>{moduleCount} independent diagnostic modules</span> across
+                five sequential phases: passive HTTP analysis, browser-rendered page inspection,
+                deep interaction probing, third-party API enrichment, and AI-powered synthesis.
+              </p>
+              <p>
+                Every module produces scored checkpoints rated{' '}
+                <span style={{ color: 'var(--gs-terminal)' }}>excellent</span>,{' '}
+                <span style={{ color: 'var(--gs-terminal)' }}>good</span>,{' '}
+                <span style={{ color: 'var(--gs-warning)' }}>warning</span>, or{' '}
+                <span style={{ color: 'var(--gs-critical)' }}>critical</span> — with
+                evidence captured directly from the site&apos;s HTTP headers, DOM, network requests,
+                cookies, data layers, console output, and third-party vendor APIs.
+                Module scores are weighted by category into a
+                single <span style={{ color: 'var(--gs-light)' }}>MarketingIQ™</span> score (0–100).
+              </p>
+              <p>
+                The report is organized into <span style={{ color: 'var(--gs-light)' }}>8 categories</span> listed
+                below. Each contains per-module findings with raw evidence, health ratings,
+                and actionable recommendations.{' '}
+                {isPaid
+                  ? 'The final sections contain AI-synthesized strategic analysis: an executive brief, prioritized remediation roadmap, ROI impact projections, and cost optimization opportunities — generated from the complete dataset of all module findings.'
+                  : 'The paid report adds AI-synthesized strategic analysis: executive brief, remediation roadmap, ROI projections, and cost optimization — generated from the full module dataset.'}
+              </p>
+            </div>
+
+            {/* Report Index — category list with scores */}
+            <h3
+              className="font-display uppercase"
+              style={{
+                fontSize: T.section,
+                fontWeight: 600,
+                letterSpacing: '0.15em',
+                color: 'var(--gs-base)',
+                marginBottom: '0.6em',
+              }}
+            >
+              Module Categories &amp; Scores
+            </h3>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.15em',
+              }}
+            >
+              {(Object.keys(CATEGORY_DISPLAY_NAMES) as ScoreCategory[]).map((catKey, i) => {
+                const label = CATEGORY_DISPLAY_NAMES[catKey];
+                const catScore = categories.find(
+                  (c) => c.category === catKey || LEGACY_CATEGORY_MAP[c.category] === catKey,
+                );
+                const s = catScore?.score ?? null;
+                const color = s != null ? getScoreColor(s) : 'var(--gs-mid)';
+                return (
+                  <div
+                    key={catKey}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.8em',
+                      padding: '0.3em 0',
+                      borderBottom: '1px solid rgba(255,178,239,0.05)',
+                    }}
+                  >
+                    {/* Section number */}
+                    <span
+                      className="font-data tabular-nums"
+                      style={{
+                        fontSize: T.overline,
+                        color: 'var(--gs-base)',
+                        opacity: 0.5,
+                        width: '1.6em',
+                        textAlign: 'right',
+                        flexShrink: 0,
+                      }}
+                    >
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    {/* Category name */}
+                    <span
+                      className="font-data"
+                      style={{
+                        fontSize: T.index,
+                        color: 'var(--gs-light)',
+                        flex: 1,
+                      }}
+                    >
+                      {label}
+                    </span>
+                    {/* Score */}
+                    <span
+                      className="font-data tabular-nums"
+                      style={{
+                        fontSize: T.index,
+                        fontWeight: 600,
+                        color,
+                      }}
+                    >
+                      {s ?? '—'}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
-          {/* Report Index — category list, NO scores */}
-          <h3
-            className="font-display uppercase"
-            style={{
-              fontSize: T.section,
-              fontWeight: 600,
-              letterSpacing: '0.15em',
-              color: 'var(--gs-base)',
-              marginBottom: '0.6em',
-            }}
-          >
-            Module Categories &amp; Scores
-          </h3>
+          {/* ── Divider ── */}
           <div
             style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '0.15em',
-              marginBottom: '1.5em',
+              width: '1px',
+              background: 'linear-gradient(to bottom, transparent 5%, rgba(255,178,239,0.1) 30%, rgba(255,178,239,0.1) 70%, transparent 95%)',
+              flexShrink: 0,
             }}
+          />
+
+          {/* ── RIGHT PANEL (~50%) — Executive Brief ── */}
+          <div
+            className="flex flex-col"
+            style={{ width: '50%', padding: '1.5% 3.5% 0 2.5%' }}
           >
-            {(Object.keys(CATEGORY_DISPLAY_NAMES) as ScoreCategory[]).map((catKey, i) => {
-              const label = CATEGORY_DISPLAY_NAMES[catKey];
-              const catScore = categories.find(
-                (c) => c.category === catKey || LEGACY_CATEGORY_MAP[c.category] === catKey,
-              );
-              const s = catScore?.score ?? null;
-              const color = s != null ? getScoreColor(s) : 'var(--gs-mid)';
-              return (
-                <div
-                  key={catKey}
+            {/* Executive Brief — headline flows into body */}
+            <h3
+              className="font-display uppercase"
+              style={{
+                fontSize: T.section,
+                fontWeight: 600,
+                letterSpacing: '0.15em',
+                color: 'var(--gs-base)',
+                marginBottom: '0.6em',
+              }}
+            >
+              Executive Brief
+            </h3>
+            <div
+              className="font-data"
+              style={{
+                fontSize: T.body,
+                lineHeight: 1.7,
+                color: 'var(--gs-light)',
+                opacity: 0.85,
+              }}
+            >
+              {headline && (
+                <p
+                  className="font-display"
                   style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.8em',
-                    padding: '0.3em 0',
-                    borderBottom: '1px solid rgba(255,178,239,0.05)',
+                    fontSize: 'clamp(14px, 1.8cqi, 19px)',
+                    fontWeight: 600,
+                    lineHeight: 1.35,
+                    color: 'var(--gs-light)',
+                    opacity: 1,
+                    marginBottom: '0.7em',
+                    borderLeft: '2px solid var(--gs-base)',
+                    paddingLeft: '0.7em',
                   }}
                 >
-                  {/* Section number */}
-                  <span
-                    className="font-data tabular-nums"
-                    style={{
-                      fontSize: T.overline,
-                      color: 'var(--gs-base)',
-                      opacity: 0.5,
-                      width: '1.6em',
-                      textAlign: 'right',
-                      flexShrink: 0,
-                    }}
-                  >
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
-                  {/* Category name */}
-                  <span
-                    className="font-data"
-                    style={{
-                      fontSize: T.index,
-                      color: 'var(--gs-light)',
-                      flex: 1,
-                    }}
-                  >
-                    {label}
-                  </span>
-                  {/* Score */}
-                  <span
-                    className="font-data tabular-nums"
-                    style={{
-                      fontSize: T.index,
-                      fontWeight: 600,
-                      color,
-                    }}
-                  >
-                    {s ?? '—'}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Detected Stack (extracted from raw module data) */}
-          {detectedTools.length > 0 && (
-            <div style={{ marginTop: 'auto' }}>
-              <h3
-                className="font-display uppercase"
-                style={{
-                  fontSize: T.section,
-                  fontWeight: 600,
-                  letterSpacing: '0.15em',
-                  color: 'var(--gs-base)',
-                  marginBottom: '0.5em',
-                }}
-              >
-                Detected Stack
-              </h3>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4em' }}>
-                {detectedTools.map((t) => (
-                  <span
-                    key={t.name}
-                    className="font-data"
-                    style={{
-                      fontSize: T.meta,
-                      color: 'var(--gs-light)',
-                      padding: '0.2em 0.6em',
-                      borderRadius: '3px',
-                      background: 'rgba(255,178,239,0.06)',
-                      border: '1px solid rgba(255,178,239,0.08)',
-                    }}
-                  >
-                    {t.name}
-                  </span>
-                ))}
-              </div>
+                  {headline}
+                </p>
+              )}
+              {briefText.split('\n').map((para, i) => (
+                <p key={i} style={{ marginBottom: i < briefText.split('\n').length - 1 ? '0.65em' : 0 }}>
+                  {para}
+                </p>
+              ))}
             </div>
-          )}
+          </div>
         </div>
 
-        {/* ── Divider ── */}
-        <div
-          style={{
-            width: '1px',
-            background: 'linear-gradient(to bottom, transparent 5%, rgba(255,178,239,0.1) 30%, rgba(255,178,239,0.1) 70%, transparent 95%)',
-            flexShrink: 0,
-          }}
-        />
-
-        {/* ── RIGHT PANEL (~45%) — Headline + Brief + Findings + URL ── */}
-        <div
-          className="flex flex-col"
-          style={{ width: '50%', padding: '1.5% 3.5% 1% 2.5%' }}
-        >
-          {/* Executive Brief — headline flows into body */}
-          <h3
-            className="font-display uppercase"
-            style={{
-              fontSize: T.section,
-              fontWeight: 600,
-              letterSpacing: '0.15em',
-              color: 'var(--gs-base)',
-              marginBottom: '0.6em',
-            }}
-          >
-            Executive Brief
-          </h3>
+        {/* ── BOTTOM: Detected Stack — full width ── */}
+        {detectedTools.length > 0 && (
           <div
-            className="font-data"
             style={{
-              fontSize: T.body,
-              lineHeight: 1.7,
-              color: 'var(--gs-light)',
-              opacity: 0.85,
-              marginBottom: '1.5em',
+              padding: '1.2% 3.5% 1.5%',
             }}
           >
-            {headline && (
-              <p
-                className="font-display"
-                style={{
-                  fontSize: 'clamp(14px, 1.8cqi, 19px)',
-                  fontWeight: 600,
-                  lineHeight: 1.35,
-                  color: 'var(--gs-light)',
-                  opacity: 1,
-                  marginBottom: '0.7em',
-                  borderLeft: '2px solid var(--gs-base)',
-                  paddingLeft: '0.7em',
-                }}
-              >
-                {headline}
-              </p>
-            )}
-            {briefText.split('\n').map((para, i) => (
-              <p key={i} style={{ marginBottom: i < briefText.split('\n').length - 1 ? '0.65em' : 0 }}>
-                {para}
-              </p>
-            ))}
-          </div>
-
-          {/* Key Findings (paid only) */}
-          {keyFindings.length > 0 && (
-            <div style={{ minHeight: 0 }}>
-              <h3
-                className="font-display uppercase"
-                style={{
-                  fontSize: T.section,
-                  fontWeight: 600,
-                  letterSpacing: '0.15em',
-                  color: 'var(--gs-base)',
-                  marginBottom: '0.5em',
-                }}
-              >
-                Key Findings
-              </h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.9em' }}>
-                {keyFindings.slice(0, 3).map((f, i) => {
-                  const urgency = URGENCY_STYLES[f.urgency] ?? URGENCY_STYLES['this_quarter']!;
-                  return (
-                    <div key={i} style={{ display: 'flex', gap: '0.6em', alignItems: 'flex-start' }}>
-                      <span
-                        className="font-data uppercase flex-shrink-0"
-                        style={{
-                          fontSize: T.badge,
-                          letterSpacing: '0.06em',
-                          padding: '0.15em 0.5em',
-                          borderRadius: '3px',
-                          background: urgency.bg,
-                          color: urgency.text,
-                          marginTop: '0.15em',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {f.urgency.replace(/_/g, ' ')}
-                      </span>
-                      <div style={{ minWidth: 0 }}>
-                        <p
-                          className="font-data"
-                          style={{
-                            fontSize: T.body,
-                            color: 'var(--gs-light)',
-                            lineHeight: 1.45,
-                          }}
-                        >
-                          {f.finding}
-                        </p>
-                        <p
-                          className="font-data"
-                          style={{
-                            fontSize: T.meta,
-                            color: 'var(--gs-mid)',
-                            lineHeight: 1.4,
-                            marginTop: '0.2em',
-                          }}
-                        >
-                          {f.business_impact}
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+            <h3
+              className="font-display uppercase"
+              style={{
+                fontSize: T.section,
+                fontWeight: 600,
+                letterSpacing: '0.15em',
+                color: 'var(--gs-base)',
+                marginBottom: '0.5em',
+              }}
+            >
+              Detected Stack
+            </h3>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35em' }}>
+              {detectedTools.map((t) => (
+                <span
+                  key={t.name}
+                  className="font-data"
+                  style={{
+                    fontSize: T.meta,
+                    color: 'var(--gs-light)',
+                    padding: '0.2em 0.6em',
+                    borderRadius: '3px',
+                    background: 'rgba(255,178,239,0.06)',
+                    border: '1px solid rgba(255,178,239,0.08)',
+                  }}
+                >
+                  {t.name}
+                </span>
+              ))}
             </div>
-          )}
+          </div>
+        )}
 
-        </div>
+
       </div>
 
+      {/* Brand strip */}
+      <div
+        className="absolute left-0 right-0 bottom-0 overflow-hidden"
+        style={{
+          background: 'var(--gs-base)',
+          height: 'clamp(16px, 2.8cqi, 28px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <pre
+          className="font-data leading-none whitespace-pre select-none"
+          style={{
+            fontSize: 'clamp(1.5px, 0.25cqi, 3px)',
+            lineHeight: '1.1',
+            color: '#080808',
+          }}
+        >
+{` █████╗ ██╗     ██████╗ ██╗  ██╗ █████╗     ███████╗ ██████╗ █████╗ ███╗   ██╗
+██╔══██╗██║     ██╔══██╗██║  ██║██╔══██╗    ██╔════╝██╔════╝██╔══██╗████╗  ██║
+███████║██║     ██████╔╝███████║███████║    ███████╗██║     ███████║██╔██╗ ██║
+██╔══██║██║     ██╔═══╝ ██╔══██║██╔══██║    ╚════██║██║     ██╔══██║██║╚██╗██║
+██║  ██║███████╗██║     ██║  ██║██║  ██║    ███████║╚██████╗██║  ██║██║ ╚████║
+╚═╝  ╚═╝╚══════╝╚═╝     ╚═╝  ╚═╝╚═╝  ╚═╝    ╚══════╝ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═══╝`}
+        </pre>
+      </div>
     </div>
   );
 }

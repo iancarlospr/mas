@@ -66,25 +66,6 @@ export interface Checkpoint {
   recommendation?: string;
 }
 
-export const HEALTH_MULTIPLIERS: Record<CheckpointHealth, number> = {
-  excellent: 1.0,
-  good: 0.75,
-  warning: 0.35,
-  critical: 0.0,
-  info: 0, // excluded from scoring
-};
-
-export const CATEGORY_WEIGHTS: Record<ScoreCategory, number> = {
-  security_compliance: 0.15,
-  analytics_measurement: 0.20,
-  performance_experience: 0.15,
-  seo_content: 0.10,
-  paid_media: 0.12,
-  martech_infrastructure: 0.10,
-  brand_presence: 0.08,
-  market_intelligence: 0.10,
-};
-
 export const CATEGORY_DISPLAY_NAMES: Record<ScoreCategory, string> = {
   security_compliance: 'Security & Compliance',
   analytics_measurement: 'Analytics & Measurement',
