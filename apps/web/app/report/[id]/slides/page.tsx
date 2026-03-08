@@ -8,10 +8,11 @@ import type { ScanWithResults, ModuleResult } from '@marketing-alpha/types';
  * /report/[id]/slides — Presentation Slides (server component)
  *
  * Two access modes:
- *   ?print=true  → service role (engine navigates here for PDF capture)
+ *   ?print=1     → service role (for browser print / Save as PDF)
  *   otherwise    → user auth + ownership + paid tier
  *
- * Bypasses the desktop OS shell (standalone route in desktop-root.tsx).
+ * When ?print=1, PresentationSlidesView auto-triggers window.print()
+ * after fonts load + slides settle.
  */
 
 export default async function PresentationSlidesPage({
@@ -26,13 +27,13 @@ export default async function PresentationSlidesPage({
 
   if (!isValidUUID(scanId)) notFound();
 
-  const isPrintMode = print === 'true';
+  const isPrintMode = print === '1' || print === 'true';
 
   let scanRow: Record<string, unknown> | null = null;
   let moduleRows: Record<string, unknown>[] = [];
 
   if (isPrintMode) {
-    // Engine PDF capture — service role, no auth needed
+    // Print mode — service role, no auth needed
     const service = createServiceClient();
 
     const { data: scan } = await service
@@ -105,5 +106,5 @@ export default async function PresentationSlidesPage({
     marketingIqResult: scanRow!.marketing_iq_result as ScanWithResults['marketingIqResult'],
   };
 
-  return <PresentationSlidesView scan={scan} />;
+  return <PresentationSlidesView scan={scan} autoPrint={isPrintMode} />;
 }

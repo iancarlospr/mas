@@ -60,7 +60,7 @@ import { ClosingSlide } from './slides/closing-slide';
  * Sets data-slides-loaded="true" after fonts are ready + 300ms settle.
  */
 
-export function PresentationSlidesView({ scan }: { scan: ScanWithResults }) {
+export function PresentationSlidesView({ scan, autoPrint = false }: { scan: ScanWithResults; autoPrint?: boolean }) {
   const [ready, setReady] = useState(false);
   const isPaid = scan.tier === 'paid';
 
@@ -69,6 +69,15 @@ export function PresentationSlidesView({ scan }: { scan: ScanWithResults }) {
       setTimeout(() => setReady(true), 300);
     });
   }, []);
+
+  // Auto-trigger print dialog when slides are ready and autoPrint is requested
+  useEffect(() => {
+    if (ready && autoPrint) {
+      // Small delay to ensure paint is complete
+      const timer = setTimeout(() => window.print(), 200);
+      return () => clearTimeout(timer);
+    }
+  }, [ready, autoPrint]);
 
   return (
     <WindowManagerProvider>
@@ -82,6 +91,7 @@ export function PresentationSlidesView({ scan }: { scan: ScanWithResults }) {
       >
         {/* Force screen-like rendering in print context */}
         <style>{`
+          @page { size: 14in 8.5in; margin: 0; }
           @media print {
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
             body { background: #080808 !important; margin: 0 !important; padding: 0 !important; }

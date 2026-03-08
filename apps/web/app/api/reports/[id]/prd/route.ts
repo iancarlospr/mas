@@ -1,17 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { verifyShareToken } from '@/lib/report/share';
-import { engineFetch } from '@/lib/engine';
 import { isValidUUID } from '@/lib/utils';
 
 /**
  * GET /api/reports/[id]/prd
  *
- * Downloads the M43 Remediation Plan as a legal-size PDF.
+ * Renders M43 Remediation Plan as printable HTML with auto-print trigger.
  * Auth: scan owner OR valid share token. Tier: paid only.
- *
- * Flow: Check Supabase Storage for cached PDF → if missing, delegate
- * to engine for rendering → redirect to signed URL.
  */
 export async function GET(
   request: NextRequest,
@@ -46,7 +42,7 @@ export async function GET(
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  // Check M43 module result exists
+  // Fetch M43 module result
   const { data: m43Result } = await serviceClient
     .from('module_results')
     .select('data')
@@ -71,42 +67,14 @@ export async function GET(
     );
   }
 
-  // Check for cached PDF in Supabase Storage
-  const pdfPath = `reports/${scanId}/remediation-plan.pdf`;
-  const { data: existing } = await serviceClient.storage
-    .from('reports')
-    .createSignedUrl(pdfPath, 60 * 60); // 1h signed URL
-
-  if (existing?.signedUrl) {
-    return NextResponse.redirect(existing.signedUrl);
-  }
-
-  // Generate PDF via engine (same pattern as the main report PDF)
-  try {
-    const res = await engineFetch(`/engine/reports/${scanId}/prd-pdf`, {
-      method: 'POST',
-    });
-
-    if (!res.ok) {
-      console.error(`[prd-pdf] Engine returned ${res.status} for scan ${scanId}`);
-      // Fall back to styled HTML
-      return renderMarkdownFallback(markdown, scan.domain ?? scanId);
-    }
-
-    const { signedUrl } = await res.json();
-    return NextResponse.redirect(signedUrl);
-  } catch (err) {
-    console.error(`[prd-pdf] Engine unreachable, falling back to HTML:`, err);
-    // Fall back to styled HTML when engine is unavailable
-    return renderMarkdownFallback(markdown, scan.domain ?? scanId);
-  }
+  return renderMarkdownPage(markdown, scan.domain ?? scanId);
 }
 
 /**
- * Fallback: render M43 markdown as styled, printable HTML.
- * Auto-triggers browser print dialog so the user can "Save as PDF".
+ * Render M43 markdown as styled, printable HTML.
+ * Auto-triggers browser print dialog on load.
  */
-function renderMarkdownFallback(markdown: string, domain: string): NextResponse {
+function renderMarkdownPage(markdown: string, domain: string): NextResponse {
   const bodyHtml = markdownToHtml(markdown);
 
   const html = `<!DOCTYPE html>
@@ -115,7 +83,7 @@ function renderMarkdownFallback(markdown: string, domain: string): NextResponse 
 <meta charset="UTF-8">
 <title>Remediation Plan — ${escapeHtml(domain)}</title>
 <style>
-  @page { size: 8.5in 14in; margin: 1in; }
+  @page { size: 8.5in 14in; margin: 0; }
   @media print { .print-banner { display: none !important; } }
   body {
     font-family: Georgia, 'Times New Roman', serif;
@@ -158,6 +126,7 @@ function renderMarkdownFallback(markdown: string, domain: string): NextResponse 
 <div style="margin-top: 48px;">
 ${bodyHtml}
 </div>
+<script>window.addEventListener('load', function() { setTimeout(function() { window.print(); }, 500); });</script>
 </body>
 </html>`;
 
@@ -176,10 +145,9 @@ function markdownToHtml(md: string): string {
   let inList = false;
   let listType = '';
   let inTable = false;
-  let tableHeaderDone = false;
 
   const closeList = () => { if (inList) { html.push(listType === 'ul' ? '</ul>' : '</ol>'); inList = false; } };
-  const closeTable = () => { if (inTable) { html.push('</tbody></table>'); inTable = false; tableHeaderDone = false; } };
+  const closeTable = () => { if (inTable) { html.push('</tbody></table>'); inTable = false; } };
 
   const fmt = (text: string): string =>
     text
@@ -198,7 +166,7 @@ function markdownToHtml(md: string): string {
     if (t.startsWith('|') && t.endsWith('|')) {
       closeList();
       const cells = t.slice(1, -1).split('|').map(c => c.trim());
-      if (cells.every(c => /^[-:]+$/.test(c))) { tableHeaderDone = true; continue; }
+      if (cells.every(c => /^[-:]+$/.test(c))) { continue; }
       if (!inTable) { html.push('<table><thead><tr>'); for (const c of cells) html.push(`<th>${fmt(c)}</th>`); html.push('</tr></thead><tbody>'); inTable = true; continue; }
       html.push('<tr>'); for (const c of cells) html.push(`<td>${fmt(c)}</td>`); html.push('</tr>'); continue;
     }
