@@ -18,7 +18,10 @@ RUN npm install --workspace=@marketing-alpha/engine --include-workspace-root
 # Copy engine source
 COPY apps/engine/src/ apps/engine/src/
 
-# Build TypeScript
+# Build types first (engine imports from @marketing-alpha/types/dist/)
+RUN npm run build --workspace=@marketing-alpha/types
+
+# Build engine TypeScript
 RUN npm run build --workspace=@marketing-alpha/engine
 
 # ─── Stage 2: Production ─────────────────────────────────────────────────────
