@@ -2,12 +2,18 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { verifyShareToken } from '@/lib/report/share';
 import { isValidUUID } from '@/lib/utils';
+import { engineFetch } from '@/lib/engine';
 
 /**
  * GET /api/reports/[id]/presentation
  *
- * Redirects to the slides view with ?print=1 to trigger browser print dialog.
+ * Generate presentation slide deck PDF via the engine (element screenshots).
+ * Returns a redirect to the signed Supabase Storage URL.
+ *
  * Auth: scan owner OR valid share token. Tier: paid only.
+ *
+ * Fallback: if engine is unavailable, redirects to the slides page with
+ * ?print=1 for client-side browser print.
  */
 export async function GET(
   request: NextRequest,
@@ -42,12 +48,38 @@ export async function GET(
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  // Redirect to slides view with print trigger
+  // Check Supabase Storage cache first
+  const filename = `reports/${scanId}/presentation.pdf`;
+  const { data: existing } = await serviceClient.storage
+    .from('reports')
+    .createSignedUrl(filename, 60 * 60 * 24);
+
+  if (existing?.signedUrl) {
+    return NextResponse.redirect(existing.signedUrl);
+  }
+
+  // Generate via engine
+  try {
+    const response = await engineFetch(`/engine/reports/${scanId}/presentation-pdf`, {
+      method: 'POST',
+      body: JSON.stringify({ scanId }),
+    });
+
+    if (response.ok) {
+      const { url } = (await response.json()) as { url: string };
+      return NextResponse.redirect(url);
+    }
+
+    console.error(`[presentation] Engine returned ${response.status}: ${await response.text()}`);
+  } catch (error) {
+    console.error('[presentation] Engine unavailable:', (error as Error).message);
+  }
+
+  // Fallback: client-side print
   const slidesUrl = new URL(`/report/${scanId}/slides`, request.url);
   slidesUrl.searchParams.set('print', '1');
   if (shareToken) {
     slidesUrl.searchParams.set('share', shareToken);
   }
-
   return NextResponse.redirect(slidesUrl.toString());
 }

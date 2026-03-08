@@ -1,0 +1,106 @@
+/**
+ * Server-side PDF generation using Patchright element screenshots.
+ *
+ * Chrome's print renderer (page.pdf()) ignores overflow:hidden at page
+ * boundaries, causing slide content to bleed across pages. Instead, we:
+ *   1. Navigate to the slides page in a real browser
+ *   2. Screenshot each .slide-card element (respects overflow:hidden)
+ *   3. Compose screenshots into a PDF via an image-only HTML page
+ *
+ * This guarantees pixel-perfect output — what you see on screen = what
+ * you get in the PDF.
+ */
+import { chromium } from 'patchright';
+import { getSupabaseAdmin } from './supabase.js';
+
+// ─── Presentation PDF (slide deck) ──────────────────────────────────────
+
+export async function generatePresentationPDF(
+  scanId: string,
+  reportBaseUrl: string,
+): Promise<Buffer> {
+  const url = `${reportBaseUrl}/report/${scanId}/slides`;
+  console.log(`[pdf-generator] Generating presentation PDF for ${scanId}: ${url}`);
+
+  const browser = await chromium.launch({ headless: true });
+  try {
+    const page = await browser.newPage({
+      viewport: { width: 1344, height: 816 },
+    });
+
+    await page.goto(url, { waitUntil: 'networkidle' });
+    await page.waitForSelector('[data-slides-loaded="true"]', { timeout: 60_000 });
+
+    // Extra settle time for canvas animations (plasma, dithering)
+    await page.waitForTimeout(500);
+
+    // Step 1: Screenshot each slide card — element screenshots
+    // always respect overflow:hidden, unlike page.pdf()
+    const cards = await page.$$('.slide-card');
+    console.log(`[pdf-generator] Screenshotting ${cards.length} slides`);
+
+    const dataUrls: string[] = [];
+    for (const card of cards) {
+      const buf = await card.screenshot({ type: 'png' });
+      dataUrls.push('data:image/png;base64,' + buf.toString('base64'));
+    }
+
+    // Step 2: Compose into PDF via image-only HTML page
+    // Since the content is flat raster images, Chrome's print renderer
+    // cannot break layout — images just fill each page exactly.
+    const compositionHtml = `<!DOCTYPE html>
+<html><head><style>
+  @page { size: 14in 8.5in; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #080808; }
+  .pg { width: 14in; height: 8.5in; page-break-after: always; overflow: hidden; }
+  .pg:last-child { page-break-after: auto; }
+  .pg img { width: 100%; height: 100%; display: block; object-fit: fill; }
+</style></head><body>
+${dataUrls.map((src) => `<div class="pg"><img src="${src}"></div>`).join('\n')}
+</body></html>`;
+
+    const pdfPage = await browser.newPage();
+    await pdfPage.setContent(compositionHtml, { waitUntil: 'load' });
+
+    // Wait for all images to render
+    await pdfPage.waitForTimeout(300);
+
+    const pdf = await pdfPage.pdf({
+      width: '14in',
+      height: '8.5in',
+      printBackground: true,
+      margin: { top: '0', bottom: '0', left: '0', right: '0' },
+      displayHeaderFooter: false,
+    });
+
+    console.log(`[pdf-generator] PDF generated: ${pdf.length} bytes, ${dataUrls.length} pages`);
+    return Buffer.from(pdf);
+  } finally {
+    await browser.close();
+  }
+}
+
+export async function uploadPresentationPDF(
+  scanId: string,
+  pdf: Buffer,
+): Promise<string> {
+  const filename = `reports/${scanId}/presentation.pdf`;
+
+  const supabase = getSupabaseAdmin();
+  const { error } = await supabase.storage
+    .from('reports')
+    .upload(filename, pdf, {
+      contentType: 'application/pdf',
+      upsert: true,
+    });
+
+  if (error) throw error;
+
+  const { data } = await getSupabaseAdmin().storage
+    .from('reports')
+    .createSignedUrl(filename, 60 * 60 * 24); // 24h expiry
+
+  if (!data) throw new Error('Failed to create signed URL for presentation PDF');
+  return data.signedUrl;
+}

@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { enqueueScanJob, getJobState, getQueueDepth } from '../queue/scan-queue.js';
 import { getScanById } from '../services/supabase.js';
 import { normalizeUrl, getRegistrableDomain } from '../utils/url.js';
+import { generatePresentationPDF, uploadPresentationPDF } from '../services/pdf-generator.js';
 import type { ModuleTier } from '@marketing-alpha/types';
 
 /**
@@ -202,6 +203,54 @@ export async function scanRoutes(fastify: FastifyInstance): Promise<void> {
 
         reply.code(500).send({
           error: 'Failed to get scan status',
+          message: (error as Error).message,
+        });
+      }
+    },
+  );
+
+  /**
+   * POST /engine/reports/:id/presentation-pdf
+   *
+   * Generate presentation slide deck PDF via element screenshots.
+   * Returns a signed Supabase Storage URL (24h expiry).
+   */
+  fastify.post(
+    '/engine/reports/:id/presentation-pdf',
+    async (
+      request: FastifyRequest<{ Params: ScanIdParamsType }>,
+      reply: FastifyReply,
+    ) => {
+      const parseResult = ScanIdParams.safeParse(request.params);
+      if (!parseResult.success) {
+        reply.code(400).send({ error: 'Invalid scan ID' });
+        return;
+      }
+
+      const { id: scanId } = parseResult.data;
+      const scan = await getScanById(scanId);
+
+      if (!scan || scan['tier'] !== 'paid' || scan['status'] !== 'complete') {
+        reply.code(404).send({ error: 'Scan not found or not eligible for PDF' });
+        return;
+      }
+
+      try {
+        const reportBaseUrl = process.env['REPORT_BASE_URL'] ?? 'http://localhost:3000';
+        request.log.info({ scanId }, 'Generating presentation PDF');
+
+        const pdf = await generatePresentationPDF(scanId, reportBaseUrl);
+        const signedUrl = await uploadPresentationPDF(scanId, pdf);
+
+        request.log.info({ scanId }, 'Presentation PDF generated and uploaded');
+        reply.send({ url: signedUrl });
+      } catch (error) {
+        request.log.error(
+          { scanId, error: (error as Error).message },
+          'Failed to generate presentation PDF',
+        );
+        reply.code(500).send({
+          error: 'PDF generation failed',
           message: (error as Error).message,
         });
       }
