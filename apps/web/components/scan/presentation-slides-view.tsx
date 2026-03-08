@@ -105,6 +105,16 @@ export function PresentationSlidesView({ scan, autoPrint = false }: { scan: Scan
               -webkit-print-color-adjust: exact !important;
               print-color-adjust: exact !important;
             }
+            html, body {
+              background: #080808 !important;
+              color: var(--gs-light) !important;
+              margin: 0 !important;
+              padding: 0 !important;
+              overflow: visible !important;
+            }
+            .slide-card {
+              overflow: hidden !important;
+            }
             .slide-page { break-before: page; break-inside: avoid; }
             .slide-page:first-child { break-before: auto; }
           }
