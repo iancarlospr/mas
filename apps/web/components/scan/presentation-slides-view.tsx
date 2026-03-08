@@ -101,24 +101,24 @@ export function PresentationSlidesView({ scan, autoPrint = false }: { scan: Scan
           @page { size: 14in 8.5in; margin: 0; }
 
           @media print {
-            /* Override globals.css print resets that break dark slides */
-            * {
+            /* Beat globals.css "* { box-shadow/text-shadow: none !important }"
+               by using a more specific selector + revert to restore inline styles */
+            [data-slides-loaded] *,
+            [data-slides-loaded] *::before,
+            [data-slides-loaded] *::after {
               -webkit-print-color-adjust: exact !important;
               print-color-adjust: exact !important;
               color-adjust: exact !important;
-              box-shadow: initial !important;
-              text-shadow: initial !important;
+              box-shadow: revert !important;
+              text-shadow: revert !important;
             }
             html, body {
               background: #080808 !important;
-              color: inherit !important;
-              font-size: inherit !important;
+              color: var(--gs-light) !important;
+              font-size: 16px !important;
               margin: 0 !important;
               padding: 0 !important;
               overflow: visible !important;
-            }
-            h1, h2, h3, h4, h5, h6 {
-              font-size: inherit !important;
             }
             .slide-page { break-before: page; break-inside: avoid; }
             .slide-page:first-child { break-before: auto; }
