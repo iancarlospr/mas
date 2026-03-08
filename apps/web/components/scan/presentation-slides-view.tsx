@@ -101,18 +101,22 @@ export function PresentationSlidesView({ scan, autoPrint = false }: { scan: Scan
           @page { size: 14in 8.5in; margin: 0; }
 
           @media print {
-            * {
+            [data-slides-loaded] *,
+            [data-slides-loaded] *::before,
+            [data-slides-loaded] *::after {
               -webkit-print-color-adjust: exact !important;
               print-color-adjust: exact !important;
+              color-adjust: exact !important;
             }
             html, body {
               background: #080808 !important;
               color: var(--gs-light) !important;
+              font-size: 16px !important;
               margin: 0 !important;
               padding: 0 !important;
               overflow: visible !important;
             }
-            .slide-card {
+            [data-slides-loaded] .slide-card {
               overflow: hidden !important;
             }
             .slide-page { break-before: page; break-inside: avoid; }
