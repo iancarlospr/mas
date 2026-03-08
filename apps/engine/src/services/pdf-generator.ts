@@ -332,6 +332,67 @@ export async function uploadPrdPDF(
   return data.signedUrl;
 }
 
+// ─── Presentation PDF (slide deck) ──────────────────────────────────────
+
+export async function generatePresentationPDF(
+  scanId: string,
+  reportBaseUrl: string,
+): Promise<Buffer> {
+  const url = `${reportBaseUrl}/report/${scanId}/slides?print=true`;
+  console.log(`[pdf-generator] Generating presentation PDF for ${scanId}: ${url}`);
+
+  const browser = await chromium.launch({ headless: true });
+  try {
+    const page = await browser.newPage({
+      viewport: { width: 1344, height: 816 },
+    });
+
+    // CRITICAL: force screen media so dark backgrounds, shadows, glows all render
+    await page.emulateMedia({ media: 'screen' });
+
+    await page.goto(url, { waitUntil: 'networkidle' });
+
+    // Wait for all slides to signal readiness (fonts loaded + settle)
+    await page.waitForSelector('[data-slides-loaded="true"]', { timeout: 60_000 });
+
+    const pdf = await page.pdf({
+      width: '14in',
+      height: '8.5in',
+      printBackground: true,
+      margin: { top: '0', bottom: '0', left: '0', right: '0' },
+      displayHeaderFooter: false,
+    });
+
+    return Buffer.from(pdf);
+  } finally {
+    await browser.close();
+  }
+}
+
+export async function uploadPresentationPDF(
+  scanId: string,
+  pdf: Buffer,
+): Promise<string> {
+  const filename = `reports/${scanId}/presentation.pdf`;
+
+  const supabase = getSupabaseAdmin();
+  const { error } = await supabase.storage
+    .from('reports')
+    .upload(filename, pdf, {
+      contentType: 'application/pdf',
+      upsert: true,
+    });
+
+  if (error) throw error;
+
+  const { data } = await getSupabaseAdmin().storage
+    .from('reports')
+    .createSignedUrl(filename, 60 * 60 * 24); // 24h expiry
+
+  if (!data) throw new Error('Failed to create signed URL for presentation PDF');
+  return data.signedUrl;
+}
+
 // ─── Report PDF ─────────────────────────────────────────────────────────
 
 export async function uploadReportPDF(

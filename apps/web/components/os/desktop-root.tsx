@@ -19,7 +19,7 @@ import { MobileGate } from './mobile-gate';
    Standalone routes (legal pages) bypass the desktop shell entirely.
    ================================================================= */
 
-const STANDALONE_ROUTES = ['/privacy', '/terms', '/cookies', '/contact'];
+const STANDALONE_ROUTES = ['/privacy', '/terms', '/cookies', '/contact', '/report'];
 
 export function DesktopRoot({ children }: { children: ReactNode }) {
   const pathname = usePathname();

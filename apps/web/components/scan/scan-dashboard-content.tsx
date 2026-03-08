@@ -10,8 +10,53 @@ import { OverviewExecSlide } from './slides/overview-exec-slide';
 import { FindingsSlide } from './slides/findings-slide';
 import { CategoryIntroSlide } from './slides/category-intro-slide';
 import { M01Slide } from './slides/m01-slide';
+import { M12Slide } from './slides/m12-slide';
+import { M40Slide } from './slides/m40-slide';
+// Cat 2: Analytics & Measurement
+import { M05Slide } from './slides/m05-slide';
+import { M06Slide } from './slides/m06-slide';
+import { M06bSlide } from './slides/m06b-slide';
+import { M08Slide } from './slides/m08-slide';
+import { M09Slide } from './slides/m09-slide';
+// Cat 3: Performance & Experience
+import { M03Slide } from './slides/m03-slide';
+import { M10Slide } from './slides/m10-slide';
+import { M11Slide } from './slides/m11-slide';
+import { M13Slide } from './slides/m13-slide';
+import { M14Slide } from './slides/m14-slide';
+// Cat 4: SEO & Content
+import { M04Slide } from './slides/m04-slide';
+import { M15Slide } from './slides/m15-slide';
+import { M26Slide } from './slides/m26-slide';
+import { M34Slide } from './slides/m34-slide';
+import { M39Slide } from './slides/m39-slide';
+// Cat 5: Paid Media
+import { M21Slide } from './slides/m21-slide';
+import { M28Slide } from './slides/m28-slide';
+import { M29Slide } from './slides/m29-slide';
+// Cat 6: MarTech & Infrastructure
+import { M02Slide } from './slides/m02-slide';
+import { M07Slide } from './slides/m07-slide';
+import { M20Slide } from './slides/m20-slide';
+// Cat 7: Brand & Digital Presence
+import { M16Slide } from './slides/m16-slide';
+import { M17Slide } from './slides/m17-slide';
+import { M18M19Slide } from './slides/m18-m19-slide';
+import { M22M23Slide } from './slides/m22-m23-slide';
+import { M37Slide } from './slides/m37-slide';
+import { M38Slide } from './slides/m38-slide';
+// Cat 8: Market Intelligence
+import { M24Slide } from './slides/m24-slide';
+import { M25Slide } from './slides/m25-slide';
+import { M27Slide } from './slides/m27-slide';
+import { M30Slide } from './slides/m30-slide';
+import { M31Slide } from './slides/m31-slide';
+import { M33Slide } from './slides/m33-slide';
+import { M36Slide } from './slides/m36-slide';
 import { ModuleSlide } from './module-slide';
-import { PaidSlides } from './paid-slides';
+import { M45Slide } from './slides/m45-slide';
+import { M43Slide } from './slides/m43-slide';
+import { ClosingSlide } from './slides/closing-slide';
 import { cn } from '@/lib/utils';
 
 /**
@@ -23,8 +68,20 @@ import { cn } from '@/lib/utils';
  * Does NOT include any window chrome — the caller provides that.
  */
 
-const PAID_MODULES = new Set(['M42', 'M43', 'M44', 'M45']);
-const HIDDEN_MODULES = new Set(['M41']);
+const PAID_MODULES = new Set(['M43', 'M44', 'M45']);
+const HIDDEN_MODULES = new Set(['M41', 'M42']);
+// Modules rendered via custom or AIModuleSlide (not the generic ModuleSlide)
+const CUSTOM_SLIDE_MODULES = new Set([
+  'M01', 'M12', 'M40',
+  'M05', 'M06', 'M06b', 'M08', 'M09',
+  'M03', 'M10', 'M11', 'M13', 'M14',
+  'M04', 'M15', 'M26', 'M34', 'M39',
+  'M21', 'M28', 'M29',
+  'M02', 'M07', 'M20',
+  'M16', 'M17', 'M18', 'M19', 'M22', 'M23', 'M37', 'M38',
+  'M24', 'M25', 'M27', 'M30', 'M31', 'M33', 'M36',
+]);
+
 const GHOST_MODULES = new Set(['M09', 'M10', 'M11', 'M12']);
 
 // FREE_CATEGORIES imported from slide-sidebar.tsx
@@ -40,6 +97,17 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
     [scan.moduleResults],
   );
   const isPaid = scan.tier === 'paid';
+
+  // M41 AI scores — used instead of checkpoint scores on slides
+  const aiScores = useMemo(() => {
+    const m41 = resultMap.get('M41');
+    const sums = (m41?.data?.['moduleSummaries'] as Record<string, { module_score?: number }> | undefined) ?? {};
+    const map = new Map<string, number>();
+    for (const [moduleId, summary] of Object.entries(sums)) {
+      if (summary.module_score != null) map.set(moduleId, summary.module_score);
+    }
+    return map;
+  }, [resultMap]);
 
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
@@ -92,7 +160,11 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
   }, [wm, scan.id, scan.domain]);
 
   const handleDownloadPdf = useCallback(() => {
-    window.open(`/api/reports/${scan.id}/pdf`, '_blank');
+    window.open(`/api/reports/${scan.id}/prd`, '_blank');
+  }, [scan.id]);
+
+  const handleDownloadPresentation = useCallback(() => {
+    window.open(`/api/reports/${scan.id}/presentation`, '_blank');
   }, [scan.id]);
 
   const handleAskChloe = useCallback(() => {
@@ -184,9 +256,74 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
         {!activeCategory && <TitleSlide scan={scan} />}
         {!activeCategory && <VerdictSlide scan={scan} />}
         {!activeCategory && <OverviewExecSlide scan={scan} />}
+        {!activeCategory && isPaid && <M45Slide scan={scan} />}
         {!activeCategory && <FindingsSlide scan={scan} />}
+        {/* ── Category 1: Security & Compliance ── */}
         {!activeCategory && <CategoryIntroSlide scan={scan} category="security_compliance" />}
         {!activeCategory && <M01Slide scan={scan} />}
+        {!activeCategory && <M12Slide scan={scan} />}
+        {!activeCategory && <M40Slide scan={scan} />}
+
+        {/* ── Category 2: Analytics & Measurement ── */}
+        {!activeCategory && <CategoryIntroSlide scan={scan} category="analytics_measurement" />}
+        {!activeCategory && <M05Slide scan={scan} />}
+        {!activeCategory && <M06Slide scan={scan} />}
+        {!activeCategory && <M06bSlide scan={scan} />}
+        {!activeCategory && <M08Slide scan={scan} />}
+        {!activeCategory && <M09Slide scan={scan} />}
+
+        {/* ── Category 3: Performance & Experience ── */}
+        {!activeCategory && <CategoryIntroSlide scan={scan} category="performance_experience" />}
+        {!activeCategory && <M03Slide scan={scan} />}
+        {!activeCategory && <M13Slide scan={scan} />}
+        {!activeCategory && <M14Slide scan={scan} />}
+        {!activeCategory && <M10Slide scan={scan} />}
+        {!activeCategory && <M11Slide scan={scan} />}
+
+        {/* ── Category 4: SEO & Content ── */}
+        {!activeCategory && <CategoryIntroSlide scan={scan} category="seo_content" />}
+        {!activeCategory && <M04Slide scan={scan} />}
+        {!activeCategory && <M15Slide scan={scan} />}
+        {!activeCategory && <M26Slide scan={scan} />}
+        {!activeCategory && <M34Slide scan={scan} />}
+        {!activeCategory && <M39Slide scan={scan} />}
+
+        {/* ── Category 5: Paid Media ── */}
+        {!activeCategory && <CategoryIntroSlide scan={scan} category="paid_media" />}
+        {!activeCategory && <M21Slide scan={scan} />}
+        {!activeCategory && <M28Slide scan={scan} />}
+        {!activeCategory && <M29Slide scan={scan} />}
+
+        {/* ── Category 6: MarTech & Infrastructure ── */}
+        {!activeCategory && <CategoryIntroSlide scan={scan} category="martech_infrastructure" />}
+        {!activeCategory && <M02Slide scan={scan} />}
+        {!activeCategory && <M07Slide scan={scan} />}
+        {!activeCategory && <M20Slide scan={scan} />}
+
+        {/* ── Category 7: Brand & Digital Presence ── */}
+        {!activeCategory && <CategoryIntroSlide scan={scan} category="brand_presence" />}
+        {!activeCategory && <M16Slide scan={scan} />}
+        {!activeCategory && <M17Slide scan={scan} />}
+        {!activeCategory && <M18M19Slide scan={scan} />}
+        {!activeCategory && <M22M23Slide scan={scan} />}
+        {!activeCategory && <M37Slide scan={scan} />}
+        {!activeCategory && <M38Slide scan={scan} />}
+
+        {/* ── Category 8: Market Intelligence ── */}
+        {!activeCategory && <CategoryIntroSlide scan={scan} category="market_intelligence" />}
+        {!activeCategory && <M24Slide scan={scan} />}
+        {!activeCategory && <M25Slide scan={scan} />}
+        {!activeCategory && <M27Slide scan={scan} />}
+        {!activeCategory && <M30Slide scan={scan} />}
+        {!activeCategory && <M31Slide scan={scan} />}
+        {!activeCategory && <M33Slide scan={scan} />}
+        {!activeCategory && <M36Slide scan={scan} />}
+
+        {/* ── M43: Remediation Roadmap ── */}
+        {!activeCategory && isPaid && <M43Slide scan={scan} />}
+
+        {/* ── Closing slide (back cover) ── */}
+        {!activeCategory && <ClosingSlide scan={scan} />}
 
         {/* Locked category placeholder */}
         {isActiveCategoryLocked && (
@@ -211,7 +348,7 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
           </div>
         )}
 
-        {!isActiveCategoryLocked && filteredModuleIds.map((mId) => (
+        {!isActiveCategoryLocked && filteredModuleIds.filter((mId) => !CUSTOM_SLIDE_MODULES.has(mId)).map((mId) => (
           <ModuleSlide
             key={mId}
             moduleId={mId}
@@ -220,18 +357,16 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
             scanId={scan.id}
             isPaid={!isPaid && PAID_MODULES.has(mId)}
             isGhostModule={GHOST_MODULES.has(mId)}
+            aiScore={aiScores.get(mId)}
           />
         ))}
 
-        {!activeCategory && (
-          <PaidSlides scanId={scan.id} isPaid={isPaid} resultMap={resultMap} />
-        )}
       </div>
 
       {/* Status Bar */}
       <div className="window-statusbar flex-shrink-0">
         <div className="window-statusbar-section">
-          {filteredModuleIds.length} modules
+          {scan.moduleResults.filter((r) => r.status === 'success' || r.status === 'partial').length} modules analyzed
         </div>
         <div className="window-statusbar-section">
           MarketingIQ™: {scan.marketingIq ?? '\u2014'}
@@ -245,11 +380,16 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
           </button>
         )}
         {isPaid && (
-          <div className="flex gap-gs-1">
-            <button onClick={handleDownloadPdf} className="bevel-button text-os-xs">
-              PDF
+          <div className="flex gap-3 items-center">
+            <button onClick={handleDownloadPresentation} className="text-gs-base hover:text-gs-bright transition-colors" style={{ fontSize: '11px', fontFamily: 'var(--font-system)' }}>
+              Slides &darr;
             </button>
-            <button onClick={handleAskChloe} className="bevel-button text-os-xs">
+            <span className="text-gs-mid" style={{ fontSize: '11px' }}>&middot;</span>
+            <button onClick={handleDownloadPdf} className="text-gs-base hover:text-gs-bright transition-colors" style={{ fontSize: '11px', fontFamily: 'var(--font-system)' }}>
+              PRD &darr;
+            </button>
+            <span className="text-gs-mid" style={{ fontSize: '11px' }}>&middot;</span>
+            <button onClick={handleAskChloe} className="text-gs-base hover:text-gs-bright transition-colors" style={{ fontSize: '11px', fontFamily: 'var(--font-system)' }}>
               Ask Chloe
             </button>
           </div>

@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { enqueueScanJob, getJobState, getQueueDepth } from '../queue/scan-queue.js';
 import { getScanById } from '../services/supabase.js';
 import { normalizeUrl, getRegistrableDomain } from '../utils/url.js';
-import { generateReportPDF, uploadReportPDF, generatePrdPDF, uploadPrdPDF } from '../services/pdf-generator.js';
+import { generateReportPDF, uploadReportPDF, generatePrdPDF, uploadPrdPDF, generatePresentationPDF, uploadPresentationPDF } from '../services/pdf-generator.js';
 import type { ModuleTier } from '@marketing-alpha/types';
 
 /**
@@ -285,6 +285,49 @@ export async function scanRoutes(fastify: FastifyInstance): Promise<void> {
         );
         reply.code(500).send({
           error: 'PRD PDF generation failed',
+          message: (error as Error).message,
+        });
+      }
+    },
+  );
+
+  /**
+   * POST /engine/reports/:id/presentation-pdf
+   *
+   * Generate the full slide deck as a landscape PDF.
+   * Uses Patchright to navigate to /report/:id/slides?print=true,
+   * emulates screen media, and captures each slide as a PDF page.
+   */
+  fastify.post(
+    '/engine/reports/:id/presentation-pdf',
+    async (
+      request: FastifyRequest<{ Params: ScanIdParamsType }>,
+      reply: FastifyReply,
+    ) => {
+      const parseResult = ScanIdParams.safeParse(request.params);
+      if (!parseResult.success) {
+        reply.code(400).send({ error: 'Invalid scan ID' });
+        return;
+      }
+
+      const { id: scanId } = parseResult.data;
+      const reportBaseUrl = process.env['REPORT_BASE_URL']
+        ?? process.env['NEXT_PUBLIC_SITE_URL']
+        ?? 'http://localhost:3000';
+
+      try {
+        request.log.info({ scanId }, 'Generating presentation PDF');
+        const pdf = await generatePresentationPDF(scanId, reportBaseUrl);
+        const signedUrl = await uploadPresentationPDF(scanId, pdf);
+        request.log.info({ scanId }, 'Presentation PDF generated and uploaded');
+        reply.send({ signedUrl });
+      } catch (error) {
+        request.log.error(
+          { scanId, error: (error as Error).message },
+          'Failed to generate presentation PDF',
+        );
+        reply.code(500).send({
+          error: 'Presentation PDF generation failed',
           message: (error as Error).message,
         });
       }
