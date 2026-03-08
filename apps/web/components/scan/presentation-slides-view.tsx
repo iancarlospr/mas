@@ -89,15 +89,41 @@ export function PresentationSlidesView({ scan, autoPrint = false }: { scan: Scan
           background: '#080808',
         }}
       >
-        {/* Force screen-like rendering in print context */}
+        {/* Override desktop OS body styles for standalone slides page */}
         <style>{`
+          html, body {
+            overflow: auto !important;
+            height: auto !important;
+            min-height: 100vh;
+            background: #080808 !important;
+          }
+
           @page { size: 14in 8.5in; margin: 0; }
+
           @media print {
-            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
-            body { background: #080808 !important; margin: 0 !important; padding: 0 !important; }
+            /* Override globals.css print resets that break dark slides */
+            * {
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+              color-adjust: exact !important;
+              box-shadow: initial !important;
+              text-shadow: initial !important;
+            }
+            html, body {
+              background: #080808 !important;
+              color: inherit !important;
+              font-size: inherit !important;
+              margin: 0 !important;
+              padding: 0 !important;
+              overflow: visible !important;
+            }
+            h1, h2, h3, h4, h5, h6 {
+              font-size: inherit !important;
+            }
             .slide-page { break-before: page; break-inside: avoid; }
             .slide-page:first-child { break-before: auto; }
           }
+
           .slide-page { break-before: page; break-inside: avoid; }
           .slide-page:first-child { break-before: auto; }
         `}</style>
