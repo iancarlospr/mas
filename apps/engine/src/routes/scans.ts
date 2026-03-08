@@ -228,7 +228,9 @@ export async function scanRoutes(fastify: FastifyInstance): Promise<void> {
       }
 
       const { id: scanId } = parseResult.data;
+      request.log.info({ scanId }, 'PDF request: looking up scan');
       const scan = await getScanById(scanId);
+      request.log.info({ scanId, found: !!scan, tier: scan?.['tier'], status: scan?.['status'] }, 'PDF request: scan lookup result');
 
       if (!scan || scan['tier'] !== 'paid' || scan['status'] !== 'complete') {
         reply.code(404).send({ error: 'Scan not found or not eligible for PDF' });
