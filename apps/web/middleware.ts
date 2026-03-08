@@ -31,9 +31,11 @@ export async function middleware(request: NextRequest) {
     return new NextResponse('Service not available in your region', { status: 451 });
   }
 
-  // Staging gate: skip for API routes and webhooks
+  // Staging gate: skip for API routes, webhooks, and engine PDF rendering
   const { pathname } = request.nextUrl;
-  if (!pathname.startsWith('/api/') && !pathname.startsWith('/auth/')) {
+  const isPrintRender = pathname.startsWith('/report/') && pathname.endsWith('/slides')
+    && (request.nextUrl.searchParams.get('print') === '1' || request.nextUrl.searchParams.get('print') === 'true');
+  if (!pathname.startsWith('/api/') && !pathname.startsWith('/auth/') && !isPrintRender) {
     const hasAccess = request.cookies.get(STAGING_COOKIE)?.value === 'granted';
 
     // Grant access via ?access=<secret>
