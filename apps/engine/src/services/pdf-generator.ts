@@ -35,8 +35,44 @@ export async function generatePresentationPDF(
       viewport: { width: 1344, height: 816 },
     });
 
-    await page.goto(url, { waitUntil: 'networkidle' });
-    await page.waitForSelector('[data-slides-loaded="true"]', { timeout: 60_000 });
+    // Capture page errors for debugging
+    page.on('console', (msg) => {
+      if (msg.type() === 'error') {
+        console.log(`[pdf-generator] Page console error: ${msg.text()}`);
+      }
+    });
+    page.on('pageerror', (err) => {
+      console.log(`[pdf-generator] Page JS error: ${err.message}`);
+    });
+
+    console.log(`[pdf-generator] Navigating to ${url}`);
+    const response = await page.goto(url, { waitUntil: 'networkidle', timeout: 30_000 });
+    console.log(`[pdf-generator] Page loaded: status=${response?.status()}, url=${page.url()}`);
+
+    // Log what we see on the page
+    const pageTitle = await page.title();
+    const bodyText = await page.evaluate(() => document.body?.innerText?.substring(0, 200) || 'empty');
+    const slidesAttr = await page.evaluate(() => document.querySelector('[data-slides-loaded]')?.getAttribute('data-slides-loaded') ?? 'NOT FOUND');
+    const cardCount = await page.evaluate(() => document.querySelectorAll('.slide-card').length);
+    console.log(`[pdf-generator] Page state: title="${pageTitle}", slidesLoaded="${slidesAttr}", cards=${cardCount}, body="${bodyText.substring(0, 100)}"`);
+
+    // Wait for slides — try data-slides-loaded first, fall back to .slide-card
+    if (slidesAttr !== 'true') {
+      console.log(`[pdf-generator] Waiting for slides to load...`);
+      try {
+        await page.waitForSelector('[data-slides-loaded="true"]', { timeout: 30_000 });
+      } catch {
+        // Fallback: wait for slide cards to appear
+        console.log(`[pdf-generator] data-slides-loaded timeout, checking for .slide-card elements...`);
+        const finalCardCount = await page.evaluate(() => document.querySelectorAll('.slide-card').length);
+        console.log(`[pdf-generator] Found ${finalCardCount} slide cards`);
+        if (finalCardCount === 0) {
+          throw new Error('No slides rendered on the page');
+        }
+        // Give extra time for rendering
+        await page.waitForTimeout(2000);
+      }
+    }
 
     // Extra settle time for canvas animations (plasma, dithering)
     await page.waitForTimeout(500);
