@@ -120,6 +120,10 @@ export function PresentationSlidesView({ scan, autoPrint = false }: { scan: Scan
               padding: 0 !important;
               overflow: visible !important;
             }
+            /* Force slide containers to clip overflow in print — matches scan window behavior */
+            [data-slides-loaded] .slide-card {
+              overflow: hidden !important;
+            }
             .slide-page { break-before: page; break-inside: avoid; }
             .slide-page:first-child { break-before: auto; }
           }
