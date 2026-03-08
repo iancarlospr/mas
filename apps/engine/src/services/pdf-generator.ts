@@ -7,7 +7,7 @@
  *   2. Screenshot each .slide-card element (respects overflow:hidden)
  *   3. Compose screenshots into a PDF via an image-only HTML page
  *
- * This guarantees pixel-perfect output — what you see on screen = what
+ * This guarantees pixel-perfect output — what you see on screen is what
  * you get in the PDF.
  */
 import { chromium } from 'patchright';
