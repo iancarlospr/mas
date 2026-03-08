@@ -44,7 +44,10 @@ jobs:
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
-          no-cache: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            CACHE_BUST=${{ github.sha }}
 
       - name: Deploy to DigitalOcean
         uses: appleboy/ssh-action@v1.2.0
