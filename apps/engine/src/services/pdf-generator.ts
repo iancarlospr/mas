@@ -19,7 +19,7 @@ export async function generatePresentationPDF(
   scanId: string,
   reportBaseUrl: string,
 ): Promise<Buffer> {
-  const url = `${reportBaseUrl}/report/${scanId}/slides`;
+  const url = `${reportBaseUrl}/report/${scanId}/slides?print=1`;
   console.log(`[pdf-generator] Generating presentation PDF for ${scanId}: ${url}`);
 
   const browser = await chromium.launch({ headless: true });
