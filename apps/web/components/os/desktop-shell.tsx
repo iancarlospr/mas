@@ -53,6 +53,12 @@ export function DesktopShell({ children }: { children: ReactNode }) {
     items: ContextMenuItem[];
   } | null>(null);
 
+  // Mark body so globals.css print rules only apply to desktop OS
+  useEffect(() => {
+    document.body.classList.add('gs-desktop');
+    return () => document.body.classList.remove('gs-desktop');
+  }, []);
+
   // Register all static window configs on mount
   useEffect(() => {
     for (const [id, config] of Object.entries(WINDOW_CONFIGS)) {

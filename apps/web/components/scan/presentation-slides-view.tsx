@@ -89,7 +89,7 @@ export function PresentationSlidesView({ scan, autoPrint = false }: { scan: Scan
           background: '#080808',
         }}
       >
-        {/* Override desktop OS body styles for standalone slides page */}
+        {/* Standalone slides styles — globals.css print rules are scoped to body.gs-desktop so they don't apply here */}
         <style>{`
           html, body {
             overflow: auto !important;
@@ -101,28 +101,9 @@ export function PresentationSlidesView({ scan, autoPrint = false }: { scan: Scan
           @page { size: 14in 8.5in; margin: 0; }
 
           @media print {
-            /* Beat globals.css "* { box-shadow/text-shadow: none !important }"
-               by using a more specific selector + revert to restore inline styles */
-            [data-slides-loaded] *,
-            [data-slides-loaded] *::before,
-            [data-slides-loaded] *::after {
+            * {
               -webkit-print-color-adjust: exact !important;
               print-color-adjust: exact !important;
-              color-adjust: exact !important;
-              box-shadow: revert !important;
-              text-shadow: revert !important;
-            }
-            html, body {
-              background: #080808 !important;
-              color: var(--gs-light) !important;
-              font-size: 16px !important;
-              margin: 0 !important;
-              padding: 0 !important;
-              overflow: visible !important;
-            }
-            /* Force slide containers to clip overflow in print — matches scan window behavior */
-            [data-slides-loaded] .slide-card {
-              overflow: hidden !important;
             }
             .slide-page { break-before: page; break-inside: avoid; }
             .slide-page:first-child { break-before: auto; }

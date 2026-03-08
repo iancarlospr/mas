@@ -640,69 +640,70 @@
     margin: 0;
   }
 
-  * {
+  /* Desktop OS print rules — scoped so they don't leak into standalone slides */
+  body.gs-desktop * {
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
     box-shadow: none !important;
     text-shadow: none !important;
   }
 
-  .gs-menubar,
-  .gs-taskbar,
-  .gs-desktop-icons,
-  .gs-chloe-screenmate,
-  .crt-scanlines,
-  .crt-vignette,
-  .noise-grain,
-  .window-titlebar-buttons,
-  .bevel-button,
-  .bevel-button-primary,
-  .redacted-stamp,
-  .redacted::after,
-  [data-interactive],
-  [data-no-print] {
+  body.gs-desktop .gs-menubar,
+  body.gs-desktop .gs-taskbar,
+  body.gs-desktop .gs-desktop-icons,
+  body.gs-desktop .gs-chloe-screenmate,
+  body.gs-desktop .crt-scanlines,
+  body.gs-desktop .crt-vignette,
+  body.gs-desktop .noise-grain,
+  body.gs-desktop .window-titlebar-buttons,
+  body.gs-desktop .bevel-button,
+  body.gs-desktop .bevel-button-primary,
+  body.gs-desktop .redacted-stamp,
+  body.gs-desktop .redacted::after,
+  body.gs-desktop [data-interactive],
+  body.gs-desktop [data-no-print] {
     display: none !important;
   }
 
-  .window {
+  body.gs-desktop .window {
     border: none !important;
     box-shadow: none !important;
     background: white !important;
     border-radius: 0 !important;
   }
-  .window-titlebar {
+  body.gs-desktop .window-titlebar {
     background: none !important;
     color: black !important;
     border-bottom: 1px solid #ccc;
   }
-  .window-content {
+  body.gs-desktop .window-content {
     border: none !important;
     margin: 0 !important;
     overflow: visible !important;
     border-radius: 0 !important;
   }
 
-  .module-panel {
+  body.gs-desktop .module-panel {
     break-before: page;
     break-inside: avoid;
     border: 1px solid #ddd !important;
     border-radius: 0 !important;
   }
-  .module-panel:first-child {
+  body.gs-desktop .module-panel:first-child {
     break-before: auto;
   }
 
-  body {
+  body.gs-desktop {
     font-size: 10pt;
     color: #000 !important;
     background: white !important;
     overflow: visible !important;
   }
-  h1 { font-size: 18pt; }
-  h2 { font-size: 14pt; }
-  h3 { font-size: 12pt; }
+  body.gs-desktop h1 { font-size: 18pt; }
+  body.gs-desktop h2 { font-size: 14pt; }
+  body.gs-desktop h3 { font-size: 12pt; }
 
-  .print-watermark {
+  body.gs-desktop .print-watermark {
     display: block !important;
     position: fixed;
     top: 50%;
