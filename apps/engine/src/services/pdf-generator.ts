@@ -22,7 +22,14 @@ export async function generatePresentationPDF(
   const url = `${reportBaseUrl}/report/${scanId}/slides?print=1`;
   console.log(`[pdf-generator] Generating presentation PDF for ${scanId}: ${url}`);
 
-  const browser = await chromium.launch({ headless: true });
+  const browser = await chromium.launch({
+    headless: true,
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+    ],
+  });
   try {
     const page = await browser.newPage({
       viewport: { width: 1344, height: 816 },
