@@ -15,10 +15,6 @@ COPY apps/engine/package.json apps/engine/tsconfig.json apps/engine/
 # Install all dependencies (workspace-aware)
 RUN npm install --workspace=@marketing-alpha/engine --include-workspace-root
 
-# Cache bust: changes every commit so source code layer always rebuilds
-ARG CACHE_BUST=dev
-RUN echo "cache-bust: ${CACHE_BUST}" > /dev/null
-
 # Copy engine source
 COPY apps/engine/src/ apps/engine/src/
 
