@@ -78,14 +78,14 @@ export function M09Slide({ scan }: { scan: ScanWithResults }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4em' }}>
       {/* Maturity header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.15em' }}>
-        <h4 className="font-display uppercase" style={{ fontSize: 'clamp(1px, 1.2cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)' }}>
+        <h4 className="font-display uppercase" style={{ fontSize: 'clamp(1px, 0.90cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)' }}>
           Behavioral Maturity Model
         </h4>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.3em' }}>
-          <span className="font-data tabular-nums" style={{ fontSize: 'clamp(1px, 2.2cqi, 26px)', fontWeight: 700, color: maturityColor, lineHeight: 1 }}>
+          <span className="font-data tabular-nums" style={{ fontSize: 'clamp(1px, 1.65cqi, 26px)', fontWeight: 700, color: maturityColor, lineHeight: 1 }}>
             {detectedCount}/{capabilities.length}
           </span>
-          <span className="font-data" style={{ fontSize: 'clamp(1px, 1.1cqi, 13px)', color: maturityColor }}>
+          <span className="font-data" style={{ fontSize: 'clamp(1px, 0.83cqi, 13px)', color: maturityColor }}>
             {maturityLabel}
           </span>
         </div>
@@ -111,7 +111,7 @@ export function M09Slide({ scan }: { scan: ScanWithResults }) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3em', marginTop: '0.3em' }}>
         {experiments.length > 0 && (
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.2em', alignItems: 'center' }}>
-            <span className="font-data uppercase" style={{ fontSize: 'clamp(1px, 1cqi, 12px)', color: 'var(--gs-mid)', marginRight: '0.3em', letterSpacing: '0.05em' }}>
+            <span className="font-data uppercase" style={{ fontSize: 'clamp(1px, 0.75cqi, 12px)', color: 'var(--gs-mid)', marginRight: '0.3em', letterSpacing: '0.05em' }}>
               A/B:
             </span>
             {experiments.map((t, i) => <Pill key={i} text={t} color="var(--gs-terminal)" />)}
@@ -119,7 +119,7 @@ export function M09Slide({ scan }: { scan: ScanWithResults }) {
         )}
         {sessionRecording.length > 0 && (
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.2em', alignItems: 'center' }}>
-            <span className="font-data uppercase" style={{ fontSize: 'clamp(1px, 1cqi, 12px)', color: 'var(--gs-mid)', marginRight: '0.3em', letterSpacing: '0.05em' }}>
+            <span className="font-data uppercase" style={{ fontSize: 'clamp(1px, 0.75cqi, 12px)', color: 'var(--gs-mid)', marginRight: '0.3em', letterSpacing: '0.05em' }}>
               Session:
             </span>
             {sessionRecording.map((t, i) => <Pill key={i} text={t} color="var(--gs-base)" />)}
@@ -127,7 +127,7 @@ export function M09Slide({ scan }: { scan: ScanWithResults }) {
         )}
         {personalization.length > 0 && (
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.2em', alignItems: 'center' }}>
-            <span className="font-data uppercase" style={{ fontSize: 'clamp(1px, 1cqi, 12px)', color: 'var(--gs-mid)', marginRight: '0.3em', letterSpacing: '0.05em' }}>
+            <span className="font-data uppercase" style={{ fontSize: 'clamp(1px, 0.75cqi, 12px)', color: 'var(--gs-mid)', marginRight: '0.3em', letterSpacing: '0.05em' }}>
               Personalization:
             </span>
             {personalization.map((t, i) => <Pill key={i} text={t} color="var(--gs-warning)" />)}
@@ -135,7 +135,7 @@ export function M09Slide({ scan }: { scan: ScanWithResults }) {
         )}
         {pushDetected && pushSdkName && (
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.2em', alignItems: 'center' }}>
-            <span className="font-data uppercase" style={{ fontSize: 'clamp(1px, 1cqi, 12px)', color: 'var(--gs-mid)', marginRight: '0.3em', letterSpacing: '0.05em' }}>
+            <span className="font-data uppercase" style={{ fontSize: 'clamp(1px, 0.75cqi, 12px)', color: 'var(--gs-mid)', marginRight: '0.3em', letterSpacing: '0.05em' }}>
               Push:
             </span>
             <Pill text={pushSdkName} color="var(--gs-terminal)" />
@@ -143,7 +143,7 @@ export function M09Slide({ scan }: { scan: ScanWithResults }) {
         )}
         {isGated && (gatingType || paywallProvider) && (
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.2em', alignItems: 'center' }}>
-            <span className="font-data uppercase" style={{ fontSize: 'clamp(1px, 1cqi, 12px)', color: 'var(--gs-mid)', marginRight: '0.3em', letterSpacing: '0.05em' }}>
+            <span className="font-data uppercase" style={{ fontSize: 'clamp(1px, 0.75cqi, 12px)', color: 'var(--gs-mid)', marginRight: '0.3em', letterSpacing: '0.05em' }}>
               Gating:
             </span>
             {paywallProvider && <Pill text={paywallProvider} color="var(--gs-warning)" />}
@@ -155,7 +155,7 @@ export function M09Slide({ scan }: { scan: ScanWithResults }) {
       {/* Overlays indicator */}
       {overlays.length > 0 && (
         <div style={{ marginTop: '0.15em' }}>
-          <span className="font-data" style={{ fontSize: 'clamp(1px, 1.1cqi, 13px)', color: 'var(--gs-warning)' }}>
+          <span className="font-data" style={{ fontSize: 'clamp(1px, 0.83cqi, 13px)', color: 'var(--gs-warning)' }}>
             {overlays.length} overlay(s) detected: {[...new Set(overlays.map(o => typeof o.type === 'string' ? o.type : 'other'))].join(', ')}
           </span>
         </div>

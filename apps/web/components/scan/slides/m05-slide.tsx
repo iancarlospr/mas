@@ -89,7 +89,7 @@ export function M05Slide({ scan }: { scan: ScanWithResults }) {
         <div style={{ display: 'flex', gap: '3%' }}>
           {/* Stack layers — left side */}
           <div style={{ flex: '1 1 65%', display: 'flex', flexDirection: 'column', gap: '0.3em' }}>
-            <h4 className="font-display uppercase" style={{ fontSize: 'clamp(1px, 1.2cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.15em' }}>
+            <h4 className="font-display uppercase" style={{ fontSize: 'clamp(1px, 0.90cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.15em' }}>
               Measurement Stack
             </h4>
 
@@ -143,7 +143,7 @@ export function M05Slide({ scan }: { scan: ScanWithResults }) {
 
           {/* Side flags — right side */}
           <div style={{ flex: '0 0 30%', display: 'flex', flexDirection: 'column', gap: '0.4em', justifyContent: 'flex-start' }}>
-            <h4 className="font-display uppercase" style={{ fontSize: 'clamp(1px, 1.2cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.15em' }}>
+            <h4 className="font-display uppercase" style={{ fontSize: 'clamp(1px, 0.90cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.15em' }}>
               Capabilities
             </h4>
             <CheckItem
@@ -156,10 +156,10 @@ export function M05Slide({ scan }: { scan: ScanWithResults }) {
               label="Server-Side Tracking"
             />
             <div style={{ marginTop: '0.3em' }}>
-              <p className="font-data" style={{ fontSize: 'clamp(1px, 1.1cqi, 13px)', color: 'var(--gs-mid)', marginBottom: '0.2em' }}>
+              <p className="font-data" style={{ fontSize: 'clamp(1px, 0.83cqi, 13px)', color: 'var(--gs-mid)', marginBottom: '0.2em' }}>
                 Tool Count
               </p>
-              <p className="font-data tabular-nums" style={{ fontSize: 'clamp(1px, 2cqi, 22px)', fontWeight: 700, color: 'var(--gs-light)', lineHeight: 1 }}>
+              <p className="font-data tabular-nums" style={{ fontSize: 'clamp(1px, 1.50cqi, 22px)', fontWeight: 700, color: 'var(--gs-light)', lineHeight: 1 }}>
                 {toolCount}
               </p>
             </div>

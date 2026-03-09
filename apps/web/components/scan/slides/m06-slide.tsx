@@ -65,7 +65,7 @@ export function M06Slide({ scan }: { scan: ScanWithResults }) {
 
   const vizContent = (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5em' }}>
-      <h4 className="font-display uppercase" style={{ fontSize: 'clamp(1px, 1.2cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.15em' }}>
+      <h4 className="font-display uppercase" style={{ fontSize: 'clamp(1px, 0.90cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.15em' }}>
         Pixel Capability Matrix
       </h4>
 
@@ -80,10 +80,10 @@ export function M06Slide({ scan }: { scan: ScanWithResults }) {
             padding: '0.5em 0.4em', borderRadius: '4px', textAlign: 'center',
             background: 'rgba(255,178,239,0.04)', border: '1px solid rgba(255,178,239,0.08)',
           }}>
-            <p className="font-data tabular-nums" style={{ fontSize: 'clamp(1px, 1.8cqi, 22px)', fontWeight: 700, lineHeight: 1, color: s.color }}>
+            <p className="font-data tabular-nums" style={{ fontSize: 'clamp(1px, 1.35cqi, 22px)', fontWeight: 700, lineHeight: 1, color: s.color }}>
               {s.value}
             </p>
-            <p className="font-data uppercase" style={{ fontSize: 'clamp(1px, 0.9cqi, 12px)', color: 'var(--gs-base)', letterSpacing: '0.06em', marginTop: '0.25em' }}>
+            <p className="font-data uppercase" style={{ fontSize: 'clamp(1px, 0.68cqi, 12px)', color: 'var(--gs-base)', letterSpacing: '0.06em', marginTop: '0.25em' }}>
               {s.label}
             </p>
           </div>
@@ -100,19 +100,19 @@ export function M06Slide({ scan }: { scan: ScanWithResults }) {
             gap: '1px',
             marginBottom: '1px',
           }}>
-            <div className="font-data uppercase" style={{ fontSize: 'clamp(1px, 1cqi, 12px)', color: 'var(--gs-mid)', padding: '0.2em 0.3em', letterSpacing: '0.05em' }}>
+            <div className="font-data uppercase" style={{ fontSize: 'clamp(1px, 0.75cqi, 12px)', color: 'var(--gs-mid)', padding: '0.2em 0.3em', letterSpacing: '0.05em' }}>
               Pixel
             </div>
-            <div className="font-data uppercase" style={{ fontSize: 'clamp(1px, 1cqi, 12px)', color: 'var(--gs-mid)', padding: '0.2em', textAlign: 'center', letterSpacing: '0.05em' }}>
+            <div className="font-data uppercase" style={{ fontSize: 'clamp(1px, 0.75cqi, 12px)', color: 'var(--gs-mid)', padding: '0.2em', textAlign: 'center', letterSpacing: '0.05em' }}>
               Enhanced
             </div>
-            <div className="font-data uppercase" style={{ fontSize: 'clamp(1px, 1cqi, 12px)', color: 'var(--gs-mid)', padding: '0.2em', textAlign: 'center', letterSpacing: '0.05em' }}>
+            <div className="font-data uppercase" style={{ fontSize: 'clamp(1px, 0.75cqi, 12px)', color: 'var(--gs-mid)', padding: '0.2em', textAlign: 'center', letterSpacing: '0.05em' }}>
               Server
             </div>
-            <div className="font-data uppercase" style={{ fontSize: 'clamp(1px, 1cqi, 12px)', color: 'var(--gs-mid)', padding: '0.2em', textAlign: 'center', letterSpacing: '0.05em' }}>
+            <div className="font-data uppercase" style={{ fontSize: 'clamp(1px, 0.75cqi, 12px)', color: 'var(--gs-mid)', padding: '0.2em', textAlign: 'center', letterSpacing: '0.05em' }}>
               Consent
             </div>
-            <div className="font-data uppercase" style={{ fontSize: 'clamp(1px, 1cqi, 12px)', color: 'var(--gs-mid)', padding: '0.2em', textAlign: 'center', letterSpacing: '0.05em' }}>
+            <div className="font-data uppercase" style={{ fontSize: 'clamp(1px, 0.75cqi, 12px)', color: 'var(--gs-mid)', padding: '0.2em', textAlign: 'center', letterSpacing: '0.05em' }}>
               Fires
             </div>
           </div>
@@ -133,19 +133,19 @@ export function M06Slide({ scan }: { scan: ScanWithResults }) {
                 background: i % 2 === 0 ? 'rgba(255,178,239,0.03)' : 'transparent',
                 borderRadius: '2px',
               }}>
-                <div className="font-data" style={{ fontSize: 'clamp(1px, 1.15cqi, 14px)', color: 'var(--gs-light)', padding: '0.25em 0.3em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                <div className="font-data" style={{ fontSize: 'clamp(1px, 0.86cqi, 14px)', color: 'var(--gs-light)', padding: '0.25em 0.3em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {pixelName}
                 </div>
                 <div style={{ textAlign: 'center', padding: '0.25em' }}>
-                  <span className="font-display" style={{ fontSize: 'clamp(1px, 1.3cqi, 15px)', fontWeight: 700, color: enhanced.color }}>{enhanced.sym}</span>
+                  <span className="font-display" style={{ fontSize: 'clamp(1px, 0.98cqi, 15px)', fontWeight: 700, color: enhanced.color }}>{enhanced.sym}</span>
                 </div>
                 <div style={{ textAlign: 'center', padding: '0.25em' }}>
-                  <span className="font-display" style={{ fontSize: 'clamp(1px, 1.3cqi, 15px)', fontWeight: 700, color: server.color }}>{server.sym}</span>
+                  <span className="font-display" style={{ fontSize: 'clamp(1px, 0.98cqi, 15px)', fontWeight: 700, color: server.color }}>{server.sym}</span>
                 </div>
                 <div style={{ textAlign: 'center', padding: '0.25em' }}>
-                  <span className="font-display" style={{ fontSize: 'clamp(1px, 1.3cqi, 15px)', fontWeight: 700, color: consent.color }}>{consent.sym}</span>
+                  <span className="font-display" style={{ fontSize: 'clamp(1px, 0.98cqi, 15px)', fontWeight: 700, color: consent.color }}>{consent.sym}</span>
                 </div>
-                <div className="font-data tabular-nums" style={{ fontSize: 'clamp(1px, 1.15cqi, 14px)', color: 'var(--gs-light)', textAlign: 'center', padding: '0.25em', fontWeight: 600 }}>
+                <div className="font-data tabular-nums" style={{ fontSize: 'clamp(1px, 0.86cqi, 14px)', color: 'var(--gs-light)', textAlign: 'center', padding: '0.25em', fontWeight: 600 }}>
                   {fires}
                 </div>
               </div>
@@ -153,7 +153,7 @@ export function M06Slide({ scan }: { scan: ScanWithResults }) {
           })}
         </div>
       ) : (
-        <p className="font-data" style={{ fontSize: 'clamp(1px, 1.2cqi, 14px)', color: 'var(--gs-mid)' }}>
+        <p className="font-data" style={{ fontSize: 'clamp(1px, 0.90cqi, 14px)', color: 'var(--gs-mid)' }}>
           No ad pixels detected on this page.
         </p>
       )}

@@ -68,9 +68,9 @@ export function M24Slide({ scan }: { scan: ScanWithResults }) {
         {/* Col 1: equation centered over Key Findings */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <StatBlock value={fmtNum(organicTraffic)} label="Organic" color="var(--gs-terminal)" />
-          <span className="font-data" style={{ fontSize: 'clamp(1px, 1.8cqi, 22px)', color: 'rgba(255,178,239,0.2)', padding: '0 1.2em', alignSelf: 'flex-start', marginTop: '0.15em', fontWeight: 300 }}>+</span>
+          <span className="font-data" style={{ fontSize: 'clamp(1px, 1.35cqi, 22px)', color: 'rgba(255,178,239,0.2)', padding: '0 1.2em', alignSelf: 'flex-start', marginTop: '0.15em', fontWeight: 300 }}>+</span>
           <StatBlock value={fmtNum(paidTraffic)} label="Paid" color="var(--gs-warning)" />
-          <span className="font-data" style={{ fontSize: 'clamp(1px, 1.8cqi, 22px)', color: 'rgba(255,178,239,0.2)', padding: '0 1.2em', alignSelf: 'flex-start', marginTop: '0.15em', fontWeight: 300 }}>=</span>
+          <span className="font-data" style={{ fontSize: 'clamp(1px, 1.35cqi, 22px)', color: 'rgba(255,178,239,0.2)', padding: '0 1.2em', alignSelf: 'flex-start', marginTop: '0.15em', fontWeight: 300 }}>=</span>
           <StatBlock value={fmtNum(totalTraffic)} label="Total/mo" color="var(--gs-light)" />
         </div>
 

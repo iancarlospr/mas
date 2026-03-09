@@ -121,7 +121,7 @@ export function M20Slide({ scan }: { scan: ScanWithResults }) {
         marginBottom: '0.6em', flexShrink: 0,
         padding: '0.5em 0', borderTop: '1px solid rgba(255,178,239,0.06)', borderBottom: '1px solid rgba(255,178,239,0.06)',
       }}>
-        <h4 className="font-display uppercase" style={{ fontSize: 'clamp(1px, 1.2cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.4em' }}>
+        <h4 className="font-display uppercase" style={{ fontSize: 'clamp(1px, 0.90cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.4em' }}>
           Commerce Capabilities
         </h4>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.4em 1.5em' }}>
@@ -135,7 +135,7 @@ export function M20Slide({ scan }: { scan: ScanWithResults }) {
           <div style={{ display: 'flex', gap: '1.5em', marginTop: '0.5em', paddingTop: '0.4em', borderTop: '1px solid rgba(255,178,239,0.04)' }}>
             {paymentProviders.length > 0 && (
               <div>
-                <p className="font-data uppercase" style={{ fontSize: 'clamp(1px, 1.1cqi, 13px)', color: 'var(--gs-mid)', letterSpacing: '0.06em', marginBottom: '0.2em' }}>
+                <p className="font-data uppercase" style={{ fontSize: 'clamp(1px, 0.83cqi, 13px)', color: 'var(--gs-mid)', letterSpacing: '0.06em', marginBottom: '0.2em' }}>
                   Payment Processors
                 </p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.2em' }}>
@@ -147,7 +147,7 @@ export function M20Slide({ scan }: { scan: ScanWithResults }) {
             )}
             {authProviders.length > 0 && (
               <div>
-                <p className="font-data uppercase" style={{ fontSize: 'clamp(1px, 1.1cqi, 13px)', color: 'var(--gs-mid)', letterSpacing: '0.06em', marginBottom: '0.2em' }}>
+                <p className="font-data uppercase" style={{ fontSize: 'clamp(1px, 0.83cqi, 13px)', color: 'var(--gs-mid)', letterSpacing: '0.06em', marginBottom: '0.2em' }}>
                   Auth Providers
                 </p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.2em' }}>

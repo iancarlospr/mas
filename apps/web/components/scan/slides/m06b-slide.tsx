@@ -67,18 +67,18 @@ export function M06bSlide({ scan }: { scan: ScanWithResults }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5em' }}>
       {/* Tracking Parity Section */}
       <div>
-        <h4 className="font-display uppercase" style={{ fontSize: 'clamp(1px, 1.2cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.3em' }}>
+        <h4 className="font-display uppercase" style={{ fontSize: 'clamp(1px, 0.90cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.3em' }}>
           Landing vs Homepage Parity
         </h4>
 
         {parityRatio != null && (
           <div style={{ marginBottom: '0.3em' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.15em' }}>
-              <span className="font-data" style={{ fontSize: 'clamp(1px, 1.15cqi, 14px)', color: 'var(--gs-light)' }}>
+              <span className="font-data" style={{ fontSize: 'clamp(1px, 0.86cqi, 14px)', color: 'var(--gs-light)' }}>
                 Tracking Parity
               </span>
               <span className="font-data tabular-nums" style={{
-                fontSize: 'clamp(1px, 1.6cqi, 18px)', fontWeight: 700,
+                fontSize: 'clamp(1px, 1.20cqi, 18px)', fontWeight: 700,
                 color: parityRatio >= 0.9 ? 'var(--gs-terminal)' : parityRatio >= 0.6 ? 'var(--gs-warning)' : 'var(--gs-critical)',
               }}>
                 {Math.round(parityRatio * 100)}%
@@ -109,7 +109,7 @@ export function M06bSlide({ scan }: { scan: ScanWithResults }) {
 
       {/* Page Signals Checklist */}
       <div>
-        <h4 className="font-display uppercase" style={{ fontSize: 'clamp(1px, 1.2cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.25em' }}>
+        <h4 className="font-display uppercase" style={{ fontSize: 'clamp(1px, 0.90cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.25em' }}>
           Conversion Readiness
         </h4>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.25em 0.8em' }}>
@@ -131,10 +131,10 @@ export function M06bSlide({ scan }: { scan: ScanWithResults }) {
             background: `color-mix(in srgb, ${loadColor} 12%, transparent)`,
             border: `1px solid color-mix(in srgb, ${loadColor} 20%, transparent)`,
           }}>
-            <span className="font-data tabular-nums" style={{ fontSize: 'clamp(1px, 1.8cqi, 20px)', fontWeight: 700, color: loadColor }}>
+            <span className="font-data tabular-nums" style={{ fontSize: 'clamp(1px, 1.35cqi, 20px)', fontWeight: 700, color: loadColor }}>
               {loadTimeMs < 1000 ? `${loadTimeMs}ms` : `${(loadTimeMs / 1000).toFixed(1)}s`}
             </span>
-            <span className="font-data" style={{ fontSize: 'clamp(1px, 1.1cqi, 13px)', color: 'var(--gs-mid)' }}>
+            <span className="font-data" style={{ fontSize: 'clamp(1px, 0.83cqi, 13px)', color: 'var(--gs-mid)' }}>
               load time
             </span>
           </div>
@@ -149,7 +149,7 @@ export function M06bSlide({ scan }: { scan: ScanWithResults }) {
 
       {/* H1 if available */}
       {h1Text && (
-        <p className="font-data" style={{ fontSize: 'clamp(1px, 1.15cqi, 14px)', color: 'var(--gs-mid)', fontStyle: 'italic', marginTop: '0.1em' }}>
+        <p className="font-data" style={{ fontSize: 'clamp(1px, 0.86cqi, 14px)', color: 'var(--gs-mid)', fontStyle: 'italic', marginTop: '0.1em' }}>
           H1: &ldquo;{h1Text}&rdquo;
         </p>
       )}

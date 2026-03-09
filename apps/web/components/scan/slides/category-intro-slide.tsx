@@ -14,10 +14,10 @@ import { CATEGORY_DISPLAY_NAMES, type ScoreCategory } from '@marketing-alpha/typ
  */
 
 const T = {
-  overline:  'clamp(1px, 1.5cqi, 17px)',
-  active:    'clamp(1px, 4.2cqi, 52px)',
-  inactive:  'clamp(1px, 1.6cqi, 20px)',
-  score:     'clamp(1px, 4.5cqi, 56px)',
+  overline:  'clamp(1px, 1.12cqi, 17px)',
+  active:    'clamp(1px, 3.15cqi, 52px)',
+  inactive:  'clamp(1px, 1.20cqi, 20px)',
+  score:     'clamp(1px, 3.38cqi, 56px)',
 } as const;
 
 // Legacy category keys from older scans

@@ -46,10 +46,10 @@ function PlatformCard({ name, active, adCount, icon }: {
 
       {/* Info */}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p className="font-data" style={{ fontSize: 'clamp(1px, 1.2cqi, 14px)', color: 'var(--gs-light)', fontWeight: 600, lineHeight: 1.2 }}>
+        <p className="font-data" style={{ fontSize: 'clamp(1px, 0.90cqi, 14px)', color: 'var(--gs-light)', fontWeight: 600, lineHeight: 1.2 }}>
           {name}
         </p>
-        <p className="font-data" style={{ fontSize: 'clamp(1px, 1.1cqi, 13px)', color: active ? 'var(--gs-terminal)' : 'var(--gs-mid)', lineHeight: 1.2 }}>
+        <p className="font-data" style={{ fontSize: 'clamp(1px, 0.83cqi, 13px)', color: active ? 'var(--gs-terminal)' : 'var(--gs-mid)', lineHeight: 1.2 }}>
           {active ? `${adCount} ad${adCount !== 1 ? 's' : ''} found` : 'No ads detected'}
         </p>
       </div>
@@ -146,12 +146,12 @@ export function M21Slide({ scan }: { scan: ScanWithResults }) {
             border: '1px solid rgba(255,178,239,0.08)',
           }}>
             <p className="font-data tabular-nums" style={{
-              fontSize: 'clamp(1px, 2.2cqi, 26px)', fontWeight: 700, lineHeight: 1, color: s.color,
+              fontSize: 'clamp(1px, 1.65cqi, 26px)', fontWeight: 700, lineHeight: 1, color: s.color,
             }}>
               {s.value}
             </p>
             <p className="font-data uppercase" style={{
-              fontSize: 'clamp(1px, 1cqi, 12px)', color: 'var(--gs-base)',
+              fontSize: 'clamp(1px, 0.75cqi, 12px)', color: 'var(--gs-base)',
               letterSpacing: '0.08em', marginTop: '0.3em',
             }}>
               {s.label}
@@ -162,7 +162,7 @@ export function M21Slide({ scan }: { scan: ScanWithResults }) {
 
       {/* Platform cards */}
       <div>
-        <p className="font-data uppercase" style={{ fontSize: 'clamp(1px, 1.1cqi, 13px)', color: 'var(--gs-base)', letterSpacing: '0.1em', marginBottom: '0.3em' }}>
+        <p className="font-data uppercase" style={{ fontSize: 'clamp(1px, 0.83cqi, 13px)', color: 'var(--gs-base)', letterSpacing: '0.1em', marginBottom: '0.3em' }}>
           Platform Coverage
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3em' }}>
@@ -190,7 +190,7 @@ export function M21Slide({ scan }: { scan: ScanWithResults }) {
       {/* Screenshot breakdown */}
       {totalImages > 0 && (
         <div style={{ marginTop: '0.2em' }}>
-          <p className="font-data" style={{ fontSize: 'clamp(1px, 1.1cqi, 13px)', color: 'var(--gs-mid)' }}>
+          <p className="font-data" style={{ fontSize: 'clamp(1px, 0.83cqi, 13px)', color: 'var(--gs-mid)' }}>
             {fbAdScreenshots > 0 && `${fbAdScreenshots} Facebook creative screenshot${fbAdScreenshots !== 1 ? 's' : ''}`}
             {fbAdScreenshots > 0 && (googleSearchAds + youtubeAds > 0) && ' | '}
             {googleSearchAds > 0 && `${googleSearchAds} Google Search ad${googleSearchAds !== 1 ? 's' : ''}`}
@@ -203,7 +203,7 @@ export function M21Slide({ scan }: { scan: ScanWithResults }) {
       {/* No advertising detected message */}
       {activePlatforms === 0 && (
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <p className="font-data" style={{ fontSize: 'clamp(1px, 1.2cqi, 14px)', color: 'var(--gs-mid)', opacity: 0.6, textAlign: 'center' }}>
+          <p className="font-data" style={{ fontSize: 'clamp(1px, 0.90cqi, 14px)', color: 'var(--gs-mid)', opacity: 0.6, textAlign: 'center' }}>
             No active advertising detected across monitored platforms
           </p>
         </div>

@@ -85,13 +85,13 @@ export function M38Slide({ scan }: { scan: ScanWithResults }) {
         <div style={{ display: 'flex', gap: '3%' }}>
           {/* Left: Business profile hero */}
           <div style={{ flex: '1 1 45%', display: 'flex', flexDirection: 'column', gap: '0.4em' }}>
-            <h4 className="font-display uppercase" style={{ fontSize: 'clamp(1px, 1.2cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.15em' }}>
+            <h4 className="font-display uppercase" style={{ fontSize: 'clamp(1px, 0.90cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.15em' }}>
               Google Business Profile
             </h4>
 
             {/* Business name */}
             {businessName && (
-              <p className="font-data" style={{ fontSize: 'clamp(1px, 1.6cqi, 18px)', fontWeight: 700, color: 'var(--gs-light)', lineHeight: 1.2 }}>
+              <p className="font-data" style={{ fontSize: 'clamp(1px, 1.20cqi, 18px)', fontWeight: 700, color: 'var(--gs-light)', lineHeight: 1.2 }}>
                 {businessName}
               </p>
             )}
@@ -100,14 +100,14 @@ export function M38Slide({ scan }: { scan: ScanWithResults }) {
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.6em' }}>
               {profileRating != null && (
                 <>
-                  <span className="font-data tabular-nums" style={{ fontSize: 'clamp(1px, 2.5cqi, 30px)', fontWeight: 700, color: 'var(--gs-light)', lineHeight: 1 }}>
+                  <span className="font-data tabular-nums" style={{ fontSize: 'clamp(1px, 1.88cqi, 30px)', fontWeight: 700, color: 'var(--gs-light)', lineHeight: 1 }}>
                     {profileRating.toFixed(1)}
                   </span>
                   <StarRating rating={profileRating} />
                 </>
               )}
               {profileReviewCount != null && (
-                <span className="font-data" style={{ fontSize: 'clamp(1px, 1.2cqi, 14px)', color: 'var(--gs-mid)' }}>
+                <span className="font-data" style={{ fontSize: 'clamp(1px, 0.90cqi, 14px)', color: 'var(--gs-mid)' }}>
                   ({profileReviewCount.toLocaleString()} reviews)
                 </span>
               )}
@@ -127,17 +127,17 @@ export function M38Slide({ scan }: { scan: ScanWithResults }) {
             {/* Contact info */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.15em', marginTop: '0.2em' }}>
               {profileAddress && (
-                <p className="font-data" style={{ fontSize: 'clamp(1px, 1.15cqi, 13px)', color: 'var(--gs-mid)' }}>
+                <p className="font-data" style={{ fontSize: 'clamp(1px, 0.86cqi, 13px)', color: 'var(--gs-mid)' }}>
                   {profileAddress}
                 </p>
               )}
               {profilePhone && (
-                <p className="font-data" style={{ fontSize: 'clamp(1px, 1.15cqi, 13px)', color: 'var(--gs-mid)' }}>
+                <p className="font-data" style={{ fontSize: 'clamp(1px, 0.86cqi, 13px)', color: 'var(--gs-mid)' }}>
                   {profilePhone}
                 </p>
               )}
               {profileWebsite && (
-                <p className="font-data" style={{ fontSize: 'clamp(1px, 1.15cqi, 13px)', color: 'var(--gs-base)', opacity: 0.7 }}>
+                <p className="font-data" style={{ fontSize: 'clamp(1px, 0.86cqi, 13px)', color: 'var(--gs-base)', opacity: 0.7 }}>
                   {profileWebsite}
                 </p>
               )}
@@ -146,7 +146,7 @@ export function M38Slide({ scan }: { scan: ScanWithResults }) {
             {/* Categories */}
             {topCategories.length > 0 && (
               <div style={{ marginTop: '0.2em' }}>
-                <p className="font-data uppercase" style={{ fontSize: 'clamp(1px, 1.1cqi, 13px)', color: 'var(--gs-mid)', letterSpacing: '0.06em', marginBottom: '0.2em' }}>
+                <p className="font-data uppercase" style={{ fontSize: 'clamp(1px, 0.83cqi, 13px)', color: 'var(--gs-mid)', letterSpacing: '0.06em', marginBottom: '0.2em' }}>
                   Categories
                 </p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.2em' }}>
@@ -165,7 +165,7 @@ export function M38Slide({ scan }: { scan: ScanWithResults }) {
           <div style={{ flex: '1 1 48%' }}>
             {completenessChecklist.length > 0 && (
               <>
-                <h4 className="font-display uppercase" style={{ fontSize: 'clamp(1px, 1.2cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.35em' }}>
+                <h4 className="font-display uppercase" style={{ fontSize: 'clamp(1px, 0.90cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.35em' }}>
                   Profile Completeness
                 </h4>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.35em 1em' }}>
@@ -183,7 +183,7 @@ export function M38Slide({ scan }: { scan: ScanWithResults }) {
 
             {completenessChecklist.length === 0 && (
               <>
-                <h4 className="font-display uppercase" style={{ fontSize: 'clamp(1px, 1.2cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.35em' }}>
+                <h4 className="font-display uppercase" style={{ fontSize: 'clamp(1px, 0.90cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.35em' }}>
                   Profile Status
                 </h4>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.35em 1em' }}>

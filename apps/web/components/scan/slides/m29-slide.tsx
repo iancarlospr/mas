@@ -85,10 +85,10 @@ export function M29Slide({ scan }: { scan: ScanWithResults }) {
               background: 'rgba(255,178,239,0.04)', border: '1px solid rgba(255,178,239,0.08)',
               display: 'flex', flexDirection: 'column', justifyContent: 'center',
             }}>
-              <p className="font-data tabular-nums" style={{ fontSize: 'clamp(1px, 1.6cqi, 20px)', fontWeight: 700, lineHeight: 1.2, color: s.color }}>
+              <p className="font-data tabular-nums" style={{ fontSize: 'clamp(1px, 1.20cqi, 20px)', fontWeight: 700, lineHeight: 1.2, color: s.color }}>
                 {s.value}
               </p>
-              <p className="font-data uppercase" style={{ fontSize: 'clamp(1px, 0.9cqi, 12px)', color: 'var(--gs-base)', letterSpacing: '0.06em', marginTop: '0.25em' }}>
+              <p className="font-data uppercase" style={{ fontSize: 'clamp(1px, 0.68cqi, 12px)', color: 'var(--gs-base)', letterSpacing: '0.06em', marginTop: '0.25em' }}>
                 {s.label}
               </p>
             </div>
@@ -98,7 +98,7 @@ export function M29Slide({ scan }: { scan: ScanWithResults }) {
         {/* Competitor table */}
         {topEight.length > 0 && (
           <div>
-            <p className="font-data uppercase" style={{ fontSize: 'clamp(1px, 1.1cqi, 13px)', color: 'var(--gs-base)', letterSpacing: '0.1em', marginBottom: '0.25em' }}>
+            <p className="font-data uppercase" style={{ fontSize: 'clamp(1px, 0.83cqi, 13px)', color: 'var(--gs-base)', letterSpacing: '0.1em', marginBottom: '0.25em' }}>
               Competitor Overlap
             </p>
             {/* Table header */}
@@ -106,10 +106,10 @@ export function M29Slide({ scan }: { scan: ScanWithResults }) {
               display: 'grid', gridTemplateColumns: '1fr 5em 4em 5em',
               gap: '0 0.6em', padding: '0 0 0.2em', borderBottom: '1px solid rgba(255,178,239,0.06)',
             }}>
-              <span className="font-data" style={{ fontSize: 'clamp(1px, 1cqi, 12px)', color: 'var(--gs-mid)' }}>Domain</span>
-              <span className="font-data" style={{ fontSize: 'clamp(1px, 1cqi, 12px)', color: 'var(--gs-mid)', textAlign: 'right' }}>Shared KWs</span>
-              <span className="font-data" style={{ fontSize: 'clamp(1px, 1cqi, 12px)', color: 'var(--gs-mid)', textAlign: 'right' }}>Avg Pos</span>
-              <span className="font-data" style={{ fontSize: 'clamp(1px, 1cqi, 12px)', color: 'var(--gs-mid)', textAlign: 'right' }}>ETV</span>
+              <span className="font-data" style={{ fontSize: 'clamp(1px, 0.75cqi, 12px)', color: 'var(--gs-mid)' }}>Domain</span>
+              <span className="font-data" style={{ fontSize: 'clamp(1px, 0.75cqi, 12px)', color: 'var(--gs-mid)', textAlign: 'right' }}>Shared KWs</span>
+              <span className="font-data" style={{ fontSize: 'clamp(1px, 0.75cqi, 12px)', color: 'var(--gs-mid)', textAlign: 'right' }}>Avg Pos</span>
+              <span className="font-data" style={{ fontSize: 'clamp(1px, 0.75cqi, 12px)', color: 'var(--gs-mid)', textAlign: 'right' }}>ETV</span>
             </div>
             {/* Table rows */}
             <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -120,21 +120,21 @@ export function M29Slide({ scan }: { scan: ScanWithResults }) {
                   borderBottom: '1px solid rgba(255,255,255,0.02)',
                 }}>
                   <span className="font-data" style={{
-                    fontSize: 'clamp(1px, 1.15cqi, 14px)', color: 'var(--gs-light)',
+                    fontSize: 'clamp(1px, 0.86cqi, 14px)', color: 'var(--gs-light)',
                     whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
                   }}>
                     {comp.domain}
                   </span>
-                  <span className="font-data tabular-nums" style={{ fontSize: 'clamp(1px, 1.1cqi, 13px)', color: 'var(--gs-base)', fontWeight: 600, textAlign: 'right' }}>
+                  <span className="font-data tabular-nums" style={{ fontSize: 'clamp(1px, 0.83cqi, 13px)', color: 'var(--gs-base)', fontWeight: 600, textAlign: 'right' }}>
                     {comp.keywordsCount.toLocaleString()}
                   </span>
                   <span className="font-data tabular-nums" style={{
-                    fontSize: 'clamp(1px, 1.1cqi, 13px)', textAlign: 'right', fontWeight: 600,
+                    fontSize: 'clamp(1px, 0.83cqi, 13px)', textAlign: 'right', fontWeight: 600,
                     color: comp.avgPosition <= 10 ? 'var(--gs-terminal)' : comp.avgPosition <= 20 ? 'var(--gs-warning)' : 'var(--gs-mid)',
                   }}>
                     {comp.avgPosition > 0 ? `#${comp.avgPosition.toFixed(0)}` : '\u2014'}
                   </span>
-                  <span className="font-data tabular-nums" style={{ fontSize: 'clamp(1px, 1.1cqi, 13px)', color: 'var(--gs-mid)', textAlign: 'right' }}>
+                  <span className="font-data tabular-nums" style={{ fontSize: 'clamp(1px, 0.83cqi, 13px)', color: 'var(--gs-mid)', textAlign: 'right' }}>
                     {comp.etv > 0 ? (comp.etv >= 1000 ? `${(comp.etv / 1000).toFixed(comp.etv >= 10000 ? 0 : 1)}K` : comp.etv.toLocaleString()) : '\u2014'}
                   </span>
                 </div>
@@ -145,7 +145,7 @@ export function M29Slide({ scan }: { scan: ScanWithResults }) {
 
         {/* No competitors message */}
         {topEight.length === 0 && (
-          <p className="font-data" style={{ fontSize: 'clamp(1px, 1.2cqi, 14px)', color: 'var(--gs-mid)', opacity: 0.6, textAlign: 'center', padding: '0.5em 0' }}>
+          <p className="font-data" style={{ fontSize: 'clamp(1px, 0.90cqi, 14px)', color: 'var(--gs-mid)', opacity: 0.6, textAlign: 'center', padding: '0.5em 0' }}>
             No competitors identified — niche market or insufficient keyword data
           </p>
         )}

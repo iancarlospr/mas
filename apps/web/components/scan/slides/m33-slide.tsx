@@ -93,12 +93,12 @@ export function M33Slide({ scan }: { scan: ScanWithResults }) {
             background: 'rgba(255,178,239,0.04)', border: '1px solid rgba(255,178,239,0.08)',
           }}>
             <p className="font-data tabular-nums" style={{
-              fontSize: 'clamp(1px, 3.5cqi, 42px)', fontWeight: 700, lineHeight: 1, color: 'var(--gs-light)',
+              fontSize: 'clamp(1px, 2.62cqi, 42px)', fontWeight: 700, lineHeight: 1, color: 'var(--gs-light)',
             }}>
               {fmtNum(totalBrandVolume || brandVolume)}
             </p>
             <p className="font-data uppercase" style={{
-              fontSize: 'clamp(1px, 1.1cqi, 13px)', color: 'var(--gs-base)',
+              fontSize: 'clamp(1px, 0.83cqi, 13px)', color: 'var(--gs-base)',
               letterSpacing: '0.1em', marginTop: '0.3em',
             }}>
               Total Brand Searches/mo
@@ -109,12 +109,12 @@ export function M33Slide({ scan }: { scan: ScanWithResults }) {
                 background: 'rgba(255,178,239,0.15)',
               }} />
               <p className="font-data" style={{
-                fontSize: 'clamp(1px, 2.8cqi, 34px)', fontWeight: 700, color: 'var(--gs-base)', lineHeight: 1,
+                fontSize: 'clamp(1px, 2.10cqi, 34px)', fontWeight: 700, color: 'var(--gs-base)', lineHeight: 1,
               }}>
                 &ldquo;{coreBrand.keyword}&rdquo;
               </p>
               <p className="font-data uppercase" style={{
-                fontSize: 'clamp(1px, 0.9cqi, 12px)', color: 'var(--gs-mid)',
+                fontSize: 'clamp(1px, 0.68cqi, 12px)', color: 'var(--gs-mid)',
                 letterSpacing: '0.08em', marginTop: '0.25em',
               }}>
                 Core Brand Term
@@ -125,12 +125,12 @@ export function M33Slide({ scan }: { scan: ScanWithResults }) {
           {brandedTraffic > 0 && (
             <div style={{ textAlign: 'center' }}>
               <p className="font-data tabular-nums" style={{
-                fontSize: 'clamp(1px, 2cqi, 24px)', fontWeight: 700, lineHeight: 1, color: 'var(--gs-terminal)',
+                fontSize: 'clamp(1px, 1.50cqi, 24px)', fontWeight: 700, lineHeight: 1, color: 'var(--gs-terminal)',
               }}>
                 {fmtNum(brandedTraffic)}
               </p>
               <p className="font-data uppercase" style={{
-                fontSize: 'clamp(1px, 0.9cqi, 12px)', color: 'var(--gs-mid)',
+                fontSize: 'clamp(1px, 0.68cqi, 12px)', color: 'var(--gs-mid)',
                 letterSpacing: '0.06em', marginTop: '0.2em',
               }}>
                 Branded Traffic
@@ -144,7 +144,7 @@ export function M33Slide({ scan }: { scan: ScanWithResults }) {
 
         {/* Right: Intent keywords ranked bars */}
         <div style={{ flex: 2 }}>
-          <p className="font-data uppercase" style={{ fontSize: 'clamp(1px, 1.1cqi, 13px)', color: 'var(--gs-base)', letterSpacing: '0.1em', marginBottom: '0.35em' }}>
+          <p className="font-data uppercase" style={{ fontSize: 'clamp(1px, 0.83cqi, 13px)', color: 'var(--gs-base)', letterSpacing: '0.1em', marginBottom: '0.35em' }}>
             Brand Intent Keywords
           </p>
           {intentKeywords.length > 0 ? (
@@ -163,7 +163,7 @@ export function M33Slide({ scan }: { scan: ScanWithResults }) {
                 return (
                   <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.5em' }}>
                     <span className="font-data" style={{
-                      fontSize: 'clamp(1px, 1.2cqi, 14px)', color: 'var(--gs-light)',
+                      fontSize: 'clamp(1px, 0.90cqi, 14px)', color: 'var(--gs-light)',
                       minWidth: '40%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
                     }}>
                       {k.keyword}
@@ -174,7 +174,7 @@ export function M33Slide({ scan }: { scan: ScanWithResults }) {
                         background: color, borderRadius: '4px', minWidth: k.volume > 0 ? '3px' : 0,
                       }} />
                     </div>
-                    <span className="font-data tabular-nums" style={{ fontSize: 'clamp(1px, 1.2cqi, 14px)', color: 'var(--gs-light)', fontWeight: 600, minWidth: '4em', textAlign: 'right' }}>
+                    <span className="font-data tabular-nums" style={{ fontSize: 'clamp(1px, 0.90cqi, 14px)', color: 'var(--gs-light)', fontWeight: 600, minWidth: '4em', textAlign: 'right' }}>
                       {fmtNum(k.volume)}
                     </span>
                   </div>
@@ -182,7 +182,7 @@ export function M33Slide({ scan }: { scan: ScanWithResults }) {
               })}
             </div>
           ) : (
-            <p className="font-data" style={{ fontSize: 'clamp(1px, 1.25cqi, 14px)', color: 'var(--gs-mid)' }}>
+            <p className="font-data" style={{ fontSize: 'clamp(1px, 0.94cqi, 14px)', color: 'var(--gs-mid)' }}>
               No brand intent keywords detected
             </p>
           )}

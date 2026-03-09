@@ -123,25 +123,25 @@ export function M12Slide({ scan }: { scan: ScanWithResults }) {
 
         {/* Module bar */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.5em', flexShrink: 0 }}>
-          <span className="font-display uppercase" style={{ fontSize: 'clamp(1px, 1.4cqi, 15px)', letterSpacing: '0.18em', color: 'var(--gs-base)' }}>
+          <span className="font-display uppercase" style={{ fontSize: 'clamp(1px, 1.05cqi, 15px)', letterSpacing: '0.18em', color: 'var(--gs-base)' }}>
             Compliance &amp; Privacy
           </span>
           {modScore != null && (
-            <span className="font-data tabular-nums" style={{ fontSize: 'clamp(1px, 1.5cqi, 17px)', fontWeight: 700, color: scoreC(modScore) }}>
+            <span className="font-data tabular-nums" style={{ fontSize: 'clamp(1px, 1.12cqi, 17px)', fontWeight: 700, color: scoreC(modScore) }}>
               {modScore}<span style={{ fontWeight: 400, color: 'var(--gs-mid)', fontSize: '0.75em' }}>/100</span>
             </span>
           )}
         </div>
 
         {/* Headline */}
-        <h2 className="font-display" style={{ fontSize: 'clamp(1px, 2.8cqi, 32px)', fontWeight: 700, lineHeight: 1.15, color: 'var(--gs-light)', marginBottom: '0.5em', flexShrink: 0, borderLeft: '3px solid var(--gs-base)', paddingLeft: '0.6em' }}>
+        <h2 className="font-display" style={{ fontSize: 'clamp(1px, 2.10cqi, 32px)', fontWeight: 700, lineHeight: 1.15, color: 'var(--gs-light)', marginBottom: '0.5em', flexShrink: 0, borderLeft: '3px solid var(--gs-base)', paddingLeft: '0.6em' }}>
           {headline}
         </h2>
 
         {/* Executive Summary */}
         {execSummary && (
           <div style={{ marginBottom: '0.7em', flexShrink: 0 }}>
-            <p className="font-data" style={{ fontSize: 'clamp(1px, 1.35cqi, 15px)', lineHeight: 1.6, color: 'var(--gs-light)', opacity: 0.85 }}>
+            <p className="font-data" style={{ fontSize: 'clamp(1px, 1.01cqi, 15px)', lineHeight: 1.6, color: 'var(--gs-light)', opacity: 0.85 }}>
               {execSummary}
             </p>
           </div>
@@ -157,14 +157,14 @@ export function M12Slide({ scan }: { scan: ScanWithResults }) {
             const style = CHECKLIST_STYLE[item.status];
             return (
               <div key={item.label} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.4em' }}>
-                <span className="font-display" style={{ fontSize: 'clamp(1px, 1.6cqi, 18px)', fontWeight: 700, color: style.color, lineHeight: 1, flexShrink: 0 }}>
+                <span className="font-display" style={{ fontSize: 'clamp(1px, 1.20cqi, 18px)', fontWeight: 700, color: style.color, lineHeight: 1, flexShrink: 0 }}>
                   {style.symbol}
                 </span>
                 <div>
-                  <p className="font-data" style={{ fontSize: 'clamp(1px, 1.3cqi, 14px)', color: 'var(--gs-light)', lineHeight: 1.3 }}>
+                  <p className="font-data" style={{ fontSize: 'clamp(1px, 0.98cqi, 14px)', color: 'var(--gs-light)', lineHeight: 1.3 }}>
                     {item.label}
                   </p>
-                  <p className="font-data" style={{ fontSize: 'clamp(1px, 1.2cqi, 13px)', color: 'var(--gs-mid)', lineHeight: 1.3 }}>
+                  <p className="font-data" style={{ fontSize: 'clamp(1px, 0.90cqi, 13px)', color: 'var(--gs-mid)', lineHeight: 1.3 }}>
                     {item.detail}
                   </p>
                 </div>
@@ -178,20 +178,20 @@ export function M12Slide({ scan }: { scan: ScanWithResults }) {
 
           {/* Findings */}
           <div style={{ flex: 1, overflow: 'hidden' }}>
-            <h4 className="font-display uppercase" style={{ fontSize: 'clamp(1px, 1.3cqi, 14px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.4em' }}>
+            <h4 className="font-display uppercase" style={{ fontSize: 'clamp(1px, 0.98cqi, 14px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.4em' }}>
               Key Findings
             </h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35em' }}>
               {findings.map((f, i) => (
                 <div key={i} style={{ display: 'flex', gap: '0.4em', alignItems: 'flex-start' }}>
                   <span className="font-data uppercase flex-shrink-0" style={{
-                    fontSize: 'clamp(1px, 1.3cqi, 14px)', padding: '0.1em 0.3em', borderRadius: '2px',
+                    fontSize: 'clamp(1px, 0.98cqi, 14px)', padding: '0.1em 0.3em', borderRadius: '2px',
                     background: `color-mix(in srgb, ${severityColor(f.severity)} 15%, transparent)`, color: severityColor(f.severity),
                     marginTop: '0.15em', fontWeight: 600,
                   }}>
                     {severityLabel(f.severity)}
                   </span>
-                  <p className="font-data" style={{ fontSize: 'clamp(1px, 1.35cqi, 15px)', color: 'var(--gs-light)', lineHeight: 1.4 }}>
+                  <p className="font-data" style={{ fontSize: 'clamp(1px, 1.01cqi, 15px)', color: 'var(--gs-light)', lineHeight: 1.4 }}>
                     {f.finding}
                   </p>
                 </div>
@@ -204,20 +204,20 @@ export function M12Slide({ scan }: { scan: ScanWithResults }) {
 
           {/* Recommendations */}
           <div style={{ flex: 1, overflow: 'hidden' }}>
-            <h4 className="font-display uppercase" style={{ fontSize: 'clamp(1px, 1.3cqi, 14px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.4em' }}>
+            <h4 className="font-display uppercase" style={{ fontSize: 'clamp(1px, 0.98cqi, 14px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.4em' }}>
               Recommendations
             </h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35em' }}>
               {recs.map((r, i) => (
                 <div key={i} style={{ display: 'flex', gap: '0.4em', alignItems: 'flex-start' }}>
                   <span className="font-data uppercase flex-shrink-0" style={{
-                    fontSize: 'clamp(1px, 1.3cqi, 14px)', padding: '0.1em 0.3em', borderRadius: '2px',
+                    fontSize: 'clamp(1px, 0.98cqi, 14px)', padding: '0.1em 0.3em', borderRadius: '2px',
                     background: 'rgba(255,178,239,0.08)', color: 'var(--gs-base)',
                     marginTop: '0.15em', fontWeight: 600,
                   }}>
                     {r.priority}
                   </span>
-                  <p className="font-data" style={{ fontSize: 'clamp(1px, 1.35cqi, 15px)', color: 'var(--gs-light)', lineHeight: 1.4 }}>
+                  <p className="font-data" style={{ fontSize: 'clamp(1px, 1.01cqi, 15px)', color: 'var(--gs-light)', lineHeight: 1.4 }}>
                     {r.action}
                   </p>
                 </div>
@@ -231,19 +231,19 @@ export function M12Slide({ scan }: { scan: ScanWithResults }) {
           {/* Score Breakdown */}
           {scores.length > 0 && (
             <div style={{ flex: 1, overflow: 'hidden' }}>
-              <h4 className="font-display uppercase" style={{ fontSize: 'clamp(1px, 1.3cqi, 14px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.4em' }}>
+              <h4 className="font-display uppercase" style={{ fontSize: 'clamp(1px, 0.98cqi, 14px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.4em' }}>
                 Score Breakdown
               </h4>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3em' }}>
                 {scores.map((s, i) => (
                   <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.5em' }}>
-                    <span className="font-data" style={{ fontSize: 'clamp(1px, 1.35cqi, 15px)', color: 'var(--gs-light)', flex: 1 }}>
+                    <span className="font-data" style={{ fontSize: 'clamp(1px, 1.01cqi, 15px)', color: 'var(--gs-light)', flex: 1 }}>
                       {s.criterion}
                     </span>
                     <div style={{ width: '50px', height: '4px', background: 'rgba(255,255,255,0.06)', borderRadius: '2px', overflow: 'hidden', flexShrink: 0 }}>
                       <div style={{ width: `${s.score}%`, height: '100%', background: scoreC(s.score), borderRadius: '2px' }} />
                     </div>
-                    <span className="font-data tabular-nums" style={{ fontSize: 'clamp(1px, 1.35cqi, 15px)', fontWeight: 600, color: scoreC(s.score), minWidth: '2em', textAlign: 'right' }}>
+                    <span className="font-data tabular-nums" style={{ fontSize: 'clamp(1px, 1.01cqi, 15px)', fontWeight: 600, color: scoreC(s.score), minWidth: '2em', textAlign: 'right' }}>
                       {s.score}
                     </span>
                   </div>
@@ -255,10 +255,10 @@ export function M12Slide({ scan }: { scan: ScanWithResults }) {
 
         {/* Footnote */}
         <div style={{ padding: '0.6em 0 0', display: 'flex', justifyContent: 'space-between', flexShrink: 0 }}>
-          <span className="font-data" style={{ fontSize: 'clamp(1px, 1.2cqi, 14px)', color: 'var(--gs-mid)', opacity: 0.4 }}>
+          <span className="font-data" style={{ fontSize: 'clamp(1px, 0.90cqi, 14px)', color: 'var(--gs-mid)', opacity: 0.4 }}>
             Source: DOM inspection, cookie audit, network requests, consent detection
           </span>
-          <span className="font-data" style={{ fontSize: 'clamp(1px, 1.2cqi, 14px)', color: 'var(--gs-mid)', opacity: 0.4 }}>
+          <span className="font-data" style={{ fontSize: 'clamp(1px, 0.90cqi, 14px)', color: 'var(--gs-mid)', opacity: 0.4 }}>
             {scan.domain} — AlphaScan
           </span>
         </div>

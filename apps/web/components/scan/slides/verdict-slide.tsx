@@ -88,7 +88,7 @@ export function VerdictSlide({ scan }: VerdictSlideProps) {
         <p
           className="font-display uppercase"
           style={{
-            fontSize: 'clamp(1px, 1.3cqi, 15px)',
+            fontSize: 'clamp(1px, 0.98cqi, 15px)',
             letterSpacing: '0.3em',
             color: 'var(--gs-base)',
             marginBottom: '0.8em',
@@ -102,7 +102,7 @@ export function VerdictSlide({ scan }: VerdictSlideProps) {
         <h2
           className="font-display"
           style={{
-            fontSize: 'clamp(1px, 5cqi, 56px)',
+            fontSize: 'clamp(1px, 3.75cqi, 56px)',
             fontWeight: 700,
             lineHeight: 1.1,
             color: '#fff',
@@ -117,7 +117,7 @@ export function VerdictSlide({ scan }: VerdictSlideProps) {
         <p
           className="font-data"
           style={{
-            fontSize: 'clamp(1px, 1.3cqi, 15px)',
+            fontSize: 'clamp(1px, 0.98cqi, 15px)',
             color: 'rgba(255,255,255,0.45)',
             marginTop: '1.2em',
             whiteSpace: 'nowrap',

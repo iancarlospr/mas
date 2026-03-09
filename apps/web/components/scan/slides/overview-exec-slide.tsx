@@ -27,13 +27,13 @@ import { aggregateDetectedTools, mergeWithAITools } from '@/lib/detected-tools';
 
 // ── Report type scale (container-relative with vw fallback) ───────────
 const T = {
-  headline: 'clamp(1px, 3.6cqi, 36px)',
-  section:  'clamp(1px, 1.6cqi, 16px)',
-  body:     'clamp(1px, 1.35cqi, 14px)',
-  index:    'clamp(1px, 1.45cqi, 15px)',
-  meta:     'clamp(1px, 1cqi, 12px)',
-  overline: 'clamp(1px, 1.2cqi, 14px)',
-  badge:    'clamp(1px, 1.1cqi, 13px)',
+  headline: 'clamp(1px, 2.70cqi, 36px)',
+  section:  'clamp(1px, 1.20cqi, 16px)',
+  body:     'clamp(1px, 1.01cqi, 14px)',
+  index:    'clamp(1px, 1.09cqi, 15px)',
+  meta:     'clamp(1px, 0.75cqi, 12px)',
+  overline: 'clamp(1px, 0.90cqi, 14px)',
+  badge:    'clamp(1px, 0.83cqi, 13px)',
 } as const;
 
 // Legacy category keys from older scans
@@ -148,7 +148,7 @@ export function OverviewExecSlide({ scan }: OverviewExecSlideProps) {
         }}
       />
 
-      <div className="relative z-10 h-full flex flex-col" style={{ paddingBottom: 'clamp(1px, 2.8cqi, 28px)' }}>
+      <div className="relative z-10 h-full flex flex-col" style={{ paddingBottom: 'clamp(1px, 2.10cqi, 28px)' }}>
 
         {/* ── TOP: Two-column layout ── */}
         <div className="flex flex-1 min-h-0" style={{ flexShrink: 0 }}>
@@ -333,7 +333,7 @@ export function OverviewExecSlide({ scan }: OverviewExecSlideProps) {
                 <p
                   className="font-display"
                   style={{
-                    fontSize: 'clamp(1px, 1.8cqi, 19px)',
+                    fontSize: 'clamp(1px, 1.35cqi, 19px)',
                     fontWeight: 600,
                     lineHeight: 1.35,
                     color: 'var(--gs-light)',
@@ -406,7 +406,7 @@ export function OverviewExecSlide({ scan }: OverviewExecSlideProps) {
         className="absolute left-0 right-0 bottom-0 overflow-hidden"
         style={{
           background: 'var(--gs-base)',
-          height: 'clamp(1px, 2.8cqi, 28px)',
+          height: 'clamp(1px, 2.10cqi, 28px)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',

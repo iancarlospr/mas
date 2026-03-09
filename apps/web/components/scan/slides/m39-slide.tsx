@@ -117,12 +117,12 @@ export function M39Slide({ scan }: { scan: ScanWithResults }) {
               border: '1px solid rgba(255,178,239,0.08)',
             }}>
               <p className="font-data tabular-nums" style={{
-                fontSize: 'clamp(1px, 2.2cqi, 26px)', fontWeight: 700, lineHeight: 1, color: s.color,
+                fontSize: 'clamp(1px, 1.65cqi, 26px)', fontWeight: 700, lineHeight: 1, color: s.color,
               }}>
                 {s.value}
               </p>
               <p className="font-data uppercase" style={{
-                fontSize: 'clamp(1px, 1cqi, 12px)', color: 'var(--gs-base)',
+                fontSize: 'clamp(1px, 0.75cqi, 12px)', color: 'var(--gs-base)',
                 letterSpacing: '0.08em', marginTop: '0.3em',
               }}>
                 {s.label}
@@ -137,16 +137,16 @@ export function M39Slide({ scan }: { scan: ScanWithResults }) {
           <div style={{ flex: 1 }}>
             {daysAgo >= 0 && (
               <div style={{ marginBottom: '0.4em' }}>
-                <p className="font-data uppercase" style={{ fontSize: 'clamp(1px, 1.1cqi, 13px)', color: 'var(--gs-base)', letterSpacing: '0.1em', marginBottom: '0.2em' }}>
+                <p className="font-data uppercase" style={{ fontSize: 'clamp(1px, 0.83cqi, 13px)', color: 'var(--gs-base)', letterSpacing: '0.1em', marginBottom: '0.2em' }}>
                   Content Freshness
                 </p>
                 <FreshnessBar daysAgo={daysAgo} />
                 {freshness && (
                   <div style={{ display: 'flex', gap: '1.5em', marginTop: '0.2em' }}>
-                    <span className="font-data tabular-nums" style={{ fontSize: 'clamp(1px, 1.1cqi, 13px)', color: 'var(--gs-light)' }}>
+                    <span className="font-data tabular-nums" style={{ fontSize: 'clamp(1px, 0.83cqi, 13px)', color: 'var(--gs-light)' }}>
                       {freshness.updatedLast30Days} updated &lt;30d
                     </span>
-                    <span className="font-data tabular-nums" style={{ fontSize: 'clamp(1px, 1.1cqi, 13px)', color: 'var(--gs-mid)' }}>
+                    <span className="font-data tabular-nums" style={{ fontSize: 'clamp(1px, 0.83cqi, 13px)', color: 'var(--gs-mid)' }}>
                       {freshness.updatedLast90Days} updated &lt;90d
                     </span>
                   </div>
@@ -165,7 +165,7 @@ export function M39Slide({ scan }: { scan: ScanWithResults }) {
             {/* Sitemap list */}
             {sitemaps.length > 0 && (
               <div style={{ marginBottom: '0.3em' }}>
-                <p className="font-data uppercase" style={{ fontSize: 'clamp(1px, 1.1cqi, 13px)', color: 'var(--gs-base)', letterSpacing: '0.1em', marginBottom: '0.2em' }}>
+                <p className="font-data uppercase" style={{ fontSize: 'clamp(1px, 0.83cqi, 13px)', color: 'var(--gs-base)', letterSpacing: '0.1em', marginBottom: '0.2em' }}>
                   Sitemaps
                 </p>
                 {sitemaps.map((sm, i) => {
@@ -174,19 +174,19 @@ export function M39Slide({ scan }: { scan: ScanWithResults }) {
                   return (
                     <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.4em', marginBottom: '0.1em' }}>
                       <span style={{
-                        fontSize: 'clamp(1px, 1.3cqi, 15px)', fontWeight: 700,
+                        fontSize: 'clamp(1px, 0.98cqi, 15px)', fontWeight: 700,
                         color: sm.valid ? 'var(--gs-terminal)' : 'var(--gs-critical)',
                       }}>
                         {sm.valid ? '\u2713' : '\u2717'}
                       </span>
                       <span className="font-data" style={{
-                        fontSize: 'clamp(1px, 1.15cqi, 13px)', color: 'var(--gs-light)',
+                        fontSize: 'clamp(1px, 0.86cqi, 13px)', color: 'var(--gs-light)',
                         overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1,
                       }}>
                         {shortUrl}
                       </span>
                       {sm.valid && (
-                        <span className="font-data tabular-nums" style={{ fontSize: 'clamp(1px, 1.1cqi, 13px)', color: 'var(--gs-mid)', flexShrink: 0 }}>
+                        <span className="font-data tabular-nums" style={{ fontSize: 'clamp(1px, 0.83cqi, 13px)', color: 'var(--gs-mid)', flexShrink: 0 }}>
                           {sm.isIndex ? 'Index' : `${sm.urlCount} URLs`}
                         </span>
                       )}
@@ -199,7 +199,7 @@ export function M39Slide({ scan }: { scan: ScanWithResults }) {
             {/* URL categories */}
             {urlCategories.length > 0 && (
               <div>
-                <p className="font-data uppercase" style={{ fontSize: 'clamp(1px, 1.1cqi, 13px)', color: 'var(--gs-base)', letterSpacing: '0.1em', marginBottom: '0.2em' }}>
+                <p className="font-data uppercase" style={{ fontSize: 'clamp(1px, 0.83cqi, 13px)', color: 'var(--gs-base)', letterSpacing: '0.1em', marginBottom: '0.2em' }}>
                   Content Types
                 </p>
                 <div style={{ display: 'flex', gap: '0.3em', flexWrap: 'wrap' }}>
@@ -213,7 +213,7 @@ export function M39Slide({ scan }: { scan: ScanWithResults }) {
             {/* Locales */}
             {locales.length > 0 && (
               <div style={{ marginTop: '0.2em' }}>
-                <span className="font-data" style={{ fontSize: 'clamp(1px, 1.1cqi, 13px)', color: 'var(--gs-mid)' }}>
+                <span className="font-data" style={{ fontSize: 'clamp(1px, 0.83cqi, 13px)', color: 'var(--gs-mid)' }}>
                   Locales: {locales.slice(0, 8).join(', ')}{locales.length > 8 ? ` +${locales.length - 8} more` : ''}
                 </span>
               </div>

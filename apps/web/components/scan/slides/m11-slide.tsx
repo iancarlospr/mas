@@ -136,12 +136,12 @@ export function M11Slide({ scan }: { scan: ScanWithResults }) {
               border: '1px solid rgba(255,178,239,0.08)',
             }}>
               <p className="font-data tabular-nums" style={{
-                fontSize: 'clamp(1px, 2.2cqi, 26px)', fontWeight: 700, lineHeight: 1, color: s.color,
+                fontSize: 'clamp(1px, 1.65cqi, 26px)', fontWeight: 700, lineHeight: 1, color: s.color,
               }}>
                 {s.value}
               </p>
               <p className="font-data uppercase" style={{
-                fontSize: 'clamp(1px, 1cqi, 12px)', color: 'var(--gs-base)',
+                fontSize: 'clamp(1px, 0.75cqi, 12px)', color: 'var(--gs-base)',
                 letterSpacing: '0.08em', marginTop: '0.3em',
               }}>
                 {s.label}
@@ -155,7 +155,7 @@ export function M11Slide({ scan }: { scan: ScanWithResults }) {
           <div style={{ flex: '1 1 55%', overflow: 'hidden' }}>
             {allErrors.length > 0 && (
               <>
-                <h4 className="font-display uppercase" style={{ fontSize: 'clamp(1px, 1.2cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.25em' }}>
+                <h4 className="font-display uppercase" style={{ fontSize: 'clamp(1px, 0.90cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.25em' }}>
                   Error Messages
                 </h4>
                 <div style={{
@@ -168,7 +168,7 @@ export function M11Slide({ scan }: { scan: ScanWithResults }) {
                   {allErrors.slice(0, 6).map((msg, i) => (
                     <p key={i} style={{
                       fontFamily: 'var(--font-mono, monospace)',
-                      fontSize: 'clamp(1px, 1.05cqi, 13px)',
+                      fontSize: 'clamp(1px, 0.79cqi, 13px)',
                       color: 'var(--gs-critical)',
                       lineHeight: 1.3,
                       wordBreak: 'break-all',
@@ -186,10 +186,10 @@ export function M11Slide({ scan }: { scan: ScanWithResults }) {
                 padding: '1em', borderRadius: '3px',
                 background: 'rgba(74,222,128,0.04)', border: '1px solid rgba(74,222,128,0.08)',
               }}>
-                <span className="font-display" style={{ fontSize: 'clamp(1px, 2cqi, 24px)', color: 'var(--gs-terminal)', fontWeight: 700 }}>
+                <span className="font-display" style={{ fontSize: 'clamp(1px, 1.50cqi, 24px)', color: 'var(--gs-terminal)', fontWeight: 700 }}>
                   {'\u2713'}
                 </span>
-                <span className="font-data" style={{ fontSize: 'clamp(1px, 1.3cqi, 15px)', color: 'var(--gs-terminal)', marginLeft: '0.5em' }}>
+                <span className="font-data" style={{ fontSize: 'clamp(1px, 0.98cqi, 15px)', color: 'var(--gs-terminal)', marginLeft: '0.5em' }}>
                   Zero JavaScript errors
                 </span>
               </div>
@@ -200,7 +200,7 @@ export function M11Slide({ scan }: { scan: ScanWithResults }) {
           <div style={{ flex: '1 1 40%', overflow: 'hidden' }}>
             {allFailedRequests.length > 0 ? (
               <>
-                <h4 className="font-display uppercase" style={{ fontSize: 'clamp(1px, 1.2cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.25em' }}>
+                <h4 className="font-display uppercase" style={{ fontSize: 'clamp(1px, 0.90cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.25em' }}>
                   Failed Requests
                 </h4>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.15em' }}>
@@ -223,14 +223,14 @@ export function M11Slide({ scan }: { scan: ScanWithResults }) {
                     return (
                       <div key={i} style={{ display: 'flex', alignItems: 'baseline', gap: '0.3em' }}>
                         <span className="font-data tabular-nums" style={{
-                          fontSize: 'clamp(1px, 1.1cqi, 13px)', fontWeight: 700,
+                          fontSize: 'clamp(1px, 0.83cqi, 13px)', fontWeight: 700,
                           color: statusColor, minWidth: '2.2em', flexShrink: 0,
                         }}>
                           {req.status}
                         </span>
                         <span style={{
                           fontFamily: 'var(--font-mono, monospace)',
-                          fontSize: 'clamp(1px, 1cqi, 12px)',
+                          fontSize: 'clamp(1px, 0.75cqi, 12px)',
                           color: 'var(--gs-light)', opacity: 0.7,
                           overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                         }}>
@@ -250,7 +250,7 @@ export function M11Slide({ scan }: { scan: ScanWithResults }) {
         {/* Error monitoring tools */}
         {errorTools.length > 0 && (
           <div style={{ display: 'flex', gap: '0.3em', flexWrap: 'wrap', marginTop: '0.4em', alignItems: 'center' }}>
-            <span className="font-data uppercase" style={{ fontSize: 'clamp(1px, 1cqi, 12px)', color: 'var(--gs-mid)', letterSpacing: '0.05em' }}>
+            <span className="font-data uppercase" style={{ fontSize: 'clamp(1px, 0.75cqi, 12px)', color: 'var(--gs-mid)', letterSpacing: '0.05em' }}>
               Monitoring:
             </span>
             {errorTools.map((tool, i) => (

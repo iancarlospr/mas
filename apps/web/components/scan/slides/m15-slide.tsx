@@ -97,7 +97,7 @@ export function M15Slide({ scan }: { scan: ScanWithResults }) {
 
         {/* Mock social preview card */}
         <div style={{ flex: '0 0 32%' }}>
-          <p className="font-data uppercase" style={{ fontSize: 'clamp(1px, 1.1cqi, 13px)', color: 'var(--gs-base)', letterSpacing: '0.1em', marginBottom: '0.3em' }}>
+          <p className="font-data uppercase" style={{ fontSize: 'clamp(1px, 0.83cqi, 13px)', color: 'var(--gs-base)', letterSpacing: '0.1em', marginBottom: '0.3em' }}>
             Social Preview
           </p>
           <div style={{
@@ -138,7 +138,7 @@ export function M15Slide({ scan }: { scan: ScanWithResults }) {
             {/* Text content */}
             <div style={{ padding: '0.4em 0.5em' }}>
               <p className="font-data" style={{
-                fontSize: 'clamp(1px, 1.2cqi, 14px)', color: 'var(--gs-light)', fontWeight: 600,
+                fontSize: 'clamp(1px, 0.90cqi, 14px)', color: 'var(--gs-light)', fontWeight: 600,
                 lineHeight: 1.25, marginBottom: '0.15em',
                 overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
               }}>
@@ -146,13 +146,13 @@ export function M15Slide({ scan }: { scan: ScanWithResults }) {
               </p>
               {displayDesc && (
                 <p className="font-data" style={{
-                  fontSize: 'clamp(1px, 1.1cqi, 13px)', color: 'var(--gs-mid)', lineHeight: 1.3,
+                  fontSize: 'clamp(1px, 0.83cqi, 13px)', color: 'var(--gs-mid)', lineHeight: 1.3,
                   display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
                 }}>
                   {displayDesc}
                 </p>
               )}
-              <p className="font-data" style={{ fontSize: 'clamp(1px, 1cqi, 12px)', color: 'var(--gs-mid)', opacity: 0.5, marginTop: '0.15em' }}>
+              <p className="font-data" style={{ fontSize: 'clamp(1px, 0.75cqi, 12px)', color: 'var(--gs-mid)', opacity: 0.5, marginTop: '0.15em' }}>
                 {scan.domain}
               </p>
             </div>
@@ -163,16 +163,16 @@ export function M15Slide({ scan }: { scan: ScanWithResults }) {
             <div style={{ marginTop: '0.4em', display: 'flex', flexDirection: 'column', gap: '0.15em' }}>
               {profileLinks.length > 0 && (
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.3em', flexWrap: 'wrap' }}>
-                  <span className="font-data" style={{ fontSize: 'clamp(1px, 1cqi, 12px)', color: 'var(--gs-mid)' }}>Profiles:</span>
-                  <span className="font-data" style={{ fontSize: 'clamp(1px, 1.1cqi, 13px)', color: 'var(--gs-light)' }}>
+                  <span className="font-data" style={{ fontSize: 'clamp(1px, 0.75cqi, 12px)', color: 'var(--gs-mid)' }}>Profiles:</span>
+                  <span className="font-data" style={{ fontSize: 'clamp(1px, 0.83cqi, 13px)', color: 'var(--gs-light)' }}>
                     {profileLinks.join(', ')}
                   </span>
                 </div>
               )}
               {shareButtons.length > 0 && (
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.3em', flexWrap: 'wrap' }}>
-                  <span className="font-data" style={{ fontSize: 'clamp(1px, 1cqi, 12px)', color: 'var(--gs-mid)' }}>Share:</span>
-                  <span className="font-data" style={{ fontSize: 'clamp(1px, 1.1cqi, 13px)', color: 'var(--gs-light)' }}>
+                  <span className="font-data" style={{ fontSize: 'clamp(1px, 0.75cqi, 12px)', color: 'var(--gs-mid)' }}>Share:</span>
+                  <span className="font-data" style={{ fontSize: 'clamp(1px, 0.83cqi, 13px)', color: 'var(--gs-light)' }}>
                     {shareButtons.join(', ')}
                   </span>
                 </div>
@@ -188,7 +188,7 @@ export function M15Slide({ scan }: { scan: ScanWithResults }) {
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5em' }}>
           {/* OG Tags */}
           <div>
-            <p className="font-data uppercase" style={{ fontSize: 'clamp(1px, 1.1cqi, 13px)', color: 'var(--gs-base)', letterSpacing: '0.1em', marginBottom: '0.2em' }}>
+            <p className="font-data uppercase" style={{ fontSize: 'clamp(1px, 0.83cqi, 13px)', color: 'var(--gs-base)', letterSpacing: '0.1em', marginBottom: '0.2em' }}>
               Open Graph
             </p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.15em 1em' }}>
@@ -205,7 +205,7 @@ export function M15Slide({ scan }: { scan: ScanWithResults }) {
 
           {/* Twitter Cards */}
           <div>
-            <p className="font-data uppercase" style={{ fontSize: 'clamp(1px, 1.1cqi, 13px)', color: 'var(--gs-base)', letterSpacing: '0.1em', marginBottom: '0.2em' }}>
+            <p className="font-data uppercase" style={{ fontSize: 'clamp(1px, 0.83cqi, 13px)', color: 'var(--gs-base)', letterSpacing: '0.1em', marginBottom: '0.2em' }}>
               Twitter Card
             </p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.15em 1em' }}>

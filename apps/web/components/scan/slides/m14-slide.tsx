@@ -145,7 +145,7 @@ export function M14Slide({ scan }: { scan: ScanWithResults }) {
         borderTop: '1px solid rgba(255,178,239,0.06)',
         borderBottom: '1px solid rgba(255,178,239,0.06)',
       }}>
-        <h4 className="font-display uppercase" style={{ fontSize: 'clamp(1px, 1.2cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.4em' }}>
+        <h4 className="font-display uppercase" style={{ fontSize: 'clamp(1px, 0.90cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.4em' }}>
           Device Readiness
         </h4>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.3em 1.5em' }}>
@@ -161,7 +161,7 @@ export function M14Slide({ scan }: { scan: ScanWithResults }) {
           {hasReducedMotion && <Pill text="Reduced Motion" color="var(--gs-terminal)" />}
           {hiddenOnMobile > 0 && <Pill text={`${hiddenOnMobile} hidden on mobile`} color="var(--gs-warning)" />}
           {breakpoints.length > 0 && (
-            <span className="font-data" style={{ fontSize: 'clamp(1px, 1.1cqi, 13px)', color: 'var(--gs-mid)' }}>
+            <span className="font-data" style={{ fontSize: 'clamp(1px, 0.83cqi, 13px)', color: 'var(--gs-mid)' }}>
               Breakpoints: {breakpoints.slice(0, 5).map(b => `${b}px`).join(', ')}
             </span>
           )}

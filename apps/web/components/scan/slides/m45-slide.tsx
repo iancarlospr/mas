@@ -24,13 +24,13 @@ interface Redundancy { tools: string[]; function: string; effortToConsolidate: s
 
 // ── Typography scale (cqi) — 12px minimum enforced, body-grade sizing ─
 const T = {
-  overline:  'clamp(1px, 1.4cqi, 15px)',
-  section:   'clamp(1px, 1.6cqi, 16px)',
-  body:      'clamp(1px, 1.35cqi, 15px)',
-  detail:    'clamp(1px, 1.25cqi, 14px)',
-  pill:      'clamp(1px, 1.15cqi, 13px)',
-  stat:      'clamp(1px, 3cqi, 36px)',
-  statLabel: 'clamp(1px, 1.25cqi, 14px)',
+  overline:  'clamp(1px, 1.05cqi, 15px)',
+  section:   'clamp(1px, 1.20cqi, 16px)',
+  body:      'clamp(1px, 1.01cqi, 15px)',
+  detail:    'clamp(1px, 0.94cqi, 14px)',
+  pill:      'clamp(1px, 0.86cqi, 13px)',
+  stat:      'clamp(1px, 2.25cqi, 36px)',
+  statLabel: 'clamp(1px, 0.94cqi, 14px)',
 };
 
 const DIVIDER = '1px solid rgba(255,178,239,0.06)';
@@ -77,7 +77,7 @@ export function M45Slide({ scan }: { scan: ScanWithResults }) {
       data-slide-id="Stack Analyzer"
       style={{ aspectRatio: '14 / 8.5', background: 'var(--gs-void)', borderRadius: '2px', containerType: 'inline-size' }}
     >
-      <div className="relative z-10 h-full flex flex-col overflow-hidden" style={{ padding: '1.5% 3.5% 0', paddingBottom: 'clamp(1px, 2.8cqi, 28px)' }}>
+      <div className="relative z-10 h-full flex flex-col overflow-hidden" style={{ padding: '1.5% 3.5% 0', paddingBottom: 'clamp(1px, 2.10cqi, 28px)' }}>
 
         {/* ═══ Module bar ═══ */}
         <div style={{ marginBottom: '0.4em', flexShrink: 0 }}>
@@ -320,7 +320,7 @@ export function M45Slide({ scan }: { scan: ScanWithResults }) {
         className="absolute left-0 right-0 bottom-0 overflow-hidden"
         style={{
           background: 'var(--gs-base)',
-          height: 'clamp(1px, 2.8cqi, 28px)',
+          height: 'clamp(1px, 2.10cqi, 28px)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
