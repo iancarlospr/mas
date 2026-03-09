@@ -3,6 +3,7 @@
 import { useRef, useState, useMemo, useCallback, useEffect } from 'react';
 import type { ScanWithResults } from '@marketing-alpha/types';
 import { useWindowManager } from '@/lib/window-manager';
+import { analytics } from '@/lib/analytics';
 import { FREE_CATEGORIES } from './slide-sidebar';
 import { TitleSlide } from './slides/title-slide';
 import { VerdictSlide } from './slides/verdict-slide';
@@ -114,11 +115,30 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
   const tabBarRef = useRef<HTMLDivElement>(null);
   const [activeTabKey, setActiveTabKey] = useState('about');
 
+  // ── Proportional slide zoom — shrinks slides like a screenshot at smaller widths ──
+  const SLIDE_DESIGN_WIDTH = 1400;
+  const [slideZoom, setSlideZoom] = useState(1);
+  useEffect(() => {
+    const el = contentRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver((entries) => {
+      const w = entries[0]?.contentRect.width ?? 0;
+      setSlideZoom(w > 0 ? Math.min(1, w / SLIDE_DESIGN_WIDTH) : 1);
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
   // Visible tabs based on paid status
   const visibleTabs = useMemo(
     () => NAV_TABS.filter((t) => !t.paidOnly || isPaid),
     [isPaid],
   );
+
+  // ── Analytics: report viewed on mount ──
+  useEffect(() => {
+    analytics.reportViewed(scan.id, scan.domain ?? '', scan.tier);
+  }, [scan.id, scan.domain, scan.tier]);
 
   // ── Scroll to section on tab click ──
   const handleTabClick = useCallback((tab: NavTab) => {
@@ -128,7 +148,8 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
     if (!el) return;
     el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     setActiveTabKey(tab.key);
-  }, []);
+    analytics.reportTabClicked(scan.id, tab.key);
+  }, [scan.id]);
 
   // ── IntersectionObserver — track which section is visible ──
   useEffect(() => {
@@ -168,6 +189,61 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
     return () => observer.disconnect();
   }, [visibleTabs, isPaid]);
 
+  // ── Analytics: track individual slide visibility (fires once per slide) ──
+  useEffect(() => {
+    const container = contentRef.current;
+    if (!container) return;
+
+    const viewedSlides = new Set<string>();
+    const slideCards = container.querySelectorAll('.slide-card');
+    if (slideCards.length === 0) return;
+
+    const slideObserver = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          const el = entry.target as HTMLElement;
+          // Use data-slide-id if present, otherwise fallback to index
+          const slideId = el.dataset.slideId ?? el.id ?? `slide-${Array.from(slideCards).indexOf(el)}`;
+          if (!viewedSlides.has(slideId)) {
+            viewedSlides.add(slideId);
+            analytics.slideViewed(scan.id, slideId);
+          }
+        }
+      },
+      { root: container, threshold: 0.3 },
+    );
+
+    for (const card of slideCards) slideObserver.observe(card);
+    return () => slideObserver.disconnect();
+  }, [scan.id, isPaid]);
+
+  // ── Analytics: scroll depth milestones (25%, 50%, 75%, 100%) ──
+  useEffect(() => {
+    const container = contentRef.current;
+    if (!container) return;
+
+    const firedDepths = new Set<number>();
+    const milestones = [25, 50, 75, 100];
+
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = container;
+      const maxScroll = scrollHeight - clientHeight;
+      if (maxScroll <= 0) return;
+      const pct = (scrollTop / maxScroll) * 100;
+
+      for (const m of milestones) {
+        if (pct >= m && !firedDepths.has(m)) {
+          firedDepths.add(m);
+          analytics.reportScrollDepth(scan.id, m);
+        }
+      }
+    };
+
+    container.addEventListener('scroll', handleScroll, { passive: true });
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, [scan.id]);
+
   // ── Score helper — uses the same synthesis scores as the title slide circle ──
   const getCategoryScore = useCallback((tab: NavTab): number | null => {
     if (!tab.categoryKey) return null;
@@ -192,8 +268,9 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
   }, [wm, scan.id, scan.domain]);
 
   const handleDownloadPdf = useCallback(() => {
+    analytics.pdfDownloaded(scan.id, scan.domain ?? '', 'status_bar');
     window.open(`/api/reports/${scan.id}/prd`, '_blank');
-  }, [scan.id]);
+  }, [scan.id, scan.domain]);
 
   const handleAskChloe = useCallback(() => {
     wm.openWindow('chat-launcher', { scanId: scan.id });
@@ -260,7 +337,14 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
       </div>
 
       {/* ── Scrollable Module Content ── */}
-      <div ref={contentRef} className="flex-1 p-gs-4 space-y-gs-3 overflow-y-auto" style={{ background: '#ffffff' }}>
+      <div ref={contentRef} className="flex-1 overflow-y-auto" style={{ background: '#ffffff' }}>
+        <div
+          className="p-gs-4 space-y-gs-3"
+          style={{
+            zoom: slideZoom,
+            width: slideZoom < 1 ? `${100 / slideZoom}%` : undefined,
+          }}
+        >
         <TitleSlide scan={scan} />
         <VerdictSlide scan={scan} />
         <div id="nav-about">
@@ -363,6 +447,7 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
 
         {/* ── Closing slide (back cover) ── */}
         <ClosingSlide scan={scan} />
+        </div>
       </div>
 
       {/* Status Bar */}
