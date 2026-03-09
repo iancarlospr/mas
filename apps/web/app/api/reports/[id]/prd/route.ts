@@ -141,7 +141,6 @@ function renderDocument(ctx: PRDContext): NextResponse {
   const bodyHtml = markdownToHtml(ctx.markdown);
   const coverHtml = renderCoverPage(ctx);
   const domainSafe = escapeHtml(ctx.domain);
-  const formattedDate = formatDate(ctx.scanDate);
 
   const html = `<!DOCTYPE html>
 <html lang="en">
@@ -165,12 +164,9 @@ function renderDocument(ctx: PRDContext): NextResponse {
 /* ── Print Controls ─────────────────────────────────── */
 @media print {
   .print-banner { display: none !important; }
-  .running-header, .running-footer { display: block !important; }
-  body { padding: 0; max-width: none; }
+  body { padding: 0; max-width: none; margin: 0; }
   .document-body { margin-top: 0; }
-}
-@media screen {
-  .running-header, .running-footer { display: none; }
+  .cover-page { width: 100%; margin: 0; }
 }
 
 /* ── Print Color Preservation ───────────────────────── */
@@ -229,34 +225,6 @@ body {
   background: #D4A017;
 }
 
-/* ── Running Header/Footer (print only) ─────────────── */
-.running-header {
-  position: fixed;
-  top: 0.3in;
-  left: 0.85in;
-  right: 0.85in;
-  font-family: 'Source Sans 3', system-ui, sans-serif;
-  font-size: 7.5pt;
-  color: #718096;
-  display: flex;
-  justify-content: space-between;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  border-bottom: 0.5pt solid #CBD5E0;
-  padding-bottom: 4pt;
-}
-.running-footer {
-  position: fixed;
-  bottom: 0.35in;
-  left: 0.85in;
-  right: 0.85in;
-  font-family: 'Source Sans 3', system-ui, sans-serif;
-  font-size: 7pt;
-  color: #A0AEC0;
-  display: flex;
-  justify-content: space-between;
-  letter-spacing: 0.04em;
-}
 
 /* ═══════════════════════════════════════════════════════
    COVER PAGE
@@ -751,16 +719,6 @@ body {
 <div class="print-banner">
   <span>Remediation Plan — ${domainSafe}</span>
   <button onclick="window.print()">Save as PDF</button>
-</div>
-
-<!-- Print-only running header/footer -->
-<div class="running-header">
-  <span>Remediation Plan — ${domainSafe}</span>
-  <span>Marketing Alpha Scan</span>
-</div>
-<div class="running-footer">
-  <span>AlphaScan Marketing Technology Audit</span>
-  <span>${domainSafe}</span>
 </div>
 
 <!-- Cover Page -->
