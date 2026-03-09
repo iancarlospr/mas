@@ -284,7 +284,7 @@ body {
 /* Main cover content */
 .cover-content {
   flex: 1;
-  padding: 0.9in 1.1in 0;
+  padding: 0.9in 0.85in 0;
   display: flex;
   flex-direction: column;
 }
@@ -355,7 +355,8 @@ body {
   padding-bottom: 0.5in;
   display: flex;
   align-items: flex-end;
-  gap: 0.5in;
+  gap: 0.4in;
+  flex-wrap: wrap;
 }
 
 /* MarketingIQ score box */
@@ -393,16 +394,18 @@ body {
 /* Priority metric boxes */
 .cover-priority-grid {
   display: flex;
-  gap: 0.22in;
+  gap: 0.18in;
+  flex-wrap: wrap;
 }
 .cover-priority-box {
-  padding: 0.12in 0.2in;
+  padding: 0.1in 0.16in;
   background: #fff;
   border: 0.75pt solid #CBD5E0;
   border-top: 3pt solid #718096;
   border-radius: 2pt;
-  min-width: 0.8in;
+  min-width: 0.7in;
   text-align: center;
+  flex-shrink: 1;
 }
 .cover-priority-box.p0 { border-top-color: #C53030; }
 .cover-priority-box.p1 { border-top-color: #C05621; }
@@ -430,7 +433,7 @@ body {
 
 /* Cover footer */
 .cover-footer {
-  padding: 0.2in 1.1in;
+  padding: 0.2in 0.85in;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -453,8 +456,8 @@ body {
   font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: #B8860B;
-  border: 1pt solid #B8860B;
+  color: #1B3A5C;
+  border: 1pt solid #CBD5E0;
   padding: 3pt 10pt;
   border-radius: 2pt;
 }
@@ -731,7 +734,7 @@ body {
 <!-- Print-only running header/footer -->
 <div class="running-header">
   <span>Remediation Plan — ${domainSafe}</span>
-  <span>CONFIDENTIAL</span>
+  <span>Marketing Alpha Scan</span>
 </div>
 <div class="running-footer">
   <span>AlphaScan Marketing Technology Audit</span>
@@ -811,7 +814,7 @@ function renderCoverPage(ctx: PRDContext): string {
   </div>
   <div class="cover-footer">
     <div class="cover-date">${dateFmt} &nbsp;·&nbsp; Est. ${ctx.estimatedTimelineWeeks}-week timeline</div>
-    <div class="cover-confidential">Confidential</div>
+    <div class="cover-confidential">Marketing Alpha Scan</div>
   </div>
   <div class="cover-band-bottom"></div>
 </div>`;
