@@ -99,10 +99,10 @@ export function M13Slide({ scan }: { scan: ScanWithResults }) {
               background: 'rgba(255,178,239,0.04)', border: '1px solid rgba(255,178,239,0.08)',
               display: 'flex', justifyContent: 'center', alignItems: 'baseline', gap: '0.5em',
             }}>
-              <span className="font-data tabular-nums" style={{ fontSize: 'clamp(14px, 3.5cqi, 42px)', fontWeight: 700, color: co2Color, lineHeight: 1 }}>
+              <span className="font-data tabular-nums" style={{ fontSize: 'clamp(1px, 3.5cqi, 42px)', fontWeight: 700, color: co2Color, lineHeight: 1 }}>
                 {co2PerView ?? (co2Grams != null ? `${co2Grams.toFixed(2)}g` : '—')}
               </span>
-              <span className="font-data uppercase" style={{ fontSize: 'clamp(7px, 1.1cqi, 13px)', color: 'var(--gs-base)', letterSpacing: '0.1em' }}>
+              <span className="font-data uppercase" style={{ fontSize: 'clamp(1px, 1.1cqi, 13px)', color: 'var(--gs-base)', letterSpacing: '0.1em' }}>
                 CO₂ per view
               </span>
             </div>
@@ -121,10 +121,10 @@ export function M13Slide({ scan }: { scan: ScanWithResults }) {
                   padding: '0.5em 0.4em', borderRadius: '4px', textAlign: 'center',
                   background: 'rgba(255,178,239,0.04)', border: '1px solid rgba(255,178,239,0.08)',
                 }}>
-                  <p className="font-data tabular-nums" style={{ fontSize: 'clamp(8px, 1.8cqi, 22px)', fontWeight: 700, lineHeight: 1, color: s.color }}>
+                  <p className="font-data tabular-nums" style={{ fontSize: 'clamp(1px, 1.8cqi, 22px)', fontWeight: 700, lineHeight: 1, color: s.color }}>
                     {s.value}
                   </p>
-                  <p className="font-data uppercase" style={{ fontSize: 'clamp(7px, 0.9cqi, 12px)', color: 'var(--gs-base)', letterSpacing: '0.06em', marginTop: '0.25em' }}>
+                  <p className="font-data uppercase" style={{ fontSize: 'clamp(1px, 0.9cqi, 12px)', color: 'var(--gs-base)', letterSpacing: '0.06em', marginTop: '0.25em' }}>
                     {s.label}
                   </p>
                 </div>
@@ -134,7 +134,7 @@ export function M13Slide({ scan }: { scan: ScanWithResults }) {
 
           {/* Right: Third-party domains by bytes */}
           <div style={{ flex: '1 1 50%', display: 'flex', flexDirection: 'column', gap: '0.2em' }}>
-            <h4 className="font-display uppercase" style={{ fontSize: 'clamp(7px, 1.2cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.15em' }}>
+            <h4 className="font-display uppercase" style={{ fontSize: 'clamp(1px, 1.2cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.15em' }}>
               Top Third-Party Domains
             </h4>
             {thirdPartyBreakdown.length > 0 ? (
@@ -154,7 +154,7 @@ export function M13Slide({ scan }: { scan: ScanWithResults }) {
                 );
               })
             ) : (
-              <p className="font-data" style={{ fontSize: 'clamp(7px, 1.2cqi, 14px)', color: 'var(--gs-mid)' }}>
+              <p className="font-data" style={{ fontSize: 'clamp(1px, 1.2cqi, 14px)', color: 'var(--gs-mid)' }}>
                 No third-party domain breakdown available.
               </p>
             )}

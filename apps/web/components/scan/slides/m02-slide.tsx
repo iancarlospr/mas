@@ -98,7 +98,7 @@ export function M02Slide({ scan }: { scan: ScanWithResults }) {
         <div style={{ display: 'flex', gap: '3%' }}>
           {/* Stack layers — left */}
           <div style={{ flex: '1 1 55%', display: 'flex', flexDirection: 'column', gap: '0.3em' }}>
-            <h4 className="font-display uppercase" style={{ fontSize: 'clamp(7px, 1.2cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.15em' }}>
+            <h4 className="font-display uppercase" style={{ fontSize: 'clamp(1px, 1.2cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.15em' }}>
               Infrastructure Blueprint
             </h4>
             {layers.length > 0 ? (
@@ -106,7 +106,7 @@ export function M02Slide({ scan }: { scan: ScanWithResults }) {
                 <StackLayer key={i} label={layer.label} value={layer.value} confidence={layer.confidence} />
               ))
             ) : (
-              <p className="font-data" style={{ fontSize: 'clamp(7px, 1.2cqi, 14px)', color: 'var(--gs-mid)' }}>
+              <p className="font-data" style={{ fontSize: 'clamp(1px, 1.2cqi, 14px)', color: 'var(--gs-mid)' }}>
                 No infrastructure components detected
               </p>
             )}
@@ -114,7 +114,7 @@ export function M02Slide({ scan }: { scan: ScanWithResults }) {
 
           {/* Detected technologies — right */}
           <div style={{ flex: '0 0 40%', display: 'flex', flexDirection: 'column', gap: '0.4em' }}>
-            <h4 className="font-display uppercase" style={{ fontSize: 'clamp(7px, 1.2cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.15em' }}>
+            <h4 className="font-display uppercase" style={{ fontSize: 'clamp(1px, 1.2cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.15em' }}>
               Detected Technologies ({technologies.length})
             </h4>
             {technologies.length > 0 ? (
@@ -124,7 +124,7 @@ export function M02Slide({ scan }: { scan: ScanWithResults }) {
                 ))}
               </div>
             ) : (
-              <p className="font-data" style={{ fontSize: 'clamp(7px, 1.2cqi, 14px)', color: 'var(--gs-mid)' }}>
+              <p className="font-data" style={{ fontSize: 'clamp(1px, 1.2cqi, 14px)', color: 'var(--gs-mid)' }}>
                 No additional technologies fingerprinted
               </p>
             )}

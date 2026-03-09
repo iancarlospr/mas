@@ -16,15 +16,15 @@ import type { ScanWithResults, ModuleResult } from '@marketing-alpha/types';
 
 // ── Report type scale ─────────────────────────────────────────────────
 const T = {
-  heroFinding:  'clamp(12px, 3.2cqi, 36px)',
-  heroImpact:   'clamp(7px, 1.5cqi, 17px)',
-  heroDetail:   'clamp(7px, 1.35cqi, 15px)',
-  subFinding:   'clamp(8px, 2cqi, 22px)',
-  subDetail:    'clamp(7px, 1.3cqi, 14px)',
-  subImpact:    'clamp(7px, 1.3cqi, 14px)',
-  badge:        'clamp(7px, 1.2cqi, 14px)',
-  context:      'clamp(7px, 1.25cqi, 14px)',
-  number:       'clamp(20px, 5.5cqi, 68px)',
+  heroFinding:  'clamp(1px, 3.2cqi, 36px)',
+  heroImpact:   'clamp(1px, 1.5cqi, 17px)',
+  heroDetail:   'clamp(1px, 1.35cqi, 15px)',
+  subFinding:   'clamp(1px, 2cqi, 22px)',
+  subDetail:    'clamp(1px, 1.3cqi, 14px)',
+  subImpact:    'clamp(1px, 1.3cqi, 14px)',
+  badge:        'clamp(1px, 1.2cqi, 14px)',
+  context:      'clamp(1px, 1.25cqi, 14px)',
+  number:       'clamp(1px, 5.5cqi, 68px)',
 } as const;
 
 // ── Urgency colors ────────────────────────────────────────────────────
@@ -112,6 +112,7 @@ export function FindingsSlide({ scan }: FindingsSlideProps) {
   return (
     <div
       className="slide-card relative overflow-hidden select-none"
+      data-slide-id="Findings"
       style={{
         aspectRatio: '14 / 8.5',
         background: 'var(--gs-void)',
@@ -119,13 +120,13 @@ export function FindingsSlide({ scan }: FindingsSlideProps) {
         containerType: 'inline-size',
       }}
     >
-      <div className="relative z-10 h-full flex flex-col" style={{ paddingBottom: 'clamp(8px, 2.8cqi, 28px)' }}>
+      <div className="relative z-10 h-full flex flex-col" style={{ paddingBottom: 'clamp(1px, 2.8cqi, 28px)' }}>
 
         {/* ── Section title ── */}
         <h3
           className="font-display uppercase"
           style={{
-            fontSize: 'clamp(7px, 1.6cqi, 16px)',
+            fontSize: 'clamp(1px, 1.6cqi, 16px)',
             fontWeight: 600,
             letterSpacing: '0.15em',
             color: 'var(--gs-base)',
@@ -348,7 +349,7 @@ export function FindingsSlide({ scan }: FindingsSlideProps) {
         className="absolute left-0 right-0 bottom-0 overflow-hidden"
         style={{
           background: 'var(--gs-base)',
-          height: 'clamp(8px, 2.8cqi, 28px)',
+          height: 'clamp(1px, 2.8cqi, 28px)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',

@@ -95,10 +95,10 @@ export function M08Slide({ scan }: { scan: ScanWithResults }) {
               flex: 1, padding: '0.5em 0.4em', borderRadius: '4px', textAlign: 'center',
               background: 'rgba(255,178,239,0.04)', border: '1px solid rgba(255,178,239,0.08)',
             }}>
-              <p className="font-data tabular-nums" style={{ fontSize: 'clamp(8px, 1.8cqi, 22px)', fontWeight: 700, lineHeight: 1, color: s.color }}>
+              <p className="font-data tabular-nums" style={{ fontSize: 'clamp(1px, 1.8cqi, 22px)', fontWeight: 700, lineHeight: 1, color: s.color }}>
                 {s.value}
               </p>
-              <p className="font-data uppercase" style={{ fontSize: 'clamp(7px, 0.9cqi, 12px)', color: 'var(--gs-base)', letterSpacing: '0.06em', marginTop: '0.25em' }}>
+              <p className="font-data uppercase" style={{ fontSize: 'clamp(1px, 0.9cqi, 12px)', color: 'var(--gs-base)', letterSpacing: '0.06em', marginTop: '0.25em' }}>
                 {s.label}
               </p>
             </div>
@@ -113,18 +113,18 @@ export function M08Slide({ scan }: { scan: ScanWithResults }) {
             background: 'rgba(255,178,239,0.04)', border: '1px solid rgba(255,178,239,0.08)',
             display: 'flex', flexDirection: 'column', justifyContent: 'center',
           }}>
-            <p className="font-data" style={{ fontSize: 'clamp(7px, 1.3cqi, 16px)', fontWeight: 700, lineHeight: 1.2, color: tmsArr.length > 0 ? 'var(--gs-light)' : 'var(--gs-critical)' }}>
+            <p className="font-data" style={{ fontSize: 'clamp(1px, 1.3cqi, 16px)', fontWeight: 700, lineHeight: 1.2, color: tmsArr.length > 0 ? 'var(--gs-light)' : 'var(--gs-critical)' }}>
               {tmsArr.length > 0 ? tmsArr.map(t => {
                 const name = typeof t.name === 'string' ? t.name : 'Unknown';
                 const containers = Array.isArray(t.containers) ? t.containers : [];
                 return containers.length > 0 ? `${name} (${containers.join(', ')})` : name;
               }).join(', ') : 'No TMS'}
             </p>
-            <p className="font-data uppercase" style={{ fontSize: 'clamp(7px, 0.9cqi, 12px)', color: 'var(--gs-base)', letterSpacing: '0.06em', marginTop: '0.25em' }}>
+            <p className="font-data uppercase" style={{ fontSize: 'clamp(1px, 0.9cqi, 12px)', color: 'var(--gs-base)', letterSpacing: '0.06em', marginTop: '0.25em' }}>
               Tag Manager
             </p>
             {tmsCount > 1 && (
-              <p className="font-data" style={{ fontSize: 'clamp(7px, 0.9cqi, 12px)', color: 'var(--gs-critical)', marginTop: '0.1em' }}>
+              <p className="font-data" style={{ fontSize: 'clamp(1px, 0.9cqi, 12px)', color: 'var(--gs-critical)', marginTop: '0.1em' }}>
                 {tmsCount} TMS — Conflict Risk
               </p>
             )}
@@ -136,14 +136,14 @@ export function M08Slide({ scan }: { scan: ScanWithResults }) {
             background: 'rgba(255,178,239,0.04)', border: '1px solid rgba(255,178,239,0.08)',
             display: 'flex', flexDirection: 'column', justifyContent: 'center',
           }}>
-            <p className="font-display" style={{ fontSize: 'clamp(10px, 2.4cqi, 28px)', fontWeight: 700, lineHeight: 1, color: serverSideIndicators ? 'var(--gs-terminal)' : 'var(--gs-critical)' }}>
+            <p className="font-display" style={{ fontSize: 'clamp(1px, 2.4cqi, 28px)', fontWeight: 700, lineHeight: 1, color: serverSideIndicators ? 'var(--gs-terminal)' : 'var(--gs-critical)' }}>
               {serverSideIndicators ? '✓' : '✗'}
             </p>
-            <p className="font-data uppercase" style={{ fontSize: 'clamp(7px, 0.9cqi, 12px)', color: 'var(--gs-base)', letterSpacing: '0.06em', marginTop: '0.25em' }}>
+            <p className="font-data uppercase" style={{ fontSize: 'clamp(1px, 0.9cqi, 12px)', color: 'var(--gs-base)', letterSpacing: '0.06em', marginTop: '0.25em' }}>
               Server-Side Tagging
             </p>
             {sstSources.length > 0 && (
-              <p className="font-data" style={{ fontSize: 'clamp(7px, 0.9cqi, 12px)', color: 'var(--gs-mid)', marginTop: '0.1em' }}>
+              <p className="font-data" style={{ fontSize: 'clamp(1px, 0.9cqi, 12px)', color: 'var(--gs-mid)', marginTop: '0.1em' }}>
                 {sstSources[0]}
               </p>
             )}
@@ -156,14 +156,14 @@ export function M08Slide({ scan }: { scan: ScanWithResults }) {
               background: 'rgba(255,178,239,0.04)', border: '1px solid rgba(255,178,239,0.08)',
               display: 'flex', flexDirection: 'column', justifyContent: 'center',
             }}>
-              <p className="font-data tabular-nums" style={{ fontSize: 'clamp(10px, 2cqi, 24px)', fontWeight: 700, lineHeight: 1, color: blockingScripts > 5 ? 'var(--gs-critical)' : blockingScripts > 0 ? 'var(--gs-warning)' : 'var(--gs-terminal)' }}>
+              <p className="font-data tabular-nums" style={{ fontSize: 'clamp(1px, 2cqi, 24px)', fontWeight: 700, lineHeight: 1, color: blockingScripts > 5 ? 'var(--gs-critical)' : blockingScripts > 0 ? 'var(--gs-warning)' : 'var(--gs-terminal)' }}>
                 {blockingScripts}
               </p>
-              <p className="font-data uppercase" style={{ fontSize: 'clamp(7px, 0.9cqi, 12px)', color: 'var(--gs-base)', letterSpacing: '0.06em', marginTop: '0.25em' }}>
+              <p className="font-data uppercase" style={{ fontSize: 'clamp(1px, 0.9cqi, 12px)', color: 'var(--gs-base)', letterSpacing: '0.06em', marginTop: '0.25em' }}>
                 Render-Blocking
               </p>
               {asyncScripts > 0 && (
-                <p className="font-data" style={{ fontSize: 'clamp(7px, 0.9cqi, 12px)', color: 'var(--gs-mid)', marginTop: '0.1em' }}>
+                <p className="font-data" style={{ fontSize: 'clamp(1px, 0.9cqi, 12px)', color: 'var(--gs-mid)', marginTop: '0.1em' }}>
                   {asyncScripts} async
                 </p>
               )}

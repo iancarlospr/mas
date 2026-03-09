@@ -3,6 +3,7 @@
 import { useRef, useEffect } from 'react';
 import type { ScanWithResults, ModuleResult } from '@marketing-alpha/types';
 import { useWindowManager } from '@/lib/window-manager';
+import { analytics } from '@/lib/analytics';
 
 /**
  * M43 Slide — The Closer
@@ -44,16 +45,16 @@ const BAYER8 = [
 
 // ── Typography scale (cqi) — 12px minimum ───────────────────────────
 const T = {
-  brand:     'clamp(2px, 0.6cqi, 7px)',
-  overline:  'clamp(7px, 1.3cqi, 14px)',
-  headline:  'clamp(12px, 3.2cqi, 42px)',
-  sub:       'clamp(7px, 1.35cqi, 15px)',
-  stat:      'clamp(14px, 3.8cqi, 46px)',
-  statLabel: 'clamp(7px, 1.2cqi, 14px)',
-  cardTitle: 'clamp(8px, 2cqi, 22px)',
-  cardBody:  'clamp(7px, 1.35cqi, 15px)',
-  cta:       'clamp(8px, 1.5cqi, 17px)',
-  bubble:    'clamp(7px, 1.35cqi, 15px)',
+  brand:     'clamp(1px, 0.6cqi, 7px)',
+  overline:  'clamp(1px, 1.3cqi, 14px)',
+  headline:  'clamp(1px, 3.2cqi, 42px)',
+  sub:       'clamp(1px, 1.35cqi, 15px)',
+  stat:      'clamp(1px, 3.8cqi, 46px)',
+  statLabel: 'clamp(1px, 1.2cqi, 14px)',
+  cardTitle: 'clamp(1px, 2cqi, 22px)',
+  cardBody:  'clamp(1px, 1.35cqi, 15px)',
+  cta:       'clamp(1px, 1.5cqi, 17px)',
+  bubble:    'clamp(1px, 1.35cqi, 15px)',
 };
 
 export function M43Slide({ scan, printMode }: { scan: ScanWithResults; printMode?: boolean }) {
@@ -151,6 +152,7 @@ export function M43Slide({ scan, printMode }: { scan: ScanWithResults; printMode
   return (
     <div
       className="slide-card relative overflow-hidden select-none"
+      data-slide-id="Remediation Roadmap"
       style={{
         aspectRatio: '14 / 8.5',
         background: 'var(--gs-void)',
@@ -506,6 +508,7 @@ export function M43Slide({ scan, printMode }: { scan: ScanWithResults; printMode
                     href={pdfUrl}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => analytics.pdfDownloaded(scan.id, scan.domain ?? '', 'm43_slide')}
                     className="font-display uppercase m43-cta-primary"
                     style={{
                       display: 'flex',

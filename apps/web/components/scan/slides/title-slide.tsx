@@ -37,16 +37,16 @@ const BAYER8 = [
 
 // ── Report type scale (container-relative with fallback) ──────────────
 const T = {
-  brand:     'clamp(3px, 0.75cqi, 8px)',     // ASCII art
-  subtitle:  'clamp(7px, 1.3cqi, 15px)',     // "Marketing Technology Audit"
-  domain:    'clamp(18px, 5.5cqi, 68px)',     // Domain headline
-  urlPath:   'clamp(7px, 1.3cqi, 15px)',     // Path below domain
-  scoreLabel:'clamp(12px, 3.2cqi, 42px)',     // "Marketing Leader" etc
-  metaLabel: 'clamp(7px, 1.2cqi, 14px)',     // Meta pill labels
-  metaValue: 'clamp(7px, 1.3cqi, 14px)',     // Meta pill values
-  scoreNum:  'clamp(30px, 10cqi, 130px)',     // Big score number
-  scoreSub:  'clamp(7px, 1.2cqi, 14px)',     // "MarketingIQ" under score
-  pending:   'clamp(8px, 1.8cqi, 20px)',     // "Pending" fallback
+  brand:     'clamp(1px, 0.75cqi, 8px)',     // ASCII art
+  subtitle:  'clamp(1px, 1.3cqi, 15px)',     // "Marketing Technology Audit"
+  domain:    'clamp(1px, 5.5cqi, 68px)',     // Domain headline
+  urlPath:   'clamp(1px, 1.3cqi, 15px)',     // Path below domain
+  scoreLabel:'clamp(1px, 3.2cqi, 42px)',     // "Marketing Leader" etc
+  metaLabel: 'clamp(1px, 1.2cqi, 14px)',     // Meta pill labels
+  metaValue: 'clamp(1px, 1.3cqi, 14px)',     // Meta pill values
+  scoreNum:  'clamp(1px, 10cqi, 130px)',     // Big score number
+  scoreSub:  'clamp(1px, 1.2cqi, 14px)',     // "MarketingIQ" under score
+  pending:   'clamp(1px, 1.8cqi, 20px)',     // "Pending" fallback
 } as const;
 
 function getScoreColor(score: number): string {
@@ -103,6 +103,7 @@ export function TitleSlide({ scan }: TitleSlideProps) {
   return (
     <div
       className="slide-card relative overflow-hidden select-none"
+      data-slide-id="Title"
       style={{
         aspectRatio: '14 / 8.5',
         background: 'var(--gs-void)',

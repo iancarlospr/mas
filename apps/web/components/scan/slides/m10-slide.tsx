@@ -101,7 +101,7 @@ export function M10Slide({ scan }: { scan: ScanWithResults }) {
 
   const vizContent = (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5em' }}>
-      <h4 className="font-display uppercase" style={{ fontSize: 'clamp(7px, 1.2cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.1em' }}>
+      <h4 className="font-display uppercase" style={{ fontSize: 'clamp(1px, 1.2cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.1em' }}>
         WCAG Compliance
       </h4>
 
@@ -110,15 +110,15 @@ export function M10Slide({ scan }: { scan: ScanWithResults }) {
         {/* Image Alt Text */}
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.1em' }}>
-            <span className="font-data" style={{ fontSize: 'clamp(7px, 1.15cqi, 14px)', color: 'var(--gs-light)' }}>
+            <span className="font-data" style={{ fontSize: 'clamp(1px, 1.15cqi, 14px)', color: 'var(--gs-light)' }}>
               Image Alt Text
             </span>
-            <span className="font-data tabular-nums" style={{ fontSize: 'clamp(7px, 1.15cqi, 14px)', fontWeight: 600, color: coverageColor(altCoverage) }}>
+            <span className="font-data tabular-nums" style={{ fontSize: 'clamp(1px, 1.15cqi, 14px)', fontWeight: 600, color: coverageColor(altCoverage) }}>
               {altCoverage}%
             </span>
           </div>
           <HorizontalBar value={altCoverage} max={100} color={coverageColor(altCoverage)} />
-          <span className="font-data" style={{ fontSize: 'clamp(7px, 1cqi, 12px)', color: 'var(--gs-mid)' }}>
+          <span className="font-data" style={{ fontSize: 'clamp(1px, 1cqi, 12px)', color: 'var(--gs-mid)' }}>
             {imgWithAlt}/{imgTotal} images{imgMissing > 0 ? ` · ${imgMissing} missing` : ''}
           </span>
         </div>
@@ -126,15 +126,15 @@ export function M10Slide({ scan }: { scan: ScanWithResults }) {
         {/* Form Labels */}
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.1em' }}>
-            <span className="font-data" style={{ fontSize: 'clamp(7px, 1.15cqi, 14px)', color: 'var(--gs-light)' }}>
+            <span className="font-data" style={{ fontSize: 'clamp(1px, 1.15cqi, 14px)', color: 'var(--gs-light)' }}>
               Form Labels
             </span>
-            <span className="font-data tabular-nums" style={{ fontSize: 'clamp(7px, 1.15cqi, 14px)', fontWeight: 600, color: coverageColor(labelCoverage) }}>
+            <span className="font-data tabular-nums" style={{ fontSize: 'clamp(1px, 1.15cqi, 14px)', fontWeight: 600, color: coverageColor(labelCoverage) }}>
               {labelCoverage}%
             </span>
           </div>
           <HorizontalBar value={labelCoverage} max={100} color={coverageColor(labelCoverage)} />
-          <span className="font-data" style={{ fontSize: 'clamp(7px, 1cqi, 12px)', color: 'var(--gs-mid)' }}>
+          <span className="font-data" style={{ fontSize: 'clamp(1px, 1cqi, 12px)', color: 'var(--gs-mid)' }}>
             {formLabeled}/{formTotal} fields labeled
           </span>
         </div>
@@ -142,15 +142,15 @@ export function M10Slide({ scan }: { scan: ScanWithResults }) {
         {/* Link Accessibility */}
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.1em' }}>
-            <span className="font-data" style={{ fontSize: 'clamp(7px, 1.15cqi, 14px)', color: 'var(--gs-light)' }}>
+            <span className="font-data" style={{ fontSize: 'clamp(1px, 1.15cqi, 14px)', color: 'var(--gs-light)' }}>
               Link Accessibility
             </span>
-            <span className="font-data tabular-nums" style={{ fontSize: 'clamp(7px, 1.15cqi, 14px)', fontWeight: 600, color: coverageColor(linkCoverage) }}>
+            <span className="font-data tabular-nums" style={{ fontSize: 'clamp(1px, 1.15cqi, 14px)', fontWeight: 600, color: coverageColor(linkCoverage) }}>
               {linkCoverage}%
             </span>
           </div>
           <HorizontalBar value={linkCoverage} max={100} color={coverageColor(linkCoverage)} />
-          <span className="font-data" style={{ fontSize: 'clamp(7px, 1cqi, 12px)', color: 'var(--gs-mid)' }}>
+          <span className="font-data" style={{ fontSize: 'clamp(1px, 1cqi, 12px)', color: 'var(--gs-mid)' }}>
             {totalLinks} links{linkIssues > 0 ? ` · ${linkIssues} issues` : ''}
           </span>
         </div>
@@ -194,7 +194,7 @@ export function M10Slide({ scan }: { scan: ScanWithResults }) {
           padding: '0.3em 0.5em', borderRadius: '3px', marginTop: '0.15em',
           background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.15)',
         }}>
-          <span className="font-data" style={{ fontSize: 'clamp(7px, 1.1cqi, 13px)', color: 'var(--gs-critical)' }}>
+          <span className="font-data" style={{ fontSize: 'clamp(1px, 1.1cqi, 13px)', color: 'var(--gs-critical)' }}>
             Accessibility overlay detected: {overlays.join(', ')} — overlays are not a substitute for native WCAG compliance
           </span>
         </div>

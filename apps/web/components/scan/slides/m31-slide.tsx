@@ -221,13 +221,13 @@ export function M31Slide({ scan }: { scan: ScanWithResults }) {
               textAlign: 'center',
             }}>
               <p className="font-data tabular-nums" style={{
-                fontSize: 'clamp(14px, 3.5cqi, 42px)', fontWeight: 700, lineHeight: 1,
+                fontSize: 'clamp(1px, 3.5cqi, 42px)', fontWeight: 700, lineHeight: 1,
                 color: domainRank <= 100_000 ? 'var(--gs-terminal)' : domainRank <= 500_000 ? 'var(--gs-warning)' : 'var(--gs-light)',
               }}>
                 #{domainRank.toLocaleString()}
               </p>
               <p className="font-data uppercase" style={{
-                fontSize: 'clamp(7px, 1.1cqi, 13px)', color: 'var(--gs-base)',
+                fontSize: 'clamp(1px, 1.1cqi, 13px)', color: 'var(--gs-base)',
                 letterSpacing: '0.1em', marginTop: '0.3em',
               }}>
                 Domain Rank
@@ -254,7 +254,7 @@ export function M31Slide({ scan }: { scan: ScanWithResults }) {
         {/* Right: SVG text cloud filling the rectangle */}
         {anchors.length > 0 ? (
           <div style={{ flex: 2 }}>
-            <p className="font-data uppercase" style={{ fontSize: 'clamp(7px, 1.1cqi, 13px)', color: 'var(--gs-base)', letterSpacing: '0.1em', marginBottom: '0.35em' }}>
+            <p className="font-data uppercase" style={{ fontSize: 'clamp(1px, 1.1cqi, 13px)', color: 'var(--gs-base)', letterSpacing: '0.1em', marginBottom: '0.35em' }}>
               Anchor Text Profile
             </p>
             <AnchorCloud anchors={anchors} totalCount={totalAnchorCount} />

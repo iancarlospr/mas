@@ -14,10 +14,10 @@ import { CATEGORY_DISPLAY_NAMES, type ScoreCategory } from '@marketing-alpha/typ
  */
 
 const T = {
-  overline:  'clamp(7px, 1.5cqi, 17px)',
-  active:    'clamp(16px, 4.2cqi, 52px)',
-  inactive:  'clamp(8px, 1.6cqi, 20px)',
-  score:     'clamp(18px, 4.5cqi, 56px)',
+  overline:  'clamp(1px, 1.5cqi, 17px)',
+  active:    'clamp(1px, 4.2cqi, 52px)',
+  inactive:  'clamp(1px, 1.6cqi, 20px)',
+  score:     'clamp(1px, 4.5cqi, 56px)',
 } as const;
 
 // Legacy category keys from older scans
@@ -55,6 +55,7 @@ export function CategoryIntroSlide({ scan, category }: CategoryIntroSlideProps) 
   return (
     <div
       className="slide-card relative overflow-hidden select-none"
+      data-slide-id={`Category: ${category}`}
       style={{
         aspectRatio: '14 / 8.5',
         background: 'var(--gs-void)',

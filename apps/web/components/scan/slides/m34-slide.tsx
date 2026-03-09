@@ -76,7 +76,7 @@ export function M34Slide({ scan }: { scan: ScanWithResults }) {
 
         {/* Keyword name */}
         <span className="font-data" style={{
-          fontSize: 'clamp(7px, 1.15cqi, 13px)', color: 'var(--gs-light)', flex: 1,
+          fontSize: 'clamp(1px, 1.15cqi, 13px)', color: 'var(--gs-light)', flex: 1,
           overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
         }}>
           {kw.keyword}
@@ -84,7 +84,7 @@ export function M34Slide({ scan }: { scan: ScanWithResults }) {
 
         {/* Position badge */}
         <span className="font-data tabular-nums" style={{
-          fontSize: 'clamp(7px, 1.15cqi, 13px)', fontWeight: 600, color: arrowColor,
+          fontSize: 'clamp(1px, 1.15cqi, 13px)', fontWeight: 600, color: arrowColor,
           flexShrink: 0,
         }}>
           #{kw.rankAbsolute}
@@ -93,7 +93,7 @@ export function M34Slide({ scan }: { scan: ScanWithResults }) {
         {/* Volume */}
         {kw.searchVolume > 0 && (
           <span className="font-data tabular-nums" style={{
-            fontSize: 'clamp(7px, 1cqi, 12px)', color: 'var(--gs-mid)', flexShrink: 0,
+            fontSize: 'clamp(1px, 1cqi, 12px)', color: 'var(--gs-mid)', flexShrink: 0,
           }}>
             {kw.searchVolume.toLocaleString()}/mo
           </span>
@@ -119,12 +119,12 @@ export function M34Slide({ scan }: { scan: ScanWithResults }) {
             border: '1px solid rgba(255,178,239,0.08)',
           }}>
             <p className="font-data tabular-nums" style={{
-              fontSize: 'clamp(8px, 2cqi, 24px)', fontWeight: 700, lineHeight: 1, color: s.color,
+              fontSize: 'clamp(1px, 2cqi, 24px)', fontWeight: 700, lineHeight: 1, color: s.color,
             }}>
               {s.value}
             </p>
             <p className="font-data uppercase" style={{
-              fontSize: 'clamp(7px, 1cqi, 12px)', color: 'var(--gs-base)',
+              fontSize: 'clamp(1px, 1cqi, 12px)', color: 'var(--gs-base)',
               letterSpacing: '0.08em', marginTop: '0.25em',
             }}>
               {s.label}
@@ -138,7 +138,7 @@ export function M34Slide({ scan }: { scan: ScanWithResults }) {
         {/* Gaining */}
         <div style={{ flex: 1, overflow: 'hidden' }}>
           <p className="font-data uppercase" style={{
-            fontSize: 'clamp(7px, 1.1cqi, 13px)', letterSpacing: '0.1em', marginBottom: '0.25em',
+            fontSize: 'clamp(1px, 1.1cqi, 13px)', letterSpacing: '0.1em', marginBottom: '0.25em',
             color: 'var(--gs-terminal)',
           }}>
             Gaining Rank
@@ -146,7 +146,7 @@ export function M34Slide({ scan }: { scan: ScanWithResults }) {
           {topGaining.length > 0 ? (
             topGaining.map((kw, i) => <MovementRow key={i} kw={kw} direction="up" />)
           ) : (
-            <p className="font-data" style={{ fontSize: 'clamp(7px, 1.1cqi, 13px)', color: 'var(--gs-mid)', opacity: 0.6 }}>
+            <p className="font-data" style={{ fontSize: 'clamp(1px, 1.1cqi, 13px)', color: 'var(--gs-mid)', opacity: 0.6 }}>
               No gaining keywords detected
             </p>
           )}
@@ -158,7 +158,7 @@ export function M34Slide({ scan }: { scan: ScanWithResults }) {
         {/* Losing */}
         <div style={{ flex: 1, overflow: 'hidden' }}>
           <p className="font-data uppercase" style={{
-            fontSize: 'clamp(7px, 1.1cqi, 13px)', letterSpacing: '0.1em', marginBottom: '0.25em',
+            fontSize: 'clamp(1px, 1.1cqi, 13px)', letterSpacing: '0.1em', marginBottom: '0.25em',
             color: 'var(--gs-critical)',
           }}>
             Losing Rank
@@ -166,7 +166,7 @@ export function M34Slide({ scan }: { scan: ScanWithResults }) {
           {topLosing.length > 0 ? (
             topLosing.map((kw, i) => <MovementRow key={i} kw={kw} direction="down" />)
           ) : (
-            <p className="font-data" style={{ fontSize: 'clamp(7px, 1.1cqi, 13px)', color: 'var(--gs-mid)', opacity: 0.6 }}>
+            <p className="font-data" style={{ fontSize: 'clamp(1px, 1.1cqi, 13px)', color: 'var(--gs-mid)', opacity: 0.6 }}>
               No losing keywords detected
             </p>
           )}
@@ -177,8 +177,8 @@ export function M34Slide({ scan }: { scan: ScanWithResults }) {
       {(gainingCount + losingCount) > 0 && (
         <div style={{ marginTop: '0.2em' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.1em' }}>
-            <span className="font-data" style={{ fontSize: 'clamp(7px, 1cqi, 12px)', color: 'var(--gs-mid)' }}>Stability ratio</span>
-            <span className="font-data tabular-nums" style={{ fontSize: 'clamp(7px, 1cqi, 12px)', color: netColor }}>
+            <span className="font-data" style={{ fontSize: 'clamp(1px, 1cqi, 12px)', color: 'var(--gs-mid)' }}>Stability ratio</span>
+            <span className="font-data tabular-nums" style={{ fontSize: 'clamp(1px, 1cqi, 12px)', color: netColor }}>
               {Math.round((gainingCount / (gainingCount + losingCount)) * 100)}% gaining
             </span>
           </div>

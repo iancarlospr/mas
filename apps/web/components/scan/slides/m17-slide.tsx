@@ -98,10 +98,10 @@ export function M17Slide({ scan }: { scan: ScanWithResults }) {
               background: 'rgba(255,178,239,0.04)', border: '1px solid rgba(255,178,239,0.08)',
               display: 'flex', flexDirection: 'column', justifyContent: 'center',
             }}>
-              <p className="font-data tabular-nums" style={{ fontSize: 'clamp(8px, 1.8cqi, 22px)', fontWeight: 700, lineHeight: 1.2, color: s.color }}>
+              <p className="font-data tabular-nums" style={{ fontSize: 'clamp(1px, 1.8cqi, 22px)', fontWeight: 700, lineHeight: 1.2, color: s.color }}>
                 {s.value}
               </p>
-              <p className="font-data uppercase" style={{ fontSize: 'clamp(7px, 0.9cqi, 12px)', color: 'var(--gs-base)', letterSpacing: '0.06em', marginTop: '0.25em' }}>
+              <p className="font-data uppercase" style={{ fontSize: 'clamp(1px, 0.9cqi, 12px)', color: 'var(--gs-base)', letterSpacing: '0.06em', marginTop: '0.25em' }}>
                 {s.label}
               </p>
             </div>
@@ -112,7 +112,7 @@ export function M17Slide({ scan }: { scan: ScanWithResults }) {
         <div style={{ display: 'flex', gap: '3%' }}>
           {/* Left: Employer brand checklist */}
           <div style={{ flex: 1 }}>
-            <p className="font-display uppercase" style={{ fontSize: 'clamp(7px, 1.2cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.3em' }}>
+            <p className="font-display uppercase" style={{ fontSize: 'clamp(1px, 1.2cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.3em' }}>
               Employer Brand Checklist
             </p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.3em 1.5em' }}>
@@ -132,7 +132,7 @@ export function M17Slide({ scan }: { scan: ScanWithResults }) {
           <div style={{ flex: '0 0 38%', display: 'flex', flexDirection: 'column', gap: '0.4em' }}>
             {hasBenefits && (
               <div>
-                <p className="font-data uppercase" style={{ fontSize: 'clamp(7px, 1.1cqi, 13px)', color: 'var(--gs-mid)', letterSpacing: '0.06em', marginBottom: '0.2em' }}>
+                <p className="font-data uppercase" style={{ fontSize: 'clamp(1px, 1.1cqi, 13px)', color: 'var(--gs-mid)', letterSpacing: '0.06em', marginBottom: '0.2em' }}>
                   Benefits & Perks
                 </p>
                 {benefitsMentioned.length > 0 ? (
@@ -148,7 +148,7 @@ export function M17Slide({ scan }: { scan: ScanWithResults }) {
             )}
             {externalLinks.length > 0 && (
               <div>
-                <p className="font-data uppercase" style={{ fontSize: 'clamp(7px, 1.1cqi, 13px)', color: 'var(--gs-mid)', letterSpacing: '0.06em', marginBottom: '0.2em' }}>
+                <p className="font-data uppercase" style={{ fontSize: 'clamp(1px, 1.1cqi, 13px)', color: 'var(--gs-mid)', letterSpacing: '0.06em', marginBottom: '0.2em' }}>
                   External Job Boards
                 </p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.2em' }}>
@@ -162,10 +162,10 @@ export function M17Slide({ scan }: { scan: ScanWithResults }) {
             )}
             {!hasBenefits && externalLinks.length === 0 && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3em' }}>
-                <p className="font-data" style={{ fontSize: 'clamp(7px, 1.15cqi, 13px)', color: 'var(--gs-mid)', opacity: 0.6 }}>
+                <p className="font-data" style={{ fontSize: 'clamp(1px, 1.15cqi, 13px)', color: 'var(--gs-mid)', opacity: 0.6 }}>
                   No benefits or perks mentioned on careers pages
                 </p>
-                <p className="font-data" style={{ fontSize: 'clamp(7px, 1.15cqi, 13px)', color: 'var(--gs-mid)', opacity: 0.6 }}>
+                <p className="font-data" style={{ fontSize: 'clamp(1px, 1.15cqi, 13px)', color: 'var(--gs-mid)', opacity: 0.6 }}>
                   No external job board links detected
                 </p>
               </div>

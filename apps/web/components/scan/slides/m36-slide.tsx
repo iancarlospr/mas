@@ -88,19 +88,19 @@ export function M36Slide({ scan }: { scan: ScanWithResults }) {
           display: 'flex', flexDirection: 'column', justifyContent: 'center',
         }}>
           <p className="font-data tabular-nums" style={{
-            fontSize: 'clamp(14px, 3.5cqi, 42px)', fontWeight: 700, lineHeight: 1, color: 'var(--gs-light)',
+            fontSize: 'clamp(1px, 3.5cqi, 42px)', fontWeight: 700, lineHeight: 1, color: 'var(--gs-light)',
           }}>
             {totalProducts.toLocaleString()}
           </p>
           <p className="font-data uppercase" style={{
-            fontSize: 'clamp(7px, 1.1cqi, 13px)', color: 'var(--gs-base)',
+            fontSize: 'clamp(1px, 1.1cqi, 13px)', color: 'var(--gs-base)',
             letterSpacing: '0.1em', marginTop: '0.3em',
           }}>
             Products Listed
           </p>
           {merchantName && (
             <p className="font-data" style={{
-              fontSize: 'clamp(7px, 1cqi, 12px)', color: 'var(--gs-mid)', marginTop: '0.2em',
+              fontSize: 'clamp(1px, 1cqi, 12px)', color: 'var(--gs-mid)', marginTop: '0.2em',
             }}>
               {merchantName}
             </p>
@@ -113,7 +113,7 @@ export function M36Slide({ scan }: { scan: ScanWithResults }) {
             display: 'flex', flexDirection: 'column', justifyContent: 'center',
           }}>
             <p className="font-data tabular-nums" style={{
-              fontSize: 'clamp(14px, 3.5cqi, 42px)', fontWeight: 700, lineHeight: 1,
+              fontSize: 'clamp(1px, 3.5cqi, 42px)', fontWeight: 700, lineHeight: 1,
               color: avgRating >= 4 ? 'var(--gs-terminal)' : avgRating >= 3 ? 'var(--gs-warning)' : 'var(--gs-critical)',
             }}>
               {avgRating.toFixed(1)}
@@ -122,7 +122,7 @@ export function M36Slide({ scan }: { scan: ScanWithResults }) {
               <StarRating rating={avgRating} />
             </div>
             <p className="font-data uppercase" style={{
-              fontSize: 'clamp(7px, 1.1cqi, 13px)', color: 'var(--gs-base)',
+              fontSize: 'clamp(1px, 1.1cqi, 13px)', color: 'var(--gs-base)',
               letterSpacing: '0.1em', marginTop: '0.2em',
             }}>
               Avg Rating
@@ -134,7 +134,7 @@ export function M36Slide({ scan }: { scan: ScanWithResults }) {
       {/* Top products list */}
       {products.length > 0 && (
         <div style={{ flex: 1, overflow: 'hidden' }}>
-          <p className="font-data uppercase" style={{ fontSize: 'clamp(7px, 1.1cqi, 13px)', color: 'var(--gs-base)', letterSpacing: '0.1em', marginBottom: '0.3em' }}>
+          <p className="font-data uppercase" style={{ fontSize: 'clamp(1px, 1.1cqi, 13px)', color: 'var(--gs-base)', letterSpacing: '0.1em', marginBottom: '0.3em' }}>
             Top Products
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35em' }}>
@@ -145,27 +145,27 @@ export function M36Slide({ scan }: { scan: ScanWithResults }) {
                 borderBottom: i < products.length - 1 ? '1px solid rgba(255,178,239,0.04)' : 'none',
               }}>
                 <span className="font-data tabular-nums" style={{
-                  fontSize: 'clamp(7px, 1.1cqi, 13px)', color: 'var(--gs-mid)',
+                  fontSize: 'clamp(1px, 1.1cqi, 13px)', color: 'var(--gs-mid)',
                   width: '1.2em', textAlign: 'center', flexShrink: 0,
                 }}>
                   {i + 1}
                 </span>
                 <div style={{ flex: 1, overflow: 'hidden' }}>
                   <p className="font-data" style={{
-                    fontSize: 'clamp(7px, 1.2cqi, 14px)', color: 'var(--gs-light)', lineHeight: 1.3,
+                    fontSize: 'clamp(1px, 1.2cqi, 14px)', color: 'var(--gs-light)', lineHeight: 1.3,
                     whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
                   }}>
                     {p.title}
                   </p>
                   {p.seller && (
-                    <p className="font-data" style={{ fontSize: 'clamp(7px, 1cqi, 12px)', color: 'var(--gs-mid)', lineHeight: 1.2 }}>
+                    <p className="font-data" style={{ fontSize: 'clamp(1px, 1cqi, 12px)', color: 'var(--gs-mid)', lineHeight: 1.2 }}>
                       {p.seller}
                     </p>
                   )}
                 </div>
                 {p.price > 0 && (
                   <span className="font-data tabular-nums" style={{
-                    fontSize: 'clamp(7px, 1.2cqi, 14px)', fontWeight: 600, color: 'var(--gs-light)',
+                    fontSize: 'clamp(1px, 1.2cqi, 14px)', fontWeight: 600, color: 'var(--gs-light)',
                     flexShrink: 0,
                   }}>
                     {fmtPrice(p.price, p.currency)}
@@ -185,7 +185,7 @@ export function M36Slide({ scan }: { scan: ScanWithResults }) {
       {/* Categories — bottom */}
       {categories.length > 0 && (
         <div>
-          <p className="font-data uppercase" style={{ fontSize: 'clamp(7px, 1.1cqi, 13px)', color: 'var(--gs-base)', letterSpacing: '0.1em', marginBottom: '0.3em' }}>
+          <p className="font-data uppercase" style={{ fontSize: 'clamp(1px, 1.1cqi, 13px)', color: 'var(--gs-base)', letterSpacing: '0.1em', marginBottom: '0.3em' }}>
             Product Categories
           </p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3em' }}>
