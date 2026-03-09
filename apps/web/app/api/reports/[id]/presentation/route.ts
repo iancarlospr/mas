@@ -48,17 +48,7 @@ export async function GET(
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  // Check Supabase Storage cache first
-  const filename = `reports/${scanId}/presentation.pdf`;
-  const { data: existing } = await serviceClient.storage
-    .from('reports')
-    .createSignedUrl(filename, 60 * 60 * 24);
-
-  if (existing?.signedUrl) {
-    return NextResponse.redirect(existing.signedUrl);
-  }
-
-  // Generate via engine
+  // Generate via engine (always regenerate — engine uploads with upsert)
   try {
     const response = await engineFetch(`/engine/reports/${scanId}/presentation-pdf`, {
       method: 'POST',
