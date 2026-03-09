@@ -295,7 +295,7 @@ export default function BlogWindow() {
         ) : posts.length === 0 ? (
           <div className="pt-12 text-center">
             <p className="font-personality text-[18px]" style={{ color: 'var(--gs-mid)' }}>
-              Nothing here yet. Chloe is still writing.
+              Nothing here yet. Chloé is still writing.
             </p>
           </div>
         ) : (
