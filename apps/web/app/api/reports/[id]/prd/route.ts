@@ -155,18 +155,7 @@ function renderDocument(ctx: PRDContext): NextResponse {
 /* ── Page Setup ─────────────────────────────────────── */
 @page {
   size: 8.5in 14in;
-  margin: 0.75in 0.85in 0.9in 0.85in;
-}
-@page:first {
   margin: 0;
-}
-
-/* ── Print Controls ─────────────────────────────────── */
-@media print {
-  .print-banner { display: none !important; }
-  body { padding: 0; max-width: none; margin: 0; }
-  .document-body { margin-top: 0; }
-  .cover-page { width: 100%; margin: 0; }
 }
 
 /* ── Print Color Preservation ───────────────────────── */
@@ -710,6 +699,26 @@ body {
   .cover-footer { padding: 0.2in 0.6in; }
   .cover-title { font-size: 26pt; }
   .cover-metrics { flex-direction: column; gap: 0.3in; align-items: flex-start; }
+}
+
+/* ═══════════════════════════════════════════════════════
+   PRINT — must be LAST to override base styles
+   ═══════════════════════════════════════════════════════ */
+@media print {
+  .print-banner { display: none !important; }
+  body {
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .cover-page {
+    width: 100% !important;
+    margin: 0 !important;
+  }
+  .document-body {
+    margin-top: 0 !important;
+    padding: 0.6in 0.75in;
+  }
 }
 </style>
 </head>
