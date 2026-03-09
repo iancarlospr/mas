@@ -126,8 +126,6 @@ export function M43Slide({ scan, printMode }: { scan: ScanWithResults; printMode
   const weeks = (metadata['estimatedTimelineWeeks'] as number) ?? 0;
 
   const pdfUrl = `/api/reports/${scan.id}/prd`;
-  const slidesUrl = `/api/reports/${scan.id}/presentation`;
-
   const handleAskChloe = () => {
     wm.openWindow('chat-launcher', { scanId: scan.id });
   };
@@ -533,58 +531,6 @@ export function M43Slide({ scan, printMode }: { scan: ScanWithResults; printMode
                   </a>
                 )}
 
-                {printMode ? (
-                  <span
-                    className="font-display uppercase"
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.4em',
-                      padding: '0.55em 2em',
-                      border: '1px solid rgba(255,178,239,0.2)',
-                      color: 'var(--gs-light)',
-                      fontSize: T.cta,
-                      fontWeight: 600,
-                      letterSpacing: '0.08em',
-                      borderRadius: '3px',
-                      background: 'transparent',
-                    }}
-                  >
-                    <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-                      <line x1="12" y1="5" x2="12" y2="19" />
-                      <polyline points="19 12 12 19 5 12" />
-                    </svg>
-                    Download This Presentation
-                  </span>
-                ) : (
-                  <a
-                    href={slidesUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-display uppercase m43-cta-secondary"
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.4em',
-                      padding: '0.55em 2em',
-                      border: '1px solid rgba(255,178,239,0.2)',
-                      color: 'var(--gs-light)',
-                      fontSize: T.cta,
-                      fontWeight: 600,
-                      letterSpacing: '0.08em',
-                      borderRadius: '3px',
-                      background: 'transparent',
-                      textDecoration: 'none',
-                      transition: 'all 0.2s',
-                    }}
-                  >
-                    <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-                      <line x1="12" y1="5" x2="12" y2="19" />
-                      <polyline points="19 12 12 19 5 12" />
-                    </svg>
-                    Download This Presentation
-                  </a>
-                )}
               </div>
             </div>
           </div>
