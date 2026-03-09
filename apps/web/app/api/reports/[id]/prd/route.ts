@@ -546,6 +546,28 @@ body {
   border: 0.5pt solid #E2E8F0;
 }
 
+.document-body pre {
+  font-family: 'Source Code Pro', 'Courier New', monospace;
+  font-size: 9pt;
+  line-height: 1.5;
+  background: #F7FAFC;
+  border: 0.75pt solid #E2E8F0;
+  border-radius: 3pt;
+  padding: 12pt 16pt;
+  margin: 10pt 0;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  page-break-inside: avoid;
+}
+.document-body pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: inherit;
+  color: #1B3A5C;
+}
+
 .document-body strong {
   font-weight: 600;
   color: #1A202C;
@@ -828,6 +850,9 @@ function markdownToHtml(md: string): string {
   let inList = false;
   let listType = '';
   let inTable = false;
+  let inCodeBlock = false;
+  let codeBlockLang = '';
+  let codeBlockLines: string[] = [];
   let inFindingCard = false;
   let currentPriority: string | null = null;
   let sectionNumber = 0;
@@ -884,6 +909,29 @@ function markdownToHtml(md: string): string {
       }
       if (preamblePhase === 0 && t === '') continue;
       if (!preambleSkipped && preamblePhase < 1) continue;
+    }
+
+    // ── Fenced code blocks ──
+    if (/^```/.test(t)) {
+      if (!inCodeBlock) {
+        closeList(); closeTable();
+        inCodeBlock = true;
+        codeBlockLang = t.slice(3).trim();
+        codeBlockLines = [];
+        continue;
+      } else {
+        const escaped = codeBlockLines.map(l => escapeHtml(l)).join('\n');
+        const langAttr = codeBlockLang ? ` data-lang="${escapeHtml(codeBlockLang)}"` : '';
+        html.push(`<pre${langAttr}><code>${escaped}</code></pre>`);
+        inCodeBlock = false;
+        codeBlockLang = '';
+        codeBlockLines = [];
+        continue;
+      }
+    }
+    if (inCodeBlock) {
+      codeBlockLines.push(line);
+      continue;
     }
 
     if (t === '') { closeList(); closeTable(); continue; }
