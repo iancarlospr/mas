@@ -14,13 +14,13 @@
   "dependencies": {
     "@marketing-alpha/email-templates": "*",
     "@react-email/render": "^1.0.3",
-    "@supabase/supabase-js": "^2.47.0",
-    "resend": "^6.9.1",
+    "@supabase/supabase-js": "^2.98.0",
+    "resend": "^6.9.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "@types/react": "^19.0.0",
+    "@types/react": "^19.2.14",
     "typescript": "^5.7.0"
   }
 }
