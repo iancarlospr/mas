@@ -1,14 +1,9 @@
 /**
- * Server-side PDF generation using Patchright element screenshots.
+ * Server-side PDF generation using page.pdf().
  *
- * Chrome's print renderer (page.pdf()) ignores overflow:hidden at page
- * boundaries, causing slide content to bleed across pages. Instead, we:
- *   1. Navigate to the slides page in a real browser
- *   2. Screenshot each .slide-card element (respects overflow:hidden)
- *   3. Compose screenshots into a PDF via an image-only HTML page
- *
- * This guarantees pixel-perfect output — what you see on screen is what
- * you get in the PDF.
+ * The presentation-slides-view.tsx has print CSS that forces each
+ * .slide-page to exactly 14in × 8.5in with overflow:hidden, so
+ * page.pdf() produces clean page breaks without content bleed.
  */
 import { chromium } from 'patchright';
 import { getSupabaseAdmin } from './supabase.js';
@@ -31,9 +26,6 @@ export async function generatePresentationPDF(
     ],
   });
   try {
-    // Use a wider viewport so slides have more vertical space (14:8.5 aspect ratio).
-    // At 1344px width, cards are only 816px tall and content overflows.
-    // At 1920px width, cards are 1165px tall — matching typical browser view.
     const page = await browser.newPage({
       viewport: { width: 1920, height: 1165 },
     });
@@ -52,8 +44,7 @@ export async function generatePresentationPDF(
     const response = await page.goto(url, { waitUntil: 'networkidle', timeout: 60_000 });
     console.log(`[pdf-generator] Page loaded: status=${response?.status()}, url=${page.url()}`);
 
-    // Wait for slide cards to appear (don't rely on data-slides-loaded —
-    // document.fonts.ready doesn't resolve in headless browsers)
+    // Wait for slide cards to render
     await page.waitForSelector('.slide-card', { timeout: 30_000 });
     const cardCount = await page.evaluate(() => document.querySelectorAll('.slide-card').length);
     console.log(`[pdf-generator] Found ${cardCount} slide cards`);
@@ -63,44 +54,12 @@ export async function generatePresentationPDF(
     }
 
     // Wait for rendering to settle (canvas animations, fonts, layout)
-    await page.waitForTimeout(3000);
+    await page.waitForTimeout(3500);
 
-    // Extra settle time for canvas animations (plasma, dithering)
-    await page.waitForTimeout(500);
-
-    // Step 1: Screenshot each slide card — element screenshots
-    // always respect overflow:hidden, unlike page.pdf()
-    const cards = await page.$$('.slide-card');
-    console.log(`[pdf-generator] Screenshotting ${cards.length} slides`);
-
-    const dataUrls: string[] = [];
-    for (const card of cards) {
-      const buf = await card.screenshot({ type: 'png' });
-      dataUrls.push('data:image/png;base64,' + buf.toString('base64'));
-    }
-
-    // Step 2: Compose into PDF via image-only HTML page
-    // Since the content is flat raster images, Chrome's print renderer
-    // cannot break layout — images just fill each page exactly.
-    const compositionHtml = `<!DOCTYPE html>
-<html><head><style>
-  @page { size: 14in 8.5in; margin: 0; }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: #080808; }
-  .pg { width: 14in; height: 8.5in; page-break-after: always; overflow: hidden; }
-  .pg:last-child { page-break-after: auto; }
-  .pg img { width: 100%; height: 100%; display: block; object-fit: fill; }
-</style></head><body>
-${dataUrls.map((src) => `<div class="pg"><img src="${src}"></div>`).join('\n')}
-</body></html>`;
-
-    const pdfPage = await browser.newPage();
-    await pdfPage.setContent(compositionHtml, { waitUntil: 'load' });
-
-    // Wait for all images to render
-    await pdfPage.waitForTimeout(300);
-
-    const pdf = await pdfPage.pdf({
+    // Generate PDF directly — print CSS in presentation-slides-view.tsx
+    // handles page dimensions (14in × 8.5in), overflow:hidden, and breaks
+    console.log(`[pdf-generator] Generating PDF via page.pdf()`);
+    const pdf = await page.pdf({
       width: '14in',
       height: '8.5in',
       printBackground: true,
@@ -108,7 +67,7 @@ ${dataUrls.map((src) => `<div class="pg"><img src="${src}"></div>`).join('\n')}
       displayHeaderFooter: false,
     });
 
-    console.log(`[pdf-generator] PDF generated: ${pdf.length} bytes, ${dataUrls.length} pages`);
+    console.log(`[pdf-generator] PDF generated: ${pdf.length} bytes, ${cardCount} slides`);
     return Buffer.from(pdf);
   } finally {
     await browser.close();

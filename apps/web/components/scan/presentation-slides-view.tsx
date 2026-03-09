@@ -102,6 +102,7 @@ export function PresentationSlidesView({ scan, autoPrint = false }: { scan: Scan
           @page { size: 14in 8.5in; margin: 0; }
 
           @media print {
+            /* Preserve all colors, shadows, backgrounds exactly */
             [data-slides-loaded] *,
             [data-slides-loaded] *::before,
             [data-slides-loaded] *::after {
@@ -111,6 +112,7 @@ export function PresentationSlidesView({ scan, autoPrint = false }: { scan: Scan
               box-shadow: revert !important;
               text-shadow: revert !important;
             }
+
             html, body {
               background: #080808 !important;
               color: var(--gs-light) !important;
@@ -118,14 +120,43 @@ export function PresentationSlidesView({ scan, autoPrint = false }: { scan: Scan
               margin: 0 !important;
               padding: 0 !important;
               overflow: visible !important;
+              width: 14in !important;
             }
-            [data-slides-loaded] .slide-card {
+
+            /* Container must not add its own spacing */
+            [data-slides-loaded] {
+              max-width: none !important;
+              width: 14in !important;
+              margin: 0 !important;
+              padding: 0 !important;
+            }
+
+            /* Each slide page = exactly one printed page */
+            .slide-page {
+              width: 14in !important;
+              height: 8.5in !important;
               overflow: hidden !important;
+              break-before: page;
+              break-inside: avoid;
+              break-after: auto;
+              position: relative;
             }
-            .slide-page { break-before: page; break-inside: avoid; }
-            .slide-page:first-child { break-before: auto; }
+            .slide-page:first-child {
+              break-before: auto;
+            }
+
+            /* Slide card fills its page exactly — no aspect-ratio, explicit dims */
+            .slide-page .slide-card {
+              width: 14in !important;
+              height: 8.5in !important;
+              aspect-ratio: unset !important;
+              overflow: hidden !important;
+              border-radius: 0 !important;
+              position: relative;
+            }
           }
 
+          /* Screen: normal page-break hints for scroll-to-print */
           .slide-page { break-before: page; break-inside: avoid; }
           .slide-page:first-child { break-before: auto; }
         `}</style>
