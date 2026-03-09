@@ -116,7 +116,7 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
   const [activeTabKey, setActiveTabKey] = useState('about');
 
   // ── Proportional slide zoom — shrinks slides like a screenshot at smaller widths ──
-  const SLIDE_DESIGN_WIDTH = 1400;
+  const SLIDE_DESIGN_WIDTH = 1625;
   const [slideZoom, setSlideZoom] = useState(1);
   useEffect(() => {
     const el = contentRef.current;
