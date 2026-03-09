@@ -32,78 +32,86 @@ export function BedroomWallpaper() {
     const container = containerRef.current;
     if (!canvas || !container) return;
 
-    const w = container.offsetWidth;
-    const h = container.offsetHeight;
-    if (w === 0 || h === 0) return;
-
-    const cw = w;
-    const ch = h;
-
-    canvas.width = cw;
-    canvas.height = ch;
-    canvas.style.width = w + 'px';
-    canvas.style.height = h + 'px';
-
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const imageData = ctx.createImageData(cw, ch);
-    const buf = imageData.data;
+    let prevW = 0;
+    let prevH = 0;
 
-    // Base color: #080808
-    const baseR = 8, baseG = 8, baseB = 8;
+    function render() {
+      const w = container!.offsetWidth;
+      const h = container!.offsetHeight;
+      if (w === 0 || h === 0 || (w === prevW && h === prevH)) return;
+      prevW = w;
+      prevH = h;
 
-    for (let y = 0; y < ch; y++) {
-      const ny = y / ch;
-      for (let x = 0; x < cw; x++) {
-        const nx = x / cw;
-        const idx = (y * cw + x) * 4;
+      canvas!.width = w;
+      canvas!.height = h;
 
-        let rr = baseR, gg = baseG, bb = baseB;
+      const imageData = ctx!.createImageData(w, h);
+      const buf = imageData.data;
 
-        // Additive light spills
-        for (const l of LIGHTS) {
-          const dx = (nx - l.cx) / l.rx;
-          const dy = (ny - l.cy) / l.ry;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < l.end) {
-            const t = 1 - dist / l.end; // 1 at center, 0 at edge
-            const intensity = t * t * l.a; // quadratic falloff
-            rr += l.r * intensity;
-            gg += l.g * intensity;
-            bb += l.b * intensity;
+      // Base color: #080808
+      const baseR = 8, baseG = 8, baseB = 8;
+
+      for (let y = 0; y < h; y++) {
+        const ny = y / h;
+        for (let x = 0; x < w; x++) {
+          const nx = x / w;
+          const idx = (y * w + x) * 4;
+
+          let rr = baseR, gg = baseG, bb = baseB;
+
+          // Additive light spills
+          for (const l of LIGHTS) {
+            const dx = (nx - l.cx) / l.rx;
+            const dy = (ny - l.cy) / l.ry;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < l.end) {
+              const t = 1 - dist / l.end; // 1 at center, 0 at edge
+              const intensity = t * t * l.a; // quadratic falloff
+              rr += l.r * intensity;
+              gg += l.g * intensity;
+              bb += l.b * intensity;
+            }
           }
-        }
 
-        // Vignette — darken corners
-        const vx = (nx - 0.5) / 0.75;
-        const vy = (ny - 0.5) / 0.65;
-        const vDist = Math.sqrt(vx * vx + vy * vy);
-        if (vDist > 0.3) {
-          const vFade = Math.min(1, (vDist - 0.3) / 0.7);
-          const darken = 1 - vFade * 0.6;
-          rr *= darken;
-          gg *= darken;
-          bb *= darken;
-        }
+          // Vignette — darken corners
+          const vx = (nx - 0.5) / 0.75;
+          const vy = (ny - 0.5) / 0.65;
+          const vDist = Math.sqrt(vx * vx + vy * vy);
+          if (vDist > 0.3) {
+            const vFade = Math.min(1, (vDist - 0.3) / 0.7);
+            const darken = 1 - vFade * 0.6;
+            rr *= darken;
+            gg *= darken;
+            bb *= darken;
+          }
 
-        // Dither: ±1.5 random noise per channel to break 8-bit banding
-        const d = () => (Math.random() - 0.5) * 3;
-        buf[idx]     = Math.max(0, Math.min(255, Math.round(rr + d())));
-        buf[idx + 1] = Math.max(0, Math.min(255, Math.round(gg + d())));
-        buf[idx + 2] = Math.max(0, Math.min(255, Math.round(bb + d())));
-        buf[idx + 3] = 255;
+          // Dither: ±1.5 random noise per channel to break 8-bit banding
+          const d = () => (Math.random() - 0.5) * 3;
+          buf[idx]     = Math.max(0, Math.min(255, Math.round(rr + d())));
+          buf[idx + 1] = Math.max(0, Math.min(255, Math.round(gg + d())));
+          buf[idx + 2] = Math.max(0, Math.min(255, Math.round(bb + d())));
+          buf[idx + 3] = 255;
+        }
       }
+
+      ctx!.putImageData(imageData, 0, 0);
     }
 
-    ctx.putImageData(imageData, 0, 0);
+    render();
+
+    const ro = new ResizeObserver(() => render());
+    ro.observe(container);
+    return () => ro.disconnect();
   }, []);
 
   return (
     <div ref={containerRef} className="absolute inset-0 pointer-events-none overflow-hidden bg-gs-void" aria-hidden="true">
       <canvas
         ref={canvasRef}
-        style={{ display: 'block' }}
+        style={{ display: 'block', width: '100%', height: '100%' }}
       />
     </div>
   );

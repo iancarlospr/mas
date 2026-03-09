@@ -149,27 +149,39 @@ function PlasmaCanvas() {
     let h = 0;
     let cols = 0;
     let rows = 0;
-
-    function resize() {
-      w = container!.offsetWidth;
-      h = container!.offsetHeight;
-      cols = Math.ceil(w / PX);
-      rows = Math.ceil(h / PX);
-      canvas!.width = cols;
-      canvas!.height = rows;
-      canvas!.style.width = w + 'px';
-      canvas!.style.height = h + 'px';
-    }
-
-    resize();
+    let imageData: ImageData | null = null;
+    let buf: Uint8ClampedArray | null = null;
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const imageData = ctx.createImageData(cols, rows);
-    const buf = imageData.data;
+    function resize() {
+      const newW = container!.offsetWidth;
+      const newH = container!.offsetHeight;
+      if (newW === w && newH === h) return;
+      w = newW;
+      h = newH;
+      cols = Math.ceil(w / PX);
+      rows = Math.ceil(h / PX);
+      canvas!.width = cols;
+      canvas!.height = rows;
+      canvas!.style.width = '100%';
+      canvas!.style.height = '100%';
+      imageData = ctx!.createImageData(cols, rows);
+      buf = imageData.data;
+    }
+
+    resize();
+
+    const ro = new ResizeObserver(() => resize());
+    ro.observe(container);
 
     function draw() {
+      if (!buf || !imageData || cols === 0 || rows === 0) {
+        rafRef.current = requestAnimationFrame(draw);
+        return;
+      }
+
       timeRef.current += 0.008;
       const t = timeRef.current;
 
@@ -222,7 +234,7 @@ function PlasmaCanvas() {
     }
 
     rafRef.current = requestAnimationFrame(draw);
-    return () => cancelAnimationFrame(rafRef.current);
+    return () => { cancelAnimationFrame(rafRef.current); ro.disconnect(); };
   }, []);
 
   return (
