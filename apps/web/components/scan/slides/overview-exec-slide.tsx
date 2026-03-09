@@ -27,13 +27,13 @@ import { aggregateDetectedTools, mergeWithAITools } from '@/lib/detected-tools';
 
 // ── Report type scale (container-relative with vw fallback) ───────────
 const T = {
-  headline: 'clamp(22px, 3.6cqi, 36px)',
-  section:  'clamp(12px, 1.6cqi, 16px)',
-  body:     'clamp(12px, 1.35cqi, 14px)',
-  index:    'clamp(12px, 1.45cqi, 15px)',
-  meta:     'clamp(10px, 1cqi, 12px)',
-  overline: 'clamp(12px, 1.2cqi, 14px)',
-  badge:    'clamp(12px, 1.1cqi, 13px)',
+  headline: 'clamp(12px, 3.6cqi, 36px)',
+  section:  'clamp(7px, 1.6cqi, 16px)',
+  body:     'clamp(7px, 1.35cqi, 14px)',
+  index:    'clamp(7px, 1.45cqi, 15px)',
+  meta:     'clamp(5px, 1cqi, 12px)',
+  overline: 'clamp(7px, 1.2cqi, 14px)',
+  badge:    'clamp(7px, 1.1cqi, 13px)',
 } as const;
 
 // Legacy category keys from older scans
@@ -147,7 +147,7 @@ export function OverviewExecSlide({ scan }: OverviewExecSlideProps) {
         }}
       />
 
-      <div className="relative z-10 h-full flex flex-col" style={{ paddingBottom: 'clamp(16px, 2.8cqi, 28px)' }}>
+      <div className="relative z-10 h-full flex flex-col" style={{ paddingBottom: 'clamp(8px, 2.8cqi, 28px)' }}>
 
         {/* ── TOP: Two-column layout ── */}
         <div className="flex flex-1 min-h-0">
@@ -332,7 +332,7 @@ export function OverviewExecSlide({ scan }: OverviewExecSlideProps) {
                 <p
                   className="font-display"
                   style={{
-                    fontSize: 'clamp(14px, 1.8cqi, 19px)',
+                    fontSize: 'clamp(8px, 1.8cqi, 19px)',
                     fontWeight: 600,
                     lineHeight: 1.35,
                     color: 'var(--gs-light)',
@@ -402,7 +402,7 @@ export function OverviewExecSlide({ scan }: OverviewExecSlideProps) {
         className="absolute left-0 right-0 bottom-0 overflow-hidden"
         style={{
           background: 'var(--gs-base)',
-          height: 'clamp(16px, 2.8cqi, 28px)',
+          height: 'clamp(8px, 2.8cqi, 28px)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',

@@ -40,15 +40,15 @@ const BAYER8 = [
 
 // ── Typography scale (cqi) — 12px minimum ───────────────────────────
 const T = {
-  brand:      'clamp(5px, 0.72cqi, 8px)',
-  subtitle:   'clamp(12px, 1.3cqi, 15px)',
-  domain:     'clamp(30px, 4.5cqi, 58px)',
-  scoreNum:   'clamp(40px, 6.5cqi, 80px)',
-  scoreSub:   'clamp(12px, 1.2cqi, 14px)',
-  scoreLabel: 'clamp(14px, 1.6cqi, 18px)',
-  meta:       'clamp(12px, 1.2cqi, 14px)',
-  signoff:    'clamp(20px, 2.8cqi, 34px)',
-  footer:     'clamp(12px, 1.1cqi, 13px)',
+  brand:      'clamp(3px, 0.72cqi, 8px)',
+  subtitle:   'clamp(7px, 1.3cqi, 15px)',
+  domain:     'clamp(16px, 4.5cqi, 58px)',
+  scoreNum:   'clamp(20px, 6.5cqi, 80px)',
+  scoreSub:   'clamp(7px, 1.2cqi, 14px)',
+  scoreLabel: 'clamp(8px, 1.6cqi, 18px)',
+  meta:       'clamp(7px, 1.2cqi, 14px)',
+  signoff:    'clamp(10px, 2.8cqi, 34px)',
+  footer:     'clamp(7px, 1.1cqi, 13px)',
 };
 
 function getScoreColor(score: number): string {
@@ -269,7 +269,7 @@ export function ClosingSlide({ scan }: { scan: ScanWithResults }) {
 
       {/* Footer — above dither */}
       <div className="absolute left-0 right-0 z-10" style={{
-        bottom: 'clamp(18px, 3cqi, 34px)',
+        bottom: 'clamp(10px, 3cqi, 34px)',
         textAlign: 'center',
       }}>
         <p className="font-data uppercase" style={{
@@ -284,9 +284,9 @@ export function ClosingSlide({ scan }: { scan: ScanWithResults }) {
 
       {/* Verification seal — bottom right, notary/diploma style */}
       <div className="absolute z-10 pointer-events-none" style={{
-        bottom: 'clamp(28px, 5cqi, 60px)',
-        right: 'clamp(20px, 4cqi, 50px)',
-        width: 'clamp(70px, 11cqi, 130px)',
+        bottom: 'clamp(14px, 5cqi, 60px)',
+        right: 'clamp(10px, 4cqi, 50px)',
+        width: 'clamp(35px, 11cqi, 130px)',
         aspectRatio: '1',
         opacity: 0.5,
         filter: 'drop-shadow(0 0 10px rgba(255,178,239,0.12))',

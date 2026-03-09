@@ -44,16 +44,16 @@ const BAYER8 = [
 
 // ── Typography scale (cqi) — 12px minimum ───────────────────────────
 const T = {
-  brand:     'clamp(4px, 0.6cqi, 7px)',
-  overline:  'clamp(12px, 1.3cqi, 14px)',
-  headline:  'clamp(22px, 3.2cqi, 42px)',
-  sub:       'clamp(13px, 1.35cqi, 15px)',
-  stat:      'clamp(26px, 3.8cqi, 46px)',
-  statLabel: 'clamp(12px, 1.2cqi, 14px)',
-  cardTitle: 'clamp(16px, 2cqi, 22px)',
-  cardBody:  'clamp(13px, 1.35cqi, 15px)',
-  cta:       'clamp(14px, 1.5cqi, 17px)',
-  bubble:    'clamp(13px, 1.35cqi, 15px)',
+  brand:     'clamp(2px, 0.6cqi, 7px)',
+  overline:  'clamp(7px, 1.3cqi, 14px)',
+  headline:  'clamp(12px, 3.2cqi, 42px)',
+  sub:       'clamp(7px, 1.35cqi, 15px)',
+  stat:      'clamp(14px, 3.8cqi, 46px)',
+  statLabel: 'clamp(7px, 1.2cqi, 14px)',
+  cardTitle: 'clamp(8px, 2cqi, 22px)',
+  cardBody:  'clamp(7px, 1.35cqi, 15px)',
+  cta:       'clamp(8px, 1.5cqi, 17px)',
+  bubble:    'clamp(7px, 1.35cqi, 15px)',
 };
 
 export function M43Slide({ scan, printMode }: { scan: ScanWithResults; printMode?: boolean }) {

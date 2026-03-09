@@ -284,10 +284,10 @@ export function M25Slide({ scan }: { scan: ScanWithResults }) {
                   width: '8px', height: '8px', borderRadius: '2px', flexShrink: 0,
                   background: trafficColor(c.sharePct, maxShare),
                 }} />
-                <span className="font-data" style={{ fontSize: 'clamp(12px, 1.1cqi, 13px)', color: 'var(--gs-light)', lineHeight: 1.2 }}>
+                <span className="font-data" style={{ fontSize: 'clamp(7px, 1.1cqi, 13px)', color: 'var(--gs-light)', lineHeight: 1.2 }}>
                   {c.name}
                 </span>
-                <span className="font-data tabular-nums" style={{ fontSize: 'clamp(12px, 1.1cqi, 13px)', color: 'var(--gs-mid)', marginLeft: 'auto', lineHeight: 1.2 }}>
+                <span className="font-data tabular-nums" style={{ fontSize: 'clamp(7px, 1.1cqi, 13px)', color: 'var(--gs-mid)', marginLeft: 'auto', lineHeight: 1.2 }}>
                   {Math.round(c.sharePct)}%
                 </span>
               </div>

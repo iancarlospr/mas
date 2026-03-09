@@ -89,12 +89,12 @@ export function M37Slide({ scan }: { scan: ScanWithResults }) {
             {avgRating != null && (
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5em', marginBottom: '0.15em' }}>
-                  <span className="font-data tabular-nums" style={{ fontSize: 'clamp(24px, 3cqi, 36px)', fontWeight: 700, color: 'var(--gs-light)', lineHeight: 1 }}>
+                  <span className="font-data tabular-nums" style={{ fontSize: 'clamp(12px, 3cqi, 36px)', fontWeight: 700, color: 'var(--gs-light)', lineHeight: 1 }}>
                     {avgRating.toFixed(1)}
                   </span>
                   <StarRating rating={avgRating} />
                 </div>
-                <p className="font-data" style={{ fontSize: 'clamp(12px, 1.1cqi, 13px)', color: 'var(--gs-mid)' }}>
+                <p className="font-data" style={{ fontSize: 'clamp(7px, 1.1cqi, 13px)', color: 'var(--gs-mid)' }}>
                   Average Rating
                 </p>
               </div>
@@ -118,12 +118,12 @@ export function M37Slide({ scan }: { scan: ScanWithResults }) {
             {trend && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.3em', marginTop: '0.2em' }}>
                 <span style={{
-                  fontSize: 'clamp(14px, 1.5cqi, 18px)',
+                  fontSize: 'clamp(8px, 1.5cqi, 18px)',
                   color: trend === 'up' || trend === 'increasing' ? 'var(--gs-terminal)' : trend === 'down' || trend === 'decreasing' ? 'var(--gs-critical)' : 'var(--gs-mid)',
                 }}>
                   {trend === 'up' || trend === 'increasing' ? '\u2191' : trend === 'down' || trend === 'decreasing' ? '\u2193' : '\u2192'}
                 </span>
-                <span className="font-data" style={{ fontSize: 'clamp(12px, 1.15cqi, 13px)', color: 'var(--gs-light)', textTransform: 'capitalize' }}>
+                <span className="font-data" style={{ fontSize: 'clamp(7px, 1.15cqi, 13px)', color: 'var(--gs-light)', textTransform: 'capitalize' }}>
                   {trend} trend
                 </span>
               </div>
@@ -134,7 +134,7 @@ export function M37Slide({ scan }: { scan: ScanWithResults }) {
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
             {monthlyBuckets.length > 0 && (
               <>
-                <h4 className="font-display uppercase" style={{ fontSize: 'clamp(12px, 1.2cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.3em' }}>
+                <h4 className="font-display uppercase" style={{ fontSize: 'clamp(7px, 1.2cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.3em' }}>
                   Monthly Review Volume
                 </h4>
                 <svg
@@ -186,7 +186,7 @@ export function M37Slide({ scan }: { scan: ScanWithResults }) {
             )}
 
             {monthlyBuckets.length === 0 && (
-              <p className="font-data" style={{ fontSize: 'clamp(12px, 1.2cqi, 14px)', color: 'var(--gs-mid)', opacity: 0.6 }}>
+              <p className="font-data" style={{ fontSize: 'clamp(7px, 1.2cqi, 14px)', color: 'var(--gs-mid)', opacity: 0.6 }}>
                 Monthly review data not available
               </p>
             )}

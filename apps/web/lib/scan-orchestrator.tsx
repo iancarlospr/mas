@@ -183,6 +183,7 @@ export function ScanOrchestratorProvider({ children }: { children: ReactNode }) 
         title: domain || 'Loading...',
         width: 900,
         height: 600,
+        minWidth: 800,
         componentType: 'scan-report',
       });
       wm.openWindow(windowId, { scanId });

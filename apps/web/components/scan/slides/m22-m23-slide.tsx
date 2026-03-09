@@ -142,7 +142,7 @@ export function M22M23Slide({ scan }: { scan: ScanWithResults }) {
         <div style={{ display: 'flex', gap: '3%' }}>
           {/* Left: News Sentiment (M22) */}
           <div style={{ flex: 1 }}>
-            <h4 className="font-display uppercase" style={{ fontSize: 'clamp(12px, 1.2cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.35em' }}>
+            <h4 className="font-display uppercase" style={{ fontSize: 'clamp(7px, 1.2cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.35em' }}>
               News Sentiment
             </h4>
 
@@ -160,14 +160,14 @@ export function M22M23Slide({ scan }: { scan: ScanWithResults }) {
 
             {/* Notable mention */}
             {newsNotable && (
-              <p className="font-data" style={{ fontSize: 'clamp(12px, 1.15cqi, 13px)', color: 'var(--gs-light)', marginBottom: '0.3em', fontStyle: 'italic', opacity: 0.8 }}>
+              <p className="font-data" style={{ fontSize: 'clamp(7px, 1.15cqi, 13px)', color: 'var(--gs-light)', marginBottom: '0.3em', fontStyle: 'italic', opacity: 0.8 }}>
                 {newsNotable}
               </p>
             )}
 
             {/* Headlines */}
             {!hasNewsData && newsHeadlines.length === 0 && (
-              <p className="font-data" style={{ fontSize: 'clamp(12px, 1.15cqi, 13px)', color: 'var(--gs-mid)', opacity: 0.5, padding: '0.5em 0' }}>
+              <p className="font-data" style={{ fontSize: 'clamp(7px, 1.15cqi, 13px)', color: 'var(--gs-mid)', opacity: 0.5, padding: '0.5em 0' }}>
                 No news coverage data was captured for this scan.
               </p>
             )}
@@ -183,15 +183,15 @@ export function M22M23Slide({ scan }: { scan: ScanWithResults }) {
                         ? 'rgba(239,68,68,0.06)'
                         : 'transparent',
                   }}>
-                    <span style={{ fontSize: 'clamp(12px, 1.1cqi, 13px)', color: sentimentColor(h.sentiment), flexShrink: 0, marginTop: '0.1em' }}>
+                    <span style={{ fontSize: 'clamp(7px, 1.1cqi, 13px)', color: sentimentColor(h.sentiment), flexShrink: 0, marginTop: '0.1em' }}>
                       {h.sentiment === 'positive' ? '+' : h.sentiment === 'negative' ? '-' : '\u00B7'}
                     </span>
                     <div>
-                      <p className="font-data" style={{ fontSize: 'clamp(12px, 1.15cqi, 13px)', color: 'var(--gs-light)', lineHeight: 1.3 }}>
+                      <p className="font-data" style={{ fontSize: 'clamp(7px, 1.15cqi, 13px)', color: 'var(--gs-light)', lineHeight: 1.3 }}>
                         {h.title ?? 'Untitled'}
                       </p>
                       {h.source && (
-                        <p className="font-data" style={{ fontSize: 'clamp(12px, 1cqi, 12px)', color: 'var(--gs-mid)', opacity: 0.6 }}>
+                        <p className="font-data" style={{ fontSize: 'clamp(7px, 1cqi, 12px)', color: 'var(--gs-mid)', opacity: 0.6 }}>
                           {h.source}{h.date ? ` \u2014 ${h.date}` : ''}
                         </p>
                       )}
@@ -207,7 +207,7 @@ export function M22M23Slide({ scan }: { scan: ScanWithResults }) {
 
           {/* Right: Social Sentiment (M23) */}
           <div style={{ flex: 1 }}>
-            <h4 className="font-display uppercase" style={{ fontSize: 'clamp(12px, 1.2cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.35em' }}>
+            <h4 className="font-display uppercase" style={{ fontSize: 'clamp(7px, 1.2cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.35em' }}>
               Social Sentiment
             </h4>
 
@@ -225,7 +225,7 @@ export function M22M23Slide({ scan }: { scan: ScanWithResults }) {
 
             {/* Social mentions */}
             {!hasSocialData && socialMentions.length === 0 && (
-              <p className="font-data" style={{ fontSize: 'clamp(12px, 1.15cqi, 13px)', color: 'var(--gs-mid)', opacity: 0.5, padding: '0.5em 0' }}>
+              <p className="font-data" style={{ fontSize: 'clamp(7px, 1.15cqi, 13px)', color: 'var(--gs-mid)', opacity: 0.5, padding: '0.5em 0' }}>
                 No social mention data was captured for this scan.
               </p>
             )}
@@ -241,15 +241,15 @@ export function M22M23Slide({ scan }: { scan: ScanWithResults }) {
                         ? 'rgba(239,68,68,0.06)'
                         : 'transparent',
                   }}>
-                    <span style={{ fontSize: 'clamp(12px, 1.1cqi, 13px)', color: sentimentColor(m.sentiment), flexShrink: 0, marginTop: '0.1em' }}>
+                    <span style={{ fontSize: 'clamp(7px, 1.1cqi, 13px)', color: sentimentColor(m.sentiment), flexShrink: 0, marginTop: '0.1em' }}>
                       {m.sentiment === 'positive' ? '+' : m.sentiment === 'negative' ? '-' : '\u00B7'}
                     </span>
                     <div>
-                      <p className="font-data" style={{ fontSize: 'clamp(12px, 1.15cqi, 13px)', color: 'var(--gs-light)', lineHeight: 1.3 }}>
+                      <p className="font-data" style={{ fontSize: 'clamp(7px, 1.15cqi, 13px)', color: 'var(--gs-light)', lineHeight: 1.3 }}>
                         {m.text ?? 'No text'}
                       </p>
                       {m.platform && (
-                        <p className="font-data" style={{ fontSize: 'clamp(12px, 1cqi, 12px)', color: 'var(--gs-mid)', opacity: 0.6 }}>
+                        <p className="font-data" style={{ fontSize: 'clamp(7px, 1cqi, 12px)', color: 'var(--gs-mid)', opacity: 0.6 }}>
                           {m.platform}
                         </p>
                       )}

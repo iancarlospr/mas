@@ -96,12 +96,12 @@ export function M28Slide({ scan }: { scan: ScanWithResults }) {
               border: '1px solid rgba(255,178,239,0.08)',
             }}>
               <p className="font-data tabular-nums" style={{
-                fontSize: 'clamp(18px, 2.2cqi, 26px)', fontWeight: 700, lineHeight: 1, color: s.color,
+                fontSize: 'clamp(10px, 2.2cqi, 26px)', fontWeight: 700, lineHeight: 1, color: s.color,
               }}>
                 {s.value}
               </p>
               <p className="font-data uppercase" style={{
-                fontSize: 'clamp(12px, 1cqi, 12px)', color: 'var(--gs-base)',
+                fontSize: 'clamp(7px, 1cqi, 12px)', color: 'var(--gs-base)',
                 letterSpacing: '0.08em', marginTop: '0.3em',
               }}>
                 {s.label}
@@ -113,7 +113,7 @@ export function M28Slide({ scan }: { scan: ScanWithResults }) {
         {/* Top keywords table */}
         {topFive.length > 0 && (
           <div>
-            <p className="font-data uppercase" style={{ fontSize: 'clamp(12px, 1.1cqi, 13px)', color: 'var(--gs-base)', letterSpacing: '0.1em', marginBottom: '0.25em' }}>
+            <p className="font-data uppercase" style={{ fontSize: 'clamp(7px, 1.1cqi, 13px)', color: 'var(--gs-base)', letterSpacing: '0.1em', marginBottom: '0.25em' }}>
               Top Keywords by Est. Cost
             </p>
             {/* Table header */}
@@ -121,11 +121,11 @@ export function M28Slide({ scan }: { scan: ScanWithResults }) {
               display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 4em 3.5em 4em 2.5em',
               gap: '0 0.8em', padding: '0 0 0.2em', borderBottom: '1px solid rgba(255,178,239,0.06)',
             }}>
-              <span className="font-data" style={{ fontSize: 'clamp(12px, 1cqi, 12px)', color: 'var(--gs-mid)', whiteSpace: 'nowrap' }}>Keyword</span>
-              <span className="font-data" style={{ fontSize: 'clamp(12px, 1cqi, 12px)', color: 'var(--gs-mid)', textAlign: 'right', whiteSpace: 'nowrap' }}>Cost</span>
-              <span className="font-data" style={{ fontSize: 'clamp(12px, 1cqi, 12px)', color: 'var(--gs-mid)', textAlign: 'right', whiteSpace: 'nowrap' }}>CPC</span>
-              <span className="font-data" style={{ fontSize: 'clamp(12px, 1cqi, 12px)', color: 'var(--gs-mid)', textAlign: 'right', whiteSpace: 'nowrap' }}>Volume</span>
-              <span className="font-data" style={{ fontSize: 'clamp(12px, 1cqi, 12px)', color: 'var(--gs-mid)', textAlign: 'right', whiteSpace: 'nowrap' }}>Pos</span>
+              <span className="font-data" style={{ fontSize: 'clamp(7px, 1cqi, 12px)', color: 'var(--gs-mid)', whiteSpace: 'nowrap' }}>Keyword</span>
+              <span className="font-data" style={{ fontSize: 'clamp(7px, 1cqi, 12px)', color: 'var(--gs-mid)', textAlign: 'right', whiteSpace: 'nowrap' }}>Cost</span>
+              <span className="font-data" style={{ fontSize: 'clamp(7px, 1cqi, 12px)', color: 'var(--gs-mid)', textAlign: 'right', whiteSpace: 'nowrap' }}>CPC</span>
+              <span className="font-data" style={{ fontSize: 'clamp(7px, 1cqi, 12px)', color: 'var(--gs-mid)', textAlign: 'right', whiteSpace: 'nowrap' }}>Volume</span>
+              <span className="font-data" style={{ fontSize: 'clamp(7px, 1cqi, 12px)', color: 'var(--gs-mid)', textAlign: 'right', whiteSpace: 'nowrap' }}>Pos</span>
             </div>
             {/* Table rows */}
             <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -138,22 +138,22 @@ export function M28Slide({ scan }: { scan: ScanWithResults }) {
                     borderBottom: '1px solid rgba(255,255,255,0.02)',
                   }}>
                     <span className="font-data" style={{
-                      fontSize: 'clamp(12px, 1.15cqi, 14px)', color: 'var(--gs-light)',
+                      fontSize: 'clamp(7px, 1.15cqi, 14px)', color: 'var(--gs-light)',
                       whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
                     }}>
                       {kw.keyword}
                     </span>
-                    <span className="font-data tabular-nums" style={{ fontSize: 'clamp(12px, 1.1cqi, 13px)', color: 'var(--gs-base)', fontWeight: 600, textAlign: 'right' }}>
+                    <span className="font-data tabular-nums" style={{ fontSize: 'clamp(7px, 1.1cqi, 13px)', color: 'var(--gs-base)', fontWeight: 600, textAlign: 'right' }}>
                       {estCost >= 1000 ? `$${(estCost / 1000).toFixed(1)}K` : `$${Math.round(estCost)}`}
                     </span>
-                    <span className="font-data tabular-nums" style={{ fontSize: 'clamp(12px, 1.1cqi, 13px)', color: 'var(--gs-mid)', textAlign: 'right' }}>
+                    <span className="font-data tabular-nums" style={{ fontSize: 'clamp(7px, 1.1cqi, 13px)', color: 'var(--gs-mid)', textAlign: 'right' }}>
                       ${kw.cpc.toFixed(2)}
                     </span>
-                    <span className="font-data tabular-nums" style={{ fontSize: 'clamp(12px, 1.1cqi, 13px)', color: 'var(--gs-mid)', textAlign: 'right' }}>
+                    <span className="font-data tabular-nums" style={{ fontSize: 'clamp(7px, 1.1cqi, 13px)', color: 'var(--gs-mid)', textAlign: 'right' }}>
                       {kw.searchVolume >= 1000 ? `${(kw.searchVolume / 1000).toFixed(0)}K` : kw.searchVolume}
                     </span>
                     <span className="font-data tabular-nums" style={{
-                      fontSize: 'clamp(12px, 1.1cqi, 13px)', fontWeight: 600, textAlign: 'right',
+                      fontSize: 'clamp(7px, 1.1cqi, 13px)', fontWeight: 600, textAlign: 'right',
                       color: kw.position <= 3 ? 'var(--gs-terminal)' : kw.position <= 10 ? 'var(--gs-warning)' : 'var(--gs-mid)',
                     }}>
                       #{kw.position}
@@ -167,7 +167,7 @@ export function M28Slide({ scan }: { scan: ScanWithResults }) {
 
         {/* No paid search message */}
         {totalPaidKeywords === 0 && topFive.length === 0 && (
-          <p className="font-data" style={{ fontSize: 'clamp(12px, 1.2cqi, 14px)', color: 'var(--gs-mid)', opacity: 0.6, textAlign: 'center', padding: '0.5em 0' }}>
+          <p className="font-data" style={{ fontSize: 'clamp(7px, 1.2cqi, 14px)', color: 'var(--gs-mid)', opacity: 0.6, textAlign: 'center', padding: '0.5em 0' }}>
             No paid search activity detected — relying on organic or other channels
           </p>
         )}

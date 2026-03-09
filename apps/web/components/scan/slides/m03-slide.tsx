@@ -122,8 +122,8 @@ export function M03Slide({ scan }: { scan: ScanWithResults }) {
               <svg width="90" height="52" viewBox="0 0 90 52">
                 <path d="M 7 50 A 38 38 0 0 1 83 50" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="7" strokeLinecap="round" />
               </svg>
-              <p className="font-data" style={{ fontSize: 'clamp(14px, 1.5cqi, 18px)', color: 'var(--gs-mid)', marginTop: '-0.6em' }}>—</p>
-              <p className="font-data" style={{ fontSize: 'clamp(12px, 1.1cqi, 13px)', color: 'var(--gs-mid)', marginTop: '0.15em' }}>LCP</p>
+              <p className="font-data" style={{ fontSize: 'clamp(8px, 1.5cqi, 18px)', color: 'var(--gs-mid)', marginTop: '-0.6em' }}>—</p>
+              <p className="font-data" style={{ fontSize: 'clamp(7px, 1.1cqi, 13px)', color: 'var(--gs-mid)', marginTop: '0.15em' }}>LCP</p>
             </div>
           )}
 
@@ -140,8 +140,8 @@ export function M03Slide({ scan }: { scan: ScanWithResults }) {
               <svg width="90" height="52" viewBox="0 0 90 52">
                 <path d="M 7 50 A 38 38 0 0 1 83 50" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="7" strokeLinecap="round" />
               </svg>
-              <p className="font-data" style={{ fontSize: 'clamp(14px, 1.5cqi, 18px)', color: 'var(--gs-mid)', marginTop: '-0.6em' }}>—</p>
-              <p className="font-data" style={{ fontSize: 'clamp(12px, 1.1cqi, 13px)', color: 'var(--gs-mid)', marginTop: '0.15em' }}>CLS</p>
+              <p className="font-data" style={{ fontSize: 'clamp(8px, 1.5cqi, 18px)', color: 'var(--gs-mid)', marginTop: '-0.6em' }}>—</p>
+              <p className="font-data" style={{ fontSize: 'clamp(7px, 1.1cqi, 13px)', color: 'var(--gs-mid)', marginTop: '0.15em' }}>CLS</p>
             </div>
           )}
 
@@ -158,8 +158,8 @@ export function M03Slide({ scan }: { scan: ScanWithResults }) {
               <svg width="90" height="52" viewBox="0 0 90 52">
                 <path d="M 7 50 A 38 38 0 0 1 83 50" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="7" strokeLinecap="round" />
               </svg>
-              <p className="font-data" style={{ fontSize: 'clamp(14px, 1.5cqi, 18px)', color: 'var(--gs-mid)', marginTop: '-0.6em' }}>—</p>
-              <p className="font-data" style={{ fontSize: 'clamp(12px, 1.1cqi, 13px)', color: 'var(--gs-mid)', marginTop: '0.15em' }}>FCP</p>
+              <p className="font-data" style={{ fontSize: 'clamp(8px, 1.5cqi, 18px)', color: 'var(--gs-mid)', marginTop: '-0.6em' }}>—</p>
+              <p className="font-data" style={{ fontSize: 'clamp(7px, 1.1cqi, 13px)', color: 'var(--gs-mid)', marginTop: '0.15em' }}>FCP</p>
             </div>
           )}
         </div>
@@ -178,10 +178,10 @@ export function M03Slide({ scan }: { scan: ScanWithResults }) {
               flex: 1, padding: '0.5em 0.4em', borderRadius: '4px', textAlign: 'center',
               background: 'rgba(255,178,239,0.04)', border: '1px solid rgba(255,178,239,0.08)',
             }}>
-              <p className="font-data tabular-nums" style={{ fontSize: 'clamp(16px, 1.8cqi, 22px)', fontWeight: 700, lineHeight: 1, color: s.color }}>
+              <p className="font-data tabular-nums" style={{ fontSize: 'clamp(8px, 1.8cqi, 22px)', fontWeight: 700, lineHeight: 1, color: s.color }}>
                 {s.value}
               </p>
-              <p className="font-data uppercase" style={{ fontSize: 'clamp(12px, 0.9cqi, 12px)', color: 'var(--gs-base)', letterSpacing: '0.06em', marginTop: '0.25em' }}>
+              <p className="font-data uppercase" style={{ fontSize: 'clamp(7px, 0.9cqi, 12px)', color: 'var(--gs-base)', letterSpacing: '0.06em', marginTop: '0.25em' }}>
                 {s.label}
               </p>
             </div>

@@ -143,16 +143,16 @@ export function M18M19Slide({ scan }: { scan: ScanWithResults }) {
                   background: 'rgba(255,178,239,0.04)', border: '1px solid rgba(255,178,239,0.08)',
                   display: 'flex', flexDirection: 'column', justifyContent: 'center',
                 }}>
-                  <p className="font-data tabular-nums" style={{ fontSize: 'clamp(15px, 1.7cqi, 20px)', fontWeight: 700, lineHeight: 1, color: s.color }}>
+                  <p className="font-data tabular-nums" style={{ fontSize: 'clamp(8px, 1.7cqi, 20px)', fontWeight: 700, lineHeight: 1, color: s.color }}>
                     {s.value}
                   </p>
-                  <p className="font-data uppercase" style={{ fontSize: 'clamp(12px, 0.85cqi, 12px)', color: 'var(--gs-base)', letterSpacing: '0.06em', marginTop: '0.2em' }}>
+                  <p className="font-data uppercase" style={{ fontSize: 'clamp(7px, 0.85cqi, 12px)', color: 'var(--gs-base)', letterSpacing: '0.06em', marginTop: '0.2em' }}>
                     {s.label}
                   </p>
                 </div>
               ))}
             </div>
-            <p className="font-display uppercase" style={{ fontSize: 'clamp(12px, 1.2cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.25em' }}>
+            <p className="font-display uppercase" style={{ fontSize: 'clamp(7px, 1.2cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.25em' }}>
               Investor Relations
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25em' }}>
@@ -180,16 +180,16 @@ export function M18M19Slide({ scan }: { scan: ScanWithResults }) {
                   background: 'rgba(255,178,239,0.04)', border: '1px solid rgba(255,178,239,0.08)',
                   display: 'flex', flexDirection: 'column', justifyContent: 'center',
                 }}>
-                  <p className="font-data tabular-nums" style={{ fontSize: 'clamp(15px, 1.7cqi, 20px)', fontWeight: 700, lineHeight: 1, color: s.color }}>
+                  <p className="font-data tabular-nums" style={{ fontSize: 'clamp(8px, 1.7cqi, 20px)', fontWeight: 700, lineHeight: 1, color: s.color }}>
                     {s.value}
                   </p>
-                  <p className="font-data uppercase" style={{ fontSize: 'clamp(12px, 0.85cqi, 12px)', color: 'var(--gs-base)', letterSpacing: '0.06em', marginTop: '0.2em' }}>
+                  <p className="font-data uppercase" style={{ fontSize: 'clamp(7px, 0.85cqi, 12px)', color: 'var(--gs-base)', letterSpacing: '0.06em', marginTop: '0.2em' }}>
                     {s.label}
                   </p>
                 </div>
               ))}
             </div>
-            <p className="font-display uppercase" style={{ fontSize: 'clamp(12px, 1.2cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.25em' }}>
+            <p className="font-display uppercase" style={{ fontSize: 'clamp(7px, 1.2cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.25em' }}>
               Support Infrastructure
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25em' }}>

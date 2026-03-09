@@ -97,12 +97,12 @@ export function M26Slide({ scan }: { scan: ScanWithResults }) {
             background: 'rgba(255,178,239,0.04)', border: '1px solid rgba(255,178,239,0.08)',
           }}>
             <p className="font-data tabular-nums" style={{
-              fontSize: 'clamp(18px, 2.2cqi, 26px)', fontWeight: 700, lineHeight: 1,
+              fontSize: 'clamp(10px, 2.2cqi, 26px)', fontWeight: 700, lineHeight: 1,
               color: totalOrganic > 0 ? scoreColor(modScore ?? 50) : 'var(--gs-mid)',
             }}>
               {totalOrganic > 0 ? totalOrganic.toLocaleString() : '—'}
             </p>
-            <p className="font-data uppercase" style={{ fontSize: 'clamp(12px, 1cqi, 12px)', color: 'var(--gs-base)', letterSpacing: '0.08em', marginTop: '0.3em' }}>
+            <p className="font-data uppercase" style={{ fontSize: 'clamp(7px, 1cqi, 12px)', color: 'var(--gs-base)', letterSpacing: '0.08em', marginTop: '0.3em' }}>
               Total Organic Keywords
             </p>
           </div>
@@ -111,12 +111,12 @@ export function M26Slide({ scan }: { scan: ScanWithResults }) {
             background: 'rgba(255,178,239,0.04)', border: '1px solid rgba(255,178,239,0.08)',
           }}>
             <p className="font-data tabular-nums" style={{
-              fontSize: 'clamp(18px, 2.2cqi, 26px)', fontWeight: 700, lineHeight: 1,
+              fontSize: 'clamp(10px, 2.2cqi, 26px)', fontWeight: 700, lineHeight: 1,
               color: top10Count >= 5 ? 'var(--gs-terminal)' : top10Count > 0 ? 'var(--gs-warning)' : 'var(--gs-critical)',
             }}>
               {top10Count}
             </p>
-            <p className="font-data uppercase" style={{ fontSize: 'clamp(12px, 1cqi, 12px)', color: 'var(--gs-base)', letterSpacing: '0.08em', marginTop: '0.3em' }}>
+            <p className="font-data uppercase" style={{ fontSize: 'clamp(7px, 1cqi, 12px)', color: 'var(--gs-base)', letterSpacing: '0.08em', marginTop: '0.3em' }}>
               In Top 10
             </p>
           </div>
@@ -125,10 +125,10 @@ export function M26Slide({ scan }: { scan: ScanWithResults }) {
               flex: 2, padding: '0.6em 0.8em', borderRadius: '4px', textAlign: 'center',
               background: 'rgba(255,178,239,0.04)', border: '1px solid rgba(255,178,239,0.08)',
             }}>
-              <p className="font-data" style={{ fontSize: 'clamp(14px, 1.5cqi, 18px)', color: 'var(--gs-light)', fontWeight: 600, lineHeight: 1.2 }}>
+              <p className="font-data" style={{ fontSize: 'clamp(8px, 1.5cqi, 18px)', color: 'var(--gs-light)', fontWeight: 600, lineHeight: 1.2 }}>
                 &ldquo;{rawKeywords[0].keyword}&rdquo; <span style={{ color: 'var(--gs-terminal)', fontWeight: 700 }}>#{rawKeywords[0].rankAbsolute}</span>
               </p>
-              <p className="font-data uppercase" style={{ fontSize: 'clamp(12px, 1cqi, 12px)', color: 'var(--gs-base)', letterSpacing: '0.08em', marginTop: '0.3em' }}>
+              <p className="font-data uppercase" style={{ fontSize: 'clamp(7px, 1cqi, 12px)', color: 'var(--gs-base)', letterSpacing: '0.08em', marginTop: '0.3em' }}>
                 Top Keyword
               </p>
             </div>
@@ -138,7 +138,7 @@ export function M26Slide({ scan }: { scan: ScanWithResults }) {
         {/* Position distribution bar */}
         {(pos1 + pos2to3 + pos4to10 + pos11to20 + pos21plus) > 0 && (
           <div style={{ marginBottom: '0.5em' }}>
-            <p className="font-data uppercase" style={{ fontSize: 'clamp(12px, 1.1cqi, 13px)', color: 'var(--gs-base)', letterSpacing: '0.1em', marginBottom: '0.25em' }}>
+            <p className="font-data uppercase" style={{ fontSize: 'clamp(7px, 1.1cqi, 13px)', color: 'var(--gs-base)', letterSpacing: '0.1em', marginBottom: '0.25em' }}>
               Position Distribution
             </p>
             <SegmentedBar segments={segments} />
@@ -148,7 +148,7 @@ export function M26Slide({ scan }: { scan: ScanWithResults }) {
         {/* Top keywords — horizontal bars */}
         {topFive.length > 0 && (
           <div>
-            <p className="font-data uppercase" style={{ fontSize: 'clamp(12px, 1.1cqi, 13px)', color: 'var(--gs-base)', letterSpacing: '0.1em', marginBottom: '0.25em' }}>
+            <p className="font-data uppercase" style={{ fontSize: 'clamp(7px, 1.1cqi, 13px)', color: 'var(--gs-base)', letterSpacing: '0.1em', marginBottom: '0.25em' }}>
               Top Keywords by Volume
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.15em' }}>
@@ -158,13 +158,13 @@ export function M26Slide({ scan }: { scan: ScanWithResults }) {
                 return (
                   <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.4em' }}>
                     <span className="font-data tabular-nums" style={{
-                      fontSize: 'clamp(12px, 1.1cqi, 13px)', fontWeight: 700, minWidth: '2.2em', textAlign: 'right',
+                      fontSize: 'clamp(7px, 1.1cqi, 13px)', fontWeight: 700, minWidth: '2.2em', textAlign: 'right',
                       color: rankColor, flexShrink: 0,
                     }}>
                       #{kw.rankAbsolute}
                     </span>
                     <span className="font-data" style={{
-                      fontSize: 'clamp(12px, 1.15cqi, 14px)', color: 'var(--gs-light)',
+                      fontSize: 'clamp(7px, 1.15cqi, 14px)', color: 'var(--gs-light)',
                       minWidth: '8em', maxWidth: '14em', flexShrink: 0,
                       whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
                     }}>
@@ -174,7 +174,7 @@ export function M26Slide({ scan }: { scan: ScanWithResults }) {
                       <div style={{ width: `${pct}%`, height: '100%', background: 'var(--gs-base)', borderRadius: '4px', minWidth: pct > 0 ? '3px' : 0 }} />
                     </div>
                     <span className="font-data tabular-nums" style={{
-                      fontSize: 'clamp(12px, 1.15cqi, 14px)', color: 'var(--gs-light)', fontWeight: 600,
+                      fontSize: 'clamp(7px, 1.15cqi, 14px)', color: 'var(--gs-light)', fontWeight: 600,
                       minWidth: '4.5em', textAlign: 'right', flexShrink: 0,
                     }}>
                       {kw.searchVolume >= 1_000_000 ? `${(kw.searchVolume / 1_000_000).toFixed(1)}M` : kw.searchVolume >= 1000 ? `${(kw.searchVolume / 1000).toFixed(kw.searchVolume >= 10000 ? 0 : 1)}K` : kw.searchVolume}/mo

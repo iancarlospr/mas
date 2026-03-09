@@ -104,13 +104,13 @@ export function M16Slide({ scan }: { scan: ScanWithResults }) {
                 textAlign: 'center',
               }}>
                 <p className="font-data tabular-nums" style={{
-                  fontSize: 'clamp(40px, 5cqi, 60px)', fontWeight: 700, lineHeight: 1,
+                  fontSize: 'clamp(20px, 5cqi, 60px)', fontWeight: 700, lineHeight: 1,
                   color: articleCount > 10 ? 'var(--gs-terminal)' : articleCount > 0 ? 'var(--gs-warning)' : 'var(--gs-critical)',
                 }}>
                   {articleCount}
                 </p>
                 <p className="font-data uppercase" style={{
-                  fontSize: 'clamp(12px, 1.1cqi, 13px)', color: 'var(--gs-base)',
+                  fontSize: 'clamp(7px, 1.1cqi, 13px)', color: 'var(--gs-base)',
                   letterSpacing: '0.1em', marginTop: '0.4em',
                 }}>
                   Articles Found
@@ -145,7 +145,7 @@ export function M16Slide({ scan }: { scan: ScanWithResults }) {
             {/* Wire service pills */}
             {wireServices.length > 0 && (
               <div style={{ width: '100%' }}>
-                <p className="font-data uppercase" style={{ fontSize: 'clamp(12px, 1.1cqi, 13px)', color: 'var(--gs-mid)', letterSpacing: '0.06em', marginBottom: '0.2em' }}>
+                <p className="font-data uppercase" style={{ fontSize: 'clamp(7px, 1.1cqi, 13px)', color: 'var(--gs-mid)', letterSpacing: '0.06em', marginBottom: '0.2em' }}>
                   Wire Services
                 </p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25em', justifyContent: 'center' }}>
@@ -162,7 +162,7 @@ export function M16Slide({ scan }: { scan: ScanWithResults }) {
 
           {/* Right: Checklist */}
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.3em' }}>
-            <p className="font-display uppercase" style={{ fontSize: 'clamp(12px, 1.2cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.1em' }}>
+            <p className="font-display uppercase" style={{ fontSize: 'clamp(7px, 1.2cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.1em' }}>
               Media Assets
             </p>
             <CheckItem

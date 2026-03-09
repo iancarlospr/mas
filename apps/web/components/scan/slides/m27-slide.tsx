@@ -89,7 +89,7 @@ export function M27Slide({ scan }: { scan: ScanWithResults }) {
       {/* Keyword position distribution */}
       {hasRankingData && (
         <div style={{ marginBottom: '0.6em', flexShrink: 0, paddingBottom: '0.5em', borderBottom: '1px solid rgba(255,178,239,0.06)' }}>
-          <p className="font-data uppercase" style={{ fontSize: 'clamp(12px, 1.1cqi, 13px)', color: 'var(--gs-base)', letterSpacing: '0.1em', marginBottom: '0.4em' }}>
+          <p className="font-data uppercase" style={{ fontSize: 'clamp(7px, 1.1cqi, 13px)', color: 'var(--gs-base)', letterSpacing: '0.1em', marginBottom: '0.4em' }}>
             Keyword Position Distribution
           </p>
           <SegmentedBar segments={[

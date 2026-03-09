@@ -39,8 +39,8 @@ function LengthBar({ value, ranges, label }: {
   return (
     <div style={{ marginBottom: '0.15em' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.15em' }}>
-        <span className="font-data" style={{ fontSize: 'clamp(12px, 1.15cqi, 13px)', color: 'var(--gs-mid)' }}>{label}</span>
-        <span className="font-data tabular-nums" style={{ fontSize: 'clamp(12px, 1.15cqi, 13px)', color, fontWeight: 600 }}>{value} chars</span>
+        <span className="font-data" style={{ fontSize: 'clamp(7px, 1.15cqi, 13px)', color: 'var(--gs-mid)' }}>{label}</span>
+        <span className="font-data tabular-nums" style={{ fontSize: 'clamp(7px, 1.15cqi, 13px)', color, fontWeight: 600 }}>{value} chars</span>
       </div>
       <div style={{ height: '5px', background: 'rgba(255,255,255,0.06)', borderRadius: '3px', overflow: 'hidden' }}>
         <div style={{ width: `${pct}%`, height: '100%', background: color, borderRadius: '3px', transition: 'width 0.3s' }} />
@@ -53,7 +53,7 @@ function LengthBar({ value, ranges, label }: {
 function TagDots({ tags, label }: { tags: Array<{ key: string; present: boolean }>; label: string }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '0.4em', marginBottom: '0.2em' }}>
-      <span className="font-data" style={{ fontSize: 'clamp(12px, 1.15cqi, 13px)', color: 'var(--gs-light)', minWidth: '6em' }}>{label}</span>
+      <span className="font-data" style={{ fontSize: 'clamp(7px, 1.15cqi, 13px)', color: 'var(--gs-light)', minWidth: '6em' }}>{label}</span>
       <div style={{ display: 'flex', gap: '0.3em', alignItems: 'center', flexWrap: 'wrap' }}>
         {tags.map((t) => (
           <div key={t.key} style={{ display: 'flex', alignItems: 'center', gap: '0.15em' }}>
@@ -62,7 +62,7 @@ function TagDots({ tags, label }: { tags: Array<{ key: string; present: boolean 
               background: t.present ? 'var(--gs-terminal)' : 'rgba(255,255,255,0.1)',
               boxShadow: t.present ? '0 0 4px var(--gs-terminal)' : 'none',
             }} />
-            <span className="font-data" style={{ fontSize: 'clamp(12px, 1cqi, 12px)', color: t.present ? 'var(--gs-light)' : 'var(--gs-mid)', opacity: t.present ? 0.8 : 0.4 }}>
+            <span className="font-data" style={{ fontSize: 'clamp(7px, 1cqi, 12px)', color: t.present ? 'var(--gs-light)' : 'var(--gs-mid)', opacity: t.present ? 0.8 : 0.4 }}>
               {t.key}
             </span>
           </div>
@@ -151,14 +151,14 @@ export function M04Slide({ scan }: { scan: ScanWithResults }) {
   // ── Viz content (left panel) ────────────────────────────────────────────
   const vizContent = (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35em' }}>
-      <h4 className="font-display uppercase" style={{ fontSize: 'clamp(12px, 1.2cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.1em' }}>
+      <h4 className="font-display uppercase" style={{ fontSize: 'clamp(7px, 1.2cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.1em' }}>
         SEO Scorecard
       </h4>
 
       {/* Title tag */}
       {titleContent && (
         <div>
-          <p className="font-data" style={{ fontSize: 'clamp(12px, 1.15cqi, 13px)', color: 'var(--gs-light)', opacity: 0.7, marginBottom: '0.1em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <p className="font-data" style={{ fontSize: 'clamp(7px, 1.15cqi, 13px)', color: 'var(--gs-light)', opacity: 0.7, marginBottom: '0.1em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             &ldquo;{titleContent}&rdquo;
           </p>
           <LengthBar value={titleLength} ranges={{ good: [1, 60], warn: [1, 70] }} label="Title" />
@@ -169,7 +169,7 @@ export function M04Slide({ scan }: { scan: ScanWithResults }) {
       {/* Meta description */}
       {descContent && (
         <div>
-          <p className="font-data" style={{ fontSize: 'clamp(12px, 1.15cqi, 13px)', color: 'var(--gs-light)', opacity: 0.7, marginBottom: '0.1em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <p className="font-data" style={{ fontSize: 'clamp(7px, 1.15cqi, 13px)', color: 'var(--gs-light)', opacity: 0.7, marginBottom: '0.1em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             &ldquo;{descContent}&rdquo;
           </p>
           <LengthBar value={descLength} ranges={{ good: [120, 160], warn: [80, 200] }} label="Description" />
@@ -193,7 +193,7 @@ export function M04Slide({ scan }: { scan: ScanWithResults }) {
       {/* JSON-LD types */}
       {hasJsonLd && (
         <div style={{ display: 'flex', gap: '0.3em', flexWrap: 'wrap', alignItems: 'center', marginTop: '0.1em' }}>
-          <span className="font-data" style={{ fontSize: 'clamp(12px, 1.15cqi, 13px)', color: 'var(--gs-mid)' }}>JSON-LD:</span>
+          <span className="font-data" style={{ fontSize: 'clamp(7px, 1.15cqi, 13px)', color: 'var(--gs-mid)' }}>JSON-LD:</span>
           {jsonLdTypes.length > 0
             ? jsonLdTypes.map((t) => <Pill key={t} text={t} color="var(--gs-terminal)" />)
             : <Pill text="Present" color="var(--gs-terminal)" />
@@ -207,8 +207,8 @@ export function M04Slide({ scan }: { scan: ScanWithResults }) {
       {/* Hreflang */}
       {hreflangArr.length > 0 && (
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.3em', marginTop: '0.1em' }}>
-          <span className="font-data" style={{ fontSize: 'clamp(12px, 1.15cqi, 13px)', color: 'var(--gs-mid)' }}>Hreflang:</span>
-          <span className="font-data tabular-nums" style={{ fontSize: 'clamp(12px, 1.15cqi, 14px)', color: 'var(--gs-light)', fontWeight: 600 }}>
+          <span className="font-data" style={{ fontSize: 'clamp(7px, 1.15cqi, 13px)', color: 'var(--gs-mid)' }}>Hreflang:</span>
+          <span className="font-data tabular-nums" style={{ fontSize: 'clamp(7px, 1.15cqi, 14px)', color: 'var(--gs-light)', fontWeight: 600 }}>
             {hreflangArr.length} locale{hreflangArr.length !== 1 ? 's' : ''}
           </span>
         </div>

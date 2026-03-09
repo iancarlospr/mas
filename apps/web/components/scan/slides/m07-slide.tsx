@@ -139,10 +139,10 @@ export function M07Slide({ scan }: { scan: ScanWithResults }) {
             flex: 1, padding: '0.5em 0.4em', borderRadius: '4px', textAlign: 'center',
             background: 'rgba(255,178,239,0.04)', border: '1px solid rgba(255,178,239,0.08)',
           }}>
-            <p className="font-data tabular-nums" style={{ fontSize: 'clamp(16px, 1.8cqi, 22px)', fontWeight: 700, lineHeight: 1, color: s.color }}>
+            <p className="font-data tabular-nums" style={{ fontSize: 'clamp(8px, 1.8cqi, 22px)', fontWeight: 700, lineHeight: 1, color: s.color }}>
               {s.value}
             </p>
-            <p className="font-data uppercase" style={{ fontSize: 'clamp(12px, 0.9cqi, 12px)', color: 'var(--gs-base)', letterSpacing: '0.06em', marginTop: '0.25em' }}>
+            <p className="font-data uppercase" style={{ fontSize: 'clamp(7px, 0.9cqi, 12px)', color: 'var(--gs-base)', letterSpacing: '0.06em', marginTop: '0.25em' }}>
               {s.label}
             </p>
           </div>
@@ -152,13 +152,13 @@ export function M07Slide({ scan }: { scan: ScanWithResults }) {
       {/* Tool categories */}
       {categoryMap.size > 0 && (
         <div>
-          <h4 className="font-display uppercase" style={{ fontSize: 'clamp(12px, 1.2cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.3em' }}>
+          <h4 className="font-display uppercase" style={{ fontSize: 'clamp(7px, 1.2cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.3em' }}>
             Detected Stack
           </h4>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3em' }}>
             {Array.from(categoryMap.entries()).map(([cat, names], ci) => (
               <div key={cat} style={{ display: 'flex', alignItems: 'baseline', gap: '0.5em' }}>
-                <span className="font-data" style={{ fontSize: 'clamp(12px, 1.1cqi, 13px)', color: catColors[ci % catColors.length], fontWeight: 600, minWidth: '8em', flexShrink: 0 }}>
+                <span className="font-data" style={{ fontSize: 'clamp(7px, 1.1cqi, 13px)', color: catColors[ci % catColors.length], fontWeight: 600, minWidth: '8em', flexShrink: 0 }}>
                   {cat}
                 </span>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.2em' }}>
@@ -175,7 +175,7 @@ export function M07Slide({ scan }: { scan: ScanWithResults }) {
       {/* Missing categories assessment */}
       {missingCategories.length > 0 && (
         <div style={{ paddingTop: '0.3em', borderTop: '1px solid rgba(255,178,239,0.06)' }}>
-          <p className="font-data uppercase" style={{ fontSize: 'clamp(12px, 1.1cqi, 13px)', color: 'var(--gs-critical)', letterSpacing: '0.08em', marginBottom: '0.2em', opacity: 0.8 }}>
+          <p className="font-data uppercase" style={{ fontSize: 'clamp(7px, 1.1cqi, 13px)', color: 'var(--gs-critical)', letterSpacing: '0.08em', marginBottom: '0.2em', opacity: 0.8 }}>
             Missing Categories
           </p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.2em' }}>
@@ -189,12 +189,12 @@ export function M07Slide({ scan }: { scan: ScanWithResults }) {
       {/* Forms detail */}
       {forms.length > 0 && (
         <div style={{ paddingTop: '0.3em', borderTop: '1px solid rgba(255,178,239,0.06)' }}>
-          <p className="font-data uppercase" style={{ fontSize: 'clamp(12px, 1.1cqi, 13px)', color: 'var(--gs-mid)', letterSpacing: '0.08em', marginBottom: '0.2em' }}>
+          <p className="font-data uppercase" style={{ fontSize: 'clamp(7px, 1.1cqi, 13px)', color: 'var(--gs-mid)', letterSpacing: '0.08em', marginBottom: '0.2em' }}>
             Forms Detected
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.1em' }}>
             {forms.map((f, i) => (
-              <p key={i} className="font-data" style={{ fontSize: 'clamp(12px, 1.15cqi, 13px)', color: 'var(--gs-light)', opacity: 0.8 }}>
+              <p key={i} className="font-data" style={{ fontSize: 'clamp(7px, 1.15cqi, 13px)', color: 'var(--gs-light)', opacity: 0.8 }}>
                 {f.id ?? f.action ?? `Form ${i + 1}`}
                 {f.method ? ` (${f.method.toUpperCase()})` : ''}
               </p>

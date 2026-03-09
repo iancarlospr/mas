@@ -179,7 +179,7 @@ export function M30Slide({ scan }: { scan: ScanWithResults }) {
       }}>
         {/* Treemap */}
         <div style={{ flex: 2 }}>
-          <p className="font-data uppercase" style={{ fontSize: 'clamp(12px, 1.1cqi, 13px)', color: 'var(--gs-base)', letterSpacing: '0.1em', marginBottom: '0.35em' }}>
+          <p className="font-data uppercase" style={{ fontSize: 'clamp(7px, 1.1cqi, 13px)', color: 'var(--gs-base)', letterSpacing: '0.1em', marginBottom: '0.35em' }}>
             Top Referring Domains
           </p>
           {sources.length > 0 ? (
@@ -246,7 +246,7 @@ export function M30Slide({ scan }: { scan: ScanWithResults }) {
               })}
             </svg>
           ) : (
-            <p className="font-data" style={{ fontSize: 'clamp(12px, 1.25cqi, 14px)', color: 'var(--gs-mid)' }}>
+            <p className="font-data" style={{ fontSize: 'clamp(7px, 1.25cqi, 14px)', color: 'var(--gs-mid)' }}>
               No referring domain data available
             </p>
           )}
@@ -262,13 +262,13 @@ export function M30Slide({ scan }: { scan: ScanWithResults }) {
             textAlign: 'center',
           }}>
             <p className="font-data tabular-nums" style={{
-              fontSize: 'clamp(28px, 3.5cqi, 42px)', fontWeight: 700, lineHeight: 1,
+              fontSize: 'clamp(14px, 3.5cqi, 42px)', fontWeight: 700, lineHeight: 1,
               color: 'var(--gs-light)',
             }}>
               {fmtNum(totalReferringDomains)}
             </p>
             <p className="font-data uppercase" style={{
-              fontSize: 'clamp(12px, 1.1cqi, 13px)', color: 'var(--gs-base)',
+              fontSize: 'clamp(7px, 1.1cqi, 13px)', color: 'var(--gs-base)',
               letterSpacing: '0.1em', marginTop: '0.3em',
             }}>
               Referring Domains
@@ -278,13 +278,13 @@ export function M30Slide({ scan }: { scan: ScanWithResults }) {
           {totalBacklinks > 0 && (
             <div style={{ padding: '0 1em' }}>
               <p className="font-data tabular-nums" style={{
-                fontSize: 'clamp(16px, 1.8cqi, 22px)', fontWeight: 600, lineHeight: 1,
+                fontSize: 'clamp(8px, 1.8cqi, 22px)', fontWeight: 600, lineHeight: 1,
                 color: 'var(--gs-base)',
               }}>
                 {fmtNum(totalBacklinks)}
               </p>
               <p className="font-data" style={{
-                fontSize: 'clamp(12px, 1.1cqi, 13px)', color: 'var(--gs-mid)', marginTop: '0.15em',
+                fontSize: 'clamp(7px, 1.1cqi, 13px)', color: 'var(--gs-mid)', marginTop: '0.15em',
               }}>
                 Total Backlinks
               </p>
@@ -300,19 +300,19 @@ export function M30Slide({ scan }: { scan: ScanWithResults }) {
               textAlign: 'center',
             }}>
               <p className="font-data uppercase" style={{
-                fontSize: 'clamp(12px, 1cqi, 12px)', color: 'var(--gs-mid)',
+                fontSize: 'clamp(7px, 1cqi, 12px)', color: 'var(--gs-mid)',
                 letterSpacing: '0.1em', marginBottom: '0.2em',
               }}>
                 Top Source Rank
               </p>
               <p className="font-data tabular-nums" style={{
-                fontSize: 'clamp(22px, 2.8cqi, 34px)', fontWeight: 700, lineHeight: 1,
+                fontSize: 'clamp(12px, 2.8cqi, 34px)', fontWeight: 700, lineHeight: 1,
                 color: sources[0].rank <= 10_000 ? 'var(--gs-terminal)' : sources[0].rank <= 100_000 ? 'var(--gs-base)' : 'var(--gs-mid)',
               }}>
                 #{sources[0].rank.toLocaleString()}
               </p>
               <p className="font-data" style={{
-                fontSize: 'clamp(12px, 1.15cqi, 14px)', color: 'var(--gs-light)',
+                fontSize: 'clamp(7px, 1.15cqi, 14px)', color: 'var(--gs-light)',
                 marginTop: '0.2em', opacity: 0.7,
               }}>
                 {sources[0].domain}
