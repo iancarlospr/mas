@@ -195,10 +195,6 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
     window.open(`/api/reports/${scan.id}/prd`, '_blank');
   }, [scan.id]);
 
-  const handleDownloadPresentation = useCallback(() => {
-    window.open(`/api/reports/${scan.id}/presentation`, '_blank');
-  }, [scan.id]);
-
   const handleAskChloe = useCallback(() => {
     wm.openWindow('chat-launcher', { scanId: scan.id });
   }, [wm, scan.id]);
@@ -387,10 +383,6 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
         )}
         {isPaid && (
           <div className="flex gap-3 items-center">
-            <button onClick={handleDownloadPresentation} className="text-gs-base hover:text-gs-bright transition-colors" style={{ fontSize: '11px', fontFamily: 'var(--font-system)' }}>
-              Slides &darr;
-            </button>
-            <span className="text-gs-mid" style={{ fontSize: '11px' }}>&middot;</span>
             <button onClick={handleDownloadPdf} className="text-gs-base hover:text-gs-bright transition-colors" style={{ fontSize: '11px', fontFamily: 'var(--font-system)' }}>
               PRD &darr;
             </button>

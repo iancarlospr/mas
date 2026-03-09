@@ -183,15 +183,6 @@ export default function HistoryWindow() {
                 {scan.tier === 'paid' && scan.status === 'complete' && (
                   <>
                     <button
-                      onClick={(e) => { e.stopPropagation(); window.open(`/api/reports/${scan.id}/presentation`, '_blank'); }}
-                      className="text-gs-base hover:text-gs-bright transition-colors"
-                      title="Download Slides"
-                      style={{ fontSize: '11px', fontFamily: 'var(--font-system)' }}
-                    >
-                      Slides&nbsp;&darr;
-                    </button>
-                    <span className="text-gs-mid" style={{ fontSize: '11px' }}>&middot;</span>
-                    <button
                       onClick={(e) => { e.stopPropagation(); window.open(`/api/reports/${scan.id}/prd`, '_blank'); }}
                       className="text-gs-base hover:text-gs-bright transition-colors"
                       title="Download PRD"
