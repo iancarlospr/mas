@@ -11,10 +11,10 @@ import { engineFetch } from '@/lib/engine';
  * Returns a redirect to the signed Supabase Storage URL.
  *
  * Auth: scan owner OR valid share token. Tier: paid only.
- *
- * Fallback: if engine is unavailable, redirects to the slides page with
- * ?print=1 for client-side browser print.
  */
+
+export const maxDuration = 120; // Vercel function timeout: 2 minutes
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -48,12 +48,18 @@ export async function GET(
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  // Generate via engine (always regenerate — engine uploads with upsert)
+  // Generate via engine with long timeout (52 slides takes ~60-90s)
   try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 110_000); // 110s
+
     const response = await engineFetch(`/engine/reports/${scanId}/presentation-pdf`, {
       method: 'POST',
       body: JSON.stringify({ scanId }),
+      signal: controller.signal,
     });
+
+    clearTimeout(timeout);
 
     if (response.ok) {
       const { url } = (await response.json()) as { url: string };
@@ -62,14 +68,12 @@ export async function GET(
 
     console.error(`[presentation] Engine returned ${response.status}: ${await response.text()}`);
   } catch (error) {
-    console.error('[presentation] Engine unavailable:', (error as Error).message);
+    console.error('[presentation] Engine error:', (error as Error).message);
   }
 
-  // Fallback: client-side print
-  const slidesUrl = new URL(`/report/${scanId}/slides`, request.url);
-  slidesUrl.searchParams.set('print', '1');
-  if (shareToken) {
-    slidesUrl.searchParams.set('share', shareToken);
-  }
-  return NextResponse.redirect(slidesUrl.toString());
+  // No fallback to window.print() — return error so user knows to retry
+  return NextResponse.json(
+    { error: 'PDF generation failed. Please try again in a moment.' },
+    { status: 503 },
+  );
 }
