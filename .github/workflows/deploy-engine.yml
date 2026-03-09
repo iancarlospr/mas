@@ -42,9 +42,15 @@ jobs:
           context: .
           file: apps/engine/Dockerfile
           push: true
+          provenance: false
+          sbom: false
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          build-args: |
+            CACHE_BUST=${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Deploy to DigitalOcean
         uses: appleboy/ssh-action@v1.2.0
