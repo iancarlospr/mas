@@ -10,6 +10,7 @@ import {
 } from '../services/supabase.js';
 import { calculateMarketingIQFromSynthesis } from '../utils/scoring.js';
 import { clearTrafficCache } from '../services/dataforseo.js';
+import { getPostHog } from '../utils/posthog.js';
 import pino from 'pino';
 
 const logger = pino({ name: 'scan-worker' });
@@ -26,10 +27,18 @@ let worker: Worker<ScanJobData, ScanJobResult> | null = null;
 async function processScanJob(
   job: Job<ScanJobData, ScanJobResult>,
 ): Promise<ScanJobResult> {
-  const { scanId, url, tier, synthesisOnly } = job.data;
+  const { scanId, url, domain, tier, userId, synthesisOnly } = job.data;
   const startTime = Date.now();
+  const distinctId = userId ?? `scan:${scanId}`;
 
   logger.info({ scanId, url, tier, synthesisOnly, jobId: job.id }, 'Processing scan job');
+
+  const ph = getPostHog();
+  ph?.capture({
+    distinctId,
+    event: 'engine_scan_started',
+    properties: { scan_id: scanId, domain, tier, synthesis_only: synthesisOnly },
+  });
 
   try {
     // Create the module runner
@@ -57,7 +66,7 @@ async function processScanJob(
       modulesFailed = fullResult.modulesFailed;
     }
 
-    // Calculate MarketingIQ from M41 AI synthesis scores (all tiers — M41 runs for everyone)
+    // Calculate MarketingIQ from M41 AI synthesis scores (paid tier only — free tier skips synthesis, so MarketingIQ will be null)
     let marketingIqScore: number | null = null;
     const m41Result = results.get('M41' as ModuleId);
     if (m41Result?.status === 'success' && m41Result.data) {
@@ -86,6 +95,19 @@ async function processScanJob(
 
     const duration = Date.now() - startTime;
 
+    ph?.capture({
+      distinctId,
+      event: 'engine_scan_completed',
+      properties: {
+        scan_id: scanId, domain, tier,
+        marketing_iq: marketingIqScore,
+        duration_ms: duration,
+        modules_completed: modulesCompleted,
+        modules_failed: modulesFailed,
+        synthesis_only: synthesisOnly,
+      },
+    });
+
     logger.info(
       {
         scanId,
@@ -108,6 +130,12 @@ async function processScanJob(
   } catch (error) {
     const err = error instanceof Error ? error : new Error(String(error));
     const duration = Date.now() - startTime;
+
+    ph?.capture({
+      distinctId,
+      event: 'engine_scan_failed',
+      properties: { scan_id: scanId, domain, tier, error: err.message, duration_ms: duration },
+    });
 
     logger.error(
       { scanId, error: err.message, duration },

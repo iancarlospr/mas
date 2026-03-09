@@ -4,7 +4,6 @@ import { useRef, useState, useMemo, useCallback, useEffect } from 'react';
 import type { ScanWithResults } from '@marketing-alpha/types';
 import { useWindowManager } from '@/lib/window-manager';
 import { analytics } from '@/lib/analytics';
-import { FREE_CATEGORIES } from './slide-sidebar';
 import { TitleSlide } from './slides/title-slide';
 import { VerdictSlide } from './slides/verdict-slide';
 import { OverviewExecSlide } from './slides/overview-exec-slide';
@@ -129,9 +128,11 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
     return () => ro.disconnect();
   }, []);
 
-  // Visible tabs based on paid status
+  // Visible tabs based on paid status — free users only see MarTech
   const visibleTabs = useMemo(
-    () => NAV_TABS.filter((t) => !t.paidOnly || isPaid),
+    () => isPaid
+      ? NAV_TABS.filter((t) => !t.paidOnly || isPaid)
+      : NAV_TABS.filter((t) => t.key === 'martech'),
     [isPaid],
   );
 
@@ -292,7 +293,6 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
       >
         {visibleTabs.map((tab) => {
           const isActive = activeTabKey === tab.key;
-          const isLocked = !isPaid && tab.categoryKey != null && !FREE_CATEGORIES.has(tab.categoryKey);
           const avgScore = getCategoryScore(tab);
           const dotColor = avgScore != null
             ? avgScore >= 70 ? 'var(--gs-terminal)' : avgScore >= 40 ? 'var(--gs-warning)' : 'var(--gs-critical)'
@@ -309,16 +309,10 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
                 isActive
                   ? 'text-gs-light'
                   : 'text-gs-mid hover:text-gs-light',
-                isLocked && 'opacity-35',
               )}
             >
-              {isLocked && (
-                <svg className="w-2.5 h-2.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-                </svg>
-              )}
               <span>{tab.label}</span>
-              {!isLocked && dotColor && (
+              {dotColor && (
                 <span
                   className="inline-block w-1 h-1 rounded-full flex-shrink-0"
                   style={{ backgroundColor: dotColor }}
@@ -343,102 +337,166 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
           style={{ zoom: slideZoom }}
         >
         <TitleSlide scan={scan} />
-        <VerdictSlide scan={scan} />
-        <div id="nav-about">
-          <OverviewExecSlide scan={scan} />
-        </div>
 
         {isPaid && (
-          <div id="nav-stack-analyzer">
-            <M45Slide scan={scan} />
-          </div>
+          <>
+            <VerdictSlide scan={scan} />
+            <div id="nav-about">
+              <OverviewExecSlide scan={scan} />
+            </div>
+
+            <div id="nav-stack-analyzer">
+              <M45Slide scan={scan} />
+            </div>
+
+            <div id="nav-findings">
+              <FindingsSlide scan={scan} />
+            </div>
+
+            {/* ── Category 1: Security & Compliance ── */}
+            <div id="nav-security">
+              <CategoryIntroSlide scan={scan} category="security_compliance" />
+            </div>
+            <M01Slide scan={scan} />
+            <M12Slide scan={scan} />
+            <M40Slide scan={scan} />
+
+            {/* ── Category 2: Analytics & Measurement ── */}
+            <div id="nav-analytics">
+              <CategoryIntroSlide scan={scan} category="analytics_measurement" />
+            </div>
+            <M05Slide scan={scan} />
+            <M06Slide scan={scan} />
+            <M06bSlide scan={scan} />
+            <M08Slide scan={scan} />
+            <M09Slide scan={scan} />
+
+            {/* ── Category 3: Performance & Experience ── */}
+            <div id="nav-performance">
+              <CategoryIntroSlide scan={scan} category="performance_experience" />
+            </div>
+            <M03Slide scan={scan} />
+            <M13Slide scan={scan} />
+            <M14Slide scan={scan} />
+            <M10Slide scan={scan} />
+            <M11Slide scan={scan} />
+
+            {/* ── Category 4: SEO & Content ── */}
+            <div id="nav-seo">
+              <CategoryIntroSlide scan={scan} category="seo_content" />
+            </div>
+            <M04Slide scan={scan} />
+            <M15Slide scan={scan} />
+            <M26Slide scan={scan} />
+            <M34Slide scan={scan} />
+            <M39Slide scan={scan} />
+
+            {/* ── Category 5: Paid Media ── */}
+            <div id="nav-paid-media">
+              <CategoryIntroSlide scan={scan} category="paid_media" />
+            </div>
+            <M21Slide scan={scan} />
+            <M28Slide scan={scan} />
+            <M29Slide scan={scan} />
+          </>
         )}
 
-        <div id="nav-findings">
-          <FindingsSlide scan={scan} />
-        </div>
-
-        {/* ── Category 1: Security & Compliance ── */}
-        <div id="nav-security">
-          <CategoryIntroSlide scan={scan} category="security_compliance" />
-        </div>
-        <M01Slide scan={scan} />
-        <M12Slide scan={scan} />
-        <M40Slide scan={scan} />
-
-        {/* ── Category 2: Analytics & Measurement ── */}
-        <div id="nav-analytics">
-          <CategoryIntroSlide scan={scan} category="analytics_measurement" />
-        </div>
-        <M05Slide scan={scan} />
-        <M06Slide scan={scan} />
-        <M06bSlide scan={scan} />
-        <M08Slide scan={scan} />
-        <M09Slide scan={scan} />
-
-        {/* ── Category 3: Performance & Experience ── */}
-        <div id="nav-performance">
-          <CategoryIntroSlide scan={scan} category="performance_experience" />
-        </div>
-        <M03Slide scan={scan} />
-        <M13Slide scan={scan} />
-        <M14Slide scan={scan} />
-        <M10Slide scan={scan} />
-        <M11Slide scan={scan} />
-
-        {/* ── Category 4: SEO & Content ── */}
-        <div id="nav-seo">
-          <CategoryIntroSlide scan={scan} category="seo_content" />
-        </div>
-        <M04Slide scan={scan} />
-        <M15Slide scan={scan} />
-        <M26Slide scan={scan} />
-        <M34Slide scan={scan} />
-        <M39Slide scan={scan} />
-
-        {/* ── Category 5: Paid Media ── */}
-        <div id="nav-paid-media">
-          <CategoryIntroSlide scan={scan} category="paid_media" />
-        </div>
-        <M21Slide scan={scan} />
-        <M28Slide scan={scan} />
-        <M29Slide scan={scan} />
-
-        {/* ── Category 6: MarTech & Infrastructure ── */}
+        {/* ── Category 6: MarTech & Infrastructure (free + paid) ── */}
         <div id="nav-martech">
-          <CategoryIntroSlide scan={scan} category="martech_infrastructure" />
+          {isPaid && <CategoryIntroSlide scan={scan} category="martech_infrastructure" />}
         </div>
         <M02Slide scan={scan} />
         <M07Slide scan={scan} />
         <M20Slide scan={scan} />
 
-        {/* ── Category 7: Brand & Digital Presence ── */}
-        <div id="nav-brand">
-          <CategoryIntroSlide scan={scan} category="brand_presence" />
-        </div>
-        <M16Slide scan={scan} />
-        <M17Slide scan={scan} />
-        <M18M19Slide scan={scan} />
-        <M22M23Slide scan={scan} />
-        <M37Slide scan={scan} />
-        <M38Slide scan={scan} />
-
-        {/* ── Category 8: Market Intelligence ── */}
-        <div id="nav-market-intel">
-          <CategoryIntroSlide scan={scan} category="market_intelligence" />
-        </div>
-        <M24Slide scan={scan} />
-        <M25Slide scan={scan} />
-        <M27Slide scan={scan} />
-        <M30Slide scan={scan} />
-        <M31Slide scan={scan} />
-        <M33Slide scan={scan} />
-        <M36Slide scan={scan} />
-
-        {/* ── M43: PRD ── */}
         {isPaid && (
-          <div id="nav-prd">
-            <M43Slide scan={scan} />
+          <>
+            {/* ── Category 7: Brand & Digital Presence ── */}
+            <div id="nav-brand">
+              <CategoryIntroSlide scan={scan} category="brand_presence" />
+            </div>
+            <M16Slide scan={scan} />
+            <M17Slide scan={scan} />
+            <M18M19Slide scan={scan} />
+            <M22M23Slide scan={scan} />
+            <M37Slide scan={scan} />
+            <M38Slide scan={scan} />
+
+            {/* ── Category 8: Market Intelligence ── */}
+            <div id="nav-market-intel">
+              <CategoryIntroSlide scan={scan} category="market_intelligence" />
+            </div>
+            <M24Slide scan={scan} />
+            <M25Slide scan={scan} />
+            <M27Slide scan={scan} />
+            <M30Slide scan={scan} />
+            <M31Slide scan={scan} />
+            <M33Slide scan={scan} />
+            <M36Slide scan={scan} />
+
+            {/* ── M43: PRD ── */}
+            <div id="nav-prd">
+              <M43Slide scan={scan} />
+            </div>
+          </>
+        )}
+
+        {/* ── Free tier upgrade CTA ── */}
+        {!isPaid && (
+          <div
+            className="slide-card flex flex-col items-center justify-center gap-4 select-none"
+            data-slide-id="UpgradeCTA"
+            style={{
+              aspectRatio: '14 / 8.5',
+              background: 'var(--gs-void)',
+              borderRadius: '2px',
+              containerType: 'inline-size',
+            }}
+          >
+            <p
+              className="font-data uppercase text-center"
+              style={{
+                fontSize: 'clamp(1px, 1.1cqi, 16px)',
+                letterSpacing: '0.15em',
+                color: 'var(--gs-mid)',
+              }}
+            >
+              42 more modules available
+            </p>
+            <p
+              className="font-display text-center"
+              style={{
+                fontSize: 'clamp(1px, 2.6cqi, 42px)',
+                fontWeight: 600,
+                color: 'var(--gs-light)',
+                lineHeight: 1.2,
+              }}
+            >
+              Unlock the Full Report
+            </p>
+            <p
+              className="font-data text-center max-w-[60%]"
+              style={{
+                fontSize: 'clamp(1px, 0.95cqi, 15px)',
+                color: 'var(--gs-mid)',
+                lineHeight: 1.5,
+              }}
+            >
+              Executive brief, remediation PRD, ROI scenarios, stack analyzer,
+              PDF export, and GhostChat&trade; — powered by 45 forensic modules.
+            </p>
+            <button
+              onClick={handleDeclassify}
+              className="bevel-button-primary"
+              style={{
+                padding: '10px 32px',
+                fontSize: 'clamp(1px, 1.0cqi, 15px)',
+                fontFamily: 'var(--font-system)',
+                fontWeight: 700,
+              }}
+            >
+              Unlock — from $24.99
+            </button>
           </div>
         )}
 
@@ -450,16 +508,18 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
       {/* Status Bar */}
       <div className="window-statusbar flex-shrink-0">
         <div className="window-statusbar-section">
-          {scan.moduleResults.filter((r) => r.status === 'success' || r.status === 'partial').length} modules analyzed
+          {isPaid
+            ? `${scan.moduleResults.filter((r) => r.status === 'success' || r.status === 'partial').length} modules analyzed`
+            : '3 modules analyzed'}
         </div>
-        <div className="window-statusbar-section">
-          MarketingIQ™: {scan.marketingIq ?? '\u2014'}
-        </div>
+        {isPaid && (
+          <div className="window-statusbar-section">
+            MarketingIQ™: {scan.marketingIq ?? '\u2014'}
+          </div>
+        )}
         {!isPaid && (
-          <button
-            onClick={handleDeclassify}
-            className="bevel-button-primary text-os-xs"
-          >
+          <button onClick={handleDeclassify} className="text-gs-base hover:text-gs-bright transition-colors flex items-center gap-1" style={{ fontSize: '11px', fontFamily: 'var(--font-system)' }}>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
             Unlock — from $24.99
           </button>
         )}

@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 };
 
 const techStack = [
-  { label: 'Forensic Modules', value: '42' },
+  { label: 'Forensic Modules', value: '45' },
   { label: 'Scan Time', value: '~90 seconds' },
   { label: 'Detection Engine', value: 'GhostScan v2.0' },
   { label: 'AI Synthesis', value: 'Proprietary LLM Pipeline' },
@@ -80,7 +80,7 @@ export default function AboutPage() {
 
               <div className="bevel-sunken bg-gs-paper p-gs-4">
                 <p className="font-data text-data-sm text-gs-muted leading-relaxed">
-                  42 forensic modules spanning DNS security, analytics architecture,
+                  45 forensic modules spanning DNS security, analytics architecture,
                   ad pixel tracking, tag governance, consent compliance, and
                   AI-powered synthesis. GhostScan&trade; active browser probing
                   detects what passive analysis can&apos;t see &mdash; A/B tests,

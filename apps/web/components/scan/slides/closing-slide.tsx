@@ -58,6 +58,7 @@ function getScoreColor(score: number): string {
 }
 
 export function ClosingSlide({ scan }: { scan: ScanWithResults }) {
+  const isPaid = scan.tier === 'paid';
   const ditherRef = useRef<HTMLCanvasElement>(null);
   const ditherContainerRef = useRef<HTMLDivElement>(null);
 
@@ -113,9 +114,9 @@ export function ClosingSlide({ scan }: { scan: ScanWithResults }) {
 
   const score = scan.marketingIq;
   const label = score != null ? getMarketingIQLabel(score) : null;
-  const moduleCount = scan.moduleResults.filter(
-    (r) => r.status === 'success' || r.status === 'partial',
-  ).length;
+  const moduleCount = isPaid
+    ? scan.moduleResults.filter((r) => r.status === 'success' || r.status === 'partial').length
+    : 3;
   const scanDate = new Date(scan.createdAt);
   const dateStr = scanDate.toLocaleDateString('en-US', {
     year: 'numeric',
@@ -202,8 +203,8 @@ export function ClosingSlide({ scan }: { scan: ScanWithResults }) {
           {scan.domain}
         </h2>
 
-        {/* MarketingIQ — the final grade */}
-        {score != null && (
+        {/* MarketingIQ — the final grade (paid only) */}
+        {isPaid && score != null && (
           <div style={{ textAlign: 'center', marginBottom: '0.3em' }}>
             <span
               className="font-data tabular-nums"
@@ -219,15 +220,17 @@ export function ClosingSlide({ scan }: { scan: ScanWithResults }) {
             </span>
           </div>
         )}
-        <div className="font-data uppercase" style={{
-          fontSize: T.scoreSub,
-          letterSpacing: '0.2em',
-          color: 'var(--gs-mid)',
-          marginBottom: '0.15em',
-        }}>
-          MarketingIQ&trade;
-        </div>
-        {label && (
+        {isPaid && (
+          <div className="font-data uppercase" style={{
+            fontSize: T.scoreSub,
+            letterSpacing: '0.2em',
+            color: 'var(--gs-mid)',
+            marginBottom: '0.15em',
+          }}>
+            MarketingIQ&trade;
+          </div>
+        )}
+        {isPaid && label && (
           <div className="font-display" style={{
             fontSize: T.scoreLabel,
             fontWeight: 300,
@@ -283,17 +286,19 @@ export function ClosingSlide({ scan }: { scan: ScanWithResults }) {
         </p>
       </div>
 
-      {/* Verification seal — bottom right, notary/diploma style */}
-      <div className="absolute z-10 pointer-events-none" style={{
-        bottom: 'clamp(1px, 3.75cqi, 60px)',
-        right: 'clamp(1px, 3.00cqi, 50px)',
-        width: 'clamp(1px, 8.25cqi, 130px)',
-        aspectRatio: '1',
-        opacity: 0.5,
-        filter: 'drop-shadow(0 0 10px rgba(255,178,239,0.12))',
-      }}>
-        <AuditSeal score={score} />
-      </div>
+      {/* Verification seal — bottom right, notary/diploma style (paid only) */}
+      {isPaid && (
+        <div className="absolute z-10 pointer-events-none" style={{
+          bottom: 'clamp(1px, 3.75cqi, 60px)',
+          right: 'clamp(1px, 3.00cqi, 50px)',
+          width: 'clamp(1px, 8.25cqi, 130px)',
+          aspectRatio: '1',
+          opacity: 0.5,
+          filter: 'drop-shadow(0 0 10px rgba(255,178,239,0.12))',
+        }}>
+          <AuditSeal score={score} />
+        </div>
+      )}
 
       {/* Bayer dither strip — bottom edge (bookend with title slide) */}
       <div

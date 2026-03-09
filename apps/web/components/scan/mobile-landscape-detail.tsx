@@ -114,7 +114,7 @@ export function MobileLandscapeDetail({
           moduleName={name}
           result={result}
           scanId={scan.id}
-          isPaid={!isPaid && PAID_MODULES.has(activeModuleId)}
+          isPaid={isPaid || !PAID_MODULES.has(activeModuleId)}
           isGhostModule={GHOST_MODULES.has(activeModuleId)}
         />
       </div>

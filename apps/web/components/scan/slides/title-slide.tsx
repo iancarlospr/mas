@@ -66,14 +66,14 @@ interface TitleSlideProps {
 }
 
 export function TitleSlide({ scan }: TitleSlideProps) {
+  const isPaid = scan.tier === 'paid';
   const score = scan.marketingIq;
   const label = score != null ? getMarketingIQLabel(score) : null;
   const categories = scan.marketingIqResult?.categories ?? [];
-  const moduleCount = scan.moduleResults.filter(
-    (r) => r.status === 'success' || r.status === 'partial',
-  ).length;
-  const totalModules = scan.moduleResults.length;
-  const isPaid = scan.tier === 'paid';
+  const moduleCount = isPaid
+    ? scan.moduleResults.filter((r) => r.status === 'success' || r.status === 'partial').length
+    : 3;
+  const totalModules = isPaid ? scan.moduleResults.length : 3;
 
   const scanDate = new Date(scan.createdAt);
   const dateStr = scanDate.toLocaleDateString('en-US', {
@@ -126,7 +126,7 @@ export function TitleSlide({ scan }: TitleSlideProps) {
       {/* Content grid */}
       <div className="relative z-10 h-full flex">
 
-        {/* -- LEFT PANEL (3/5) -- */}
+        {/* -- LEFT PANEL (3/5 paid, full width free) -- */}
         <div
           className="flex flex-col"
           style={{ width: '58%', padding: '1.5% 3% 1.5% 3.5%' }}
@@ -185,7 +185,7 @@ export function TitleSlide({ scan }: TitleSlideProps) {
               </p>
             )}
 
-            {label && (
+            {isPaid && label && (
               <div
                 className="font-display uppercase"
                 style={{
@@ -223,11 +223,15 @@ export function TitleSlide({ scan }: TitleSlideProps) {
           className="flex items-center justify-center"
           style={{ width: '42%', padding: '1.5% 3.5% 1.5% 2%', overflow: 'visible' }}
         >
-          <ScoreVisual
-            score={score}
-            scorePercent={scorePercent}
-            categories={categories}
-          />
+          {isPaid ? (
+            <ScoreVisual
+              score={score}
+              scorePercent={scorePercent}
+              categories={categories}
+            />
+          ) : (
+            <LockedScoreVisual />
+          )}
         </div>
       </div>
 
@@ -490,6 +494,110 @@ function ScoreVisual({
             Pending
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+/* -- Locked Score Visual: teaser rings with ? center -- */
+
+function LockedScoreVisual() {
+  const size = 460;
+  const cx = size / 2;
+  const cy = size / 2;
+  const pk = 'rgba(255,178,239,';
+
+  // 8 dashed arc segments around the outer ring
+  const segments = 8;
+  const gap = 4;
+  const segAngle = (360 - gap * segments) / segments;
+
+  function arcPath(r: number, startDeg: number, endDeg: number): string {
+    const startRad = ((startDeg - 90) * Math.PI) / 180;
+    const endRad = ((endDeg - 90) * Math.PI) / 180;
+    const x1 = cx + r * Math.cos(startRad);
+    const y1 = cy + r * Math.sin(startRad);
+    const x2 = cx + r * Math.cos(endRad);
+    const y2 = cy + r * Math.sin(endRad);
+    const largeArc = endDeg - startDeg > 180 ? 1 : 0;
+    return `M ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2}`;
+  }
+
+  return (
+    <div className="relative" style={{ width: '100%', aspectRatio: '1' }}>
+      <svg
+        viewBox={`0 0 ${size} ${size}`}
+        className="w-full h-full"
+        style={{ overflow: 'visible' }}
+      >
+        {/* Main ring — dashed */}
+        <circle
+          cx={cx} cy={cy} r={170}
+          fill="none"
+          stroke={`${pk}0.08)`}
+          strokeWidth="8"
+          strokeDasharray="12 8"
+        />
+
+        {/* Outer category ring — dashed segments */}
+        {Array.from({ length: segments }, (_, i) => {
+          const startDeg = i * (segAngle + gap);
+          return (
+            <path
+              key={i}
+              d={arcPath(192, startDeg, startDeg + segAngle)}
+              fill="none"
+              stroke={`${pk}0.06)`}
+              strokeWidth="4"
+              strokeLinecap="round"
+              strokeDasharray="6 6"
+            />
+          );
+        })}
+
+        {/* Inner decorative ring */}
+        <circle
+          cx={cx} cy={cy} r={142}
+          fill="none"
+          stroke={`${pk}0.04)`}
+          strokeWidth="0.5"
+        />
+
+        {/* Lock icon at center */}
+        <g transform={`translate(${cx - 16}, ${cy - 28})`} opacity="0.25">
+          <rect x="2" y="14" width="28" height="20" rx="3" fill="none" stroke={`${pk}0.5)`} strokeWidth="2" />
+          <path d="M8 14V10a8 8 0 0 1 16 0v4" fill="none" stroke={`${pk}0.5)`} strokeWidth="2" strokeLinecap="round" />
+        </g>
+      </svg>
+
+      {/* Center: ? + label */}
+      <div
+        className="absolute inset-0 flex flex-col items-center justify-center"
+        style={{ pointerEvents: 'none' }}
+      >
+        <div
+          className="font-data tabular-nums"
+          style={{
+            fontSize: T.scoreNum,
+            fontWeight: 700,
+            lineHeight: 0.85,
+            letterSpacing: '-0.04em',
+            color: `${pk}0.12)`,
+          }}
+        >
+          ?
+        </div>
+        <div
+          className="font-data uppercase"
+          style={{
+            fontSize: T.scoreSub,
+            letterSpacing: '0.2em',
+            color: `${pk}0.15)`,
+            marginTop: '0.5em',
+          }}
+        >
+          MarketingIQ
+        </div>
       </div>
     </div>
   );

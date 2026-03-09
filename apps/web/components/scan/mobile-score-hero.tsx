@@ -35,7 +35,7 @@ export function MobileScoreHero({ scan }: { scan: ScanWithResults }) {
             {scan.domain} — {new Date(scan.createdAt).toLocaleDateString()}
           </div>
           <div className="font-data text-data-xs text-gs-muted">
-            {scan.moduleResults.filter((r) => r.status === 'success' || r.status === 'partial').length} modules completed
+            {scan.tier === 'paid' ? scan.moduleResults.filter((r) => r.status === 'success' || r.status === 'partial').length : 3} modules completed
           </div>
         </div>
       </div>

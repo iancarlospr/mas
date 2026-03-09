@@ -76,7 +76,7 @@ function getExecutor(moduleId: ModuleId): ModuleExecuteFn {
  * Phase configuration mapping tiers to which phases they run.
  */
 const TIER_PHASES: Record<ModuleTier, ScanStatus[]> = {
-  full: ['passive', 'browser', 'ghostscan', 'external', 'paid-media', 'synthesis'],
+  full: ['passive', 'browser'],
   paid: ['passive', 'browser', 'ghostscan', 'external', 'paid-media', 'synthesis'],
 };
 
@@ -197,7 +197,7 @@ export class ModuleRunner {
             break;
           case 'browser':
             await this.runBrowserPhase();
-            await this.runMobilePass();
+            if (this.tier !== 'full') await this.runMobilePass();
             break;
           case 'ghostscan':
             await this.runGhostScanPhase();

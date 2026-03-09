@@ -128,12 +128,12 @@ export function ModuleSlide({
         )}
 
         {/* Paid user — full content */}
-        {!isError && result && !isPaid && (
+        {!isError && result && isPaid && (
           <PaidContent result={result} dataEntries={dataEntries} toolSignals={toolSignals} />
         )}
 
         {/* Free user — limited content + redaction overlay */}
-        {!isError && result && isPaid && (
+        {!isError && result && !isPaid && (
           <FreeContent
             result={result}
             freeCheckpointLimit={freeCheckpointLimit}
@@ -151,7 +151,7 @@ export function ModuleSlide({
       </ModulePanel>
 
       {/* Redaction overlay for free tier */}
-      {isPaid && result && (
+      {!isPaid && result && (
         <UnlockOverlay scanId={scanId} hiddenCount={hiddenCount > 0 ? hiddenCount : undefined} />
       )}
     </div>

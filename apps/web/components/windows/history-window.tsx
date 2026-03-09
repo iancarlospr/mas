@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/auth-context';
 import { useWindowManager } from '@/lib/window-manager';
 import { useScanOrchestrator } from '@/lib/scan-orchestrator';
+import { analytics } from '@/lib/analytics';
 
 /* ═══════════════════════════════════════════════════════════════
    My Scans — Window Content
@@ -51,6 +52,7 @@ export default function HistoryWindow() {
     try {
       const res = await fetch(`/api/scans/${scanId}`, { method: 'DELETE' });
       if (res.ok) {
+        analytics.scanDeleted(scanId);
         setScans((prev) => prev.filter((s) => s.id !== scanId));
         // Close the scan window if it's open
         const windowId = `scan-${scanId}`;
@@ -125,7 +127,7 @@ export default function HistoryWindow() {
         <span className="w-14 text-center">Score</span>
         <span className="w-6 text-center" />
         <span className="w-14 text-center">Tier</span>
-        <span className="w-28 text-center">Export</span>
+        <span className="w-28 text-center">Actions</span>
         <span className="w-16 text-right">Date</span>
         <span className="w-6" />
       </div>
@@ -180,18 +182,33 @@ export default function HistoryWindow() {
                 </span>
               </span>
               <span className="w-28 text-center flex items-center justify-center gap-1 whitespace-nowrap">
-                {scan.tier === 'paid' && scan.status === 'complete' && (
-                  <>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); window.open(`/api/reports/${scan.id}/prd`, '_blank'); }}
-                      className="text-gs-base hover:text-gs-bright transition-colors"
-                      title="Download PRD"
-                      style={{ fontSize: '11px', fontFamily: 'var(--font-system)' }}
-                    >
-                      PRD&nbsp;&darr;
-                    </button>
-                  </>
-                )}
+                {scan.tier === 'paid' && scan.status === 'complete' ? (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); window.open(`/api/reports/${scan.id}/prd`, '_blank'); }}
+                    className="text-gs-base hover:text-gs-bright transition-colors"
+                    title="Download PRD"
+                    style={{ fontSize: '11px', fontFamily: 'var(--font-system)' }}
+                  >
+                    PRD&nbsp;&darr;
+                  </button>
+                ) : scan.tier !== 'paid' && scan.status === 'complete' ? (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      let domain: string;
+                      try { domain = new URL(scan.url).hostname; } catch { domain = scan.url; }
+                      const paymentId = `payment-${scan.id}`;
+                      wm.registerWindow(paymentId, { title: 'Checkout', width: 420, height: 300, variant: 'dialog', componentType: 'payment' });
+                      wm.openWindow(paymentId, { scanId: scan.id, domain, product: 'alpha_brief' });
+                    }}
+                    className="text-gs-base hover:text-gs-bright transition-colors flex items-center gap-1"
+                    title="Unlock full report"
+                    style={{ fontSize: '11px', fontFamily: 'var(--font-system)' }}
+                  >
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    Unlock
+                  </button>
+                ) : null}
               </span>
               <span className="w-16 text-right text-data-xs text-gs-muted">
                 {new Date(scan.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}

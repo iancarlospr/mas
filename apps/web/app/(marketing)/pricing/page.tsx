@@ -59,7 +59,7 @@ export default function PricingPage() {
               {[
                 {
                   q: 'What does the free scan include?',
-                  a: 'All 42 forensic modules, GhostScan active probing, a full dashboard with findings, per-module AI insights, PPC landing page audit, and DataForSEO market intelligence. No credit card required.',
+                  a: '3 MarTech modules — CMS & infrastructure detection, MarTech orchestration, and ecommerce/SaaS detection. Full results with no redaction. No credit card required.',
                 },
                 {
                   q: 'What does the Alpha Brief unlock?',
