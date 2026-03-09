@@ -161,6 +161,7 @@ export function SignupWall({ domain, scanUrl }: SignupWallProps) {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Your name"
+                  autoComplete="name"
                   fullWidth
                 />
               )}
@@ -170,6 +171,7 @@ export function SignupWall({ domain, scanUrl }: SignupWallProps) {
                 onChange={(e) => { setEmail(e.target.value); if (error) setError(null); }}
                 required
                 placeholder="you@company.com"
+                autoComplete="email"
                 fullWidth
               />
               <BevelInput
@@ -179,6 +181,7 @@ export function SignupWall({ domain, scanUrl }: SignupWallProps) {
                 required
                 minLength={8}
                 placeholder="Min. 8 characters"
+                autoComplete={mode === 'register' ? 'new-password' : 'current-password'}
                 fullWidth
               />
 

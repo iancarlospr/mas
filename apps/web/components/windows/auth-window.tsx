@@ -234,6 +234,7 @@ export default function AuthWindow() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Your name"
+              autoComplete="name"
               fullWidth
             />
           </div>
@@ -248,6 +249,7 @@ export default function AuthWindow() {
             onChange={(e) => setEmail(e.target.value)}
             required
             placeholder="you@company.com"
+            autoComplete="email"
             fullWidth
           />
         </div>
@@ -262,6 +264,7 @@ export default function AuthWindow() {
             required
             minLength={8}
             placeholder="Min. 8 characters"
+            autoComplete={isRegister ? 'new-password' : 'current-password'}
             fullWidth
           />
         </div>

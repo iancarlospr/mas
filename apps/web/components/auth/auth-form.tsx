@@ -198,6 +198,7 @@ export function AuthForm({ mode }: AuthFormProps) {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Your name"
+                    autoComplete="name"
                     fullWidth
                   />
                 </div>
@@ -212,6 +213,7 @@ export function AuthForm({ mode }: AuthFormProps) {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   placeholder="you@company.com"
+                  autoComplete="email"
                   fullWidth
                 />
               </div>
@@ -226,6 +228,7 @@ export function AuthForm({ mode }: AuthFormProps) {
                   required
                   minLength={8}
                   placeholder="Min. 8 characters"
+                  autoComplete={mode === 'register' ? 'new-password' : 'current-password'}
                   fullWidth
                 />
               </div>

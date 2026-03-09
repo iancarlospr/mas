@@ -298,6 +298,7 @@ export default function ProfileWindow() {
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               placeholder="New password (min. 8 chars)"
+              autoComplete="new-password"
               minLength={8}
               fullWidth
             />
@@ -306,6 +307,7 @@ export default function ProfileWindow() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="Confirm new password"
+              autoComplete="new-password"
               fullWidth
             />
             <button
