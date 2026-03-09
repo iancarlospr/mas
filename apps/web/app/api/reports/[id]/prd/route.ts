@@ -155,9 +155,6 @@ function renderDocument(ctx: PRDContext): NextResponse {
 /* ── Page Setup ─────────────────────────────────────── */
 @page {
   size: 8.5in 14in;
-  margin: 0.7in 0.75in;
-}
-@page:first {
   margin: 0;
 }
 
@@ -722,13 +719,7 @@ body {
   }
   .document-body {
     margin-top: 0 !important;
-    padding: 0 !important;
-  }
-  .finding-card {
-    margin-top: 20pt;
-  }
-  h2, h3 {
-    margin-top: 28pt;
+    padding: 0.5in 0.65in !important;
   }
 }
 </style>
