@@ -63,6 +63,12 @@ export async function middleware(request: NextRequest) {
     }
   }
 
+  // Skip auth for engine PDF rendering — the slides page handles its own
+  // auth via service role when ?print=1 is present
+  if (isPrintRender) {
+    return NextResponse.next();
+  }
+
   return await updateSession(request);
 }
 
