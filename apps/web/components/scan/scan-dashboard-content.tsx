@@ -337,13 +337,10 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
       </div>
 
       {/* ── Scrollable Module Content ── */}
-      <div ref={contentRef} className="flex-1 overflow-y-auto" style={{ background: '#ffffff' }}>
+      <div ref={contentRef} className="flex-1 overflow-y-auto overflow-x-hidden" style={{ background: '#ffffff' }}>
         <div
           className="p-gs-4 space-y-gs-3"
-          style={{
-            zoom: slideZoom,
-            width: slideZoom < 1 ? `${100 / slideZoom}%` : undefined,
-          }}
+          style={{ zoom: slideZoom }}
         >
         <TitleSlide scan={scan} />
         <VerdictSlide scan={scan} />
