@@ -31,8 +31,11 @@ export async function generatePresentationPDF(
     ],
   });
   try {
+    // Use a wider viewport so slides have more vertical space (14:8.5 aspect ratio).
+    // At 1344px width, cards are only 816px tall and content overflows.
+    // At 1920px width, cards are 1165px tall — matching typical browser view.
     const page = await browser.newPage({
-      viewport: { width: 1344, height: 816 },
+      viewport: { width: 1920, height: 1165 },
     });
 
     // Capture page errors for debugging

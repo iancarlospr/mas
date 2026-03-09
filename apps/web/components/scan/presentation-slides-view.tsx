@@ -84,7 +84,8 @@ export function PresentationSlidesView({ scan, autoPrint = false }: { scan: Scan
       <div
         data-slides-loaded={ready ? 'true' : 'false'}
         style={{
-          width: '1344px',
+          width: '100%',
+          maxWidth: '1920px',
           margin: '0 auto',
           background: '#080808',
         }}
