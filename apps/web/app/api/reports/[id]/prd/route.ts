@@ -546,9 +546,11 @@ body {
   border-left: 3.5pt solid #718096;
   border-radius: 3pt;
   padding: 14pt 16pt;
-  margin: 12pt 0;
+  margin: 16pt 0;
   background: #FAFBFD;
   page-break-inside: avoid;
+  break-inside: avoid;
+  padding-top: 18pt;
 }
 .finding-card.p0 { border-left-color: #C53030; }
 .finding-card.p1 { border-left-color: #C05621; }
@@ -718,6 +720,12 @@ body {
   .document-body {
     margin-top: 0 !important;
     padding: 0.6in 0.75in;
+  }
+  .finding-card {
+    margin-top: 20pt;
+  }
+  h2, h3 {
+    margin-top: 28pt;
   }
 }
 </style>
