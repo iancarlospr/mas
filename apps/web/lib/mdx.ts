@@ -21,19 +21,24 @@ export function getAllPosts(): BlogPostMeta[] {
 
   const files = fs.readdirSync(CONTENT_DIR).filter((f) => f.endsWith('.mdx'));
 
-  const posts: BlogPostMeta[] = files.map((file) => {
-    const slug = file.replace(/\.mdx$/, '');
-    const raw = fs.readFileSync(path.join(CONTENT_DIR, file), 'utf-8');
-    const { data } = matter(raw);
+  const posts = files
+    .map((file) => {
+      const slug = file.replace(/\.mdx$/, '');
+      const raw = fs.readFileSync(path.join(CONTENT_DIR, file), 'utf-8');
+      const { data } = matter(raw);
 
-    return {
-      slug,
-      title: data.title ?? slug,
-      excerpt: data.excerpt ?? '',
-      date: data.date ?? '',
-      author: data.author,
-    };
-  });
+      // Skip drafts — only show posts with published: true
+      if (data.published === false) return null;
+
+      return {
+        slug,
+        title: data.title ?? slug,
+        excerpt: data.excerpt ?? '',
+        date: data.date ?? '',
+        author: data.author as string | undefined,
+      };
+    })
+    .filter((p) => p !== null);
 
   return posts.sort((a, b) => (a.date > b.date ? -1 : 1));
 }
