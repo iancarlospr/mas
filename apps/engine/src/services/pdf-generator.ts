@@ -49,33 +49,21 @@ export async function generatePresentationPDF(
     });
 
     console.log(`[pdf-generator] Navigating to ${url}`);
-    const response = await page.goto(url, { waitUntil: 'networkidle', timeout: 30_000 });
+    const response = await page.goto(url, { waitUntil: 'networkidle', timeout: 60_000 });
     console.log(`[pdf-generator] Page loaded: status=${response?.status()}, url=${page.url()}`);
 
-    // Log what we see on the page
-    const pageTitle = await page.title();
-    const bodyText = await page.evaluate(() => document.body?.innerText?.substring(0, 200) || 'empty');
-    const slidesAttr = await page.evaluate(() => document.querySelector('[data-slides-loaded]')?.getAttribute('data-slides-loaded') ?? 'NOT FOUND');
+    // Wait for slide cards to appear (don't rely on data-slides-loaded —
+    // document.fonts.ready doesn't resolve in headless browsers)
+    await page.waitForSelector('.slide-card', { timeout: 30_000 });
     const cardCount = await page.evaluate(() => document.querySelectorAll('.slide-card').length);
-    console.log(`[pdf-generator] Page state: title="${pageTitle}", slidesLoaded="${slidesAttr}", cards=${cardCount}, body="${bodyText.substring(0, 100)}"`);
+    console.log(`[pdf-generator] Found ${cardCount} slide cards`);
 
-    // Wait for slides — try data-slides-loaded first, fall back to .slide-card
-    if (slidesAttr !== 'true') {
-      console.log(`[pdf-generator] Waiting for slides to load...`);
-      try {
-        await page.waitForSelector('[data-slides-loaded="true"]', { timeout: 30_000 });
-      } catch {
-        // Fallback: wait for slide cards to appear
-        console.log(`[pdf-generator] data-slides-loaded timeout, checking for .slide-card elements...`);
-        const finalCardCount = await page.evaluate(() => document.querySelectorAll('.slide-card').length);
-        console.log(`[pdf-generator] Found ${finalCardCount} slide cards`);
-        if (finalCardCount === 0) {
-          throw new Error('No slides rendered on the page');
-        }
-        // Give extra time for rendering
-        await page.waitForTimeout(2000);
-      }
+    if (cardCount === 0) {
+      throw new Error('No slides rendered on the page');
     }
+
+    // Wait for rendering to settle (canvas animations, fonts, layout)
+    await page.waitForTimeout(3000);
 
     // Extra settle time for canvas animations (plasma, dithering)
     await page.waitForTimeout(500);
