@@ -21,15 +21,64 @@ export const analytics = {
     posthog.capture('signup_wall_converted', { domain });
   },
 
-  reportPurchased(scanId: string, product: string) {
-    posthog.capture('report_purchased', { scan_id: scanId, product });
-  },
-
   chatMessageSent(scanId: string) {
     posthog.capture('chat_message_sent', { scan_id: scanId });
   },
 
   moduleExpanded(moduleId: string, scanId: string) {
     posthog.capture('module_expanded', { module_id: moduleId, scan_id: scanId });
+  },
+
+  checkoutStarted(product: string, scanId: string, amountCents: number) {
+    posthog.capture('checkout_started', { product, scan_id: scanId, amount_cents: amountCents });
+  },
+
+  /** PRD/PDF download — source distinguishes which button was clicked */
+  pdfDownloaded(scanId: string, domain: string, source: 'status_bar' | 'm43_slide' | 'report_topbar') {
+    posthog.capture('pdf_downloaded', { scan_id: scanId, domain, source });
+  },
+
+  shareLinkCreated(scanId: string) {
+    posthog.capture('share_link_created', { scan_id: scanId });
+  },
+
+  scanDeleted(scanId: string) {
+    posthog.capture('scan_deleted', { scan_id: scanId });
+  },
+
+  accountDeleted() {
+    posthog.capture('account_deleted');
+  },
+
+  windowOpened(windowId: string) {
+    posthog.capture('window_opened', { window_id: windowId });
+  },
+
+  chatActivated(scanId: string) {
+    posthog.capture('chat_activated', { scan_id: scanId });
+  },
+
+  authFailed(mode: string, errorMessage: string, context?: string) {
+    posthog.capture('auth_failed', { mode, error_message: errorMessage, context });
+  },
+
+  /** Scan report opened — fires when ScanDashboardContent mounts with data */
+  reportViewed(scanId: string, domain: string, tier: string) {
+    posthog.capture('report_viewed', { scan_id: scanId, domain, tier });
+  },
+
+  /** Tab/category navigation within the scan report */
+  reportTabClicked(scanId: string, tabKey: string) {
+    posthog.capture('report_tab_clicked', { scan_id: scanId, tab: tabKey });
+  },
+
+  /** Slide became visible via scroll (fires once per slide per session) */
+  slideViewed(scanId: string, slideId: string) {
+    posthog.capture('slide_viewed', { scan_id: scanId, slide_id: slideId });
+  },
+
+  /** Scroll depth milestone in the report (25%, 50%, 75%, 100%) */
+  reportScrollDepth(scanId: string, depth: number) {
+    posthog.capture('report_scroll_depth', { scan_id: scanId, depth_percent: depth });
   },
 };
