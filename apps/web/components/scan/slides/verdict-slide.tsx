@@ -182,7 +182,7 @@ function PlasmaCanvas() {
         return;
       }
 
-      timeRef.current += 0.008;
+      timeRef.current += 0.025;
       const t = timeRef.current;
 
       for (let y = 0; y < rows; y++) {
