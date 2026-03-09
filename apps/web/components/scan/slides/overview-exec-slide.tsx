@@ -150,7 +150,7 @@ export function OverviewExecSlide({ scan }: OverviewExecSlideProps) {
       <div className="relative z-10 h-full flex flex-col" style={{ paddingBottom: 'clamp(8px, 2.8cqi, 28px)' }}>
 
         {/* ── TOP: Two-column layout ── */}
-        <div className="flex flex-1 min-h-0">
+        <div className="flex flex-1 min-h-0" style={{ flexShrink: 0 }}>
 
           {/* ── LEFT PANEL (~50%) — About + Index ── */}
           <div
@@ -359,6 +359,9 @@ export function OverviewExecSlide({ scan }: OverviewExecSlideProps) {
           <div
             style={{
               padding: '1.2% 3.5% 1.5%',
+              overflow: 'hidden',
+              flexShrink: 1,
+              minHeight: 0,
             }}
           >
             <h3
@@ -373,7 +376,7 @@ export function OverviewExecSlide({ scan }: OverviewExecSlideProps) {
             >
               Detected Stack
             </h3>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35em' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35em', overflow: 'hidden' }}>
               {detectedTools.map((t) => (
                 <span
                   key={t.name}
