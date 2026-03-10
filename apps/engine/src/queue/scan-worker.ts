@@ -95,6 +95,25 @@ async function processScanJob(
 
     const duration = Date.now() - startTime;
 
+    // Collect synthesis and failure diagnostics for PostHog
+    let synthesisFailed = 0;
+    let synthesisTotal = 0;
+    const failedModules: string[] = [];
+    const failedErrors: Record<string, string> = {};
+
+    for (const [modId, modResult] of results) {
+      if (modResult.status === 'error') {
+        failedModules.push(modId);
+        if (modResult.error) failedErrors[modId] = modResult.error;
+      }
+    }
+
+    if (m41Result?.status === 'success' && m41Result.data) {
+      const m41 = m41Result.data as unknown as import('@marketing-alpha/types').M41Data;
+      synthesisTotal = m41.synthesizedCount + m41.failedCount;
+      synthesisFailed = m41.failedCount;
+    }
+
     ph?.capture({
       distinctId,
       event: 'engine_scan_completed',
@@ -105,6 +124,11 @@ async function processScanJob(
         modules_completed: modulesCompleted,
         modules_failed: modulesFailed,
         synthesis_only: synthesisOnly,
+        synthesis_total: synthesisTotal,
+        synthesis_failed: synthesisFailed,
+        synthesis_degraded: synthesisFailed > 0,
+        failed_modules: failedModules,
+        failed_errors: failedErrors,
       },
     });
 
