@@ -336,6 +336,8 @@ interface WindowManagerContextValue {
   visibleWindows: WindowState[];
   openWindows: WindowState[];
   taskbarWindows: WindowState[];
+  /** True when any scan-report window is open (used to suppress ghost) */
+  hasOpenScanReport: boolean;
 }
 
 const WindowManagerContext = createContext<WindowManagerContextValue | null>(null);
@@ -358,6 +360,8 @@ export function WindowManagerProvider({ children }: { children: ReactNode }) {
 
   const openWindow = useCallback((id: string, data?: Record<string, unknown>) => {
     dispatch({ type: 'OPEN', id, data });
+    // Lazy import to avoid circular deps (analytics imports posthog-js, not this module)
+    import('@/lib/analytics').then(({ analytics }) => analytics.windowOpened(id)).catch(() => {});
   }, []);
 
   const closeWindow = useCallback((id: string) => {
@@ -419,6 +423,11 @@ export function WindowManagerProvider({ children }: { children: ReactNode }) {
     [state.windows],
   );
 
+  const hasOpenScanReport = useMemo(
+    () => Object.values(state.windows).some((w) => w.isOpen && w.componentType === 'scan-report'),
+    [state.windows],
+  );
+
   const value = useMemo<WindowManagerContextValue>(
     () => ({
       windows: state.windows,
@@ -437,6 +446,7 @@ export function WindowManagerProvider({ children }: { children: ReactNode }) {
       visibleWindows,
       openWindows,
       taskbarWindows,
+      hasOpenScanReport,
     }),
     [
       state.windows,
@@ -455,6 +465,7 @@ export function WindowManagerProvider({ children }: { children: ReactNode }) {
       visibleWindows,
       openWindows,
       taskbarWindows,
+      hasOpenScanReport,
     ],
   );
 

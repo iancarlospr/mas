@@ -187,7 +187,7 @@ export function DesktopShell({ children }: { children: ReactNode }) {
         {children}
 
         {/* Chloe screenmate — living desktop pet */}
-        <ChloeScreenmate active />
+        <ChloeScreenmate active suppressed={wm.hasOpenScanReport || orchestrator.isVisualSequenceActive} />
       </div>
 
       {/* Taskbar (bottom) */}

@@ -29,6 +29,8 @@ interface ChloeScreenmateProps {
   initialX?: number;
   initialY?: number;
   active?: boolean;
+  /** When true, ghost puffs away (scan running or report open) */
+  suppressed?: boolean;
 }
 
 /* -- Laser beam constants ------------------------------------- */
@@ -179,6 +181,7 @@ export function ChloeScreenmate({
   initialX,
   initialY,
   active = true,
+  suppressed = false,
 }: ChloeScreenmateProps) {
   const { state, speech, speechVariant, triggerReaction, dismissSpeech } =
     useChloeReactions();
@@ -205,6 +208,34 @@ export function ChloeScreenmate({
   const laserTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const ghostSpriteRef = useRef<HTMLDivElement>(null);
 
+  /* -- Puff animation (suppressed = scan running or report open) */
+  const [puffVisible, setPuffVisible] = useState(!suppressed);
+  const [puffing, setPuffing] = useState<'in' | 'out' | null>(null);
+
+  useEffect(() => {
+    if (suppressed) {
+      // Kill active laser immediately
+      setLaserTarget(null);
+      zapTargetRef.current = null;
+      // Start puff-out
+      setPuffing('out');
+      const timer = setTimeout(() => {
+        setPuffVisible(false);
+        setPuffing(null);
+      }, 400);
+      return () => clearTimeout(timer);
+    } else {
+      // Puff back in
+      setPuffVisible(true);
+      // Need a frame for the element to mount before transitioning
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setPuffing('in'));
+      });
+      const timer = setTimeout(() => setPuffing(null), 400);
+      return () => clearTimeout(timer);
+    }
+  }, [suppressed]);
+
   /* -- Initialize position to bottom-right of desktop --------- */
   useEffect(() => {
     if (initialized) return;
@@ -216,6 +247,8 @@ export function ChloeScreenmate({
 
   /* -- Roam every 57s: dart around viewport then settle to bottom */
   useEffect(() => {
+    if (suppressed) return;
+
     const roam = () => {
       const vw = window.innerWidth;
       const vh = window.innerHeight;
@@ -257,7 +290,7 @@ export function ChloeScreenmate({
       clearTimeout(timer);
       clearInterval(interval);
     };
-  }, []);
+  }, [suppressed]);
 
   /* -- Animation frame counter (blink + wave) ----------------- */
   useEffect(() => {
@@ -445,6 +478,8 @@ export function ChloeScreenmate({
 
   // Input sweep — fires at 22s, repeats every 22s if scan window still open
   useEffect(() => {
+    if (suppressed) return;
+
     const doSweepAnim = (startX: number, startY: number, sweepWidth: number, onDone: () => void) => {
       const sweepDuration = 1200;
       const sweepStart = Date.now();
@@ -515,11 +550,12 @@ export function ChloeScreenmate({
       clearInterval(repeatId);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [suppressed]);
 
   // Pricing window — laser the "Unlock Results" button 3s after open
   const pricingFiredRef = useRef(false);
   useEffect(() => {
+    if (suppressed) return;
     const pricingWin = wm.windows['pricing'];
     if (pricingWin?.isOpen && !pricingWin.isMinimized && !pricingFiredRef.current) {
       pricingFiredRef.current = true;
@@ -567,13 +603,15 @@ export function ChloeScreenmate({
     if (!pricingWin?.isOpen) {
       pricingFiredRef.current = false; // reset when closed so it fires again next open
     }
-  }, [wm.windows]);
+  }, [wm.windows, suppressed]);
 
   // Random icon zaps — only fire when laser is active (during a sweep event)
   const laserActiveRef = useRef(false);
   laserActiveRef.current = !!laserTarget;
 
   useEffect(() => {
+    if (suppressed) return;
+
     laserTimerRef.current = setInterval(() => {
       if (!laserActiveRef.current) return;
 
@@ -615,14 +653,17 @@ export function ChloeScreenmate({
     return () => {
       if (laserTimerRef.current) clearInterval(laserTimerRef.current);
     };
-  }, []);
+  }, [suppressed]);
 
   /* -- Double-click: random quip ------------------------------ */
   const handleDoubleClick = useCallback(() => {
     triggerReaction({ type: 'idle-quip' });
   }, [triggerReaction]);
 
-  if (!active || !initialized) return null;
+  if (!active || !initialized || !puffVisible) return null;
+
+  const isPuffingOut = puffing === 'out';
+  const isPuffingIn = puffing === 'in';
 
   return (
     <div
@@ -631,9 +672,16 @@ export function ChloeScreenmate({
       style={{
         left: position.x,
         top: position.y,
+        opacity: isPuffingOut ? 0 : (isPuffingIn || !puffing) ? 1 : 0,
+        transform: isPuffingOut ? 'scale(1.3)' : 'scale(1)',
+        filter: isPuffingOut ? 'blur(6px)' : isPuffingIn ? 'blur(0px)' : undefined,
         transition: isDragging
           ? 'none'
-          : 'left 1.8s cubic-bezier(0.34, 1.56, 0.64, 1), top 1.8s cubic-bezier(0.34, 1.56, 0.64, 1)',
+          : [
+              'left 1.8s cubic-bezier(0.34, 1.56, 0.64, 1)',
+              'top 1.8s cubic-bezier(0.34, 1.56, 0.64, 1)',
+              ...(puffing ? ['opacity 400ms ease-out', 'transform 400ms ease-out', 'filter 400ms ease-out'] : []),
+            ].join(', '),
         willChange: 'left, top',
       }}
     >
