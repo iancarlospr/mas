@@ -5,15 +5,20 @@ import pino from 'pino';
 const logger = pino({ name: 'gemini-service' });
 
 let genAI: GoogleGenerativeAI | null = null;
+let apiKeyMissing = false;
 
 /**
  * Initialize the Google Generative AI client.
+ * Caches missing-key state to fail instantly on subsequent calls
+ * instead of re-checking process.env each time.
  */
 function getClient(): GoogleGenerativeAI {
   if (genAI) return genAI;
+  if (apiKeyMissing) throw new Error('Missing GOOGLE_AI_API_KEY environment variable');
 
   const apiKey = process.env['GOOGLE_AI_API_KEY'];
   if (!apiKey) {
+    apiKeyMissing = true;
     throw new Error('Missing GOOGLE_AI_API_KEY environment variable');
   }
 

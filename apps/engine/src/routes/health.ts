@@ -14,6 +14,11 @@ interface HealthResponse {
   memory_heap_mb: number;
   uptime_seconds: number;
   queue_depth: number;
+  config: {
+    gemini: boolean;
+    supabase: boolean;
+    redis: boolean;
+  };
 }
 
 /**
@@ -65,6 +70,11 @@ export async function healthRoutes(fastify: FastifyInstance): Promise<void> {
         memory_heap_mb: heapMb,
         uptime_seconds: uptimeSeconds,
         queue_depth: queueDepth,
+        config: {
+          gemini: !!process.env['GOOGLE_AI_API_KEY'],
+          supabase: !!process.env['SUPABASE_URL'],
+          redis: !!process.env['REDIS_URL'],
+        },
       };
 
       // Return 503 if Redis is down

@@ -5,6 +5,7 @@ import { healthRoutes } from './routes/health.js';
 import { scanRoutes } from './routes/scans.js';
 import { startScanWorker, stopScanWorker } from './queue/scan-worker.js';
 import { closeRedisConnection } from './queue/connection.js';
+import { shutdownPostHog } from './utils/posthog.js';
 import pino from 'pino';
 
 // Register all module executors (side-effect imports)
@@ -15,6 +16,25 @@ import './modules/external/index.js';
 import './modules/synthesis/index.js';
 
 const logger = pino({ name: 'engine-server' });
+
+/**
+ * Validate that all required environment variables are present.
+ * Fails fast at startup instead of failing silently per-scan.
+ */
+function validateRequiredEnvVars(): void {
+  const required = [
+    'GOOGLE_AI_API_KEY',
+    'SUPABASE_URL',
+    'SUPABASE_SERVICE_ROLE_KEY',
+    'ENGINE_HMAC_SECRET',
+    'REDIS_URL',
+  ];
+  const missing = required.filter((key) => !process.env[key]);
+  if (missing.length > 0) {
+    logger.fatal({ missing }, 'Missing required environment variables — engine cannot start');
+    process.exit(1);
+  }
+}
 
 /**
  * Create and configure the Fastify server.
@@ -81,6 +101,9 @@ export async function buildServer() {
  * Start the server and scan worker.
  */
 async function start(): Promise<void> {
+  // Fail fast if critical env vars are missing
+  validateRequiredEnvVars();
+
   const port = parseInt(process.env['PORT'] ?? '3001', 10);
   const host = process.env['HOST'] ?? '0.0.0.0';
 
@@ -102,6 +125,10 @@ async function start(): Promise<void> {
       // Stop the scan worker (wait for current job to finish)
       await stopScanWorker();
       logger.info('Scan worker stopped');
+
+      // Flush PostHog events
+      await shutdownPostHog();
+      logger.info('PostHog flushed');
 
       // Close Redis connection
       await closeRedisConnection();

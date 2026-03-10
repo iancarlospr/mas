@@ -989,6 +989,12 @@ export class ModuleRunner {
           'Module execution failed',
         );
       }
+
+      // Don't retry configuration errors (missing env vars) — they won't self-resolve
+      if (lastError?.message.includes('Missing') && lastError.message.includes('environment variable')) {
+        logger.error({ moduleId: mod.id }, 'Configuration error — skipping retries');
+        break;
+      }
     }
 
     // If no successful result, create an error result
