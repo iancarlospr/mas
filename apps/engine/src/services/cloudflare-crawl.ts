@@ -217,12 +217,12 @@ export async function pollUntilDone(
 
   while (Date.now() - start < maxWait) {
     try {
-      const result = await getCrawlStatus(jobId);
+      const result = await getCrawlStatus(jobId, 100, 'completed');
       lastStatus = result.status;
 
       // Collect completed pages
       for (const record of result.records) {
-        if (record.status === 'completed' && record.html) {
+        if (record.html) {
           pages.set(normalizePageUrl(record.url), record);
         }
       }
