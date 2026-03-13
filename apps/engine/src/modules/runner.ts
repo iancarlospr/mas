@@ -304,8 +304,8 @@ export class ModuleRunner {
 
     try {
       this.crawlJobId = await cfCrawl.submitCrawl(this.context.url, {
-        limit: 50,
-        depth: 2,
+        limit: 100,
+        depth: 3,
         source: 'all',
         formats: ['html'],
         render: true,
@@ -330,7 +330,7 @@ export class ModuleRunner {
 
     try {
       const { pages, jobStatus } = await cfCrawl.pollUntilDone(this.crawlJobId, {
-        maxWaitMs: 45_000,
+        maxWaitMs: 60_000,
         pollIntervalMs: 5_000,
       });
 
