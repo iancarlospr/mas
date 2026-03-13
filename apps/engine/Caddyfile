@@ -1,0 +1,72 @@
+{
+	servers {
+		max_header_size 16kb
+	}
+}
+
+engine.marketingalphascan.com {
+	# Request body size limit (10MB — covers scan payloads)
+	request_body {
+		max_size 10MB
+	}
+
+	reverse_proxy engine:3001 {
+		# Timeouts for upstream
+		transport http {
+			dial_timeout 10s
+			response_header_timeout 300s
+			read_timeout 300s
+			write_timeout 300s
+		}
+
+		# Health check upstream
+		health_uri /engine/health
+		health_interval 30s
+		health_timeout 5s
+	}
+
+	header {
+		# Transport security (2-year HSTS with preload)
+		Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
+
+		# Prevent MIME sniffing
+		X-Content-Type-Options "nosniff"
+
+		# Clickjacking protection
+		X-Frame-Options "DENY"
+
+		# Referrer policy
+		Referrer-Policy "strict-origin-when-cross-origin"
+
+		# Content Security Policy — API-only, deny all content rendering
+		Content-Security-Policy "default-src 'none'; frame-ancestors 'none'"
+
+		# Permissions Policy — deny all browser features for API
+		Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()"
+
+		# Prevent Flash/PDF cross-domain requests
+		X-Permitted-Cross-Domain-Policies "none"
+
+		# Remove server identity headers
+		-Server
+		-X-Powered-By
+	}
+
+	# CORS — only allow requests from the web app
+	@cors_preflight method OPTIONS
+	handle @cors_preflight {
+		header Access-Control-Allow-Origin "https://marketingalphascan.com"
+		header Access-Control-Allow-Methods "GET, POST, OPTIONS"
+		header Access-Control-Allow-Headers "Content-Type, Authorization, X-Engine-Signature, X-Engine-Timestamp"
+		header Access-Control-Max-Age "86400"
+		respond "" 204
+	}
+
+	header Access-Control-Allow-Origin "https://marketingalphascan.com"
+
+	log {
+		output stdout
+		format json
+		level INFO
+	}
+}

@@ -1,0 +1,9 @@
+[
+  { "pattern": "googletagmanager.com", "tool": "Google Tag Manager" },
+  { "pattern": "www.googletagmanager.com", "tool": "Google Tag Manager" },
+  { "pattern": "tags.tiqcdn.com", "tool": "Tealium iQ" },
+  { "pattern": "collect.tealiumiq.com", "tool": "Tealium iQ" },
+  { "pattern": "assets.adobedtm.com", "tool": "Adobe Launch" },
+  { "pattern": "nexus.ensighten.com", "tool": "Ensighten" },
+  { "pattern": "cdn.segment.com", "tool": "Segment" }
+]

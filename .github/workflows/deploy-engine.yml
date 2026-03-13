@@ -1,0 +1,88 @@
+name: Deploy Engine
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/engine/**'
+      - 'packages/types/**'
+      - 'apps/engine/Dockerfile'
+      - '.github/workflows/deploy-engine.yml'
+
+concurrency:
+  group: deploy-engine
+  cancel-in-progress: false  # Never cancel a deploy in progress
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository_owner }}/alphascan-engine
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        run: |
+          docker build \
+            -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest \
+            -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            -f apps/engine/Dockerfile .
+          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+
+      - name: Deploy to DigitalOcean
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.DO_HOST }}
+          username: deploy
+          key: ${{ secrets.DO_SSH_PRIVATE_KEY }}
+          script: |
+            cd /opt/alphascan
+
+            # Pull latest image
+            docker compose -f docker-compose.prod.yml pull engine
+
+            # Restart engine (Redis stays up)
+            docker compose -f docker-compose.prod.yml up -d engine
+
+            # Wait for Docker health check (engine only exposed within Docker network)
+            echo "Waiting for engine to be healthy..."
+            for i in $(seq 1 30); do
+              STATUS=$(docker inspect --format='{{.State.Health.Status}}' alphascan-engine 2>/dev/null || echo "missing")
+              if [ "$STATUS" = "healthy" ]; then
+                echo "Engine is healthy!"
+                exit 0
+              fi
+              echo "Attempt $i/30 (status: $STATUS)..."
+              sleep 2
+            done
+
+            echo "Health check failed after 60 seconds"
+            docker logs alphascan-engine --tail 20
+            exit 1
+
+      - name: Rollback on failure
+        if: failure()
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.DO_HOST }}
+          username: deploy
+          key: ${{ secrets.DO_SSH_PRIVATE_KEY }}
+          script: |
+            cd /opt/alphascan
+            PREV_SHA=$(docker inspect alphascan-engine --format='{{index .Config.Image}}' | cut -d: -f2)
+            echo "Rolling back from $PREV_SHA..."
+            docker compose -f docker-compose.prod.yml up -d engine
+            echo "Rollback completed. Manual investigation required."

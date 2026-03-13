@@ -1,0 +1,264 @@
+import { Worker, type Job, type WorkerOptions } from 'bullmq';
+import { getRedisConnection } from './connection.js';
+import { SCAN_QUEUE_NAME, type ScanJobData, type ScanJobResult } from './scan-queue.js';
+import type { ModuleId, ModuleResult } from '@marketing-alpha/types';
+import { ModuleRunner } from '../modules/runner.js';
+import {
+  updateScanStatus,
+  updateScanMarketingIQ,
+  getModuleResults,
+} from '../services/supabase.js';
+import { calculateMarketingIQFromSynthesis } from '../utils/scoring.js';
+import { clearTrafficCache } from '../services/dataforseo.js';
+import { getPostHog } from '../utils/posthog.js';
+import pino from 'pino';
+
+const logger = pino({ name: 'scan-worker' });
+
+let worker: Worker<ScanJobData, ScanJobResult> | null = null;
+
+/**
+ * Process a scan job through all phases based on tier.
+ *
+ * Tier phases:
+ *   full = passive + browser + ghostscan + external + M41 synthesis
+ *   paid = all phases including M42-M45 synthesis
+ */
+async function processScanJob(
+  job: Job<ScanJobData, ScanJobResult>,
+): Promise<ScanJobResult> {
+  const { scanId, url, domain, tier, userId, synthesisOnly } = job.data;
+  const startTime = Date.now();
+  const distinctId = userId ?? `scan:${scanId}`;
+
+  logger.info({ scanId, url, tier, synthesisOnly, jobId: job.id }, 'Processing scan job');
+
+  const ph = getPostHog();
+  ph?.capture({
+    distinctId,
+    event: 'engine_scan_started',
+    properties: { scan_id: scanId, domain, tier, synthesis_only: synthesisOnly },
+  });
+
+  try {
+    // Create the module runner
+    const runner = new ModuleRunner(scanId, url, tier);
+
+    let results: Map<string, ModuleResult>;
+    let modulesCompleted: number;
+    let modulesFailed: number;
+
+    if (synthesisOnly) {
+      // Load existing module results from DB (M01-M41 already ran)
+      const existingResults = await getModuleResults(scanId);
+      const existingMap = new Map(existingResults.map(r => [r.moduleId, r]));
+
+      // Run only the synthesis phase with pre-loaded results
+      const synthResult = await runner.runSynthesisOnly(existingMap);
+      results = synthResult.results;
+      modulesCompleted = synthResult.modulesCompleted;
+      modulesFailed = synthResult.modulesFailed;
+    } else {
+      // Full scan: run all phases
+      const fullResult = await runner.run();
+      results = fullResult.results;
+      modulesCompleted = fullResult.modulesCompleted;
+      modulesFailed = fullResult.modulesFailed;
+    }
+
+    // Calculate MarketingIQ from M41 AI synthesis scores (paid tier only — free tier skips synthesis, so MarketingIQ will be null)
+    let marketingIqScore: number | null = null;
+    const m41Result = results.get('M41' as ModuleId);
+    if (m41Result?.status === 'success' && m41Result.data) {
+      const m41Data = m41Result.data as unknown as import('@marketing-alpha/types').M41Data;
+      const marketingIqResult = calculateMarketingIQFromSynthesis(m41Data);
+      marketingIqScore = marketingIqResult.final;
+
+      try {
+        await updateScanMarketingIQ(
+          scanId,
+          marketingIqResult.final,
+          marketingIqResult as unknown as Record<string, unknown>,
+        );
+      } catch (error) {
+        logger.error(
+          { scanId, error: (error as Error).message },
+          'Failed to update MarketingIQ',
+        );
+      }
+    }
+
+    // Mark scan as complete
+    await updateScanStatus(scanId, 'complete', {
+      ...(marketingIqScore != null ? { marketing_iq: marketingIqScore } : {}),
+    });
+
+    const duration = Date.now() - startTime;
+
+    // Collect synthesis and failure diagnostics for PostHog
+    let synthesisFailed = 0;
+    let synthesisTotal = 0;
+    const failedModules: string[] = [];
+    const failedErrors: Record<string, string> = {};
+
+    for (const [modId, modResult] of results) {
+      if (modResult.status === 'error') {
+        failedModules.push(modId);
+        if (modResult.error) failedErrors[modId] = modResult.error;
+      }
+    }
+
+    if (m41Result?.status === 'success' && m41Result.data) {
+      const m41 = m41Result.data as unknown as import('@marketing-alpha/types').M41Data;
+      synthesisTotal = m41.synthesizedCount + m41.failedCount;
+      synthesisFailed = m41.failedCount;
+    }
+
+    ph?.capture({
+      distinctId,
+      event: 'engine_scan_completed',
+      properties: {
+        scan_id: scanId, domain, tier,
+        marketing_iq: marketingIqScore,
+        duration_ms: duration,
+        modules_completed: modulesCompleted,
+        modules_failed: modulesFailed,
+        synthesis_only: synthesisOnly,
+        synthesis_total: synthesisTotal,
+        synthesis_failed: synthesisFailed,
+        synthesis_degraded: synthesisFailed > 0,
+        failed_modules: failedModules,
+        failed_errors: failedErrors,
+      },
+    });
+
+    logger.info(
+      {
+        scanId,
+        marketingIq: marketingIqScore,
+        modulesCompleted,
+        modulesFailed,
+        duration,
+      },
+      'Scan job completed successfully',
+    );
+
+    return {
+      scanId,
+      status: 'complete',
+      marketingIq: marketingIqScore,
+      modulesCompleted,
+      modulesFailed,
+      duration,
+    };
+  } catch (error) {
+    const err = error instanceof Error ? error : new Error(String(error));
+    const duration = Date.now() - startTime;
+
+    ph?.capture({
+      distinctId,
+      event: 'engine_scan_failed',
+      properties: { scan_id: scanId, domain, tier, error: err.message, duration_ms: duration },
+    });
+
+    logger.error(
+      { scanId, error: err.message, duration },
+      'Scan job failed',
+    );
+
+    // Mark scan as failed
+    try {
+      await updateScanStatus(scanId, 'failed', {
+        error: err.message,
+      });
+    } catch (updateError) {
+      logger.error(
+        { scanId, error: (updateError as Error).message },
+        'Failed to update scan status to failed',
+      );
+    }
+
+    return {
+      scanId,
+      status: 'failed',
+      marketingIq: null,
+      modulesCompleted: 0,
+      modulesFailed: 0,
+      duration,
+    };
+  } finally {
+    // Clear any cached API responses for this scan
+    clearTrafficCache();
+  }
+}
+
+/**
+ * Start the BullMQ scan worker.
+ */
+export function startScanWorker(): Worker<ScanJobData, ScanJobResult> {
+  if (worker) return worker;
+
+  const connection = getRedisConnection();
+
+  worker = new Worker<ScanJobData, ScanJobResult>(
+    SCAN_QUEUE_NAME,
+    processScanJob,
+    {
+      connection: connection as WorkerOptions['connection'],
+      concurrency: 1,
+      stalledInterval: 60_000,    // Check for stalled jobs every 60s
+      lockDuration: 600_000,      // Job lock held for 10 minutes
+      lockRenewTime: 300_000,     // Renew lock every 5 minutes
+      limiter: {
+        max: 1,
+        duration: 1_000,
+      },
+    },
+  );
+
+  worker.on('completed', (job, result) => {
+    logger.info(
+      {
+        jobId: job?.id,
+        scanId: result?.scanId,
+        marketingIq: result?.marketingIq,
+        duration: result?.duration,
+      },
+      'Worker: job completed',
+    );
+  });
+
+  worker.on('failed', (job, error) => {
+    logger.error(
+      {
+        jobId: job?.id,
+        scanId: job?.data?.scanId,
+        error: error.message,
+        attemptsMade: job?.attemptsMade,
+      },
+      'Worker: job failed',
+    );
+  });
+
+  worker.on('stalled', (jobId) => {
+    logger.warn({ jobId }, 'Worker: job stalled');
+  });
+
+  worker.on('error', (error) => {
+    logger.error({ error: error.message }, 'Worker: error');
+  });
+
+  logger.info('Scan worker started');
+  return worker;
+}
+
+/**
+ * Gracefully stop the scan worker.
+ */
+export async function stopScanWorker(): Promise<void> {
+  if (worker) {
+    await worker.close();
+    worker = null;
+    logger.info('Scan worker stopped');
+  }
+}
