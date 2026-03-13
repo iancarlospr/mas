@@ -2,29 +2,11 @@ import { registerModuleExecutor } from '../runner.js';
 import type { ModuleContext, ModuleExecuteFn } from '../types.js';
 import type { ModuleResult, ModuleId, Signal, Checkpoint } from '@marketing-alpha/types';
 import { createSignal, createCheckpoint, infoCheckpoint } from '../../utils/signals.js';
-import { fetchWithRetry } from '../../utils/http.js';
 import { normalizeUrl } from '../../utils/url.js';
 import { parseHtml, extractLinks, extractScriptSrcs } from '../../utils/html.js';
 import type { CheerioAPI } from '../../utils/html.js';
-import { detectPageLanguage, expandProbePaths, getMultilingualKeywords } from '../../utils/i18n-probes.js';
-import { discoverPathsFromSitemap } from '../../utils/sitemap.js';
-import { findMatchingCrawlPages, getUncoveredPaths } from '../../utils/crawl-probe.js';
-import { fetchRenderedContent } from '../../services/cloudflare-crawl.js';
+import { detectPageLanguage } from '../../utils/i18n-probes.js';
 import * as cheerio from 'cheerio';
-
-// ─── Probe paths (English base — expanded at runtime via i18n-probes) ───────
-const CAREERS_PATHS_BASE = [
-  '/careers', '/careers/jobs', '/jobs', '/join-us', '/about/team', '/team', '/culture',
-  '/hiring', '/work-with-us', '/join', '/opportunities', '/about/careers',
-  '/careers/openings', '/open-positions',
-  // Locale-prefixed career paths (samsung.com/us/careers, etc.)
-  '/us/careers', '/en/careers', '/en-us/careers', '/global/careers',
-  '/company/careers', '/about-us/careers', '/corporate/careers',
-] as const;
-
-const CAREERS_LINK_KEYWORDS_BASE = [
-  'careers', 'jobs', 'join us', 'join our team', 'we\'re hiring', 'work with us',
-] as const;
 
 // ─── ATS providers ──────────────────────────────────────────────────────────
 const ATS_PROVIDERS: { name: string; patterns: RegExp[] }[] = [
@@ -56,33 +38,6 @@ interface ProbeResult {
   found: boolean;
   html?: string;
   status?: number;
-}
-
-async function probePath(
-  baseUrl: string,
-  path: string,
-): Promise<ProbeResult> {
-  try {
-    const result = await fetchWithRetry(`${baseUrl}${path}`, {
-      timeout: 8000,
-      retries: 1,
-    });
-    if (result.ok) {
-      // Reject catch-all redirects to homepage that contain no careers content
-      const finalUrl = new URL(result.finalUrl);
-      if (finalUrl.pathname === '/' && path !== '/') {
-        const bodyLower = result.body.toLowerCase();
-        const careerSignals = ['career', 'job opening', 'open position', 'join our team',
-          'we are hiring', 'work with us', 'current opportunities', 'apply now'];
-        const hits = careerSignals.filter(kw => bodyLower.includes(kw)).length;
-        if (hits < 1) return { path, found: false, status: result.status };
-      }
-      return { path, found: true, html: result.body, status: result.status };
-    }
-    return { path, found: false, status: result.status };
-  } catch {
-    return { path, found: false };
-  }
 }
 
 /**
@@ -304,29 +259,6 @@ function detectEmployerBranding($: CheerioAPI): {
   return result;
 }
 
-/**
- * Check the main page HTML for nav/footer links to careers-related pages.
- * Uses multilingual keywords based on the page's detected language.
- */
-function findCareersLinksInMainPage($: CheerioAPI, lang: string): string[] {
-  const careersLinks: string[] = [];
-  const keywords = getMultilingualKeywords(CAREERS_LINK_KEYWORDS_BASE, lang, 'careers');
-
-  $('a[href]').each((_, el) => {
-    const href = $(el).attr('href') ?? '';
-    const text = $(el).text().trim().toLowerCase();
-
-    for (const keyword of keywords) {
-      if (text.includes(keyword) || href.toLowerCase().includes(`/${keyword.replace(/\s+/g, '-')}`)) {
-        careersLinks.push(href);
-        break;
-      }
-    }
-  });
-
-  return [...new Set(careersLinks)];
-}
-
 // ─── Module execute function ────────────────────────────────────────────────
 
 const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResult> => {
@@ -336,196 +268,18 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
 
   const baseUrl = normalizeUrl(ctx.url);
 
-  // Detect page language for multilingual probe expansion
+  // Detect page language
   const lang = ctx.html ? detectPageLanguage(ctx.html) : 'en';
-  const CAREERS_PATHS_STATIC = expandProbePaths(CAREERS_PATHS_BASE, lang, 'careers');
   data.detected_language = lang;
 
-  // 0. Discover careers paths from sitemap.xml / robots.txt
-  const CAREERS_KEYWORDS = ['career', 'jobs', 'hiring', 'join', 'talent', 'employment', 'vacancies', 'openings'];
-  const sitemapDiscovery = await discoverPathsFromSitemap(baseUrl, CAREERS_KEYWORDS, { timeout: 6000, maxMatchedPaths: 10 });
-  data.sitemap_discovery = {
-    found: sitemapDiscovery.sitemapFound,
-    matched: sitemapDiscovery.matchedPaths,
-    robotsHints: sitemapDiscovery.robotsHints,
-  };
-
-  // Merge sitemap-discovered paths with static paths
-  const staticPathSet = new Set(CAREERS_PATHS_STATIC);
-  const sitemapPaths = [
-    ...sitemapDiscovery.matchedPaths,
-    ...sitemapDiscovery.robotsHints,
-  ].filter(p => !staticPathSet.has(p));
-  const CAREERS_PATHS = [...CAREERS_PATHS_STATIC, ...sitemapPaths];
-
-  // 1. Check the main page for careers-related links
-  let mainPageCareersLinks: string[] = [];
-  if (ctx.html) {
-    const $main = parseHtml(ctx.html);
-    mainPageCareersLinks = findCareersLinksInMainPage($main, lang);
-  }
-
-  // 2. Crawl-first discovery: check crawl results before probing
-  const CAREERS_CONTENT_SIGNALS = [
-    'career', 'job opening', 'open position', 'join our team',
-    'we are hiring', 'work with us', 'apply now', 'current opening',
-    'open role', 'empleo', 'vacante',
-  ];
-  const crawlHits = findMatchingCrawlPages(
-    ctx.crawlPages, baseUrl, CAREERS_PATHS,
-    (html) => CAREERS_CONTENT_SIGNALS.some(kw => html.includes(kw)),
-  );
-
+  // Use pre-rendered sitemap pages from runner
   const foundPages: ProbeResult[] = [];
 
-  for (const page of crawlHits) {
-    const path = new URL(page.url).pathname;
-    foundPages.push({ path, found: true, html: page.html, status: page.metadata.status });
+  for (const page of ctx.sitemapPages?.careers ?? []) {
+    foundPages.push({ path: page.path, found: true, html: page.html, status: 200 });
   }
 
-  // 2a. Probe uncovered paths via Cloudflare /content, then raw HTTP as fallback
-  const uncoveredPaths = getUncoveredPaths(ctx.crawlPages, baseUrl, CAREERS_PATHS);
-  const coveredByCf = new Set<string>();
-
-  const cfProbeResults = await Promise.allSettled(
-    uncoveredPaths.map(async (path) => {
-      const url = `${baseUrl}${path}`;
-      const html = await fetchRenderedContent(url);
-      if (!html) return null;
-      coveredByCf.add(path);
-      return { path, found: true as const, html, status: 200 };
-    }),
-  );
-
-  for (const result of cfProbeResults) {
-    if (result.status === 'fulfilled' && result.value) {
-      foundPages.push(result.value);
-    }
-  }
-
-  // Last resort: raw HTTP
-  const stillUncovered = uncoveredPaths.filter(p => !coveredByCf.has(p));
-  const probeResults = await Promise.allSettled(
-    stillUncovered.map((path) => probePath(baseUrl, path)),
-  );
-
-  for (const result of probeResults) {
-    if (result.status === 'fulfilled' && result.value.found) {
-      foundPages.push(result.value);
-    }
-  }
-
-  // 2b. Follow discovered careers links from the main page that weren't covered by fixed path probes
-  if (mainPageCareersLinks.length > 0 && foundPages.length === 0) {
-    const probedPathSet = new Set(CAREERS_PATHS.map(p => `${baseUrl}${p}`.toLowerCase()));
-    const discoveredUrls: string[] = [];
-
-    for (const link of mainPageCareersLinks) {
-      try {
-        const resolved = new URL(link, baseUrl).href;
-        if (probedPathSet.has(resolved.toLowerCase())) continue;
-        if (!resolved.startsWith('http')) continue;
-        discoveredUrls.push(resolved);
-      } catch { /* ignore malformed URLs */ }
-    }
-
-    const discoveredProbes = await Promise.allSettled(
-      discoveredUrls.slice(0, 5).map(async (url) => {
-        try {
-          const result = await fetchWithRetry(url, { timeout: 8000, retries: 1 });
-          if (result.ok) {
-            // Trust links discovered via career-keyword matching on main page.
-            // The link text already confirmed relevance (matched against career keywords).
-            // Skip body content validation — the page may need JS rendering
-            // (e.g., orientalbank.com's /es/conoce-a-oriental/oportunidades-de-empleo/).
-            // Only reject same-domain redirects to homepage (catch-all guard).
-            const finalUrl = new URL(result.finalUrl);
-            const originalUrl = new URL(url);
-            const finalHost = finalUrl.hostname.replace(/^www\./, '');
-            const origHost = originalUrl.hostname.replace(/^www\./, '');
-            if (finalUrl.pathname === '/' && originalUrl.pathname !== '/' && finalHost === origHost) {
-              return { path: originalUrl.pathname, found: false as const, status: result.status };
-            }
-            const parsedUrl = new URL(url);
-            const baseHost = new URL(baseUrl).hostname.replace(/^www\./, '');
-            const probeHost = parsedUrl.hostname.replace(/^www\./, '');
-            const pathKey = probeHost !== baseHost
-              ? `${probeHost}${parsedUrl.pathname}`
-              : parsedUrl.pathname;
-            return { path: pathKey, found: true as const, html: result.body, status: result.status };
-          }
-          return { path: new URL(url).pathname, found: false as const, status: result.status };
-        } catch {
-          // Trust links discovered via career-keyword matching even on fetch failure
-          // (e.g. orientalbank.com timeout on JS-rendered careers page).
-          // The link text already confirmed relevance; score with empty HTML so
-          // checkpoint logic sees the discovered page (even without content analysis).
-          try {
-            const parsedUrl = new URL(url);
-            const baseHost = new URL(baseUrl).hostname.replace(/^www\./, '');
-            const probeHost = parsedUrl.hostname.replace(/^www\./, '');
-            const pathKey = probeHost !== baseHost
-              ? `${probeHost}${parsedUrl.pathname}`
-              : parsedUrl.pathname;
-            return { path: pathKey, found: true as const, html: '', status: 0 };
-          } catch {
-            return { path: url, found: false as const };
-          }
-        }
-      })
-    );
-
-    for (const result of discoveredProbes) {
-      if (result.status === 'fulfilled' && result.value.found) {
-        foundPages.push(result.value);
-      }
-    }
-  }
-
-  // 2c. Probe common careers subdomains (careers.company.com, jobs.company.com, etc.)
-  if (foundPages.length === 0) {
-    const CAREERS_SUBDOMAINS = ['careers', 'jobs', 'talent', 'hiring', 'people'] as const;
-    const CAREERS_SUBDOMAIN_PATHS = ['/', '/search', '/jobs'] as const;
-    const registrableDomain = new URL(baseUrl).hostname.replace(/^www\./, '');
-
-    const subdomainProbes = await Promise.allSettled(
-      CAREERS_SUBDOMAINS.flatMap(sub =>
-        CAREERS_SUBDOMAIN_PATHS.map(async (path) => {
-          const subUrl = `https://${sub}.${registrableDomain}${path}`;
-          try {
-            const result = await fetchWithRetry(subUrl, { timeout: 8000, retries: 1 });
-            if (result.ok && result.body) {
-              // Guard against wildcard DNS: verify content contains career-related keywords
-              const bodyLower = result.body.toLowerCase();
-              const careerSignals = [
-                'career', 'job opening', 'open position', 'join our team',
-                'we are hiring', 'work with us', 'apply now', 'current opening',
-                'open role', 'empleo', 'vacante',
-              ];
-              const hits = careerSignals.filter(kw => bodyLower.includes(kw)).length;
-              if (hits >= 1) {
-                return { path: `${sub}.${registrableDomain}${path}`, found: true as const, html: result.body, status: result.status };
-              }
-            }
-            return { path: `${sub}.${registrableDomain}${path}`, found: false as const, status: result.status };
-          } catch {
-            return { path: `${sub}.${registrableDomain}${path}`, found: false as const };
-          }
-        })
-      )
-    );
-
-    for (const result of subdomainProbes) {
-      if (result.status === 'fulfilled' && result.value.found) {
-        foundPages.push(result.value);
-        break; // One successful subdomain is enough
-      }
-    }
-  }
-
-  data.probed_paths = CAREERS_PATHS;
   data.found_pages = foundPages.map((p) => p.path);
-  data.main_page_careers_links = mainPageCareersLinks;
 
   // 3. Analyze found pages
   let bestCareersPage: ProbeResult | null = null;

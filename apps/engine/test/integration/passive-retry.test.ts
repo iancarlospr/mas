@@ -73,12 +73,19 @@ vi.mock('../../src/services/crux.js', () => ({
   fetchCruxData: vi.fn().mockResolvedValue(null),
 }));
 
-// Mock Cloudflare crawl service
-vi.mock('../../src/services/cloudflare-crawl.js', () => ({
+// Mock Cloudflare render service
+vi.mock('../../src/services/cloudflare-render.js', () => ({
   isAvailable: vi.fn().mockReturnValue(false),
-  submitCrawl: vi.fn().mockResolvedValue('mock-job-id'),
-  pollUntilDone: vi.fn().mockResolvedValue({ pages: new Map(), jobStatus: 'completed' }),
   fetchRenderedContent: vi.fn().mockResolvedValue(null),
+}));
+
+// Mock sitemap discovery
+vi.mock('../../src/utils/sitemap.js', () => ({
+  discoverPathsFromSitemap: vi.fn().mockResolvedValue({
+    matchedPaths: [],
+    robotsHints: [],
+    sitemapFound: false,
+  }),
 }));
 
 // Mock registry — only passive + browser modules

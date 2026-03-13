@@ -1622,21 +1622,6 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
   // Sitemap needs robots.txt sitemapUrls first
   const sitemap = await fetchSitemap(ctx.url, robotsTxt.sitemapUrls);
 
-  // Enrich sitemap URLs with crawl-discovered pages
-  if (ctx.crawlPages && ctx.crawlPages.size > 0 && sitemap.present) {
-    const existing = new Set((sitemap.urls ?? []).map(u => u.toLowerCase()));
-    const crawlUrls: string[] = [];
-    for (const [url, page] of ctx.crawlPages) {
-      if (page.status === 'completed' && !existing.has(url.toLowerCase())) {
-        crawlUrls.push(url);
-      }
-    }
-    if (crawlUrls.length > 0) {
-      sitemap.urls = [...(sitemap.urls ?? []), ...crawlUrls].slice(0, 500);
-      sitemap.urlCount = sitemap.urls.length;
-    }
-  }
-
   // Structured data extraction (microdata, RDFa, rich snippet eligibility)
   const structuredData = extractStructuredData(ctx.html);
 

@@ -33,7 +33,6 @@ import type { FormSnapshot } from '../utils/form-collector.js';
 import type { ContentAnalysis } from '../utils/content-analyzer.js';
 import type { ImageAudit } from '../utils/image-auditor.js';
 import type { LinkAnalysis } from '../utils/link-analyzer.js';
-import type { CrawledPage } from '../services/cloudflare-crawl.js';
 import type { ModuleId, ModuleTier, ModuleResult } from '@marketing-alpha/types';
 import type { ModuleDataMap } from '@marketing-alpha/types';
 
@@ -165,11 +164,13 @@ export interface ModuleContext {
   /** Optional proxy configuration for this scan. */
   proxy?: { server: string };
 
-  /** Cloudflare crawl results — discovered and rendered pages. */
-  crawlPages?: Map<string, CrawledPage>;
-
-  /** Source of ctx.html for diagnostics. */
-  htmlSource?: 'raw' | 'cloudflare' | 'browser';
+  /** Sitemap-discovered pages, categorized and pre-rendered via Cloudflare /content. */
+  sitemapPages?: {
+    press: Array<{ url: string; path: string; html: string }>;
+    careers: Array<{ url: string; path: string; html: string }>;
+    ir: Array<{ url: string; path: string; html: string }>;
+    support: Array<{ url: string; path: string; html: string }>;
+  };
 }
 
 // ---------------------------------------------------------------------------

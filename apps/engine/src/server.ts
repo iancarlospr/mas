@@ -6,7 +6,7 @@ import { scanRoutes } from './routes/scans.js';
 import { startScanWorker, stopScanWorker } from './queue/scan-worker.js';
 import { closeRedisConnection } from './queue/connection.js';
 import { shutdownPostHog } from './utils/posthog.js';
-import { isAvailable as cfCrawlAvailable } from './services/cloudflare-crawl.js';
+import { isAvailable as cfRenderAvailable } from './services/cloudflare-render.js';
 import pino from 'pino';
 
 // Register all module executors (side-effect imports)
@@ -115,7 +115,7 @@ async function start(): Promise<void> {
   logger.info('Scan worker started');
 
   // Log Cloudflare Browser Rendering availability
-  logger.info({ cloudflare_crawl: cfCrawlAvailable() }, 'Cloudflare Browser Rendering status');
+  logger.info({ cloudflare_render: cfRenderAvailable() }, 'Cloudflare Browser Rendering status');
 
   // Graceful shutdown
   const shutdown = async (signal: string) => {

@@ -6,36 +6,8 @@ import { fetchWithRetry } from '../../utils/http.js';
 import { normalizeUrl } from '../../utils/url.js';
 import { parseHtml, extractLinks } from '../../utils/html.js';
 import type { CheerioAPI } from '../../utils/html.js';
-import { detectPageLanguage, expandProbePaths, buildMultilingualLinkRegex } from '../../utils/i18n-probes.js';
-import { discoverPathsFromSitemap } from '../../utils/sitemap.js';
-import { findMatchingCrawlPages, getUncoveredPaths } from '../../utils/crawl-probe.js';
-import { fetchRenderedContent } from '../../services/cloudflare-crawl.js';
+import { detectPageLanguage } from '../../utils/i18n-probes.js';
 import * as cheerio from 'cheerio';
-
-// ─── Probe paths (English base — expanded at runtime via i18n-probes) ───────
-const IR_PATHS_BASE = [
-  '/investors', '/investor', '/ir', '/investor-relations', '/sec-filings', '/annual-report',
-  '/shareholders', '/governance', '/financials', '/quarterly-results', '/earnings',
-  '/about/investors', '/about/investor-relations', '/company/investors', '/company/investor-relations',
-  '/investor-events', '/stock-information', '/dividend-history',
-  '/proxy', '/corporate-governance', '/esg',
-  // Compound paths for global/corporate sites
-  '/global/ir', '/global/investors', '/corporate/investors', '/corporate/ir',
-  '/about-us/investors', '/about-us/investor-relations',
-  '/en/investors', '/en-us/investors', '/us/investors',
-  // Sub-pages under IR portals (IBM /investor/sec-filings, etc.)
-  '/ir/sec-filings', '/ir/earnings', '/ir/governance', '/ir/annual-report',
-  '/investor/sec-filings', '/investor/earnings', '/investor/governance',
-  '/investors/sec-filings', '/investors/earnings', '/investors/governance',
-] as const;
-
-// Common IR subdomains (probed as https://{sub}.{domain}/)
-const IR_SUBDOMAINS = ['investors', 'investor', 'ir', 'corporate', 'corp'] as const;
-const IR_SUBDOMAIN_PATHS = ['/', '/home/default.aspx', '/investors'] as const;
-
-const IR_LINK_KEYWORDS_BASE = [
-  'investor', 'shareholder', 'stockholder',
-] as const;
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -44,61 +16,6 @@ interface ProbeResult {
   found: boolean;
   html?: string;
   status?: number;
-}
-
-// Keywords that indicate genuine IR content (not SPA shell or soft-404)
-const IR_CONTENT_SIGNALS = [
-  'investor', 'shareholder', 'sec filing', '10-k', '10-q',
-  'annual report', 'earnings call', 'stock price', 'ticker',
-  'quarterly results', 'financial results', 'board of directors',
-  'corporate governance', 'proxy statement', 'dividend',
-] as const;
-
-async function probePath(
-  baseUrl: string,
-  path: string,
-): Promise<ProbeResult> {
-  try {
-    const result = await fetchWithRetry(`${baseUrl}${path}`, {
-      timeout: 8000,
-      retries: 1,
-    });
-    if (result.ok) {
-      // Reject redirects to locale roots (e.g. IBM /ir → /us-en).
-      // A real IR page redirects to /investors or /ir/overview, not a bare locale slug.
-      const finalPath = new URL(result.finalUrl).pathname.replace(/\/$/, '');
-      const requestedPath = path.replace(/\/$/, '');
-      if (requestedPath !== '/' && finalPath !== requestedPath) {
-        const isLocaleRoot = /^\/([a-z]{2}(-[a-z]{2,4})?)$/.test(finalPath);
-        const isHomepage = finalPath === '' || finalPath === '/';
-        if (isLocaleRoot || isHomepage) {
-          return { path, found: false, status: result.status };
-        }
-      }
-
-      // Content validation: verify the page actually contains IR-related content.
-      // Prevents SPA catch-all / soft-404 / redirect false positives
-      // (angular.dev, vercel.com, dell.com all return 200 for every path).
-      const bodyLower = result.body.toLowerCase();
-
-      // Primary check: page <title> explicitly mentions IR (strongest signal).
-      // An IR landing page like "Investor Relations - Humana" passes immediately,
-      // while SPA shells like "Angular" or "Vercel" do not.
-      const titleMatch = result.body.match(/<title[^>]*>(.*?)<\/title>/is);
-      const title = (titleMatch?.[1] ?? '').toLowerCase();
-      if (/investor|shareholder|(?:^|\s)ir(?:\s|$)/.test(title)) {
-        return { path, found: true, html: result.body, status: result.status };
-      }
-
-      // Secondary check: body must have 2+ IR keywords
-      const irHits = IR_CONTENT_SIGNALS.filter(kw => bodyLower.includes(kw)).length;
-      if (irHits < 2) return { path, found: false, status: result.status };
-      return { path, found: true, html: result.body, status: result.status };
-    }
-    return { path, found: false, status: result.status };
-  } catch {
-    return { path, found: false };
-  }
 }
 
 /**
@@ -530,42 +447,6 @@ function detectUpcomingEvents($: CheerioAPI): { found: boolean; evidence: string
   return { found: false, evidence: 'No upcoming investor events detected' };
 }
 
-/**
- * Check the main page HTML for nav/footer links to IR-related pages.
- * Uses multilingual keywords based on the page's detected language.
- */
-function findIrLinksInMainPage($: CheerioAPI, lang: string): string[] {
-  const irLinks: string[] = [];
-  const textRegex = buildMultilingualLinkRegex(IR_LINK_KEYWORDS_BASE, lang, 'ir');
-
-  $('a[href]').each((_, el) => {
-    const href = $(el).attr('href') ?? '';
-    const text = $(el).text().trim().toLowerCase();
-    const hrefLower = href.toLowerCase();
-
-    // Skip editorial/article links (news sites like nytimes.com have articles
-    // with "investor" in headlines — these are NOT IR portal links).
-    // Date-patterned URLs: /2024/01/15/..., /business/..., /technology/...
-    if (/\/\d{4}\/\d{1,2}\//.test(hrefLower)) return;
-    if (/\/(business|technology|politics|opinion|world|arts|science|sports|style|health)\//i.test(hrefLower)) return;
-
-    // Text-based matching (multilingual keywords)
-    if (textRegex.test(text)) {
-      irLinks.push(href);
-      return;
-    }
-
-    // href-based matching (specific IR paths/subdomains)
-    if (/\/(investors?|investor-relations|ir|inversionistas|investisseurs|investoren|investidores)\b/i.test(hrefLower) ||
-        /\/sec-filings|\/annual-report|\/earnings/i.test(hrefLower) ||
-        /^(https?:)?\/\/ir\./i.test(hrefLower)) {
-      irLinks.push(href);
-    }
-  });
-
-  return [...new Set(irLinks)];
-}
-
 // ─── Module execute function ────────────────────────────────────────────────
 
 const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResult> => {
@@ -575,254 +456,18 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
 
   const baseUrl = normalizeUrl(ctx.url);
 
-  // Detect page language for multilingual probe expansion
+  // Detect page language
   const lang = ctx.html ? detectPageLanguage(ctx.html) : 'en';
-  const IR_PATHS_STATIC = expandProbePaths(IR_PATHS_BASE, lang, 'ir');
   data.detected_language = lang;
 
-  // 0. Discover IR paths from sitemap.xml / robots.txt
-  //    The site literally tells us where its IR pages are — much smarter than
-  //    brute-forcing dozens of paths.
-  const IR_KEYWORDS = ['investor', 'ir', 'shareholder', 'sec-filing', 'annual-report', 'earnings', 'governance'];
-  const sitemapDiscovery = await discoverPathsFromSitemap(baseUrl, IR_KEYWORDS, { timeout: 6000, maxMatchedPaths: 10 });
-  data.sitemap_discovery = {
-    found: sitemapDiscovery.sitemapFound,
-    matched: sitemapDiscovery.matchedPaths,
-    robotsHints: sitemapDiscovery.robotsHints,
-  };
-
-  // Merge sitemap-discovered paths with static paths (deduplicated)
-  const staticPathSet = new Set(IR_PATHS_STATIC);
-  const sitemapPaths = [
-    ...sitemapDiscovery.matchedPaths,
-    ...sitemapDiscovery.robotsHints,
-  ].filter(p => !staticPathSet.has(p));
-  const IR_PATHS = [...IR_PATHS_STATIC, ...sitemapPaths];
-
-  // 1. Check the main page for IR-related links
-  let mainPageIrLinks: string[] = [];
-  if (ctx.html) {
-    const $main = parseHtml(ctx.html);
-    mainPageIrLinks = findIrLinksInMainPage($main, lang);
-  }
-
-  // 2. Crawl-first discovery: check crawl results before probing
-  const crawlHits = findMatchingCrawlPages(
-    ctx.crawlPages, baseUrl, IR_PATHS,
-    (html) => IR_CONTENT_SIGNALS.some(kw => html.includes(kw)),
-  );
-
+  // Use pre-rendered sitemap pages from runner
   const foundPages: ProbeResult[] = [];
 
-  for (const page of crawlHits) {
-    const path = new URL(page.url).pathname;
-    foundPages.push({ path, found: true, html: page.html, status: page.metadata.status });
+  for (const page of ctx.sitemapPages?.ir ?? []) {
+    foundPages.push({ path: page.path, found: true, html: page.html, status: 200 });
   }
 
-  // 2a. Probe uncovered paths via Cloudflare /content, then raw HTTP as fallback
-  const uncoveredPaths = getUncoveredPaths(ctx.crawlPages, baseUrl, IR_PATHS);
-  const coveredByCf = new Set<string>();
-
-  const cfProbeResults = await Promise.allSettled(
-    uncoveredPaths.map(async (path) => {
-      const url = `${baseUrl}${path}`;
-      const html = await fetchRenderedContent(url);
-      if (!html) return null;
-      const bodyLower = html.toLowerCase();
-      const irHits = IR_CONTENT_SIGNALS.filter(kw => bodyLower.includes(kw)).length;
-      if (irHits < 2) return null;
-      coveredByCf.add(path);
-      return { path, found: true as const, html, status: 200 };
-    }),
-  );
-
-  for (const result of cfProbeResults) {
-    if (result.status === 'fulfilled' && result.value) {
-      foundPages.push(result.value);
-    }
-  }
-
-  // Last resort: raw HTTP
-  const stillUncovered = uncoveredPaths.filter(p => !coveredByCf.has(p));
-  const probeResults = await Promise.allSettled(
-    stillUncovered.map((path) => probePath(baseUrl, path)),
-  );
-
-  for (const result of probeResults) {
-    if (result.status === 'fulfilled' && result.value.found) {
-      foundPages.push(result.value);
-    }
-  }
-
-  // 2b. Follow discovered IR links from the main page that weren't covered by fixed path probes
-  if (mainPageIrLinks.length > 0) {
-    const probedPathSet = new Set(IR_PATHS.map(p => `${baseUrl}${p}`.toLowerCase()));
-    const discoveredUrls: string[] = [];
-
-    for (const link of mainPageIrLinks) {
-      try {
-        const resolved = new URL(link, baseUrl).href;
-        // Skip if already probed via fixed paths
-        if (probedPathSet.has(resolved.toLowerCase())) continue;
-        // Skip non-http links
-        if (!resolved.startsWith('http')) continue;
-        discoveredUrls.push(resolved);
-      } catch { /* ignore malformed URLs */ }
-    }
-
-    // Fetch up to 5 discovered IR links (avoid excessive requests)
-    const discoveredProbes = await Promise.allSettled(
-      discoveredUrls.slice(0, 5).map(async (url) => {
-        try {
-          const result = await fetchWithRetry(url, { timeout: 8000, retries: 1 });
-          if (result.ok) {
-            return { path: new URL(url).pathname, found: true as const, html: result.body, status: result.status, url };
-          }
-          return { path: new URL(url).pathname, found: false as const, status: result.status, url };
-        } catch {
-          return { path: new URL(url).pathname, found: false as const, url };
-        }
-      })
-    );
-
-    for (const result of discoveredProbes) {
-      if (result.status === 'fulfilled' && result.value.found) {
-        foundPages.push(result.value);
-      }
-    }
-  }
-
-  // 2c. Probe common IR subdomains (investors.company.com, ir.company.com, etc.)
-  if (foundPages.length === 0) {
-    const registrableDomain = new URL(baseUrl).hostname.replace(/^www\./, '');
-    const subdomainProbes = await Promise.allSettled(
-      IR_SUBDOMAINS.flatMap(sub =>
-        IR_SUBDOMAIN_PATHS.map(async (path) => {
-          const subUrl = `https://${sub}.${registrableDomain}${path}`;
-          try {
-            const result = await fetchWithRetry(subUrl, { timeout: 10000, retries: 1 });
-            if (result.ok && result.body) {
-              // For IR-specific subdomains (investors.*, ir.*), the hostname itself
-              // is strong evidence — these are dedicated IR portals, not generic pages.
-              // Many are Q4/GCS-hosted SPAs where the static HTML shell may lack
-              // enough keywords to pass strict content validation.
-              const isIrSubdomain = /^(investors?|ir|shareholder)\b/.test(sub);
-              if (isIrSubdomain) {
-                // Lightweight check: just verify we didn't get redirected to
-                // the main domain (wildcard DNS guard)
-                const finalHost = new URL(result.finalUrl).hostname.replace(/^www\./, '');
-                if (finalHost === registrableDomain) {
-                  return { path: `${sub}.${registrableDomain}${path}`, found: false as const, status: result.status };
-                }
-                // Also check title for generic "not found" / "error" pages
-                const titleMatch = result.body.match(/<title[^>]*>(.*?)<\/title>/is);
-                const title = (titleMatch?.[1] ?? '').toLowerCase();
-                if (/not found|404|error|page not|unavailable/i.test(title)) {
-                  return { path: `${sub}.${registrableDomain}${path}`, found: false as const, status: result.status };
-                }
-                return { path: `${sub}.${registrableDomain}${path}`, found: true as const, html: result.body, status: result.status };
-              }
-              // For generic subdomains (corporate.*, corp.*), require content validation
-              const bodyLower = result.body.toLowerCase();
-              const irHits = IR_CONTENT_SIGNALS.filter(kw => bodyLower.includes(kw)).length;
-              if (irHits >= 2) {
-                return { path: `${sub}.${registrableDomain}${path}`, found: true as const, html: result.body, status: result.status };
-              }
-            }
-            return { path: `${sub}.${registrableDomain}${path}`, found: false as const, status: result.status };
-          } catch {
-            return { path: `${sub}.${registrableDomain}${path}`, found: false as const };
-          }
-        })
-      )
-    );
-
-    for (const result of subdomainProbes) {
-      if (result.status === 'fulfilled' && result.value.found) {
-        foundPages.push(result.value);
-        break; // One successful subdomain is enough
-      }
-    }
-  }
-
-  // 2d. SPA catch-all dedup: if many "found" pages have identical bodies, it's
-  // an SPA rendering every route with the same shell (vercel.com, angular.dev).
-  // Hash first 2000 chars of body to detect duplicates; if >3 share a hash, discard all.
-  if (foundPages.length > 3) {
-    const bodyHashes = new Map<string, number>();
-    for (const page of foundPages) {
-      if (!page.html) continue;
-      const snippet = page.html.slice(0, 2000);
-      const count = bodyHashes.get(snippet) ?? 0;
-      bodyHashes.set(snippet, count + 1);
-    }
-    const maxDupes = Math.max(...bodyHashes.values(), 0);
-    if (maxDupes > 3) {
-      // Most pages returned the same HTML shell — SPA catch-all confirmed
-      const spaSnippets = new Set<string>();
-      for (const [snippet, count] of bodyHashes) {
-        if (count > 3) spaSnippets.add(snippet);
-      }
-      // Remove pages that match SPA bodies
-      for (let i = foundPages.length - 1; i >= 0; i--) {
-        const snippet = foundPages[i]!.html?.slice(0, 2000) ?? '';
-        if (spaSnippets.has(snippet)) {
-          foundPages.splice(i, 1);
-        }
-      }
-    }
-  }
-
-  // 2e. Probe third-party IR hosting platforms (Nasdaq GlobeNewswire / Q4 Inc).
-  // Companies like Humana host IR on {company}.gcs-web.com rather than their own domain.
-  // These are known IR-only platforms — the domain itself is strong evidence.
-  if (foundPages.length === 0) {
-    const IR_EXTERNAL_PLATFORMS = ['gcs-web.com', 'q4web.com', 'q4inc.com'] as const;
-    const hostname = new URL(baseUrl).hostname.replace(/^www\./, '');
-    // Extract company name from domain (e.g. "humana" from "humana.com")
-    const companySlug = hostname.split('.')[0] ?? '';
-
-    if (companySlug) {
-      const platformProbes = await Promise.allSettled(
-        IR_EXTERNAL_PLATFORMS.map(async (platform) => {
-          const extUrl = `https://${companySlug}.${platform}/`;
-          try {
-            const result = await fetchWithRetry(extUrl, { timeout: 20000, retries: 1 });
-            if (result.ok && result.body) {
-              // Known IR platforms: trust the domain. These are GCS/Q4 hosted
-              // IR portals — often React SPAs where static HTML is a shell.
-              // Just verify we got a real page (not a 404 body or empty shell).
-              const titleMatch = result.body.match(/<title[^>]*>(.*?)<\/title>/is);
-              const title = (titleMatch?.[1] ?? '').toLowerCase();
-              if (/not found|404|error|unavailable|coming soon/.test(title)) {
-                return { path: `${companySlug}.${platform}/`, found: false as const };
-              }
-              // Accept if the page has ANY content (not a blank/error page).
-              // GCS/Q4 portals are React SPAs — the static HTML shell can be small
-              // but any response > 100 chars with a 200 status on a known IR platform is valid.
-              if (result.body.length > 100) {
-                return { path: `${companySlug}.${platform}/`, found: true as const, html: result.body, status: result.status };
-              }
-            }
-            return { path: `${companySlug}.${platform}/`, found: false as const };
-          } catch {
-            return { path: `${companySlug}.${platform}/`, found: false as const };
-          }
-        })
-      );
-
-      for (const result of platformProbes) {
-        if (result.status === 'fulfilled' && result.value.found) {
-          foundPages.push(result.value);
-          break; // One external platform is enough
-        }
-      }
-    }
-  }
-
-  data.probed_paths = IR_PATHS;
   data.found_pages = foundPages.map((p) => p.path);
-  data.main_page_ir_links = mainPageIrLinks;
 
   // 3. Analyze found pages
   let bestIrPage: ProbeResult | null = null;

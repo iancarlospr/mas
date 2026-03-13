@@ -19,7 +19,8 @@ import { getRegistrableDomain } from '../utils/url.js';
 import { assertUrlSafe } from '../utils/url-safety.js';
 import { updateScanStatus, upsertModuleResult } from '../services/supabase.js';
 import { extractDetectedTools } from '../utils/tool-extractor.js';
-import * as cfCrawl from '../services/cloudflare-crawl.js';
+import { discoverPathsFromSitemap } from '../utils/sitemap.js';
+import { fetchRenderedContent, isAvailable as cfRenderAvailable } from '../services/cloudflare-render.js';
 import type { DOMForensics, NavigatorSnapshot } from './types.js';
 import pino from 'pino';
 
@@ -102,7 +103,6 @@ export class ModuleRunner {
   private context: ModuleContext;
   private browserPool: BrowserPool;
   private tier: ModuleTier;
-  private crawlJobId: string | null = null;
 
   constructor(
     scanId: string,
@@ -178,15 +178,12 @@ export class ModuleRunner {
     );
 
     try {
-      // Perform initial fetch for passive phase HTML + CrUX data + crawl submission in parallel
+      // Perform initial fetch for passive phase HTML + CrUX data + sitemap discovery in parallel
       await Promise.all([
         this.performInitialFetch(),
         this.fetchCruxData(),
-        this.submitCloudflareCrawl(),
+        this.fetchSitemapAndCategorize(),
       ]);
-
-      // Phase 0.5: Collect crawl results before passive phase
-      await this.collectCrawlResults();
 
       for (const phase of phases) {
         logger.info(
@@ -296,104 +293,179 @@ export class ModuleRunner {
   }
 
   /**
-   * Submit a Cloudflare crawl job (non-blocking, fire-and-forget).
-   * The job runs in parallel with initial fetch and CrUX. Results collected later.
+   * Fetch sitemap, categorize matched URLs by module category, and render
+   * each via Cloudflare /content. Stores pre-rendered pages on ctx.sitemapPages.
+   *
+   * Also falls back to parsing ctx.html for nav/footer links when sitemap
+   * has no matches for a category (zero extra API calls).
    */
-  private async submitCloudflareCrawl(): Promise<void> {
-    if (!cfCrawl.isAvailable()) return;
-
-    try {
-      this.crawlJobId = await cfCrawl.submitCrawl(this.context.url, {
-        limit: 100,
-        depth: 3,
-        source: 'all',
-        formats: ['html'],
-        render: true,
-        rejectResourceTypes: ['image', 'media', 'font'],
-      });
-    } catch (error) {
-      logger.warn(
-        { scanId: this.context.scanId, error: (error as Error).message },
-        'Cloudflare crawl submission failed — passive modules will use raw HTTP',
-      );
-    }
-  }
-
-  /**
-   * Phase 0.5: Poll Cloudflare crawl results and upgrade ctx.html if applicable.
-   * Runs between initial fetch and passive phase. Max 20s wait.
-   */
-  private async collectCrawlResults(): Promise<void> {
-    if (!this.crawlJobId) return;
-
+  private async fetchSitemapAndCategorize(): Promise<void> {
     const start = Date.now();
 
+    // Root keywords only — matching is substring-based, so 'news' catches
+    // /latest-news, /corporate-news, /company-news; 'prensa' catches
+    // /sala-de-prensa, /comunicados-de-prensa, etc. No compounds needed.
+    // Keywords ≤3 chars use word-boundary matching to avoid false positives.
+    const CATEGORY_KEYWORDS: Record<string, string[]> = {
+      press: [
+        'press', 'newsroom', 'news', 'media', 'announcement',
+        // es
+        'prensa', 'noticias', 'comunicado', 'medios', 'anuncio', 'boletin',
+        // fr / de / pt
+        'actualite', 'presse', 'nachrichten', 'imprensa', 'nouvelle',
+      ],
+      careers: [
+        'career', 'jobs', 'hiring', 'join', 'talent', 'employment',
+        'opportunit', 'opening', 'vacanc', 'position', 'recruit',
+        'culture', 'life-at', 'team', 'people', 'apply',
+        // es
+        'empleo', 'carrera', 'trabaja', 'unete', 'oportunidad',
+        'vacante', 'oferta', 'talento', 'reclutamiento', 'contratacion',
+        'convocatoria', 'bolsa-de-trabajo',
+        // fr / de / pt
+        'carriere', 'emploi', 'recrutement', 'stellenangebot', 'karriere',
+        'vaga', 'trabalhe',
+      ],
+      ir: [
+        'investor', 'shareholder', 'stockholder', 'ir',
+        'sec-filing', 'annual-report', 'earning', 'financial',
+        'governance', 'proxy', 'stock', 'dividend', 'esg', 'sustainab',
+        // es
+        'inversionista', 'inversor', 'accionista', 'financier',
+        'informe-anual', 'gobierno-corporativo', 'gobernanza',
+        'dividendo', 'cotizacion', 'sostenibilidad', 'bursatil',
+        // fr / de / pt
+        'investisseur', 'investoren', 'investidor', 'aktionaer', 'acionista',
+      ],
+      support: [
+        'support', 'help', 'knowledge', 'faq', 'contact',
+        'doc', 'guide', 'tutorial', 'troubleshoot', 'how-to',
+        'communit', 'forum', 'discussion', 'resource',
+        'learn', 'academy', 'training', 'getting-started', 'quickstart',
+        'developer', 'api', 'status', 'kb',
+        // es
+        'soporte', 'ayuda', 'conocimiento', 'pregunta', 'contacto',
+        'documentacion', 'guia', 'comunidad', 'foro', 'recurso',
+        'capacitacion', 'formacion', 'academia', 'desarrollador',
+        'atencion', 'servicio-al-cliente',
+        // fr / de / pt
+        'aide', 'hilfe', 'suporte', 'ajuda', 'kontakt',
+      ],
+    };
+
+    // Combined keywords across all categories for a single sitemap fetch
+    const ALL_KEYWORDS = Object.values(CATEGORY_KEYWORDS).flat();
+
+    const baseUrl = this.context.url.replace(/\/$/, '');
+
     try {
-      const { pages, jobStatus } = await cfCrawl.pollUntilDone(this.crawlJobId, {
-        maxWaitMs: 60_000,
-        pollIntervalMs: 5_000,
+      // 1. Fetch sitemap with combined keywords
+      const discovery = await discoverPathsFromSitemap(baseUrl, ALL_KEYWORDS, {
+        timeout: 8000,
+        maxMatchedPaths: 50,
+        maxChildSitemaps: 5,
       });
 
-      this.context.crawlPages = pages;
+      // 2. Categorize matched paths into buckets
+      const categorized: Record<string, string[]> = {
+        press: [], careers: [], ir: [], support: [],
+      };
 
-      // Upgrade ctx.html if crawl returned a better version of the main page
-      if (this.context.html && pages.size > 0) {
-        const mainUrl = this.normalizeUrlForCrawl(this.context.url);
-        const finalUrl = this.normalizeUrlForCrawl(this.context.finalUrl);
-
-        const mainPage = pages.get(mainUrl) ?? pages.get(finalUrl);
-
-        if (mainPage?.html) {
-          const rawLen = this.context.html.length;
-          const crawlLen = mainPage.html.length;
-
-          // Upgrade if crawl HTML is significantly larger (SPA shell → rendered)
-          // or if we already detected an SPA shell
-          if (this.context.spaDetected || crawlLen > rawLen * 1.3) {
-            this.context.html = mainPage.html;
-            this.context.htmlSource = 'cloudflare';
-
-            // Re-run content analysis on upgraded HTML
-            if (mainPage.html) {
-              try {
-                this.context.contentAnalysis = analyzeContent(mainPage.html, this.context.headers);
-              } catch {
-                // Content analysis is non-critical
-              }
+      for (const path of discovery.matchedPaths) {
+        const pathLower = path.toLowerCase();
+        for (const [category, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
+          // For short keywords (≤3 chars like "ir"), use word boundary matching
+          const matched = keywords.some(kw => {
+            if (kw.length <= 3) {
+              return new RegExp(`\\b${kw}\\b`, 'i').test(pathLower);
             }
-
-            logger.info(
-              { scanId: this.context.scanId, rawLen, crawlLen },
-              'HTML upgraded from Cloudflare crawl',
-            );
+            return pathLower.includes(kw);
+          });
+          if (matched) {
+            categorized[category]!.push(path);
+            break; // Each path goes to first matching category
           }
         }
       }
 
+      // 3. Fall back to parsing main page HTML for nav/footer links when a category has no sitemap match
+      if (this.context.html) {
+        const htmlLower = this.context.html.toLowerCase();
+        for (const [category, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
+          if (categorized[category]!.length > 0) continue;
+
+          // Parse anchor tags from HTML for matching links
+          const linkRegex = /<a[^>]+href=["']([^"']+)["'][^>]*>/gi;
+          let linkMatch: RegExpExecArray | null;
+          while ((linkMatch = linkRegex.exec(this.context.html)) !== null) {
+            const href = linkMatch[1]!;
+            try {
+              const resolved = new URL(href, baseUrl);
+              const resolvedHost = resolved.hostname.replace(/^www\./, '');
+              const baseHost = new URL(baseUrl).hostname.replace(/^www\./, '');
+              if (!resolvedHost.endsWith(baseHost)) continue;
+
+              const pathLower = resolved.pathname.toLowerCase();
+              const matched = keywords.some(kw => {
+                if (kw.length <= 3) {
+                  return new RegExp(`\\b${kw}\\b`, 'i').test(pathLower);
+                }
+                return pathLower.includes(kw);
+              });
+              if (matched && !categorized[category]!.includes(resolved.pathname)) {
+                categorized[category]!.push(resolved.pathname);
+              }
+            } catch { /* skip malformed */ }
+          }
+        }
+      }
+
+      // 4. Render each matched URL via CF /content (cap at 5 per category)
+      const sitemapPages: NonNullable<typeof this.context.sitemapPages> = {
+        press: [], careers: [], ir: [], support: [],
+      };
+
+      const renderPromises: Promise<void>[] = [];
+      for (const [category, paths] of Object.entries(categorized)) {
+        for (const path of paths.slice(0, 5)) {
+          const fullUrl = `${baseUrl}${path}`;
+          renderPromises.push(
+            (async () => {
+              const html = await fetchRenderedContent(fullUrl);
+              if (html) {
+                sitemapPages[category as keyof typeof sitemapPages].push({
+                  url: fullUrl,
+                  path,
+                  html,
+                });
+              }
+            })(),
+          );
+        }
+      }
+
+      await Promise.allSettled(renderPromises);
+      this.context.sitemapPages = sitemapPages;
+
       logger.info(
         {
           scanId: this.context.scanId,
-          pagesFound: pages.size,
-          htmlUpgraded: this.context.htmlSource === 'cloudflare',
-          crawlStatus: jobStatus,
+          sitemapFound: discovery.sitemapFound,
+          press: sitemapPages.press.length,
+          careers: sitemapPages.careers.length,
+          ir: sitemapPages.ir.length,
+          support: sitemapPages.support.length,
+          totalRendered: sitemapPages.press.length + sitemapPages.careers.length +
+            sitemapPages.ir.length + sitemapPages.support.length,
           durationMs: Date.now() - start,
         },
-        'Cloudflare crawl results collected',
+        'Sitemap discovery and rendering complete',
       );
     } catch (error) {
       logger.warn(
         { scanId: this.context.scanId, error: (error as Error).message },
-        'Cloudflare crawl collection failed — passive modules will use raw HTTP',
+        'Sitemap discovery failed — modules will use raw HTTP fallback',
       );
-    }
-  }
-
-  private normalizeUrlForCrawl(url: string): string {
-    try {
-      const u = new URL(url);
-      return `${u.protocol}//${u.hostname.toLowerCase()}${u.pathname.replace(/\/$/, '') || '/'}`;
-    } catch {
-      return url.toLowerCase().replace(/\/$/, '');
     }
   }
 

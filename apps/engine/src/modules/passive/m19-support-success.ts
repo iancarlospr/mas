@@ -6,22 +6,9 @@ import { fetchWithRetry } from '../../utils/http.js';
 import { normalizeUrl } from '../../utils/url.js';
 import { parseHtml, extractLinks, extractScriptSrcs } from '../../utils/html.js';
 import type { CheerioAPI } from '../../utils/html.js';
-import { detectPageLanguage, expandProbePaths, getMultilingualKeywords } from '../../utils/i18n-probes.js';
-import { findMatchingCrawlPages, getUncoveredPaths } from '../../utils/crawl-probe.js';
-import { fetchRenderedContent } from '../../services/cloudflare-crawl.js';
+import { detectPageLanguage } from '../../utils/i18n-probes.js';
 import * as cheerio from 'cheerio';
 
-// ─── Probe paths (English base — expanded at runtime via i18n-probes) ───────
-const SUPPORT_PATHS_BASE = [
-  '/support', '/help', '/help-center', '/knowledge-base', '/status',
-  '/community', '/contact', '/faq', '/docs', '/documentation',
-  '/developers', '/api', '/academy', '/training', '/getting-started',
-  '/resources/support', '/customer-support',
-] as const;
-
-const SUPPORT_LINK_KEYWORDS_BASE = [
-  'support', 'help', 'help center', 'knowledge base', 'contact', 'community',
-] as const;
 
 // ─── Help center providers ──────────────────────────────────────────────────
 const HELP_CENTER_PROVIDERS: { name: string; patterns: RegExp[] }[] = [
@@ -70,33 +57,6 @@ interface ProbeResult {
   found: boolean;
   html?: string;
   status?: number;
-}
-
-async function probePath(
-  baseUrl: string,
-  path: string,
-): Promise<ProbeResult> {
-  try {
-    const result = await fetchWithRetry(`${baseUrl}${path}`, {
-      timeout: 8000,
-      retries: 1,
-    });
-    if (result.ok) {
-      // Reject catch-all redirects to homepage that contain no support content
-      const finalUrl = new URL(result.finalUrl);
-      if (finalUrl.pathname === '/' && path !== '/') {
-        const bodyLower = result.body.toLowerCase();
-        const supportSignals = ['support', 'help center', 'knowledge base', 'contact us',
-          'faq', 'documentation', 'getting started', 'customer service', 'help desk'];
-        const hits = supportSignals.filter(kw => bodyLower.includes(kw)).length;
-        if (hits < 1) return { path, found: false, status: result.status };
-      }
-      return { path, found: true, html: result.body, status: result.status };
-    }
-    return { path, found: false, status: result.status };
-  } catch {
-    return { path, found: false };
-  }
 }
 
 /**
@@ -566,29 +526,6 @@ function detectSla($: CheerioAPI): { found: boolean; evidence: string } {
   return { found: false, evidence: 'No SLA information detected' };
 }
 
-/**
- * Check the main page HTML for support-related links.
- * Uses multilingual keywords based on the page's detected language.
- */
-function findSupportLinksInMainPage($: CheerioAPI, lang: string): string[] {
-  const supportLinks: string[] = [];
-  const keywords = getMultilingualKeywords(SUPPORT_LINK_KEYWORDS_BASE, lang, 'support');
-
-  $('a[href]').each((_, el) => {
-    const href = $(el).attr('href') ?? '';
-    const text = $(el).text().trim().toLowerCase();
-
-    for (const keyword of keywords) {
-      if (text === keyword || text.includes(keyword) || href.toLowerCase().includes(`/${keyword.replace(/\s+/g, '-')}`)) {
-        supportLinks.push(href);
-        break;
-      }
-    }
-  });
-
-  return [...new Set(supportLinks)];
-}
-
 // ─── Module execute function ────────────────────────────────────────────────
 
 const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResult> => {
@@ -598,77 +535,30 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
 
   const baseUrl = normalizeUrl(ctx.url);
 
-  // Detect page language for multilingual probe expansion
+  // Detect page language
   const lang = ctx.html ? detectPageLanguage(ctx.html) : 'en';
-  const SUPPORT_PATHS = expandProbePaths(SUPPORT_PATHS_BASE, lang, 'support');
   data.detected_language = lang;
 
   // 1. Check the main page for support-related links and embedded widgets
-  let mainPageSupportLinks: string[] = [];
   let mainPageHelpCenter: { name: string; evidence: string } | null = null;
   let mainPageCommunity: { provider: string | null; url: string | null; evidence: string } | null = null;
   let mainPageStatusPage: { provider: string | null; url: string | null; evidence: string } | null = null;
 
   if (ctx.html) {
     const $main = parseHtml(ctx.html);
-    mainPageSupportLinks = findSupportLinksInMainPage($main, lang);
     mainPageHelpCenter = detectHelpCenterProvider($main);
     mainPageCommunity = detectCommunityForum($main);
     mainPageStatusPage = detectStatusPageFromHtml($main);
   }
 
-  // 2. Crawl-first discovery: check crawl results before probing
-  const SUPPORT_CONTENT_SIGNALS = [
-    'support', 'help center', 'knowledge base', 'contact us',
-    'faq', 'documentation', 'getting started', 'customer service', 'help desk',
-  ];
-  const crawlHits = findMatchingCrawlPages(
-    ctx.crawlPages, baseUrl, SUPPORT_PATHS,
-    (html) => SUPPORT_CONTENT_SIGNALS.some(kw => html.includes(kw)),
-  );
-
+  // 2. Use pre-rendered sitemap pages from runner
   const foundPages: ProbeResult[] = [];
 
-  for (const page of crawlHits) {
-    const path = new URL(page.url).pathname;
-    foundPages.push({ path, found: true, html: page.html, status: page.metadata.status });
+  for (const page of ctx.sitemapPages?.support ?? []) {
+    foundPages.push({ path: page.path, found: true, html: page.html, status: 200 });
   }
 
-  // 2a. Probe uncovered paths via Cloudflare /content, then raw HTTP as fallback
-  const uncoveredPaths = getUncoveredPaths(ctx.crawlPages, baseUrl, SUPPORT_PATHS);
-  const coveredByCf = new Set<string>();
-
-  const cfProbeResults = await Promise.allSettled(
-    uncoveredPaths.map(async (path) => {
-      const url = `${baseUrl}${path}`;
-      const html = await fetchRenderedContent(url);
-      if (!html) return null;
-      coveredByCf.add(path);
-      return { path, found: true as const, html, status: 200 };
-    }),
-  );
-
-  for (const result of cfProbeResults) {
-    if (result.status === 'fulfilled' && result.value) {
-      foundPages.push(result.value);
-    }
-  }
-
-  // Last resort: raw HTTP
-  const stillUncovered = uncoveredPaths.filter(p => !coveredByCf.has(p));
-  const probeResults = await Promise.allSettled(
-    stillUncovered.map((path) => probePath(baseUrl, path)),
-  );
-
-  for (const result of probeResults) {
-    if (result.status === 'fulfilled' && result.value.found) {
-      foundPages.push(result.value);
-    }
-  }
-
-  data.probed_paths = SUPPORT_PATHS;
   data.found_pages = foundPages.map((p) => p.path);
-  data.main_page_support_links = mainPageSupportLinks;
 
   // 3. Analyze found pages
   let helpCenterProvider: { name: string; evidence: string } | null = mainPageHelpCenter;

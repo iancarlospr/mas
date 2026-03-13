@@ -2,26 +2,11 @@ import { registerModuleExecutor } from '../runner.js';
 import type { ModuleContext, ModuleExecuteFn } from '../types.js';
 import type { ModuleResult, ModuleId, Signal, Checkpoint } from '@marketing-alpha/types';
 import { createSignal, createCheckpoint, infoCheckpoint } from '../../utils/signals.js';
-import { fetchWithRetry } from '../../utils/http.js';
 import { normalizeUrl } from '../../utils/url.js';
 import { parseHtml, extractLinks } from '../../utils/html.js';
 import type { CheerioAPI } from '../../utils/html.js';
-import { detectPageLanguage, expandProbePaths, getMultilingualKeywords } from '../../utils/i18n-probes.js';
-import { discoverPathsFromSitemap } from '../../utils/sitemap.js';
-import { findMatchingCrawlPages, getUncoveredPaths } from '../../utils/crawl-probe.js';
-import { fetchRenderedContent } from '../../services/cloudflare-crawl.js';
+import { detectPageLanguage, getMultilingualKeywords } from '../../utils/i18n-probes.js';
 import * as cheerio from 'cheerio';
-
-// ─── Probe paths (English base — expanded at runtime via i18n-probes) ───────
-const PRESS_PATHS_BASE = [
-  '/press', '/newsroom', '/media', '/news', '/press-releases', '/media-kit',
-  '/blog', '/blog/news', '/blog/press', '/about/press', '/about/news', '/company/news',
-  '/corporate/press', '/corporate/news', '/corporate/newsroom',
-] as const;
-
-// Common press subdomains (probed when path probes fail)
-const PRESS_SUBDOMAINS = ['news', 'press', 'newsroom', 'corporate', 'about', 'media'] as const;
-const PRESS_SUBDOMAIN_PATHS = ['/', '/newsroom', '/press', '/news'] as const;
 
 const PRESS_LINK_KEYWORDS_BASE = [
   'press', 'newsroom', 'media', 'news', 'press releases',
@@ -34,41 +19,6 @@ interface ProbeResult {
   found: boolean;
   html?: string;
   status?: number;
-}
-
-// Keywords that indicate genuine press/newsroom content (not SPA shell or soft-404)
-const PRESS_CONTENT_SIGNALS = [
-  'press release', 'newsroom', 'media contact', 'press kit',
-  'news release', 'corporate news', 'press room', 'media relations',
-  'for immediate release', 'press inquir', 'media inquir',
-  'press center', 'company news',
-  // Modern/casual newsroom variants (Etsy-style blog/stories sections)
-  'latest news', 'announcement', 'company update', 'in the news',
-  'featured stories', 'our stories', 'press coverage', 'media coverage',
-] as const;
-
-async function probePath(
-  baseUrl: string,
-  path: string,
-): Promise<ProbeResult> {
-  try {
-    const result = await fetchWithRetry(`${baseUrl}${path}`, {
-      timeout: 8000,
-      retries: 1,
-    });
-    if (result.ok) {
-      // Content validation: verify the page actually contains press/news-related content.
-      // Prevents SPA catch-all / soft-404 / redirect false positives
-      // (angular.dev returns 200 for every path with no press content).
-      const bodyLower = result.body.toLowerCase();
-      const hits = PRESS_CONTENT_SIGNALS.filter(kw => bodyLower.includes(kw)).length;
-      if (hits < 1) return { path, found: false, status: result.status };
-      return { path, found: true, html: result.body, status: result.status };
-    }
-    return { path, found: false, status: result.status };
-  } catch {
-    return { path, found: false };
-  }
 }
 
 /**
@@ -395,27 +345,9 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
 
   // Detect page language for multilingual probe expansion
   const lang = ctx.html ? detectPageLanguage(ctx.html) : 'en';
-  const PRESS_PATHS_STATIC = expandProbePaths(PRESS_PATHS_BASE, lang, 'press');
   data.detected_language = lang;
 
-  // 0. Discover press/news paths from sitemap.xml / robots.txt
-  const PRESS_KEYWORDS = ['press', 'newsroom', 'news', 'media', 'press-release', 'announcement'];
-  const sitemapDiscovery = await discoverPathsFromSitemap(baseUrl, PRESS_KEYWORDS, { timeout: 6000, maxMatchedPaths: 10 });
-  data.sitemap_discovery = {
-    found: sitemapDiscovery.sitemapFound,
-    matched: sitemapDiscovery.matchedPaths,
-    robotsHints: sitemapDiscovery.robotsHints,
-  };
-
-  // Merge sitemap-discovered paths with static paths
-  const staticPathSet = new Set(PRESS_PATHS_STATIC);
-  const sitemapPaths = [
-    ...sitemapDiscovery.matchedPaths,
-    ...sitemapDiscovery.robotsHints,
-  ].filter(p => !staticPathSet.has(p));
-  const PRESS_PATHS = [...PRESS_PATHS_STATIC, ...sitemapPaths];
-
-  // 1. Check the main page for press-related links
+  // 1. Check the main page for press-related links + RSS + media logos
   let mainPagePressLinks: string[] = [];
   if (ctx.html) {
     const $main = parseHtml(ctx.html);
@@ -433,129 +365,13 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
     }
   }
 
-  // 2. Crawl-first discovery: check crawl results before probing
-  const crawlHits = findMatchingCrawlPages(
-    ctx.crawlPages, baseUrl, PRESS_PATHS,
-    (html) => PRESS_CONTENT_SIGNALS.some(kw => html.includes(kw)),
-  );
-
+  // 2. Use pre-rendered sitemap pages from runner
   const foundPages: ProbeResult[] = [];
 
-  for (const page of crawlHits) {
-    const path = new URL(page.url).pathname;
-    foundPages.push({ path, found: true, html: page.html, status: page.metadata.status });
+  for (const page of ctx.sitemapPages?.press ?? []) {
+    foundPages.push({ path: page.path, found: true, html: page.html, status: 200 });
   }
 
-  // 2a. Probe uncovered paths via Cloudflare /content, then raw HTTP as fallback
-  const uncoveredPaths = getUncoveredPaths(ctx.crawlPages, baseUrl, PRESS_PATHS);
-  const coveredByCf = new Set<string>();
-
-  // Try Cloudflare /content for JS-rendered pages
-  const cfProbeResults = await Promise.allSettled(
-    uncoveredPaths.map(async (path) => {
-      const url = `${baseUrl}${path}`;
-      const html = await fetchRenderedContent(url);
-      if (!html) return null;
-      const bodyLower = html.toLowerCase();
-      const hits = PRESS_CONTENT_SIGNALS.filter(kw => bodyLower.includes(kw)).length;
-      if (hits < 1) return null;
-      coveredByCf.add(path);
-      return { path, found: true as const, html, status: 200 };
-    }),
-  );
-
-  for (const result of cfProbeResults) {
-    if (result.status === 'fulfilled' && result.value) {
-      foundPages.push(result.value);
-    }
-  }
-
-  // Last resort: raw HTTP for anything CF couldn't fetch
-  const stillUncovered = uncoveredPaths.filter(p => !coveredByCf.has(p));
-  const probeResults = await Promise.allSettled(
-    stillUncovered.map((path) => probePath(baseUrl, path)),
-  );
-
-  for (const result of probeResults) {
-    if (result.status === 'fulfilled' && result.value.found) {
-      foundPages.push(result.value);
-    }
-  }
-
-  // 2b. Follow discovered press links from the main page that weren't covered by fixed path probes
-  if (mainPagePressLinks.length > 0) {
-    const probedPathSet = new Set(PRESS_PATHS.map(p => `${baseUrl}${p}`.toLowerCase()));
-    const discoveredUrls: string[] = [];
-
-    for (const link of mainPagePressLinks) {
-      try {
-        const resolved = new URL(link, baseUrl).href;
-        if (probedPathSet.has(resolved.toLowerCase())) continue;
-        if (!resolved.startsWith('http')) continue;
-        discoveredUrls.push(resolved);
-      } catch { /* ignore */ }
-    }
-
-    const discoveredProbes = await Promise.allSettled(
-      discoveredUrls.slice(0, 5).map(async (url) => {
-        try {
-          const result = await fetchWithRetry(url, { timeout: 8000, retries: 1 });
-          if (result.ok) {
-            return { path: new URL(url).pathname, found: true as const, html: result.body, status: result.status };
-          }
-          return { path: new URL(url).pathname, found: false as const, status: result.status };
-        } catch {
-          return { path: new URL(url).pathname, found: false as const };
-        }
-      })
-    );
-
-    for (const result of discoveredProbes) {
-      if (result.status === 'fulfilled' && result.value.found) {
-        foundPages.push(result.value);
-      }
-    }
-  }
-
-  // 2c. Probe common press subdomains (news.company.com, press.company.com, etc.)
-  if (foundPages.length === 0) {
-    const registrableDomain = new URL(baseUrl).hostname.replace(/^www\./, '');
-    const subdomainProbes = await Promise.allSettled(
-      PRESS_SUBDOMAINS.flatMap(sub =>
-        PRESS_SUBDOMAIN_PATHS.map(async (path) => {
-          const subUrl = `https://${sub}.${registrableDomain}${path}`;
-          try {
-            const result = await fetchWithRetry(subUrl, { timeout: 8000, retries: 1 });
-            if (result.ok && result.body) {
-              // Guard against wildcard DNS: verify content contains press/news keywords
-              const bodyLower = result.body.toLowerCase();
-              const pressSignals = [
-                'press release', 'newsroom', 'media contact', 'press kit',
-                'news release', 'media inquir', 'corporate news', 'press center',
-                'latest news', 'in the news', 'media relations',
-              ];
-              const hits = pressSignals.filter(kw => bodyLower.includes(kw)).length;
-              if (hits >= 1) {
-                return { path: `${sub}.${registrableDomain}${path}`, found: true as const, html: result.body, status: result.status };
-              }
-            }
-            return { path: `${sub}.${registrableDomain}${path}`, found: false as const, status: result.status };
-          } catch {
-            return { path: `${sub}.${registrableDomain}${path}`, found: false as const };
-          }
-        })
-      )
-    );
-
-    for (const result of subdomainProbes) {
-      if (result.status === 'fulfilled' && result.value.found) {
-        foundPages.push(result.value);
-        break; // One successful subdomain is enough
-      }
-    }
-  }
-
-  data.probed_paths = PRESS_PATHS;
   data.found_pages = foundPages.map((p) => p.path);
 
   // 3. Analyze found pages
