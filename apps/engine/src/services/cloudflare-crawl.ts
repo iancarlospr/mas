@@ -149,6 +149,17 @@ export async function getCrawlStatus(
     throw new Error(`Cloudflare crawl status returned no result: ${JSON.stringify(json).slice(0, 200)}`);
   }
 
+  // Log raw response shape for debugging
+  logger.debug({
+    jobId,
+    resultKeys: Object.keys(r),
+    status: r.status,
+    total: r.total,
+    finished: r.finished,
+    dataLength: Array.isArray(r.data) ? r.data.length : 'not-array',
+    rawSnippet: JSON.stringify(r).slice(0, 500),
+  }, 'Cloudflare crawl status raw');
+
   return {
     id: r.id,
     status: r.status,
@@ -217,12 +228,14 @@ export async function pollUntilDone(
 
   while (Date.now() - start < maxWait) {
     try {
-      const result = await getCrawlStatus(jobId, 100, 'completed');
+      const result = await getCrawlStatus(jobId, 100);
       lastStatus = result.status;
+
+      logger.debug({ jobId, status: result.status, total: result.total, finished: result.finished, records: result.records.length }, 'Crawl poll tick');
 
       // Collect completed pages
       for (const record of result.records) {
-        if (record.html) {
+        if (record.status === 'completed' && record.html) {
           pages.set(normalizePageUrl(record.url), record);
         }
       }
