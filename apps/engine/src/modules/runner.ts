@@ -304,8 +304,8 @@ export class ModuleRunner {
 
     try {
       this.crawlJobId = await cfCrawl.submitCrawl(this.context.url, {
-        limit: 20,
-        depth: 1,
+        limit: 50,
+        depth: 2,
         source: 'all',
         formats: ['html'],
         render: true,
