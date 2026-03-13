@@ -178,12 +178,12 @@ export class ModuleRunner {
     );
 
     try {
-      // Perform initial fetch for passive phase HTML + CrUX data + sitemap discovery in parallel
+      // Initial fetch + CrUX in parallel, then sitemap (needs ctx.html for fallback)
       await Promise.all([
         this.performInitialFetch(),
         this.fetchCruxData(),
-        this.fetchSitemapAndCategorize(),
       ]);
+      await this.fetchSitemapAndCategorize();
 
       for (const phase of phases) {
         logger.info(
@@ -389,33 +389,57 @@ export class ModuleRunner {
       }
 
       // 3. Fall back to parsing main page HTML for nav/footer links when a category has no sitemap match
+      // Stores full URLs for cross-domain links (e.g. careers.bestbuy.com)
+      // and relative paths for same-domain links.
+      const categorizedUrls: Record<string, string[]> = {
+        press: [], careers: [], ir: [], support: [],
+      };
+
       if (this.context.html) {
-        const htmlLower = this.context.html.toLowerCase();
-        for (const [category, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
-          if (categorized[category]!.length > 0) continue;
+        const baseHost = new URL(baseUrl).hostname.replace(/^www\./, '');
+        const linkRegex = /<a[^>]+href=["']([^"']+)["'][^>]*>/gi;
+        let linkMatch: RegExpExecArray | null;
+        while ((linkMatch = linkRegex.exec(this.context.html)) !== null) {
+          const href = linkMatch[1]!;
+          try {
+            const resolved = new URL(href, baseUrl);
+            const resolvedHost = resolved.hostname.replace(/^www\./, '');
+            if (!resolvedHost.endsWith(baseHost)) continue;
 
-          // Parse anchor tags from HTML for matching links
-          const linkRegex = /<a[^>]+href=["']([^"']+)["'][^>]*>/gi;
-          let linkMatch: RegExpExecArray | null;
-          while ((linkMatch = linkRegex.exec(this.context.html)) !== null) {
-            const href = linkMatch[1]!;
-            try {
-              const resolved = new URL(href, baseUrl);
-              const resolvedHost = resolved.hostname.replace(/^www\./, '');
-              const baseHost = new URL(baseUrl).hostname.replace(/^www\./, '');
-              if (!resolvedHost.endsWith(baseHost)) continue;
-
-              const pathLower = resolved.pathname.toLowerCase();
+            // Match against both hostname and path
+            const matchTarget = (resolvedHost + resolved.pathname).toLowerCase();
+            for (const [category, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
               const matched = keywords.some(kw => {
                 if (kw.length <= 3) {
-                  return new RegExp(`\\b${kw}\\b`, 'i').test(pathLower);
+                  return new RegExp(`\\b${kw}\\b`, 'i').test(matchTarget);
                 }
-                return pathLower.includes(kw);
+                return matchTarget.includes(kw);
               });
-              if (matched && !categorized[category]!.includes(resolved.pathname)) {
-                categorized[category]!.push(resolved.pathname);
+              if (matched) {
+                const fullUrl = resolved.origin + resolved.pathname.replace(/\/$/, '');
+                if (!categorizedUrls[category]!.includes(fullUrl)) {
+                  categorizedUrls[category]!.push(fullUrl);
+                }
+                break;
               }
-            } catch { /* skip malformed */ }
+            }
+          } catch { /* skip malformed */ }
+        }
+      }
+
+      // Merge: sitemap paths (as full URLs) + HTML-discovered URLs
+      const mergedUrls: Record<string, string[]> = {
+        press: [], careers: [], ir: [], support: [],
+      };
+      for (const [category, paths] of Object.entries(categorized)) {
+        // Sitemap paths are relative — convert to full URLs
+        for (const path of paths) {
+          mergedUrls[category]!.push(`${baseUrl}${path}`);
+        }
+        // Add HTML-discovered URLs that aren't already in the list
+        for (const url of categorizedUrls[category]!) {
+          if (!mergedUrls[category]!.includes(url)) {
+            mergedUrls[category]!.push(url);
           }
         }
       }
@@ -426,9 +450,9 @@ export class ModuleRunner {
       };
 
       const renderPromises: Promise<void>[] = [];
-      for (const [category, paths] of Object.entries(categorized)) {
-        for (const path of paths.slice(0, 5)) {
-          const fullUrl = `${baseUrl}${path}`;
+      for (const [category, urls] of Object.entries(mergedUrls)) {
+        for (const fullUrl of urls.slice(0, 5)) {
+          const path = new URL(fullUrl).pathname;
           renderPromises.push(
             (async () => {
               const html = await fetchRenderedContent(fullUrl);
@@ -451,12 +475,15 @@ export class ModuleRunner {
         {
           scanId: this.context.scanId,
           sitemapFound: discovery.sitemapFound,
+          sitemapMatched: discovery.matchedPaths.length,
+          htmlLinks: { press: categorizedUrls.press!.length, careers: categorizedUrls.careers!.length, ir: categorizedUrls.ir!.length, support: categorizedUrls.support!.length },
           press: sitemapPages.press.length,
           careers: sitemapPages.careers.length,
           ir: sitemapPages.ir.length,
           support: sitemapPages.support.length,
           totalRendered: sitemapPages.press.length + sitemapPages.careers.length +
             sitemapPages.ir.length + sitemapPages.support.length,
+          mergedUrls: { press: mergedUrls.press!.slice(0, 3), careers: mergedUrls.careers!.slice(0, 3), ir: mergedUrls.ir!.slice(0, 3), support: mergedUrls.support!.slice(0, 3) },
           durationMs: Date.now() - start,
         },
         'Sitemap discovery and rendering complete',
