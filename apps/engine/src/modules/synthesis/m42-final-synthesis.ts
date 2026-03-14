@@ -272,7 +272,7 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
 
   // Validate M41 dependency
   const m41Result = ctx.previousResults.get('M41' as ModuleId);
-  if (!m41Result || m41Result.status !== 'success') {
+  if (!m41Result || m41Result.status === 'error' || m41Result.status === 'skipped') {
     return {
       moduleId: 'M42' as ModuleId,
       status: 'error',

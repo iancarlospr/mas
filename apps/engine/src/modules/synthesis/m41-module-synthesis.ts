@@ -246,7 +246,7 @@ const PROMPT_VERSION = createHash('sha256')
 
 // ─── Concurrency helper ─────────────────────────────────────────────────
 
-const MAX_CONCURRENCY = 10;
+const MAX_CONCURRENCY = 8;
 
 async function parallelMap<T, R>(
   items: T[],

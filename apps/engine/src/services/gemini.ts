@@ -1,19 +1,19 @@
-import { GoogleGenerativeAI, type GenerativeModel, type Part } from '@google/generative-ai';
+import { GoogleGenAI, type GenerateContentResponse } from '@google/genai';
 import { z, type ZodType } from 'zod';
+import { zodToJsonSchema } from 'zod-to-json-schema';
 import pino from 'pino';
 
 const logger = pino({ name: 'gemini-service' });
 
-let genAI: GoogleGenerativeAI | null = null;
+let ai: GoogleGenAI | null = null;
 let apiKeyMissing = false;
 
 /**
- * Initialize the Google Generative AI client.
- * Caches missing-key state to fail instantly on subsequent calls
- * instead of re-checking process.env each time.
+ * Initialize the Google GenAI client (unified SDK).
+ * Caches missing-key state to fail instantly on subsequent calls.
  */
-function getClient(): GoogleGenerativeAI {
-  if (genAI) return genAI;
+function getClient(): GoogleGenAI {
+  if (ai) return ai;
   if (apiKeyMissing) throw new Error('Missing GOOGLE_AI_API_KEY environment variable');
 
   const apiKey = process.env['GOOGLE_AI_API_KEY'];
@@ -22,19 +22,16 @@ function getClient(): GoogleGenerativeAI {
     throw new Error('Missing GOOGLE_AI_API_KEY environment variable');
   }
 
-  genAI = new GoogleGenerativeAI(apiKey);
-  logger.info('Google Generative AI client initialized');
-  return genAI;
+  ai = new GoogleGenAI({ apiKey });
+  logger.info('Google GenAI client initialized');
+  return ai;
 }
 
 /**
  * Model identifiers for different quality tiers.
  */
-// NOTE: gemini-3-flash-preview is a preview model. Update to GA model ID
-// (e.g., 'gemini-3-flash') when Google promotes it to general availability.
 export const MODELS = {
   flash: 'gemini-3-flash-preview',
-  // NOTE: gemini-3.1-pro-preview is a preview model. Update when GA releases.
   pro: 'gemini-3.1-pro-preview',
 } as const;
 
@@ -70,6 +67,22 @@ const DEFAULT_RETRIES = 3;
 const DEFAULT_RETRY_DELAY = 2_000;
 
 /**
+ * Extract token usage from the new SDK response.
+ */
+function extractTokenUsage(response: GenerateContentResponse): {
+  prompt: number;
+  completion: number;
+  total: number;
+} {
+  const usage = response.usageMetadata;
+  return {
+    prompt: usage?.promptTokenCount ?? 0,
+    completion: usage?.candidatesTokenCount ?? 0,
+    total: usage?.totalTokenCount ?? 0,
+  };
+}
+
+/**
  * Call Gemini Flash model (fast, cost-effective).
  * Used for M41 individual module synthesis.
  */
@@ -95,7 +108,7 @@ export async function callFlash<T>(
 
 /**
  * Call Gemini Pro model (high quality, higher latency).
- * Used for M42 final synthesis, M43 PRD generation.
+ * Used for M42 final synthesis, M44/M45.
  */
 export async function callPro<T>(
   prompt: string,
@@ -118,7 +131,7 @@ export async function callPro<T>(
 }
 
 /**
- * Generate content with retry logic and Zod validation.
+ * Generate content with retry logic, native JSON schema enforcement, and Zod validation.
  */
 async function generateWithValidation<T>(
   options: GenerateOptions,
@@ -138,19 +151,11 @@ async function generateWithValidation<T>(
   const client = getClient();
   const modelId = MODELS[modelTier];
 
-  const modelConfig: Record<string, unknown> = {
-    model: modelId,
-  };
-
-  if (systemInstruction) {
-    (modelConfig as { systemInstruction?: string }).systemInstruction = systemInstruction;
-  }
-
-  const generativeModel: GenerativeModel = client.getGenerativeModel(
-    modelConfig as { model: string; systemInstruction?: string },
-  );
+  // Convert Zod schema to JSON Schema for native enforcement
+  const jsonSchema = zodToJsonSchema(schema, { target: 'openApi3' });
 
   let lastError: Error | null = null;
+  let zodRetryUsed = false;
 
   for (let attempt = 0; attempt <= retries; attempt++) {
     if (attempt > 0) {
@@ -160,8 +165,10 @@ async function generateWithValidation<T>(
     }
 
     try {
-      // Build multimodal parts: text first, then images (if any)
-      const parts: Part[] = [{ text: prompt }];
+      // Build multimodal parts
+      const parts: Array<{ text: string } | { fileData: { mimeType: string; fileUri: string } }> = [
+        { text: prompt },
+      ];
       if (images?.length) {
         for (const img of images) {
           parts.push({ fileData: { mimeType: img.mimeType, fileUri: img.uri } });
@@ -169,17 +176,19 @@ async function generateWithValidation<T>(
         logger.debug({ imageCount: images.length, model: modelId }, 'Sending multimodal request with images');
       }
 
-      const result = await generativeModel.generateContent({
+      const response = await client.models.generateContent({
+        model: modelId,
         contents: [{ role: 'user', parts }],
-        generationConfig: {
+        config: {
           temperature,
           maxOutputTokens: maxTokens,
           responseMimeType: 'application/json',
+          responseJsonSchema: jsonSchema,
+          systemInstruction,
         },
       });
 
-      const response = result.response;
-      const text = response.text();
+      const text = response.text ?? '';
 
       // Parse JSON response
       let parsed: unknown;
@@ -191,20 +200,14 @@ async function generateWithValidation<T>(
         if (jsonMatch?.[1]) {
           parsed = JSON.parse(jsonMatch[1].trim());
         } else {
-          throw new Error('Response is not valid JSON');
+          throw new Error(`Response is not valid JSON (length: ${text.length})`);
         }
       }
 
-      // Validate with Zod
+      // Validate with Zod (safety net — native schema should handle most cases)
       const validated = schema.parse(parsed);
 
-      // Extract token usage
-      const usage = response.usageMetadata;
-      const tokensUsed = {
-        prompt: usage?.promptTokenCount ?? 0,
-        completion: usage?.candidatesTokenCount ?? 0,
-        total: usage?.totalTokenCount ?? 0,
-      };
+      const tokensUsed = extractTokenUsage(response);
 
       logger.debug(
         { model: modelId, tokensUsed },
@@ -219,81 +222,56 @@ async function generateWithValidation<T>(
     } catch (error) {
       lastError = error instanceof Error ? error : new Error(String(error));
 
-      // Check for retryable errors (429 Too Many Requests, 503 Service Unavailable)
-      const isRetryable = isRetryableError(lastError);
-
-      // ZodErrors = structural schema mismatch — retrying with same prompt won't help.
-      // Fall through to throw immediately so the caller can use its fallback.
+      // ZodErrors: allow one retry (Gemini is non-deterministic), then throw
       if (lastError instanceof z.ZodError) {
-        logger.warn(
-          { model: modelId, attempt, zodIssues: lastError.issues.length },
-          'Gemini returned JSON that failed schema validation — not retrying',
+        if (!zodRetryUsed && attempt < retries) {
+          zodRetryUsed = true;
+          logger.warn(
+            {
+              model: modelId,
+              attempt,
+              zodIssues: lastError.issues.map(i => ({ path: i.path.join('.'), message: i.message })),
+            },
+            'Gemini returned JSON that failed schema validation — retrying once',
+          );
+          continue;
+        }
+        logger.error(
+          {
+            model: modelId,
+            attempt,
+            zodIssues: lastError.issues.map(i => ({ path: i.path.join('.'), message: i.message })),
+          },
+          'Gemini schema validation failed after retry — giving up',
         );
         throw lastError;
       }
 
-      if (!isRetryable && attempt < retries) {
-        logger.warn(
+      // Configuration errors: don't retry (won't self-resolve)
+      if (isConfigurationError(lastError)) {
+        logger.error(
           { error: lastError.message, model: modelId, attempt },
-          'Non-retryable Gemini error',
+          'Non-retryable configuration error',
         );
         throw lastError;
       }
 
+      // Everything else: retry (default to optimistic)
       logger.warn(
-        { error: lastError.message, model: modelId, attempt },
-        'Gemini call failed, will retry',
+        {
+          error: lastError.message,
+          errorName: lastError.name,
+          status: (lastError as { status?: number }).status,
+          model: modelId,
+          attempt,
+          willRetry: attempt < retries,
+        },
+        attempt < retries ? 'Gemini call failed, will retry' : 'Gemini call failed, no retries left',
       );
     }
   }
 
   throw lastError ?? new Error(`Gemini call failed after ${retries + 1} attempts`);
-}
-
-/**
- * Simple text generation without JSON validation.
- * Useful for generating natural language text (PRD, summaries).
- */
-export async function generateText(
-  modelTier: ModelTier,
-  prompt: string,
-  options?: {
-    systemInstruction?: string;
-    temperature?: number;
-    maxTokens?: number;
-  },
-): Promise<{ text: string; tokensUsed: { prompt: number; completion: number; total: number } }> {
-  const client = getClient();
-  const modelId = MODELS[modelTier];
-
-  const modelConfig: Record<string, unknown> = { model: modelId };
-  if (options?.systemInstruction) {
-    (modelConfig as { systemInstruction?: string }).systemInstruction = options.systemInstruction;
-  }
-
-  const generativeModel = client.getGenerativeModel(
-    modelConfig as { model: string; systemInstruction?: string },
-  );
-
-  const result = await generativeModel.generateContent({
-    contents: [{ role: 'user', parts: [{ text: prompt }] }],
-    generationConfig: {
-      temperature: options?.temperature ?? 0.4,
-      maxOutputTokens: options?.maxTokens ?? 16384,
-    },
-  });
-
-  const response = result.response;
-  const usage = response.usageMetadata;
-
-  return {
-    text: response.text(),
-    tokensUsed: {
-      prompt: usage?.promptTokenCount ?? 0,
-      completion: usage?.candidatesTokenCount ?? 0,
-      total: usage?.totalTokenCount ?? 0,
-    },
-  };
 }
 
 /**
@@ -319,15 +297,6 @@ export async function callProRaw(
   const client = getClient();
   const modelId = MODELS.pro;
 
-  const modelConfig: Record<string, unknown> = { model: modelId };
-  if (options?.systemInstruction) {
-    (modelConfig as { systemInstruction?: string }).systemInstruction = options.systemInstruction;
-  }
-
-  const generativeModel = client.getGenerativeModel(
-    modelConfig as { model: string; systemInstruction?: string },
-  );
-
   let lastError: Error | null = null;
 
   for (let attempt = 0; attempt <= retries; attempt++) {
@@ -338,37 +307,41 @@ export async function callProRaw(
     }
 
     try {
-      const result = await generativeModel.generateContent({
+      const response = await client.models.generateContent({
+        model: modelId,
         contents: [{ role: 'user', parts: [{ text: prompt }] }],
-        generationConfig: {
+        config: {
           temperature,
           maxOutputTokens: maxTokens,
+          systemInstruction: options?.systemInstruction,
         },
       });
 
-      const response = result.response;
-      const text = response.text();
-      const usage = response.usageMetadata;
-
-      const tokensUsed = {
-        prompt: usage?.promptTokenCount ?? 0,
-        completion: usage?.candidatesTokenCount ?? 0,
-        total: usage?.totalTokenCount ?? 0,
-      };
+      const text = response.text ?? '';
+      const tokensUsed = extractTokenUsage(response);
 
       logger.debug({ model: modelId, tokensUsed, textLength: text.length }, 'Gemini raw call successful');
 
       return { data: text, model: modelId, tokensUsed };
     } catch (error) {
       lastError = error instanceof Error ? error : new Error(String(error));
-      const retryable = isRetryableError(lastError);
 
-      if (!retryable) {
-        logger.warn({ error: lastError.message, model: modelId, attempt }, 'Non-retryable Gemini raw error');
+      if (isConfigurationError(lastError)) {
+        logger.error({ error: lastError.message, model: modelId, attempt }, 'Non-retryable configuration error');
         throw lastError;
       }
 
-      logger.warn({ error: lastError.message, model: modelId, attempt }, 'Gemini raw call failed, will retry');
+      logger.warn(
+        {
+          error: lastError.message,
+          errorName: lastError.name,
+          status: (lastError as { status?: number }).status,
+          model: modelId,
+          attempt,
+          willRetry: attempt < retries,
+        },
+        attempt < retries ? 'Gemini raw call failed, will retry' : 'Gemini raw call failed, no retries left',
+      );
     }
   }
 
@@ -376,24 +349,48 @@ export async function callProRaw(
 }
 
 /**
- * Check if an error is retryable (429, 503, network errors).
+ * Simple text generation without retry logic.
+ * Useful for one-off text tasks.
  */
-function isRetryableError(error: Error): boolean {
+export async function generateText(
+  modelTier: ModelTier,
+  prompt: string,
+  options?: {
+    systemInstruction?: string;
+    temperature?: number;
+    maxTokens?: number;
+  },
+): Promise<{ text: string; tokensUsed: { prompt: number; completion: number; total: number } }> {
+  const client = getClient();
+  const modelId = MODELS[modelTier];
+
+  const response = await client.models.generateContent({
+    model: modelId,
+    contents: [{ role: 'user', parts: [{ text: prompt }] }],
+    config: {
+      temperature: options?.temperature ?? 0.4,
+      maxOutputTokens: options?.maxTokens ?? 16384,
+      systemInstruction: options?.systemInstruction,
+    },
+  });
+
+  const tokensUsed = extractTokenUsage(response);
+
+  return {
+    text: response.text ?? '',
+    tokensUsed,
+  };
+}
+
+/**
+ * Check if an error is a configuration error that won't self-resolve.
+ */
+function isConfigurationError(error: Error): boolean {
   const message = error.message.toLowerCase();
   return (
-    message.includes('429') ||
-    message.includes('too many requests') ||
-    message.includes('503') ||
-    message.includes('service unavailable') ||
-    message.includes('resource exhausted') ||
-    message.includes('quota') ||
-    message.includes('rate limit') ||
-    message.includes('econnreset') ||
-    message.includes('etimedout') ||
-    message.includes('econnrefused') ||
-    message.includes('fetch failed') ||
-    message.includes('not valid json') ||
-    message.includes('unexpected end of json')
+    (message.includes('missing') && message.includes('environment variable')) ||
+    (message.includes('missing') && message.includes('api key')) ||
+    message.includes('api key not valid')
   );
 }
 

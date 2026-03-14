@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenAI } from '@google/genai';
 import { rateLimit } from '@/lib/rate-limit';
 import { getPostHog, captureServerError } from '@/lib/posthog-server';
 import { isValidUUID } from '@/lib/utils';
@@ -209,12 +209,12 @@ ${context}`;
 
 // ─── Gemini Client ───────────────────────────────────────────────────────────
 
-function getGeminiClient(): GoogleGenerativeAI {
+function getGeminiClient(): GoogleGenAI {
   const apiKey = process.env.GOOGLE_AI_API_KEY;
   if (!apiKey) {
     throw new Error('Missing GOOGLE_AI_API_KEY');
   }
-  return new GoogleGenerativeAI(apiKey);
+  return new GoogleGenAI({ apiKey });
 }
 
 // ─── POST: Send message ──────────────────────────────────────────────────────
@@ -306,14 +306,6 @@ export async function POST(
 
   try {
     const genAI = getGeminiClient();
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-3.1-pro-preview',
-      systemInstruction: buildSystemPrompt(scan.domain, context),
-      generationConfig: {
-        temperature: 0.4,
-        maxOutputTokens: 2048,
-      },
-    });
 
     // Build conversation history for context
     const chatHistory = (history ?? [])
@@ -324,9 +316,18 @@ export async function POST(
         parts: [{ text: m.content }],
       }));
 
-    const chat = model.startChat({ history: chatHistory });
-    const result = await chat.sendMessage(parsed.data.message);
-    assistantResponse = result.response.text();
+    const chat = genAI.chats.create({
+      model: 'gemini-3.1-pro-preview',
+      config: {
+        systemInstruction: buildSystemPrompt(scan.domain, context),
+        temperature: 0.4,
+        maxOutputTokens: 2048,
+      },
+      history: chatHistory,
+    });
+
+    const result = await chat.sendMessage({ message: parsed.data.message });
+    assistantResponse = result.text ?? '';
   } catch (err) {
     console.error(`[chat/${scanId}] Gemini error:`, err);
     captureServerError(user.id, err, { route: 'chat', scan_id: scanId });

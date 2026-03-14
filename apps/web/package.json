@@ -12,7 +12,7 @@
     "test:unit": "vitest run --project web"
   },
   "dependencies": {
-    "@google/generative-ai": "^0.21.0",
+    "@google/genai": "^1.45.0",
     "@marketing-alpha/email-service": "*",
     "@marketing-alpha/email-templates": "*",
     "@marketing-alpha/types": "*",
