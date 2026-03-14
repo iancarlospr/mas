@@ -49,9 +49,13 @@ jobs:
           username: deploy
           key: ${{ secrets.DO_SSH_PRIVATE_KEY }}
           script: |
+            set -e
             cd /opt/alphascan
 
-            # Pull latest image
+            # Authenticate with GHCR (credentials expire periodically)
+            echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u iancarlospr --password-stdin
+
+            # Pull latest image (fail fast if pull fails)
             docker compose -f docker-compose.prod.yml pull engine
 
             # Restart engine (Redis stays up)
