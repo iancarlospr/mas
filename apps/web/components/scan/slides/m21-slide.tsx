@@ -15,10 +15,9 @@ import {
  * Layout B (SlideShellAlt): left panel = platform coverage viz, right = findings/recs.
  *
  * Visualization:
- *   - Platform coverage cards (Facebook/Meta, Google Search, YouTube)
+ *   - Platform coverage cards (Facebook/Meta, Google Search)
  *   - Active/inactive status indicators per platform
  *   - Summary stats: total images captured, platforms active
- *   - Screenshot count per platform
  */
 
 // ── Platform status card ────────────────────────────────────────────────
@@ -83,22 +82,13 @@ function GoogleIcon() {
   );
 }
 
-function YouTubeIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-      <rect x="1" y="3" width="12" height="8" rx="2" stroke="var(--gs-base)" strokeWidth="1.2" />
-      <path d="M5.5 5.5L9 7L5.5 8.5z" fill="var(--gs-base)" />
-    </svg>
-  );
-}
-
 export function M21Slide({ scan }: { scan: ScanWithResults }) {
   const syn = getM41Summary(scan, 'M21');
   const mod = getModuleResult(scan, 'M21');
   const raw = (mod?.data as Record<string, unknown> | undefined) ?? null;
 
   if (!syn && (!mod || mod.status === 'skipped' || mod.status === 'error')) {
-    return <SkippedSlide moduleName="Ad Library Intelligence" scan={scan} sourceLabel="Source: Meta Ad Library, Google Ads Transparency, TikTok Ad Library" />;
+    return <SkippedSlide moduleName="Ad Library Intelligence" scan={scan} sourceLabel="Source: Meta Ad Library, Google Ads Transparency" />;
   }
 
   const findings = syn?.key_findings ?? [];
@@ -112,23 +102,17 @@ export function M21Slide({ scan }: { scan: ScanWithResults }) {
   const summary = (raw?.['summary'] as Record<string, unknown> | undefined) ?? {};
   const facebookActive = summary['facebookActive'] === true;
   const googleSearchActive = summary['googleSearchActive'] === true;
-  const googleYoutubeActive = summary['googleYoutubeActive'] === true;
   const totalImages = typeof summary['totalImages'] === 'number' ? summary['totalImages'] as number : 0;
 
   // Facebook data
   const fbObj = raw?.['facebook'] as Record<string, unknown> | undefined;
   const fbTotalAds = typeof fbObj?.['totalAdsVisible'] === 'number' ? fbObj['totalAdsVisible'] as number : 0;
-  const fbScreenshots = fbObj?.['screenshots'] as Record<string, unknown> | undefined;
-  const fbAdScreenshots = Array.isArray(fbScreenshots?.['ads']) ? (fbScreenshots!['ads'] as unknown[]).length : 0;
 
   // Google data
   const googleObj = raw?.['google'] as Record<string, unknown> | undefined;
-  const googleSearch = googleObj?.['search'] as Record<string, unknown> | undefined;
-  const googleYoutube = googleObj?.['youtube'] as Record<string, unknown> | undefined;
-  const googleSearchAds = typeof googleSearch?.['totalAdsVisible'] === 'number' ? googleSearch['totalAdsVisible'] as number : 0;
-  const youtubeAds = typeof googleYoutube?.['totalAdsVisible'] === 'number' ? googleYoutube['totalAdsVisible'] as number : 0;
+  const googleSearchAds = typeof googleObj?.['totalAdsVisible'] === 'number' ? googleObj['totalAdsVisible'] as number : 0;
 
-  const activePlatforms = [facebookActive, googleSearchActive, googleYoutubeActive].filter(Boolean).length;
+  const activePlatforms = [facebookActive, googleSearchActive].filter(Boolean).length;
 
   // ── Viz content (left panel) ────────────────────────────────────────────
   const vizContent = (
@@ -138,7 +122,7 @@ export function M21Slide({ scan }: { scan: ScanWithResults }) {
         {[
           { value: activePlatforms, label: `Platform${activePlatforms !== 1 ? 's' : ''} Active`, color: activePlatforms > 0 ? 'var(--gs-terminal)' : 'var(--gs-mid)' },
           { value: totalImages, label: 'Screenshots', color: 'var(--gs-light)' },
-          { value: fbTotalAds + googleSearchAds + youtubeAds, label: 'Total Ads Found', color: fbTotalAds + googleSearchAds + youtubeAds > 0 ? 'var(--gs-base)' : 'var(--gs-mid)' },
+          { value: fbTotalAds + googleSearchAds, label: 'Total Ads Found', color: fbTotalAds + googleSearchAds > 0 ? 'var(--gs-base)' : 'var(--gs-mid)' },
         ].map((s, i) => (
           <div key={i} style={{
             flex: 1, padding: '0.6em 0.8em', borderRadius: '4px', textAlign: 'center',
@@ -178,27 +162,8 @@ export function M21Slide({ scan }: { scan: ScanWithResults }) {
             adCount={googleSearchAds}
             icon={<GoogleIcon />}
           />
-          <PlatformCard
-            name="YouTube"
-            active={googleYoutubeActive}
-            adCount={youtubeAds}
-            icon={<YouTubeIcon />}
-          />
         </div>
       </div>
-
-      {/* Screenshot breakdown */}
-      {totalImages > 0 && (
-        <div style={{ marginTop: '0.2em' }}>
-          <p className="font-data" style={{ fontSize: 'clamp(1px, 0.83cqi, 13px)', color: 'var(--gs-mid)' }}>
-            {fbAdScreenshots > 0 && `${fbAdScreenshots} Facebook creative screenshot${fbAdScreenshots !== 1 ? 's' : ''}`}
-            {fbAdScreenshots > 0 && (googleSearchAds + youtubeAds > 0) && ' | '}
-            {googleSearchAds > 0 && `${googleSearchAds} Google Search ad${googleSearchAds !== 1 ? 's' : ''}`}
-            {googleSearchAds > 0 && youtubeAds > 0 && ' | '}
-            {youtubeAds > 0 && `${youtubeAds} YouTube ad${youtubeAds !== 1 ? 's' : ''}`}
-          </p>
-        </div>
-      )}
 
       {/* No advertising detected message */}
       {activePlatforms === 0 && (
@@ -218,7 +183,7 @@ export function M21Slide({ scan }: { scan: ScanWithResults }) {
       headline={headline}
       execSummary={execSummary}
       scan={scan}
-      sourceLabel="Source: Meta Ad Library, Google Ads Transparency, TikTok Ad Library"
+      sourceLabel="Source: Meta Ad Library, Google Ads Transparency"
       vizContent={vizContent}
       findings={findings}
       recommendations={recs}

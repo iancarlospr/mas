@@ -416,51 +416,16 @@ function extractM21Images(data: Record<string, unknown>): M21ImageExtraction {
     }
   };
 
-  // Facebook screenshots
+  // Facebook screenshot
   const fb = data['facebook'] as Record<string, unknown> | undefined;
   if (fb) {
-    const fbScreenshots = fb['screenshots'] as Record<string, unknown> | undefined;
-    if (fbScreenshots) {
-      addImage(fbScreenshots['fullPage'] as string | null, 'Facebook Ad Library — full-page overview');
-      const fbAds = fbScreenshots['ads'] as string[] | undefined;
-      if (fbAds) {
-        for (let i = 0; i < fbAds.length; i++) {
-          addImage(fbAds[i], `Facebook Ad #${i + 1} screenshot (matches facebook.ads[${i}] text data)`);
-        }
-      }
-    }
+    addImage(fb['screenshot'] as string | null, 'Facebook Ad detail screenshot (matches facebook.ads[0] text data)');
   }
 
-  // Google Search screenshots
+  // Google Search screenshot
   const google = data['google'] as Record<string, unknown> | undefined;
   if (google) {
-    const search = google['search'] as Record<string, unknown> | undefined;
-    if (search) {
-      const searchScreenshots = search['screenshots'] as Record<string, unknown> | undefined;
-      if (searchScreenshots) {
-        addImage(searchScreenshots['fullPage'] as string | null, 'Google Search Ads — full-page overview');
-        const searchAds = searchScreenshots['ads'] as string[] | undefined;
-        if (searchAds) {
-          for (let i = 0; i < searchAds.length; i++) {
-            addImage(searchAds[i], `Google Search Ad #${i + 1} screenshot`);
-          }
-        }
-      }
-    }
-
-    const youtube = google['youtube'] as Record<string, unknown> | undefined;
-    if (youtube) {
-      const ytScreenshots = youtube['screenshots'] as Record<string, unknown> | undefined;
-      if (ytScreenshots) {
-        addImage(ytScreenshots['fullPage'] as string | null, 'Google YouTube Ads — full-page overview');
-        const ytAds = ytScreenshots['ads'] as string[] | undefined;
-        if (ytAds) {
-          for (let i = 0; i < ytAds.length; i++) {
-            addImage(ytAds[i], `YouTube Ad #${i + 1} screenshot`);
-          }
-        }
-      }
-    }
+    addImage(google['screenshot'] as string | null, 'Google Search Ad detail screenshot');
   }
 
   const labelText = images.length > 0

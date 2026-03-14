@@ -1310,20 +1310,9 @@ METHODOLOGY:
         benchmarks: 'Google Ads best practices: 3 headlines (max 30 chars each), 2 descriptions (max 90 chars), sitelink extensions improve CTR by 10-20%.',
       },
       {
-        parameter: 'Individual YouTube Ad Analysis (per ad)',
-        evaluationSteps: `For each YouTube ad screenshot:
-1. VISUAL ASSESSMENT (from screenshot):
-   - Assess video thumbnail quality and click-appeal
-   - Identify ad format: TrueView in-stream, Discovery/in-feed, Bumper, Shorts
-   - Evaluate visual branding and production quality
-2. Check if video content aligns with brand messaging from Facebook ads
-3. Produce a key_finding for each YouTube ad`,
-        benchmarks: 'YouTube: first 5 seconds are critical for TrueView retention. Thumbnails with faces get 38% higher CTR.',
-      },
-      {
         parameter: 'Cross-Platform Creative Strategy',
         evaluationSteps: `After analyzing all individual ads:
-1. CONSISTENCY: Compare messaging across Facebook, Google Search, YouTube
+1. CONSISTENCY: Compare messaging across Facebook and Google Search
    - Is the brand story consistent across platforms?
    - Are visual themes and brand elements consistent?
 2. CREATIVE DIVERSITY:
@@ -1331,8 +1320,8 @@ METHODOLOGY:
    - Different headlines, images, CTAs = active testing = POSITIVE
    - Same creative everywhere = WARNING (no testing)
 3. PLATFORM COVERAGE:
-   - Check summary: facebookActive, googleSearchActive, googleYoutubeActive
-   - All active: POSITIVE — diversified strategy
+   - Check summary: facebookActive, googleSearchActive
+   - Both active: POSITIVE — diversified strategy
    - Only one platform: WARNING — concentration risk
    - None active: INFO — may not be running paid ads
 4. UTM DISCIPLINE:
@@ -1355,8 +1344,8 @@ Include this as a special recommendation with action: "Recommended Creative Conc
       },
     ],
     scoringAnchors: {
-      excellent: 'Active on Meta + Google Search + YouTube, diverse creatives with professional design, clear CTAs, <20% text on Meta images, UTM tracking on all links, active creative testing, broad geographic targeting.',
-      good: 'Active on 2+ platforms, professional creative quality, some creative diversity, tracking parameters present.',
+      excellent: 'Active on Meta + Google Search, diverse creatives with professional design, clear CTAs, <20% text on Meta images, UTM tracking on all links, active creative testing, broad geographic targeting.',
+      good: 'Active on both platforms, professional creative quality, some creative diversity, tracking parameters present.',
       moderate: 'Active on 1 platform only, limited creative variety, basic design quality.',
       poor: 'Minimal ad presence, single creative, amateur design, no tracking parameters.',
       critical: 'No ads found on any platform despite evidence of paid traffic, or extremely poor creative quality with no tracking.',

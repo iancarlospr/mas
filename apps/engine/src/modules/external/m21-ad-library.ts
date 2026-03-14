@@ -2,14 +2,13 @@
  * M21 - Ad Library Extractor
  *
  * Navigates Facebook Ad Library and Google Ads Transparency Center using
- * browser automation. Captures screenshots and extracts Facebook CTA URLs.
- * Uploads 12 images to Supabase Storage for AI analysis and dashboard rendering.
+ * browser automation. Captures 1 ad detail screenshot per platform and
+ * extracts Facebook CTA URLs for downstream M06/M06b analysis.
  *
  * Checkpoints:
- *   1. Facebook Ad Library (weight: 0.35)
- *   2. Google Search Ads (weight: 0.35)
- *   3. YouTube Ads (weight: 0.15)
- *   4. Multi-Platform Advertising (weight: 0.15)
+ *   1. Facebook Ad Library (weight: 0.40)
+ *   2. Google Search Ads (weight: 0.40)
+ *   3. Multi-Platform Advertising (weight: 0.20)
  */
 
 import { registerModuleExecutor } from '../runner.js';
@@ -194,52 +193,11 @@ async function resolveFacebookPageInfo(pool: BrowserPool, slug: string): Promise
   }
 }
 
-/**
- * Convert an ISO 3166-1 alpha-2 country code to its English display name.
- * Facebook's country dropdown uses these English names for autocomplete.
- */
-function getCountryDisplayName(code: string): string {
-  try {
-    return new Intl.DisplayNames(['en'], { type: 'region' }).of(code) ?? 'United States';
-  } catch {
-    return 'United States';
-  }
-}
-
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
 const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
-
-/**
- * Hide all fixed/sticky elements on the page so they don't float in the
- * middle of a full-page screenshot. Call `restoreFixedElements` to undo.
- */
-async function hideFixedElements(page: Page): Promise<void> {
-  await page.evaluate(() => {
-    for (const el of document.querySelectorAll('*')) {
-      const pos = window.getComputedStyle(el).position;
-      if (pos === 'fixed' || pos === 'sticky') {
-        (el as HTMLElement).dataset.m21Hidden = '1';
-        (el as HTMLElement).style.setProperty('display', 'none', 'important');
-      }
-    }
-  });
-  await new Promise(r => setTimeout(r, 200));
-}
-
-/**
- * Restore elements previously hidden by `hideFixedElements`.
- */
-async function restoreFixedElements(page: Page): Promise<void> {
-  await page.evaluate(() => {
-    for (const el of document.querySelectorAll('[data-m21-hidden]')) {
-      (el as HTMLElement).style.removeProperty('display');
-      delete (el as HTMLElement).dataset.m21Hidden;
-    }
-  });
-}
 
 /**
  * Upload a screenshot buffer to Supabase Storage and return the public URL.
@@ -318,10 +276,7 @@ function extractUtmParams(url: string): Record<string, string> {
 // ---------------------------------------------------------------------------
 
 interface FacebookResult {
-  screenshots: {
-    fullPage: string | null;
-    ads: string[];
-  };
+  screenshot: string | null;
   ads: Array<{
     ctaUrl: string | null;
     utmParams: Record<string, string>;
@@ -400,7 +355,7 @@ async function scrapeFacebookAdLibrary(
   brandUrl: string,
 ): Promise<FacebookResult> {
   const result: FacebookResult = {
-    screenshots: { fullPage: null, ads: [] },
+    screenshot: null,
     ads: [],
     brandPageName: null,
     totalAdsVisible: 0,
@@ -419,40 +374,16 @@ async function scrapeFacebookAdLibrary(
   try {
     page = await pool.createPage('https://www.facebook.com');
 
-    const countryName = getCountryDisplayName(countryCode);
-    logger.info({ scanId, searchTerm, brandName, country: countryName, countryCode, pageId }, 'Navigating to Facebook Ad Library');
+    logger.info({ scanId, searchTerm, brandName, countryCode, pageId }, 'Navigating to Facebook Ad Library');
 
-    // Navigate to Ad Library and set up country + category
+    // Navigate to Ad Library and set up category (country defaults to user's region)
     await page.goto('https://www.facebook.com/ads/library/', {
       waitUntil: 'domcontentloaded',
       timeout: 30_000,
     });
     await sleep(4000);
 
-    // ── Step 1: Select country from the dropdown ──────────────────────────
-    try {
-      const countryCombo = page.locator('[role="combobox"]').first();
-      await countryCombo.click({ timeout: 5_000, force: true });
-      await sleep(1000);
-
-      const countrySearch = page.locator('input[placeholder*="country" i], input[placeholder*="Search for" i]').first();
-      await countrySearch.waitFor({ state: 'visible', timeout: 5_000 });
-      await countrySearch.click({ timeout: 3_000 });
-      await countrySearch.fill('');
-      await sleep(300);
-      await countrySearch.type(countryName, { delay: 80 });
-      await sleep(2000);
-
-      const countryCell = page.locator(`[role="gridcell"]:has-text("${countryName}")`).first();
-      await countryCell.waitFor({ state: 'visible', timeout: 5_000 });
-      await countryCell.click({ timeout: 3_000, force: true });
-      logger.info({ scanId, country: countryName }, 'Selected country');
-      await sleep(2000);
-    } catch (err) {
-      logger.warn({ scanId, error: (err as Error).message }, 'Failed to select country — continuing with default');
-    }
-
-    // ── Step 2: Select "All ads" from category dropdown ─────────────────
+    // ── Step 1: Select "All ads" from category dropdown ─────────────────
     try {
       const adCategoryCombo = page.locator('[role="combobox"]:has-text("Ad category"), [role="combobox"]:has-text("All ads"), [role="combobox"]:has-text("Issues")').first();
       await adCategoryCombo.click({ timeout: 5_000, force: true });
@@ -637,23 +568,10 @@ async function scrapeFacebookAdLibrary(
       // Keep existing count
     }
 
-    // Take full-page screenshot.
-    // Hide fixed/sticky elements first (navbar, cookie banners) so they don't
-    // render floating in the middle of the long screenshot blocking ad content.
-    try {
-      await hideFixedElements(page);
-      const fullBuffer = await page.screenshot({ fullPage: true, type: 'png' });
-      result.screenshots.fullPage = await uploadScreenshot(scanId, 'fb-full.png', fullBuffer);
-      await restoreFixedElements(page);
-    } catch (err) {
-      logger.warn({ scanId, error: (err as Error).message }, 'Facebook full-page screenshot failed');
-    }
-
-    // Extract individual ad screenshots and CTA URLs (up to 3).
-    // Strategy: expand the viewport to 2400px tall before opening ad details
-    // so the dialog stretches to show the full ad creative without cutoff,
-    // then screenshot the dialog element directly.
-    const adsToCapture = Math.min(3, result.totalAdsVisible);
+    // Extract ad detail screenshot and CTA URL (1 ad only).
+    // Expand the viewport to 2400px tall so the dialog stretches to show
+    // the full ad creative without cutoff, then screenshot the dialog directly.
+    const adsToCapture = Math.min(1, result.totalAdsVisible);
 
     if (adsToCapture > 0) {
       // Stretch viewport tall so the ad detail dialog expands to fit all content
@@ -948,9 +866,9 @@ async function scrapeFacebookAdLibrary(
 
           if (bestIdx >= 0 && bestLen > 50) {
             const adBuffer = await dialogs.nth(bestIdx).screenshot({ type: 'png' });
-            const adUrl = await uploadScreenshot(scanId, `fb-ad-${i + 1}.png`, adBuffer);
+            const adUrl = await uploadScreenshot(scanId, 'fb-ad.png', adBuffer);
             if (adUrl) {
-              result.screenshots.ads.push(adUrl);
+              result.screenshot = adUrl;
               screenshotCaptured = true;
             }
           }
@@ -961,8 +879,8 @@ async function scrapeFacebookAdLibrary(
         // Fallback: viewport screenshot if element screenshot didn't work
         if (!screenshotCaptured) {
           const viewportBuffer = await page.screenshot({ type: 'png' });
-          const adUrl = await uploadScreenshot(scanId, `fb-ad-${i + 1}.png`, viewportBuffer);
-          if (adUrl) result.screenshots.ads.push(adUrl);
+          const adUrl = await uploadScreenshot(scanId, 'fb-ad.png', viewportBuffer);
+          if (adUrl) result.screenshot = adUrl;
         }
 
         // Extract CTA URL from external links visible in the detail view
@@ -1001,33 +919,6 @@ async function scrapeFacebookAdLibrary(
           reachData: adDetails?.reachData ?? [],
         });
 
-        // Close the dialog — FB uses a "Close" button at the bottom or X at top
-        try {
-          const closeBtn = page.locator('[role="dialog"] button:has-text("Close"), [role="dialog"] [aria-label="Close"]').last();
-          await closeBtn.click({ timeout: 2_000, force: true });
-          await sleep(1000);
-        } catch {
-          await page.keyboard.press('Escape');
-          await sleep(1000);
-        }
-
-        // Remove lingering Facebook overlays that intercept clicks on subsequent ads
-        try {
-          await page.evaluate(() => {
-            document.querySelectorAll('div[data-visualcompletion="ignore"]').forEach(el => {
-              const style = window.getComputedStyle(el);
-              // Only remove overlay-style elements that cover the page (not structural ones)
-              if (style.position === 'fixed' || style.position === 'absolute') {
-                const rect = el.getBoundingClientRect();
-                if (rect.width > 500 && rect.height > 500) {
-                  (el as HTMLElement).style.setProperty('pointer-events', 'none', 'important');
-                }
-              }
-            });
-          });
-        } catch {
-          // Non-critical
-        }
       } catch (err) {
         logger.warn({ scanId, adIndex: i, error: (err as Error).message }, 'Failed to capture Facebook ad');
       }
@@ -1066,21 +957,13 @@ async function dismissGoogleOverlays(page: Page): Promise<void> {
 }
 
 // ---------------------------------------------------------------------------
-// Part 2 & 3: Google Ads Transparency Center
+// Part 2: Google Ads Transparency Center
 // ---------------------------------------------------------------------------
 
-interface GooglePlatformResult {
-  screenshots: {
-    fullPage: string | null;
-    ads: string[];
-  };
+interface GoogleResult {
+  screenshot: string | null;
   totalAdsVisible: number;
   searchSuccessful: boolean;
-}
-
-interface GoogleResult {
-  search: GooglePlatformResult;
-  youtube: GooglePlatformResult;
 }
 
 async function scrapeGoogleAdsTransparency(
@@ -1091,8 +974,9 @@ async function scrapeGoogleAdsTransparency(
   countryCode: string,
 ): Promise<GoogleResult> {
   const result: GoogleResult = {
-    search: { screenshots: { fullPage: null, ads: [] }, totalAdsVisible: 0, searchSuccessful: false },
-    youtube: { screenshots: { fullPage: null, ads: [] }, totalAdsVisible: 0, searchSuccessful: false },
+    screenshot: null,
+    totalAdsVisible: 0,
+    searchSuccessful: false,
   };
 
   let page: Page | null = null;
@@ -1100,7 +984,6 @@ async function scrapeGoogleAdsTransparency(
   try {
     page = await pool.createPage('https://adstransparency.google.com');
 
-    // ---- PART 2: Google Search Ads ----
     logger.info({ scanId, brandUrl, region: countryCode }, 'Navigating to Google Ads Transparency Center');
 
     // Navigate directly with domain= URL param — bypasses autocomplete entirely
@@ -1112,14 +995,12 @@ async function scrapeGoogleAdsTransparency(
     });
     await sleep(4000);
 
-    result.search.searchSuccessful = true;
+    result.searchSuccessful = true;
 
     // Dismiss overlays before interacting with filter buttons
     await dismissGoogleOverlays(page);
 
-    // Select "Google Search" platform FIRST (before date filter).
-    // Applying platform filter first is more reliable because the date filter
-    // reloads the page and can disrupt subsequent dropdown interactions.
+    // Select "Google Search" platform filter
     try {
       const platformBtn = page.locator('[aria-label*="Platform filter"]').first();
       await platformBtn.waitFor({ state: 'visible', timeout: 5_000 });
@@ -1139,72 +1020,13 @@ async function scrapeGoogleAdsTransparency(
       logger.warn({ scanId, error: (err as Error).message }, 'Google Search platform filter failed — continuing with all platforms');
     }
 
-    // Scroll to top, then set date filter to "Last 30 days".
-    await page.evaluate(() => window.scrollTo(0, 0));
-    await sleep(500);
-
-    try {
-      const dateBtn = page.locator('[aria-label="Date range filter button"]').first();
-      await dateBtn.waitFor({ state: 'visible', timeout: 5_000 });
-      await dateBtn.scrollIntoViewIfNeeded({ timeout: 3_000 });
-      await sleep(300);
-      await dismissGoogleOverlays(page);
-      await dateBtn.click({ timeout: 5_000, force: true });
-      await sleep(1500);
-
-      const last30 = page.locator('material-select-item[role="option"]:has-text("Last 30 days")').first();
-      await last30.waitFor({ state: 'visible', timeout: 5_000 });
-      await last30.click({ timeout: 3_000 });
-      await sleep(500);
-
-      // The date picker popup stays open after selecting a preset — must click "OK" to confirm.
-      // The OK button is <material-button class="apply"> with text "OK".
-      const okBtn = page.locator('material-button.apply, material-button:has-text("OK")').first();
-      await okBtn.waitFor({ state: 'visible', timeout: 3_000 });
-      await okBtn.click({ timeout: 3_000 });
-      logger.info({ scanId }, 'Selected "Last 30 days" date filter and confirmed');
-      await sleep(4000);
-      await dismissGoogleOverlays(page);
-    } catch (err) {
-      logger.warn({ scanId, error: (err as Error).message }, 'Failed to set "Last 30 days" date filter — using default time range');
-    }
-
-    // Click "See all ads" to reveal the full ad listing.
-    // Google shows only ~4 ads by default. The expansion button is a <material-button>
-    // with class "grid-expansion-button" and text "See all ads".
-    {
-      const seeAllBtn = page.locator(
-        'material-button.grid-expansion-button, ' +
-        'material-button:has-text("See all ads"), ' +
-        '[role="button"]:has-text("See all ads")',
-      ).first();
-      try {
-        await seeAllBtn.waitFor({ state: 'visible', timeout: 8_000 });
-        await seeAllBtn.scrollIntoViewIfNeeded({ timeout: 3_000 });
-        await sleep(500);
-        await dismissGoogleOverlays(page);
-        // Use JS click as fallback — element may be "outside viewport" per Playwright
-        // even after scrollIntoView if the page layout is unusual
-        try {
-          await seeAllBtn.click({ timeout: 5_000, force: true });
-        } catch {
-          await seeAllBtn.evaluate((el: HTMLElement) => el.click());
-        }
-        logger.info({ scanId }, 'Clicked "See all ads" for Google Search');
-        await sleep(4000);
-        await dismissGoogleOverlays(page);
-      } catch (err) {
-        logger.warn({ scanId, error: (err as Error).message }, 'Failed to click "See all ads" for Google Search — only preview ads will be captured');
-      }
-    }
-
     // Count visible ads — Google uses <creative-preview> custom elements
     try {
       const adItems = page.locator('creative-preview');
       const count = await adItems.count();
-      result.search.totalAdsVisible = count;
+      result.totalAdsVisible = count;
     } catch {
-      result.search.totalAdsVisible = 0;
+      result.totalAdsVisible = 0;
     }
 
     // Scroll down 5 times to trigger lazy loading
@@ -1218,7 +1040,7 @@ async function scrapeGoogleAdsTransparency(
       try {
         const adItems = page.locator('creative-preview');
         const count = await adItems.count();
-        result.search.totalAdsVisible = Math.max(result.search.totalAdsVisible, count);
+        result.totalAdsVisible = Math.max(result.totalAdsVisible, count);
       } catch {
         // Keep existing count
       }
@@ -1229,238 +1051,22 @@ async function scrapeGoogleAdsTransparency(
       );
     }
 
-    // Full-page screenshot of Google Search ads
-    try {
-      await hideFixedElements(page);
-      const fullBuffer = await page.screenshot({ fullPage: true, type: 'png' });
-      result.search.screenshots.fullPage = await uploadScreenshot(scanId, 'google-search-full.png', fullBuffer);
-      await restoreFixedElements(page);
-    } catch (err) {
-      logger.warn({ scanId, error: (err as Error).message }, 'Google Search full screenshot failed');
-    }
-
-    // Store the results page URL so we can reliably navigate back after ad detail views
-    const resultsPageUrl = page.url();
-
-    // Individual ad screenshots (up to 3)
-    const searchAdsToCapture = Math.min(3, result.search.totalAdsVisible);
-    for (let i = 0; i < searchAdsToCapture; i++) {
+    // Capture 1 ad detail screenshot
+    if (result.totalAdsVisible > 0) {
       try {
-        // Dismiss overlays each iteration in case they reappear
         await dismissGoogleOverlays(page);
 
-        const adItem = page.locator('creative-preview').nth(i);
-
-        // Click to view ad details — this navigates to a new page.
-        // Use force:true to bypass overlay interception.
+        const adItem = page.locator('creative-preview').first();
         await adItem.click({ timeout: 5_000, force: true });
         await sleep(3000);
 
-        // Take viewport screenshot of the detail page
         const viewportBuffer = await page.screenshot({ type: 'png' });
-        const adUrl = await uploadScreenshot(scanId, `google-search-ad-${i + 1}.png`, viewportBuffer);
-        if (adUrl) result.search.screenshots.ads.push(adUrl);
-
-        // Navigate back to results list
-        await page.goto(resultsPageUrl, { waitUntil: 'domcontentloaded', timeout: 15_000 });
-        await sleep(2000);
+        result.screenshot = await uploadScreenshot(scanId, 'google-search-ad.png', viewportBuffer);
       } catch (err) {
-        logger.warn({ scanId, adIndex: i, error: (err as Error).message }, 'Failed to capture Google Search ad');
-        // Try to get back to results page on failure
-        try { await page.goto(resultsPageUrl, { waitUntil: 'domcontentloaded', timeout: 10_000 }); await sleep(1000); } catch { /* ignore */ }
+        logger.warn({ scanId, error: (err as Error).message }, 'Failed to capture Google Search ad screenshot');
       }
     }
 
-    // ---- PART 3: YouTube Ads ----
-    logger.info({ scanId }, 'Switching to YouTube ads');
-
-    // Navigate back to the results page first — individual ad clicks navigated away.
-    try {
-      await page.goto(resultsPageUrl, { waitUntil: 'domcontentloaded', timeout: 15_000 });
-      await sleep(3000);
-      await dismissGoogleOverlays(page);
-    } catch {
-      logger.warn({ scanId }, 'Failed to navigate back for YouTube platform switch');
-    }
-
-    // Scroll to top so filter buttons are accessible
-    await page.evaluate(() => window.scrollTo(0, 0));
-    await sleep(500);
-
-    // Switch to YouTube using the platform filter dropdown.
-    try {
-      const platformBtn = page.locator('[aria-label*="Platform filter"]').first();
-      await platformBtn.waitFor({ state: 'visible', timeout: 5_000 });
-      await platformBtn.scrollIntoViewIfNeeded({ timeout: 3_000 });
-      await sleep(300);
-      await dismissGoogleOverlays(page);
-      await platformBtn.click({ timeout: 5_000, force: true });
-      logger.info({ scanId }, 'Opened platform filter dropdown for YouTube');
-      await sleep(1500);
-
-      const youtubeOption = page.locator('material-select-item[role="option"]:has-text("YouTube")').first();
-      await youtubeOption.waitFor({ state: 'visible', timeout: 5_000 });
-      await youtubeOption.click({ timeout: 3_000 });
-      logger.info({ scanId }, 'Selected YouTube from platform filter');
-      await sleep(4000);
-      await dismissGoogleOverlays(page);
-
-      result.youtube.searchSuccessful = true;
-    } catch (err) {
-      logger.warn({ scanId, error: (err as Error).message }, 'YouTube platform switch failed');
-    }
-
-    if (result.youtube.searchSuccessful) {
-      // Scroll to top so filter buttons are accessible
-      await page.evaluate(() => window.scrollTo(0, 0));
-      await sleep(500);
-
-      // Set date filter to "Last 30 days" for YouTube.
-      // It may carry over from Google Search, but re-apply to be safe.
-      try {
-        const dateBtn = page.locator('[aria-label="Date range filter button"]').first();
-        await dateBtn.waitFor({ state: 'visible', timeout: 5_000 });
-        await dateBtn.scrollIntoViewIfNeeded({ timeout: 3_000 });
-        await sleep(300);
-        await dismissGoogleOverlays(page);
-        await dateBtn.click({ timeout: 5_000, force: true });
-        await sleep(1500);
-
-        const last30 = page.locator('material-select-item[role="option"]:has-text("Last 30 days")').first();
-        await last30.waitFor({ state: 'visible', timeout: 5_000 });
-        await last30.click({ timeout: 3_000 });
-        await sleep(500);
-
-        // Click OK to confirm the date selection
-        const okBtn = page.locator('material-button.apply, material-button:has-text("OK")').first();
-        await okBtn.waitFor({ state: 'visible', timeout: 3_000 });
-        await okBtn.click({ timeout: 3_000 });
-        logger.info({ scanId }, 'Selected "Last 30 days" date filter for YouTube');
-        await sleep(4000);
-        await dismissGoogleOverlays(page);
-      } catch (err) {
-        logger.warn({ scanId, error: (err as Error).message }, 'Failed to set date filter for YouTube');
-      }
-
-      // Set format filter to "Video" for YouTube.
-      // Button: aria-label includes "Ad format filter"
-      // Options: <material-select-item role="option"> — "Video"
-      await page.evaluate(() => window.scrollTo(0, 0));
-      await sleep(300);
-
-      try {
-        const formatBtn = page.locator('[aria-label*="format filter"], [aria-label*="Format filter"]').first();
-        await formatBtn.waitFor({ state: 'visible', timeout: 5_000 });
-        await formatBtn.scrollIntoViewIfNeeded({ timeout: 3_000 });
-        await sleep(300);
-        await dismissGoogleOverlays(page);
-        await formatBtn.click({ timeout: 5_000, force: true });
-        await sleep(1500);
-
-        // Scope to the visible popup to avoid matching hidden platform filter options
-        // (YouTube's option text contains "video_youtube" which also matches "Video")
-        const videoOption = page.locator('.popup-wrapper.visible material-select-item[role="option"]:has-text("Video")').first();
-        await videoOption.waitFor({ state: 'visible', timeout: 5_000 });
-        await videoOption.click({ timeout: 3_000 });
-        logger.info({ scanId }, 'Selected "Video" format filter for YouTube');
-        await sleep(4000);
-        await dismissGoogleOverlays(page);
-      } catch (err) {
-        logger.warn({ scanId, error: (err as Error).message }, 'Failed to set "Video" format filter for YouTube');
-      }
-
-      // Click "See all ads" for YouTube ads
-      {
-        const seeAllBtn = page.locator(
-          'material-button.grid-expansion-button, ' +
-          'material-button:has-text("See all ads"), ' +
-          '[role="button"]:has-text("See all ads")',
-        ).first();
-        try {
-          await seeAllBtn.waitFor({ state: 'visible', timeout: 8_000 });
-          await seeAllBtn.scrollIntoViewIfNeeded({ timeout: 3_000 });
-          await sleep(500);
-          await dismissGoogleOverlays(page);
-          try {
-            await seeAllBtn.click({ timeout: 5_000, force: true });
-          } catch {
-            await seeAllBtn.evaluate((el: HTMLElement) => el.click());
-          }
-          logger.info({ scanId }, 'Clicked "See all ads" for YouTube');
-          await sleep(4000);
-          await dismissGoogleOverlays(page);
-        } catch (err) {
-          logger.warn({ scanId, error: (err as Error).message }, 'Failed to click "See all ads" for YouTube — only preview ads will be captured');
-        }
-      }
-
-      // Count YouTube ads
-      try {
-        const ytAdItems = page.locator('creative-preview');
-        const count = await ytAdItems.count();
-        result.youtube.totalAdsVisible = count;
-      } catch {
-        result.youtube.totalAdsVisible = 0;
-      }
-
-      // Scroll 5 times to load more
-      try {
-        for (let i = 0; i < 5; i++) {
-          await page.mouse.wheel(0, 800);
-          await sleep(500);
-        }
-
-        // Recount after scrolling
-        try {
-          const ytAdItems = page.locator('creative-preview');
-          const count = await ytAdItems.count();
-          result.youtube.totalAdsVisible = Math.max(result.youtube.totalAdsVisible, count);
-        } catch {
-          // Keep existing
-        }
-      } catch (scrollErr) {
-        logger.warn(
-          { scanId, error: (scrollErr as Error).message },
-          'Page crashed during YouTube scrolling — proceeding with ads captured before scroll',
-        );
-      }
-
-      // Full-page screenshot of YouTube ads
-      try {
-        await hideFixedElements(page);
-        const fullBuffer = await page.screenshot({ fullPage: true, type: 'png' });
-        result.youtube.screenshots.fullPage = await uploadScreenshot(scanId, 'google-youtube-full.png', fullBuffer);
-        await restoreFixedElements(page);
-      } catch (err) {
-        logger.warn({ scanId, error: (err as Error).message }, 'YouTube full screenshot failed');
-      }
-
-      // Store YouTube results page URL for back-navigation after ad detail views
-      const ytResultsPageUrl = page.url();
-
-      // Individual YouTube ad screenshots (up to 3)
-      const ytAdsToCapture = Math.min(3, result.youtube.totalAdsVisible);
-      for (let i = 0; i < ytAdsToCapture; i++) {
-        try {
-          await dismissGoogleOverlays(page);
-
-          const adItem = page.locator('creative-preview').nth(i);
-          await adItem.click({ timeout: 5_000, force: true });
-          await sleep(3000);
-
-          const viewportBuffer = await page.screenshot({ type: 'png' });
-          const adUrl = await uploadScreenshot(scanId, `google-youtube-ad-${i + 1}.png`, viewportBuffer);
-          if (adUrl) result.youtube.screenshots.ads.push(adUrl);
-
-          // Navigate back to YouTube results
-          await page.goto(ytResultsPageUrl, { waitUntil: 'domcontentloaded', timeout: 15_000 });
-          await sleep(2000);
-        } catch (err) {
-          logger.warn({ scanId, adIndex: i, error: (err as Error).message }, 'Failed to capture YouTube ad');
-          try { await page.goto(ytResultsPageUrl, { waitUntil: 'domcontentloaded', timeout: 10_000 }); await sleep(1000); } catch { /* ignore */ }
-        }
-      }
-    }
   } catch (err) {
     logger.error({ scanId, error: (err as Error).message }, 'Google Ads Transparency scraping failed');
   } finally {
@@ -1531,7 +1137,7 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
       logger.error({ scanId: ctx.scanId, error: (err as Error).message }, 'Facebook section failed completely');
     }
 
-    // Parts 2 & 3: Google Ads Transparency (Search + YouTube)
+    // Part 2: Google Ads Transparency (Search only)
     try {
       googleResult = await scrapeGoogleAdsTransparency(pool, ctx.scanId, ctx.url, fallbackBrandName, countryCode);
     } catch (err) {
@@ -1540,7 +1146,7 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
 
     // Build data shape
     const fb = fbResult ?? {
-      screenshots: { fullPage: null, ads: [] },
+      screenshot: null,
       ads: [],
       brandPageName: null,
       totalAdsVisible: 0,
@@ -1550,18 +1156,15 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
     };
 
     const google = googleResult ?? {
-      search: { screenshots: { fullPage: null, ads: [] }, totalAdsVisible: 0, searchSuccessful: false },
-      youtube: { screenshots: { fullPage: null, ads: [] }, totalAdsVisible: 0, searchSuccessful: false },
+      screenshot: null,
+      totalAdsVisible: 0,
+      searchSuccessful: false,
     };
 
     const facebookActive = fb.searchSuccessful && fb.totalAdsVisible > 0;
-    const googleSearchActive = google.search.searchSuccessful && google.search.totalAdsVisible > 0;
-    const googleYoutubeActive = google.youtube.searchSuccessful && google.youtube.totalAdsVisible > 0;
+    const googleSearchActive = google.searchSuccessful && google.totalAdsVisible > 0;
 
-    const totalImages =
-      (fb.screenshots.fullPage ? 1 : 0) + fb.screenshots.ads.length +
-      (google.search.screenshots.fullPage ? 1 : 0) + google.search.screenshots.ads.length +
-      (google.youtube.screenshots.fullPage ? 1 : 0) + google.youtube.screenshots.ads.length;
+    const totalImages = (fb.screenshot ? 1 : 0) + (google.screenshot ? 1 : 0);
 
     data.facebook = fb;
     data.google = google;
@@ -1569,7 +1172,6 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
       totalImages,
       facebookActive,
       googleSearchActive,
-      googleYoutubeActive,
     };
 
     // Signals
@@ -1583,27 +1185,20 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
     if (googleSearchActive) {
       signals.push(createSignal({
         type: 'google_search_ads_active', name: 'Google Search Ads Active',
-        confidence: 0.9, evidence: `${google.search.totalAdsVisible} Google Search ads found`,
-        category: 'paid_media',
-      }));
-    }
-    if (googleYoutubeActive) {
-      signals.push(createSignal({
-        type: 'youtube_ads_active', name: 'YouTube Ads Active',
-        confidence: 0.9, evidence: `${google.youtube.totalAdsVisible} YouTube ads found`,
+        confidence: 0.9, evidence: `${google.totalAdsVisible} Google Search ads found`,
         category: 'paid_media',
       }));
     }
 
-    // CP1: Facebook Ad Library (weight: 0.35)
+    // CP1: Facebook Ad Library (weight: 0.40)
     {
       let health: CheckpointHealth;
       let evidence: string;
       let recommendation: string | undefined;
 
-      if (facebookActive && fb.screenshots.ads.length > 0) {
+      if (facebookActive && fb.screenshot) {
         health = 'excellent';
-        evidence = `${fb.totalAdsVisible} active Facebook ads found, ${fb.screenshots.ads.length} screenshots captured`;
+        evidence = `${fb.totalAdsVisible} active Facebook ads found, screenshot captured`;
       } else if (fb.searchSuccessful && fb.totalAdsVisible === 0) {
         health = 'good';
         evidence = 'Facebook Ad Library search successful but no active ads found';
@@ -1611,71 +1206,50 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
       } else {
         health = 'warning';
         evidence = fb.searchSuccessful
-          ? `Facebook ads found but screenshot capture incomplete (${fb.screenshots.ads.length} captured)`
+          ? 'Facebook ads found but screenshot capture failed'
           : 'Facebook Ad Library search failed or brand not found';
         recommendation = 'Verify brand presence on Facebook and ensure active ad campaigns are running';
       }
 
-      checkpoints.push(createCheckpoint({ id: 'm21-facebook', name: 'Facebook Ad Library', weight: 0.35, health, evidence, recommendation }));
+      checkpoints.push(createCheckpoint({ id: 'm21-facebook', name: 'Facebook Ad Library', weight: 0.40, health, evidence, recommendation }));
     }
 
-    // CP2: Google Search Ads (weight: 0.35)
+    // CP2: Google Search Ads (weight: 0.40)
     {
       let health: CheckpointHealth;
       let evidence: string;
       let recommendation: string | undefined;
 
-      if (googleSearchActive && google.search.screenshots.ads.length > 0) {
+      if (googleSearchActive && google.screenshot) {
         health = 'excellent';
-        evidence = `${google.search.totalAdsVisible} Google Search ads found, ${google.search.screenshots.ads.length} screenshots captured`;
-      } else if (google.search.searchSuccessful && google.search.totalAdsVisible === 0) {
+        evidence = `${google.totalAdsVisible} Google Search ads found, screenshot captured`;
+      } else if (google.searchSuccessful && google.totalAdsVisible === 0) {
         health = 'good';
-        evidence = 'Google Ads Transparency search successful but no Search ads in last 30 days';
+        evidence = 'Google Ads Transparency search successful but no Search ads found';
         recommendation = 'Consider running Google Search ad campaigns for brand visibility';
       } else {
         health = 'warning';
-        evidence = google.search.searchSuccessful
-          ? `Google Search ads found but screenshot capture incomplete (${google.search.screenshots.ads.length} captured)`
+        evidence = google.searchSuccessful
+          ? 'Google Search ads found but screenshot capture failed'
           : 'Google Ads Transparency search failed';
       }
 
-      checkpoints.push(createCheckpoint({ id: 'm21-google-search', name: 'Google Search Ads', weight: 0.35, health, evidence, recommendation }));
+      checkpoints.push(createCheckpoint({ id: 'm21-google-search', name: 'Google Search Ads', weight: 0.40, health, evidence, recommendation }));
     }
 
-    // CP3: YouTube Ads (weight: 0.15)
+    // CP3: Multi-Platform Advertising (weight: 0.20)
     {
-      let health: CheckpointHealth;
-      let evidence: string;
-
-      if (googleYoutubeActive) {
-        health = 'excellent';
-        evidence = `${google.youtube.totalAdsVisible} YouTube ads found`;
-      } else {
-        health = 'good';
-        evidence = 'No YouTube ads found (common for many brands)';
-      }
-
-      checkpoints.push(createCheckpoint({ id: 'm21-youtube', name: 'YouTube Ads', weight: 0.15, health, evidence }));
-    }
-
-    // CP4: Multi-Platform Advertising (weight: 0.15)
-    {
-      const activePlatforms = [facebookActive, googleSearchActive, googleYoutubeActive].filter(Boolean).length;
+      const activePlatforms = [facebookActive, googleSearchActive].filter(Boolean).length;
       let health: CheckpointHealth;
       let evidence: string;
       let recommendation: string | undefined;
 
-      if (activePlatforms >= 2) {
+      if (activePlatforms === 2) {
         health = 'excellent';
-        const platforms = [
-          facebookActive ? 'Facebook' : null,
-          googleSearchActive ? 'Google Search' : null,
-          googleYoutubeActive ? 'YouTube' : null,
-        ].filter(Boolean).join(', ');
-        evidence = `Active on ${activePlatforms} platforms: ${platforms}`;
+        evidence = 'Active on both Facebook and Google Search';
       } else if (activePlatforms === 1) {
         health = 'good';
-        const platform = facebookActive ? 'Facebook' : googleSearchActive ? 'Google Search' : 'YouTube';
+        const platform = facebookActive ? 'Facebook' : 'Google Search';
         evidence = `Active on 1 platform: ${platform}`;
         recommendation = 'Diversify advertising across multiple platforms for broader reach';
       } else {
@@ -1684,12 +1258,12 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
         recommendation = 'Consider launching advertising campaigns on Facebook and Google';
       }
 
-      checkpoints.push(createCheckpoint({ id: 'm21-multi-platform', name: 'Multi-Platform Advertising', weight: 0.15, health, evidence, recommendation }));
+      checkpoints.push(createCheckpoint({ id: 'm21-multi-platform', name: 'Multi-Platform Advertising', weight: 0.20, health, evidence, recommendation }));
     }
 
     // Determine overall status
-    const anySuccess = fb.searchSuccessful || google.search.searchSuccessful || google.youtube.searchSuccessful;
-    const allSuccess = fb.searchSuccessful && google.search.searchSuccessful;
+    const anySuccess = fb.searchSuccessful || google.searchSuccessful;
+    const allSuccess = fb.searchSuccessful && google.searchSuccessful;
     const status = allSuccess ? 'success' : anySuccess ? 'partial' : 'error';
 
     return {
