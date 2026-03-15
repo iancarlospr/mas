@@ -381,15 +381,19 @@ async function scrapeFacebookAdLibrary(
       waitUntil: 'domcontentloaded',
       timeout: 30_000,
     });
+    // Wait for JS to render the search form
+    await page.waitForLoadState('networkidle', { timeout: 15_000 }).catch(() => {});
+    await sleep(2000);
 
     // ── Step 1: Set country to "All" ────────────────────────────────────
     // Facebook defaults to the server's region (DO = US/PR). Setting to "All"
     // ensures we see ads running globally, not just in one country.
     // Must be done BEFORE category selection.
-    // The country combobox is the FIRST [role="combobox"] in the search form —
-    // its text is the current country name (not "country"), so we use .first().
+    // Scope to the search form area — page has comboboxes in nav dialogs too.
+    const searchForm = page.locator('text=Search ads').locator('..').locator('..');
     try {
-      const countryCombo = page.locator('[role="combobox"]').first();
+      // The country combobox is the first combobox near the "Search ads" heading
+      const countryCombo = searchForm.locator('[role="combobox"]').first();
       await countryCombo.waitFor({ state: 'visible', timeout: 15_000 });
       await sleep(1000);
       await countryCombo.click({ timeout: 5_000, force: true });
@@ -416,8 +420,8 @@ async function scrapeFacebookAdLibrary(
     let categorySelected = false;
     for (let attempt = 0; attempt < 2; attempt++) {
       try {
-        // Wait for the category combobox to be interactive (not just loaded)
-        const adCategoryCombo = page.locator('[role="combobox"]:has-text("Ad category"), [role="combobox"]:has-text("All ads"), [role="combobox"]:has-text("Issues")').first();
+        // Wait for the category combobox to be interactive (scoped to search form)
+        const adCategoryCombo = searchForm.locator('[role="combobox"]:has-text("Ad category"), [role="combobox"]:has-text("All ads"), [role="combobox"]:has-text("Issues")').first();
         await adCategoryCombo.waitFor({ state: 'visible', timeout: 15_000 });
         await sleep(1000); // Brief settle after visible
         await adCategoryCombo.click({ timeout: 5_000, force: true });
