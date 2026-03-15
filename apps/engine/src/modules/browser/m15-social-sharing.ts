@@ -82,12 +82,17 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
     ];
 
     const profileLinks: string[] = [];
-    const links = document.querySelectorAll('a[href]');
+    // Collect social URLs from standard href AND data-link/data-href attributes.
+    // Some sites (e.g. SharePoint) use data-link instead of href for social icons.
+    const socialUrls: string[] = [];
+    const links = document.querySelectorAll('a[href], a[data-link], a[data-href]');
     links.forEach((link) => {
-      const href = link.getAttribute('href') || '';
+      const href = link.getAttribute('href') || link.getAttribute('data-link') || link.getAttribute('data-href') || '';
+      if (!href) return;
       for (const { name, pattern } of socialPlatforms) {
-        if (pattern.test(href) && !profileLinks.includes(name)) {
-          profileLinks.push(name);
+        if (pattern.test(href)) {
+          if (!profileLinks.includes(name)) profileLinks.push(name);
+          if (href.startsWith('http') && !socialUrls.includes(href)) socialUrls.push(href);
         }
       }
     });
@@ -115,6 +120,12 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
           profileLinks.push(name);
         }
       }
+    }
+
+    // Merge social URLs found via href/data-link into sameAsLinks
+    // so downstream modules (M21) can extract Facebook slugs
+    for (const url of socialUrls) {
+      if (!sameAsLinks.includes(url)) sameAsLinks.push(url);
     }
 
     return {
