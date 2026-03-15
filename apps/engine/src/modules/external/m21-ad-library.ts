@@ -393,13 +393,26 @@ async function scrapeFacebookAdLibrary(
       await countryCombo.click({ timeout: 5_000, force: true });
       await sleep(1500);
 
-      const allOption = page.locator('[role="gridcell"]:has-text("All"), [role="option"]:has-text("All")').first();
+      // Facebook's country dropdown is searchable — type "All" to filter
+      await page.keyboard.type('All', { delay: 80 });
+      await sleep(1000);
+
+      // Try multiple selector patterns for the "All" option
+      const allOption = page.locator(
+        '[role="gridcell"]:has-text("All"), ' +
+        '[role="option"]:has-text("All"), ' +
+        'li:has-text("All"), ' +
+        'span:text-is("All")',
+      ).first();
       await allOption.waitFor({ state: 'visible', timeout: 5_000 });
       await allOption.click({ timeout: 3_000, force: true });
       logger.info({ scanId }, 'Set country filter to "All"');
       await sleep(1500);
     } catch (err) {
       logger.warn({ scanId, error: (err as Error).message }, 'Failed to set country to "All" — proceeding with default region');
+      // Close any lingering dropdown so it doesn't interfere with category selection
+      await page.keyboard.press('Escape').catch(() => {});
+      await sleep(500);
     }
 
     // ── Step 2: Select "All ads" from category dropdown ─────────────────
@@ -420,9 +433,15 @@ async function scrapeFacebookAdLibrary(
         await allAdsCell.click({ timeout: 3_000, force: true });
         logger.info({ scanId, attempt }, 'Selected "All ads" category');
 
-        // Wait for search input to become enabled (role changes from textbox to searchbox)
-        await sleep(1000);
-        await page.locator('[role="searchbox"]').first().waitFor({ state: 'visible', timeout: 10_000 });
+        // Wait for search input to become enabled after category selection
+        await sleep(2000);
+        const searchReady = page.locator(
+          '[role="searchbox"], ' +
+          'input[placeholder*="keyword" i], ' +
+          'input[placeholder*="advertiser" i], ' +
+          'input[aria-label*="Search" i]',
+        ).first();
+        await searchReady.waitFor({ state: 'visible', timeout: 10_000 });
 
         categorySelected = true;
         break;
