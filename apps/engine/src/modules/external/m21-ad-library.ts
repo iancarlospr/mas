@@ -1063,30 +1063,11 @@ async function scrapeGoogleAdsTransparency(
 
     result.searchSuccessful = true;
 
-    // Dismiss overlays before interacting with filter buttons
+    // Dismiss overlays before interacting
     await dismissGoogleOverlays(page);
 
-    // Select "Google Search" platform filter
-    try {
-      const platformBtn = page.locator('[aria-label*="Platform filter"]').first();
-      await platformBtn.waitFor({ state: 'visible', timeout: 5_000 });
-      await platformBtn.scrollIntoViewIfNeeded({ timeout: 3_000 });
-      await sleep(300);
-      await dismissGoogleOverlays(page);
-      await platformBtn.click({ timeout: 5_000, force: true });
-      await sleep(1500);
-
-      const searchOption = page.locator('material-select-item[role="option"]:has-text("Google Search")').first();
-      await searchOption.waitFor({ state: 'visible', timeout: 5_000 });
-      await searchOption.click({ timeout: 3_000 });
-      logger.info({ scanId }, 'Selected Google Search from platform filter');
-      await sleep(4000);
-      await dismissGoogleOverlays(page);
-    } catch (err) {
-      logger.warn({ scanId, error: (err as Error).message }, 'Google Search platform filter failed — continuing with all platforms');
-    }
-
-    // Count visible ads — Google uses <creative-preview> custom elements
+    // Count ALL ads first (before any platform filter)
+    // Google uses <creative-preview> custom elements
     try {
       const adItems = page.locator('creative-preview');
       const count = await adItems.count();
@@ -1095,7 +1076,7 @@ async function scrapeGoogleAdsTransparency(
       result.totalAdsVisible = 0;
     }
 
-    // Scroll down 5 times to trigger lazy loading
+    // Scroll down 5 times to trigger lazy loading and get full count
     try {
       for (let i = 0; i < 5; i++) {
         await page.mouse.wheel(0, 800);
@@ -1113,12 +1094,36 @@ async function scrapeGoogleAdsTransparency(
     } catch (scrollErr) {
       logger.warn(
         { scanId, error: (scrollErr as Error).message },
-        'Page crashed during Google Search scrolling — proceeding with ads captured before scroll',
+        'Page crashed during Google scrolling — proceeding with ads captured before scroll',
       );
     }
 
+    logger.info({ scanId, totalAdsAllPlatforms: result.totalAdsVisible }, 'Counted all Google ads before platform filter');
+
+    // Now filter to "Google Search" for the screenshot (most relevant ad type)
+    await dismissGoogleOverlays(page);
+    try {
+      const platformBtn = page.locator('[aria-label*="Platform filter"]').first();
+      await platformBtn.waitFor({ state: 'visible', timeout: 5_000 });
+      await platformBtn.scrollIntoViewIfNeeded({ timeout: 3_000 });
+      await sleep(300);
+      await dismissGoogleOverlays(page);
+      await platformBtn.click({ timeout: 5_000, force: true });
+      await sleep(1500);
+
+      const searchOption = page.locator('material-select-item[role="option"]:has-text("Google Search")').first();
+      await searchOption.waitFor({ state: 'visible', timeout: 5_000 });
+      await searchOption.click({ timeout: 3_000 });
+      logger.info({ scanId }, 'Selected Google Search platform filter for screenshot');
+      await sleep(4000);
+      await dismissGoogleOverlays(page);
+    } catch (err) {
+      logger.warn({ scanId, error: (err as Error).message }, 'Google Search platform filter failed — screenshotting all platforms');
+    }
+
     // Capture 1 ad detail screenshot
-    if (result.totalAdsVisible > 0) {
+    const screenshotAdCount = await page.locator('creative-preview').count().catch(() => 0);
+    if (screenshotAdCount > 0) {
       try {
         await dismissGoogleOverlays(page);
 
