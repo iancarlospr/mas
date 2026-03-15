@@ -1058,9 +1058,31 @@ async function scrapeGoogleAdsTransparency(
     // Dismiss overlays before interacting
     await dismissGoogleOverlays(page);
 
+    // Google changed their DOM — ad cards are now <a> links with accessible names
+    // like "Advertisement (1 of 80)", not <creative-preview> custom elements.
+    // The ad count selector matches these link elements.
+    const adCardSelector = 'a[href*="/creative/"], a[href*="/advertiser/"]';
+
+    // Also extract the total ad count from the "~20K ads" text badge
+    try {
+      const countText = await page.locator('text=/~?\\d+[KkMm]?\\s*ads/').first().textContent({ timeout: 3_000 });
+      if (countText) {
+        const match = countText.match(/([\d,.]+)\s*([KkMm])?/);
+        if (match) {
+          let total = parseFloat(match[1]!.replace(/,/g, ''));
+          const mult = match[2]?.toUpperCase();
+          if (mult === 'K') total *= 1_000;
+          if (mult === 'M') total *= 1_000_000;
+          result.totalAdsVisible = Math.round(total);
+          logger.info({ scanId, totalFromBadge: result.totalAdsVisible, raw: countText.trim() }, 'Extracted total ad count from badge');
+        }
+      }
+    } catch {
+      // Badge not found — will count visible cards instead
+    }
+
     // Load ALL ads: scroll to bottom → click "See all ads" → repeat.
-    // Google Ads Transparency paginates behind a button. Big brands can have
-    // 50-100+ ads across 4-5 pages. We need at least 3-4 clicks to get them all.
+    // Google shows ~80 cards initially, then loads more on "See all ads" click.
     try {
       let consecutiveMisses = 0;
       for (let round = 0; round < 10; round++) {
@@ -1069,11 +1091,11 @@ async function scrapeGoogleAdsTransparency(
           await page.mouse.wheel(0, 1000);
           await sleep(300);
         }
-        await sleep(1000); // Let content settle
+        await sleep(1000);
 
-        const prevCount = await page.locator('creative-preview').count().catch(() => 0);
+        const prevCount = await page.locator(adCardSelector).count().catch(() => 0);
 
-        // Look for "See all ads" / "Show more" button and click it
+        // Look for "See all ads" button and click it
         const seeAllBtn = page.locator(
           'button:has-text("See all"), ' +
           'button:has-text("Show more"), ' +
@@ -1086,18 +1108,17 @@ async function scrapeGoogleAdsTransparency(
           await dismissGoogleOverlays(page);
           await seeAllBtn.click({ timeout: 5_000, force: true });
           logger.info({ scanId, round, adsBefore: prevCount }, 'Clicked "See all ads" button');
-          await sleep(4000); // Wait for new batch to render
+          await sleep(4000);
           consecutiveMisses = 0;
         } catch {
           consecutiveMisses++;
-          // Only give up after 2 consecutive misses (button may appear after more scrolling)
           if (consecutiveMisses >= 2) break;
           continue;
         }
 
-        const newCount = await page.locator('creative-preview').count().catch(() => 0);
+        const newCount = await page.locator(adCardSelector).count().catch(() => 0);
         logger.info({ scanId, round, adsBefore: prevCount, adsAfter: newCount }, 'Ad count after "See all" click');
-        if (newCount <= prevCount) break; // No new ads loaded
+        if (newCount <= prevCount) break;
       }
     } catch (err) {
       logger.warn(
@@ -1106,50 +1127,31 @@ async function scrapeGoogleAdsTransparency(
       );
     }
 
-    // Count total ads across all platforms
-    try {
-      result.totalAdsVisible = await page.locator('creative-preview').count();
-    } catch {
-      result.totalAdsVisible = 0;
+    // If badge count wasn't found, use visible card count
+    if (result.totalAdsVisible === 0) {
+      try {
+        result.totalAdsVisible = await page.locator(adCardSelector).count();
+      } catch {
+        result.totalAdsVisible = 0;
+      }
     }
 
-    logger.info({ scanId, totalAdsAllPlatforms: result.totalAdsVisible }, 'Counted all Google ads before platform filter');
+    logger.info({ scanId, totalAdsVisible: result.totalAdsVisible }, 'Google ads count finalized');
 
-    // Now filter to "Google Search" for the screenshot (most relevant ad type)
-    await dismissGoogleOverlays(page);
-    try {
-      const platformBtn = page.locator('[aria-label*="Platform filter"]').first();
-      await platformBtn.waitFor({ state: 'visible', timeout: 5_000 });
-      await platformBtn.scrollIntoViewIfNeeded({ timeout: 3_000 });
-      await sleep(300);
-      await dismissGoogleOverlays(page);
-      await platformBtn.click({ timeout: 5_000, force: true });
-      await sleep(1500);
-
-      const searchOption = page.locator('material-select-item[role="option"]:has-text("Google Search")').first();
-      await searchOption.waitFor({ state: 'visible', timeout: 5_000 });
-      await searchOption.click({ timeout: 3_000 });
-      logger.info({ scanId }, 'Selected Google Search platform filter for screenshot');
-      await sleep(4000);
-      await dismissGoogleOverlays(page);
-    } catch (err) {
-      logger.warn({ scanId, error: (err as Error).message }, 'Google Search platform filter failed — screenshotting all platforms');
-    }
-
-    // Capture 1 ad detail screenshot
-    const screenshotAdCount = await page.locator('creative-preview').count().catch(() => 0);
-    if (screenshotAdCount > 0) {
+    // Capture 1 ad detail screenshot by clicking first ad card
+    const visibleAdCount = await page.locator(adCardSelector).count().catch(() => 0);
+    if (visibleAdCount > 0) {
       try {
         await dismissGoogleOverlays(page);
 
-        const adItem = page.locator('creative-preview').first();
+        const adItem = page.locator(adCardSelector).first();
         await adItem.click({ timeout: 5_000, force: true });
         await sleep(3000);
 
         const viewportBuffer = await page.screenshot({ type: 'png', timeout: 15_000 });
         result.screenshot = await uploadScreenshot(scanId, 'google-search-ad.png', viewportBuffer);
       } catch (err) {
-        logger.warn({ scanId, error: (err as Error).message }, 'Failed to capture Google Search ad screenshot');
+        logger.warn({ scanId, error: (err as Error).message }, 'Failed to capture Google ad screenshot');
       }
     }
 
