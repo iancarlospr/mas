@@ -389,11 +389,9 @@ async function scrapeFacebookAdLibrary(
     // Facebook defaults to the server's region (DO = US/PR). Setting to "All"
     // ensures we see ads running globally, not just in one country.
     // Must be done BEFORE category selection.
-    // Scope to the search form area — page has comboboxes in nav dialogs too.
-    const searchForm = page.locator('text=Search ads').locator('..').locator('..');
+    // Only 2 comboboxes on the page: country (first) and category (second).
     try {
-      // The country combobox is the first combobox near the "Search ads" heading
-      const countryCombo = searchForm.locator('[role="combobox"]').first();
+      const countryCombo = page.locator('[role="combobox"]').first();
       await countryCombo.waitFor({ state: 'visible', timeout: 15_000 });
       await sleep(1000);
       // Use JS click — Facebook overlays intercept Playwright's click action
@@ -421,8 +419,8 @@ async function scrapeFacebookAdLibrary(
     let categorySelected = false;
     for (let attempt = 0; attempt < 2; attempt++) {
       try {
-        // Wait for the category combobox to be interactive (scoped to search form)
-        const adCategoryCombo = searchForm.locator('[role="combobox"]:has-text("Ad category"), [role="combobox"]:has-text("All ads"), [role="combobox"]:has-text("Issues")').first();
+        // Wait for the category combobox to be interactive
+        const adCategoryCombo = page.locator('[role="combobox"]:has-text("Ad category"), [role="combobox"]:has-text("All ads"), [role="combobox"]:has-text("Issues")').first();
         await adCategoryCombo.waitFor({ state: 'visible', timeout: 15_000 });
         await sleep(1000);
         await adCategoryCombo.evaluate((el: HTMLElement) => el.click());
