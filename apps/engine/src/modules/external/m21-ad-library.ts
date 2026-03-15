@@ -405,9 +405,12 @@ async function scrapeFacebookAdLibrary(
         'span:text-is("All")',
       ).first();
       await allOption.waitFor({ state: 'visible', timeout: 5_000 });
-      await allOption.click({ timeout: 3_000, force: true });
+      // Facebook triggers a navigation after country selection — don't wait for it
+      await allOption.click({ timeout: 5_000, force: true, noWaitAfter: true });
       logger.info({ scanId }, 'Set country filter to "All"');
-      await sleep(1500);
+      // Wait for the page to settle after country change (may trigger reload)
+      await sleep(3000);
+      await page.waitForLoadState('domcontentloaded', { timeout: 10_000 }).catch(() => {});
     } catch (err) {
       logger.warn({ scanId, error: (err as Error).message }, 'Failed to set country to "All" — proceeding with default region');
       // Close any lingering dropdown so it doesn't interfere with category selection
