@@ -381,18 +381,19 @@ async function scrapeFacebookAdLibrary(
       waitUntil: 'domcontentloaded',
       timeout: 30_000,
     });
-    // Wait for JS to render the search form
-    await page.waitForLoadState('networkidle', { timeout: 15_000 }).catch(() => {});
-    await sleep(2000);
+    // DO NOT use waitForLoadState('networkidle') — Facebook never goes idle
+    // (constant beacon/analytics requests). On the DO server this hangs forever.
+    // Instead, wait for the comboboxes to appear which proves the form is ready.
+    logger.info({ scanId }, 'Facebook Ad Library page loaded, waiting for comboboxes');
 
     // ── Step 1: Set country to "All" ────────────────────────────────────
     // Facebook defaults to the server's region (DO = US/PR). Setting to "All"
     // ensures we see ads running globally, not just in one country.
-    // Must be done BEFORE category selection.
     // Only 2 comboboxes on the page: country (first) and category (second).
     try {
       const countryCombo = page.locator('[role="combobox"]').first();
-      await countryCombo.waitFor({ state: 'visible', timeout: 15_000 });
+      await countryCombo.waitFor({ state: 'visible', timeout: 20_000 });
+      logger.info({ scanId }, 'Country combobox visible, clicking');
       await sleep(1000);
       // Use JS click — Facebook overlays intercept Playwright's click action
       await countryCombo.evaluate((el: HTMLElement) => el.click());
@@ -403,9 +404,7 @@ async function scrapeFacebookAdLibrary(
       await allOption.waitFor({ state: 'visible', timeout: 5_000 });
       await allOption.evaluate((el: HTMLElement) => el.click());
       logger.info({ scanId }, 'Set country filter to "All"');
-      // Wait for the page to settle after country change
       await sleep(3000);
-      await page.waitForLoadState('domcontentloaded', { timeout: 10_000 }).catch(() => {});
     } catch (err) {
       logger.warn({ scanId, error: (err as Error).message }, 'Failed to set country to "All" — proceeding with default region');
       // Close any lingering dropdown so it doesn't interfere with category selection
@@ -422,6 +421,7 @@ async function scrapeFacebookAdLibrary(
         // Wait for the category combobox to be interactive
         const adCategoryCombo = page.locator('[role="combobox"]:has-text("Ad category"), [role="combobox"]:has-text("All ads"), [role="combobox"]:has-text("Issues")').first();
         await adCategoryCombo.waitFor({ state: 'visible', timeout: 15_000 });
+        logger.info({ scanId, attempt }, 'Category combobox visible, clicking');
         await sleep(1000);
         await adCategoryCombo.evaluate((el: HTMLElement) => el.click());
         await sleep(1500);
