@@ -381,21 +381,65 @@ async function scrapeFacebookAdLibrary(
       waitUntil: 'domcontentloaded',
       timeout: 30_000,
     });
-    await sleep(4000);
 
-    // ── Step 1: Select "All ads" from category dropdown ─────────────────
+    // ── Step 1: Set country to "All" ────────────────────────────────────
+    // Facebook defaults to the server's region (DO = US). Setting to "All"
+    // ensures we see ads running globally, not just in one country.
+    // Must be done BEFORE category selection.
     try {
-      const adCategoryCombo = page.locator('[role="combobox"]:has-text("Ad category"), [role="combobox"]:has-text("All ads"), [role="combobox"]:has-text("Issues")').first();
-      await adCategoryCombo.click({ timeout: 5_000, force: true });
+      const countryCombo = page.locator('[role="combobox"]:has-text("country"), [role="combobox"]:has-text("Country"), [role="combobox"]:has-text("United States"), [role="combobox"]:has-text("location")').first();
+      await countryCombo.waitFor({ state: 'visible', timeout: 15_000 });
+      await sleep(1000);
+      await countryCombo.click({ timeout: 5_000, force: true });
       await sleep(1500);
 
-      const allAdsCell = page.locator('[role="gridcell"]:has-text("All ads")').first();
-      await allAdsCell.waitFor({ state: 'visible', timeout: 5_000 });
-      await allAdsCell.click({ timeout: 3_000, force: true });
-      logger.info({ scanId }, 'Selected "All ads" category');
-      await sleep(2000);
+      const allOption = page.locator('[role="gridcell"]:has-text("All"), [role="option"]:has-text("All")').first();
+      await allOption.waitFor({ state: 'visible', timeout: 5_000 });
+      await allOption.click({ timeout: 3_000, force: true });
+      logger.info({ scanId }, 'Set country filter to "All"');
+      await sleep(1500);
     } catch (err) {
-      logger.warn({ scanId, error: (err as Error).message }, 'Failed to select "All ads" category');
+      logger.warn({ scanId, error: (err as Error).message }, 'Failed to set country to "All" — proceeding with default region');
+    }
+
+    // ── Step 2: Select "All ads" from category dropdown ─────────────────
+    // The search input is DISABLED until a category is selected. This is a hard
+    // dependency — if category selection fails, search will always fail too.
+    let categorySelected = false;
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        // Wait for the category combobox to be interactive (not just loaded)
+        const adCategoryCombo = page.locator('[role="combobox"]:has-text("Ad category"), [role="combobox"]:has-text("All ads"), [role="combobox"]:has-text("Issues")').first();
+        await adCategoryCombo.waitFor({ state: 'visible', timeout: 15_000 });
+        await sleep(1000); // Brief settle after visible
+        await adCategoryCombo.click({ timeout: 5_000, force: true });
+        await sleep(1500);
+
+        const allAdsCell = page.locator('[role="gridcell"]:has-text("All ads")').first();
+        await allAdsCell.waitFor({ state: 'visible', timeout: 5_000 });
+        await allAdsCell.click({ timeout: 3_000, force: true });
+        logger.info({ scanId, attempt }, 'Selected "All ads" category');
+
+        // Wait for search input to become enabled (role changes from textbox to searchbox)
+        await sleep(1000);
+        await page.locator('[role="searchbox"]').first().waitFor({ state: 'visible', timeout: 10_000 });
+
+        categorySelected = true;
+        break;
+      } catch (err) {
+        if (attempt === 0) {
+          logger.warn({ scanId, error: (err as Error).message }, 'Category selection attempt 1 failed — retrying');
+          await sleep(3000);
+          continue;
+        }
+        logger.warn({ scanId, error: (err as Error).message }, 'Failed to select "All ads" category after 2 attempts');
+      }
+    }
+
+    // If category selection failed, search input is disabled — skip search entirely
+    if (!categorySelected) {
+      logger.warn({ scanId }, 'Category not selected — search input disabled, skipping Facebook search');
+      return result;
     }
 
     // ── Step 3: Search for the brand using AI-powered advertiser selection ──
@@ -1060,7 +1104,7 @@ async function scrapeGoogleAdsTransparency(
         await adItem.click({ timeout: 5_000, force: true });
         await sleep(3000);
 
-        const viewportBuffer = await page.screenshot({ type: 'png' });
+        const viewportBuffer = await page.screenshot({ type: 'png', timeout: 15_000 });
         result.screenshot = await uploadScreenshot(scanId, 'google-search-ad.png', viewportBuffer);
       } catch (err) {
         logger.warn({ scanId, error: (err as Error).message }, 'Failed to capture Google Search ad screenshot');
