@@ -1066,16 +1066,18 @@ async function scrapeGoogleAdsTransparency(
     // Dismiss overlays before interacting
     await dismissGoogleOverlays(page);
 
-    // Load ALL ads: click "See all ads" → scroll → repeat until no more load
-    // Google Ads Transparency paginates with a "See all ads" button that loads
-    // the next batch. We loop: scroll to bottom, click the button, scroll again.
+    // Load ALL ads: scroll to bottom → click "See all ads" → repeat.
+    // Google Ads Transparency paginates behind a button. Big brands can have
+    // 50-100+ ads across 4-5 pages. We need at least 3-4 clicks to get them all.
     try {
+      let consecutiveMisses = 0;
       for (let round = 0; round < 10; round++) {
-        // Scroll down to trigger lazy loading
-        for (let i = 0; i < 5; i++) {
-          await page.mouse.wheel(0, 800);
-          await sleep(400);
+        // Scroll aggressively to the bottom to reveal the "See all" button
+        for (let i = 0; i < 8; i++) {
+          await page.mouse.wheel(0, 1000);
+          await sleep(300);
         }
+        await sleep(1000); // Let content settle
 
         const prevCount = await page.locator('creative-preview').count().catch(() => 0);
 
@@ -1087,18 +1089,22 @@ async function scrapeGoogleAdsTransparency(
           '[role="button"]:has-text("See all")',
         ).first();
         try {
-          await seeAllBtn.waitFor({ state: 'visible', timeout: 3_000 });
+          await seeAllBtn.waitFor({ state: 'visible', timeout: 5_000 });
           await seeAllBtn.scrollIntoViewIfNeeded({ timeout: 2_000 });
           await dismissGoogleOverlays(page);
-          await seeAllBtn.click({ timeout: 3_000, force: true });
+          await seeAllBtn.click({ timeout: 5_000, force: true });
           logger.info({ scanId, round, adsBefore: prevCount }, 'Clicked "See all ads" button');
-          await sleep(3000);
+          await sleep(4000); // Wait for new batch to render
+          consecutiveMisses = 0;
         } catch {
-          // No more "See all" button — we've loaded everything
-          break;
+          consecutiveMisses++;
+          // Only give up after 2 consecutive misses (button may appear after more scrolling)
+          if (consecutiveMisses >= 2) break;
+          continue;
         }
 
         const newCount = await page.locator('creative-preview').count().catch(() => 0);
+        logger.info({ scanId, round, adsBefore: prevCount, adsAfter: newCount }, 'Ad count after "See all" click');
         if (newCount <= prevCount) break; // No new ads loaded
       }
     } catch (err) {
