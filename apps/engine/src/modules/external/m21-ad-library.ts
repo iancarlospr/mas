@@ -1066,36 +1066,53 @@ async function scrapeGoogleAdsTransparency(
     // Dismiss overlays before interacting
     await dismissGoogleOverlays(page);
 
-    // Count ALL ads first (before any platform filter)
-    // Google uses <creative-preview> custom elements
+    // Load ALL ads: click "See all ads" → scroll → repeat until no more load
+    // Google Ads Transparency paginates with a "See all ads" button that loads
+    // the next batch. We loop: scroll to bottom, click the button, scroll again.
     try {
-      const adItems = page.locator('creative-preview');
-      const count = await adItems.count();
-      result.totalAdsVisible = count;
-    } catch {
-      result.totalAdsVisible = 0;
+      for (let round = 0; round < 10; round++) {
+        // Scroll down to trigger lazy loading
+        for (let i = 0; i < 5; i++) {
+          await page.mouse.wheel(0, 800);
+          await sleep(400);
+        }
+
+        const prevCount = await page.locator('creative-preview').count().catch(() => 0);
+
+        // Look for "See all ads" / "Show more" button and click it
+        const seeAllBtn = page.locator(
+          'button:has-text("See all"), ' +
+          'button:has-text("Show more"), ' +
+          'a:has-text("See all"), ' +
+          '[role="button"]:has-text("See all")',
+        ).first();
+        try {
+          await seeAllBtn.waitFor({ state: 'visible', timeout: 3_000 });
+          await seeAllBtn.scrollIntoViewIfNeeded({ timeout: 2_000 });
+          await dismissGoogleOverlays(page);
+          await seeAllBtn.click({ timeout: 3_000, force: true });
+          logger.info({ scanId, round, adsBefore: prevCount }, 'Clicked "See all ads" button');
+          await sleep(3000);
+        } catch {
+          // No more "See all" button — we've loaded everything
+          break;
+        }
+
+        const newCount = await page.locator('creative-preview').count().catch(() => 0);
+        if (newCount <= prevCount) break; // No new ads loaded
+      }
+    } catch (err) {
+      logger.warn(
+        { scanId, error: (err as Error).message },
+        'Error during Google ad loading loop — proceeding with ads captured so far',
+      );
     }
 
-    // Scroll down 5 times to trigger lazy loading and get full count
+    // Count total ads across all platforms
     try {
-      for (let i = 0; i < 5; i++) {
-        await page.mouse.wheel(0, 800);
-        await sleep(500);
-      }
-
-      // Recount after scrolling
-      try {
-        const adItems = page.locator('creative-preview');
-        const count = await adItems.count();
-        result.totalAdsVisible = Math.max(result.totalAdsVisible, count);
-      } catch {
-        // Keep existing count
-      }
-    } catch (scrollErr) {
-      logger.warn(
-        { scanId, error: (scrollErr as Error).message },
-        'Page crashed during Google scrolling — proceeding with ads captured before scroll',
-      );
+      result.totalAdsVisible = await page.locator('creative-preview').count();
+    } catch {
+      result.totalAdsVisible = 0;
     }
 
     logger.info({ scanId, totalAdsAllPlatforms: result.totalAdsVisible }, 'Counted all Google ads before platform filter');
