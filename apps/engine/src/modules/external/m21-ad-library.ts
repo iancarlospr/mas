@@ -383,32 +383,24 @@ async function scrapeFacebookAdLibrary(
     });
 
     // ── Step 1: Set country to "All" ────────────────────────────────────
-    // Facebook defaults to the server's region (DO = US). Setting to "All"
+    // Facebook defaults to the server's region (DO = US/PR). Setting to "All"
     // ensures we see ads running globally, not just in one country.
     // Must be done BEFORE category selection.
+    // The country combobox is the FIRST [role="combobox"] in the search form —
+    // its text is the current country name (not "country"), so we use .first().
     try {
-      const countryCombo = page.locator('[role="combobox"]:has-text("country"), [role="combobox"]:has-text("Country"), [role="combobox"]:has-text("United States"), [role="combobox"]:has-text("location")').first();
+      const countryCombo = page.locator('[role="combobox"]').first();
       await countryCombo.waitFor({ state: 'visible', timeout: 15_000 });
       await sleep(1000);
       await countryCombo.click({ timeout: 5_000, force: true });
       await sleep(1500);
 
-      // Facebook's country dropdown is searchable — type "All" to filter
-      await page.keyboard.type('All', { delay: 80 });
-      await sleep(1000);
-
-      // Try multiple selector patterns for the "All" option
-      const allOption = page.locator(
-        '[role="gridcell"]:has-text("All"), ' +
-        '[role="option"]:has-text("All"), ' +
-        'li:has-text("All"), ' +
-        'span:text-is("All")',
-      ).first();
+      // Click the "All" gridcell in the country dropdown
+      const allOption = page.locator('[role="gridcell"]').filter({ hasText: /^All$/ }).first();
       await allOption.waitFor({ state: 'visible', timeout: 5_000 });
-      // Facebook triggers a navigation after country selection — don't wait for it
       await allOption.click({ timeout: 5_000, force: true, noWaitAfter: true });
       logger.info({ scanId }, 'Set country filter to "All"');
-      // Wait for the page to settle after country change (may trigger reload)
+      // Wait for the page to settle after country change
       await sleep(3000);
       await page.waitForLoadState('domcontentloaded', { timeout: 10_000 }).catch(() => {});
     } catch (err) {
