@@ -396,13 +396,14 @@ async function scrapeFacebookAdLibrary(
       const countryCombo = searchForm.locator('[role="combobox"]').first();
       await countryCombo.waitFor({ state: 'visible', timeout: 15_000 });
       await sleep(1000);
-      await countryCombo.click({ timeout: 5_000, force: true });
+      // Use JS click — Facebook overlays intercept Playwright's click action
+      await countryCombo.evaluate((el: HTMLElement) => el.click());
       await sleep(1500);
 
       // Click the "All" gridcell in the country dropdown
       const allOption = page.locator('[role="gridcell"]').filter({ hasText: /^All$/ }).first();
       await allOption.waitFor({ state: 'visible', timeout: 5_000 });
-      await allOption.click({ timeout: 5_000, force: true, noWaitAfter: true });
+      await allOption.evaluate((el: HTMLElement) => el.click());
       logger.info({ scanId }, 'Set country filter to "All"');
       // Wait for the page to settle after country change
       await sleep(3000);
@@ -423,13 +424,13 @@ async function scrapeFacebookAdLibrary(
         // Wait for the category combobox to be interactive (scoped to search form)
         const adCategoryCombo = searchForm.locator('[role="combobox"]:has-text("Ad category"), [role="combobox"]:has-text("All ads"), [role="combobox"]:has-text("Issues")').first();
         await adCategoryCombo.waitFor({ state: 'visible', timeout: 15_000 });
-        await sleep(1000); // Brief settle after visible
-        await adCategoryCombo.click({ timeout: 5_000, force: true });
+        await sleep(1000);
+        await adCategoryCombo.evaluate((el: HTMLElement) => el.click());
         await sleep(1500);
 
         const allAdsCell = page.locator('[role="gridcell"]:has-text("All ads")').first();
         await allAdsCell.waitFor({ state: 'visible', timeout: 5_000 });
-        await allAdsCell.click({ timeout: 3_000, force: true });
+        await allAdsCell.evaluate((el: HTMLElement) => el.click());
         logger.info({ scanId, attempt }, 'Selected "All ads" category');
 
         // Wait for search input to become enabled after category selection
@@ -469,7 +470,7 @@ async function scrapeFacebookAdLibrary(
         'input[aria-label*="Search" i]',
       ).first();
       await searchBox.waitFor({ state: 'visible', timeout: 8_000 });
-      await searchBox.click({ timeout: 3_000 });
+      await searchBox.evaluate((el: HTMLElement) => el.click());
       await sleep(500);
       await page.keyboard.type(searchTerm, { delay: 100 });
       logger.info({ scanId, searchTerm }, 'Typed search term in Ad Library');
