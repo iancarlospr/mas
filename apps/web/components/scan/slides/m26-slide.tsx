@@ -71,7 +71,7 @@ export function M26Slide({ scan }: { scan: ScanWithResults }) {
     { value: pos21plus, color: 'var(--gs-critical)', label: '#21+' },
   ];
 
-  const topFive = rawKeywords.slice(0, 5);
+  const topFive = [...rawKeywords].sort((a, b) => b.searchVolume - a.searchVolume).slice(0, 5);
   const maxVolume = topFive.reduce((max, k) => Math.max(max, k.searchVolume), 1);
 
   return (
