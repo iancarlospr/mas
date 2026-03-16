@@ -25,9 +25,9 @@ jobs:
 
       - name: Verify deployment health
         run: |
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" ${{ steps.vercel.outputs.url }})
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" ${{ steps.vercel.outputs.url }}/api/health)
           if [ "$STATUS" != "200" ]; then
-            echo "Deployment health check failed with status $STATUS"
+            echo "Deployment health check failed with status $STATUS at ${{ steps.vercel.outputs.url }}/api/health"
             exit 1
           fi
-          echo "Deployment healthy at ${{ steps.vercel.outputs.url }}"
+          echo "Deployment healthy at ${{ steps.vercel.outputs.url }}/api/health"
