@@ -35,7 +35,7 @@
     "react-dom": "^19.0.0",
     "react-markdown": "^10.1.0",
     "react-simple-maps": "^3.0.0",
-    "recharts": "^2.15.0",
+    "recharts": "^3.8.0",
     "resend": "^6.9.1",
     "standardwebhooks": "^1.0.0",
     "stripe": "^17.4.0",
