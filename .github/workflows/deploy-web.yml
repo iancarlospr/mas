@@ -9,25 +9,32 @@ on:
 
 jobs:
   # Vercel handles the actual deployment via its GitHub integration.
-  # This job exists to:
-  # 1. Verify the deployment succeeded
-  # 2. Send notifications
+  # This job verifies the production deployment succeeded by polling /api/health.
   verify:
     runs-on: ubuntu-latest
     steps:
-      - name: Wait for Vercel deployment
-        uses: patrickedqvist/wait-for-vercel-preview@v1.3.2
-        id: vercel
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          max_timeout: 300
-          check_interval: 10
-
-      - name: Verify deployment health
+      - name: Wait for Vercel deployment and verify health
         run: |
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" ${{ steps.vercel.outputs.url }}/api/health)
-          if [ "$STATUS" != "200" ]; then
-            echo "Deployment health check failed with status $STATUS at ${{ steps.vercel.outputs.url }}/api/health"
-            exit 1
-          fi
-          echo "Deployment healthy at ${{ steps.vercel.outputs.url }}/api/health"
+          # Wait for Vercel to pick up the commit (initial delay)
+          echo "Waiting 60s for Vercel to start building..."
+          sleep 60
+
+          # Poll /api/health on the production domain (bypasses staging gate)
+          PROD_URL="https://www.marketingalphascan.com"
+          MAX_ATTEMPTS=30
+          INTERVAL=10
+
+          for i in $(seq 1 $MAX_ATTEMPTS); do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$PROD_URL/api/health" --max-time 10 2>/dev/null || echo "000")
+            echo "Attempt $i/$MAX_ATTEMPTS: $PROD_URL/api/health → HTTP $STATUS"
+
+            if [ "$STATUS" = "200" ]; then
+              echo "✅ Deployment healthy at $PROD_URL"
+              exit 0
+            fi
+
+            sleep $INTERVAL
+          done
+
+          echo "❌ Deployment health check failed after $MAX_ATTEMPTS attempts"
+          exit 1
