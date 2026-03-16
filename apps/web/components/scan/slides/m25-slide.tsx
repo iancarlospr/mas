@@ -23,7 +23,7 @@ import {
  * Stats panel overlaid bottom-right.
  */
 
-const GEO_URL = '/world-110m.json';
+const GEO_URL = '/api/geo/world';
 
 interface CountryEntry {
   country?: string;
