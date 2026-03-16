@@ -62,7 +62,8 @@ export function M18M19Slide({ scan }: { scan: ScanWithResults }) {
     ? (raw18?.['ir_portal_depth'] ?? raw18?.['irPortalDepth']) as number
     : null;
   const esgReportRaw = raw18?.['esg_report'] ?? raw18?.['esgReport'] ?? null;
-  const hasEsg = esgReportRaw === true || (typeof esgReportRaw === 'string' && esgReportRaw.length > 0);
+  const hasEsg = esgReportRaw === true || (typeof esgReportRaw === 'string' && esgReportRaw.length > 0)
+    || (esgReportRaw != null && typeof esgReportRaw === 'object' && (esgReportRaw as Record<string, unknown>)['found'] === true);
   const ticker = typeof raw18?.['ticker'] === 'string' ? raw18['ticker'] as string : null;
   const boardMembersRaw = raw18?.['boardMembers'] ?? null;
   const boardMembersCount = typeof boardMembersRaw === 'number'
@@ -81,7 +82,7 @@ export function M18M19Slide({ scan }: { scan: ScanWithResults }) {
     ?? (raw19?.['supportChannels'] as string[] | undefined)
     ?? [];
   const chatbotRaw = raw19?.['chatbot'] ?? null;
-  const hasChatbot = chatbotRaw === true || (chatbotRaw != null && typeof chatbotRaw === 'object');
+  const hasChatbot = chatbotRaw === true || (chatbotRaw != null && typeof chatbotRaw === 'object' && (chatbotRaw as Record<string, unknown>)['found'] !== false);
   const statusPageRaw = raw19?.['statusPage'] ?? null;
   const hasStatusPage = statusPageRaw === true || (typeof statusPageRaw === 'string' && statusPageRaw.length > 0);
   const forumsRaw = raw19?.['communityForums'] ?? null;
@@ -89,10 +90,18 @@ export function M18M19Slide({ scan }: { scan: ScanWithResults }) {
   const devDocsRaw = raw19?.['devDocs'] ?? null;
   const hasDevDocs = devDocsRaw === true || (typeof devDocsRaw === 'string' && devDocsRaw.length > 0);
 
-  // ── AI fallback: check if M41 findings mention items as present ──
-  // When raw data says "not found" but AI analysis confirms existence (e.g. from footer links)
+  // ── AI fallback: check if M41 findings mention items as PRESENT (not absent) ──
+  // Negation-aware: reject matches preceded by "no ", "not ", "missing", "absent", "lacks", "without"
   const allText = [...findings.map(f => f.finding), execSummary].join(' ').toLowerCase();
-  const aiConfirms = (keywords: string[]) => keywords.some(kw => allText.includes(kw));
+  const NEGATION_PREFIXES = /(?:^|[.\n])\s*(?:no|not|missing|absent|lacks?|without|zero|none)\b[^.]{0,30}/;
+  const aiConfirms = (keywords: string[]) => keywords.some(kw => {
+    const idx = allText.indexOf(kw);
+    if (idx < 0) return false;
+    // Check the 60-char window before the match for negation
+    const before = allText.slice(Math.max(0, idx - 60), idx);
+    if (/\b(?:no|not|none|zero|missing|absent|lacks?|without|neither)\b/.test(before)) return false;
+    return true;
+  });
 
   const aiSec = aiConfirms(['sec filing', 'sec filings', 'financial disclosures', '10-k', '10-q', 'annual report']);
   const aiEsg = aiConfirms(['esg', 'sustainability report', 'sustainability reporting']);

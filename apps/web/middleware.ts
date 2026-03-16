@@ -43,7 +43,8 @@ export async function middleware(request: NextRequest) {
     || pathname === '/icon.svg'
     || pathname.endsWith('/opengraph-image')
     || pathname.includes('/opengraph-image');
-  if (!pathname.startsWith('/api/') && !pathname.startsWith('/auth/') && !isPrintRender && !isSeoRoute) {
+  const isStaticAsset = /\.(json|png|jpg|jpeg|gif|svg|ico|webp|avif|woff2?|ttf|css|js|map|txt|xml|webmanifest)$/i.test(pathname);
+  if (!pathname.startsWith('/api/') && !pathname.startsWith('/auth/') && !isPrintRender && !isSeoRoute && !isStaticAsset) {
     const hasAccess = request.cookies.get(STAGING_COOKIE)?.value === 'granted';
 
     // Grant access via ?access=<secret>
