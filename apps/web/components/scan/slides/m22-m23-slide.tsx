@@ -136,12 +136,13 @@ export function M22M23Slide({ scan }: { scan: ScanWithResults }) {
     >
       {/* ═══ Two-panel sentiment visualization ═══ */}
       <div style={{
-        marginBottom: '0.6em', flexShrink: 0,
+        marginBottom: '0.6em', flexShrink: 1, minHeight: 0,
         padding: '0.5em 0', borderTop: '1px solid rgba(255,178,239,0.06)', borderBottom: '1px solid rgba(255,178,239,0.06)',
+        overflow: 'hidden',
       }}>
-        <div style={{ display: 'flex', gap: '3%' }}>
+        <div style={{ display: 'flex', gap: '3%', height: '100%', minHeight: 0 }}>
           {/* Left: News Sentiment (M22) */}
-          <div style={{ flex: 1 }}>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
             <h4 className="font-display uppercase" style={{ fontSize: 'clamp(1px, 0.90cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.35em' }}>
               News Sentiment
             </h4>
@@ -172,7 +173,7 @@ export function M22M23Slide({ scan }: { scan: ScanWithResults }) {
               </p>
             )}
             {newsHeadlines.length > 0 && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2em' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2em', overflow: 'auto', minHeight: 0, flex: '1 1 0' }}>
                 {newsHeadlines.map((h, i) => (
                   <div key={i} style={{
                     display: 'flex', gap: '0.4em', alignItems: 'flex-start',
@@ -206,7 +207,7 @@ export function M22M23Slide({ scan }: { scan: ScanWithResults }) {
           <div style={{ width: '1px', background: 'rgba(255,178,239,0.08)', flexShrink: 0 }} />
 
           {/* Right: Social Sentiment (M23) */}
-          <div style={{ flex: 1 }}>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
             <h4 className="font-display uppercase" style={{ fontSize: 'clamp(1px, 0.90cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.35em' }}>
               Social Sentiment
             </h4>
@@ -230,7 +231,7 @@ export function M22M23Slide({ scan }: { scan: ScanWithResults }) {
               </p>
             )}
             {socialMentions.length > 0 && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2em' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2em', overflow: 'auto', minHeight: 0, flex: '1 1 0' }}>
                 {socialMentions.map((m, i) => (
                   <div key={i} style={{
                     display: 'flex', gap: '0.4em', alignItems: 'flex-start',
