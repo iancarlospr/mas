@@ -912,15 +912,17 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
     }
   }
 
-  // Google Ads: cookie-based fallback detection
-  let gadsFromCookies = false;
+  // Cookie-based fallback detection: if window globals and network both missed pixels,
+  // check for tracking cookies that prove the pixel was loaded at some point.
+  let cookieFallbackCount = 0;
   try {
     const rawCookies = await page.context().cookies();
+
+    // Google Ads: _gcl_au or _gcl_aw cookies
     const hasGclAu = rawCookies.some(c => c.name === '_gcl_au');
     const hasGclAw = rawCookies.some(c => c.name === '_gcl_aw');
     if ((hasGclAu || hasGclAw) && !pixels.find(p => p.name === 'Google Ads')) {
-      gadsFromCookies = true;
-      // Also check network for Google Ads fires
+      cookieFallbackCount++;
       const gadsNet = extractGoogleAdsFromNetwork(allRequests);
       pixels.push({
         name: 'Google Ads',
@@ -933,8 +935,62 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
         loadMethod: 'gtm',
       });
     }
-  } catch { /* */ }
-  data.googleAdsCookieFallback = gadsFromCookies;
+
+    // Meta Pixel: _fbp or _fbc cookies
+    const hasFbp = rawCookies.some(c => c.name === '_fbp');
+    const hasFbc = rawCookies.some(c => c.name === '_fbc');
+    if ((hasFbp || hasFbc) && !pixels.find(p => p.name === 'Meta Pixel')) {
+      cookieFallbackCount++;
+      const metaNet = extractMetaFromNetwork(allRequests);
+      pixels.push({
+        name: 'Meta Pixel',
+        id: metaNet.id,
+        events: metaNet.events.length > 0 ? metaNet.events : ['PageView'],
+        hasEnhancedConversions: false,
+        serverSide: false,
+        confidence: 0.8,
+        networkFires: metaNet.fires,
+        loadMethod: 'gtm',
+      });
+    }
+
+    // LinkedIn Insight: li_fat_id or _li_ss cookies
+    const hasLiFat = rawCookies.some(c => c.name === 'li_fat_id');
+    const hasLiSs = rawCookies.some(c => c.name === '_li_ss');
+    if ((hasLiFat || hasLiSs) && !pixels.find(p => p.name === 'LinkedIn Insight')) {
+      cookieFallbackCount++;
+      const liNet = extractLinkedInFromNetwork(allRequests);
+      pixels.push({
+        name: 'LinkedIn Insight',
+        id: liNet.id,
+        events: liNet.events.length > 0 ? liNet.events : [],
+        hasEnhancedConversions: false,
+        serverSide: false,
+        confidence: 0.8,
+        networkFires: liNet.fires,
+        loadMethod: 'gtm',
+      });
+    }
+
+    // Microsoft Ads (UET): _uetsid or _uetvid cookies
+    const hasUetSid = rawCookies.some(c => c.name === '_uetsid');
+    const hasUetVid = rawCookies.some(c => c.name === '_uetvid');
+    if ((hasUetSid || hasUetVid) && !pixels.find(p => p.name === 'Microsoft Ads (UET)')) {
+      cookieFallbackCount++;
+      const uetNet = extractUETFromNetwork(allRequests);
+      pixels.push({
+        name: 'Microsoft Ads (UET)',
+        id: uetNet.id,
+        events: uetNet.events.length > 0 ? uetNet.events : [],
+        hasEnhancedConversions: false,
+        serverSide: false,
+        confidence: 0.8,
+        networkFires: uetNet.fires,
+        loadMethod: 'gtm',
+      });
+    }
+  } catch { /* cookie access can fail in restricted contexts */ }
+  data.cookieFallbackCount = cookieFallbackCount;
 
   // Amazon Ads: network-based detection
   const amazonNet = extractAmazonAdsFromNetwork(allRequests);

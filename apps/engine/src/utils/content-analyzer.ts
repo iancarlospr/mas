@@ -602,22 +602,30 @@ function extractFreshness($: CheerioAPI, headers?: Record<string, string>): Fres
   }
 
   // ── Copyright year ────────────────────────────────────────────────────────
+  // Extract the LATEST year from copyright strings (e.g. "© 1996 — 2025" → 2025)
   const bodyText = $('body').text();
-  const copyrightMatch = bodyText.match(/(?:\u00A9|&copy;|copyright)\s*(\d{4})/i);
-  if (copyrightMatch?.[1]) {
-    const year = parseInt(copyrightMatch[1], 10);
-    if (year >= 1990 && year <= 2100) {
-      copyrightYear = year;
+  const copyrightMatch = bodyText.match(/(?:\u00A9|&copy;|copyright)\s*(\d{4})(?:\s*[\u2013\u2014\-–—]\s*(\d{4}))?/i);
+  if (copyrightMatch) {
+    // Prefer the end year of a range, fall back to the single year
+    const yearStr = copyrightMatch[2] ?? copyrightMatch[1];
+    if (yearStr) {
+      const year = parseInt(yearStr, 10);
+      if (year >= 1990 && year <= 2100) {
+        copyrightYear = year;
+      }
     }
   }
 
   // Also try the raw © character
   if (copyrightYear === null) {
-    const rawCopyright = bodyText.match(/\u00A9\s*(\d{4})/);
-    if (rawCopyright?.[1]) {
-      const year = parseInt(rawCopyright[1], 10);
-      if (year >= 1990 && year <= 2100) {
-        copyrightYear = year;
+    const rawCopyright = bodyText.match(/\u00A9\s*(\d{4})(?:\s*[\u2013\u2014\-–—]\s*(\d{4}))?/);
+    if (rawCopyright) {
+      const yearStr = rawCopyright[2] ?? rawCopyright[1];
+      if (yearStr) {
+        const year = parseInt(yearStr, 10);
+        if (year >= 1990 && year <= 2100) {
+          copyrightYear = year;
+        }
       }
     }
   }

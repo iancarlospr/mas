@@ -891,5 +891,181 @@
         }
       ]
     }
+  },
+  {
+    "id": "optimizely-cms",
+    "name": "Optimizely CMS",
+    "category": "cms",
+    "rules": {
+      "html": [
+        {
+          "pattern": "cms--mode--",
+          "confidence": 0.95
+        },
+        {
+          "pattern": "EPiServer",
+          "confidence": 0.95
+        }
+      ],
+      "cookies": [
+        {
+          "namePattern": "^EPi",
+          "confidence": 0.95
+        },
+        {
+          "namePattern": "^\\.EPiForm",
+          "confidence": 0.95
+        }
+      ]
+    }
+  },
+  {
+    "id": "aspnet-core",
+    "name": "ASP.NET Core",
+    "category": "server",
+    "rules": {
+      "cookies": [
+        {
+          "namePattern": "^\\.AspNetCore\\.",
+          "confidence": 0.95
+        },
+        {
+          "namePattern": "^\\.AspNet\\.Cookies",
+          "confidence": 0.9
+        }
+      ],
+      "headers": [
+        {
+          "name": "x-aspnet-version",
+          "confidence": 0.95
+        },
+        {
+          "name": "x-powered-by",
+          "pattern": "ASP\\.NET",
+          "confidence": 0.9
+        }
+      ]
+    },
+    "implies": ["dotnet"]
+  },
+  {
+    "id": "azure-app-service",
+    "name": "Azure App Service",
+    "category": "hosting",
+    "rules": {
+      "cookies": [
+        {
+          "namePattern": "^ARRAffinity",
+          "confidence": 0.95
+        }
+      ],
+      "headers": [
+        {
+          "name": "x-azure-ref",
+          "confidence": 0.95
+        }
+      ]
+    }
+  },
+  {
+    "id": "siteimprove",
+    "name": "Siteimprove",
+    "category": "analytics",
+    "rules": {
+      "scripts": [
+        {
+          "pattern": "siteimproveanalytics\\.com",
+          "confidence": 0.95
+        },
+        {
+          "pattern": "siteanalyze_\\d+\\.js",
+          "confidence": 0.9
+        }
+      ]
+    }
+  },
+  {
+    "id": "autopilot",
+    "name": "Autopilot / Ortto",
+    "category": "marketing_automation",
+    "rules": {
+      "scripts": [
+        {
+          "pattern": "cdn\\.bc0a\\.com/autopilot",
+          "confidence": 0.95
+        },
+        {
+          "pattern": "autopilot_sdk\\.js",
+          "confidence": 0.95
+        }
+      ]
+    }
+  },
+  {
+    "id": "eloqua",
+    "name": "Oracle Eloqua",
+    "category": "crm",
+    "rules": {
+      "cookies": [
+        {
+          "namePattern": "^ELOQUA$",
+          "confidence": 0.95
+        }
+      ],
+      "scripts": [
+        {
+          "pattern": "en25\\.com",
+          "confidence": 0.9
+        },
+        {
+          "pattern": "eloqua\\.com",
+          "confidence": 0.95
+        },
+        {
+          "pattern": "tracking\\.en25\\.com",
+          "confidence": 0.95
+        }
+      ]
+    }
+  },
+  {
+    "id": "briteverify",
+    "name": "BriteVerify",
+    "category": "other",
+    "rules": {
+      "scripts": [
+        {
+          "pattern": "briteverify\\.com",
+          "confidence": 0.95
+        },
+        {
+          "pattern": "bpi\\.briteverify\\.com",
+          "confidence": 0.95
+        }
+      ]
+    }
+  },
+  {
+    "id": "adobe-launch",
+    "name": "Adobe Experience Platform (Launch)",
+    "category": "analytics",
+    "rules": {
+      "scripts": [
+        {
+          "pattern": "assets\\.adobedtm\\.com",
+          "confidence": 0.95
+        },
+        {
+          "pattern": "adobedtm\\.com.*launch-",
+          "confidence": 0.95
+        }
+      ],
+      "html": [
+        {
+          "pattern": "_satellite",
+          "confidence": 0.85
+        }
+      ]
+    }
   }
 ]

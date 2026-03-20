@@ -87,12 +87,20 @@ export interface ToolLookupResult {
 
 /**
  * Look up a third-party domain in the unified registry.
- * Matches if the domain **contains** the pattern string.
+ * Matches if the domain ends with the pattern, or equals it exactly.
+ * Patterns are treated as domain suffixes — a match requires a domain
+ * boundary (`.` or start-of-string) immediately before the pattern.
+ * This prevents "t.co" from matching "onetrust.com".
  */
 export function lookupToolByDomain(domain: string): ToolLookupResult | null {
   const lower = domain.toLowerCase();
   for (const entry of REGISTRY) {
-    if (lower.includes(entry.pattern)) {
+    const p = entry.pattern;
+    if (lower === p || lower.endsWith('.' + p) || lower.endsWith('/' + p)) {
+      return { name: entry.tool, category: entry.category };
+    }
+    // Also support path-containing patterns like "facebook.com/tr"
+    if (p.includes('/') && lower.includes(p)) {
       return { name: entry.tool, category: entry.category };
     }
   }

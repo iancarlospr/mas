@@ -87,20 +87,25 @@ function detectTickerSymbol($: CheerioAPI): { ticker: string | null; exchange: s
   }
 
   // Common patterns: "NYSE: AAPL", "NASDAQ: GOOGL", "Stock: MSFT"
-  const tickerPatterns = [
-    /(?:NYSE|NASDAQ|AMEX|TSX|LSE|ASX|TYO|KRX|BSE|NSE|SGX|HKEX)\s*:\s*([A-Z]{1,5})/i,
-    /\b(?:ticker|stock)\s*(?:symbol)?\s*:\s*([A-Z]{1,5})\b/i,
-  ];
+  // First pattern captures the exchange name directly from the match
+  // to avoid a separate body text search that could pick up false positives
+  // (e.g. "NSE" from "SolutionsEngineered")
+  const exchangeTickerPattern = /\b(NYSE|NASDAQ|AMEX|TSX|LSE|ASX|TYO|KRX|BSE|NSE|SGX|HKEX)\s*:\s*([A-Z]{1,5})\b/i;
+  const exchangeTickerMatch = bodyText.match(exchangeTickerPattern);
+  if (exchangeTickerMatch?.[2]) {
+    return {
+      ticker: exchangeTickerMatch[2],
+      exchange: exchangeTickerMatch[1]!.toUpperCase(),
+    };
+  }
 
-  for (const pattern of tickerPatterns) {
-    const match = bodyText.match(pattern);
-    if (match?.[1]) {
-      const exchangeMatch = bodyText.match(/(NYSE|NASDAQ|AMEX|TSX|LSE|ASX|TYO|KRX|BSE|NSE|SGX|HKEX)/i);
-      return {
-        ticker: match[1],
-        exchange: exchangeMatch?.[1] ? exchangeMatch[1].toUpperCase() : null,
-      };
-    }
+  const genericTickerPattern = /\b(?:ticker|stock)\s*(?:symbol)?\s*:\s*([A-Z]{1,5})\b/i;
+  const genericTickerMatch = bodyText.match(genericTickerPattern);
+  if (genericTickerMatch?.[1]) {
+    return {
+      ticker: genericTickerMatch[1],
+      exchange: null,
+    };
   }
 
   // $TICKER pattern — only match in IR/financial context to avoid false positives

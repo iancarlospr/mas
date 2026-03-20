@@ -587,6 +587,26 @@ function detectTechnologies(
       }
     }
 
+    // --- Cookie rules (from Set-Cookie header) ---
+    if (fp.rules.cookies) {
+      const setCookieHeader = lowerHeaders['set-cookie'] ?? '';
+      if (setCookieHeader) {
+        for (const rule of fp.rules.cookies) {
+          try {
+            const re = new RegExp(rule.namePattern, 'i');
+            // Set-Cookie header may contain multiple cookies; check cookie name prefixes
+            // Cookie names appear at the start of each Set-Cookie value or after a comma
+            const cookieNames = setCookieHeader.split(/,\s*(?=[A-Za-z])/).map(c => c.split('=')[0]?.trim() ?? '');
+            if (cookieNames.some(name => re.test(name))) {
+              matched.push(rule.confidence);
+            }
+          } catch {
+            // Invalid regex -- skip
+          }
+        }
+      }
+    }
+
     if (matched.length > 0) {
       // Also try to pull version from HTML if not already found via meta/header
       if (!version && html) {

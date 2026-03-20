@@ -539,7 +539,27 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
     const formEls = d.querySelectorAll('form');
     const forms: Array<{ action: string; method: string; hasEmail: boolean; hasPhone: boolean; hasName: boolean; hiddenFields: string[]; formBuilder: string | null; inputCount: number }> = [];
     formEls.forEach((form) => {
-      const emailField = !!form.querySelector('input[type="email"], input[name*="email"], input[autocomplete="email"]');
+      const emailField = !!(
+        form.querySelector('input[type="email"], input[name*="email"], input[autocomplete="email"], input[placeholder*="email" i], input[aria-label*="email" i]') ||
+        (() => {
+          // Check labels containing "email" that reference an input
+          const labels = form.querySelectorAll('label');
+          for (const lbl of labels) {
+            if (/email/i.test(lbl.textContent || '')) {
+              const forId = lbl.getAttribute('for');
+              if ((forId && form.querySelector('#' + CSS.escape(forId))) || lbl.querySelector('input')) return true;
+            }
+          }
+          // Check data-* attributes containing "email" on text inputs (e.g. data-ryder-field-name="emailAddress")
+          const textInputs = form.querySelectorAll('input[type="text"], input:not([type])');
+          for (const inp of textInputs) {
+            for (const attr of (inp as Element).getAttributeNames()) {
+              if (attr.startsWith('data-') && /email/i.test((inp as Element).getAttribute(attr) || '')) return true;
+            }
+          }
+          return false;
+        })()
+      );
       const phoneField = !!form.querySelector('input[type="tel"], input[name*="phone"], input[autocomplete="tel"]');
       const nameField = !!form.querySelector('input[name*="name"], input[autocomplete="name"], input[autocomplete="given-name"]');
       const hidden = Array.from(form.querySelectorAll('input[type="hidden"]')).map((i) => (i as HTMLInputElement).name).filter(Boolean);

@@ -481,14 +481,19 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
   }
 
   // CP8: Third-party weight impact
-  // Use domain count to distinguish CDN-hosted first-party assets (1-2 domains)
-  // from actual third-party service sprawl (many domains).
+  // Prefer NetworkCollector total (captures all traffic) over Performance API
+  // ResourceTiming entries (may miss XHR/fetch). Use domain count to distinguish
+  // CDN-hosted first-party assets from actual third-party sprawl.
   {
+    const ncThirdPartyBytes = (data as Record<string, unknown>).thirdPartyTotalBytes as number | undefined;
+    const effectiveTPBytes = (ncThirdPartyBytes && ncThirdPartyBytes > metrics.thirdPartyBytes)
+      ? ncThirdPartyBytes
+      : metrics.thirdPartyBytes;
     const tpPct =
       metrics.totalBytes > 0
-        ? Math.round((metrics.thirdPartyBytes / metrics.totalBytes) * 100)
+        ? Math.round((effectiveTPBytes / metrics.totalBytes) * 100)
         : 0;
-    const tpKB = Math.round(metrics.thirdPartyBytes / 1024);
+    const tpKB = Math.round(effectiveTPBytes / 1024);
     const tpDomains = (metrics as Record<string, unknown>).thirdPartyDomainCount as number ?? 0;
     let health: CheckpointHealth;
     let evidence: string;

@@ -78,7 +78,7 @@ const DOMAIN_PATTERNS: Array<{ pattern: RegExp; category: RequestCategory }> = [
   // Advertising
   { pattern: /doubleclick\.net|googlesyndication\.com|googleads\.g\.doubleclick\.net/, category: 'advertising' },
   { pattern: /facebook\.com\/tr|connect\.facebook\.net/, category: 'advertising' },
-  { pattern: /ads-twitter\.com|analytics\.twitter\.com|t\.co/, category: 'advertising' },
+  { pattern: /ads-twitter\.com|analytics\.twitter\.com|(?:^|\.)t\.co(?:\/|$)/, category: 'advertising' },
   { pattern: /linkedin\.com\/px|snap\.licdn\.com/, category: 'advertising' },
   { pattern: /tiktok\.com\/i18n|analytics\.tiktok\.com/, category: 'advertising' },
   { pattern: /bing\.com\/bat|bat\.bing\.com/, category: 'advertising' },
