@@ -87,8 +87,9 @@ RULES:
    - Enhanced conversions improve attribution accuracy by 15-30% (Google Ads)
    - Average bounce rate: 41-55% (Semrush 2024)
    - Average CPC (search): $1.50-3.00 depending on industry
-   - GDPR average fine: €2.8M (DLA Piper 2024)
-   - CCPA per-violation penalty: $2,663-$7,988
+   - GDPR average fine: €2.8M (DLA Piper 2024) — ONLY cite for EU-market sites
+   - CCPA per-violation penalty: $2,663-$7,988 — ONLY cite for US-market sites
+   NOTE: Check the site's geographic market. Do NOT cite GDPR fines for US-only sites or CCPA for EU-only sites.
 6. The impact areas should cover these categories for all 3 scenarios:
    - tracking: gaps in measurement causing invisible revenue
    - attribution: wasted ad spend from poor attribution

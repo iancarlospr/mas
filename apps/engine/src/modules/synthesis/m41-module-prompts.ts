@@ -315,8 +315,8 @@ Cross-reference parameters: a strong DMARC policy (p=reject) with a broken SPF r
   M12: {
     name: 'Legal Compliance',
     category: 'Security & Compliance',
-    purpose: 'Assesses GDPR/CCPA compliance posture by checking privacy policy presence and quality, cookie consent mechanism, terms of service, and pre-consent tracking. Non-compliance exposes the business to regulatory fines (up to 4% of global revenue for GDPR).',
-    assessmentInstructions: `Evaluate each compliance component independently. Cross-reference: if trackingPreConsent contains tools but consentBanner.found is false, this is a CRITICAL violation. Consider the jurisdiction field to determine which regulations apply.`,
+    purpose: 'Assesses privacy compliance posture by checking privacy policy presence and quality, cookie consent mechanism, terms of service, and tracking behavior. Compliance requirements depend on GEOGRAPHIC MARKET: US-market sites (.com with en-us) operate under CCPA (opt-out model) where tracking before consent is standard and legal. GDPR (consent-before-tracking) only applies to EU-market sites. Do NOT flag GDPR violations for US-market sites.',
+    assessmentInstructions: `IMPORTANT: Check the site's market FIRST. If the domain is US-market (e.g. .com with en-us hreflang, no EU hreflangs), evaluate under CCPA rules (opt-out model — tracking before consent is NORMAL). Only apply GDPR rules if the site targets EU users (EU hreflangs, .eu/.co.uk TLDs). Evaluate each compliance component independently. Consider the jurisdiction to determine which regulations actually apply — do not default to GDPR for every site.`,
     parameters: [
       {
         parameter: 'Privacy Policy',
@@ -337,14 +337,15 @@ Cross-reference parameters: a strong DMARC policy (p=reject) with a broken SPF r
       },
       {
         parameter: 'Consent Banner',
-        evaluationSteps: `1. Check consentBanner.found:
-   - false and site uses tracking cookies: CRITICAL — GDPR violation
-2. If found, check consentBanner.hasReject:
-   - false: CRITICAL — GDPR requires easy rejection (no "dark patterns")
-3. Check consentBanner.hasPreferences:
-   - false: WARNING — users should be able to choose cookie categories
+        evaluationSteps: `1. Determine market: US-market sites do NOT require consent banners (CCPA is opt-out).
+2. Check consentBanner.found:
+   - false on US site: INFO — not required under CCPA
+   - false on EU site: CRITICAL — GDPR violation
+3. If found, check consentBanner.hasReject:
+   - false on EU site: CRITICAL — GDPR requires easy rejection
+   - false on US site: INFO — nice-to-have but not required
 4. Note consentBanner.platform (CMP provider)`,
-        benchmarks: 'GDPR requires informed, specific, freely given consent. CNIL/ICO enforce reject button requirement. ePrivacy Directive requires cookie consent.',
+        benchmarks: 'US: CCPA requires opt-out mechanism (not consent banner). EU: GDPR requires informed consent before tracking. Do NOT apply GDPR to US-only sites.',
       },
       {
         parameter: 'CCPA Compliance',
@@ -364,15 +365,15 @@ Cross-reference parameters: a strong DMARC policy (p=reject) with a broken SPF r
    - Empty: EXCELLENT — no tracking before consent
    - Contains tools: WARNING to CRITICAL — tracking fires before user consents
 2. Cross-reference with consentBanner: if no banner but tracking present, CRITICAL`,
-        benchmarks: 'GDPR requires consent BEFORE setting non-essential cookies or firing tracking pixels.',
+        benchmarks: 'EU (GDPR): consent required BEFORE tracking. US (CCPA): tracking on page load is standard — opt-out only. Do NOT flag pre-consent tracking as a violation for US sites.',
       },
     ],
     scoringAnchors: {
-      excellent: 'Privacy policy present and comprehensive, consent banner with reject + preferences, no pre-consent tracking, CCPA mechanism present, cookie policy present.',
-      good: 'Privacy policy present, consent banner with reject, minimal pre-consent tracking, ToS present.',
-      moderate: 'Privacy policy present but thin, consent banner exists but lacks reject button, some pre-consent tracking.',
-      poor: 'Privacy policy thin or missing key disclosures, no reject on consent banner, significant pre-consent tracking.',
-      critical: 'No privacy policy, no consent banner, tracking fires before consent, no CCPA mechanism for California-targeted site.',
+      excellent: 'Privacy policy present and comprehensive, appropriate consent mechanism for market (banner for EU, opt-out for US), CCPA mechanism present if US-targeted, cookie policy present.',
+      good: 'Privacy policy present, consent mechanism appropriate for market, ToS present.',
+      moderate: 'Privacy policy present but thin, consent mechanism exists but incomplete for the applicable regulation.',
+      poor: 'Privacy policy thin or missing key disclosures, missing consent mechanism required by applicable regulation.',
+      critical: 'No privacy policy, missing legally required consent mechanism for the site\'s target market.',
     },
   },
 
@@ -689,7 +690,8 @@ Cross-reference parameters: a strong DMARC policy (p=reject) with a broken SPF r
       {
         parameter: 'Consent Mode',
         evaluationSteps: `1. Check consent.hasConsentMode:
-   - false: WARNING — required for GDPR compliance and accurate GA4 data in EU
+   - false on EU site: WARNING — required for GDPR compliance and accurate GA4 data
+   - false on US site: INFO — optional, not required under CCPA
 2. Check consent.version:
    - v2: GOOD (Google Consent Mode v2, required since March 2024)
    - v1: WARNING — outdated
@@ -731,10 +733,10 @@ Cross-reference parameters: a strong DMARC policy (p=reject) with a broken SPF r
     ],
     scoringAnchors: {
       excellent: 'GA4 configured with Consent Mode v2, server-side tracking active, structured data layer, session replay present, all cookies properly attributed and secured.',
-      good: 'GA4 present with consent mode, data layer exists, cookies mostly attributed.',
-      moderate: 'GA4 present but no consent mode, limited data layer, no server-side tracking.',
-      poor: 'Analytics present but misconfigured, no consent integration, multiple gaps.',
-      critical: 'No analytics detected, or analytics firing without consent, no data layer, broken implementation.',
+      good: 'GA4 present with data layer, cookies mostly attributed, consent mode if EU-targeted.',
+      moderate: 'GA4 present but limited data layer, no server-side tracking.',
+      poor: 'Analytics present but misconfigured, multiple gaps in measurement.',
+      critical: 'No analytics detected, no data layer, broken implementation.',
     },
   },
 

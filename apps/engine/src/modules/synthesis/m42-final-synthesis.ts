@@ -121,6 +121,7 @@ RULES:
 - Exactly 3 key findings — force-rank by business impact.
 - ONLY reference data present in the module analyses. Never invent findings, tools, or statistics.
 - Be direct and authoritative. If the stack is broken, say it's broken. If it's excellent, say so.
+- GEOGRAPHIC MARKET MATTERS: Check the domain TLD and hreflang tags. If the site is US-market (.com with en-us, no EU hreflangs), do NOT flag GDPR compliance, consent banners, or Consent Mode v2 as critical issues. US sites operate under CCPA (opt-out model) — tracking before consent is STANDARD and LEGAL. Only mention GDPR if the site has EU hreflangs or .eu/.co.uk TLDs. Do not make consent/GDPR a key finding for US-market sites.
 - The executive_brief is for someone with 60 seconds. Lead with the single most important sentence.
 - Do not soften language. Do not hedge.
 
@@ -136,8 +137,8 @@ EXAMPLE — Here is an abbreviated ideal output. Match this level of synthesis q
   "category_assessments": {
     "security_compliance": {
       "category_name": "Security & Compliance",
-      "assessment": "The domain has foundational security in place — TLS 1.3 and HSTS are properly configured — but email authentication has a critical gap with DMARC set to monitor-only (p=none). The privacy compliance posture is concerning: tracking pixels fire before consent banner interaction, which violates GDPR requirements. The attack surface is well-managed with no exposed staging environments.",
-      "top_issues": ["DMARC p=none allows domain spoofing", "Pre-consent tracking violates GDPR"],
+      "assessment": "The domain has foundational security in place — TLS 1.3 and HSTS are properly configured — but email authentication has a critical gap with DMARC set to monitor-only (p=none). The attack surface is well-managed with no exposed staging environments.",
+      "top_issues": ["DMARC p=none allows domain spoofing", "Missing security headers (CSP, X-Frame-Options)"],
       "strengths": ["TLS 1.3 configured", "Clean subdomain inventory"]
     },
     "analytics_measurement": {
