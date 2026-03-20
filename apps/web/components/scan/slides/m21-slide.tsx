@@ -87,7 +87,8 @@ export function M21Slide({ scan }: { scan: ScanWithResults }) {
   const mod = getModuleResult(scan, 'M21');
   const raw = (mod?.data as Record<string, unknown> | undefined) ?? null;
 
-  if (!syn && (!mod || mod.status === 'skipped' || mod.status === 'error')) {
+  const hasData = raw && (raw['facebook'] || raw['google']);
+  if (!syn && !hasData && (!mod || mod.status === 'skipped' || mod.status === 'error')) {
     return <SkippedSlide moduleName="Ad Library Intelligence" scan={scan} sourceLabel="Source: Meta Ad Library, Google Ads Transparency" />;
   }
 

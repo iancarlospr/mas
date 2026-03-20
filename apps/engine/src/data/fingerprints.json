@@ -5,20 +5,50 @@
     "category": "cms",
     "rules": {
       "html": [
-        { "pattern": "/hubfs/", "confidence": 0.9 },
-        { "pattern": "hub_generated/", "confidence": 0.95 },
-        { "pattern": "hsappstatic\\.net", "confidence": 0.85 }
+        {
+          "pattern": "/hubfs/",
+          "confidence": 0.9
+        },
+        {
+          "pattern": "hub_generated/",
+          "confidence": 0.95
+        },
+        {
+          "pattern": "hsappstatic\\.net",
+          "confidence": 0.85
+        }
       ],
       "headers": [
-        { "name": "x-hs-hub-id", "confidence": 0.99 },
-        { "name": "x-hs-content-id", "confidence": 0.95 },
-        { "name": "x-hs-prerendered", "confidence": 0.9 },
-        { "name": "x-hs-cache-config", "confidence": 0.9 }
+        {
+          "name": "x-hs-hub-id",
+          "confidence": 0.99
+        },
+        {
+          "name": "x-hs-content-id",
+          "confidence": 0.95
+        },
+        {
+          "name": "x-hs-prerendered",
+          "confidence": 0.9
+        },
+        {
+          "name": "x-hs-cache-config",
+          "confidence": 0.9
+        }
       ],
       "scripts": [
-        { "pattern": "js\\.hs-scripts\\.com", "confidence": 0.85 },
-        { "pattern": "js\\.hs-analytics\\.net", "confidence": 0.8 },
-        { "pattern": "js\\.hs-banner\\.com", "confidence": 0.8 }
+        {
+          "pattern": "js\\.hs-scripts\\.com",
+          "confidence": 0.85
+        },
+        {
+          "pattern": "js\\.hs-analytics\\.net",
+          "confidence": 0.8
+        },
+        {
+          "pattern": "js\\.hs-banner\\.com",
+          "confidence": 0.8
+        }
       ]
     }
   },
@@ -28,18 +58,43 @@
     "category": "cms",
     "rules": {
       "html": [
-        { "pattern": "wp-content/", "confidence": 0.95 },
-        { "pattern": "wp-includes/", "confidence": 0.9 }
+        {
+          "pattern": "wp-content/",
+          "confidence": 0.95
+        },
+        {
+          "pattern": "wp-includes/",
+          "confidence": 0.9
+        }
       ],
       "meta": [
-        { "name": "generator", "contentPattern": "WordPress", "confidence": 1.0 }
+        {
+          "name": "generator",
+          "contentPattern": "WordPress",
+          "confidence": 1.0
+        }
       ],
       "headers": [
-        { "name": "x-powered-by", "pattern": "WordPress", "confidence": 0.9 },
-        { "name": "link", "pattern": "wp-json", "confidence": 0.85 }
+        {
+          "name": "x-powered-by",
+          "pattern": "WordPress",
+          "confidence": 0.9
+        },
+        {
+          "name": "x-powered-by",
+          "pattern": "WP Engine",
+          "confidence": 0.85
+        },
+        {
+          "name": "link",
+          "pattern": "wp-json",
+          "confidence": 0.85
+        }
       ]
     },
-    "implies": ["php"]
+    "implies": [
+      "php"
+    ]
   },
   {
     "id": "shopify",
@@ -47,15 +102,30 @@
     "category": "cms",
     "rules": {
       "html": [
-        { "pattern": "cdn\\.shopify\\.com", "confidence": 0.95 },
-        { "pattern": "Shopify\\.theme", "confidence": 0.95 }
+        {
+          "pattern": "cdn\\.shopify\\.com",
+          "confidence": 0.95
+        },
+        {
+          "pattern": "Shopify\\.theme",
+          "confidence": 0.95
+        }
       ],
       "headers": [
-        { "name": "x-shopify-stage", "confidence": 1.0 },
-        { "name": "x-shopid", "confidence": 1.0 }
+        {
+          "name": "x-shopify-stage",
+          "confidence": 1.0
+        },
+        {
+          "name": "x-shopid",
+          "confidence": 1.0
+        }
       ],
       "scripts": [
-        { "pattern": "cdn\\.shopify\\.com/s/", "confidence": 0.9 }
+        {
+          "pattern": "cdn\\.shopify\\.com/s/",
+          "confidence": 0.9
+        }
       ]
     }
   },
@@ -65,11 +135,21 @@
     "category": "cms",
     "rules": {
       "html": [
-        { "pattern": "webflow\\.js", "confidence": 0.95 },
-        { "pattern": "data-wf-page", "confidence": 0.95 }
+        {
+          "pattern": "webflow\\.js",
+          "confidence": 0.95
+        },
+        {
+          "pattern": "data-wf-page",
+          "confidence": 0.95
+        }
       ],
       "meta": [
-        { "name": "generator", "contentPattern": "Webflow", "confidence": 1.0 }
+        {
+          "name": "generator",
+          "contentPattern": "Webflow",
+          "confidence": 1.0
+        }
       ]
     }
   },
@@ -79,11 +159,21 @@
     "category": "cms",
     "rules": {
       "html": [
-        { "pattern": "static\\.wixstatic\\.com", "confidence": 0.95 },
-        { "pattern": "_wix_browser_sess", "confidence": 0.9 }
+        {
+          "pattern": "static\\.wixstatic\\.com",
+          "confidence": 0.95
+        },
+        {
+          "pattern": "_wix_browser_sess",
+          "confidence": 0.9
+        }
       ],
       "meta": [
-        { "name": "generator", "contentPattern": "Wix", "confidence": 1.0 }
+        {
+          "name": "generator",
+          "contentPattern": "Wix",
+          "confidence": 1.0
+        }
       ]
     }
   },
@@ -93,11 +183,20 @@
     "category": "cms",
     "rules": {
       "html": [
-        { "pattern": "squarespace\\.com", "confidence": 0.8 },
-        { "pattern": "sqsp", "confidence": 0.7 }
+        {
+          "pattern": "squarespace\\.com",
+          "confidence": 0.8
+        },
+        {
+          "pattern": "sqsp",
+          "confidence": 0.7
+        }
       ],
       "scripts": [
-        { "pattern": "static1\\.squarespace\\.com", "confidence": 0.95 }
+        {
+          "pattern": "static1\\.squarespace\\.com",
+          "confidence": 0.95
+        }
       ]
     }
   },
@@ -107,18 +206,37 @@
     "category": "cms",
     "rules": {
       "html": [
-        { "pattern": "Drupal\\.settings", "confidence": 0.95 },
-        { "pattern": "sites/default/files", "confidence": 0.8 }
+        {
+          "pattern": "Drupal\\.settings",
+          "confidence": 0.95
+        },
+        {
+          "pattern": "sites/default/files",
+          "confidence": 0.8
+        }
       ],
       "meta": [
-        { "name": "generator", "contentPattern": "Drupal", "confidence": 1.0 }
+        {
+          "name": "generator",
+          "contentPattern": "Drupal",
+          "confidence": 1.0
+        }
       ],
       "headers": [
-        { "name": "x-drupal-cache", "confidence": 1.0 },
-        { "name": "x-generator", "pattern": "Drupal", "confidence": 1.0 }
+        {
+          "name": "x-drupal-cache",
+          "confidence": 1.0
+        },
+        {
+          "name": "x-generator",
+          "pattern": "Drupal",
+          "confidence": 1.0
+        }
       ]
     },
-    "implies": ["php"]
+    "implies": [
+      "php"
+    ]
   },
   {
     "id": "sitecore",
@@ -126,19 +244,41 @@
     "category": "cms",
     "rules": {
       "html": [
-        { "pattern": "/-/media/", "confidence": 0.85 },
-        { "pattern": "/-/speak/", "confidence": 0.9 },
-        { "pattern": "/sitecore/", "confidence": 0.8 }
+        {
+          "pattern": "/-/media/",
+          "confidence": 0.85
+        },
+        {
+          "pattern": "/-/speak/",
+          "confidence": 0.9
+        },
+        {
+          "pattern": "/sitecore/",
+          "confidence": 0.8
+        }
       ],
       "headers": [
-        { "name": "x-powered-by", "pattern": "Sitecore", "confidence": 0.99 }
+        {
+          "name": "x-powered-by",
+          "pattern": "Sitecore",
+          "confidence": 0.99
+        }
       ],
       "scripts": [
-        { "pattern": "sc_analytics", "confidence": 0.9 },
-        { "pattern": "Sitecore\\.Analytics", "confidence": 0.95 }
+        {
+          "pattern": "sc_analytics",
+          "confidence": 0.9
+        },
+        {
+          "pattern": "Sitecore\\.Analytics",
+          "confidence": 0.95
+        }
       ],
       "cookies": [
-        { "namePattern": "SC_ANALYTICS_GLOBAL_COOKIE", "confidence": 0.95 }
+        {
+          "namePattern": "SC_ANALYTICS_GLOBAL_COOKIE",
+          "confidence": 0.95
+        }
       ]
     }
   },
@@ -148,24 +288,54 @@
     "category": "cms",
     "rules": {
       "html": [
-        { "pattern": "/catalog/product/view", "confidence": 0.85 },
-        { "pattern": "/checkout/cart", "confidence": 0.8 }
+        {
+          "pattern": "/catalog/product/view",
+          "confidence": 0.85
+        },
+        {
+          "pattern": "/checkout/cart",
+          "confidence": 0.8
+        }
       ],
       "meta": [
-        { "name": "generator", "contentPattern": "Magento", "confidence": 1.0 }
+        {
+          "name": "generator",
+          "contentPattern": "Magento",
+          "confidence": 1.0
+        }
       ],
       "scripts": [
-        { "pattern": "Magento_", "confidence": 0.95 },
-        { "pattern": "requirejs/require", "confidence": 0.7 },
-        { "pattern": "mage/cookies", "confidence": 0.9 }
+        {
+          "pattern": "Magento_",
+          "confidence": 0.95
+        },
+        {
+          "pattern": "requirejs/require",
+          "confidence": 0.7
+        },
+        {
+          "pattern": "mage/cookies",
+          "confidence": 0.9
+        }
       ],
       "cookies": [
-        { "namePattern": "mage-messages", "confidence": 0.9 },
-        { "namePattern": "form_key", "confidence": 0.7 },
-        { "namePattern": "mage-cache-storage", "confidence": 0.9 }
+        {
+          "namePattern": "mage-messages",
+          "confidence": 0.9
+        },
+        {
+          "namePattern": "form_key",
+          "confidence": 0.7
+        },
+        {
+          "namePattern": "mage-cache-storage",
+          "confidence": 0.9
+        }
       ]
     },
-    "implies": ["php"]
+    "implies": [
+      "php"
+    ]
   },
   {
     "id": "aem",
@@ -173,22 +343,52 @@
     "category": "cms",
     "rules": {
       "html": [
-        { "pattern": "/content/dam/", "confidence": 0.9 },
-        { "pattern": "/etc/designs/", "confidence": 0.85 },
-        { "pattern": "/etc\\.clientlibs/", "confidence": 0.9 },
-        { "pattern": "data-sly-", "confidence": 0.95 },
-        { "pattern": "cq:include", "confidence": 0.95 }
+        {
+          "pattern": "/content/dam/",
+          "confidence": 0.9
+        },
+        {
+          "pattern": "/etc/designs/",
+          "confidence": 0.85
+        },
+        {
+          "pattern": "/etc\\.clientlibs/",
+          "confidence": 0.9
+        },
+        {
+          "pattern": "data-sly-",
+          "confidence": 0.95
+        },
+        {
+          "pattern": "cq:include",
+          "confidence": 0.95
+        }
       ],
       "headers": [
-        { "name": "x-dispatcher-info", "confidence": 0.95 },
-        { "name": "x-dispatcher-output", "confidence": 0.95 }
+        {
+          "name": "x-dispatcher-info",
+          "confidence": 0.95
+        },
+        {
+          "name": "x-dispatcher-output",
+          "confidence": 0.95
+        }
       ],
       "scripts": [
-        { "pattern": "/clientlib-", "confidence": 0.85 },
-        { "pattern": "granite\\.ui", "confidence": 0.9 }
+        {
+          "pattern": "/clientlib-",
+          "confidence": 0.85
+        },
+        {
+          "pattern": "granite\\.ui",
+          "confidence": 0.9
+        }
       ],
       "cookies": [
-        { "namePattern": "cq-authoring-mode", "confidence": 0.95 }
+        {
+          "namePattern": "cq-authoring-mode",
+          "confidence": 0.95
+        }
       ]
     }
   },
@@ -198,17 +398,33 @@
     "category": "framework",
     "rules": {
       "html": [
-        { "pattern": "__NEXT_DATA__", "confidence": 1.0 },
-        { "pattern": "_next/static", "confidence": 0.95 }
+        {
+          "pattern": "__NEXT_DATA__",
+          "confidence": 1.0
+        },
+        {
+          "pattern": "_next/static",
+          "confidence": 0.95
+        }
       ],
       "headers": [
-        { "name": "x-powered-by", "pattern": "Next\\.js", "confidence": 1.0 }
+        {
+          "name": "x-powered-by",
+          "pattern": "Next\\.js",
+          "confidence": 1.0
+        }
       ],
       "scripts": [
-        { "pattern": "/_next/", "confidence": 0.9 }
+        {
+          "pattern": "/_next/",
+          "confidence": 0.9
+        }
       ]
     },
-    "implies": ["react", "nodejs"]
+    "implies": [
+      "react",
+      "nodejs"
+    ]
   },
   {
     "id": "react",
@@ -216,9 +432,18 @@
     "category": "framework",
     "rules": {
       "html": [
-        { "pattern": "data-reactroot", "confidence": 0.95 },
-        { "pattern": "react\\.production\\.min\\.js", "confidence": 0.9 },
-        { "pattern": "__REACT_DEVTOOLS", "confidence": 0.8 }
+        {
+          "pattern": "data-reactroot",
+          "confidence": 0.95
+        },
+        {
+          "pattern": "react\\.production\\.min\\.js",
+          "confidence": 0.9
+        },
+        {
+          "pattern": "__REACT_DEVTOOLS",
+          "confidence": 0.8
+        }
       ]
     }
   },
@@ -228,8 +453,14 @@
     "category": "framework",
     "rules": {
       "html": [
-        { "pattern": "data-v-[a-f0-9]", "confidence": 0.9 },
-        { "pattern": "__vue", "confidence": 0.95 }
+        {
+          "pattern": "data-v-[a-f0-9]",
+          "confidence": 0.9
+        },
+        {
+          "pattern": "__vue",
+          "confidence": 0.95
+        }
       ]
     }
   },
@@ -239,11 +470,20 @@
     "category": "framework",
     "rules": {
       "html": [
-        { "pattern": "__NUXT__", "confidence": 1.0 },
-        { "pattern": "_nuxt/", "confidence": 0.9 }
+        {
+          "pattern": "__NUXT__",
+          "confidence": 1.0
+        },
+        {
+          "pattern": "_nuxt/",
+          "confidence": 0.9
+        }
       ]
     },
-    "implies": ["vue", "nodejs"]
+    "implies": [
+      "vue",
+      "nodejs"
+    ]
   },
   {
     "id": "angular",
@@ -251,8 +491,14 @@
     "category": "framework",
     "rules": {
       "html": [
-        { "pattern": "ng-version", "confidence": 0.95 },
-        { "pattern": "ng-app", "confidence": 0.8 }
+        {
+          "pattern": "ng-version=",
+          "confidence": 0.95
+        },
+        {
+          "pattern": "[\\s\"']ng-app[\\s\"'=>]",
+          "confidence": 0.8
+        }
       ]
     }
   },
@@ -262,14 +508,26 @@
     "category": "framework",
     "rules": {
       "html": [
-        { "pattern": "___gatsby", "confidence": 1.0 },
-        { "pattern": "gatsby-", "confidence": 0.7 }
+        {
+          "pattern": "___gatsby",
+          "confidence": 1.0
+        },
+        {
+          "pattern": "gatsby-",
+          "confidence": 0.7
+        }
       ],
       "meta": [
-        { "name": "generator", "contentPattern": "Gatsby", "confidence": 1.0 }
+        {
+          "name": "generator",
+          "contentPattern": "Gatsby",
+          "confidence": 1.0
+        }
       ]
     },
-    "implies": ["react"]
+    "implies": [
+      "react"
+    ]
   },
   {
     "id": "cloudflare",
@@ -277,9 +535,19 @@
     "category": "cdn",
     "rules": {
       "headers": [
-        { "name": "cf-ray", "confidence": 1.0 },
-        { "name": "server", "pattern": "cloudflare", "confidence": 1.0 },
-        { "name": "cf-cache-status", "confidence": 0.95 }
+        {
+          "name": "cf-ray",
+          "confidence": 1.0
+        },
+        {
+          "name": "server",
+          "pattern": "cloudflare",
+          "confidence": 1.0
+        },
+        {
+          "name": "cf-cache-status",
+          "confidence": 0.95
+        }
       ]
     }
   },
@@ -289,8 +557,15 @@
     "category": "hosting",
     "rules": {
       "headers": [
-        { "name": "x-vercel-id", "confidence": 1.0 },
-        { "name": "server", "pattern": "Vercel", "confidence": 0.95 }
+        {
+          "name": "x-vercel-id",
+          "confidence": 1.0
+        },
+        {
+          "name": "server",
+          "pattern": "Vercel",
+          "confidence": 0.95
+        }
       ]
     }
   },
@@ -300,8 +575,15 @@
     "category": "hosting",
     "rules": {
       "headers": [
-        { "name": "x-nf-request-id", "confidence": 1.0 },
-        { "name": "server", "pattern": "Netlify", "confidence": 0.95 }
+        {
+          "name": "x-nf-request-id",
+          "confidence": 1.0
+        },
+        {
+          "name": "server",
+          "pattern": "Netlify",
+          "confidence": 0.95
+        }
       ]
     }
   },
@@ -311,7 +593,11 @@
     "category": "server",
     "rules": {
       "headers": [
-        { "name": "server", "pattern": "nginx", "confidence": 0.95 }
+        {
+          "name": "server",
+          "pattern": "nginx",
+          "confidence": 0.95
+        }
       ]
     }
   },
@@ -321,7 +607,11 @@
     "category": "server",
     "rules": {
       "headers": [
-        { "name": "server", "pattern": "Apache", "confidence": 0.95 }
+        {
+          "name": "server",
+          "pattern": "Apache",
+          "confidence": 0.95
+        }
       ]
     }
   },
@@ -331,10 +621,17 @@
     "category": "language",
     "rules": {
       "headers": [
-        { "name": "x-powered-by", "pattern": "PHP", "confidence": 0.95 }
+        {
+          "name": "x-powered-by",
+          "pattern": "PHP",
+          "confidence": 0.95
+        }
       ],
       "cookies": [
-        { "namePattern": "PHPSESSID", "confidence": 0.9 }
+        {
+          "namePattern": "PHPSESSID",
+          "confidence": 0.9
+        }
       ]
     }
   },
@@ -344,7 +641,11 @@
     "category": "language",
     "rules": {
       "headers": [
-        { "name": "x-powered-by", "pattern": "Express", "confidence": 0.9 }
+        {
+          "name": "x-powered-by",
+          "pattern": "Express",
+          "confidence": 0.9
+        }
       ]
     }
   },
@@ -354,10 +655,16 @@
     "category": "analytics",
     "rules": {
       "scripts": [
-        { "pattern": "googletagmanager\\.com/gtag/js\\?id=G-", "confidence": 1.0 }
+        {
+          "pattern": "googletagmanager\\.com/gtag/js\\?id=G-",
+          "confidence": 1.0
+        }
       ],
       "html": [
-        { "pattern": "G-[A-Z0-9]{7,10}", "confidence": 0.7 }
+        {
+          "pattern": "[\"'=,;\\s]G-[A-Z0-9]{7,10}",
+          "confidence": 0.7
+        }
       ]
     }
   },
@@ -367,10 +674,16 @@
     "category": "analytics",
     "rules": {
       "scripts": [
-        { "pattern": "googletagmanager\\.com/gtm\\.js", "confidence": 1.0 }
+        {
+          "pattern": "googletagmanager\\.com/gtm\\.js",
+          "confidence": 1.0
+        }
       ],
       "html": [
-        { "pattern": "GTM-[A-Z0-9]{4,8}", "confidence": 0.9 }
+        {
+          "pattern": "GTM-[A-Z0-9]{4,8}",
+          "confidence": 0.9
+        }
       ]
     }
   },
@@ -380,7 +693,10 @@
     "category": "payment",
     "rules": {
       "scripts": [
-        { "pattern": "js\\.stripe\\.com", "confidence": 1.0 }
+        {
+          "pattern": "js\\.stripe\\.com",
+          "confidence": 1.0
+        }
       ]
     }
   },
@@ -390,8 +706,14 @@
     "category": "payment",
     "rules": {
       "scripts": [
-        { "pattern": "paypal\\.com/sdk", "confidence": 0.95 },
-        { "pattern": "paypalobjects\\.com", "confidence": 0.8 }
+        {
+          "pattern": "paypal\\.com/sdk",
+          "confidence": 0.95
+        },
+        {
+          "pattern": "paypalobjects\\.com",
+          "confidence": 0.8
+        }
       ]
     }
   },
@@ -401,8 +723,14 @@
     "category": "security",
     "rules": {
       "scripts": [
-        { "pattern": "recaptcha/api\\.js", "confidence": 1.0 },
-        { "pattern": "recaptcha/enterprise\\.js", "confidence": 1.0 }
+        {
+          "pattern": "recaptcha/api\\.js",
+          "confidence": 1.0
+        },
+        {
+          "pattern": "recaptcha/enterprise\\.js",
+          "confidence": 1.0
+        }
       ]
     }
   },
@@ -412,8 +740,14 @@
     "category": "monitoring",
     "rules": {
       "scripts": [
-        { "pattern": "browser\\.sentry-cdn\\.com", "confidence": 0.95 },
-        { "pattern": "sentry\\.io", "confidence": 0.8 }
+        {
+          "pattern": "browser\\.sentry-cdn\\.com",
+          "confidence": 0.95
+        },
+        {
+          "pattern": "sentry\\.io",
+          "confidence": 0.8
+        }
       ]
     }
   },
@@ -423,8 +757,14 @@
     "category": "build_tool",
     "rules": {
       "html": [
-        { "pattern": "webpackJsonp", "confidence": 0.9 },
-        { "pattern": "__webpack_require__", "confidence": 0.85 }
+        {
+          "pattern": "webpackJsonp",
+          "confidence": 0.9
+        },
+        {
+          "pattern": "__webpack_require__",
+          "confidence": 0.85
+        }
       ]
     }
   },
@@ -434,8 +774,14 @@
     "category": "build_tool",
     "rules": {
       "html": [
-        { "pattern": "@vite/client", "confidence": 0.95 },
-        { "pattern": "modulepreload", "confidence": 0.5 }
+        {
+          "pattern": "@vite/client",
+          "confidence": 0.95
+        },
+        {
+          "pattern": "modulepreload",
+          "confidence": 0.5
+        }
       ]
     }
   },
@@ -445,8 +791,14 @@
     "category": "other",
     "rules": {
       "scripts": [
-        { "pattern": "jquery[.-]\\d", "confidence": 0.95 },
-        { "pattern": "jquery\\.min\\.js", "confidence": 0.95 }
+        {
+          "pattern": "jquery[.-]\\d",
+          "confidence": 0.95
+        },
+        {
+          "pattern": "jquery\\.min\\.js",
+          "confidence": 0.95
+        }
       ]
     }
   },
@@ -456,7 +808,10 @@
     "category": "other",
     "rules": {
       "html": [
-        { "pattern": "tailwindcss", "confidence": 0.7 }
+        {
+          "pattern": "tailwindcss",
+          "confidence": 0.7
+        }
       ]
     }
   },
@@ -466,11 +821,74 @@
     "category": "other",
     "rules": {
       "scripts": [
-        { "pattern": "bootstrap\\.min\\.js", "confidence": 0.95 },
-        { "pattern": "bootstrap\\.bundle", "confidence": 0.9 }
+        {
+          "pattern": "bootstrap\\.min\\.js",
+          "confidence": 0.95
+        },
+        {
+          "pattern": "bootstrap\\.bundle",
+          "confidence": 0.9
+        }
       ],
       "html": [
-        { "pattern": "bootstrap\\.min\\.css", "confidence": 0.9 }
+        {
+          "pattern": "bootstrap\\.min\\.css",
+          "confidence": 0.9
+        }
+      ]
+    }
+  },
+  {
+    "id": "evergage",
+    "name": "Evergage / Salesforce Interaction Studio",
+    "category": "analytics",
+    "rules": {
+      "scripts": [
+        {
+          "pattern": "cdn\\.evgnet\\.com",
+          "confidence": 0.95
+        },
+        {
+          "pattern": "evergage\\.min\\.js",
+          "confidence": 0.95
+        }
+      ],
+      "html": [
+        {
+          "pattern": "Evergage",
+          "confidence": 0.8
+        }
+      ]
+    }
+  },
+  {
+    "id": "salesforce",
+    "name": "Salesforce",
+    "category": "crm",
+    "rules": {
+      "scripts": [
+        {
+          "pattern": "service\\.force\\.com/embeddedservice",
+          "confidence": 0.95
+        },
+        {
+          "pattern": "salesforceliveagent\\.com",
+          "confidence": 0.95
+        },
+        {
+          "pattern": "salesforce-scrt\\.com",
+          "confidence": 0.9
+        }
+      ],
+      "html": [
+        {
+          "pattern": "initEmbeddedMessaging|embeddedservice_bootstrap",
+          "confidence": 0.85
+        },
+        {
+          "pattern": "liveagent\\.enableLiveAgent",
+          "confidence": 0.9
+        }
       ]
     }
   }
