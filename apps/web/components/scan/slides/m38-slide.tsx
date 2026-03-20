@@ -58,7 +58,8 @@ export function M38Slide({ scan }: { scan: ScanWithResults }) {
   const topCategories = (raw?.['categories'] as string[] | undefined) ?? profileCategories;
 
   // Map completeness status to CheckItem status
-  function mapStatus(s: string): 'pass' | 'fail' | 'warn' {
+  function mapStatus(s: string | undefined | null): 'pass' | 'fail' | 'warn' {
+    if (!s) return 'warn';
     const lower = s.toLowerCase();
     if (lower === 'complete' || lower === 'pass' || lower === 'yes' || lower === 'true' || lower === 'found') return 'pass';
     if (lower === 'missing' || lower === 'fail' || lower === 'no' || lower === 'false' || lower === 'not found') return 'fail';

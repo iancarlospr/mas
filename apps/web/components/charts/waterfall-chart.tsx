@@ -169,7 +169,7 @@ export function WaterfallChart({
           const y = i * (rowHeight + gap);
           const barStart = 250 + (entry.startTime / maxTime) * 700;
           const barWidth = Math.max(2, (entry.duration / maxTime) * 700);
-          const typeKey = entry.type.toLowerCase() as keyof typeof RESOURCE_COLORS;
+          const typeKey = (entry.type ?? 'other').toLowerCase() as keyof typeof RESOURCE_COLORS;
           const barColor =
             RESOURCE_COLORS[typeKey] ?? RESOLVED_COLORS.chrome;
           const isHovered = hoveredRow === i;

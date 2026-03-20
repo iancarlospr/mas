@@ -61,8 +61,8 @@ const TYPE_COLOR_MAP: Record<string, string> = {
   other: RESOURCE_COLORS.other,
 };
 
-function getTypeColor(type: string): string {
-  return TYPE_COLOR_MAP[type.toLowerCase()] ?? RESOLVED_COLORS.chrome;
+function getTypeColor(type: string | undefined | null): string {
+  return TYPE_COLOR_MAP[(type ?? 'other').toLowerCase()] ?? RESOLVED_COLORS.chrome;
 }
 
 export function ResourceBreakdown({
