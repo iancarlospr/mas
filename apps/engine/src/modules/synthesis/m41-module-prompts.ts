@@ -1265,8 +1265,7 @@ METHODOLOGY:
 1. Start with the full-page overview screenshots to understand the overall ad presence on each platform.
 2. For each individual ad screenshot: pair it with the corresponding text data (facebook.ads[0] matches the first Facebook ad screenshot, etc.).
 3. Analyze each ad one-by-one: examine the visual design quality, read the extracted text data, and assess them together as a single ad unit.
-4. After analyzing all individual ads, step back and assess the cross-platform strategy.
-5. At the very end, after all recommendations, generate an improved ad creative concept based on your analysis.`,
+4. After analyzing all individual ads, step back and assess the cross-platform strategy.`,
     parameters: [
       {
         parameter: 'Individual Facebook Ad Analysis (per ad)',
@@ -1328,19 +1327,6 @@ METHODOLOGY:
    - Are UTM parameters consistent across all ad CTAs?
    - Missing UTMs on any platform = attribution gaps`,
         benchmarks: 'Diversified paid media across 2+ platforms reduces dependency risk. Creative testing across 3-5 variants improves performance by 15-30%.',
-      },
-      {
-        parameter: 'AI-Generated Improved Ad Concept',
-        evaluationSteps: `After completing ALL analysis and recommendations, generate ONE improved ad creative concept:
-1. Write a suggested ad headline (platform-appropriate length)
-2. Write suggested body/description text
-3. Describe the visual concept (what the image should look like)
-4. Specify the recommended CTA button text
-5. Recommend the best platform and format for this creative
-6. Explain why this creative would outperform the current ads based on your analysis
-
-Include this as a special recommendation with action: "Recommended Creative Concept" and the ad copy/concept in implementation_steps.`,
-        benchmarks: 'Data-driven creative recommendations based on competitive analysis and platform best practices.',
       },
     ],
     scoringAnchors: {

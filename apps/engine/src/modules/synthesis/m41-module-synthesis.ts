@@ -659,8 +659,7 @@ Produce your analysis as valid JSON matching the schema. Ensure:
 - The module_score reflects your assessment with score_breakdown criteria
 - All findings cite specific evidence from the extracted data above${moduleId === 'M21' && m21Images && m21Images.images.length > 0 ? `
 - Analyze each attached ad screenshot individually, paired with its text data
-- For each ad: assess visual design, CTA placement, platform compliance, and creative quality
-- After all analysis and recommendations, generate an improved ad creative concept` : ''}`;
+- For each ad: assess visual design, CTA placement, platform compliance, and creative quality` : ''}`;
 
       let result = await callFlash(prompt, ModuleSynthesisSchema, {
         systemInstruction: SYSTEM_PROMPT_WITH_EXAMPLE,

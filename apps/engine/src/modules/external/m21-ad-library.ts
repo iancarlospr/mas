@@ -102,97 +102,6 @@ function extractFacebookSlug(ctx: ModuleContext): string | null {
   return null;
 }
 
-interface FacebookPageInfo {
-  pageName: string | null;
-  pageId: string | null;
-}
-
-/**
- * Resolve a Facebook page slug to its display name and numeric page ID.
- * The display name is what the Ad Library uses for advertiser search
- * (which can differ from the page slug — e.g., slug "pideuva" → name "Uva App").
- * The numeric page ID enables direct Ad Library navigation via view_all_page_id.
- */
-async function resolveFacebookPageInfo(pool: BrowserPool, slug: string): Promise<FacebookPageInfo> {
-  let page: Page | null = null;
-  try {
-    page = await pool.createPage('https://www.facebook.com');
-    await page.goto(`https://www.facebook.com/${encodeURIComponent(slug)}`, {
-      waitUntil: 'domcontentloaded',
-      timeout: 15_000,
-    });
-    await new Promise(r => setTimeout(r, 3000));
-
-    const info = await page.evaluate(() => {
-      // --- Page name extraction ---
-      let pageName: string | null = null;
-      const ogTitle = document.querySelector('meta[property="og:title"]')?.getAttribute('content');
-      if (ogTitle) {
-        pageName = ogTitle.trim();
-      } else {
-        const title = document.title;
-        if (title.includes('|')) pageName = title.split('|')[0]!.trim();
-        else if (title.includes('-')) pageName = title.split('-')[0]!.trim();
-        else pageName = title?.trim() || null;
-      }
-
-      // --- Numeric page ID extraction ---
-      let pageId: string | null = null;
-      const idPattern = /^(\d{5,})$/;
-
-      // Priority 1: al:android:url meta tag (fb://page/ID or fb://profile/ID)
-      const androidUrl = document.querySelector('meta[property="al:android:url"]')?.getAttribute('content');
-      if (androidUrl) {
-        const match = androidUrl.match(/fb:\/\/(?:page|profile)\/(\d+)/);
-        if (match?.[1] && idPattern.test(match[1])) pageId = match[1];
-      }
-
-      // Priority 2: al:ios:url meta tag (fb://page/ID or fb://profile/ID)
-      if (!pageId) {
-        const iosUrl = document.querySelector('meta[property="al:ios:url"]')?.getAttribute('content');
-        if (iosUrl) {
-          const match = iosUrl.match(/fb:\/\/(?:page|profile)\/(\d+)/);
-          if (match?.[1] && idPattern.test(match[1])) pageId = match[1];
-        }
-      }
-
-      // Priority 3: JSON patterns in script tags
-      if (!pageId) {
-        const scripts = document.querySelectorAll('script');
-        for (const script of scripts) {
-          const text = script.textContent ?? '';
-          if (text.length < 100) continue;
-          // "pageID":"123456789"
-          const m1 = text.match(/"pageID"\s*:\s*"(\d{5,})"/);
-          if (m1?.[1]) { pageId = m1[1]; break; }
-          // "page_id":"123456789"
-          const m2 = text.match(/"page_id"\s*:\s*"(\d{5,})"/);
-          if (m2?.[1]) { pageId = m2[1]; break; }
-          // "entity_id":"123456789"
-          const m3 = text.match(/"entity_id"\s*:\s*"(\d{5,})"/);
-          if (m3?.[1]) { pageId = m3[1]; break; }
-        }
-      }
-
-      return { pageName, pageId };
-    });
-
-    if (info.pageName) {
-      logger.info({ slug, pageName: info.pageName, pageId: info.pageId }, 'Resolved Facebook page info');
-    } else {
-      logger.warn({ slug, pageId: info.pageId }, 'Could not resolve Facebook page display name');
-    }
-    return info;
-  } catch (err) {
-    logger.warn({ slug, error: (err as Error).message }, 'Failed to resolve Facebook page info');
-    return { pageName: null, pageId: null };
-  } finally {
-    if (page) {
-      try { await page.close(); } catch { /* ignore */ }
-    }
-  }
-}
-
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
@@ -346,7 +255,6 @@ Return JSON: { "index": <0-based index of best match or -1>, "reasoning": "<brie
 }
 
 async function scrapeFacebookAdLibrary(
-  pool: BrowserPool,
   scanId: string,
   countryCode: string,
   brandName: string,
@@ -354,6 +262,7 @@ async function scrapeFacebookAdLibrary(
   fbSlug: string | null,
   brandUrl: string,
 ): Promise<FacebookResult> {
+  const pool = new BrowserPool();
   const result: FacebookResult = {
     screenshot: null,
     ads: [],
@@ -376,44 +285,16 @@ async function scrapeFacebookAdLibrary(
 
     logger.info({ scanId, searchTerm, brandName, countryCode, pageId }, 'Navigating to Facebook Ad Library');
 
-    // Navigate to Ad Library and set up category (country defaults to user's region)
-    await page.goto('https://www.facebook.com/ads/library/', {
+    // Navigate to Ad Library with country=ALL in URL — avoids the flaky country
+    // dropdown click (Facebook defaults to server's region which may have no ads).
+    await page.goto('https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=ALL&media_type=all', {
       waitUntil: 'domcontentloaded',
       timeout: 30_000,
     });
     // DO NOT use waitForLoadState('networkidle') — Facebook never goes idle
     // (constant beacon/analytics requests). On the DO server this hangs forever.
     // Instead, wait for the comboboxes to appear which proves the form is ready.
-    logger.info({ scanId }, 'Facebook Ad Library page loaded, waiting for comboboxes');
-
-    // ── Step 1: Set country to "All" ────────────────────────────────────
-    // Facebook defaults to the server's region (DO = US/PR). Setting to "All"
-    // ensures we see ads running globally, not just in one country.
-    // Only 2 comboboxes on the page: country (first) and category (second).
-    try {
-      const countryCombo = page.locator('[role="combobox"]').first();
-      await countryCombo.waitFor({ state: 'visible', timeout: 20_000 });
-      logger.info({ scanId }, 'Country combobox visible, clicking');
-      await sleep(1000);
-      // force: bypasses overlay interception. noWaitAfter: critical — Facebook
-      // triggers navigation on clicks that Playwright waits for indefinitely.
-      await countryCombo.click({ force: true, noWaitAfter: true, timeout: 5_000 });
-      logger.info({ scanId }, 'Country combobox clicked');
-      await sleep(2000);
-
-      // Click the "All" gridcell in the country dropdown
-      const allOption = page.locator('[role="gridcell"]').filter({ hasText: /^All$/ }).first();
-      await allOption.waitFor({ state: 'visible', timeout: 5_000 });
-      logger.info({ scanId }, 'All option visible, clicking');
-      await allOption.click({ force: true, noWaitAfter: true, timeout: 5_000 });
-      logger.info({ scanId }, 'Set country filter to "All"');
-      await sleep(3000);
-    } catch (err) {
-      logger.warn({ scanId, error: (err as Error).message }, 'Failed to set country to "All" — proceeding with default region');
-      // Close any lingering dropdown so it doesn't interfere with category selection
-      await page.keyboard.press('Escape').catch(() => {});
-      await sleep(500);
-    }
+    logger.info({ scanId }, 'Facebook Ad Library page loaded (country=ALL), waiting for comboboxes');
 
     // ── Step 2: Select "All ads" from category dropdown ─────────────────
     // The search input is DISABLED until a category is selected. This is a hard
@@ -505,16 +386,17 @@ async function scrapeFacebookAdLibrary(
         if (advertiserOptions.length > 0) {
           let pickIndex = -1;
 
-          // Strategy 1: Exact slug match — look for @slug in the option text
+          // Strategy 1: Exact handle match — look for @searchTerm in the option text
           // e.g. slug "SupermaxPR" matches "@supermaxpr" in "SuperMax @supermaxpr · 147K..."
-          if (fbSlug) {
-            const slugLower = fbSlug.toLowerCase();
+          // Works with fbSlug or brandName (domain-derived, e.g. "nike")
+          {
+            const termLower = searchTerm.toLowerCase();
             const slugMatchIdx = advertiserOptions.findIndex(
-              o => o.text.toLowerCase().includes(`@${slugLower}`),
+              o => o.text.toLowerCase().includes(`@${termLower}`),
             );
             if (slugMatchIdx >= 0) {
               pickIndex = slugMatchIdx;
-              logger.info({ scanId, method: 'slug-match', slug: fbSlug, matched: advertiserOptions[slugMatchIdx]!.text }, 'Matched advertiser by slug');
+              logger.info({ scanId, method: 'handle-match', term: searchTerm, matched: advertiserOptions[slugMatchIdx]!.text }, 'Matched advertiser by @handle');
             }
           }
 
@@ -536,16 +418,16 @@ async function scrapeFacebookAdLibrary(
           }
 
           // Strategy 3: Highest-follower heuristic — pick the option with the most followers
-          // that also contains the brand name or slug substring
-          if (pickIndex < 0 && fbSlug) {
-            const slugLower = fbSlug.toLowerCase();
+          // that also contains the search term or brand name as substring
+          if (pickIndex < 0) {
+            const termLower = searchTerm.toLowerCase();
             const nameLower = brandName.toLowerCase();
             let bestFollowers = 0;
             let bestHeuristicIdx = -1;
             for (let i = 0; i < advertiserOptions.length; i++) {
               const textLower = advertiserOptions[i]!.text.toLowerCase();
-              // Must contain slug or brand name as substring
-              if (!textLower.includes(slugLower) && !textLower.includes(nameLower)) continue;
+              // Must contain search term or brand name as substring
+              if (!textLower.includes(termLower) && !textLower.includes(nameLower)) continue;
               // Extract follower count: "147K follow", "1K follow", "7 follow"
               const followMatch = advertiserOptions[i]!.text.match(/([\d,.]+)\s*([KkMm])?\s*follow/);
               if (followMatch) {
@@ -602,34 +484,59 @@ async function scrapeFacebookAdLibrary(
       // Not critical
     }
 
-    // Wait for ad results to load
+    // After clicking an advertiser, Facebook's SPA navigation often crashes with
+    // "Something went wrong". Fix: grab the view_all_page_id from the URL after
+    // the click, then do a clean page.goto() to load it fresh.
+    await sleep(3000);
+    const postClickUrl = page.url();
+    const pageIdMatch = postClickUrl.match(/view_all_page_id=(\d+)/);
+    if (pageIdMatch?.[1]) {
+      const directUrl = `https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=ALL&media_type=all&search_type=page&view_all_page_id=${pageIdMatch[1]}`;
+      logger.info({ scanId, pageId: pageIdMatch[1] }, 'Navigating directly to advertiser Ad Library page');
+      await page.goto(directUrl, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+    }
+
+    // Wait for ad results to render
+    try {
+      await page.locator('button:has-text("See ad details"), [role="button"]:has-text("See ad details")').first()
+        .waitFor({ state: 'visible', timeout: 20_000 });
+    } catch {
+      logger.warn({ scanId, pageUrl: page.url() }, 'No "See ad details" button found after 20s');
+    }
     await sleep(2000);
 
-    // Facebook renders ads in a grid layout. Ad content containers use
-    // data-testid="ad-library-dynamic-content-container". "See ad details"
-    // buttons are the entry point to individual ad detail views.
+    // Facebook shows the total ad count as "~2,500 results" text below the
+    // page logo. Extract that number directly instead of counting DOM buttons.
+    try {
+      const countText = await page.evaluate(() => {
+        const body = document.body.textContent ?? '';
+        // Matches "~2,500 results", "1 result", "12,345 results", "~50K results"
+        const match = body.match(/~?([\d,]+[KkMm]?)\s+results?/);
+        return match?.[1] ?? null;
+      });
+      if (countText) {
+        let count = parseFloat(countText.replace(/,/g, ''));
+        const multiplier = countText.slice(-1).toUpperCase();
+        if (multiplier === 'K') count *= 1_000;
+        if (multiplier === 'M') count *= 1_000_000;
+        result.totalAdsVisible = Math.round(count);
+        logger.info({ scanId, totalFromBadge: result.totalAdsVisible, raw: countText }, 'Extracted Facebook ad count from results badge');
+      }
+    } catch {
+      // Fall through — count stays 0
+    }
+
+    // Fallback: count "See ad details" buttons if the badge text wasn't found
     const seeDetailsButtons = page.locator('button:has-text("See ad details"), [role="button"]:has-text("See ad details")');
-
-    // Count visible ads via "See ad details" buttons (most reliable indicator)
-    try {
-      const count = await seeDetailsButtons.count();
-      result.totalAdsVisible = count;
-    } catch {
-      result.totalAdsVisible = 0;
-    }
-
-    // Scroll down 5 times to load more ads
-    for (let i = 0; i < 5; i++) {
-      await page.mouse.wheel(0, 800);
-      await sleep(500);
-    }
-
-    // Recount after scrolling
-    try {
-      const count = await seeDetailsButtons.count();
-      result.totalAdsVisible = Math.max(result.totalAdsVisible, count);
-    } catch {
-      // Keep existing count
+    if (result.totalAdsVisible === 0) {
+      try {
+        // Wait up to 8s for at least one ad card to appear
+        await seeDetailsButtons.first().waitFor({ state: 'visible', timeout: 8_000 });
+        const count = await seeDetailsButtons.count();
+        result.totalAdsVisible = count;
+      } catch {
+        result.totalAdsVisible = 0;
+      }
     }
 
     // Extract ad detail screenshot and CTA URL (1 ad only).
@@ -993,6 +900,7 @@ async function scrapeFacebookAdLibrary(
     if (page) {
       try { await page.close(); } catch { /* ignore */ }
     }
+    try { await pool.close(); } catch { /* ignore */ }
   }
 
   return result;
@@ -1031,12 +939,12 @@ interface GoogleResult {
 }
 
 async function scrapeGoogleAdsTransparency(
-  pool: BrowserPool,
   scanId: string,
   brandUrl: string,
   brandName: string,
   countryCode: string,
 ): Promise<GoogleResult> {
+  const pool = new BrowserPool();
   const result: GoogleResult = {
     screenshot: null,
     totalAdsVisible: 0,
@@ -1087,53 +995,7 @@ async function scrapeGoogleAdsTransparency(
       // Badge not found — will count visible cards instead
     }
 
-    // Load ALL ads: scroll to bottom → click "See all ads" → repeat.
-    // Google shows ~80 cards initially, then loads more on "See all ads" click.
-    try {
-      let consecutiveMisses = 0;
-      for (let round = 0; round < 10; round++) {
-        // Scroll aggressively to the bottom to reveal the "See all" button
-        for (let i = 0; i < 8; i++) {
-          await page.mouse.wheel(0, 1000);
-          await sleep(300);
-        }
-        await sleep(1000);
-
-        const prevCount = await page.locator(adCardSelector).count().catch(() => 0);
-
-        // Look for "See all ads" button and click it
-        const seeAllBtn = page.locator(
-          'button:has-text("See all"), ' +
-          'button:has-text("Show more"), ' +
-          'a:has-text("See all"), ' +
-          '[role="button"]:has-text("See all")',
-        ).first();
-        try {
-          await seeAllBtn.waitFor({ state: 'visible', timeout: 5_000 });
-          await seeAllBtn.scrollIntoViewIfNeeded({ timeout: 2_000 });
-          await dismissGoogleOverlays(page);
-          await seeAllBtn.click({ timeout: 5_000, force: true });
-          logger.info({ scanId, round, adsBefore: prevCount }, 'Clicked "See all ads" button');
-          await sleep(4000);
-          consecutiveMisses = 0;
-        } catch {
-          consecutiveMisses++;
-          if (consecutiveMisses >= 2) break;
-          continue;
-        }
-
-        const newCount = await page.locator(adCardSelector).count().catch(() => 0);
-        logger.info({ scanId, round, adsBefore: prevCount, adsAfter: newCount }, 'Ad count after "See all" click');
-        if (newCount <= prevCount) break;
-      }
-    } catch (err) {
-      logger.warn(
-        { scanId, error: (err as Error).message },
-        'Error during Google ad loading loop — proceeding with ads captured so far',
-      );
-    }
-
-    // If badge count wasn't found, use visible card count
+    // If badge count wasn't found, fall back to counting visible ad cards
     if (result.totalAdsVisible === 0) {
       try {
         result.totalAdsVisible = await page.locator(adCardSelector).count();
@@ -1167,6 +1029,7 @@ async function scrapeGoogleAdsTransparency(
     if (page) {
       try { await page.close(); } catch { /* ignore */ }
     }
+    try { await pool.close(); } catch { /* ignore */ }
   }
 
   return result;
@@ -1184,8 +1047,6 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
   const domain = new URL(ctx.url).hostname.replace('www.', '');
   const fallbackBrandName = domain.split('.')[0] ?? domain;
 
-  const pool = new BrowserPool();
-
   try {
     // Ensure storage bucket exists
     await ensureBucket();
@@ -1200,23 +1061,13 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
       logger.warn({ scanId: ctx.scanId }, 'Could not fetch scan record for country code — using US fallback');
     }
 
-    // Get best brand name for Facebook search:
-    // 1. Extract slug from M15/M04 sameAs (e.g., "pideuva")
-    // 2. Visit the Facebook page to get the display name (e.g., "Uva App")
-    //    The display name is what the Ad Library uses for advertiser matching,
-    //    which can differ from the slug.
-    // 3. Fall back to slug, then domain-derived name
+    // Extract Facebook slug from M15/M04 social links (e.g., "nike" from facebook.com/nike).
+    // The slug is the search term for the Ad Library. Falls back to domain name.
     const fbSlug = extractFacebookSlug(ctx);
-    let brandName = fallbackBrandName;
-    let fbPageId: string | null = null;
-    if (fbSlug) {
-      const pageInfo = await resolveFacebookPageInfo(pool, fbSlug);
-      brandName = pageInfo.pageName ?? fbSlug;
-      fbPageId = pageInfo.pageId;
-    }
+    const brandName = fallbackBrandName;
 
     logger.info(
-      { scanId: ctx.scanId, fbSlug, brandName, fbPageId, countryCode },
+      { scanId: ctx.scanId, fbSlug, brandName, countryCode },
       'Starting M21 Ad Library Extractor',
     );
 
@@ -1226,14 +1077,14 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
 
     // Part 1: Facebook Ad Library
     try {
-      fbResult = await scrapeFacebookAdLibrary(pool, ctx.scanId, countryCode, brandName, fbPageId, fbSlug, ctx.url);
+      fbResult = await scrapeFacebookAdLibrary(ctx.scanId, countryCode, brandName, null, fbSlug, ctx.url);
     } catch (err) {
       logger.error({ scanId: ctx.scanId, error: (err as Error).message }, 'Facebook section failed completely');
     }
 
     // Part 2: Google Ads Transparency (Search only)
     try {
-      googleResult = await scrapeGoogleAdsTransparency(pool, ctx.scanId, ctx.url, fallbackBrandName, countryCode);
+      googleResult = await scrapeGoogleAdsTransparency(ctx.scanId, ctx.url, fallbackBrandName, countryCode);
     } catch (err) {
       logger.error({ scanId: ctx.scanId, error: (err as Error).message }, 'Google section failed completely');
     }
@@ -1380,13 +1231,6 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
       duration: 0,
       error: (error as Error).message,
     };
-  } finally {
-    // Always close the browser pool
-    try {
-      await pool.close();
-    } catch {
-      // Ignore close errors
-    }
   }
 };
 
