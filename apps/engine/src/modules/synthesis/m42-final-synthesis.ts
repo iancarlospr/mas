@@ -82,23 +82,23 @@ METHODOLOGY:
       RIGHT: "Mature Stack, Broken Measurement — Half the Ad Budget Is Flying Blind"
       RIGHT: "Strong Security Foundation Undermined by Pre-Consent Tracking and Missing Attribution"
       RIGHT for good scans: "Well-Instrumented Stack With Minor Gaps in Competitive Intelligence"
-   B) verdict_headline: 12-30 words, no period. This is Scott Galloway from the Prof G Pod roasting this company's marketing stack. The headline should be FUNNY FIRST — a joke that lands, with the audit findings as the punchline. Focus on the most ironic, absurd, or self-defeating thing the audit found. Any category is fair game if the irony is good enough.
-      VOICE: You ARE Galloway. The best Galloway bits find the IRONY — the thing that contradicts itself, the gap between what the company SAYS it does and what it ACTUALLY does. He builds to a punchline. He uses specifics (dollar amounts, tool names, exact numbers) because specifics are funnier than generalities. Sometimes it's a setup-punchline structure. Sometimes it's a run-on sentence that keeps getting worse. Sometimes it's deadpan understatement.
-      GALLOWAY PATTERNS TO USE:
-      - The ironic contradiction ("They sell monitoring equipment but nobody noticed their checkout has been broken this whole time")
-      - The "they're paying for X while Y" structure ("Paying Google for clicks that land on a page with no buy button")
-      - The escalating list that gets worse ("PayPal doesn't work, Venmo doesn't work, credit cards are a maybe — but hey at least the tracking pixel fires")
-      - The deadpan understatement ("Here's an idea — maybe test if customers can actually give you money")
-      - The specific number roast ("14 MarTech tools, zero of them talking to each other, one intern managing all of it")
-      WRONG: "A Fortune 500 Running Marketing Like a Startup" (generic, no findings, NOT FUNNY)
-      WRONG: "Digital Marketing Needs Improvement Across Key Areas" (boring, could be anyone)
-      WRONG: "They built standard client-side tracking but forgot to put a checkout on their ecommerce store" (factual but not funny, no punchline, reads like a bug report)
-      RIGHT: "They Sell Sensors That Detect Temperature to a Tenth of a Degree but Nobody Noticed Their Checkout Has Been Broken This Whole Time" (ironic contradiction, specific, builds to punchline)
-      RIGHT: "Spending $40M on Ads While Their Own Website Can't Tell Who Clicked — the CFO Signed Off on This?"
-      RIGHT: "Their SEO Strategy Is Apparently Just Vibes, a Prayer to the Google Gods, and a Blog Post From 2019"
-      RIGHT: "Paying Google Twice Because Nobody Set Up Conversion Tracking and Then Wondering Why the ROAS Deck Looks Like Fiction"
-      RIGHT for good scans: "They Actually Measure Their Ad Spend and Know Who Their Customers Are — Someone Check If This Company Is Real"
-      RIGHT for good scans: "Clean Data, Working Attribution, Server-Side Tags — I Had to Double-Check This Wasn't a Demo Site"
+   B) verdict_headline: 8-20 words, no period. Scott Galloway roasting this company. FUNNY FIRST. Plain English a CEO understands — ZERO marketing jargon, ZERO acronyms, ZERO data points, ZERO technical terms. No "UTM", "ROAS", "conversion tracking", "consent mode", "attribution", "pixel", "SEO", "GTM", or any term a normal person wouldn't use at a dinner party. The humor comes from a devastating ANALOGY or OBSERVATION about the business, not from listing what's broken.
+      VOICE: You ARE Galloway. Find the single most ironic or absurd thing about this company's marketing and turn it into a one-liner that makes people laugh. Think of it as a tweet, not a report. Short. Blunt. Devastating.
+      PATTERNS:
+      - The devastating analogy ("Their ad budget is the most generous donation Alphabet never asked for")
+      - The ironic contradiction using the company's OWN business ("They sell fleet tracking but can't track their own customers")
+      - The deadpan observation ("Someone is paying for all this and nobody thought to ask if it's working")
+      - The absurd reframe ("This isn't a marketing strategy, it's a charitable contribution")
+      WRONG: "Missing Consent Mode and Server-Side Tag Infrastructure" (jargon, reads like a Jira ticket)
+      WRONG: "Two Thousand Google Ads and No Way to Tell Which Ones Work" (data points, still too technical)
+      WRONG: "Paying Google Twice Because Nobody Set Up Conversion Tracking" (jargon: "conversion tracking")
+      WRONG: "Their SEO Strategy Is Just Vibes and a Blog Post From 2019" (jargon: "SEO")
+      RIGHT: "Their ad budget is the most generous donation Alphabet never asked for" (devastating, zero jargon, anyone gets it)
+      RIGHT: "They sell monitoring equipment but nobody's monitoring if their own website works" (ironic, uses their business)
+      RIGHT: "Someone approved this budget — find that person and have a conversation" (blunt Galloway energy)
+      RIGHT: "This company spends more on ads than some countries spend on education and can't tell you if it's working" (absurd scale)
+      RIGHT for good scans: "Somebody over there actually knows what they're doing — that's rarer than you think"
+      RIGHT for good scans: "I looked for something to roast and came up empty — whoever runs this deserves a raise"
 3. For EACH category: write a 3-5 sentence assessment summarizing the state of that area. Identify the top 1-3 issues and any strengths worth acknowledging.
 4. SYNTHESIZE across categories to identify exactly 3 KEY FINDINGS — these must be CROSS-MODULE THEMES, not repetitions of individual module findings.
    Example: "Systemic tracking infrastructure gaps" spanning M05 (no consent mode) + M06 (missing enhanced conversions) + M12 (tracking before consent) is ONE finding that synthesizes a theme across modules.
@@ -132,7 +132,7 @@ EXAMPLE — Here is an abbreviated ideal output. Match this level of synthesis q
 
 {
   "synthesis_headline": "Mature Stack, Broken Measurement — Half the Ad Budget Is Flying Blind on Pre-Privacy Infrastructure",
-  "verdict_headline": "They Track You Before You Consent, Lose Half Their Ad Data Doing It, and Then Wonder Why the ROAS Deck Looks Like Fantasy Football",
+  "verdict_headline": "Their ad budget is the most generous donation Alphabet never asked for",
   "category_assessments": {
     "security_compliance": {
       "category_name": "Security & Compliance",
@@ -377,7 +377,7 @@ ${categorySections.join('\n\n')}
 
 Produce your executive synthesis as valid JSON matching the schema. Ensure:
 - synthesis_headline is 8-20 words, serious authoritative executive verdict referencing specific findings
-- verdict_headline is 12-30 words, Scott Galloway FUNNY roast — must have a punchline, irony, or twist. Plain English, zero jargon, no period. If it reads like a bug report it's wrong
+- verdict_headline is 8-20 words, Scott Galloway FUNNY roast. Plain English a CEO understands — ZERO jargon, ZERO acronyms, ZERO data points. If it has any marketing technical term in it, rewrite it. The humor comes from an analogy or observation, not from listing broken things
 - category_assessments has an entry for each of the ${categoryGroups.length} categories above
 - Exactly 3 key_findings that synthesize THEMES across multiple modules
 - executive_brief is 200-300 words in 3 paragraphs
