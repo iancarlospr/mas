@@ -246,37 +246,59 @@ function inspectTlsCertificate(hostname: string, port: number = 443): Promise<Tl
   });
 }
 
-/** Identify email provider from MX records. */
+/** Known email provider patterns — order does not matter, priority-sorted MX is checked first. */
+const EMAIL_PROVIDER_PATTERNS: Array<{ test: (exchange: string) => boolean; provider: string; confidence: number }> = [
+  { test: (e) => e.includes('aspmx.l.google.com') || e.includes('google.com') || e.includes('googlemail.com'), provider: 'Google Workspace', confidence: 0.95 },
+  { test: (e) => e.includes('outlook.com') || e.includes('protection.outlook.com') || e.includes('mail.protection.outlook.com'), provider: 'Microsoft 365', confidence: 0.95 },
+  { test: (e) => e.includes('pphosted.com') || e.includes('proofpoint'), provider: 'Proofpoint', confidence: 0.9 },
+  { test: (e) => e.includes('mimecast'), provider: 'Mimecast', confidence: 0.9 },
+  { test: (e) => e.includes('zoho.com'), provider: 'Zoho Mail', confidence: 0.9 },
+  { test: (e) => e.includes('yahoodns') || e.includes('yahoo.com'), provider: 'Yahoo Mail', confidence: 0.85 },
+  { test: (e) => e.includes('mailgun'), provider: 'Mailgun', confidence: 0.9 },
+  { test: (e) => e.includes('sendgrid'), provider: 'SendGrid', confidence: 0.9 },
+  { test: (e) => e.includes('1and1') || e.includes('ionos') || e.includes('perfora.net') || e.includes('kundenserver.de'), provider: 'IONOS (1&1)', confidence: 0.9 },
+  { test: (e) => e.includes('secureserver.net') || e.includes('godaddy'), provider: 'GoDaddy', confidence: 0.9 },
+  { test: (e) => e.includes('emailsrvr.com') || e.includes('rackspace'), provider: 'Rackspace Email', confidence: 0.9 },
+  { test: (e) => e.includes('ovh.net'), provider: 'OVH', confidence: 0.9 },
+  { test: (e) => e.includes('hover.com'), provider: 'Hover', confidence: 0.85 },
+  { test: (e) => e.includes('namecheap'), provider: 'Namecheap Email', confidence: 0.85 },
+  { test: (e) => e.includes('dreamhost'), provider: 'DreamHost', confidence: 0.85 },
+  { test: (e) => e.includes('bluehost'), provider: 'Bluehost', confidence: 0.85 },
+  { test: (e) => e.includes('hostgator'), provider: 'HostGator', confidence: 0.85 },
+  { test: (e) => e.includes('pair.com'), provider: 'pair Networks', confidence: 0.85 },
+  { test: (e) => e.includes('barracuda'), provider: 'Barracuda', confidence: 0.9 },
+  { test: (e) => e.includes('postmarkapp'), provider: 'Postmark', confidence: 0.9 },
+  { test: (e) => e.includes('amazonaws.com') || e.includes('amazonses.com'), provider: 'Amazon SES', confidence: 0.9 },
+  { test: (e) => e.includes('forcepoint'), provider: 'Forcepoint', confidence: 0.9 },
+];
+
+/** Identify email provider from MX records, respecting MX priority (lowest number = highest precedence). */
 function identifyEmailProvider(
   mxRecords: Array<{ exchange: string; priority: number }>,
 ): { provider: string; confidence: number } {
   if (mxRecords.length === 0) return { provider: 'none', confidence: 1.0 };
 
-  const exchanges = mxRecords.map((r) => r.exchange.toLowerCase());
+  // Sort by priority ascending (lowest priority number = primary mail handler)
+  const sorted = [...mxRecords].sort((a, b) => a.priority - b.priority);
 
-  if (exchanges.some((e) => e.includes('aspmx.l.google.com') || e.includes('google.com') || e.includes('googlemail.com'))) {
-    return { provider: 'Google Workspace', confidence: 0.95 };
+  // Match against the primary MX group first (all records sharing the lowest priority)
+  const primaryPriority = sorted[0]!.priority;
+  const primaryExchanges = sorted
+    .filter((r) => r.priority === primaryPriority)
+    .map((r) => r.exchange.toLowerCase());
+
+  for (const { test, provider, confidence } of EMAIL_PROVIDER_PATTERNS) {
+    if (primaryExchanges.some(test)) {
+      return { provider, confidence };
+    }
   }
-  if (exchanges.some((e) => e.includes('outlook.com') || e.includes('protection.outlook.com') || e.includes('mail.protection.outlook.com'))) {
-    return { provider: 'Microsoft 365', confidence: 0.95 };
-  }
-  if (exchanges.some((e) => e.includes('pphosted.com') || e.includes('proofpoint'))) {
-    return { provider: 'Proofpoint', confidence: 0.9 };
-  }
-  if (exchanges.some((e) => e.includes('mimecast'))) {
-    return { provider: 'Mimecast', confidence: 0.9 };
-  }
-  if (exchanges.some((e) => e.includes('zoho.com'))) {
-    return { provider: 'Zoho Mail', confidence: 0.9 };
-  }
-  if (exchanges.some((e) => e.includes('yahoodns') || e.includes('yahoo.com'))) {
-    return { provider: 'Yahoo Mail', confidence: 0.85 };
-  }
-  if (exchanges.some((e) => e.includes('mailgun'))) {
-    return { provider: 'Mailgun', confidence: 0.9 };
-  }
-  if (exchanges.some((e) => e.includes('sendgrid'))) {
-    return { provider: 'SendGrid', confidence: 0.9 };
+
+  // Fallback: check all exchanges (backup MX may still indicate the provider)
+  const allExchanges = sorted.map((r) => r.exchange.toLowerCase());
+  for (const { test, provider, confidence } of EMAIL_PROVIDER_PATTERNS) {
+    if (allExchanges.some(test)) {
+      return { provider, confidence: confidence * 0.8 }; // lower confidence for backup MX match
+    }
   }
 
   return { provider: 'Custom', confidence: 0.6 };
@@ -1239,6 +1261,16 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
       const styleSrcDirective = directives.find(d => d.startsWith('style-src'));
       const defaultSrcDirective = directives.find(d => d.startsWith('default-src'));
 
+      // Check if CSP has any resource-restricting directives (not just upgrade-insecure-requests / block-all-mixed-content)
+      const RESOURCE_DIRECTIVES = [
+        'default-src', 'script-src', 'style-src', 'img-src', 'font-src',
+        'connect-src', 'media-src', 'frame-src', 'base-uri', 'form-action',
+        'frame-ancestors', 'object-src', 'worker-src',
+      ];
+      const hasResourceDirective = directives.some(d =>
+        RESOURCE_DIRECTIVES.some(rd => d.startsWith(rd)),
+      );
+
       const unsafeInlineInScript = scriptSrcDirective?.includes("'unsafe-inline'")
         ?? (!scriptSrcDirective && defaultSrcDirective?.includes("'unsafe-inline'"));
       const unsafeInlineInStyleOnly = !unsafeInlineInScript && styleSrcDirective?.includes("'unsafe-inline'");
@@ -1248,7 +1280,12 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
       let evidence: string;
       let recommendation: string | undefined;
 
-      if (!unsafeInlineInScript && !hasUnsafeEval && !hasWildcard) {
+      if (!hasResourceDirective) {
+        // CSP exists but has no resource-restricting directives (e.g. only upgrade-insecure-requests)
+        health = 'warning';
+        evidence = `CSP present but contains no resource-restricting directives (no default-src, script-src, etc.): ${cspValue.substring(0, 200)}`;
+        recommendation = 'The current CSP only contains non-restrictive directives and provides no XSS protection. Add at least a default-src directive to control resource loading.';
+      } else if (!unsafeInlineInScript && !hasUnsafeEval && !hasWildcard) {
         if (hasNonce) {
           health = 'excellent';
           evidence = `CSP with nonce-based script-src${unsafeInlineInStyleOnly ? ' (unsafe-inline in style-src only — acceptable)' : ''}: ${cspValue.substring(0, 200)}`;
@@ -2043,6 +2080,9 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
       { pattern: /^webex-domain-verification=/i, service: 'Webex' },
       { pattern: /^cisco-ci-domain-verification=/i, service: 'Cisco' },
       { pattern: /^salesforce-verification=/i, service: 'Salesforce' },
+      { pattern: /^00D[a-zA-Z0-9]+=/, service: 'Salesforce' },
+      { pattern: /^zoho-verification=/i, service: 'Zoho' },
+      { pattern: /^amazon-business-verification=/i, service: 'Amazon Business' },
       { pattern: /^twilio-domain-verification=/i, service: 'Twilio' },
       { pattern: /^dropbox-domain-verification=/i, service: 'Dropbox' },
       { pattern: /^notion-domain-verification=/i, service: 'Notion' },

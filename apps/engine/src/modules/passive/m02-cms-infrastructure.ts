@@ -593,12 +593,27 @@ function detectTechnologies(
         version = extractVersionFromHtml(html, fp.id);
       }
 
-      // WordPress/Drupal/Joomla: extract version from ?ver= in script/style URLs
+      // WordPress/Drupal/Joomla: extract version from ?ver= in script/style URLs.
+      // Prefer WP core files (wp-emoji-release, wp-util, wp-mediaelement) which use
+      // the actual WP version as their ?ver= value.  Exclude bundled libraries
+      // (jQuery, Underscore, Backbone, etc.) whose ?ver= is the *library* version.
       if (!version && html && (fp.id === 'wordpress' || fp.id === 'drupal' || fp.id === 'joomla')) {
+        const LIBRARY_FILENAMES = /\/(jquery|jquery-migrate|underscore|backbone|mediaelement|wp-polyfill|lodash|moment|react|react-dom|wp-hooks|wp-i18n)[.\-/]/i;
+        // First pass: prefer WP core files that reliably carry the WP version
+        const WP_CORE_FILES = /\/(wp-emoji-release|wp-util|wp-mediaelement|wp-embed|admin-bar)[.\-]/i;
         for (const src of scriptSrcs) {
-          if (src.includes('wp-') || src.includes('drupal') || src.includes('joomla')) {
+          if ((src.includes('wp-') || src.includes('drupal') || src.includes('joomla')) && WP_CORE_FILES.test(src)) {
             const verMatch = src.match(/[?&]ver=(\d+\.\d+(?:\.\d+)*)/);
             if (verMatch) { version = verMatch[1]; break; }
+          }
+        }
+        // Second pass: any wp- URL excluding known libraries
+        if (!version) {
+          for (const src of scriptSrcs) {
+            if ((src.includes('wp-') || src.includes('drupal') || src.includes('joomla')) && !LIBRARY_FILENAMES.test(src)) {
+              const verMatch = src.match(/[?&]ver=(\d+\.\d+(?:\.\d+)*)/);
+              if (verMatch) { version = verMatch[1]; break; }
+            }
           }
         }
       }
@@ -797,6 +812,9 @@ function detectInfraFromHeaders(headers: Record<string, string>): InfraDetails {
     lower['rtss'] ? 'fastly' : '',                     // Fastly Real-Time Stats header
     // x-timer with Fastly signature: S{epoch},VS{n},VE{n}
     lower['x-timer'] && /^S\d+\.\d+,VS\d+,VE\d+/.test(lower['x-timer']) ? 'fastly' : '',
+    // Sucuri Cloudproxy (CDN + WAF)
+    lower['x-sucuri-cache'] ? 'sucuri' : '',
+    lower['x-sucuri-id'] ? 'sucuri' : '',
   ].join(' ');
 
   for (const cdn of CDN_HEADER_PATTERNS) {
@@ -1373,26 +1391,10 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
   // Extract cache layer info
   const cacheInfo = extractCacheInfo(ctx.headers);
 
-  // Build signals (add tracking signals)
-  const signals = buildSignals(detected, infra);
-
-  // Add tracking ID signals
-  for (const tracker of trackingIds) {
-    signals.push(
-      createSignal({
-        type: 'tracking',
-        name: `${tracker.tool}: ${tracker.id}`,
-        confidence: 0.95,
-        evidence: `${tracker.type} ID extracted from HTML/inline scripts`,
-        category: 'marketing',
-      }),
-    );
-  }
-
-  // Build checkpoints
-  const checkpoints = buildCheckpoints(detected, infra, ctx.headers);
-
   // ─── CSS class fingerprint detection (Layer 4) ──────────────────────────
+  // NOTE: CSS class + inline config detection must run BEFORE checkpoint
+  // building so that late-detected frameworks (e.g. Elementor from CSS
+  // classes) are included in the framework checkpoint.
   const cssAnalysis = ctx.html ? analyzeCSSFromHTML(ctx.html) : { platformClasses: [] };
 
   // Promote CSS class detections: if a tech was found by CSS classes but NOT
@@ -1452,6 +1454,25 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
 
     detected.sort((a, b) => b.confidence - a.confidence);
   }
+
+  // Build signals (add tracking signals) — after all detection passes
+  const signals = buildSignals(detected, infra);
+
+  // Add tracking ID signals
+  for (const tracker of trackingIds) {
+    signals.push(
+      createSignal({
+        type: 'tracking',
+        name: `${tracker.tool}: ${tracker.id}`,
+        confidence: 0.95,
+        evidence: `${tracker.type} ID extracted from HTML/inline scripts`,
+        category: 'marketing',
+      }),
+    );
+  }
+
+  // Build checkpoints — after all detection passes (CSS class, inline config)
+  const checkpoints = buildCheckpoints(detected, infra, ctx.headers);
 
   // Organize data output by category
   const byCategory = (cat: string) => detected.filter((t) => t.category === cat);

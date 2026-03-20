@@ -89,9 +89,17 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
     const w = window as unknown as Record<string, unknown>;
 
     // --- Tracking detection ---
-    const hasGA4 = !!(w['gtag'] || w['google_tag_data']);
+    // Check window globals first, then fall back to DOM script tags
+    // (window globals may not be set yet if scripts load asynchronously)
+    const hasGA4 = !!(
+      w['gtag'] || w['google_tag_data'] ||
+      document.querySelector('script[src*="googletagmanager.com/gtag/js"]')
+    );
     const gtmObj = w['google_tag_manager'] as Record<string, unknown> | undefined;
-    const hasGTM = !!(gtmObj && Object.keys(gtmObj).some(k => k.startsWith('GTM-')));
+    const hasGTM = !!(
+      (gtmObj && Object.keys(gtmObj).some(k => k.startsWith('GTM-'))) ||
+      document.querySelector('script[src*="googletagmanager.com/gtm.js"]')
+    );
     const hasMetaPixel = typeof w['fbq'] === 'function' || !!w['_fbq'];
     const hasGoogleAds = !!(
       (gtmObj && Object.keys(gtmObj).some(k => k.startsWith('AW-'))) ||

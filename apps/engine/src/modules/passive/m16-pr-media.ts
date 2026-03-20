@@ -320,12 +320,19 @@ function findPressLinksInMainPage($: CheerioAPI, lang: string, rawHtml?: string)
   const pressLinks: string[] = [];
   const keywords = getMultilingualKeywords(PRESS_LINK_KEYWORDS_BASE, lang, 'press');
 
+  // Build word-boundary regexes for each keyword to avoid false positives
+  // (e.g. "press" matching "WordPress" or "Pressure")
+  const keywordRegexes = keywords.map(kw => new RegExp(`\\b${kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i'));
+  // Also build path-segment regexes: keyword must be a full path segment
+  const pathRegexes = keywords.map(kw => new RegExp(`/${kw.replace(/\s+/g, '-').replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?:/|$|\\?)`, 'i'));
+
   $('a[href]').each((_, el) => {
     const href = $(el).attr('href') ?? '';
     const text = $(el).text().trim().toLowerCase();
 
-    for (const keyword of keywords) {
-      if (text === keyword || text.includes(keyword) || href.toLowerCase().includes(`/${keyword.replace(/\s+/g, '-')}`)) {
+    for (let i = 0; i < keywords.length; i++) {
+      const kw = keywords[i]!;
+      if (text === kw || keywordRegexes[i]!.test(text) || pathRegexes[i]!.test(href)) {
         pressLinks.push(href);
         break;
       }
@@ -334,8 +341,9 @@ function findPressLinksInMainPage($: CheerioAPI, lang: string, rawHtml?: string)
 
   // Fallback: scan raw HTML for URLs inside JS strings that Cheerio can't parse
   // (e.g. footer links injected via innerHTML from a script-defined data structure)
+  // Use path-segment matching: keyword must be a full path segment (e.g. /press/ not /pressure/)
   if (rawHtml) {
-    const urlMatches = rawHtml.matchAll(/https?:\/\/[a-zA-Z0-9._-]+\.[a-zA-Z]{2,}[^\s"'`\\<)]*(?:newsroom|press|prensa|noticias|sala-de-prensa)[^\s"'`\\<)]*/gi);
+    const urlMatches = rawHtml.matchAll(/https?:\/\/[a-zA-Z0-9._-]+\.[a-zA-Z]{2,}[^\s"'`\\<)]*\/(?:newsroom|press|prensa|noticias|sala-de-prensa)(?:\/|$)[^\s"'`\\<)]*/gi);
     for (const match of urlMatches) {
       pressLinks.push(match[0]);
     }
@@ -380,19 +388,33 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
     }
   }
 
-  // 2. Use pre-rendered sitemap pages from runner
-  const foundPages: ProbeResult[] = [];
+  // 2. Use pre-rendered sitemap pages from runner, then validate content
+  const PRESS_TITLE_KEYWORDS = /\b(?:press|news|newsroom|media|announcement|release|prensa|noticias|presse|nachrichten|actualite|imprensa)\b/i;
 
-  for (const page of ctx.sitemapPages?.press ?? []) {
-    foundPages.push({ path: page.path, found: true, html: page.html, status: 200 });
+  function validatePressPage(page: ProbeResult): boolean {
+    if (!page.html) return true; // no HTML = can't validate, allow
+    const $p = parseHtml(page.html);
+    const pageTitle = $p('title').first().text().toLowerCase();
+    const h1Text = $p('h1').first().text().toLowerCase();
+    return PRESS_TITLE_KEYWORDS.test(`${pageTitle} ${h1Text}`);
   }
 
-  // 2b. Fallback: if no press pages from sitemap, probe common paths directly
+  let foundPages: ProbeResult[] = [];
+
+  // Try sitemap pages first
+  for (const page of ctx.sitemapPages?.press ?? []) {
+    const result: ProbeResult = { path: page.path, found: true, html: page.html, status: 200 };
+    if (validatePressPage(result)) {
+      foundPages.push(result);
+    }
+  }
+
+  // Fallback: if no valid press pages from sitemap, probe common paths
   if (foundPages.length === 0) {
     const PRESS_PROBE_PATHS = [
       '/press/', '/press-release/', '/press-releases/',
-      '/media/', '/newsroom/', '/news-room/',
-      '/about/press/', '/about/media/', '/about/newsroom/',
+      '/media/', '/newsroom/', '/news-room/', '/news/',
+      '/about/press/', '/about/media/', '/about/newsroom/', '/about/news/',
     ];
     const probeResults = await Promise.allSettled(
       PRESS_PROBE_PATHS.map(async (path) => {
@@ -407,7 +429,7 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
       }),
     );
     for (const r of probeResults) {
-      if (r.status === 'fulfilled' && r.value) {
+      if (r.status === 'fulfilled' && r.value && validatePressPage(r.value)) {
         foundPages.push(r.value);
       }
     }

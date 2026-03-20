@@ -153,8 +153,10 @@ function detectCommunityForum(
     const text = link.text.toLowerCase();
 
     if (/community|forum|discuss/i.test(text) || /community|forum|discuss/i.test(href)) {
-      // Exclude non-community pages (startup programs, applications, pricing, etc.)
+      // Exclude non-community pages (scheduling platforms, product pages, etc.)
       if (/startup|application|apply|program|pricing|product|affiliate|partner/i.test(href)) continue;
+      // Exclude scheduling platform links (Calendly "discussion" is a meeting type, not a forum)
+      if (/calendly\.com|hubspot\.com\/meetings|acuityscheduling|koalendar|savvycal|cal\.com|tidycal/i.test(href)) continue;
       for (const provider of COMMUNITY_PROVIDERS) {
         for (const pattern of provider.patterns) {
           if (pattern.test(link.href)) {
@@ -321,10 +323,15 @@ function assessHelpPageQuality($: CheerioAPI, helpCenterProvider: string | null)
     articleCount += $(selector).length;
   }
 
-  // Check for category/section structure
-  const hasCategories = $('h2, h3').length >= 3;
+  // Check for category/section structure — require headings to contain help-related keywords
+  // (plain h2/h3 count is too loose: any page with a nav menu will have 3+ headings and 10+ links)
+  const helpHeadings = $('h2, h3').filter((_, el) => {
+    const text = $(el).text().toLowerCase();
+    return /help|how to|guide|tutorial|faq|getting started|troubleshoot|documentation|knowledge|support|step\s+\d/i.test(text);
+  }).length;
+  const hasHelpCategories = helpHeadings >= 3;
 
-  if (articleCount >= 5 || (hasCategories && links.length >= 10)) {
+  if (articleCount >= 5 || (hasHelpCategories && links.length >= 10)) {
     return 'any';
   }
 

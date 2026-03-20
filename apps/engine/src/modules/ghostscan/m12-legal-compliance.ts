@@ -222,7 +222,10 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
       [/terms\s+(of\s+)?(service|use)/i, /terms\s+(&|and)\s+conditions/i, /\btos\b/i, /nutzungsbedingungen/i, /legal[- ]?(disclaimer|stuff|notice)/i, /eula/i, /acceptable[- ]?use/i],
       [/\/terms[-_]?(of[-_]?service|of[-_]?use)?/i, /\/legal[-_]?disclaimer/i, /\/tos\/?$/i, /\/eula\/?$/i],
     );
-    const cookiePolicy = helpers.findLink([/cookie[- ]?policy/i, /cookie[- ]?notice/i]);
+    const cookiePolicy = helpers.findLink(
+      [/cookie[- ]?policy/i, /cookie[- ]?notice/i, /\bcookies?\b/i],
+      [/\/cookie[-_]?policy/i, /\/cookie[-_]?notice/i, /\/cookies?\/?$/i],
+    );
     // CCPA: specific legal language only — "Do Not Sell" / "Your Privacy Choices"
     // NOT generic "opt-out" (which matches DAA AdChoices, newsletter unsubscribes, etc.)
     const ccpaOptOut = helpers.findLink(

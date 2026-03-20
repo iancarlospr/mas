@@ -102,7 +102,7 @@ const NETWORK_PATTERNS: NetworkToolPattern[] = [
   { pattern: /sibautomation\.com|sib-conversations\.com/, name: 'Brevo', category: 'marketing_automation' },
   { pattern: /omnisnippet1\.com|omnisrc\.com/, name: 'Omnisend', category: 'marketing_automation' },
   { pattern: /app\.getresponse\.com|getresponse\.com\/script/, name: 'GetResponse', category: 'marketing_automation' },
-  { pattern: /static\.mailerlite\.com/, name: 'MailerLite', category: 'marketing_automation' },
+  { pattern: /(?:static|assets)\.mailerlite\.com/, name: 'MailerLite', category: 'marketing_automation' },
   { pattern: /cdn\.moosend\.com/, name: 'Moosend', category: 'marketing_automation' },
   { pattern: /chimpstatic\.com|mailchimp\.com/, name: 'Mailchimp', category: 'marketing_automation' },
   { pattern: /trackcmp\.net|trackcmp_url/, name: 'ActiveCampaign', category: 'marketing_automation' },
@@ -345,7 +345,7 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
       tools.push({ name: 'Omnisend', category: 'marketing_automation', confidence: 0.85, details: {} });
     if (w['GrTracking'] != null || d.querySelector('script[src*="getresponse.com"]'))
       tools.push({ name: 'GetResponse', category: 'marketing_automation', confidence: 0.85, details: {} });
-    if (w['ml'] != null && w['MailerLiteObject'] != null)
+    if (w['ml'] != null || w['MailerLiteObject'] != null || d.querySelector('script[src*="mailerlite"]'))
       tools.push({ name: 'MailerLite', category: 'marketing_automation', confidence: 0.85, details: {} });
     if (w['mootrack'] != null)
       tools.push({ name: 'Moosend', category: 'marketing_automation', confidence: 0.85, details: {} });

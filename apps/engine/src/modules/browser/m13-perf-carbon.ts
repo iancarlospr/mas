@@ -217,10 +217,13 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
     const m02 = ctx.previousResults?.get('M02' as ModuleId);
     if (m02?.data) {
       const m02Data = m02.data as Record<string, unknown>;
-      const cdn = m02Data['cdn'] as string | undefined;
-      if (cdn && GREEN_PROVIDERS.test(cdn)) {
+      const cdnRaw = m02Data['cdn'];
+      // M02 cdn field can be an object {id, name, ...} or a string
+      const cdnName = typeof cdnRaw === 'string' ? cdnRaw
+        : (cdnRaw && typeof cdnRaw === 'object') ? ((cdnRaw as Record<string, unknown>)['name'] as string ?? (cdnRaw as Record<string, unknown>)['id'] as string ?? '') : '';
+      if (cdnName && GREEN_PROVIDERS.test(cdnName)) {
         greenHosting = true;
-        greenProvider = cdn;
+        greenProvider = cdnName;
       }
     }
   } catch {
@@ -251,6 +254,9 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
     } else if (cdnHeaders.includes('akamai')) {
       greenHosting = true;
       greenProvider = 'Akamai';
+    } else if (cdnHeaders.includes('sucuri')) {
+      greenHosting = true;
+      greenProvider = 'Sucuri';
     }
   }
   data.greenHosting = greenHosting;

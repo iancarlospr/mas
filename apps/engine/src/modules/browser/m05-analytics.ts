@@ -883,12 +883,27 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
   data.tagManagerRequestCount = tagManagerRequests.length;
 
   // Server-side tracking indicators
+  // Standard GA4 sends to google-analytics.com/g/collect (client-side).
+  // Server-side GTM (sGTM) sends to a first-party domain like sgtm.example.com/g/collect.
+  // Only flag /g/collect and /j/collect when the host is NOT a standard Google domain.
+  const STANDARD_GOOGLE_COLLECT_HOSTS = /google-analytics\.com|analytics\.google\.com|googletagmanager\.com|google\.com/i;
   let serverSideDetected = false;
   for (const req of allRequests) {
-    // Custom collect endpoints, non-standard analytics domains
-    if (/\/g\/collect|\/j\/collect|sgtm\.|server-side-tagging/.test(req.url)) {
+    const url = req.url;
+    // Explicit sGTM indicators — always count
+    if (/sgtm\.|server-side-tagging/i.test(url)) {
       serverSideDetected = true;
       break;
+    }
+    // Collect endpoints on non-Google domains = first-party collect = sGTM
+    if (/\/g\/collect|\/j\/collect/.test(url)) {
+      try {
+        const host = new URL(url).hostname;
+        if (!STANDARD_GOOGLE_COLLECT_HOSTS.test(host)) {
+          serverSideDetected = true;
+          break;
+        }
+      } catch { /* malformed URL, skip */ }
     }
   }
   data.serverSideTracking = serverSideDetected;

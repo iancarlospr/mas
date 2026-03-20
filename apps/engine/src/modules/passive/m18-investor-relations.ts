@@ -119,14 +119,21 @@ function detectEsgReport($: CheerioAPI): { found: boolean; evidence: string } {
   const links = extractLinks($);
   const bodyText = $('body').text().toLowerCase();
 
+  // Paths that indicate a product/service page, not the company's own ESG report
+  const PRODUCT_PATH_PATTERN = /\/(?:solutions?|products?|services?|features?|platform)\//i;
+
   for (const link of links) {
     const href = link.href.toLowerCase();
     const text = link.text.toLowerCase();
+
+    // Skip links pointing to product/solution pages (e.g. /solutions/esg-monitoring)
+    if (PRODUCT_PATH_PATTERN.test(href)) continue;
+
     if (
-      /esg/i.test(text) ||
+      /\b(?:our\s+)?esg\s+report/i.test(text) ||
       /sustainability\s*report/i.test(text) ||
       /corporate\s*(?:social\s*)?responsibility/i.test(text) ||
-      /esg/i.test(href) ||
+      /esg[-_]?report/i.test(href) ||
       /sustainability[-_]?report/i.test(href)
     ) {
       return { found: true, evidence: `ESG/sustainability report link: "${link.text.trim().slice(0, 80)}"` };
@@ -160,8 +167,9 @@ function detectIrPortalDepth($: CheerioAPI): 'filings' | 'basic' | 'none' {
 
   if (filingCount >= 2) return 'filings';
 
-  // Check for basic IR info
-  const basicIndicators = ['investor', 'shareholder', 'stock', 'financial', 'annual report', 'governance'];
+  // Check for basic IR info — use full phrases to avoid false positives
+  // "governance" alone matches "Environmental, Social, and Governance (ESG)" on product pages
+  const basicIndicators = ['investor', 'shareholder', 'stock price', 'financial statement', 'annual report', 'corporate governance'];
   let basicCount = 0;
   for (const indicator of basicIndicators) {
     if (bodyText.includes(indicator)) basicCount++;
@@ -347,8 +355,9 @@ function detectEmailAlertSignup($: CheerioAPI): boolean {
 
   if (hasAlertForm) return true;
 
-  // Text-based detection
-  const alertPhrases = ['email alert', 'email notification', 'subscribe to', 'investor alert', 'sign up for', 'ir email', 'press release alert'];
+  // Text-based detection — require investor-specific context
+  // "sign up for" alone is too generic (catches marketing newsletters)
+  const alertPhrases = ['email alert', 'email notification', 'investor alert', 'ir email', 'press release alert', 'subscribe to investor', 'sign up for investor', 'sign up for ir', 'sign up for alert'];
   for (const phrase of alertPhrases) {
     if (bodyText.includes(phrase)) return true;
   }
@@ -460,10 +469,24 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
   const lang = ctx.html ? detectPageLanguage(ctx.html) : 'en';
   data.detected_language = lang;
 
-  // Use pre-rendered sitemap pages from runner
+  // Use pre-rendered sitemap pages from runner, with content validation
+  // Pages under /solutions/, /products/, /services/ are product pages, not IR pages
+  // (e.g. /solutions/esg-monitoring is an IoT product, not an investor ESG report)
+  const PRODUCT_PATH_PREFIXES = ['/solutions/', '/products/', '/services/', '/features/', '/platform/', '/shop/'];
+  const IR_TITLE_KEYWORDS = /\b(?:investor|shareholder|stock|financial|annual\s+report|sec\s+filing|governance|earnings|ir\b)/i;
+
   const foundPages: ProbeResult[] = [];
 
   for (const page of ctx.sitemapPages?.ir ?? []) {
+    // Skip product/service pages
+    if (PRODUCT_PATH_PREFIXES.some(prefix => page.path.startsWith(prefix))) continue;
+    // Validate title contains IR keywords if HTML is available
+    if (page.html) {
+      const $p = parseHtml(page.html);
+      const title = $p('title').first().text().toLowerCase();
+      const h1 = $p('h1').first().text().toLowerCase();
+      if (!IR_TITLE_KEYWORDS.test(`${title} ${h1}`)) continue;
+    }
     foundPages.push({ path: page.path, found: true, html: page.html, status: 200 });
   }
 

@@ -353,15 +353,25 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
     if (pageBranding.dei) branding.dei = true;
     branding.reviewLinks.push(...pageBranding.reviewLinks);
   }
-  // Also check main page
+  // Also check main page for external links + review site links
+  // Note: only check employer branding keywords (benefits, remote, DEI) on the
+  // main page when a careers page exists. On product/services sites, generic words
+  // like "benefits" and "remote" are product-related (e.g. "benefits of our IoT
+  // platform", "remote monitoring"), producing false positives.
   if (ctx.html) {
     const $m = parseHtml(ctx.html);
     externalCareersLinks.push(...detectExternalCareersLinks($m, domain));
-    const mainBranding = detectEmployerBranding($m);
-    if (mainBranding.benefits) branding.benefits = true;
-    if (mainBranding.remoteWork) branding.remoteWork = true;
-    if (mainBranding.dei) branding.dei = true;
-    branding.reviewLinks.push(...mainBranding.reviewLinks);
+    if (bestCareersPage) {
+      const mainBranding = detectEmployerBranding($m);
+      if (mainBranding.benefits) branding.benefits = true;
+      if (mainBranding.remoteWork) branding.remoteWork = true;
+      if (mainBranding.dei) branding.dei = true;
+      branding.reviewLinks.push(...mainBranding.reviewLinks);
+    } else {
+      // Still check for review site links (Glassdoor, etc.) — those are unambiguous
+      const mainBranding = detectEmployerBranding($m);
+      branding.reviewLinks.push(...mainBranding.reviewLinks);
+    }
   }
   externalCareersLinks = [...new Set(externalCareersLinks)];
   branding.reviewLinks = [...new Set(branding.reviewLinks)];
