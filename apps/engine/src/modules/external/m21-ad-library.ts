@@ -505,14 +505,19 @@ async function scrapeFacebookAdLibrary(
     }
     await sleep(2000);
 
-    // Facebook shows the total ad count as "~2,500 results" text below the
-    // page logo. Extract that number directly instead of counting DOM buttons.
+    // Facebook shows the total ad count as an <h3> heading: "~1 result", "~2,500 results".
+    // Target the heading directly instead of scanning entire body text (which is greedy
+    // and matches unrelated numbers like follower counts near the word "result").
     try {
       const countText = await page.evaluate(() => {
-        const body = document.body.textContent ?? '';
-        // Matches "~2,500 results", "1 result", "12,345 results", "~50K results"
-        const match = body.match(/~?([\d,]+[KkMm]?)\s+results?/);
-        return match?.[1] ?? null;
+        // The ad count is an <h3> with text like "~1 result" or "~2,500 results"
+        const headings = document.querySelectorAll('h3');
+        for (const h of headings) {
+          const text = h.textContent?.trim() ?? '';
+          const match = text.match(/^~?([\d,]+[KkMm]?)\s+results?$/);
+          if (match?.[1]) return match[1];
+        }
+        return null;
       });
       if (countText) {
         let count = parseFloat(countText.replace(/,/g, ''));
@@ -520,7 +525,7 @@ async function scrapeFacebookAdLibrary(
         if (multiplier === 'K') count *= 1_000;
         if (multiplier === 'M') count *= 1_000_000;
         result.totalAdsVisible = Math.round(count);
-        logger.info({ scanId, totalFromBadge: result.totalAdsVisible, raw: countText }, 'Extracted Facebook ad count from results badge');
+        logger.info({ scanId, totalFromBadge: result.totalAdsVisible, raw: countText }, 'Extracted Facebook ad count from h3 badge');
       }
     } catch {
       // Fall through — count stays 0
@@ -854,20 +859,36 @@ async function scrapeFacebookAdLibrary(
           if (adUrl) result.screenshot = adUrl;
         }
 
-        // Extract CTA URL from external links visible in the detail view
+        // Extract CTA URL from external links visible in the detail view.
+        // Facebook wraps ad CTA links in l.facebook.com/l.php?u=<encoded_url> redirects.
+        // We need to unwrap the real destination URL from the `u` query parameter.
         let ctaUrl: string | null = null;
         try {
           const externalLinks = await page.evaluate(() => {
             const links = document.querySelectorAll('a[href]');
+            const metaDomains = [
+              'facebook.com', 'fb.com', 'fbcdn.net', 'instagram.com',
+              'meta.com', 'metastatus.com', 'whatsapp.com', 'messenger.com',
+              'threads.net', 'fb.me',
+            ];
             const externals: string[] = [];
             for (const a of links) {
-              const href = a.getAttribute('href') ?? '';
-              if (href.startsWith('http') &&
-                  !href.includes('facebook.com') &&
-                  !href.includes('fb.com') &&
-                  !href.includes('fbcdn.net')) {
-                externals.push(href);
+              let href = a.getAttribute('href') ?? '';
+              // Unwrap l.facebook.com/l.php?u= redirects to get the real destination
+              if (href.includes('l.facebook.com/l.php')) {
+                try {
+                  const url = new URL(href);
+                  const realUrl = url.searchParams.get('u');
+                  if (realUrl) href = realUrl;
+                } catch { /* keep original href */ }
               }
+              if (!href.startsWith('http')) continue;
+              // Exclude all Meta-owned domains
+              try {
+                const hostname = new URL(href).hostname;
+                if (metaDomains.some(d => hostname === d || hostname.endsWith('.' + d))) continue;
+              } catch { continue; }
+              externals.push(href);
             }
             return externals;
           });
@@ -960,8 +981,11 @@ async function scrapeGoogleAdsTransparency(
 
     // Navigate directly with domain= URL param — bypasses autocomplete entirely
     // and guarantees we get the correct brand's ads, not a random suggestion.
+    // Use region=anywhere to get global results — country-specific regions often
+    // show 0 ads because the advertiser targets different geos (e.g., US ads
+    // don't appear when region=PR is auto-detected from server location).
     const domain = new URL(brandUrl).hostname.replace('www.', '');
-    await page.goto(`https://adstransparency.google.com/?hl=en&region=${countryCode}&domain=${domain}`, {
+    await page.goto(`https://adstransparency.google.com/?hl=en&region=anywhere&domain=${domain}`, {
       waitUntil: 'domcontentloaded',
       timeout: 30_000,
     });
@@ -979,7 +1003,7 @@ async function scrapeGoogleAdsTransparency(
 
     // Also extract the total ad count from the "~20K ads" text badge
     try {
-      const countText = await page.locator('text=/~?\\d+[KkMm]?\\s*ads/').first().textContent({ timeout: 3_000 });
+      const countText = await page.locator('text=/~?\\d+[KkMm]?\\s*ads/').first().textContent({ timeout: 8_000 });
       if (countText) {
         const match = countText.match(/([\d,.]+)\s*([KkMm])?/);
         if (match) {
