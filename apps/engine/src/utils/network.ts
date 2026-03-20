@@ -21,6 +21,7 @@ export interface CapturedResponse {
   headers: Record<string, string>;
   timestamp: number;
   requestUrl: string;
+  bodySize?: number;
 }
 
 export interface CapturedWebSocket {
@@ -292,12 +293,14 @@ export class NetworkCollector {
           headers[key] = value;
         }
 
+        const contentLength = parseInt(headers['content-length'] || '0', 10);
         this.responses.push({
           url,
           status,
           headers,
           timestamp: Date.now(),
           requestUrl: response.request().url(),
+          bodySize: contentLength || undefined,
         });
 
         // Fill in redirect chain status codes
