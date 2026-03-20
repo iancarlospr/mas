@@ -257,6 +257,10 @@ const KNOWN_DOMAINS: Record<string, string> = {
   'clarity.ms': 'Microsoft Clarity',
   'analytics.tiktok.com': 'TikTok Pixel',
   'connect.facebook.net': 'Facebook SDK',
+  'service.force.com': 'Salesforce',
+  'salesforceliveagent.com': 'Salesforce Live Agent',
+  'force.com': 'Salesforce',
+  'cdn.evgnet.com': 'Evergage / Salesforce Interaction Studio',
 };
 
 function extractThirdPartyDomains(
@@ -318,12 +322,16 @@ function extractThirdPartyDomains(
     'glassdoor.com', 'trustpilot.com', 'bbb.org', 'yelp.com',
     'g2.com', 'capterra.com',
   ]);
+  // Well-known TLDs to filter out JS property paths that look like URLs (e.g. "custom.transaction")
+  const REAL_TLD_SUFFIXES = /\.(com|net|org|io|co|dev|app|ai|gov|edu|mil|int|xyz|me|info|biz|us|uk|de|fr|jp|cn|au|ca|nl|se|no|fi|dk|ch|at|be|es|it|pt|br|mx|ar|cl|in|kr|tw|sg|hk|nz|za|ru|pl|cz|hu|ro|bg|hr|si|sk|lt|lv|ee|ie|is)$/i;
   for (const script of inlineScripts) {
     const urlMatches = script.matchAll(/https?:\/\/[a-zA-Z0-9._-]+\.[a-zA-Z]{2,}[^\s'"`);<]*/g);
     for (const match of urlMatches) {
       try {
         const host = new URL(match[0]).hostname.replace(/^www\./, '');
         if (NON_RESOURCE_DOMAINS.has(host)) continue;
+        // Filter out JS property paths that regex matched as URLs (e.g. custom.transaction)
+        if (!REAL_TLD_SUFFIXES.test(host)) continue;
         addUrl(match[0], 'script');
       } catch {
         // Invalid URL, skip
@@ -373,7 +381,7 @@ function extractCacheInfo(headers: Record<string, string>): CacheInfo {
   }
 
   // Cache status from x-cache or cf-cache-status header
-  const xCache = lower['x-cache'] ?? lower['cf-cache-status'] ?? null;
+  const xCache = lower['x-cache'] ?? lower['cf-cache-status'] ?? lower['x-sucuri-cache'] ?? null;
   let cacheStatus: string | null = null;
   if (xCache) {
     if (/hit/i.test(xCache)) cacheStatus = 'hit';
@@ -694,6 +702,7 @@ const SERVER_HOSTING_MAP: { pattern: RegExp; name: string }[] = [
   { pattern: /gws|gse/i, name: 'Google' },
   { pattern: /microsoft-iis/i, name: 'Azure (IIS)' },
   { pattern: /github\.com/i, name: 'GitHub Pages' },
+  { pattern: /WP Engine/i, name: 'WP Engine' },
 ];
 
 function detectInfraFromHeaders(headers: Record<string, string>): InfraDetails {
@@ -797,22 +806,24 @@ function detectInfraFromHeaders(headers: Record<string, string>): InfraDetails {
     }
   }
 
-  // Hosting detection from server header
+  // Hosting detection from server header AND x-powered-by
   let headerHosting: string | null = null;
-  if (serverRaw) {
+  const headersToCheckForHosting = [serverRaw, lower['x-powered-by']].filter(Boolean) as string[];
+  for (const headerVal of headersToCheckForHosting) {
     for (const mapping of SERVER_HOSTING_MAP) {
-      if (mapping.pattern.test(serverRaw)) {
+      if (mapping.pattern.test(headerVal)) {
         headerHosting = mapping.name;
         break;
       }
     }
+    if (headerHosting) break;
   }
-  // Also infer hosting from CDN-specific headers
+  // Also infer hosting from CDN-specific headers (lower priority than x-powered-by)
   if (!headerHosting) {
     if (lower['x-amz-cf-id'] || lower['x-amz-cf-pop']) headerHosting = 'AWS';
-    else if (lower['cf-ray']) headerHosting = 'Cloudflare';
     else if (lower['x-vercel-id']) headerHosting = 'Vercel';
     else if (lower['x-nf-request-id']) headerHosting = 'Netlify';
+    else if (lower['cf-ray']) headerHosting = 'Cloudflare';
   }
 
   // x-powered-by
@@ -1315,10 +1326,19 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
   const thirdPartyDomains = $ ? extractThirdPartyDomains($, scriptSrcs, stylesheetHrefs, inlineScripts, ctx.url) : [];
 
   // Annotate third-party domains with known service names
-  const thirdPartyAnnotated = thirdPartyDomains.map((d) => ({
-    ...d,
-    service: KNOWN_DOMAINS[d.domain] ?? null,
-  }));
+  // Check exact match first, then suffix match for subdomains (e.g. bancopopular.my.site.com → Salesforce)
+  const thirdPartyAnnotated = thirdPartyDomains.map((d) => {
+    let service = KNOWN_DOMAINS[d.domain] ?? null;
+    if (!service) {
+      for (const [knownDomain, knownService] of Object.entries(KNOWN_DOMAINS)) {
+        if (d.domain.endsWith('.' + knownDomain)) {
+          service = knownService;
+          break;
+        }
+      }
+    }
+    return { ...d, service };
+  });
 
   // CDN fallback: detect CDN from third-party domain patterns when headers are stripped
   if (!infra.headerCdn && thirdPartyDomains.length > 0) {

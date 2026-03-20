@@ -196,6 +196,11 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
         if (/\.webp|\.avif|image\/webp|image\/avif/i.test(src)) {
           modernImageFormats++;
         }
+        // Detect CDN auto-format (Cloudinary f_auto, imgix auto=format, etc.)
+        // These serve WebP/AVIF via content negotiation without changing the URL extension
+        else if (/[?&,/]f_auto|auto=format|format=auto/i.test(src)) {
+          modernImageFormats++;
+        }
       }
     });
 
@@ -494,17 +499,19 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
     let evidence: string;
     let recommendation: string | undefined;
     const lcp = metrics.lcp ?? metrics.domContentLoaded;
+    const lcpFallback = metrics.lcp === null;
+    const lcpLabel = lcpFallback ? 'LCP (est. from DOM Content Loaded)' : 'LCP';
 
     if (lcp <= 2500) {
       health = 'excellent';
-      evidence = `LCP: ${Math.round(lcp)}ms (good — under 2.5s threshold)`;
+      evidence = `${lcpLabel}: ${Math.round(lcp)}ms (good — under 2.5s threshold)`;
     } else if (lcp <= 4000) {
       health = 'warning';
-      evidence = `LCP: ${Math.round(lcp)}ms (needs improvement — over 2.5s)`;
+      evidence = `${lcpLabel}: ${Math.round(lcp)}ms (needs improvement — over 2.5s)`;
       recommendation = 'Optimize largest contentful paint by preloading hero images and reducing render-blocking resources.';
     } else {
       health = 'critical';
-      evidence = `LCP: ${Math.round(lcp)}ms (poor — over 4s)`;
+      evidence = `${lcpLabel}: ${Math.round(lcp)}ms (poor — over 4s)`;
       recommendation = 'Critical LCP issue — optimize images, reduce server response time, and eliminate render-blocking resources.';
     }
 
@@ -517,10 +524,13 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
     let evidence: string;
     let recommendation: string | undefined;
     const cls = metrics.cls ?? 0;
+    const clsMeasured = metrics.cls !== null;
 
     if (cls <= 0.1) {
       health = 'excellent';
-      evidence = `CLS: ${cls.toFixed(3)} (good — under 0.1 threshold)`;
+      evidence = clsMeasured
+        ? `CLS: ${cls.toFixed(3)} (good — under 0.1 threshold)`
+        : `CLS: not directly measurable (layout-shift entries unavailable) — no layout shifts observed during page load`;
     } else if (cls <= 0.25) {
       health = 'warning';
       evidence = `CLS: ${cls.toFixed(3)} (needs improvement — over 0.1)`;
@@ -707,7 +717,23 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
     let health: CheckpointHealth;
     let evidence: string;
     const tpScripts = metrics.thirdPartyScripts;
-    const tpKB = Math.round(metrics.thirdPartyBytes / 1024);
+    // Performance API returns transferSize=0 for cross-origin resources without
+    // Timing-Allow-Origin. Use network collector data when available.
+    let tpBytes = metrics.thirdPartyBytes;
+    if (tpBytes === 0 && ctx.networkCollector) {
+      const responses = ctx.networkCollector.getAllResponses();
+      const currentHost = new URL(ctx.url).hostname;
+      const apexHost = currentHost.replace(/^www\./, '');
+      for (const resp of responses) {
+        try {
+          const rHost = new URL(resp.url).hostname;
+          if (rHost !== currentHost && rHost !== apexHost && !rHost.endsWith('.' + apexHost)) {
+            tpBytes += resp.bodySize ?? 0;
+          }
+        } catch { /* skip */ }
+      }
+    }
+    const tpKB = Math.round(tpBytes / 1024);
     const tpDomains = metrics.thirdPartyDomains ?? 0;
 
     // Use domain count as the primary signal when available

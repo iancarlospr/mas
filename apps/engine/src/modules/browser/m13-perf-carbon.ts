@@ -40,7 +40,7 @@ import { ThirdPartyProfiler } from '../../utils/third-party-profiler.js';
 const CO2_GRAMS_PER_GB = 400;
 
 // Known green-committed CDN/hosting providers
-const GREEN_PROVIDERS = /cloudflare|vercel|netlify|google cloud|cloudfront|akamai|fastly|azure cdn|aws|digitalocean/i;
+const GREEN_PROVIDERS = /cloudflare|vercel|netlify|google cloud|cloudfront|akamai|fastly|azure cdn|aws|digitalocean|sucuri/i;
 
 const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
   const signals: Signal[] = [];
@@ -129,8 +129,9 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
         /\.(png|jpe?g|gif|webp|avif|svg|ico|bmp)(\?|$)/.test(urlLower)
       ) {
         imageBytes += size;
-        // Image format analysis
+        // Image format analysis — includes CDN auto-format (Cloudinary f_auto, imgix auto=format)
         if (/\.(webp|avif|svg)(\?|$)/i.test(url)) modernImageCount++;
+        else if (/[?&,/]f_auto|auto=format|format=auto/i.test(url)) modernImageCount++;
         else if (/\.(png|jpe?g|gif|bmp)(\?|$)/i.test(url)) legacyImageCount++;
       } else {
         otherBytes += size;

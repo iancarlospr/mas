@@ -275,8 +275,14 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
   // Use pre-rendered sitemap pages from runner
   const foundPages: ProbeResult[] = [];
 
+  // Paths under /tools/, /resources/, /guides/ are user-facing content, not corporate careers pages
+  const EXCLUDED_PATH_PREFIXES = ['/tools/', '/resources/', '/guides/', '/calculator', '/quiz'];
+
   for (const page of ctx.sitemapPages?.careers ?? []) {
-    foundPages.push({ path: page.path, found: true, html: page.html, status: 200 });
+    const isExcluded = EXCLUDED_PATH_PREFIXES.some((prefix) => page.path.startsWith(prefix));
+    if (!isExcluded) {
+      foundPages.push({ path: page.path, found: true, html: page.html, status: 200 });
+    }
   }
 
   data.found_pages = foundPages.map((p) => p.path);
@@ -294,10 +300,20 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
 
     const $ = parseHtml(page.html);
 
+    // Validate this is a corporate careers page, not educational content.
+    // A real careers page should have: ATS references, job listings, "apply" links,
+    // or headings like "Open Positions", "Join Our Team", "We're Hiring".
+    const pageText = $('body').text().toLowerCase();
+    const hasHiringIndicators =
+      detectAtsProvider($) !== null ||
+      countOpenPositions($) > 0 ||
+      /\b(join our team|we.re hiring|open positions|current openings|apply now|view jobs)\b/i.test(pageText) ||
+      /\/careers\/?$|\/jobs\/?$/i.test(page.path);
+
     // Use the first /careers or /jobs page as primary
     if (!bestCareersPage && (page.path === '/careers' || page.path === '/jobs')) {
       bestCareersPage = page;
-    } else if (!bestCareersPage) {
+    } else if (!bestCareersPage && hasHiringIndicators) {
       bestCareersPage = page;
     }
 

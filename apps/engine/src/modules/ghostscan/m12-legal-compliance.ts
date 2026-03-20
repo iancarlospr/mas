@@ -382,7 +382,7 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
     const regulatoryNotices: string[] = [];
 
     // ── Banking/Finance ──
-    if (/member\s+fdic/i.test(bodyText)) regulatoryNotices.push('FDIC Member');
+    if (/member\s+fdic|miembro\s+fdic/i.test(bodyText)) regulatoryNotices.push('FDIC Member');
     if (/ncua/i.test(bodyText)) regulatoryNotices.push('NCUA');
     if (/equal\s+housing\s+(lender|opportunity)/i.test(bodyText)) regulatoryNotices.push('Equal Housing');
     if (/nmls\s*#?\s*\d+/i.test(bodyText)) {

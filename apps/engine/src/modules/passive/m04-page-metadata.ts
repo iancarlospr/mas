@@ -246,7 +246,15 @@ function extractJsonLdDeep($: cheerio.CheerioAPI): JsonLdDeep {
   $('script[type="application/ld+json"]').each((_, el) => {
     const content = $(el).html();
     if (content) {
-      try { raw.push(JSON.parse(content)); } catch { /* skip */ }
+      try {
+        const parsed = JSON.parse(content);
+        // Handle array-wrapped JSON-LD (e.g., Rank Math outputs [{...}])
+        if (Array.isArray(parsed)) {
+          for (const item of parsed) raw.push(item);
+        } else {
+          raw.push(parsed);
+        }
+      } catch { /* skip */ }
     }
   });
 
@@ -303,7 +311,7 @@ function extractJsonLdDeep($: cheerio.CheerioAPI): JsonLdDeep {
 }
 
 function extractRobotsDirectives($: cheerio.CheerioAPI, headers: Record<string, string>): RobotsDirectives {
-  const metaRobots = $('meta[name="robots"]').attr('content')?.trim() ?? null;
+  const metaRobots = $('meta[name="robots" i]').attr('content')?.trim() ?? null;
   const xRobotsTag = headers['x-robots-tag'] ?? null;
   const combined = [metaRobots, xRobotsTag].filter(Boolean).join(', ').toLowerCase();
   return {
@@ -765,7 +773,7 @@ function buildTwitterCardCheckpoint(twitterCards: Record<string, string>): Check
   const name = 'Twitter Card';
   const weight = 4 / 10;
 
-  const cardType = twitterCards['twitter:card'];
+  const cardType = twitterCards['twitter:card']?.toLowerCase();
   if (!cardType) {
     return createCheckpoint({
       id, name, weight,
@@ -864,19 +872,23 @@ function buildSchemaOrgCheckpoint(jsonLd: JsonLdDeep): Checkpoint {
 function extractSchemaTypes(jsonLd: unknown[]): string[] {
   const types: string[] = [];
   for (const item of jsonLd) {
-    if (item && typeof item === 'object') {
-      const record = item as Record<string, unknown>;
-      if (typeof record['@type'] === 'string') {
-        types.push(record['@type']);
-      } else if (Array.isArray(record['@type'])) {
-        for (const t of record['@type']) {
-          if (typeof t === 'string') types.push(t);
-        }
+    if (!item || typeof item !== 'object') continue;
+    // Handle array-wrapped items (e.g., [{...}] from Rank Math)
+    if (Array.isArray(item)) {
+      types.push(...extractSchemaTypes(item as unknown[]));
+      continue;
+    }
+    const record = item as Record<string, unknown>;
+    if (typeof record['@type'] === 'string') {
+      types.push(record['@type']);
+    } else if (Array.isArray(record['@type'])) {
+      for (const t of record['@type']) {
+        if (typeof t === 'string') types.push(t);
       }
-      // Handle @graph arrays
-      if (Array.isArray(record['@graph'])) {
-        types.push(...extractSchemaTypes(record['@graph'] as unknown[]));
-      }
+    }
+    // Handle @graph arrays
+    if (Array.isArray(record['@graph'])) {
+      types.push(...extractSchemaTypes(record['@graph'] as unknown[]));
     }
   }
   return types;

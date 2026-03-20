@@ -1199,19 +1199,35 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
   // 7b. CSP
   try {
     const cspValue = getHeader(headers, 'content-security-policy');
+    const cspReportOnly = getHeader(headers, 'content-security-policy-report-only');
     data.csp = cspValue ?? null;
+    data.cspReportOnly = cspReportOnly ?? null;
 
     if (!cspValue) {
-      checkpoints.push(
-        createCheckpoint({
-          id: 'm01-csp',
-          name: 'CSP',
-          weight: 0.7,
-          health: 'critical',
-          evidence: 'Content-Security-Policy header is missing',
-          recommendation: 'Implement a Content-Security-Policy header to prevent XSS and data injection attacks.',
-        }),
-      );
+      if (cspReportOnly) {
+        // Report-only CSP exists — site is actively testing but not enforcing
+        checkpoints.push(
+          createCheckpoint({
+            id: 'm01-csp',
+            name: 'CSP',
+            weight: 0.7,
+            health: 'warning',
+            evidence: `Enforcing Content-Security-Policy header is missing, but Content-Security-Policy-Report-Only IS deployed: ${cspReportOnly.substring(0, 200)}`,
+            recommendation: 'Transition the existing Content-Security-Policy-Report-Only to an enforcing Content-Security-Policy once violation reports are clean.',
+          }),
+        );
+      } else {
+        checkpoints.push(
+          createCheckpoint({
+            id: 'm01-csp',
+            name: 'CSP',
+            weight: 0.7,
+            health: 'critical',
+            evidence: 'Content-Security-Policy header is missing',
+            recommendation: 'Implement a Content-Security-Policy header to prevent XSS and data injection attacks.',
+          }),
+        );
+      }
     } else {
       const hasUnsafeEval = /unsafe-eval/i.test(cspValue);
       const hasWildcard = /\s\*\s|'\*'|default-src\s+\*|script-src\s+\*/.test(cspValue);
@@ -1704,7 +1720,7 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
 
   // ─── 12. NS provider signal ─────────────────────────────────────────────
   try {
-    const nsInfo = identifyNsProvider(dns.NS);
+    const nsInfo = identifyNsProvider(apexDns.NS);
     data.nsProvider = nsInfo;
 
     if (nsInfo.provider !== 'unknown') {
@@ -1713,7 +1729,7 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
           type: 'dns-provider',
           name: nsInfo.provider,
           confidence: nsInfo.confidence,
-          evidence: `NS: ${dns.NS.join(', ')}`,
+          evidence: `NS: ${apexDns.NS.join(', ')}`,
           category: 'infrastructure',
         }),
       );
@@ -1843,6 +1859,12 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
     } else {
       // We're scanning apex — check www using existing function
       wwwCheck = await checkWwwConsistency(domain, headers);
+
+      // Detect apex→www redirect using data already collected in HTTPS redirect check
+      const httpsRedirectData = data.httpsRedirect as { finalUrl?: string } | undefined;
+      if (httpsRedirectData?.finalUrl?.includes(`://www.${domain}`)) {
+        wwwCheck.apexRedirectsToWww = true;
+      }
     }
 
     data.wwwConsistency = wwwCheck;
@@ -2035,9 +2057,10 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
       { pattern: /^loom-verification=/i, service: 'Loom' },
       { pattern: /^figma-domain-verification=/i, service: 'Figma' },
       { pattern: /^neat-pulse-domain-verification/i, service: 'Neat Pulse' },
+      { pattern: /^knowbe4-site-verification=/i, service: 'KnowBe4' },
     ];
 
-    const txtFlat = ((data.dns as DnsRecords | undefined)?.TXT ?? []).map((arr: string[]) => arr.join(''));
+    const txtFlat = (apexDns.TXT ?? []).map((arr: string[]) => arr.join(''));
     const verifications: Array<{ service: string; record: string }> = [];
     const seen = new Set<string>();
 

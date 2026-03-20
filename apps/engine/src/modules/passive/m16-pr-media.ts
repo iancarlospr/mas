@@ -3,6 +3,7 @@ import type { ModuleContext, ModuleExecuteFn } from '../types.js';
 import type { ModuleResult, ModuleId, Signal, Checkpoint } from '@marketing-alpha/types';
 import { createSignal, createCheckpoint, infoCheckpoint } from '../../utils/signals.js';
 import { normalizeUrl } from '../../utils/url.js';
+import { fetchWithRetry } from '../../utils/http.js';
 import { parseHtml, extractLinks } from '../../utils/html.js';
 import type { CheerioAPI } from '../../utils/html.js';
 import { detectPageLanguage, getMultilingualKeywords } from '../../utils/i18n-probes.js';
@@ -315,7 +316,7 @@ function findAllDates($: CheerioAPI): Date[] {
  * Check the main page HTML for nav/footer links to press-related pages.
  * Uses multilingual keywords based on the page's detected language.
  */
-function findPressLinksInMainPage($: CheerioAPI, lang: string): string[] {
+function findPressLinksInMainPage($: CheerioAPI, lang: string, rawHtml?: string): string[] {
   const pressLinks: string[] = [];
   const keywords = getMultilingualKeywords(PRESS_LINK_KEYWORDS_BASE, lang, 'press');
 
@@ -330,6 +331,20 @@ function findPressLinksInMainPage($: CheerioAPI, lang: string): string[] {
       }
     }
   });
+
+  // Fallback: scan raw HTML for URLs inside JS strings that Cheerio can't parse
+  // (e.g. footer links injected via innerHTML from a script-defined data structure)
+  if (rawHtml) {
+    const urlMatches = rawHtml.matchAll(/https?:\/\/[a-zA-Z0-9._-]+\.[a-zA-Z]{2,}[^\s"'`\\<)]*(?:newsroom|press|prensa|noticias|sala-de-prensa)[^\s"'`\\<)]*/gi);
+    for (const match of urlMatches) {
+      pressLinks.push(match[0]);
+    }
+    // Also match URLs where the keyword is in the subdomain/path before the rest
+    const urlMatches2 = rawHtml.matchAll(/https?:\/\/(?:newsroom|press|prensa|noticias)[.\-][a-zA-Z0-9._-]+\.[a-zA-Z]{2,}[^\s"'`\\<)]*/gi);
+    for (const match of urlMatches2) {
+      pressLinks.push(match[0]);
+    }
+  }
 
   return [...new Set(pressLinks)];
 }
@@ -351,7 +366,7 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
   let mainPagePressLinks: string[] = [];
   if (ctx.html) {
     const $main = parseHtml(ctx.html);
-    mainPagePressLinks = findPressLinksInMainPage($main, lang);
+    mainPagePressLinks = findPressLinksInMainPage($main, lang, ctx.html);
 
     // Check RSS feed in main page
     const mainRss = detectRssFeed($main);
@@ -370,6 +385,32 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
 
   for (const page of ctx.sitemapPages?.press ?? []) {
     foundPages.push({ path: page.path, found: true, html: page.html, status: 200 });
+  }
+
+  // 2b. Fallback: if no press pages from sitemap, probe common paths directly
+  if (foundPages.length === 0) {
+    const PRESS_PROBE_PATHS = [
+      '/press/', '/press-release/', '/press-releases/',
+      '/media/', '/newsroom/', '/news-room/',
+      '/about/press/', '/about/media/', '/about/newsroom/',
+    ];
+    const probeResults = await Promise.allSettled(
+      PRESS_PROBE_PATHS.map(async (path) => {
+        try {
+          const url = `${baseUrl}${path}`;
+          const res = await fetchWithRetry(url, { timeout: 10_000, retries: 0 });
+          if (res.ok && res.body.length > 500 && !res.body.trimStart().startsWith('{')) {
+            return { path, found: true, html: res.body, status: 200 } as ProbeResult;
+          }
+        } catch { /* not found */ }
+        return null;
+      }),
+    );
+    for (const r of probeResults) {
+      if (r.status === 'fulfilled' && r.value) {
+        foundPages.push(r.value);
+      }
+    }
   }
 
   data.found_pages = foundPages.map((p) => p.path);

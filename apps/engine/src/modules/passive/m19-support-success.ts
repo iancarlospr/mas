@@ -202,10 +202,11 @@ function countSupportChannels(
     channels.push('email');
   }
 
-  // Phone support
+  // Phone support — only count tel: links as reliable phone signals.
+  // The phone regex produces false positives on URL version numbers, image IDs,
+  // zip codes, etc. Body text matching is too noisy for reliable detection.
   const hasPhone = $('a[href^="tel:"]').length > 0;
-  const phoneRegex = /(?:\+?1?[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/;
-  if (hasPhone || phoneRegex.test(bodyText)) {
+  if (hasPhone) {
     channels.push('phone');
   }
 
@@ -339,7 +340,7 @@ function assessHelpPageQuality($: CheerioAPI, helpCenterProvider: string | null)
  */
 function detectSupportSubdomains($: CheerioAPI, domain: string): { subdomain: string; url: string }[] {
   const subdomains: Map<string, string> = new Map();
-  const supportPrefixes = /^(help|support|community|docs|developers|api|academy|training|status|knowledge|learn|education|forum|faq)/i;
+  const supportPrefixes = /^(help|support|community|docs|developers|api|academy|training|status|knowledge|learn|education|forum|faq|resourcecenter|centro)/i;
 
   $('a[href]').each((_, el) => {
     const href = $(el).attr('href') ?? '';
@@ -556,6 +557,32 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
 
   for (const page of ctx.sitemapPages?.support ?? []) {
     foundPages.push({ path: page.path, found: true, html: page.html, status: 200 });
+  }
+
+  // 2b. Fallback: if no support pages from sitemap, probe common paths directly
+  if (foundPages.length === 0) {
+    const SUPPORT_PROBE_PATHS = [
+      '/help/', '/support/', '/contact/', '/contact-us/',
+      '/faq/', '/help-center/', '/knowledge-base/',
+      '/about/contact/', '/about/support/',
+    ];
+    const probeResults = await Promise.allSettled(
+      SUPPORT_PROBE_PATHS.map(async (path) => {
+        try {
+          const url = `${baseUrl}${path}`;
+          const res = await fetchWithRetry(url, { timeout: 10_000, retries: 0 });
+          if (res.ok && res.body.length > 500 && !res.body.trimStart().startsWith('{')) {
+            return { path, found: true, html: res.body, status: 200 } as ProbeResult;
+          }
+        } catch { /* not found */ }
+        return null;
+      }),
+    );
+    for (const r of probeResults) {
+      if (r.status === 'fulfilled' && r.value) {
+        foundPages.push(r.value);
+      }
+    }
   }
 
   data.found_pages = foundPages.map((p) => p.path);

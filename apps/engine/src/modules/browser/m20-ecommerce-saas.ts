@@ -128,7 +128,7 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
     );
     const hasFreeTrial = !!(
       doc.querySelector('a[href*="free-trial"], a[href*="free_trial"], a[href*="/trial"], a[href*="get-started-free"], a[href*="start-free"], [class*="free-trial"]') ||
-      doc.querySelector('a[href*="signup/free"], a[href*="sign-up/free"], a[href*="/free"]') ||
+      doc.querySelector('a[href*="signup/free"], a[href*="sign-up/free"]') ||
       !!Array.from(doc.querySelectorAll('a, button')).find((el) => {
         const text = (el.textContent || '').trim().toLowerCase();
         return /\bfree\s*(trial|plan|tier)\b|\bstart\s*free\b|\btry\s*(it\s*)?free\b|\bget\s*started\s*free\b|\bfree\s*sign\s*up\b/.test(text);
