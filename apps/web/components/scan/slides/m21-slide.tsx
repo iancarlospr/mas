@@ -121,6 +121,18 @@ const SHOWCASE_BRANDS: Record<string, ShowcaseBrand> = {
     linkDescription: 'Supply Chain Solutions · Ever better.',
     ctaLabel: 'Learn More',
   },
+  senzary: {
+    pageName: 'Senzary',
+    avatarBg: '#0D2137',
+    avatarLetter: 'S',
+    postText: 'Every machine on your floor is sending signals. Temperature spikes. Vibration changes. Air quality shifts. Most companies don\'t hear them until something breaks. Senzary makes the invisible visible — wireless sensors, zero cabling, live dashboards in days.',
+    imageSrc: 'https://hrqdatbrlcoxthqybtnp.supabase.co/storage/v1/object/public/ad-screenshots/showcase/senzary-ad-creative.png',
+    imageAlt: 'Senzary ad — Factorio-style isometric factory with glowing IoT sensors',
+    linkDomain: 'senzary.com',
+    linkHeadline: 'Your Factory Is Talking.',
+    linkDescription: 'Wireless IoT · Predictive Maintenance · Enterprise from $25K',
+    ctaLabel: 'Learn More',
+  },
 };
 
 // ── Facebook Ad Preview (showcase) ────────────────────────────────────
@@ -133,9 +145,6 @@ function FacebookAdPreview({ brand }: { brand: ShowcaseBrand }) {
       border: '1px solid #dddfe2',
       fontFamily: 'Helvetica, Arial, sans-serif',
       maxWidth: '100%',
-      height: '100%',
-      display: 'flex',
-      flexDirection: 'column',
     }}>
       {/* Header — Page + Sponsored */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 12px' }}>
@@ -174,7 +183,6 @@ function FacebookAdPreview({ brand }: { brand: ShowcaseBrand }) {
       <div style={{
         width: '100%', position: 'relative', background: '#f7f7f2',
         aspectRatio: '1 / 1', overflow: 'hidden',
-        flexShrink: 0,
       }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
@@ -270,6 +278,7 @@ export function M21Slide({ scan }: { scan: ScanWithResults }) {
   const domain = (scan.url ?? '').toLowerCase();
   const showcaseBrand = domain.includes('santander') ? SHOWCASE_BRANDS['santander']!
     : domain.includes('ryder') ? SHOWCASE_BRANDS['ryder']!
+    : domain.includes('senzary') ? SHOWCASE_BRANDS['senzary']!
     : null;
   const showShowcase = showcaseBrand !== null;
 
@@ -335,14 +344,14 @@ export function M21Slide({ scan }: { scan: ScanWithResults }) {
 
       {/* Showcase: Proposed Facebook Ad Creative */}
       {showShowcase && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3em', marginTop: '0.2em', flex: 1, minHeight: 0 }}>
+        <div style={{ marginTop: '0.2em' }}>
           <p className="font-data uppercase" style={{
             fontSize: 'clamp(1px, 0.75cqi, 12px)', color: 'var(--gs-base)',
-            letterSpacing: '0.1em', flexShrink: 0,
+            letterSpacing: '0.1em', marginBottom: '0.3em',
           }}>
             Proposed Creative
           </p>
-          <div style={{ overflow: 'hidden', borderRadius: '6px', flex: 1, minHeight: 0 }}>
+          <div style={{ borderRadius: '6px', overflow: 'hidden' }}>
             <FacebookAdPreview brand={showcaseBrand!} />
           </div>
         </div>
