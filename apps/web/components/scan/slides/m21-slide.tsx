@@ -170,11 +170,11 @@ function FacebookAdPreview({ brand }: { brand: ShowcaseBrand }) {
         </p>
       </div>
 
-      {/* Ad image — square 1:1, flex to fill available space */}
+      {/* Ad image — square 1:1 */}
       <div style={{
         width: '100%', position: 'relative', background: '#f7f7f2',
         aspectRatio: '1 / 1', overflow: 'hidden',
-        flex: '1 1 0', minHeight: 0,
+        flexShrink: 0,
       }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
