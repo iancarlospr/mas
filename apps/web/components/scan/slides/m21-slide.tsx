@@ -179,10 +179,10 @@ function FacebookAdPreview({ brand }: { brand: ShowcaseBrand }) {
         </p>
       </div>
 
-      {/* Ad image — square 1:1 */}
+      {/* Ad image — square 1:1, padding-bottom trick for bulletproof aspect ratio */}
       <div style={{
         width: '100%', position: 'relative', background: '#f7f7f2',
-        aspectRatio: '1 / 1', overflow: 'hidden',
+        paddingBottom: '100%', overflow: 'hidden',
       }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
