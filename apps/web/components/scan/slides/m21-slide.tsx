@@ -82,6 +82,105 @@ function GoogleIcon() {
   );
 }
 
+// ── Facebook Ad Preview (showcase) ────────────────────────────────────
+function FacebookAdPreview() {
+  return (
+    <div style={{
+      borderRadius: '8px',
+      overflow: 'hidden',
+      background: '#ffffff',
+      border: '1px solid #dddfe2',
+      fontFamily: 'Helvetica, Arial, sans-serif',
+      maxWidth: '100%',
+    }}>
+      {/* Header — Page + Sponsored */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 12px' }}>
+        {/* Santander avatar */}
+        <div style={{
+          width: '36px', height: '36px', borderRadius: '50%', flexShrink: 0,
+          background: '#EC0000', display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <span style={{ color: '#fff', fontSize: '14px', fontWeight: 700, lineHeight: 1 }}>S</span>
+        </div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <p style={{ fontSize: '13px', fontWeight: 600, color: '#050505', lineHeight: 1.2, margin: 0 }}>
+            Santander US
+          </p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <span style={{ fontSize: '11px', color: '#65676b', lineHeight: 1.2 }}>Sponsored</span>
+            <span style={{ fontSize: '11px', color: '#65676b' }}>·</span>
+            {/* Globe icon */}
+            <svg width="10" height="10" viewBox="0 0 16 16" fill="#65676b">
+              <path d="M8 0a8 8 0 100 16A8 8 0 008 0zm0 1.5a6.5 6.5 0 015.25 2.67h-1.9A9.5 9.5 0 009.5 1.6 6.5 6.5 0 018 1.5zm-1.5.1A9.5 9.5 0 004.65 4.17H2.75A6.5 6.5 0 016.5 1.6zM1.5 8c0-.87.17-1.7.48-2.46h2.4A16 16 0 004 8c0 .85.05 1.67.14 2.46H1.98A6.5 6.5 0 011.5 8zm1.25 3.83h1.9A9.5 9.5 0 006.5 14.4 6.5 6.5 0 012.75 11.83zM8 14.5a6.5 6.5 0 01-1.5-.1 9.5 9.5 0 001.85-2.57h-1.9a8 8 0 01-.9-2.37H5.5c-.1-.78-.15-1.6-.15-2.46s.05-1.68.15-2.46h5c.1.78.15 1.6.15 2.46s-.05 1.68-.15 2.46h-1.95a8 8 0 01-.9 2.37h-1.9A9.5 9.5 0 009.5 14.4 6.5 6.5 0 018 14.5zm5.25-2.67h-1.9a9.5 9.5 0 001.85-2.57h2.4A6.5 6.5 0 0113.25 11.83zM14.02 8H11.86c.09-.79.14-1.61.14-2.46s-.05-1.67-.14-2.46h2.16c.31.76.48 1.59.48 2.46s-.17 1.7-.48 2.46z" />
+            </svg>
+          </div>
+        </div>
+        {/* Three dots */}
+        <div style={{ color: '#65676b', fontSize: '16px', cursor: 'default', lineHeight: 1 }}>•••</div>
+      </div>
+
+      {/* Post text */}
+      <div style={{ padding: '0 12px 10px' }}>
+        <p style={{ fontSize: '13px', color: '#050505', lineHeight: 1.4, margin: 0 }}>
+          Your savings should work harder than you do. With 4.20% APY and zero fees, your money grows while you rest. Open a High Yield Savings account today.
+        </p>
+      </div>
+
+      {/* Ad image */}
+      <div style={{ width: '100%', aspectRatio: '1/1', position: 'relative', background: '#f7f7f2' }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/showcase/santander-ad-creative.png"
+          alt="Santander savings ad — person relaxing in hammock under money tree"
+          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+        />
+      </div>
+
+      {/* Link preview bar */}
+      <div style={{
+        padding: '10px 12px',
+        background: '#f0f2f5',
+        borderBottom: '1px solid #dddfe2',
+      }}>
+        <p style={{ fontSize: '11px', color: '#65676b', lineHeight: 1.2, margin: 0, textTransform: 'uppercase' }}>
+          santanderbank.com
+        </p>
+        <p style={{ fontSize: '14px', fontWeight: 600, color: '#050505', lineHeight: 1.3, margin: '2px 0 0' }}>
+          Your Money Never Sleeps.
+        </p>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '4px' }}>
+          <p style={{ fontSize: '12px', color: '#65676b', lineHeight: 1.2, margin: 0 }}>
+            High Yield Savings · No Fees · Member FDIC
+          </p>
+          {/* CTA button */}
+          <span style={{
+            fontSize: '12px', fontWeight: 600, color: '#050505',
+            background: '#e4e6eb', padding: '4px 14px', borderRadius: '4px',
+            whiteSpace: 'nowrap',
+          }}>
+            Open Account
+          </span>
+        </div>
+      </div>
+
+      {/* Action bar */}
+      <div style={{
+        display: 'flex', justifyContent: 'space-around', padding: '6px 12px',
+        borderTop: '1px solid #dddfe2',
+      }}>
+        {['👍 Like', '💬 Comment', '↗ Share'].map((action) => (
+          <span key={action} style={{
+            fontSize: '12px', fontWeight: 600, color: '#65676b',
+            padding: '4px 8px', borderRadius: '4px',
+          }}>
+            {action}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function M21Slide({ scan }: { scan: ScanWithResults }) {
   const syn = getM41Summary(scan, 'M21');
   const mod = getModuleResult(scan, 'M21');
@@ -114,6 +213,10 @@ export function M21Slide({ scan }: { scan: ScanWithResults }) {
   const googleSearchAds = typeof googleObj?.['totalAdsVisible'] === 'number' ? googleObj['totalAdsVisible'] as number : 0;
 
   const activePlatforms = [facebookActive, googleSearchActive].filter(Boolean).length;
+
+  // Showcase mode: show proposed ad creative for specific presentation domains
+  const domain = (scan.url ?? '').toLowerCase();
+  const showShowcase = domain.includes('santander');
 
   // ── Viz content (left panel) ────────────────────────────────────────────
   const vizContent = (
@@ -167,11 +270,26 @@ export function M21Slide({ scan }: { scan: ScanWithResults }) {
       </div>
 
       {/* No advertising detected message */}
-      {activePlatforms === 0 && (
+      {activePlatforms === 0 && !showShowcase && (
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <p className="font-data" style={{ fontSize: 'clamp(1px, 0.90cqi, 14px)', color: 'var(--gs-mid)', opacity: 0.6, textAlign: 'center' }}>
             No active advertising detected across monitored platforms
           </p>
+        </div>
+      )}
+
+      {/* Showcase: Proposed Facebook Ad Creative */}
+      {showShowcase && (
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.3em', marginTop: '0.2em' }}>
+          <p className="font-data uppercase" style={{
+            fontSize: 'clamp(1px, 0.75cqi, 12px)', color: 'var(--gs-base)',
+            letterSpacing: '0.1em',
+          }}>
+            Proposed Creative
+          </p>
+          <div style={{ flex: 1, overflow: 'hidden', borderRadius: '6px' }}>
+            <FacebookAdPreview />
+          </div>
         </div>
       )}
     </div>
