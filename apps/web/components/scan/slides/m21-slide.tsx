@@ -351,8 +351,10 @@ export function M21Slide({ scan }: { scan: ScanWithResults }) {
           }}>
             Proposed Creative
           </p>
-          <div style={{ borderRadius: '6px', overflow: 'hidden' }}>
-            <FacebookAdPreview brand={showcaseBrand!} />
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <div style={{ width: '60%', maxWidth: '280px', minWidth: '180px', borderRadius: '6px', overflow: 'hidden' }}>
+              <FacebookAdPreview brand={showcaseBrand!} />
+            </div>
           </div>
         </div>
       )}
