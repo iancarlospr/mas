@@ -82,8 +82,49 @@ function GoogleIcon() {
   );
 }
 
+// ── Showcase brand configs ────────────────────────────────────────────
+interface ShowcaseBrand {
+  pageName: string;
+  avatarBg: string;
+  avatarLetter: string;
+  postText: string;
+  imageSrc: string;
+  imageAlt: string;
+  linkDomain: string;
+  linkHeadline: string;
+  linkDescription: string;
+  ctaLabel: string;
+}
+
+const SHOWCASE_BRANDS: Record<string, ShowcaseBrand> = {
+  santander: {
+    pageName: 'Santander US',
+    avatarBg: '#EC0000',
+    avatarLetter: 'S',
+    postText: 'Your savings should work harder than you do. With 4.20% APY and zero fees, your money grows while you rest. Open a High Yield Savings account today.',
+    imageSrc: '/showcase/santander-ad-creative.png',
+    imageAlt: 'Santander savings ad — person relaxing in hammock under money tree',
+    linkDomain: 'santanderbank.com',
+    linkHeadline: 'Your Money Never Sleeps.',
+    linkDescription: 'High Yield Savings · No Fees · Member FDIC',
+    ctaLabel: 'Open Account',
+  },
+  ryder: {
+    pageName: 'Ryder System, Inc.',
+    avatarBg: '#000000',
+    avatarLetter: 'R',
+    postText: '"We believe in partnerships and in finding solutions that benefit both parties. Ryder is one of those partners." — Dale Finnestad, VP Customer Service & Logistics, Hill\'s Pet Nutrition. From raw ingredients to pet bowl, Ryder keeps the supply chain running on time.',
+    imageSrc: '/showcase/ryder-ad-creative.png',
+    imageAlt: 'Ryder ad — border collie at loading dock, Sit. Stay. Deliver.',
+    linkDomain: 'ryder.com',
+    linkHeadline: 'Sit. Stay. Deliver.',
+    linkDescription: 'Supply Chain Solutions · Ever better.',
+    ctaLabel: 'Learn More',
+  },
+};
+
 // ── Facebook Ad Preview (showcase) ────────────────────────────────────
-function FacebookAdPreview() {
+function FacebookAdPreview({ brand }: { brand: ShowcaseBrand }) {
   return (
     <div style={{
       borderRadius: '8px',
@@ -98,16 +139,16 @@ function FacebookAdPreview() {
     }}>
       {/* Header — Page + Sponsored */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 12px' }}>
-        {/* Santander avatar */}
+        {/* Page avatar */}
         <div style={{
           width: '36px', height: '36px', borderRadius: '50%', flexShrink: 0,
-          background: '#EC0000', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: brand.avatarBg, display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
-          <span style={{ color: '#fff', fontSize: '14px', fontWeight: 700, lineHeight: 1 }}>S</span>
+          <span style={{ color: '#fff', fontSize: '14px', fontWeight: 700, lineHeight: 1 }}>{brand.avatarLetter}</span>
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <p style={{ fontSize: '13px', fontWeight: 600, color: '#050505', lineHeight: 1.2, margin: 0 }}>
-            Santander US
+            {brand.pageName}
           </p>
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
             <span style={{ fontSize: '11px', color: '#65676b', lineHeight: 1.2 }}>Sponsored</span>
@@ -125,7 +166,7 @@ function FacebookAdPreview() {
       {/* Post text */}
       <div style={{ padding: '0 12px 10px' }}>
         <p style={{ fontSize: '13px', color: '#050505', lineHeight: 1.4, margin: 0 }}>
-          Your savings should work harder than you do. With 4.20% APY and zero fees, your money grows while you rest. Open a High Yield Savings account today.
+          {brand.postText}
         </p>
       </div>
 
@@ -137,8 +178,8 @@ function FacebookAdPreview() {
       }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/showcase/santander-ad-creative.png"
-          alt="Santander savings ad — person relaxing in hammock under money tree"
+          src={brand.imageSrc}
+          alt={brand.imageAlt}
           style={{
             position: 'absolute', inset: 0,
             width: '100%', height: '100%',
@@ -154,14 +195,14 @@ function FacebookAdPreview() {
         borderBottom: '1px solid #dddfe2',
       }}>
         <p style={{ fontSize: '11px', color: '#65676b', lineHeight: 1.2, margin: 0, textTransform: 'uppercase' }}>
-          santanderbank.com
+          {brand.linkDomain}
         </p>
         <p style={{ fontSize: '14px', fontWeight: 600, color: '#050505', lineHeight: 1.3, margin: '2px 0 0' }}>
-          Your Money Never Sleeps.
+          {brand.linkHeadline}
         </p>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '4px' }}>
           <p style={{ fontSize: '12px', color: '#65676b', lineHeight: 1.2, margin: 0 }}>
-            High Yield Savings · No Fees · Member FDIC
+            {brand.linkDescription}
           </p>
           {/* CTA button */}
           <span style={{
@@ -169,7 +210,7 @@ function FacebookAdPreview() {
             background: '#e4e6eb', padding: '4px 14px', borderRadius: '4px',
             whiteSpace: 'nowrap',
           }}>
-            Open Account
+            {brand.ctaLabel}
           </span>
         </div>
       </div>
@@ -227,7 +268,10 @@ export function M21Slide({ scan }: { scan: ScanWithResults }) {
 
   // Showcase mode: show proposed ad creative for specific presentation domains
   const domain = (scan.url ?? '').toLowerCase();
-  const showShowcase = domain.includes('santander');
+  const showcaseBrand = domain.includes('santander') ? SHOWCASE_BRANDS['santander']!
+    : domain.includes('ryder') ? SHOWCASE_BRANDS['ryder']!
+    : null;
+  const showShowcase = showcaseBrand !== null;
 
   // ── Viz content (left panel) ────────────────────────────────────────────
   const vizContent = (
@@ -299,7 +343,7 @@ export function M21Slide({ scan }: { scan: ScanWithResults }) {
             Proposed Creative
           </p>
           <div style={{ overflow: 'hidden', borderRadius: '6px', flex: 1, minHeight: 0 }}>
-            <FacebookAdPreview />
+            <FacebookAdPreview brand={showcaseBrand!} />
           </div>
         </div>
       )}
