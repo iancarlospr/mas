@@ -127,12 +127,12 @@ function FacebookAdPreview() {
       </div>
 
       {/* Ad image */}
-      <div style={{ width: '100%', aspectRatio: '1/1', position: 'relative', background: '#f7f7f2' }}>
+      <div style={{ width: '100%', position: 'relative', background: '#f7f7f2' }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/showcase/santander-ad-creative.png"
           alt="Santander savings ad — person relaxing in hammock under money tree"
-          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+          style={{ width: '100%', height: 'auto', aspectRatio: '1/1', objectFit: 'cover', display: 'block' }}
         />
       </div>
 
@@ -280,14 +280,14 @@ export function M21Slide({ scan }: { scan: ScanWithResults }) {
 
       {/* Showcase: Proposed Facebook Ad Creative */}
       {showShowcase && (
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.3em', marginTop: '0.2em' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3em', marginTop: '0.2em' }}>
           <p className="font-data uppercase" style={{
             fontSize: 'clamp(1px, 0.75cqi, 12px)', color: 'var(--gs-base)',
             letterSpacing: '0.1em',
           }}>
             Proposed Creative
           </p>
-          <div style={{ flex: 1, overflow: 'hidden', borderRadius: '6px' }}>
+          <div style={{ overflow: 'hidden', borderRadius: '6px' }}>
             <FacebookAdPreview />
           </div>
         </div>
