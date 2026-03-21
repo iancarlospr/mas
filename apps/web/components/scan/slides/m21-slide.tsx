@@ -92,6 +92,9 @@ function FacebookAdPreview() {
       border: '1px solid #dddfe2',
       fontFamily: 'Helvetica, Arial, sans-serif',
       maxWidth: '100%',
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
     }}>
       {/* Header — Page + Sponsored */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 12px' }}>
@@ -126,13 +129,21 @@ function FacebookAdPreview() {
         </p>
       </div>
 
-      {/* Ad image */}
-      <div style={{ width: '100%', position: 'relative', background: '#f7f7f2' }}>
+      {/* Ad image — square 1:1, flex to fill available space */}
+      <div style={{
+        width: '100%', position: 'relative', background: '#f7f7f2',
+        aspectRatio: '1 / 1', overflow: 'hidden',
+        flex: '1 1 0', minHeight: 0,
+      }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/showcase/santander-ad-creative.png"
           alt="Santander savings ad — person relaxing in hammock under money tree"
-          style={{ width: '100%', height: 'auto', aspectRatio: '1/1', objectFit: 'cover', display: 'block' }}
+          style={{
+            position: 'absolute', inset: 0,
+            width: '100%', height: '100%',
+            objectFit: 'cover', display: 'block',
+          }}
         />
       </div>
 
@@ -280,14 +291,14 @@ export function M21Slide({ scan }: { scan: ScanWithResults }) {
 
       {/* Showcase: Proposed Facebook Ad Creative */}
       {showShowcase && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3em', marginTop: '0.2em' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3em', marginTop: '0.2em', flex: 1, minHeight: 0 }}>
           <p className="font-data uppercase" style={{
             fontSize: 'clamp(1px, 0.75cqi, 12px)', color: 'var(--gs-base)',
-            letterSpacing: '0.1em',
+            letterSpacing: '0.1em', flexShrink: 0,
           }}>
             Proposed Creative
           </p>
-          <div style={{ overflow: 'hidden', borderRadius: '6px' }}>
+          <div style={{ overflow: 'hidden', borderRadius: '6px', flex: 1, minHeight: 0 }}>
             <FacebookAdPreview />
           </div>
         </div>
