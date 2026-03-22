@@ -342,7 +342,7 @@ export default function ChatWindow({ windowId }: ChatWindowProps) {
 
   // ── Main chat UI ───────────────────────────────────────────
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col" style={{ position: 'absolute', inset: 0 }}>
       {/* Messages */}
       <div className="flex-1 overflow-y-auto py-gs-3 space-y-gs-4" style={{ paddingLeft: 10, paddingRight: 10 }}>
         {messages.length === 0 && !sending && (
