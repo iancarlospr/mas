@@ -343,36 +343,6 @@ export default function ChatWindow({ windowId }: ChatWindowProps) {
   // ── Main chat UI ───────────────────────────────────────────
   return (
     <div className="flex flex-col h-full">
-      {/* Header */}
-      <div
-        className="flex items-center gap-gs-2 px-gs-3 flex-shrink-0"
-        style={{
-          height: 44,
-          borderBottom: '1px solid oklch(0.20 0.02 340 / 0.6)',
-          background: 'oklch(0.10 0.01 340 / 0.5)',
-        }}
-      >
-        <ChloeSprite state={sending ? 'scanning' : 'chat'} size={32} />
-        <div className="flex-1 min-w-0">
-          <h2 className="font-system text-os-xs font-bold" style={{ color: 'var(--gs-light)' }}>
-            Ask Chlo&eacute;
-          </h2>
-          {domain && (
-            <span className="font-data text-gs-muted truncate block" style={{ fontSize: '10px' }}>
-              {domain}
-            </span>
-          )}
-        </div>
-        <div
-          className="bevel-sunken px-gs-2 py-0.5 flex-shrink-0"
-          style={{ background: 'oklch(0.12 0.01 340 / 0.8)' }}
-        >
-          <span className="font-data tabular-nums" style={{ fontSize: '10px', color: 'var(--gs-muted)' }}>
-            {credits ?? 0} credits
-          </span>
-        </div>
-      </div>
-
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-gs-3 py-gs-3 space-y-gs-3">
         {messages.length === 0 && !sending && (
@@ -483,28 +453,36 @@ export default function ChatWindow({ windowId }: ChatWindowProps) {
             </button>
           </div>
         ) : (
-          <form
-            onSubmit={(e) => { e.preventDefault(); handleSend(); }}
-            className="flex gap-gs-2"
-          >
-            <BevelInput
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask Chloé anything..."
-              disabled={sending}
-              fullWidth
-              className="!text-data-sm !min-h-[32px] !py-gs-1"
-            />
-            <button
-              type="submit"
-              disabled={sending || !input.trim()}
-              className="bevel-button-primary flex-shrink-0 disabled:opacity-40"
-              style={{ fontSize: '12px', padding: '0 12px', height: 32 }}
+          <div>
+            <form
+              onSubmit={(e) => { e.preventDefault(); handleSend(); }}
+              className="flex gap-gs-2"
             >
-              Send
-            </button>
-          </form>
+              <BevelInput
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Ask Chloé anything..."
+                disabled={sending}
+                fullWidth
+                className="!text-data-sm !min-h-[32px] !py-gs-1"
+              />
+              <button
+                type="submit"
+                disabled={sending || !input.trim()}
+                className="bevel-button-primary flex-shrink-0 disabled:opacity-40"
+                style={{ fontSize: '12px', padding: '0 12px', height: 32 }}
+              >
+                Send
+              </button>
+            </form>
+            {/* Credits — subtle, below input */}
+            <div className="flex justify-end mt-1">
+              <span className="font-data tabular-nums" style={{ fontSize: '9px', color: 'oklch(0.30 0.02 340)', opacity: 0.6 }}>
+                {credits ?? 0} remaining
+              </span>
+            </div>
+          </div>
         )}
       </div>
     </div>

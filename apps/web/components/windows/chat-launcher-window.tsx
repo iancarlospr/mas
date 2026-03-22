@@ -65,6 +65,8 @@ export default function ChatLauncherWindow() {
   }, [contextScanId, contextDomain, authLoading, isAuthenticated, redirected, wm]);
 
   useEffect(() => {
+    // Wait for auth to resolve before querying — prevents "no paid scans" flash
+    if (authLoading) return;
     if (!user) {
       setDataLoading(false);
       return;
@@ -85,7 +87,7 @@ export default function ChatLauncherWindow() {
       setDataLoading(false);
     }
     load();
-  }, [user?.id]);
+  }, [user?.id, authLoading]);
 
   // Handle scan click — open dynamic chat window, close launcher
   const handleScanClick = useCallback((scan: PaidScan) => {
