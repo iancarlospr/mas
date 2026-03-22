@@ -297,8 +297,8 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
     // Pin to bottom-right corner
     const vw = window.innerWidth;
     const vh = window.innerHeight;
-    // Snap to corner: flush right, bottom touching taskbar (44px)
-    wm.moveWindow(chatId, vw - 380, vh - 480 - 44);
+    // Snap to corner: flush right, bottom above report status bar (24px) + taskbar (40px)
+    wm.moveWindow(chatId, vw - 380, vh - 480 - 64);
   }, [wm, scan.id, scan.domain]);
 
   return (
