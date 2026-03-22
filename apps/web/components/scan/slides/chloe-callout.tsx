@@ -59,9 +59,9 @@ export function ChloeCallout({
           95% { background-position: 100% 50%; }
           100% { background-position: 0% 50%; }
         }
-        @keyframes gc-text-shine {
-          0% { left: -30%; }
-          100% { left: 130%; }
+        @keyframes gc-text-bloom {
+          0%, 100% { background-position: 200% center; }
+          50% { background-position: -200% center; }
         }
         .gc-glow-border {
           position: relative;
@@ -78,28 +78,22 @@ export function ChloeCallout({
           background-size: 300% 100%;
           animation: gc-border-sweep 30s linear infinite;
         }
-        .gc-question-shine {
-          position: relative;
-          overflow: hidden;
-        }
-        .gc-question-shine::after {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: -30%;
-          width: 25%;
-          height: 100%;
+        .gc-text-bloom {
           background: linear-gradient(
             90deg,
-            transparent 0%,
-            rgba(255,255,255,0.08) 30%,
-            rgba(255,255,255,0.15) 50%,
-            rgba(255,255,255,0.08) 70%,
-            transparent 100%
+            var(--gs-light) 0%,
+            var(--gs-light) 35%,
+            #fff 48%,
+            var(--gs-base) 50%,
+            #fff 52%,
+            var(--gs-light) 65%,
+            var(--gs-light) 100%
           );
-          animation: gc-text-shine 8s ease-in-out infinite;
-          pointer-events: none;
-          border-radius: inherit;
+          background-size: 500% 100%;
+          -webkit-background-clip: text;
+          background-clip: text;
+          -webkit-text-fill-color: transparent;
+          animation: gc-text-bloom 8s ease-in-out infinite;
         }
       `}</style>
 
@@ -146,7 +140,6 @@ export function ChloeCallout({
           {/* Clickable question row — this IS the button, with text shine */}
           <button
             onClick={handleClick}
-            className="gc-question-shine"
             style={{
               display: 'flex',
               alignItems: 'baseline',
@@ -180,11 +173,9 @@ export function ChloeCallout({
               &rsaquo;
             </span>
             <span
-              className="font-data italic"
+              className="font-data italic gc-text-bloom"
               style={{
                 fontSize: T.bubble,
-                color: 'var(--gs-light)',
-                opacity: 0.85,
                 lineHeight: 1.35,
                 fontWeight: 600,
               }}
