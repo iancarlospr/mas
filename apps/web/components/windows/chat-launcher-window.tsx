@@ -47,8 +47,9 @@ function openChatWindow(
   // Pin to bottom-right corner
   const vw = typeof window !== 'undefined' ? window.innerWidth : 1200;
   const vh = typeof window !== 'undefined' ? window.innerHeight : 800;
-  // Snap to corner: flush right, bottom above report status bar (24px) + taskbar (40px)
-  wm.moveWindow(chatId, vw - 380, vh - 480 - 64);
+  // Snap to corner: flush right, bottom flush with report status bar top
+  // 40px taskbar + 24px status bar + 2px window border + 2px content margin
+  wm.moveWindow(chatId, vw - 380, vh - 480 - 68);
 }
 
 export default function ChatLauncherWindow() {
