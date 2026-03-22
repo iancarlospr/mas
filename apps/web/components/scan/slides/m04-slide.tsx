@@ -72,7 +72,7 @@ function TagDots({ tags, label }: { tags: Array<{ key: string; present: boolean 
   );
 }
 
-export function M04Slide({ scan, onAskChloe }: { scan: ScanWithResults; onAskChloe?: () => void }) {
+export function M04Slide({ scan, onAskChloe, slideNumber }: { scan: ScanWithResults; onAskChloe?: () => void; slideNumber?: string }) {
   const syn = getM41Summary(scan, 'M04');
   const mod = getModuleResult(scan, 'M04');
   const raw = (mod?.data as Record<string, unknown> | undefined) ?? null;
@@ -229,6 +229,7 @@ export function M04Slide({ scan, onAskChloe }: { scan: ScanWithResults; onAskChl
       recommendations={recs}
       scoreBreakdown={scores}
       onAskChloe={onAskChloe}
+      slideNumber={slideNumber}
     />
   );
 }

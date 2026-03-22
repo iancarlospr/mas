@@ -37,7 +37,7 @@ function formatCurrency(n: number): string {
   return `$${n.toLocaleString()}`;
 }
 
-export function M28Slide({ scan, onAskChloe }: { scan: ScanWithResults; onAskChloe?: () => void }) {
+export function M28Slide({ scan, onAskChloe, slideNumber }: { scan: ScanWithResults; onAskChloe?: () => void; slideNumber?: string }) {
   const syn = getM41Summary(scan, 'M28');
   const mod = getModuleResult(scan, 'M28');
   const raw = (mod?.data as Record<string, unknown> | undefined) ?? null;
@@ -78,6 +78,7 @@ export function M28Slide({ scan, onAskChloe }: { scan: ScanWithResults; onAskChl
       recommendations={recs}
       scoreBreakdown={scores}
       onAskChloe={onAskChloe}
+      slideNumber={slideNumber}
     >
       <div style={{
         marginBottom: '0.6em', flexShrink: 0,

@@ -35,7 +35,7 @@ function scoreC(n: number) { return n >= 70 ? 'var(--gs-terminal)' : n >= 40 ? '
 
 // ── Component ─────────────────────────────────────────────────────────
 
-export function M12Slide({ scan, onAskChloe }: { scan: ScanWithResults; onAskChloe?: () => void }) {
+export function M12Slide({ scan, onAskChloe, slideNumber }: { scan: ScanWithResults; onAskChloe?: () => void; slideNumber?: string }) {
   const rm = new Map<string, ModuleResult>(scan.moduleResults.map((r) => [r.moduleId, r]));
   const m41 = rm.get('M41');
   const sums = (m41?.data?.['moduleSummaries'] as Record<string, M41Summary> | undefined) ?? {};
@@ -276,7 +276,7 @@ export function M12Slide({ scan, onAskChloe }: { scan: ScanWithResults; onAskChl
             Source: DOM inspection, cookie audit, network requests, consent detection
           </span>
           <span className="font-data" style={{ fontSize: 'clamp(1px, 0.90cqi, 14px)', color: 'var(--gs-mid)', opacity: 0.4 }}>
-            {scan.domain} — AlphaScan
+            {scan.domain} &mdash; AlphaScan{slideNumber && <> &middot; {slideNumber}</>}
           </span>
         </div>
       </div>

@@ -78,9 +78,10 @@ interface BusinessContext {
 
 interface OverviewExecSlideProps {
   scan: ScanWithResults;
+  slideNumber?: string;
 }
 
-export function OverviewExecSlide({ scan }: OverviewExecSlideProps) {
+export function OverviewExecSlide({ scan, slideNumber }: OverviewExecSlideProps) {
   const isPaid = scan.tier === 'paid';
   const resultMap = new Map<string, ModuleResult>(
     scan.moduleResults.map((r) => [r.moduleId, r]),
@@ -410,8 +411,14 @@ export function OverviewExecSlide({ scan }: OverviewExecSlideProps) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
+          position: 'relative',
         }}
       >
+        {slideNumber && (
+          <span className="font-data" style={{ position: 'absolute', right: '3.5%', fontSize: 'clamp(1px, 0.90cqi, 14px)', color: '#080808', opacity: 0.4 }}>
+            {slideNumber}
+          </span>
+        )}
         <pre
           className="font-data leading-none whitespace-pre select-none"
           style={{

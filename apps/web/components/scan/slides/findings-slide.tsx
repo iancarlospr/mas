@@ -57,6 +57,7 @@ interface M42Synthesis {
 
 interface FindingsSlideProps {
   scan: ScanWithResults;
+  slideNumber?: string;
 }
 
 // Dev-only mock data for layout preview
@@ -90,7 +91,7 @@ const DEV_MOCK: { findings: KeyFinding[]; context: string } | null =
       }
     : null;
 
-export function FindingsSlide({ scan }: FindingsSlideProps) {
+export function FindingsSlide({ scan, slideNumber }: FindingsSlideProps) {
   const isPaid = scan.tier === 'paid';
 
   const resultMap = new Map<string, ModuleResult>(
@@ -354,8 +355,14 @@ export function FindingsSlide({ scan }: FindingsSlideProps) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
+          position: 'relative',
         }}
       >
+        {slideNumber && (
+          <span className="font-data" style={{ position: 'absolute', right: '3.5%', fontSize: 'clamp(1px, 0.90cqi, 14px)', color: '#080808', opacity: 0.4 }}>
+            {slideNumber}
+          </span>
+        )}
         <pre
           className="font-data leading-none whitespace-pre select-none"
           style={{

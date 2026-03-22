@@ -61,12 +61,14 @@ interface SlideShellProps {
   flexViz?: boolean;
   /** Opens the chat launcher — if provided and findings contain CRIT, GhostChat widget renders in recs column */
   onAskChloe?: () => void;
+  /** Slide number shown in bottom-right corner (e.g., "01", "A") */
+  slideNumber?: string;
 }
 
 export function SlideShell({
   moduleName, score, headline, execSummary, scan, sourceLabel,
   children, findings = [], recommendations = [], scoreBreakdown = [],
-  flexViz = false, onAskChloe,
+  flexViz = false, onAskChloe, slideNumber,
 }: SlideShellProps) {
   // Detect if this slide has a critical finding + derive a contextual question
   // Skip GhostChat on flexViz slides (e.g., M25 world map) — no room
@@ -230,7 +232,7 @@ export function SlideShell({
             {sourceLabel}
           </span>
           <span className="font-data" style={{ fontSize: 'clamp(1px, 0.90cqi, 14px)', color: 'var(--gs-mid)', opacity: 0.4 }}>
-            {scan.domain} — AlphaScan
+            {scan.domain} &mdash; AlphaScan{slideNumber && <> &middot; {slideNumber}</>}
           </span>
         </div>
       </div>
@@ -490,12 +492,14 @@ interface SlideShellAltProps {
   scoreBreakdown: M41Summary['score_breakdown'];
   /** Opens the chat launcher — if provided and findings contain CRIT, GhostChat widget renders */
   onAskChloe?: () => void;
+  /** Slide number shown in bottom-right corner */
+  slideNumber?: string;
 }
 
 export function SlideShellAlt({
   moduleName, score, headline, execSummary, scan, sourceLabel,
   vizContent, findings = [], recommendations = [], scoreBreakdown = [],
-  onAskChloe,
+  onAskChloe, slideNumber,
 }: SlideShellAltProps) {
   const critFinding = findings?.find((f) => f.severity === 'critical');
   const topRec = recommendations?.find((r) => r.priority === 'P0') ?? recommendations?.[0];
@@ -635,7 +639,7 @@ export function SlideShellAlt({
             {sourceLabel}
           </span>
           <span className="font-data" style={{ fontSize: 'clamp(1px, 0.90cqi, 14px)', color: 'var(--gs-mid)', opacity: 0.4 }}>
-            {scan.domain} — AlphaScan
+            {scan.domain} &mdash; AlphaScan{slideNumber && <> &middot; {slideNumber}</>}
           </span>
         </div>
       </div>

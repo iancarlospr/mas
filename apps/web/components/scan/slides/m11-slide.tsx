@@ -38,7 +38,7 @@ interface NetworkError {
   status?: number;
 }
 
-export function M11Slide({ scan, onAskChloe }: { scan: ScanWithResults; onAskChloe?: () => void }) {
+export function M11Slide({ scan, onAskChloe, slideNumber }: { scan: ScanWithResults; onAskChloe?: () => void; slideNumber?: string }) {
   const syn = getM41Summary(scan, 'M11');
   const mod = getModuleResult(scan, 'M11');
   const raw = (mod?.data as Record<string, unknown> | undefined) ?? null;
@@ -114,6 +114,7 @@ export function M11Slide({ scan, onAskChloe }: { scan: ScanWithResults; onAskChl
       recommendations={recs}
       scoreBreakdown={scores}
       onAskChloe={onAskChloe}
+      slideNumber={slideNumber}
     >
       {/* ═══ Hero Stats + Error Messages + Failed Requests ═══ */}
       <div style={{

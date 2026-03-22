@@ -41,7 +41,7 @@ function statColor(n: number, threshold: number) {
   return n > 0 ? (n >= threshold ? 'var(--gs-critical)' : 'var(--gs-warning)') : 'var(--gs-terminal)';
 }
 
-export function M45Slide({ scan }: { scan: ScanWithResults; onAskChloe?: () => void }) {
+export function M45Slide({ scan, slideNumber }: { scan: ScanWithResults; onAskChloe?: () => void; slideNumber?: string }) {
   const rm = new Map<string, ModuleResult>(scan.moduleResults.map((r) => [r.moduleId, r]));
   const m45 = rm.get('M45');
   if (!m45 || m45.status !== 'success') return null;

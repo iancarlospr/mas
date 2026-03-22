@@ -37,7 +37,7 @@ function extractConfidence(val: unknown): number | undefined {
   return undefined;
 }
 
-export function M02Slide({ scan, onAskChloe }: { scan: ScanWithResults; onAskChloe?: () => void }) {
+export function M02Slide({ scan, onAskChloe, slideNumber }: { scan: ScanWithResults; onAskChloe?: () => void; slideNumber?: string }) {
   const syn = getM41Summary(scan, 'M02');
   const mod = getModuleResult(scan, 'M02');
   const raw = (mod?.data as Record<string, unknown> | undefined) ?? null;
@@ -90,6 +90,7 @@ export function M02Slide({ scan, onAskChloe }: { scan: ScanWithResults; onAskChl
       recommendations={recs}
       scoreBreakdown={scores}
       onAskChloe={onAskChloe}
+      slideNumber={slideNumber}
     >
       {/* ═══ Infrastructure Blueprint ═══ */}
       <div style={{

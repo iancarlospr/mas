@@ -46,7 +46,7 @@ interface FreshnessData {
   urlsWithLastmod: number;
 }
 
-export function M39Slide({ scan, onAskChloe }: { scan: ScanWithResults; onAskChloe?: () => void }) {
+export function M39Slide({ scan, onAskChloe, slideNumber }: { scan: ScanWithResults; onAskChloe?: () => void; slideNumber?: string }) {
   const syn = getM41Summary(scan, 'M39');
   const mod = getModuleResult(scan, 'M39');
   const raw = (mod?.data as Record<string, unknown> | undefined) ?? null;
@@ -99,6 +99,7 @@ export function M39Slide({ scan, onAskChloe }: { scan: ScanWithResults; onAskChl
       recommendations={recs}
       scoreBreakdown={scores}
       onAskChloe={onAskChloe}
+      slideNumber={slideNumber}
     >
       <div style={{
         marginBottom: '0.6em', flexShrink: 0,

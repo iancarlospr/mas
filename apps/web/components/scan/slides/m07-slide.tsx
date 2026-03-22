@@ -30,7 +30,7 @@ interface FormEntry {
   id?: string;
 }
 
-export function M07Slide({ scan, onAskChloe }: { scan: ScanWithResults; onAskChloe?: () => void }) {
+export function M07Slide({ scan, onAskChloe, slideNumber }: { scan: ScanWithResults; onAskChloe?: () => void; slideNumber?: string }) {
   const syn = getM41Summary(scan, 'M07');
   const mod = getModuleResult(scan, 'M07');
   const raw = (mod?.data as Record<string, unknown> | undefined) ?? null;
@@ -218,6 +218,7 @@ export function M07Slide({ scan, onAskChloe }: { scan: ScanWithResults; onAskChl
       recommendations={recs}
       scoreBreakdown={scores}
       onAskChloe={onAskChloe}
+      slideNumber={slideNumber}
     />
   );
 }

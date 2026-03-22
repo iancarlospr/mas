@@ -38,7 +38,7 @@ function fmtPrice(price: number, currency?: string): string {
   return `${sym}${price.toFixed(2)}`;
 }
 
-export function M36Slide({ scan, onAskChloe }: { scan: ScanWithResults; onAskChloe?: () => void }) {
+export function M36Slide({ scan, onAskChloe, slideNumber }: { scan: ScanWithResults; onAskChloe?: () => void; slideNumber?: string }) {
   const syn = getM41Summary(scan, 'M36');
   const mod = getModuleResult(scan, 'M36');
   const raw = (mod?.data as Record<string, unknown> | undefined) ?? null;
@@ -211,6 +211,7 @@ export function M36Slide({ scan, onAskChloe }: { scan: ScanWithResults; onAskChl
       recommendations={recs}
       scoreBreakdown={scores}
       onAskChloe={onAskChloe}
+      slideNumber={slideNumber}
     />
   );
 }

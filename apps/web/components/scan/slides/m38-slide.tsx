@@ -27,7 +27,7 @@ interface CompletenessItem {
   detail?: string;
 }
 
-export function M38Slide({ scan, onAskChloe }: { scan: ScanWithResults; onAskChloe?: () => void }) {
+export function M38Slide({ scan, onAskChloe, slideNumber }: { scan: ScanWithResults; onAskChloe?: () => void; slideNumber?: string }) {
   const syn = getM41Summary(scan, 'M38');
   const mod = getModuleResult(scan, 'M38');
   const raw = (mod?.data as Record<string, unknown> | undefined) ?? null;
@@ -78,6 +78,7 @@ export function M38Slide({ scan, onAskChloe }: { scan: ScanWithResults; onAskChl
       recommendations={recs}
       scoreBreakdown={scores}
       onAskChloe={onAskChloe}
+      slideNumber={slideNumber}
     >
       {/* ═══ GBP Profile & Completeness ═══ */}
       <div style={{

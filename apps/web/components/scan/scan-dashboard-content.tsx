@@ -342,62 +342,62 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
           <>
             <VerdictSlide scan={scan} />
             <div id="nav-about">
-              <OverviewExecSlide scan={scan} />
+              <OverviewExecSlide scan={scan} slideNumber="A" />
             </div>
 
             <div id="nav-stack-analyzer">
-              <M45Slide scan={scan} />
+              <M45Slide scan={scan} slideNumber="B" />
             </div>
 
             <div id="nav-findings">
-              <FindingsSlide scan={scan} />
+              <FindingsSlide scan={scan} slideNumber="C" />
             </div>
 
             {/* ── Category 1: Security & Compliance ── */}
             <div id="nav-security">
               <CategoryIntroSlide scan={scan} category="security_compliance" />
             </div>
-            <M01Slide scan={scan} onAskChloe={handleAskChloe} />
-            <M12Slide scan={scan} onAskChloe={handleAskChloe} />
-            <M40Slide scan={scan} onAskChloe={handleAskChloe} />
+            <M01Slide scan={scan} onAskChloe={handleAskChloe} slideNumber="01" />
+            <M12Slide scan={scan} onAskChloe={handleAskChloe} slideNumber="02" />
+            <M40Slide scan={scan} onAskChloe={handleAskChloe} slideNumber="03" />
 
             {/* ── Category 2: Analytics & Measurement ── */}
             <div id="nav-analytics">
               <CategoryIntroSlide scan={scan} category="analytics_measurement" />
             </div>
-            <M05Slide scan={scan} onAskChloe={handleAskChloe} />
-            <M06Slide scan={scan} onAskChloe={handleAskChloe} />
-            <M06bSlide scan={scan} onAskChloe={handleAskChloe} />
-            <M08Slide scan={scan} onAskChloe={handleAskChloe} />
-            <M09Slide scan={scan} onAskChloe={handleAskChloe} />
+            <M05Slide scan={scan} onAskChloe={handleAskChloe} slideNumber="04" />
+            <M06Slide scan={scan} onAskChloe={handleAskChloe} slideNumber="05" />
+            <M06bSlide scan={scan} onAskChloe={handleAskChloe} slideNumber="06" />
+            <M08Slide scan={scan} onAskChloe={handleAskChloe} slideNumber="07" />
+            <M09Slide scan={scan} onAskChloe={handleAskChloe} slideNumber="08" />
 
             {/* ── Category 3: Performance & Experience ── */}
             <div id="nav-performance">
               <CategoryIntroSlide scan={scan} category="performance_experience" />
             </div>
-            <M03Slide scan={scan} onAskChloe={handleAskChloe} />
-            <M13Slide scan={scan} onAskChloe={handleAskChloe} />
-            <M14Slide scan={scan} onAskChloe={handleAskChloe} />
-            <M10Slide scan={scan} onAskChloe={handleAskChloe} />
-            <M11Slide scan={scan} onAskChloe={handleAskChloe} />
+            <M03Slide scan={scan} onAskChloe={handleAskChloe} slideNumber="09" />
+            <M13Slide scan={scan} onAskChloe={handleAskChloe} slideNumber="10" />
+            <M14Slide scan={scan} onAskChloe={handleAskChloe} slideNumber="11" />
+            <M10Slide scan={scan} onAskChloe={handleAskChloe} slideNumber="12" />
+            <M11Slide scan={scan} onAskChloe={handleAskChloe} slideNumber="13" />
 
             {/* ── Category 4: SEO & Content ── */}
             <div id="nav-seo">
               <CategoryIntroSlide scan={scan} category="seo_content" />
             </div>
-            <M04Slide scan={scan} onAskChloe={handleAskChloe} />
-            <M15Slide scan={scan} onAskChloe={handleAskChloe} />
-            <M26Slide scan={scan} onAskChloe={handleAskChloe} />
-            <M34Slide scan={scan} onAskChloe={handleAskChloe} />
-            <M39Slide scan={scan} onAskChloe={handleAskChloe} />
+            <M04Slide scan={scan} onAskChloe={handleAskChloe} slideNumber="14" />
+            <M15Slide scan={scan} onAskChloe={handleAskChloe} slideNumber="15" />
+            <M26Slide scan={scan} onAskChloe={handleAskChloe} slideNumber="16" />
+            <M34Slide scan={scan} onAskChloe={handleAskChloe} slideNumber="17" />
+            <M39Slide scan={scan} onAskChloe={handleAskChloe} slideNumber="18" />
 
             {/* ── Category 5: Paid Media ── */}
             <div id="nav-paid-media">
               <CategoryIntroSlide scan={scan} category="paid_media" />
             </div>
-            <M21Slide scan={scan} onAskChloe={handleAskChloe} />
-            <M28Slide scan={scan} onAskChloe={handleAskChloe} />
-            <M29Slide scan={scan} onAskChloe={handleAskChloe} />
+            <M21Slide scan={scan} onAskChloe={handleAskChloe} slideNumber="19" />
+            <M28Slide scan={scan} onAskChloe={handleAskChloe} slideNumber="20" />
+            <M29Slide scan={scan} onAskChloe={handleAskChloe} slideNumber="21" />
           </>
         )}
 
@@ -405,9 +405,9 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
         <div id="nav-martech">
           {isPaid && <CategoryIntroSlide scan={scan} category="martech_infrastructure" />}
         </div>
-        <M02Slide scan={scan} onAskChloe={handleAskChloe} />
-        <M07Slide scan={scan} onAskChloe={handleAskChloe} />
-        <M20Slide scan={scan} onAskChloe={handleAskChloe} />
+        <M02Slide scan={scan} onAskChloe={handleAskChloe} slideNumber={isPaid ? '22' : undefined} />
+        <M07Slide scan={scan} onAskChloe={handleAskChloe} slideNumber={isPaid ? '23' : undefined} />
+        <M20Slide scan={scan} onAskChloe={handleAskChloe} slideNumber={isPaid ? '24' : undefined} />
 
         {isPaid && (
           <>
@@ -415,24 +415,24 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
             <div id="nav-brand">
               <CategoryIntroSlide scan={scan} category="brand_presence" />
             </div>
-            <M16Slide scan={scan} onAskChloe={handleAskChloe} />
-            <M17Slide scan={scan} onAskChloe={handleAskChloe} />
-            <M18M19Slide scan={scan} onAskChloe={handleAskChloe} />
-            <M22M23Slide scan={scan} onAskChloe={handleAskChloe} />
-            <M37Slide scan={scan} onAskChloe={handleAskChloe} />
-            <M38Slide scan={scan} onAskChloe={handleAskChloe} />
+            <M16Slide scan={scan} onAskChloe={handleAskChloe} slideNumber="25" />
+            <M17Slide scan={scan} onAskChloe={handleAskChloe} slideNumber="26" />
+            <M18M19Slide scan={scan} onAskChloe={handleAskChloe} slideNumber="27" />
+            <M22M23Slide scan={scan} onAskChloe={handleAskChloe} slideNumber="28" />
+            <M37Slide scan={scan} onAskChloe={handleAskChloe} slideNumber="29" />
+            <M38Slide scan={scan} onAskChloe={handleAskChloe} slideNumber="30" />
 
             {/* ── Category 8: Market Intelligence ── */}
             <div id="nav-market-intel">
               <CategoryIntroSlide scan={scan} category="market_intelligence" />
             </div>
-            <M24Slide scan={scan} onAskChloe={handleAskChloe} />
-            <M25Slide scan={scan} onAskChloe={handleAskChloe} />
-            <M27Slide scan={scan} onAskChloe={handleAskChloe} />
-            <M30Slide scan={scan} onAskChloe={handleAskChloe} />
-            <M31Slide scan={scan} onAskChloe={handleAskChloe} />
-            <M33Slide scan={scan} onAskChloe={handleAskChloe} />
-            <M36Slide scan={scan} onAskChloe={handleAskChloe} />
+            <M24Slide scan={scan} onAskChloe={handleAskChloe} slideNumber="31" />
+            <M25Slide scan={scan} onAskChloe={handleAskChloe} slideNumber="32" />
+            <M27Slide scan={scan} onAskChloe={handleAskChloe} slideNumber="33" />
+            <M30Slide scan={scan} onAskChloe={handleAskChloe} slideNumber="34" />
+            <M31Slide scan={scan} onAskChloe={handleAskChloe} slideNumber="35" />
+            <M33Slide scan={scan} onAskChloe={handleAskChloe} slideNumber="36" />
+            <M36Slide scan={scan} onAskChloe={handleAskChloe} slideNumber="37" />
 
             {/* ── M43: PRD ── */}
             <div id="nav-prd">

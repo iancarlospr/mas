@@ -24,7 +24,7 @@ function fmtNum(n: number): string {
   return n.toLocaleString();
 }
 
-export function M27Slide({ scan, onAskChloe }: { scan: ScanWithResults; onAskChloe?: () => void }) {
+export function M27Slide({ scan, onAskChloe, slideNumber }: { scan: ScanWithResults; onAskChloe?: () => void; slideNumber?: string }) {
   const syn = getM41Summary(scan, 'M27');
   const mod = getModuleResult(scan, 'M27');
   const raw = (mod?.data as Record<string, unknown> | undefined) ?? null;
@@ -67,6 +67,7 @@ export function M27Slide({ scan, onAskChloe }: { scan: ScanWithResults; onAskChl
       recommendations={recs}
       scoreBreakdown={scores}
       onAskChloe={onAskChloe}
+      slideNumber={slideNumber}
     >
       {/* Stats — 3-col grid aligned to findings/recs/scores below */}
       <div style={{

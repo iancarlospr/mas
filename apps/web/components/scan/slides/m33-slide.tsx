@@ -32,7 +32,7 @@ function fmtNum(n: number): string {
   return n.toLocaleString();
 }
 
-export function M33Slide({ scan, onAskChloe }: { scan: ScanWithResults; onAskChloe?: () => void }) {
+export function M33Slide({ scan, onAskChloe, slideNumber }: { scan: ScanWithResults; onAskChloe?: () => void; slideNumber?: string }) {
   const syn = getM41Summary(scan, 'M33');
   const mod = getModuleResult(scan, 'M33');
   const raw = (mod?.data as Record<string, unknown> | undefined) ?? null;
@@ -80,6 +80,7 @@ export function M33Slide({ scan, onAskChloe }: { scan: ScanWithResults; onAskChl
       recommendations={recs}
       scoreBreakdown={scores}
       onAskChloe={onAskChloe}
+      slideNumber={slideNumber}
     >
       <div style={{
         display: 'flex', gap: '3%', flexShrink: 0,

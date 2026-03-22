@@ -29,7 +29,7 @@ interface ThirdPartyEntry {
   toolName?: string;
 }
 
-export function M13Slide({ scan, onAskChloe }: { scan: ScanWithResults; onAskChloe?: () => void }) {
+export function M13Slide({ scan, onAskChloe, slideNumber }: { scan: ScanWithResults; onAskChloe?: () => void; slideNumber?: string }) {
   const syn = getM41Summary(scan, 'M13');
   const mod = getModuleResult(scan, 'M13');
   const raw = (mod?.data as Record<string, unknown> | undefined) ?? null;
@@ -83,6 +83,7 @@ export function M13Slide({ scan, onAskChloe }: { scan: ScanWithResults; onAskChl
       recommendations={recs}
       scoreBreakdown={scores}
       onAskChloe={onAskChloe}
+      slideNumber={slideNumber}
     >
       {/* ═══ Hero CO2 + Green Hosting + Resource Bars ═══ */}
       <div style={{

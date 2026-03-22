@@ -19,7 +19,7 @@ import {
  * Combines M18 (Investor Relations) and M19 (Support Infrastructure).
  */
 
-export function M18M19Slide({ scan, onAskChloe }: { scan: ScanWithResults; onAskChloe?: () => void }) {
+export function M18M19Slide({ scan, onAskChloe, slideNumber }: { scan: ScanWithResults; onAskChloe?: () => void; slideNumber?: string }) {
   const syn18 = getM41Summary(scan, 'M18');
   const syn19 = getM41Summary(scan, 'M19');
   const mod18 = getModuleResult(scan, 'M18');
@@ -131,6 +131,7 @@ export function M18M19Slide({ scan, onAskChloe }: { scan: ScanWithResults; onAsk
       recommendations={recs}
       scoreBreakdown={scores}
       onAskChloe={onAskChloe}
+      slideNumber={slideNumber}
     >
       <div style={{
         marginBottom: '0.6em', flexShrink: 0,

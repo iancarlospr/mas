@@ -21,7 +21,7 @@ import {
  *   Auth providers, Payment processors, Form security, Cart detection
  */
 
-export function M20Slide({ scan, onAskChloe }: { scan: ScanWithResults; onAskChloe?: () => void }) {
+export function M20Slide({ scan, onAskChloe, slideNumber }: { scan: ScanWithResults; onAskChloe?: () => void; slideNumber?: string }) {
   const syn = getM41Summary(scan, 'M20');
   const mod = getModuleResult(scan, 'M20');
   const raw = (mod?.data as Record<string, unknown> | undefined) ?? null;
@@ -116,6 +116,7 @@ export function M20Slide({ scan, onAskChloe }: { scan: ScanWithResults; onAskChl
       recommendations={recs}
       scoreBreakdown={scores}
       onAskChloe={onAskChloe}
+      slideNumber={slideNumber}
     >
       {/* ═══ Commerce Capabilities Grid ═══ */}
       <div style={{

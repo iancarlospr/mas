@@ -72,7 +72,7 @@ const MOCK_M01: Record<string, unknown> | null = process.env.NODE_ENV === 'devel
 
 // ── Component ─────────────────────────────────────────────────────────
 
-export function M01Slide({ scan, onAskChloe }: { scan: ScanWithResults; onAskChloe?: () => void }) {
+export function M01Slide({ scan, onAskChloe, slideNumber }: { scan: ScanWithResults; onAskChloe?: () => void; slideNumber?: string }) {
   const rm = new Map<string, ModuleResult>(scan.moduleResults.map((r) => [r.moduleId, r]));
   const m41 = rm.get('M41');
   const sums = (m41?.data?.['moduleSummaries'] as Record<string, M41Summary> | undefined) ?? {};
@@ -277,7 +277,7 @@ export function M01Slide({ scan, onAskChloe }: { scan: ScanWithResults; onAskChl
             Source: DNS TXT records (SPF, DKIM, DMARC), HTTP headers, TLS handshake
           </span>
           <span className="font-data" style={{ fontSize: 'clamp(1px, 0.90cqi, 14px)', color: 'var(--gs-mid)', opacity: 0.4 }}>
-            {scan.domain} — AlphaScan
+            {scan.domain} &mdash; AlphaScan{slideNumber && <> &middot; {slideNumber}</>}
           </span>
         </div>
       </div>

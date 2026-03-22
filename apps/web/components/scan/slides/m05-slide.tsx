@@ -29,7 +29,7 @@ interface AnalyticsTool {
   confidence?: number;
 }
 
-export function M05Slide({ scan, onAskChloe }: { scan: ScanWithResults; onAskChloe?: () => void }) {
+export function M05Slide({ scan, onAskChloe, slideNumber }: { scan: ScanWithResults; onAskChloe?: () => void; slideNumber?: string }) {
   const syn = getM41Summary(scan, 'M05');
   const mod = getModuleResult(scan, 'M05');
   const raw = (mod?.data as Record<string, unknown> | undefined) ?? null;
@@ -84,6 +84,7 @@ export function M05Slide({ scan, onAskChloe }: { scan: ScanWithResults; onAskChl
       recommendations={recs}
       scoreBreakdown={scores}
       onAskChloe={onAskChloe}
+      slideNumber={slideNumber}
     >
       {/* ═══ Measurement Stack Viz ═══ */}
       <div style={{ marginBottom: '0.6em', flexShrink: 0, padding: '0.5em 0', borderTop: '1px solid rgba(255,178,239,0.06)', borderBottom: '1px solid rgba(255,178,239,0.06)' }}>

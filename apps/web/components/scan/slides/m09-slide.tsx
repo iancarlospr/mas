@@ -18,7 +18,7 @@ import {
  * feature checklist with detected tools, right panel has findings/recs.
  */
 
-export function M09Slide({ scan, onAskChloe }: { scan: ScanWithResults; onAskChloe?: () => void }) {
+export function M09Slide({ scan, onAskChloe, slideNumber }: { scan: ScanWithResults; onAskChloe?: () => void; slideNumber?: string }) {
   const syn = getM41Summary(scan, 'M09');
   const mod = getModuleResult(scan, 'M09');
   const raw = (mod?.data as Record<string, unknown> | undefined) ?? null;
@@ -176,6 +176,7 @@ export function M09Slide({ scan, onAskChloe }: { scan: ScanWithResults; onAskChl
       recommendations={recs}
       scoreBreakdown={scores}
       onAskChloe={onAskChloe}
+      slideNumber={slideNumber}
     />
   );
 }

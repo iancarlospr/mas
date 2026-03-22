@@ -21,7 +21,7 @@ import {
  * Wire Services as pills, Press Page/Media Kit/RSS as CheckItems.
  */
 
-export function M16Slide({ scan, onAskChloe }: { scan: ScanWithResults; onAskChloe?: () => void }) {
+export function M16Slide({ scan, onAskChloe, slideNumber }: { scan: ScanWithResults; onAskChloe?: () => void; slideNumber?: string }) {
   const syn = getM41Summary(scan, 'M16');
   const mod = getModuleResult(scan, 'M16');
   const raw = (mod?.data as Record<string, unknown> | undefined) ?? null;
@@ -86,6 +86,7 @@ export function M16Slide({ scan, onAskChloe }: { scan: ScanWithResults; onAskChl
       recommendations={recs}
       scoreBreakdown={scores}
       onAskChloe={onAskChloe}
+      slideNumber={slideNumber}
     >
       {/* ═══ PR Stats & Checklist ═══ */}
       <div style={{
