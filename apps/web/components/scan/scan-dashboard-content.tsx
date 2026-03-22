@@ -432,7 +432,7 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
 
             {/* ── Category 1: Security & Compliance ── */}
             <div id="nav-security">
-              <CategoryIntroSlide scan={scan} category="security_compliance" chloeCallout={categoryCallouts.get('security_compliance')} onAskChloe={handleAskChloe} />
+              <CategoryIntroSlide scan={scan} category="security_compliance" />
             </div>
             <M01Slide scan={scan} chloeCallout={buildModuleCallout('M01')} />
             <M12Slide scan={scan} chloeCallout={buildModuleCallout('M12')} />
@@ -440,7 +440,7 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
 
             {/* ── Category 2: Analytics & Measurement ── */}
             <div id="nav-analytics">
-              <CategoryIntroSlide scan={scan} category="analytics_measurement" chloeCallout={categoryCallouts.get('analytics_measurement')} onAskChloe={handleAskChloe} />
+              <CategoryIntroSlide scan={scan} category="analytics_measurement" />
             </div>
             <M05Slide scan={scan} chloeCallout={buildModuleCallout('M05')} />
             <M06Slide scan={scan} chloeCallout={buildModuleCallout('M06')} />
@@ -450,7 +450,7 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
 
             {/* ── Category 3: Performance & Experience ── */}
             <div id="nav-performance">
-              <CategoryIntroSlide scan={scan} category="performance_experience" chloeCallout={categoryCallouts.get('performance_experience')} onAskChloe={handleAskChloe} />
+              <CategoryIntroSlide scan={scan} category="performance_experience" />
             </div>
             <M03Slide scan={scan} chloeCallout={buildModuleCallout('M03')} />
             <M13Slide scan={scan} chloeCallout={buildModuleCallout('M13')} />
@@ -460,7 +460,7 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
 
             {/* ── Category 4: SEO & Content ── */}
             <div id="nav-seo">
-              <CategoryIntroSlide scan={scan} category="seo_content" chloeCallout={categoryCallouts.get('seo_content')} onAskChloe={handleAskChloe} />
+              <CategoryIntroSlide scan={scan} category="seo_content" />
             </div>
             <M04Slide scan={scan} chloeCallout={buildModuleCallout('M04')} />
             <M15Slide scan={scan} chloeCallout={buildModuleCallout('M15')} />
@@ -470,7 +470,7 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
 
             {/* ── Category 5: Paid Media ── */}
             <div id="nav-paid-media">
-              <CategoryIntroSlide scan={scan} category="paid_media" chloeCallout={categoryCallouts.get('paid_media')} onAskChloe={handleAskChloe} />
+              <CategoryIntroSlide scan={scan} category="paid_media" />
             </div>
             <M21Slide scan={scan} chloeCallout={buildModuleCallout('M21')} />
             <M28Slide scan={scan} chloeCallout={buildModuleCallout('M28')} />
@@ -480,7 +480,7 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
 
         {/* ── Category 6: MarTech & Infrastructure (free + paid) ── */}
         <div id="nav-martech">
-          {isPaid && <CategoryIntroSlide scan={scan} category="martech_infrastructure" chloeCallout={categoryCallouts.get('martech_infrastructure')} onAskChloe={handleAskChloe} />}
+          {isPaid && <CategoryIntroSlide scan={scan} category="martech_infrastructure" />}
         </div>
         <M02Slide scan={scan} chloeCallout={buildModuleCallout('M02')} />
         <M07Slide scan={scan} chloeCallout={buildModuleCallout('M07')} />
@@ -490,7 +490,7 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
           <>
             {/* ── Category 7: Brand & Digital Presence ── */}
             <div id="nav-brand">
-              <CategoryIntroSlide scan={scan} category="brand_presence" chloeCallout={categoryCallouts.get('brand_presence')} onAskChloe={handleAskChloe} />
+              <CategoryIntroSlide scan={scan} category="brand_presence" />
             </div>
             <M16Slide scan={scan} chloeCallout={buildModuleCallout('M16')} />
             <M17Slide scan={scan} chloeCallout={buildModuleCallout('M17')} />
@@ -501,7 +501,7 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
 
             {/* ── Category 8: Market Intelligence ── */}
             <div id="nav-market-intel">
-              <CategoryIntroSlide scan={scan} category="market_intelligence" chloeCallout={categoryCallouts.get('market_intelligence')} onAskChloe={handleAskChloe} />
+              <CategoryIntroSlide scan={scan} category="market_intelligence" />
             </div>
             <M24Slide scan={scan} chloeCallout={buildModuleCallout('M24')} />
             <M25Slide scan={scan} chloeCallout={buildModuleCallout('M25')} />
