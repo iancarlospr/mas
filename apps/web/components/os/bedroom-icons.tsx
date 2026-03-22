@@ -48,6 +48,7 @@ const BEDROOM_ICONS: Record<string, React.FC<LucideProps>> = {
 const DYNAMIC_ICONS: Record<string, React.FC<LucideProps>> = {
   'scan-': FileSearch,
   'payment-': CircleDollarSign,
+  'chat-': MessageCircleMore,
 };
 
 export function BedroomIcon({ windowId, size = 24, className }: { windowId: string; size?: number; className?: string }) {

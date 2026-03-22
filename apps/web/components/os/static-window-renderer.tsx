@@ -34,6 +34,7 @@ const ProfileWindow = lazy(() => import('@/components/windows/profile-window'));
 // Lazy-loaded dynamic window content components (resolved by componentType)
 const ScanReportWindow = lazy(() => import('@/components/windows/scan-report-window'));
 const PaymentWindow = lazy(() => import('@/components/windows/payment-window'));
+const ChatWindow = lazy(() => import('@/components/windows/chat-window'));
 
 /** Static windows — keyed by exact window ID */
 const WINDOW_COMPONENTS: Record<string, React.ComponentType> = {
@@ -57,6 +58,7 @@ const WINDOW_COMPONENTS: Record<string, React.ComponentType> = {
 const DYNAMIC_WINDOW_COMPONENTS: Record<string, React.ComponentType<{ windowId: string }>> = {
   'scan-report': ScanReportWindow,
   'payment': PaymentWindow,
+  'ghost-chat': ChatWindow,
 };
 
 function WindowLoadingFallback() {

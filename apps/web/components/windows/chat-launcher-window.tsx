@@ -1,16 +1,18 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import Link from 'next/link';
+import { useEffect, useState, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/auth-context';
-import { useWindowManager } from '@/lib/window-manager';
+import { useWindowManager, useWindowState } from '@/lib/window-manager';
 
 /* ═══════════════════════════════════════════════════════════════
    GhostChat Launcher — Window Content
 
-   Lists paid scans. Click one to open /chat/[scanId].
-   If no paid scans, shows upgrade prompt.
+   Two modes:
+   1. Context-aware (openData.scanId set) — auto-redirects to
+      the dynamic chat window, then closes this launcher.
+   2. Context-free (no scanId) — lists paid scans. Click one
+      to open its chat window.
    ═══════════════════════════════════════════════════════════════ */
 
 interface PaidScan {
@@ -20,11 +22,47 @@ interface PaidScan {
   created_at: string;
 }
 
+/** Register + open a dynamic GhostChat window for a specific scan */
+function openChatWindow(
+  wm: ReturnType<typeof useWindowManager>,
+  scanId: string,
+  domain?: string,
+) {
+  const chatId = `chat-${scanId}`;
+  if (wm.windows[chatId]?.isOpen) {
+    wm.focusWindow(chatId);
+    return;
+  }
+  wm.registerWindow(chatId, {
+    title: `Ask Chloé — ${domain ?? ''}`,
+    width: 380,
+    height: 480,
+    minWidth: 340,
+    minHeight: 400,
+    componentType: 'ghost-chat',
+  });
+  wm.openWindow(chatId, { scanId, domain });
+}
+
 export default function ChatLauncherWindow() {
   const { user, loading: authLoading, isAuthenticated } = useAuth();
   const wm = useWindowManager();
+  const windowState = useWindowState('chat-launcher');
+  const contextScanId = windowState?.openData?.scanId as string | undefined;
+  const contextDomain = windowState?.openData?.domain as string | undefined;
+
   const [scans, setScans] = useState<PaidScan[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
+  const [redirected, setRedirected] = useState(false);
+
+  // Auto-redirect: if scanId was passed, skip selector → open chat window directly
+  useEffect(() => {
+    if (contextScanId && !authLoading && isAuthenticated && !redirected) {
+      setRedirected(true);
+      openChatWindow(wm, contextScanId, contextDomain);
+      wm.closeWindow('chat-launcher');
+    }
+  }, [contextScanId, contextDomain, authLoading, isAuthenticated, redirected, wm]);
 
   useEffect(() => {
     if (!user) {
@@ -48,6 +86,18 @@ export default function ChatLauncherWindow() {
     }
     load();
   }, [user?.id]);
+
+  // Handle scan click — open dynamic chat window, close launcher
+  const handleScanClick = useCallback((scan: PaidScan) => {
+    let domain: string;
+    try {
+      domain = new URL(scan.url).hostname;
+    } catch {
+      domain = scan.url;
+    }
+    openChatWindow(wm, scan.id, domain);
+    wm.closeWindow('chat-launcher');
+  }, [wm]);
 
   if (authLoading || dataLoading) {
     return (
@@ -99,10 +149,10 @@ export default function ChatLauncherWindow() {
             domain = scan.url;
           }
           return (
-            <Link
+            <button
               key={scan.id}
-              href={`/chat/${scan.id}`}
-              className="flex items-center gap-gs-3 px-gs-4 py-gs-3 hover:bg-gs-red/5 border-b border-gs-chrome-dark/20"
+              onClick={() => handleScanClick(scan)}
+              className="flex items-center gap-gs-3 px-gs-4 py-gs-3 hover:bg-gs-red/5 border-b border-gs-chrome-dark/20 w-full text-left"
             >
               <span className="font-system text-os-sm text-gs-muted">{'>'}</span>
               <div className="flex-1 min-w-0">
@@ -112,7 +162,7 @@ export default function ChatLauncherWindow() {
                 </div>
               </div>
               <span className="text-gs-muted text-data-sm">→</span>
-            </Link>
+            </button>
           );
         })}
       </div>

@@ -274,8 +274,21 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
   }, [scan.id, scan.domain]);
 
   const handleAskChloe = useCallback(() => {
-    wm.openWindow('chat-launcher', { scanId: scan.id });
-  }, [wm, scan.id]);
+    const chatId = `chat-${scan.id}`;
+    if (wm.windows[chatId]?.isOpen) {
+      wm.focusWindow(chatId);
+      return;
+    }
+    wm.registerWindow(chatId, {
+      title: `Ask Chloé — ${scan.domain ?? ''}`,
+      width: 380,
+      height: 480,
+      minWidth: 340,
+      minHeight: 400,
+      componentType: 'ghost-chat',
+    });
+    wm.openWindow(chatId, { scanId: scan.id, domain: scan.domain });
+  }, [wm, scan.id, scan.domain]);
 
   return (
     <div className="flex flex-col h-full">

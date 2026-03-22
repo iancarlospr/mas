@@ -128,7 +128,20 @@ export function M43Slide({ scan, printMode }: { scan: ScanWithResults; printMode
 
   const pdfUrl = `/api/reports/${scan.id}/prd`;
   const handleAskChloe = () => {
-    wm.openWindow('chat-launcher', { scanId: scan.id });
+    const chatId = `chat-${scan.id}`;
+    if (wm.windows[chatId]?.isOpen) {
+      wm.focusWindow(chatId);
+      return;
+    }
+    wm.registerWindow(chatId, {
+      title: `Ask Chloé — ${scan.domain ?? ''}`,
+      width: 380,
+      height: 480,
+      minWidth: 340,
+      minHeight: 400,
+      componentType: 'ghost-chat',
+    });
+    wm.openWindow(chatId, { scanId: scan.id, domain: scan.domain });
   };
 
   const priorities = [
