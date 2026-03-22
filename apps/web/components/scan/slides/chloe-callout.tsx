@@ -6,17 +6,16 @@ import { analytics } from '@/lib/analytics';
  * ChloeCallout — Mini GhostChat™ widget for module slides
  * ═══════════════════════════════════════════════════════
  *
- * Mirrors the M43 closer GhostChat card: title, description,
- * one contextual example question from the CRIT finding, and
- * "Ask Chloé" button. Paid-only. Print-hidden.
+ * Title, description, and one clickable contextual question
+ * derived from the CRIT finding. The question row IS the button.
+ * Paid-only. Print-hidden.
  */
 
-// ── Typography scale (cqi) — matches M43 card scale ─────────────────
+// ── Typography scale (cqi) ───────────────────────────────────────────
 const T = {
   title:  'clamp(12px, 1.20cqi, 18px)',
   body:   'clamp(12px, 0.90cqi, 14px)',
   bubble: 'clamp(12px, 0.90cqi, 14px)',
-  cta:    'clamp(12px, 0.98cqi, 15px)',
 } as const;
 
 // ── Component ────────────────────────────────────────────────────────
@@ -86,8 +85,9 @@ export function ChloeCallout({
           in your audit. Ask anything &mdash; she&apos;ll walk you through it.
         </p>
 
-        {/* Single contextual example question — highlighted */}
-        <div
+        {/* Clickable question row — this IS the button */}
+        <button
+          onClick={handleClick}
           style={{
             display: 'flex',
             alignItems: 'baseline',
@@ -96,7 +96,20 @@ export function ChloeCallout({
             borderLeft: '2px solid var(--gs-base)',
             padding: '0.3em 0.5em',
             borderRadius: '0 3px 3px 0',
-            marginBottom: '0.5em',
+            border: 'none',
+            borderLeftWidth: '2px',
+            borderLeftStyle: 'solid',
+            borderLeftColor: 'var(--gs-base)',
+            cursor: 'pointer',
+            textAlign: 'left',
+            width: '100%',
+            transition: 'background 0.2s',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'rgba(255,178,239,0.15)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'rgba(255,178,239,0.08)';
           }}
         >
           <span
@@ -122,51 +135,6 @@ export function ChloeCallout({
           >
             &ldquo;{question}&rdquo;
           </span>
-        </div>
-
-        {/* CTA button */}
-        <button
-          onClick={handleClick}
-          className="font-display uppercase"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '0.4em',
-            padding: '0.4em 1em',
-            border: '1px solid rgba(255,178,239,0.15)',
-            color: 'var(--gs-light)',
-            fontSize: T.cta,
-            fontWeight: 600,
-            letterSpacing: '0.08em',
-            borderRadius: '3px',
-            background: 'transparent',
-            cursor: 'pointer',
-            width: 'fit-content',
-            transition: 'all 0.2s',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'rgba(255,178,239,0.06)';
-            e.currentTarget.style.borderColor = 'rgba(255,178,239,0.3)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'transparent';
-            e.currentTarget.style.borderColor = 'rgba(255,178,239,0.15)';
-          }}
-        >
-          <svg
-            width="1em"
-            height="1em"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            style={{ flexShrink: 0 }}
-          >
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-          </svg>
-          Ask Chlo&eacute;
         </button>
       </div>
     </div>
