@@ -2,7 +2,6 @@
 
 import type { ScanWithResults } from '@marketing-alpha/types';
 import { CATEGORY_DISPLAY_NAMES, type ScoreCategory } from '@marketing-alpha/types';
-import { ChloeCallout } from './chloe-callout';
 
 /**
  * Category Intro Slide — Section Divider
@@ -38,20 +37,12 @@ function getScoreColor(s: number): string {
   return 'var(--gs-critical)';
 }
 
-interface CategoryCalloutData {
-  variant: 'margin-note' | 'cta';
-  quip?: string;
-  question: string;
-}
-
 interface CategoryIntroSlideProps {
   scan: ScanWithResults;
   category: ScoreCategory;
-  chloeCallout?: CategoryCalloutData;
-  onAskChloe?: () => void;
 }
 
-export function CategoryIntroSlide({ scan, category, chloeCallout, onAskChloe }: CategoryIntroSlideProps) {
+export function CategoryIntroSlide({ scan, category }: CategoryIntroSlideProps) {
   const categories = scan.marketingIqResult?.categories ?? [];
   const allCategoryKeys = Object.keys(CATEGORY_DISPLAY_NAMES) as ScoreCategory[];
 
@@ -163,29 +154,6 @@ export function CategoryIntroSlide({ scan, category, chloeCallout, onAskChloe }:
         </div>
       </div>
 
-      {/* Chloé callout — positioned in the empty right 45% area */}
-      {chloeCallout && onAskChloe && (
-        <div
-          data-no-print
-          style={{
-            position: 'absolute',
-            right: '3.5%',
-            bottom: '12%',
-            width: '38%',
-            zIndex: 5,
-          }}
-        >
-          <ChloeCallout
-            variant={chloeCallout.variant}
-            quip={chloeCallout.quip}
-            question={chloeCallout.question}
-            topic={CATEGORY_DISPLAY_NAMES[category]}
-            onAskChloe={onAskChloe}
-            scanId={scan.id}
-            slideId={`Category: ${category}`}
-          />
-        </div>
-      )}
     </div>
   );
 }

@@ -58,8 +58,6 @@ import { M43Slide } from './slides/m43-slide';
 import { ClosingSlide } from './slides/closing-slide';
 import { ChloeCallout } from './slides/chloe-callout';
 import { cn } from '@/lib/utils';
-import { CATEGORY_DISPLAY_NAMES, type ScoreCategory } from '@marketing-alpha/types';
-import { pickRandom, CHAT_CALLOUT_QUIPS } from '@/lib/chloe-ai-copy';
 
 /**
  * GhostScan OS — Scan Dashboard Content
@@ -113,43 +111,28 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
     return map;
   }, [scan.marketingIqResult]);
 
-  // ── Chloé callout: worst-scoring modules (top 3 with score < 40) ──
-  const worstModules = useMemo(() => {
-    if (!isPaid) return new Map<string, number>();
-    return new Map(
-      scan.moduleResults
-        .filter((r) => r.score != null && r.score < 40 && (r.status === 'success' || r.status === 'partial'))
-        .sort((a, b) => (a.score ?? 100) - (b.score ?? 100))
-        .slice(0, 3)
-        .map((r) => [r.moduleId, r.score ?? 0]),
-    );
-  }, [scan.moduleResults, isPaid]);
-
-  // ── Chloé callout: category intro callouts (score < 70, max 3) ──
-  const categoryCallouts = useMemo(() => {
-    if (!isPaid) return new Map<string, { variant: 'margin-note' | 'cta'; quip?: string; question: string }>();
-    const result = new Map<string, { variant: 'margin-note' | 'cta'; quip?: string; question: string }>();
-    let count = 0;
-    for (const [catKey, score] of categoryScoreMap) {
-      if (count >= 3 || score >= 70) continue;
-      const displayName = CATEGORY_DISPLAY_NAMES[catKey as ScoreCategory] ?? catKey;
-      const rounded = Math.round(score);
-      if (score < 40) {
-        result.set(catKey, {
-          variant: 'margin-note',
-          quip: pickRandom(CHAT_CALLOUT_QUIPS.categoryCritical),
-          question: `Why is my ${displayName} score only ${rounded}, and what should I fix first?`,
-        });
-      } else {
-        result.set(catKey, {
-          variant: 'cta',
-          question: `What can I do to improve my ${displayName} score from ${rounded}?`,
-        });
+  // ── Chloé callout: modules with at least one CRIT key finding ──
+  interface CritModuleData { score: number; critFinding: string; topRec: string }
+  const critModules = useMemo(() => {
+    if (!isPaid) return new Map<string, CritModuleData>();
+    const m41 = scan.moduleResults.find((r) => r.moduleId === 'M41');
+    const sums = (m41?.data?.['moduleSummaries'] as Record<string, {
+      key_findings?: Array<{ finding: string; severity: string }>;
+      recommendations?: Array<{ action: string; priority: string }>;
+    }> | undefined) ?? {};
+    const result = new Map<string, CritModuleData>();
+    for (const r of scan.moduleResults) {
+      if (r.score == null || r.status === 'skipped' || r.status === 'error') continue;
+      const summary = sums[r.moduleId];
+      const crit = summary?.key_findings?.find((f) => f.severity === 'critical');
+      if (crit) {
+        const topRec = summary?.recommendations?.find((rec) => rec.priority === 'P0')?.action
+          ?? summary?.recommendations?.[0]?.action ?? '';
+        result.set(r.moduleId, { score: r.score ?? 0, critFinding: crit.finding, topRec });
       }
-      count++;
     }
     return result;
-  }, [categoryScoreMap, isPaid]);
+  }, [scan.moduleResults, isPaid]);
 
   const contentRef = useRef<HTMLDivElement>(null);
   const tabBarRef = useRef<HTMLDivElement>(null);
@@ -318,40 +301,24 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
     wm.openWindow('chat-launcher', { scanId: scan.id });
   }, [wm, scan.id]);
 
-  // ── Chloé callout: build ReactNode for worst-scoring module slides ──
-  const MODULE_NAMES: Record<string, string> = {
-    M01: 'Email Authentication', M02: 'HTTP Headers', M03: 'Performance & Web Vitals',
-    M04: 'SEO Fundamentals', M05: 'Google Analytics', M06: 'Tag Management',
-    M07: 'MarTech Stack', M08: 'Conversion Tracking', M09: 'Session Recording',
-    M10: 'Accessibility', M11: 'Mobile Experience', M12: 'Compliance',
-    M13: 'Core Web Vitals', M14: 'Page Speed', M15: 'Content Quality',
-    M16: 'Social Profiles', M17: 'Open Graph', M18: 'Press & Media',
-    M19: 'Support Channels', M20: 'JavaScript Analysis', M21: 'Ad Creative',
-    M22: 'Brand Consistency', M23: 'Visual Identity', M24: 'Competitor Analysis',
-    M25: 'Market Position', M26: 'Backlink Profile', M27: 'Share of Voice',
-    M28: 'PPC Analysis', M29: 'Social Advertising', M30: 'Industry Benchmarks',
-    M31: 'Keyword Rankings', M33: 'Content Gap', M34: 'Schema Markup',
-    M36: 'Local SEO', M37: 'Reviews & Reputation', M38: 'Email Marketing',
-    M39: 'Site Architecture', M40: 'Attack Surface', M45: 'Stack Analyzer',
-  };
-
   const buildModuleCallout = useCallback(
     (moduleId: string) => {
-      const score = worstModules.get(moduleId);
-      if (score == null) return undefined;
-      const name = MODULE_NAMES[moduleId] ?? moduleId;
+      const data = critModules.get(moduleId);
+      if (!data) return undefined;
+      // Build contextual question from the recommendation (actionable) or the finding
+      const question = data.topRec
+        ? `How do I ${data.topRec.charAt(0).toLowerCase()}${data.topRec.slice(1).replace(/\.$/, '')}?`
+        : `How do I fix the ${data.critFinding.toLowerCase().slice(0, 80)} issue?`;
       return (
         <ChloeCallout
-          variant="margin-note"
-          quip={pickRandom(CHAT_CALLOUT_QUIPS.moduleCritical).replace('{module}', name).replace('{score}', String(score))}
-          question={`Walk me through fixing my ${name} — it scored ${score}/100`}
+          question={question}
           onAskChloe={handleAskChloe}
           scanId={scan.id}
           slideId={moduleId}
         />
       );
     },
-    [worstModules, handleAskChloe, scan.id],
+    [critModules, handleAskChloe, scan.id],
   );
 
   return (
@@ -427,7 +394,7 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
             </div>
 
             <div id="nav-findings">
-              <FindingsSlide scan={scan} onAskChloe={handleAskChloe} />
+              <FindingsSlide scan={scan} />
             </div>
 
             {/* ── Category 1: Security & Compliance ── */}
