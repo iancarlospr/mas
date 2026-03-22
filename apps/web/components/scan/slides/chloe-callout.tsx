@@ -156,7 +156,18 @@ export function ChloeCallout({
 
           {/* Recommendations list */}
           {recommendations && recommendations.length > 0 && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3em', marginBottom: '0.5em' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3em', marginBottom: '0.5em', marginTop: '0.3em' }}>
+              <h4
+                className="font-display uppercase"
+                style={{
+                  fontSize: 'clamp(12px, 0.98cqi, 14px)',
+                  letterSpacing: '0.18em',
+                  color: 'var(--gs-base)',
+                  marginBottom: '0.2em',
+                }}
+              >
+                Recommendations
+              </h4>
               {recommendations.map((r, i) => (
                 <div key={i} style={{ display: 'flex', gap: '0.4em', alignItems: 'flex-start' }}>
                   <span
