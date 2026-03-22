@@ -156,37 +156,39 @@ export function SlideShell({
             <div style={{ width: '1px', background: 'rgba(255,178,239,0.06)', flexShrink: 0 }} />
           )}
 
-          {/* Recommendations + GhostChat widget */}
+          {/* Recommendations — absorbed into GhostChat when CRIT, standalone otherwise */}
           {recommendations && recommendations.length > 0 && (
             <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-              <h4 className="font-display uppercase" style={{ fontSize: 'clamp(1px, 0.98cqi, 14px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.4em' }}>
-                Recommendations
-              </h4>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35em' }}>
-                {recommendations.map((r, i) => (
-                  <div key={i} style={{ display: 'flex', gap: '0.4em', alignItems: 'flex-start' }}>
-                    <span className="font-data uppercase flex-shrink-0" style={{
-                      fontSize: 'clamp(1px, 0.98cqi, 14px)', padding: '0.1em 0.3em', borderRadius: '2px',
-                      background: 'rgba(255,178,239,0.08)', color: 'var(--gs-base)',
-                      marginTop: '0.15em', fontWeight: 600,
-                    }}>
-                      {r.priority}
-                    </span>
-                    <p className="font-data" style={{ fontSize: 'clamp(1px, 1.01cqi, 15px)', color: 'var(--gs-light)', lineHeight: 1.4 }}>
-                      {r.action}
-                    </p>
+              {showGhostChat ? (
+                <ChloeCallout
+                  question={ghostChatQuestion}
+                  onAskChloe={onAskChloe!}
+                  recommendations={recommendations}
+                  scanId={scan.id}
+                  slideId={moduleName}
+                />
+              ) : (
+                <>
+                  <h4 className="font-display uppercase" style={{ fontSize: 'clamp(1px, 0.98cqi, 14px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.4em' }}>
+                    Recommendations
+                  </h4>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35em' }}>
+                    {recommendations.map((r, i) => (
+                      <div key={i} style={{ display: 'flex', gap: '0.4em', alignItems: 'flex-start' }}>
+                        <span className="font-data uppercase flex-shrink-0" style={{
+                          fontSize: 'clamp(1px, 0.98cqi, 14px)', padding: '0.1em 0.3em', borderRadius: '2px',
+                          background: 'rgba(255,178,239,0.08)', color: 'var(--gs-base)',
+                          marginTop: '0.15em', fontWeight: 600,
+                        }}>
+                          {r.priority}
+                        </span>
+                        <p className="font-data" style={{ fontSize: 'clamp(1px, 1.01cqi, 15px)', color: 'var(--gs-light)', lineHeight: 1.4 }}>
+                          {r.action}
+                        </p>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-              {showGhostChat && (
-                <div style={{ marginTop: 'auto', paddingTop: '0.5em' }}>
-                  <ChloeCallout
-                    question={ghostChatQuestion}
-                    onAskChloe={onAskChloe!}
-                    scanId={scan.id}
-                    slideId={moduleName}
-                  />
-                </div>
+                </>
               )}
             </div>
           )}
@@ -571,35 +573,37 @@ export function SlideShellAlt({
               </div>
             )}
             {recommendations && recommendations.length > 0 && (
-              <div style={{ display: 'flex', flexDirection: 'column', flex: showGhostChat ? 1 : undefined }}>
-                <h4 className="font-display uppercase" style={{ fontSize: 'clamp(1px, 0.90cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.3em' }}>
-                  Recommendations
-                </h4>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25em' }}>
-                  {recommendations.map((r, i) => (
-                    <div key={i} style={{ display: 'flex', gap: '0.3em', alignItems: 'flex-start' }}>
-                      <span className="font-data uppercase flex-shrink-0" style={{
-                        fontSize: 'clamp(1px, 0.86cqi, 13px)', padding: '0.05em 0.25em', borderRadius: '2px',
-                        background: 'rgba(255,178,239,0.08)', color: 'var(--gs-base)',
-                        marginTop: '0.1em', fontWeight: 600,
-                      }}>
-                        {r.priority}
-                      </span>
-                      <p className="font-data" style={{ fontSize: 'clamp(1px, 0.90cqi, 14px)', color: 'var(--gs-light)', lineHeight: 1.35 }}>
-                        {r.action}
-                      </p>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                {showGhostChat ? (
+                  <ChloeCallout
+                    question={ghostChatQuestion}
+                    onAskChloe={onAskChloe!}
+                    recommendations={recommendations}
+                    scanId={scan.id}
+                    slideId={moduleName}
+                  />
+                ) : (
+                  <>
+                    <h4 className="font-display uppercase" style={{ fontSize: 'clamp(1px, 0.90cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.3em' }}>
+                      Recommendations
+                    </h4>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25em' }}>
+                      {recommendations.map((r, i) => (
+                        <div key={i} style={{ display: 'flex', gap: '0.3em', alignItems: 'flex-start' }}>
+                          <span className="font-data uppercase flex-shrink-0" style={{
+                            fontSize: 'clamp(1px, 0.86cqi, 13px)', padding: '0.05em 0.25em', borderRadius: '2px',
+                            background: 'rgba(255,178,239,0.08)', color: 'var(--gs-base)',
+                            marginTop: '0.1em', fontWeight: 600,
+                          }}>
+                            {r.priority}
+                          </span>
+                          <p className="font-data" style={{ fontSize: 'clamp(1px, 0.90cqi, 14px)', color: 'var(--gs-light)', lineHeight: 1.35 }}>
+                            {r.action}
+                          </p>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-                {showGhostChat && (
-                  <div style={{ marginTop: 'auto', paddingTop: '0.5em' }}>
-                    <ChloeCallout
-                      question={ghostChatQuestion}
-                      onAskChloe={onAskChloe!}
-                      scanId={scan.id}
-                      slideId={moduleName}
-                    />
-                  </div>
+                  </>
                 )}
               </div>
             )}

@@ -3,13 +3,13 @@
 import { analytics } from '@/lib/analytics';
 
 /**
- * ChloeCallout — Mini GhostChat™ widget for module slides
- * ═══════════════════════════════════════════════════════
+ * ChloeCallout — GhostChat™ widget that absorbs recommendations
+ * ══════════════════════════════════════════════════════════════
  *
- * Title, description, and one clickable contextual question
- * derived from the CRIT finding. The question row IS the button.
- * Outer border has animated pink gradient sweep (30s).
- * Question text has platinum shine sweep (8s).
+ * When a slide has CRIT findings, this replaces the standalone
+ * Recommendations section. Renders recs + contextual question
+ * inside one animated-border card.
+ *
  * Paid-only. Print-hidden.
  */
 
@@ -17,16 +17,25 @@ import { analytics } from '@/lib/analytics';
 const T = {
   title:  'clamp(12px, 1.20cqi, 18px)',
   body:   'clamp(12px, 0.90cqi, 14px)',
+  rec:    'clamp(12px, 1.01cqi, 15px)',
+  recBadge: 'clamp(12px, 0.98cqi, 14px)',
   bubble: 'clamp(12px, 0.90cqi, 14px)',
 } as const;
 
-// ── Component ────────────────────────────────────────────────────────
+// ── Types ────────────────────────────────────────────────────────────
+
+interface Recommendation {
+  action: string;
+  priority: string;
+}
 
 interface ChloeCalloutProps {
   /** Contextual example question derived from the CRIT finding + recommendation */
   question: string;
   /** Click handler — opens chat launcher */
   onAskChloe: () => void;
+  /** Recommendations to render inside the card */
+  recommendations?: Recommendation[];
   /** Scan ID for analytics */
   scanId?: string;
   /** Slide ID for analytics (e.g., "M03") */
@@ -36,6 +45,7 @@ interface ChloeCalloutProps {
 export function ChloeCallout({
   question,
   onAskChloe,
+  recommendations,
   scanId,
   slideId,
 }: ChloeCalloutProps) {
@@ -143,6 +153,40 @@ export function ChloeCallout({
             Your AI marketing strategist who memorized every finding
             in your audit. Ask anything &mdash; she&apos;ll walk you through it.
           </p>
+
+          {/* Recommendations list */}
+          {recommendations && recommendations.length > 0 && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3em', marginBottom: '0.5em' }}>
+              {recommendations.map((r, i) => (
+                <div key={i} style={{ display: 'flex', gap: '0.4em', alignItems: 'flex-start' }}>
+                  <span
+                    className="font-data uppercase flex-shrink-0"
+                    style={{
+                      fontSize: T.recBadge,
+                      padding: '0.1em 0.3em',
+                      borderRadius: '2px',
+                      background: 'rgba(255,178,239,0.08)',
+                      color: 'var(--gs-base)',
+                      marginTop: '0.15em',
+                      fontWeight: 600,
+                    }}
+                  >
+                    {r.priority}
+                  </span>
+                  <p
+                    className="font-data"
+                    style={{
+                      fontSize: T.rec,
+                      color: 'var(--gs-light)',
+                      lineHeight: 1.4,
+                    }}
+                  >
+                    {r.action}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Clickable question row — this IS the button, with text shine */}
           <button

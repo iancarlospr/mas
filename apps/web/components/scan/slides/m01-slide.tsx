@@ -204,7 +204,7 @@ export function M01Slide({ scan, onAskChloe }: { scan: ScanWithResults; onAskChl
           {/* Divider */}
           <div style={{ width: '1px', background: 'rgba(255,178,239,0.06)', flexShrink: 0 }} />
 
-          {/* Recommendations */}
+          {/* Recommendations — absorbed into GhostChat when CRIT */}
           {(() => {
             const critF = findings.find((f) => f.severity === 'critical');
             const topR = recs.find((r) => r.priority === 'P0') ?? recs[0];
@@ -214,29 +214,30 @@ export function M01Slide({ scan, onAskChloe }: { scan: ScanWithResults; onAskChl
               : `How do I fix the ${critF?.finding?.toLowerCase().slice(0, 80) ?? ''} issue?`;
             return (
               <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-                <h4 className="font-display uppercase" style={{ fontSize: 'clamp(1px, 0.98cqi, 14px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.4em' }}>
-                  Recommendations
-                </h4>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35em' }}>
-                  {recs.map((r, i) => (
-                    <div key={i} style={{ display: 'flex', gap: '0.4em', alignItems: 'flex-start' }}>
-                      <span className="font-data uppercase flex-shrink-0" style={{
-                        fontSize: 'clamp(1px, 0.98cqi, 14px)', padding: '0.1em 0.3em', borderRadius: '2px',
-                        background: 'rgba(255,178,239,0.08)', color: 'var(--gs-base)',
-                        marginTop: '0.15em', fontWeight: 600,
-                      }}>
-                        {r.priority}
-                      </span>
-                      <p className="font-data" style={{ fontSize: 'clamp(1px, 1.01cqi, 15px)', color: 'var(--gs-light)', lineHeight: 1.4 }}>
-                        {r.action}
-                      </p>
+                {showChat ? (
+                  <ChloeCallout question={chatQ} onAskChloe={onAskChloe!} recommendations={recs} scanId={scan.id} slideId="M01" />
+                ) : (
+                  <>
+                    <h4 className="font-display uppercase" style={{ fontSize: 'clamp(1px, 0.98cqi, 14px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.4em' }}>
+                      Recommendations
+                    </h4>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35em' }}>
+                      {recs.map((r, i) => (
+                        <div key={i} style={{ display: 'flex', gap: '0.4em', alignItems: 'flex-start' }}>
+                          <span className="font-data uppercase flex-shrink-0" style={{
+                            fontSize: 'clamp(1px, 0.98cqi, 14px)', padding: '0.1em 0.3em', borderRadius: '2px',
+                            background: 'rgba(255,178,239,0.08)', color: 'var(--gs-base)',
+                            marginTop: '0.15em', fontWeight: 600,
+                          }}>
+                            {r.priority}
+                          </span>
+                          <p className="font-data" style={{ fontSize: 'clamp(1px, 1.01cqi, 15px)', color: 'var(--gs-light)', lineHeight: 1.4 }}>
+                            {r.action}
+                          </p>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-                {showChat && (
-                  <div style={{ marginTop: 'auto', paddingTop: '0.5em' }}>
-                    <ChloeCallout question={chatQ} onAskChloe={onAskChloe!} scanId={scan.id} slideId="M01" />
-                  </div>
+                  </>
                 )}
               </div>
             );
