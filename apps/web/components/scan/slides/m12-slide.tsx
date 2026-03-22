@@ -1,6 +1,7 @@
 'use client';
 
 import type { ScanWithResults, ModuleResult } from '@marketing-alpha/types';
+import { ChloeCallout } from './chloe-callout';
 
 /**
  * M12 Slide — Compliance & Privacy
@@ -34,7 +35,7 @@ function scoreC(n: number) { return n >= 70 ? 'var(--gs-terminal)' : n >= 40 ? '
 
 // ── Component ─────────────────────────────────────────────────────────
 
-export function M12Slide({ scan }: { scan: ScanWithResults; onAskChloe?: () => void }) {
+export function M12Slide({ scan, onAskChloe }: { scan: ScanWithResults; onAskChloe?: () => void }) {
   const rm = new Map<string, ModuleResult>(scan.moduleResults.map((r) => [r.moduleId, r]));
   const m41 = rm.get('M41');
   const sums = (m41?.data?.['moduleSummaries'] as Record<string, M41Summary> | undefined) ?? {};
@@ -203,27 +204,42 @@ export function M12Slide({ scan }: { scan: ScanWithResults; onAskChloe?: () => v
           <div style={{ width: '1px', background: 'rgba(255,178,239,0.06)', flexShrink: 0 }} />
 
           {/* Recommendations */}
-          <div style={{ flex: 1, overflow: 'hidden' }}>
-            <h4 className="font-display uppercase" style={{ fontSize: 'clamp(1px, 0.98cqi, 14px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.4em' }}>
-              Recommendations
-            </h4>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35em' }}>
-              {recs.map((r, i) => (
-                <div key={i} style={{ display: 'flex', gap: '0.4em', alignItems: 'flex-start' }}>
-                  <span className="font-data uppercase flex-shrink-0" style={{
-                    fontSize: 'clamp(1px, 0.98cqi, 14px)', padding: '0.1em 0.3em', borderRadius: '2px',
-                    background: 'rgba(255,178,239,0.08)', color: 'var(--gs-base)',
-                    marginTop: '0.15em', fontWeight: 600,
-                  }}>
-                    {r.priority}
-                  </span>
-                  <p className="font-data" style={{ fontSize: 'clamp(1px, 1.01cqi, 15px)', color: 'var(--gs-light)', lineHeight: 1.4 }}>
-                    {r.action}
-                  </p>
+          {(() => {
+            const critF = findings.find((f) => f.severity === 'critical');
+            const topR = recs.find((r) => r.priority === 'P0') ?? recs[0];
+            const showChat = !!(onAskChloe && critF);
+            const chatQ = topR
+              ? `How do I ${topR.action.charAt(0).toLowerCase()}${topR.action.slice(1).replace(/\.$/, '')}?`
+              : `How do I fix the ${critF?.finding?.toLowerCase().slice(0, 80) ?? ''} issue?`;
+            return (
+              <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                <h4 className="font-display uppercase" style={{ fontSize: 'clamp(1px, 0.98cqi, 14px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.4em' }}>
+                  Recommendations
+                </h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35em' }}>
+                  {recs.map((r, i) => (
+                    <div key={i} style={{ display: 'flex', gap: '0.4em', alignItems: 'flex-start' }}>
+                      <span className="font-data uppercase flex-shrink-0" style={{
+                        fontSize: 'clamp(1px, 0.98cqi, 14px)', padding: '0.1em 0.3em', borderRadius: '2px',
+                        background: 'rgba(255,178,239,0.08)', color: 'var(--gs-base)',
+                        marginTop: '0.15em', fontWeight: 600,
+                      }}>
+                        {r.priority}
+                      </span>
+                      <p className="font-data" style={{ fontSize: 'clamp(1px, 1.01cqi, 15px)', color: 'var(--gs-light)', lineHeight: 1.4 }}>
+                        {r.action}
+                      </p>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
+                {showChat && (
+                  <div style={{ marginTop: 'auto', paddingTop: '0.5em' }}>
+                    <ChloeCallout question={chatQ} onAskChloe={onAskChloe!} scanId={scan.id} slideId="M12" />
+                  </div>
+                )}
+              </div>
+            );
+          })()}
 
           {/* Divider */}
           <div style={{ width: '1px', background: 'rgba(255,178,239,0.06)', flexShrink: 0 }} />
