@@ -108,12 +108,18 @@ const chatMarkdownComponents = {
   ),
 };
 
-// ── Copy button — appears on hover ──────────────────────────
-function CopyButton({ text }: { text: string }) {
+// ── Copyable AI message wrapper — floating tooltip follows cursor ────
+function CopyableMessage({ text, children }: { text: string; children: ReactNode }) {
+  const [hovered, setHovered] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [pos, setPos] = useState({ x: 0, y: 0 });
 
-  const handleCopy = async (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleMouseMove = (e: React.MouseEvent) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setPos({ x: e.clientX - rect.left + 12, y: e.clientY - rect.top - 24 });
+  };
+
+  const handleClick = async () => {
     try {
       await navigator.clipboard.writeText(text);
       setCopied(true);
@@ -122,32 +128,52 @@ function CopyButton({ text }: { text: string }) {
   };
 
   return (
-    <button
-      onClick={handleCopy}
-      title={copied ? 'Copied!' : 'Copy message'}
-      className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
-      style={{
-        background: 'oklch(0.18 0.02 340)',
-        border: '1px solid oklch(0.25 0.02 340)',
-        borderRadius: 4,
-        padding: '2px 5px',
-        cursor: 'pointer',
-        display: 'flex',
-        alignItems: 'center',
-        gap: 3,
-      }}
+    <div
+      className="relative"
+      style={{ cursor: 'pointer' }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => { setHovered(false); setCopied(false); }}
+      onMouseMove={handleMouseMove}
+      onClick={handleClick}
     >
-      {copied ? (
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--gs-terminal)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <polyline points="20 6 9 17 4 12" />
-        </svg>
-      ) : (
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="oklch(0.55 0.03 340)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-        </svg>
+      {children}
+      {hovered && (
+        <div
+          className="pointer-events-none"
+          style={{
+            position: 'absolute',
+            left: pos.x,
+            top: pos.y,
+            background: 'oklch(0.16 0.02 340)',
+            border: '1px solid oklch(0.28 0.02 340)',
+            borderRadius: 5,
+            padding: '3px 8px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 4,
+            whiteSpace: 'nowrap',
+            zIndex: 10,
+          }}
+        >
+          {copied ? (
+            <>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="var(--gs-terminal)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              <span className="font-data" style={{ fontSize: '10px', color: 'var(--gs-terminal)' }}>Copied</span>
+            </>
+          ) : (
+            <>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="oklch(0.60 0.03 340)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+              </svg>
+              <span className="font-data" style={{ fontSize: '10px', color: 'oklch(0.55 0.03 340)' }}>Copy</span>
+            </>
+          )}
+        </div>
       )}
-    </button>
+    </div>
   );
 }
 
@@ -402,11 +428,10 @@ export default function ChatWindow({ windowId }: ChatWindowProps) {
         )}
 
         {messages.map((msg) => (
-          <div key={msg.id} className="group relative">
+          <div key={msg.id}>
             {msg.role === 'user' ? (
-              /* User message — pill, right-aligned, stands out */
-              <div className="flex justify-end items-start gap-1.5">
-                <CopyButton text={msg.content} />
+              /* User message — pill, right-aligned */
+              <div className="flex justify-end">
                 <div
                   className="font-data text-data-sm whitespace-pre-wrap leading-relaxed"
                   style={{
@@ -421,14 +446,11 @@ export default function ChatWindow({ windowId }: ChatWindowProps) {
                 </div>
               </div>
             ) : (
-              /* Chloé message — ghost icon top-left corner, pink border, full width */
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <div className="flex items-center gap-1.5">
-                    <GhostIcon size={12} />
-                    <span className="font-data" style={{ fontSize: '10px', color: 'oklch(0.45 0.04 340)' }}>Chlo&eacute;</span>
-                  </div>
-                  <CopyButton text={msg.content} />
+              /* Chloé message — click anywhere to copy, tooltip follows cursor */
+              <CopyableMessage text={msg.content}>
+                <div className="flex items-center gap-1.5 mb-1">
+                  <GhostIcon size={12} />
+                  <span className="font-data" style={{ fontSize: '10px', color: 'oklch(0.45 0.04 340)' }}>Chlo&eacute;</span>
                 </div>
                 <div
                   style={{
@@ -440,7 +462,7 @@ export default function ChatWindow({ windowId }: ChatWindowProps) {
                     {msg.content}
                   </ReactMarkdown>
                 </div>
-              </div>
+              </CopyableMessage>
             )}
           </div>
         ))}
