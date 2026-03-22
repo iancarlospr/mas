@@ -34,7 +34,7 @@ export const analytics = {
   },
 
   /** PRD/PDF download — source distinguishes which button was clicked */
-  pdfDownloaded(scanId: string, domain: string, source: 'status_bar' | 'm43_slide' | 'report_topbar') {
+  pdfDownloaded(scanId: string, domain: string, source: 'status_bar' | 'm43_slide' | 'report_topbar' | 'boss_deck' | 'm43_boss_deck') {
     posthog.capture('pdf_downloaded', { scan_id: scanId, domain, source });
   },
 

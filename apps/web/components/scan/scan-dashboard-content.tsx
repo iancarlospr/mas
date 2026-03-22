@@ -273,6 +273,11 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
     window.open(`/api/reports/${scan.id}/prd`, '_blank');
   }, [scan.id, scan.domain]);
 
+  const handleDownloadBossDeck = useCallback(() => {
+    analytics.pdfDownloaded(scan.id, scan.domain ?? '', 'boss_deck');
+    window.open(`/api/reports/${scan.id}/boss-deck`, '_blank');
+  }, [scan.id, scan.domain]);
+
   const handleAskChloe = useCallback(() => {
     const chatId = `chat-${scan.id}`;
     if (wm.windows[chatId]?.isOpen) {
@@ -546,6 +551,10 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
             `}</style>
             <button onClick={handleDownloadPdf} className="text-gs-base hover:text-gs-bright transition-colors" style={{ fontSize: '11px', fontFamily: 'var(--font-system)' }}>
               PRD &darr;
+            </button>
+            <span className="text-gs-mid" style={{ fontSize: '11px' }}>&middot;</span>
+            <button onClick={handleDownloadBossDeck} className="text-gs-base hover:text-gs-bright transition-colors" style={{ fontSize: '11px', fontFamily: 'var(--font-system)' }}>
+              Boss Deck &darr;
             </button>
             <span className="text-gs-mid" style={{ fontSize: '11px' }}>&middot;</span>
             <button

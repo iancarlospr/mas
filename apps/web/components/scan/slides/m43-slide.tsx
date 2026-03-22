@@ -581,6 +581,32 @@ export function M43Slide({ scan, printMode }: { scan: ScanWithResults; printMode
                   </a>
                 )}
 
+                {!printMode && (
+                  <a
+                    href={`/api/reports/${scan.id}/boss-deck`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => analytics.pdfDownloaded(scan.id, scan.domain ?? '', 'm43_boss_deck')}
+                    className="font-display uppercase m43-cta-secondary"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.4em',
+                      padding: '0.45em 1.6em',
+                      border: '1px solid rgba(255,178,239,0.2)',
+                      color: 'var(--gs-light)',
+                      fontSize: T.cardBody,
+                      fontWeight: 600,
+                      letterSpacing: '0.08em',
+                      borderRadius: '6px',
+                      textDecoration: 'none',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    Boss Deck &darr;
+                  </a>
+                )}
+
               </div>
             </div>
           </div>
