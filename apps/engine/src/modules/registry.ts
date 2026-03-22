@@ -429,6 +429,16 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     category: 'market_intelligence',
     dependsOn: ['M41'],
   },
+  {
+    id: 'M46',
+    name: 'Boss Deck',
+    phase: 'synthesis',
+    minimumTier: 'paid',
+    timeout: 120_000,
+    retries: 2,
+    category: 'market_intelligence',
+    dependsOn: ['M42', 'M43', 'M45'],
+  },
 ];
 
 /**

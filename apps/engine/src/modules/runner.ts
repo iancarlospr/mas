@@ -1111,8 +1111,8 @@ export class ModuleRunner {
       await this.executeModule(m41);
     }
 
-    // M42-M45 run sequentially (topological order: M42 → M45 → M43)
-    // M43 depends on both M42 AND M45, so M45 must run before M43.
+    // M42-M46 run sequentially (topological order: M42 → M45 → M43 → M46)
+    // M43 depends on M42+M45, M46 depends on M42+M43+M45.
     const sequentialModules = allSynthesis
       .filter((m) => m.id !== 'M41')
       .sort((a, b) => {
@@ -1120,6 +1120,7 @@ export class ModuleRunner {
           M42: 0,
           M45: 1,
           M43: 2,
+          M46: 3,
         };
         return (order[a.id] ?? 99) - (order[b.id] ?? 99);
       });

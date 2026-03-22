@@ -10,3 +10,4 @@ import './m42-final-synthesis.js';
 import './m43-prd-generation.js';
 // import './m44-roi-simulator.js'; // Disabled — DataForSEO traffic data too unreliable for ROI projections
 import './m45-cost-cutter.js';
+import './m46-boss-deck.js';
