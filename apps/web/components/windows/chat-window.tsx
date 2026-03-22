@@ -110,9 +110,15 @@ const chatMarkdownComponents = {
 
 // ── Copyable AI message wrapper — floating tooltip follows cursor ────
 function CopyableMessage({ text, children }: { text: string; children: ReactNode }) {
-  const [hovered, setHovered] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [selecting, setSelecting] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
   const tooltipRef = useRef<HTMLDivElement>(null);
+
+  const hasSelection = () => {
+    const sel = window.getSelection();
+    return sel != null && sel.toString().trim().length > 0;
+  };
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
     if (!tooltipRef.current) return;
@@ -122,7 +128,32 @@ function CopyableMessage({ text, children }: { text: string; children: ReactNode
     tooltipRef.current.style.transform = `translate(${x}px, ${y}px)`;
   }, []);
 
+  const handleMouseDown = () => {
+    setSelecting(true);
+    setShowTooltip(false);
+  };
+
+  const handleMouseUp = () => {
+    setSelecting(false);
+    // If user just finished a drag-select, hide tooltip
+    if (hasSelection()) {
+      setShowTooltip(false);
+    }
+  };
+
+  const handleMouseEnter = () => {
+    if (!hasSelection()) setShowTooltip(true);
+  };
+
+  const handleMouseLeave = () => {
+    setShowTooltip(false);
+    setCopied(false);
+    setSelecting(false);
+  };
+
   const handleClick = async () => {
+    // Don't copy-all if user has a text selection — let native Cmd+C work
+    if (hasSelection()) return;
     try {
       await navigator.clipboard.writeText(text);
       setCopied(true);
@@ -130,54 +161,58 @@ function CopyableMessage({ text, children }: { text: string; children: ReactNode
     } catch { /* clipboard not available */ }
   };
 
+  const visible = showTooltip && !selecting && !hasSelection();
+
   return (
     <div
       className="relative"
-      style={{ cursor: 'pointer' }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => { setHovered(false); setCopied(false); }}
+      style={{ cursor: visible ? 'pointer' : undefined }}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       onMouseMove={handleMouseMove}
+      onMouseDown={handleMouseDown}
+      onMouseUp={handleMouseUp}
       onClick={handleClick}
     >
       {children}
-      {hovered && (
-        <div
-          ref={tooltipRef}
-          className="pointer-events-none"
-          style={{
-            position: 'absolute',
-            left: 0,
-            top: 0,
-            willChange: 'transform',
-            background: 'oklch(0.16 0.02 340)',
-            border: '1px solid oklch(0.28 0.02 340)',
-            borderRadius: 5,
-            padding: '3px 8px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 4,
-            whiteSpace: 'nowrap',
-            zIndex: 10,
-          }}
-        >
-          {copied ? (
-            <>
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="var(--gs-terminal)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-              <span className="font-data" style={{ fontSize: '10px', color: 'var(--gs-terminal)' }}>Copied</span>
-            </>
-          ) : (
-            <>
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="oklch(0.60 0.03 340)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-              </svg>
-              <span className="font-data" style={{ fontSize: '10px', color: 'oklch(0.55 0.03 340)' }}>Copy</span>
-            </>
-          )}
-        </div>
-      )}
+      <div
+        ref={tooltipRef}
+        className="pointer-events-none"
+        style={{
+          position: 'absolute',
+          left: 0,
+          top: 0,
+          willChange: 'transform',
+          background: 'oklch(0.16 0.02 340)',
+          border: '1px solid oklch(0.28 0.02 340)',
+          borderRadius: 5,
+          padding: '3px 8px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 4,
+          whiteSpace: 'nowrap',
+          zIndex: 10,
+          opacity: visible || copied ? 1 : 0,
+          transition: 'opacity 0.15s ease',
+        }}
+      >
+        {copied ? (
+          <>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="var(--gs-terminal)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+            <span className="font-data" style={{ fontSize: '10px', color: 'var(--gs-terminal)' }}>Copied</span>
+          </>
+        ) : (
+          <>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="oklch(0.60 0.03 340)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+            </svg>
+            <span className="font-data" style={{ fontSize: '10px', color: 'oklch(0.55 0.03 340)' }}>Copy</span>
+          </>
+        )}
+      </div>
     </div>
   );
 }
