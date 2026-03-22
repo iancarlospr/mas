@@ -6,9 +6,9 @@ import { ChloeSprite } from '@/components/chloe/chloe-sprite';
  * ═══════════════════════════════════
  *
  * WHAT: Error state when a scan can't reach the target domain.
- * WHY:  Every error is a Chloe personality moment — no generic
+ * WHY:  Every error is a Chloé personality moment — no generic
  *       "Something went wrong" messages (Plan Section 17).
- * HOW:  Chloe critical sprite, personality copy, bevel error dialog,
+ * HOW:  Chloé critical sprite, personality copy, bevel error dialog,
  *       retry CTA.
  */
 

@@ -76,7 +76,7 @@ export async function middleware(request: NextRequest) {
         <meta property="og:image:height" content="630">
         <meta name="twitter:card" content="summary_large_image">
         <meta name="twitter:title" content="Alpha Scan">
-        <meta name="twitter:description" content="Your MarTech stack is a landfill. Let Chloe run the forensics.">
+        <meta name="twitter:description" content="Your MarTech stack is a landfill. Let Chloé run the forensics.">
         <meta name="twitter:image" content="${ogImageUrl}">
         <meta name="theme-color" content="#080808">
         <link rel="apple-touch-icon" href="/apple-icon" sizes="180x180">

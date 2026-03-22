@@ -6,9 +6,9 @@ import { ChloeSprite } from '@/components/chloe/chloe-sprite';
  * ═══════════════════════════════════════
  *
  * WHAT: Shown when user hits the 4-scan-per-day limit.
- * WHY:  Chloe enforces limits with personality, not apologies
+ * WHY:  Chloé enforces limits with personality, not apologies
  *       (Plan Section 17).
- * HOW:  Chloe smug sprite, usage counter, retro dialog styling.
+ * HOW:  Chloé smug sprite, usage counter, retro dialog styling.
  */
 
 interface RateLimitedProps {

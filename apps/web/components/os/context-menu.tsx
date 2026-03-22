@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react';
 
 /* =================================================================
-   Chloe's Bedroom OS — Context Menu
+   Chloé's Bedroom OS — Context Menu
 
    Frosted glass right-click popup with rounded corners,
    pink hover tint, and stagger animation.

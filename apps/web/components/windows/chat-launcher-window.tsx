@@ -63,7 +63,7 @@ export default function ChatLauncherWindow() {
         <div className="font-system text-os-lg font-bold text-gs-muted">Locked</div>
         <h2 className="font-system text-os-base font-bold">Login Required</h2>
         <p className="font-data text-data-sm text-gs-muted">
-          Log in to chat with Chloe about your scans.
+          Log in to chat with Chloé about your scans.
         </p>
         <button onClick={() => wm.openWindow('auth')} className="bevel-button-primary">
           Log In
@@ -87,7 +87,7 @@ export default function ChatLauncherWindow() {
     <div className="h-full flex flex-col">
       <div className="px-gs-4 py-gs-2 bg-gs-chrome border-b border-gs-chrome-dark">
         <p className="font-system text-os-xs text-gs-muted">
-          Select a scan to chat with Chloe:
+          Select a scan to chat with Chloé:
         </p>
       </div>
       <div className="flex-1 overflow-auto">

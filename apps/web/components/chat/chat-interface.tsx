@@ -8,14 +8,14 @@ import { ChloeSprite } from '@/components/chloe/chloe-sprite';
 import { BevelInput } from '@/components/os/bevel-input';
 
 /**
- * GhostScan OS — Chat Interface (Ask Chloe Window)
+ * GhostScan OS — Chat Interface (Ask Chloé Window)
  * ═══════════════════════════════════════════════════
  *
- * WHAT: AI chat with Chloe rendered as a retro OS chat window.
- * WHY:  The chat IS Chloe — she's the AI analyst who knows your scan
+ * WHAT: AI chat with Chloé rendered as a retro OS chat window.
+ * WHY:  The chat IS Chloé — she's the AI analyst who knows your scan
  *       data. Retro bubble styling, her sprite as avatar, credits as
  *       gems in the status area (Plan Section 7).
- * HOW:  Chloe messages left-aligned with cyan accent border, user
+ * HOW:  Chloé messages left-aligned with cyan accent border, user
  *       messages right-aligned with bevel style, typing indicator
  *       with bouncing dots, bevel input + send button.
  */
@@ -98,12 +98,12 @@ export function ChatInterface({ scanId, initialMessages, initialCredits }: ChatI
 
   return (
     <div className="flex flex-col h-full">
-      {/* Chloe header */}
+      {/* Chloé header */}
       <div className="flex items-center gap-gs-3 p-gs-4 border-b-2 border-gs-chrome">
         <ChloeSprite state={loading ? 'scanning' : 'chat'} size={32} />
         <div className="flex-1">
           <h2 className="font-system text-os-sm font-bold text-gs-ink">
-            Ask Chloe
+            Ask Chloé
           </h2>
           <span className="font-data text-data-xs text-gs-muted">
             {loading ? 'Analyzing...' : 'Ready'}
@@ -192,7 +192,7 @@ export function ChatInterface({ scanId, initialMessages, initialCredits }: ChatI
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask Chloe anything..."
+              placeholder="Ask Chloé anything..."
               disabled={loading}
               fullWidth
             />

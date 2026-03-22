@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 import { soundEffects } from '@/lib/sound-effects';
 
 /* =================================================================
-   Chloe's Bedroom OS — Window Component
+   Chloé's Bedroom OS — Window Component
 
    The foundational UI unit. Everything is a window.
    4 variants: default, terminal, ghost, dialog

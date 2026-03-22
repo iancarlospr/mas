@@ -4,7 +4,7 @@ import { useMemo, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 
 /**
- * Chloe's Bedroom OS — Chloe Sprite Renderer
+ * Chloé's Bedroom OS — Chloé Sprite Renderer
  * =============================================
  *
  * 32x32 pixel art ghost rendered on canvas.
@@ -311,7 +311,7 @@ export function ChloeSprite({
       )}
       style={{ width: size, height: canvasH }}
       role="img"
-      aria-label={`Chloe the ghost — ${state}`}
+      aria-label={`Chloé the ghost — ${state}`}
     >
       <canvas
         ref={canvasRef}

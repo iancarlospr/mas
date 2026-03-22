@@ -8,7 +8,7 @@ import { organizationJsonLd } from '@/lib/json-ld';
 import './globals.css';
 
 /**
- * Chloe's Bedroom OS — Root Layout
+ * Chloé's Bedroom OS — Root Layout
  *
  * The entire app is one persistent Desktop shell.
  * WindowManagerProvider wraps everything for window state.
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Alpha Scan',
-    description: 'Your MarTech stack is a landfill. Let Chloe run the forensics.',
+    description: 'Your MarTech stack is a landfill. Let Chloé run the forensics.',
   },
   robots: { index: true, follow: true },
 };

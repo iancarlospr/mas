@@ -3,7 +3,7 @@ import { ImageResponse } from 'next/og';
 /**
  * Apple Touch Icon (180×180)
  *
- * Uses the EXACT same Chloe ghost pixel art from icon.svg —
+ * Uses the EXACT same Chloé ghost pixel art from icon.svg —
  * same body, outline, eyes, highlights, blush, tail, and glow.
  * Scaled up from the 32×32 grid to 180×180 for iOS home screen.
  */

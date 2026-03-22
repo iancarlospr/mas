@@ -3,7 +3,7 @@
 import { cn } from '@/lib/utils';
 
 /* =================================================================
-   Chloe's Bedroom OS — Progress Bar
+   Chloé's Bedroom OS — Progress Bar
 
    Modern gradient fill with dithered leading edge.
    Also a terminal-style variant using block characters.

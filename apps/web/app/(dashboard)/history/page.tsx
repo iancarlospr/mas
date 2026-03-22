@@ -16,7 +16,7 @@ import type { Metadata } from 'next';
  *       each scan is a "file" with domain, date, score, tier badge
  *       (Plan Section 18).
  * HOW:  Bevel-raised card with file-list rows, favicon placeholders,
- *       traffic light scores, tier badges. Chloe empty state.
+ *       traffic light scores, tier badges. Chloé empty state.
  */
 
 export const metadata: Metadata = { title: 'My Scans' };

@@ -3,7 +3,7 @@
 import { cn } from '@/lib/utils';
 
 /* =================================================================
-   Chloe's Bedroom OS — Dither Components
+   Chloé's Bedroom OS — Dither Components
 
    Reusable CSS dither edge/overlay components.
    2px checkerboard pattern using repeating-conic-gradient.

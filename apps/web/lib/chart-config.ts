@@ -1,5 +1,5 @@
 /**
- * Chloe's Bedroom OS — Chart Configuration
+ * Chloé's Bedroom OS — Chart Configuration
  * ============================================
  *
  * Palette: Monochromatic Pink (OKLCH hue 340)

@@ -4,7 +4,7 @@ import { forwardRef, type InputHTMLAttributes } from 'react';
 import { cn } from '@/lib/utils';
 
 /* =================================================================
-   Chloe's Bedroom OS — Modern Input
+   Chloé's Bedroom OS — Modern Input
 
    Rounded border with pink focus ring + backdrop blur.
    ================================================================= */

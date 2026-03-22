@@ -20,7 +20,7 @@ import {
 import type { LucideProps } from 'lucide-react';
 
 /* =================================================================
-   Chloe's Bedroom OS — Desktop Icons (Lucide)
+   Chloé's Bedroom OS — Desktop Icons (Lucide)
    ================================================================= */
 
 const BEDROOM_ICONS: Record<string, React.FC<LucideProps>> = {

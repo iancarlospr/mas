@@ -7,17 +7,17 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 
 /**
- * GhostScan OS — Chat Page (Ask Chloe)
+ * GhostScan OS — Chat Page (Ask Chloé)
  * ═══════════════════════════════════════════
  *
- * WHAT: Full-page chat with Chloe for a specific scan.
+ * WHAT: Full-page chat with Chloé for a specific scan.
  * WHY:  The chat window is a standalone "program" on the OS desktop.
  *       Wraps ChatInterface in a Window component (Plan Section 7).
  * HOW:  Server component fetches messages + credits, renders Window
- *       with ChatInterface inside. Handles error states with Chloe.
+ *       with ChatInterface inside. Handles error states with Chloé.
  */
 
-export const metadata: Metadata = { title: 'Ask Chloe' };
+export const metadata: Metadata = { title: 'Ask Chloé' };
 
 export default async function ChatPage({
   params,
@@ -81,7 +81,7 @@ export default async function ChatPage({
     <div className="max-w-3xl mx-auto">
       <Window
         id="ask-chloe"
-        title={`Ask Chloe — ${scan.domain}`}
+        title={`Ask Chloé — ${scan.domain}`}
         variant="ghost"
         isActive
       >

@@ -12,7 +12,7 @@ import { getMarketingIQLabel } from '@marketing-alpha/types';
  * Centered vertical stack: logo bloom → domain → final grade → sign-off.
  *
  * The ASCII brand gets its most intense glow of the entire deck (4-layer
- * text-shadow bloom). "Now you know." in Permanent Marker is Chloe's
+ * text-shadow bloom). "Now you know." in Permanent Marker is Chloé's
  * mic-drop sign-off. Bayer dither at bottom mirrors the title slide
  * (bookend effect).
  *
@@ -260,7 +260,7 @@ export function ClosingSlide({ scan }: { scan: ScanWithResults }) {
           {dateStr} &middot; {moduleCount} modules analyzed
         </div>
 
-        {/* Sign-off — Permanent Marker (Chloe's mic drop) */}
+        {/* Sign-off — Permanent Marker (Chloé's mic drop) */}
         <p className="font-marker" style={{
           fontSize: T.signoff,
           color: 'var(--gs-base)',

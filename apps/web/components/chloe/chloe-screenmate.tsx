@@ -7,10 +7,10 @@ import { useChloeReactions } from './chloe-reactions';
 import { useWindowManager } from '@/lib/window-manager';
 
 /**
- * Chloe's Bedroom OS — Chloe Screenmate
+ * Chloé's Bedroom OS — Chloé Screenmate
  * ========================================
  *
- * The living desktop pet. Chloe roams the desktop, sits on window
+ * The living desktop pet. Chloé roams the desktop, sits on window
  * title bars, peeks around edges, sleeps after idle, does mischief,
  * reacts to window opens/closes, and can be dragged.
  *
@@ -685,7 +685,7 @@ export function ChloeScreenmate({
         willChange: 'left, top',
       }}
     >
-      {/* Shadow beneath Chloe when perched */}
+      {/* Shadow beneath Chloé when perched */}
       {isPerched && (
         <div
           className="absolute bottom-[-4px] left-1/2 -translate-x-1/2 w-[48px] h-[6px] rounded-full"
@@ -695,7 +695,7 @@ export function ChloeScreenmate({
         />
       )}
 
-      {/* Chloe sprite (draggable + double-clickable) */}
+      {/* Chloé sprite (draggable + double-clickable) */}
       <div
         className="pointer-events-auto cursor-ghost select-none"
         onPointerDown={handlePointerDown}

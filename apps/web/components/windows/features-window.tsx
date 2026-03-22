@@ -10,11 +10,11 @@ const STEPS = [
   {
     num: '01',
     title: 'Drop a URL',
-    desc: 'Any website. Any competitor. Any landing page. Chloe eats it all.',
+    desc: 'Any website. Any competitor. Any landing page. Chloé eats it all.',
   },
   {
     num: '02',
-    title: 'Chloe scans everything',
+    title: 'Chloé scans everything',
     desc: '45 forensic modules fire in parallel. Passive recon, browser forensics, GhostScan™ deep interaction, external intelligence, AI synthesis.',
   },
   {

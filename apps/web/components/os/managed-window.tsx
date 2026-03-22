@@ -97,7 +97,7 @@ function DitherTitlebar({ active }: { active: boolean }) {
 }
 
 /* =================================================================
-   Chloe's Bedroom OS — Managed Window
+   Chloé's Bedroom OS — Managed Window
 
    Height is CSS-driven: fit-content up to 85vh, then scrolls.
    Width comes from window manager state.

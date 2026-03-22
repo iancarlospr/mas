@@ -12,7 +12,7 @@ import { useScanOrchestrator } from '@/lib/scan-orchestrator';
 import { BedroomIcon } from './bedroom-icons';
 
 /* =================================================================
-   Chloe's Bedroom OS — Desktop Shell
+   Chloé's Bedroom OS — Desktop Shell
 
    The root desktop environment. Renders at the root layout level
    and persists across all Next.js navigations. Contains:
@@ -186,7 +186,7 @@ export function DesktopShell({ children }: { children: ReactNode }) {
         {/* Route-based windows (from Next.js children) */}
         {children}
 
-        {/* Chloe screenmate — living desktop pet */}
+        {/* Chloé screenmate — living desktop pet */}
         <ChloeScreenmate active suppressed={wm.hasOpenScanReport || orchestrator.isVisualSequenceActive} />
       </div>
 

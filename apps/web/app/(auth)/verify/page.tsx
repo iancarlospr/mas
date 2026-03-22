@@ -10,8 +10,8 @@ import { ResendVerificationButton } from './resend-button';
  *
  * WHAT: "Awaiting Verification" screen after registration.
  * WHY:  Auth pages live outside the OS — dark CRT background, you're
- *       trying to get in. Chloe waits impatiently (Plan Section 15).
- * HOW:  Full-screen dark bg, Window dialog, Chloe idle sprite,
+ *       trying to get in. Chloé waits impatiently (Plan Section 15).
+ * HOW:  Full-screen dark bg, Window dialog, Chloé idle sprite,
  *       verification instructions, resend button.
  */
 
@@ -37,7 +37,7 @@ export default async function VerifyPage({
       <div className="crt-scanlines" aria-hidden="true" />
 
       <div className="relative">
-        {/* Chloe waiting */}
+        {/* Chloé waiting */}
         <div className="absolute -top-[80px] left-1/2 -translate-x-1/2 flex flex-col items-center">
           <ChloeSprite state="idle" size={64} glowing />
         </div>

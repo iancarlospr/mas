@@ -4,7 +4,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { useWindowManager } from '@/lib/window-manager';
 
 /* =================================================================
-   Chloe's Bedroom OS — Menu Bar
+   Chloé's Bedroom OS — Menu Bar
 
    Frosted glass top bar. Connected to WindowManagerProvider.
    Left: Logo + menu items (File, View, Help)
@@ -54,7 +54,7 @@ export function MenuBar() {
     {
       label: 'Help',
       items: [
-        { label: 'Ask Chloe', onClick: () => wm.openWindow('chat-launcher') },
+        { label: 'Ask Chloé', onClick: () => wm.openWindow('chat-launcher') },
         { label: 'Why AlphaScan?', onClick: () => wm.openWindow('features') },
         { separator: true, label: '' },
         { label: 'About GhostScan OS', onClick: () => wm.openWindow('about') },

@@ -97,7 +97,7 @@ export default function AboutPage() {
               <div className="bevel-sunken bg-gs-paper p-gs-4">
                 <p className="font-data text-data-sm text-gs-muted leading-relaxed">
                   The result: a MarketingIQ&trade; score (0&ndash;100), an
-                  executive-grade Alpha Brief&trade; dossier, and Chloe &mdash;
+                  executive-grade Alpha Brief&trade; dossier, and Chloé &mdash;
                   an AI analyst who knows your scan data better than you do.
                 </p>
               </div>

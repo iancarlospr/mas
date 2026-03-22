@@ -10,11 +10,11 @@ import { DesktopShell } from './desktop-shell';
 import { MobileGate } from './mobile-gate';
 
 /* =================================================================
-   Chloe's Bedroom OS — Desktop Root
+   Chloé's Bedroom OS — Desktop Root
 
    Client component that wraps everything in providers.
    AuthProvider at shell level = single source of truth for auth.
-   ChloeReactionsProvider at root = Chloe reacts to everything.
+   ChloeReactionsProvider at root = Chloé reacts to everything.
 
    Standalone routes (legal pages) bypass the desktop shell entirely.
    ================================================================= */

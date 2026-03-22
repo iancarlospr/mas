@@ -35,7 +35,7 @@ const faqs = [
   },
   {
     q: 'Can I scan competitors?',
-    a: "Yes. Any public URL. Chloe doesn't discriminate.",
+    a: "Yes. Any public URL. Chloé doesn't discriminate.",
   },
 ];
 

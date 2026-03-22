@@ -3,7 +3,7 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 
 /* =================================================================
-   Chloe TV — Block-art ghost animation. 200×55, 6.5px.
+   Chloé TV — Block-art ghost animation. 200×55, 6.5px.
    Classic bedsheet ghost with wavy bottom tails.
    Ethereal effects, floating particles, cute chaos.
    ================================================================= */

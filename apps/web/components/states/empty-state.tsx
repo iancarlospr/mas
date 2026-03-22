@@ -6,9 +6,9 @@ import { ChloeSprite } from '@/components/chloe/chloe-sprite';
  * ═══════════════════════════════
  *
  * WHAT: Shown when user has no scans yet (history page, dashboard).
- * WHY:  Chloe invites them to start — not a generic "no data" card
+ * WHY:  Chloé invites them to start — not a generic "no data" card
  *       (Plan Section 17).
- * HOW:  Chloe idle sprite, personality invitation, embedded scan input.
+ * HOW:  Chloé idle sprite, personality invitation, embedded scan input.
  */
 
 export function EmptyState() {

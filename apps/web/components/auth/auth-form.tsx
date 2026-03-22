@@ -10,7 +10,7 @@ import { ChloeSprite } from '@/components/chloe/chloe-sprite';
 import { pickRandom, GREETINGS, ERROR_STATES } from '@/lib/chloe-ai-copy';
 
 /**
- * Chloe's Bedroom OS — Auth Form
+ * Chloé's Bedroom OS — Auth Form
  * ================================
  *
  * Login/register form as a frosted glass dialog on dark background.
@@ -145,7 +145,7 @@ export function AuthForm({ mode }: AuthFormProps) {
       <div className="noise-grain" aria-hidden="true" />
 
       <div className="relative">
-        {/* Chloe greeting */}
+        {/* Chloé greeting */}
         <div className="absolute -top-[100px] left-1/2 -translate-x-1/2 flex flex-col items-center">
           <ChloeSprite state="chat" size={64} glowing />
         </div>

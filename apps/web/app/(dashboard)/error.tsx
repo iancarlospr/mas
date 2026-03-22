@@ -8,8 +8,8 @@ import { ChloeSprite } from '@/components/chloe/chloe-sprite';
  * ═══════════════════════════════════════════════
  *
  * WHAT: Error fallback for dashboard pages.
- * WHY:  Even crashes get the Chloe treatment (Plan Section 17).
- * HOW:  Chloe critical sprite, retro error dialog, retry + escape buttons.
+ * WHY:  Even crashes get the Chloé treatment (Plan Section 17).
+ * HOW:  Chloé critical sprite, retro error dialog, retry + escape buttons.
  */
 
 export default function DashboardError({

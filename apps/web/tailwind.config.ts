@@ -1,7 +1,7 @@
 import type { Config } from 'tailwindcss';
 
 /**
- * Chloe's Bedroom OS — Tailwind Configuration
+ * Chloé's Bedroom OS — Tailwind Configuration
  *
  * Palette: Monochromatic Pink (OKLCH hue 340)
  * Anchored on #080808 (void) and #FFB2EF (base)
@@ -78,7 +78,7 @@ const config: Config = {
         'data-2xl':   ['24px', { lineHeight: '1.1', letterSpacing: '-0.01em', fontWeight: '700' }],
         'data-hero':  ['48px', { lineHeight: '1.0', letterSpacing: '-0.02em', fontWeight: '800' }],
 
-        /* Personality (Chloe) */
+        /* Personality (Chloé) */
         'chloe':      ['16px', { lineHeight: '1.4' }],
         'chloe-lg':   ['20px', { lineHeight: '1.3' }],
         'chloe-xl':   ['28px', { lineHeight: '1.2' }],

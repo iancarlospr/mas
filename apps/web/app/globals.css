@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 /* =================================================================
-   Chloe's Bedroom OS — Design System Foundation
+   Chloé's Bedroom OS — Design System Foundation
    Palette: Monochromatic Pink (OKLCH hue 340)
    Anchored on #080808 (void) and #FFB2EF (base)
    ================================================================= */
@@ -20,7 +20,7 @@
     --gs-void:   #080808;                    /* Deepest dark — desktop bg, dark panels */
     --gs-deep:   oklch(0.18 0.02 340);       /* Window chrome, taskbar, dark surfaces */
     --gs-mid:    oklch(0.35 0.05 340);       /* Borders, separators, secondary text */
-    --gs-base:   #FFB2EF;                    /* THE pink — primary UI, icons, Chloe */
+    --gs-base:   #FFB2EF;                    /* THE pink — primary UI, icons, Chloé */
     --gs-bright: oklch(0.88 0.13 340);       /* Active states, hover, glow */
     --gs-light:  oklch(0.96 0.04 340);       /* Text on dark backgrounds, content areas */
 
@@ -122,7 +122,7 @@
     letter-spacing: -0.03em;
   }
 
-  /* Personality font for Chloe moments */
+  /* Personality font for Chloé moments */
   .font-personality {
     font-family: var(--font-personality);
   }
@@ -512,7 +512,7 @@
     text-shadow: 0 0 4px var(--gs-terminal), 0 0 8px oklch(0.80 0.15 145 / 0.3);
   }
 
-  /* -- Ghost Glow (pink, Chloe only) -------------------------- */
+  /* -- Ghost Glow (pink, Chloé only) -------------------------- */
   .ghost-glow {
     filter: drop-shadow(0 0 8px var(--gs-base)) drop-shadow(0 0 16px oklch(0.82 0.15 340 / 0.2));
   }

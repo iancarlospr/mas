@@ -4,7 +4,7 @@
  *
  * WHAT: Placeholder for individual modules that couldn't complete analysis.
  * WHY:  Graceful per-module degradation with retro styling (Plan Section 17).
- * HOW:  Semi-transparent bevel-raised card with Chloe personality copy.
+ * HOW:  Semi-transparent bevel-raised card with Chloé personality copy.
  */
 
 interface ModuleUnavailableProps {

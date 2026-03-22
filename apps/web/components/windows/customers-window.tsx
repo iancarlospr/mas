@@ -7,7 +7,7 @@ import { useAuth } from '@/lib/auth-context';
 /* ═══════════════════════════════════════════════════════════════
    Reviews — Window Content
 
-   Live scan counter (starting at 101), Chloe's fake review card
+   Live scan counter (starting at 101), Chloé's fake review card
    with Scooby-Doo reveal, and a polished feedback form.
    ═══════════════════════════════════════════════════════════════ */
 

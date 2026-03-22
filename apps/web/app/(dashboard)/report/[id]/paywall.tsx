@@ -56,7 +56,7 @@ export function ReportPaywall({ scanId }: ReportPaywallProps) {
         </li>
         <li className="flex items-start gap-gs-2">
           <span className="text-gs-terminal font-bold flex-shrink-0">☑</span>
-          <span>15 Chloe chat questions</span>
+          <span>15 Chloé chat questions</span>
         </li>
       </ul>
       <div className="flex items-center justify-center gap-gs-2 mb-gs-6">

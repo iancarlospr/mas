@@ -4,9 +4,9 @@ import { useEffect, useRef, useState } from 'react';
 import { ChloeSprite } from '@/components/chloe/chloe-sprite';
 
 /**
- * Chloe's Bedroom OS — Easter Eggs
+ * Chloé's Bedroom OS — Easter Eggs
  *
- * 1. Konami code (up up down down left right left right B A) → Chloe celebration
+ * 1. Konami code (up up down down left right left right B A) → Chloé celebration
  * 2. Console ASCII art + hiring message (on mount)
  */
 
@@ -94,7 +94,7 @@ export function EasterEggs() {
         style={{ background: 'oklch(0.82 0.15 340 / 0.12)' }}
       />
 
-      {/* Chloe celebrating */}
+      {/* Chloé celebrating */}
       <div className="relative animate-bounce">
         <ChloeSprite state="celebrating" size={256} glowing />
         <div className="absolute -bottom-[40px] left-1/2 -translate-x-1/2 whitespace-nowrap">

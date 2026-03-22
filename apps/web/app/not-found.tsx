@@ -5,10 +5,10 @@ import { ChloeSprite } from '@/components/chloe/chloe-sprite';
  * GhostScan OS — 404 Page
  * ═══════════════════════════════
  *
- * WHAT: Custom 404 page with Chloe personality.
+ * WHAT: Custom 404 page with Chloé personality.
  * WHY:  "This page ghosted you harder than your last agency."
  *       Every edge case is a brand moment (Plan Section 17).
- * HOW:  Full-screen dark CRT background, Chloe confused, retro dialog.
+ * HOW:  Full-screen dark CRT background, Chloé confused, retro dialog.
  */
 
 export default function NotFound() {

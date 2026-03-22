@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { ChloeSprite } from '@/components/chloe/chloe-sprite';
 
 /**
- * Chloe's Bedroom OS — Mobile Gate
+ * Chloé's Bedroom OS — Mobile Gate
  *
  * Screen < 1024px: Show gate with option to "Scan anyway."
  * Updated to pink monochrome palette.
