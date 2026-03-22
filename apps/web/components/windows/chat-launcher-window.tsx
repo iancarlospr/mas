@@ -47,7 +47,8 @@ function openChatWindow(
   // Pin to bottom-right corner
   const vw = typeof window !== 'undefined' ? window.innerWidth : 1200;
   const vh = typeof window !== 'undefined' ? window.innerHeight : 800;
-  wm.moveWindow(chatId, vw - 380 - 16, vh - 480 - 44 - 16);
+  // 44px taskbar + 28px report status bar + 8px margin
+  wm.moveWindow(chatId, vw - 380 - 16, vh - 480 - 80);
 }
 
 export default function ChatLauncherWindow() {

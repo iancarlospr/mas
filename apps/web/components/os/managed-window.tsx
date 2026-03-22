@@ -226,10 +226,12 @@ export function ManagedWindow({
       )}
       style={{
         position: isAuthGate ? 'fixed' : 'absolute',
-        left: isAuthGate ? '50%' : isMaximized ? 0 : windowState.x,
+        left: isAuthGate ? '50%'
+          : (isMaximized && !windowState.alwaysOnTop) ? 0
+          : windowState.x,
         top: isAuthGate ? '50%' : isMaximized ? 0 : windowState.y,
         transform: isAuthGate ? 'translate(-50%, -50%)' : undefined,
-        width: isMaximized ? '100%' : windowState.width,
+        width: (isMaximized && !windowState.alwaysOnTop) ? '100%' : windowState.width,
         height: isMaximized ? '100%' : 'fit-content',
         maxHeight: isMaximized ? '100%' : 'calc(85vh - 44px)',
         zIndex: isAuthGate ? 10001 : windowState.zIndex + ((windowState.alwaysOnTop || windowState.componentType === 'ghost-chat') ? 1000 : 0),
