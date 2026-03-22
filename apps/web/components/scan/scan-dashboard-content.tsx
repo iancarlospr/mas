@@ -293,6 +293,10 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
       componentType: 'ghost-chat',
     });
     wm.openWindow(chatId, { scanId: scan.id, domain: scan.domain });
+    // Pin to bottom-right corner
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    wm.moveWindow(chatId, vw - 380 - 16, vh - 480 - 44 - 16);
   }, [wm, scan.id, scan.domain]);
 
   return (

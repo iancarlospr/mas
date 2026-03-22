@@ -337,8 +337,8 @@ export async function POST(
     );
   }
 
-  // Only save messages and decrement credits on success
-  await Promise.all([
+  // Save messages first — these are the paid deliverable and must persist
+  const [userInsert, assistantInsert] = await Promise.all([
     supabase.from('chat_messages').insert({
       scan_id: scanId,
       user_id: user.id,
@@ -351,9 +351,20 @@ export async function POST(
       role: 'assistant',
       content: assistantResponse,
     }),
-    // Atomic decrement — prevents double-spend race condition
-    supabase.rpc('decrement_chat_credits', { p_user_id: user.id, p_amount: 1 }),
   ]);
+
+  if (userInsert.error) console.error(`[chat/${scanId}] user msg insert failed:`, userInsert.error);
+  if (assistantInsert.error) console.error(`[chat/${scanId}] assistant msg insert failed:`, assistantInsert.error);
+
+  // Decrement credit separately — failure here is a billing issue, not data loss
+  const { error: creditError } = await supabase.rpc('decrement_chat_credits', {
+    p_user_id: user.id,
+    p_amount: 1,
+  });
+  if (creditError) {
+    console.error(`[chat/${scanId}] credit decrement failed:`, creditError);
+    captureServerError(user.id, creditError, { route: 'chat/credits', scan_id: scanId });
+  }
 
   return NextResponse.json({
     message: assistantResponse,
