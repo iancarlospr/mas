@@ -337,23 +337,21 @@ export async function POST(
     );
   }
 
-  // Save messages first — these are the paid deliverable and must persist
-  const [userInsert, assistantInsert] = await Promise.all([
-    supabase.from('chat_messages').insert({
-      scan_id: scanId,
-      user_id: user.id,
-      role: 'user',
-      content: parsed.data.message,
-    }),
-    supabase.from('chat_messages').insert({
-      scan_id: scanId,
-      user_id: user.id,
-      role: 'assistant',
-      content: assistantResponse,
-    }),
-  ]);
-
+  // Save messages sequentially — guarantees created_at ordering
+  const userInsert = await supabase.from('chat_messages').insert({
+    scan_id: scanId,
+    user_id: user.id,
+    role: 'user',
+    content: parsed.data.message,
+  });
   if (userInsert.error) console.error(`[chat/${scanId}] user msg insert failed:`, userInsert.error);
+
+  const assistantInsert = await supabase.from('chat_messages').insert({
+    scan_id: scanId,
+    user_id: user.id,
+    role: 'assistant',
+    content: assistantResponse,
+  });
   if (assistantInsert.error) console.error(`[chat/${scanId}] assistant msg insert failed:`, assistantInsert.error);
 
   // Decrement credit separately — failure here is a billing issue, not data loss

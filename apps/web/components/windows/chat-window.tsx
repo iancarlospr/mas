@@ -108,6 +108,49 @@ const chatMarkdownComponents = {
   ),
 };
 
+// ── Copy button — appears on hover ──────────────────────────
+function CopyButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch { /* clipboard not available */ }
+  };
+
+  return (
+    <button
+      onClick={handleCopy}
+      title={copied ? 'Copied!' : 'Copy message'}
+      className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
+      style={{
+        background: 'oklch(0.18 0.02 340)',
+        border: '1px solid oklch(0.25 0.02 340)',
+        borderRadius: 4,
+        padding: '2px 5px',
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 3,
+      }}
+    >
+      {copied ? (
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--gs-terminal)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="20 6 9 17 4 12" />
+        </svg>
+      ) : (
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="oklch(0.55 0.03 340)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+        </svg>
+      )}
+    </button>
+  );
+}
+
 export default function ChatWindow({ windowId }: ChatWindowProps) {
   const wm = useWindowManager();
   const windowState = useWindowState(windowId);
@@ -344,7 +387,7 @@ export default function ChatWindow({ windowId }: ChatWindowProps) {
   return (
     <div className="flex flex-col" style={{ height: windowState?.isMaximized ? '100%' : (windowState?.height ? (windowState.height - 32) : 448), minHeight: 0 }}>
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto py-gs-3 space-y-gs-4" style={{ paddingLeft: 10, paddingRight: 10, minHeight: 0 }}>
+      <div className="flex-1 overflow-y-auto py-gs-3 space-y-gs-4 select-text" style={{ paddingLeft: 10, paddingRight: 10, minHeight: 0 }}>
         {messages.length === 0 && !sending && (
           <div className="text-center py-gs-6">
             <ChloeSprite state="chat" size={32} glowing className="mx-auto mb-gs-3" />
@@ -359,10 +402,11 @@ export default function ChatWindow({ windowId }: ChatWindowProps) {
         )}
 
         {messages.map((msg) => (
-          <div key={msg.id}>
+          <div key={msg.id} className="group relative">
             {msg.role === 'user' ? (
               /* User message — pill, right-aligned, stands out */
-              <div className="flex justify-end">
+              <div className="flex justify-end items-start gap-1.5">
+                <CopyButton text={msg.content} />
                 <div
                   className="font-data text-data-sm whitespace-pre-wrap leading-relaxed"
                   style={{
@@ -379,9 +423,12 @@ export default function ChatWindow({ windowId }: ChatWindowProps) {
             ) : (
               /* Chloé message — ghost icon top-left corner, pink border, full width */
               <div>
-                <div className="flex items-center gap-1.5 mb-1">
-                  <GhostIcon size={12} />
-                  <span className="font-data" style={{ fontSize: '10px', color: 'oklch(0.45 0.04 340)' }}>Chlo&eacute;</span>
+                <div className="flex items-center justify-between mb-1">
+                  <div className="flex items-center gap-1.5">
+                    <GhostIcon size={12} />
+                    <span className="font-data" style={{ fontSize: '10px', color: 'oklch(0.45 0.04 340)' }}>Chlo&eacute;</span>
+                  </div>
+                  <CopyButton text={msg.content} />
                 </div>
                 <div
                   style={{
