@@ -27,7 +27,7 @@ interface CompletenessItem {
   detail?: string;
 }
 
-export function M38Slide({ scan, chloeCallout }: { scan: ScanWithResults; chloeCallout?: React.ReactNode }) {
+export function M38Slide({ scan, onAskChloe }: { scan: ScanWithResults; onAskChloe?: () => void }) {
   const syn = getM41Summary(scan, 'M38');
   const mod = getModuleResult(scan, 'M38');
   const raw = (mod?.data as Record<string, unknown> | undefined) ?? null;
@@ -77,7 +77,7 @@ export function M38Slide({ scan, chloeCallout }: { scan: ScanWithResults; chloeC
       findings={findings}
       recommendations={recs}
       scoreBreakdown={scores}
-      chloeCallout={chloeCallout}
+      onAskChloe={onAskChloe}
     >
       {/* ═══ GBP Profile & Completeness ═══ */}
       <div style={{

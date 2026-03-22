@@ -20,7 +20,7 @@ import {
  *   - Per-competitor: avg position, keyword count, ETV
  */
 
-export function M29Slide({ scan, chloeCallout }: { scan: ScanWithResults; chloeCallout?: React.ReactNode }) {
+export function M29Slide({ scan, onAskChloe }: { scan: ScanWithResults; onAskChloe?: () => void }) {
   const syn = getM41Summary(scan, 'M29');
   const mod = getModuleResult(scan, 'M29');
   const raw = (mod?.data as Record<string, unknown> | undefined) ?? null;
@@ -66,7 +66,7 @@ export function M29Slide({ scan, chloeCallout }: { scan: ScanWithResults; chloeC
       findings={findings}
       recommendations={recs}
       scoreBreakdown={scores}
-      chloeCallout={chloeCallout}
+      onAskChloe={onAskChloe}
     >
       <div style={{
         marginBottom: '0.6em', flexShrink: 0,

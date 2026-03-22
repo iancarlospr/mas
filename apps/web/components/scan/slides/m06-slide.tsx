@@ -32,7 +32,7 @@ interface AdPixel {
   loadMethod?: string;
 }
 
-export function M06Slide({ scan, chloeCallout }: { scan: ScanWithResults; chloeCallout?: React.ReactNode }) {
+export function M06Slide({ scan, onAskChloe }: { scan: ScanWithResults; onAskChloe?: () => void }) {
   const syn = getM41Summary(scan, 'M06');
   const mod = getModuleResult(scan, 'M06');
   const raw = (mod?.data as Record<string, unknown> | undefined) ?? null;
@@ -180,7 +180,7 @@ export function M06Slide({ scan, chloeCallout }: { scan: ScanWithResults; chloeC
       findings={findings}
       recommendations={recs}
       scoreBreakdown={scores}
-      chloeCallout={chloeCallout}
+      onAskChloe={onAskChloe}
     />
   );
 }

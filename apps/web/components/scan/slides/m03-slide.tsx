@@ -19,7 +19,7 @@ import {
  * plus a stats row for Lighthouse score, Page Weight, and TTI.
  */
 
-export function M03Slide({ scan, chloeCallout }: { scan: ScanWithResults; chloeCallout?: React.ReactNode }) {
+export function M03Slide({ scan, onAskChloe }: { scan: ScanWithResults; onAskChloe?: () => void }) {
   const syn = getM41Summary(scan, 'M03');
   const mod = getModuleResult(scan, 'M03');
   const raw = (mod?.data as Record<string, unknown> | undefined) ?? null;
@@ -99,7 +99,7 @@ export function M03Slide({ scan, chloeCallout }: { scan: ScanWithResults; chloeC
       findings={findings}
       recommendations={recs}
       scoreBreakdown={scores}
-      chloeCallout={chloeCallout}
+      onAskChloe={onAskChloe}
     >
       {/* ═══ Web Vitals Gauges + Stats ═══ */}
       <div style={{

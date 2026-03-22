@@ -56,7 +56,6 @@ import { M36Slide } from './slides/m36-slide';
 import { M45Slide } from './slides/m45-slide';
 import { M43Slide } from './slides/m43-slide';
 import { ClosingSlide } from './slides/closing-slide';
-import { ChloeCallout } from './slides/chloe-callout';
 import { cn } from '@/lib/utils';
 
 /**
@@ -110,29 +109,6 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
     }
     return map;
   }, [scan.marketingIqResult]);
-
-  // ── Chloé callout: modules with at least one CRIT key finding ──
-  interface CritModuleData { score: number; critFinding: string; topRec: string }
-  const critModules = useMemo(() => {
-    if (!isPaid) return new Map<string, CritModuleData>();
-    const m41 = scan.moduleResults.find((r) => r.moduleId === 'M41');
-    const sums = (m41?.data?.['moduleSummaries'] as Record<string, {
-      key_findings?: Array<{ finding: string; severity: string }>;
-      recommendations?: Array<{ action: string; priority: string }>;
-    }> | undefined) ?? {};
-    const result = new Map<string, CritModuleData>();
-    for (const r of scan.moduleResults) {
-      if (r.score == null || r.status === 'skipped' || r.status === 'error') continue;
-      const summary = sums[r.moduleId];
-      const crit = summary?.key_findings?.find((f) => f.severity === 'critical');
-      if (crit) {
-        const topRec = summary?.recommendations?.find((rec) => rec.priority === 'P0')?.action
-          ?? summary?.recommendations?.[0]?.action ?? '';
-        result.set(r.moduleId, { score: r.score ?? 0, critFinding: crit.finding, topRec });
-      }
-    }
-    return result;
-  }, [scan.moduleResults, isPaid]);
 
   const contentRef = useRef<HTMLDivElement>(null);
   const tabBarRef = useRef<HTMLDivElement>(null);
@@ -301,26 +277,6 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
     wm.openWindow('chat-launcher', { scanId: scan.id });
   }, [wm, scan.id]);
 
-  const buildModuleCallout = useCallback(
-    (moduleId: string) => {
-      const data = critModules.get(moduleId);
-      if (!data) return undefined;
-      // Build contextual question from the recommendation (actionable) or the finding
-      const question = data.topRec
-        ? `How do I ${data.topRec.charAt(0).toLowerCase()}${data.topRec.slice(1).replace(/\.$/, '')}?`
-        : `How do I fix the ${data.critFinding.toLowerCase().slice(0, 80)} issue?`;
-      return (
-        <ChloeCallout
-          question={question}
-          onAskChloe={handleAskChloe}
-          scanId={scan.id}
-          slideId={moduleId}
-        />
-      );
-    },
-    [critModules, handleAskChloe, scan.id],
-  );
-
   return (
     <div className="flex flex-col h-full">
       {/* ── Category Nav Bar ── */}
@@ -401,47 +357,47 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
             <div id="nav-security">
               <CategoryIntroSlide scan={scan} category="security_compliance" />
             </div>
-            <M01Slide scan={scan} chloeCallout={buildModuleCallout('M01')} />
-            <M12Slide scan={scan} chloeCallout={buildModuleCallout('M12')} />
-            <M40Slide scan={scan} chloeCallout={buildModuleCallout('M40')} />
+            <M01Slide scan={scan} onAskChloe={handleAskChloe} />
+            <M12Slide scan={scan} onAskChloe={handleAskChloe} />
+            <M40Slide scan={scan} onAskChloe={handleAskChloe} />
 
             {/* ── Category 2: Analytics & Measurement ── */}
             <div id="nav-analytics">
               <CategoryIntroSlide scan={scan} category="analytics_measurement" />
             </div>
-            <M05Slide scan={scan} chloeCallout={buildModuleCallout('M05')} />
-            <M06Slide scan={scan} chloeCallout={buildModuleCallout('M06')} />
-            <M06bSlide scan={scan} chloeCallout={buildModuleCallout('M06b')} />
-            <M08Slide scan={scan} chloeCallout={buildModuleCallout('M08')} />
-            <M09Slide scan={scan} chloeCallout={buildModuleCallout('M09')} />
+            <M05Slide scan={scan} onAskChloe={handleAskChloe} />
+            <M06Slide scan={scan} onAskChloe={handleAskChloe} />
+            <M06bSlide scan={scan} onAskChloe={handleAskChloe} />
+            <M08Slide scan={scan} onAskChloe={handleAskChloe} />
+            <M09Slide scan={scan} onAskChloe={handleAskChloe} />
 
             {/* ── Category 3: Performance & Experience ── */}
             <div id="nav-performance">
               <CategoryIntroSlide scan={scan} category="performance_experience" />
             </div>
-            <M03Slide scan={scan} chloeCallout={buildModuleCallout('M03')} />
-            <M13Slide scan={scan} chloeCallout={buildModuleCallout('M13')} />
-            <M14Slide scan={scan} chloeCallout={buildModuleCallout('M14')} />
-            <M10Slide scan={scan} chloeCallout={buildModuleCallout('M10')} />
-            <M11Slide scan={scan} chloeCallout={buildModuleCallout('M11')} />
+            <M03Slide scan={scan} onAskChloe={handleAskChloe} />
+            <M13Slide scan={scan} onAskChloe={handleAskChloe} />
+            <M14Slide scan={scan} onAskChloe={handleAskChloe} />
+            <M10Slide scan={scan} onAskChloe={handleAskChloe} />
+            <M11Slide scan={scan} onAskChloe={handleAskChloe} />
 
             {/* ── Category 4: SEO & Content ── */}
             <div id="nav-seo">
               <CategoryIntroSlide scan={scan} category="seo_content" />
             </div>
-            <M04Slide scan={scan} chloeCallout={buildModuleCallout('M04')} />
-            <M15Slide scan={scan} chloeCallout={buildModuleCallout('M15')} />
-            <M26Slide scan={scan} chloeCallout={buildModuleCallout('M26')} />
-            <M34Slide scan={scan} chloeCallout={buildModuleCallout('M34')} />
-            <M39Slide scan={scan} chloeCallout={buildModuleCallout('M39')} />
+            <M04Slide scan={scan} onAskChloe={handleAskChloe} />
+            <M15Slide scan={scan} onAskChloe={handleAskChloe} />
+            <M26Slide scan={scan} onAskChloe={handleAskChloe} />
+            <M34Slide scan={scan} onAskChloe={handleAskChloe} />
+            <M39Slide scan={scan} onAskChloe={handleAskChloe} />
 
             {/* ── Category 5: Paid Media ── */}
             <div id="nav-paid-media">
               <CategoryIntroSlide scan={scan} category="paid_media" />
             </div>
-            <M21Slide scan={scan} chloeCallout={buildModuleCallout('M21')} />
-            <M28Slide scan={scan} chloeCallout={buildModuleCallout('M28')} />
-            <M29Slide scan={scan} chloeCallout={buildModuleCallout('M29')} />
+            <M21Slide scan={scan} onAskChloe={handleAskChloe} />
+            <M28Slide scan={scan} onAskChloe={handleAskChloe} />
+            <M29Slide scan={scan} onAskChloe={handleAskChloe} />
           </>
         )}
 
@@ -449,9 +405,9 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
         <div id="nav-martech">
           {isPaid && <CategoryIntroSlide scan={scan} category="martech_infrastructure" />}
         </div>
-        <M02Slide scan={scan} chloeCallout={buildModuleCallout('M02')} />
-        <M07Slide scan={scan} chloeCallout={buildModuleCallout('M07')} />
-        <M20Slide scan={scan} chloeCallout={buildModuleCallout('M20')} />
+        <M02Slide scan={scan} onAskChloe={handleAskChloe} />
+        <M07Slide scan={scan} onAskChloe={handleAskChloe} />
+        <M20Slide scan={scan} onAskChloe={handleAskChloe} />
 
         {isPaid && (
           <>
@@ -459,24 +415,24 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
             <div id="nav-brand">
               <CategoryIntroSlide scan={scan} category="brand_presence" />
             </div>
-            <M16Slide scan={scan} chloeCallout={buildModuleCallout('M16')} />
-            <M17Slide scan={scan} chloeCallout={buildModuleCallout('M17')} />
-            <M18M19Slide scan={scan} chloeCallout={buildModuleCallout('M18')} />
-            <M22M23Slide scan={scan} chloeCallout={buildModuleCallout('M22')} />
-            <M37Slide scan={scan} chloeCallout={buildModuleCallout('M37')} />
-            <M38Slide scan={scan} chloeCallout={buildModuleCallout('M38')} />
+            <M16Slide scan={scan} onAskChloe={handleAskChloe} />
+            <M17Slide scan={scan} onAskChloe={handleAskChloe} />
+            <M18M19Slide scan={scan} onAskChloe={handleAskChloe} />
+            <M22M23Slide scan={scan} onAskChloe={handleAskChloe} />
+            <M37Slide scan={scan} onAskChloe={handleAskChloe} />
+            <M38Slide scan={scan} onAskChloe={handleAskChloe} />
 
             {/* ── Category 8: Market Intelligence ── */}
             <div id="nav-market-intel">
               <CategoryIntroSlide scan={scan} category="market_intelligence" />
             </div>
-            <M24Slide scan={scan} chloeCallout={buildModuleCallout('M24')} />
-            <M25Slide scan={scan} chloeCallout={buildModuleCallout('M25')} />
-            <M27Slide scan={scan} chloeCallout={buildModuleCallout('M27')} />
-            <M30Slide scan={scan} chloeCallout={buildModuleCallout('M30')} />
-            <M31Slide scan={scan} chloeCallout={buildModuleCallout('M31')} />
-            <M33Slide scan={scan} chloeCallout={buildModuleCallout('M33')} />
-            <M36Slide scan={scan} chloeCallout={buildModuleCallout('M36')} />
+            <M24Slide scan={scan} onAskChloe={handleAskChloe} />
+            <M25Slide scan={scan} onAskChloe={handleAskChloe} />
+            <M27Slide scan={scan} onAskChloe={handleAskChloe} />
+            <M30Slide scan={scan} onAskChloe={handleAskChloe} />
+            <M31Slide scan={scan} onAskChloe={handleAskChloe} />
+            <M33Slide scan={scan} onAskChloe={handleAskChloe} />
+            <M36Slide scan={scan} onAskChloe={handleAskChloe} />
 
             {/* ── M43: PRD ── */}
             <div id="nav-prd">

@@ -18,7 +18,7 @@ import {
  * device readiness signals.
  */
 
-export function M14Slide({ scan, chloeCallout }: { scan: ScanWithResults; chloeCallout?: React.ReactNode }) {
+export function M14Slide({ scan, onAskChloe }: { scan: ScanWithResults; onAskChloe?: () => void }) {
   const syn = getM41Summary(scan, 'M14');
   const mod = getModuleResult(scan, 'M14');
   const raw = (mod?.data as Record<string, unknown> | undefined) ?? null;
@@ -137,7 +137,7 @@ export function M14Slide({ scan, chloeCallout }: { scan: ScanWithResults; chloeC
       findings={findings}
       recommendations={recs}
       scoreBreakdown={scores}
-      chloeCallout={chloeCallout}
+      onAskChloe={onAskChloe}
     >
       {/* ═══ Device Readiness Grid ═══ */}
       <div style={{

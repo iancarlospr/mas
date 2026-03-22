@@ -71,7 +71,7 @@ const MOCK_M01: Record<string, unknown> | null = process.env.NODE_ENV === 'devel
 
 // ── Component ─────────────────────────────────────────────────────────
 
-export function M01Slide({ scan }: { scan: ScanWithResults; chloeCallout?: import('react').ReactNode }) {
+export function M01Slide({ scan }: { scan: ScanWithResults; onAskChloe?: () => void }) {
   const rm = new Map<string, ModuleResult>(scan.moduleResults.map((r) => [r.moduleId, r]));
   const m41 = rm.get('M41');
   const sums = (m41?.data?.['moduleSummaries'] as Record<string, M41Summary> | undefined) ?? {};

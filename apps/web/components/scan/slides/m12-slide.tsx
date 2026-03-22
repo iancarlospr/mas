@@ -34,7 +34,7 @@ function scoreC(n: number) { return n >= 70 ? 'var(--gs-terminal)' : n >= 40 ? '
 
 // ── Component ─────────────────────────────────────────────────────────
 
-export function M12Slide({ scan }: { scan: ScanWithResults; chloeCallout?: import('react').ReactNode }) {
+export function M12Slide({ scan }: { scan: ScanWithResults; onAskChloe?: () => void }) {
   const rm = new Map<string, ModuleResult>(scan.moduleResults.map((r) => [r.moduleId, r]));
   const m41 = rm.get('M41');
   const sums = (m41?.data?.['moduleSummaries'] as Record<string, M41Summary> | undefined) ?? {};

@@ -115,7 +115,7 @@ function layoutTreemap(
   return rects;
 }
 
-export function M30Slide({ scan, chloeCallout }: { scan: ScanWithResults; chloeCallout?: React.ReactNode }) {
+export function M30Slide({ scan, onAskChloe }: { scan: ScanWithResults; onAskChloe?: () => void }) {
   const syn = getM41Summary(scan, 'M30');
   const mod = getModuleResult(scan, 'M30');
   const raw = (mod?.data as Record<string, unknown> | undefined) ?? null;
@@ -171,7 +171,7 @@ export function M30Slide({ scan, chloeCallout }: { scan: ScanWithResults; chloeC
       findings={findings}
       recommendations={recs}
       scoreBreakdown={scores}
-      chloeCallout={chloeCallout}
+      onAskChloe={onAskChloe}
     >
       <div style={{
         display: 'flex', gap: '3%', flexShrink: 0,

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import type { ScanWithResults, ModuleResult } from '@marketing-alpha/types';
+import { ChloeCallout } from './chloe-callout';
 
 /**
  * Shared utilities and base layout for custom module slides.
@@ -58,15 +59,22 @@ interface SlideShellProps {
   scoreBreakdown: M41Summary['score_breakdown'];
   /** When true, children area flexes to fill remaining space while bottom columns stay at natural height */
   flexViz?: boolean;
-  /** Optional Chloé callout shown below exec summary (passed from orchestrator) */
-  chloeCallout?: React.ReactNode;
+  /** Opens the chat launcher — if provided and findings contain CRIT, GhostChat widget renders in recs column */
+  onAskChloe?: () => void;
 }
 
 export function SlideShell({
   moduleName, score, headline, execSummary, scan, sourceLabel,
   children, findings = [], recommendations = [], scoreBreakdown = [],
-  flexViz = false, chloeCallout,
+  flexViz = false, onAskChloe,
 }: SlideShellProps) {
+  // Detect if this slide has a critical finding + derive a contextual question
+  const critFinding = findings?.find((f) => f.severity === 'critical');
+  const topRec = recommendations?.find((r) => r.priority === 'P0') ?? recommendations?.[0];
+  const showGhostChat = !!(onAskChloe && critFinding);
+  const ghostChatQuestion = topRec
+    ? `How do I ${topRec.action.charAt(0).toLowerCase()}${topRec.action.slice(1).replace(/\.$/, '')}?`
+    : `How do I fix the ${critFinding?.finding?.toLowerCase().slice(0, 80) ?? ''} issue?`;
   return (
     <div
       className="slide-card relative overflow-hidden select-none"
@@ -104,9 +112,6 @@ export function SlideShell({
             </p>
           </div>
         )}
-
-        {/* Chloé callout (optional — worst-scoring modules only) */}
-        {chloeCallout}
 
         {/* Custom visualization area */}
         {flexViz ? (
@@ -151,9 +156,9 @@ export function SlideShell({
             <div style={{ width: '1px', background: 'rgba(255,178,239,0.06)', flexShrink: 0 }} />
           )}
 
-          {/* Recommendations */}
+          {/* Recommendations + GhostChat widget */}
           {recommendations && recommendations.length > 0 && (
-            <div style={{ flex: 1, overflow: 'hidden' }}>
+            <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
               <h4 className="font-display uppercase" style={{ fontSize: 'clamp(1px, 0.98cqi, 14px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.4em' }}>
                 Recommendations
               </h4>
@@ -173,6 +178,16 @@ export function SlideShell({
                   </div>
                 ))}
               </div>
+              {showGhostChat && (
+                <div style={{ marginTop: 'auto', paddingTop: '0.5em' }}>
+                  <ChloeCallout
+                    question={ghostChatQuestion}
+                    onAskChloe={onAskChloe!}
+                    scanId={scan.id}
+                    slideId={moduleName}
+                  />
+                </div>
+              )}
             </div>
           )}
 
@@ -470,15 +485,21 @@ interface SlideShellAltProps {
   findings: M41Summary['key_findings'];
   recommendations: M41Summary['recommendations'];
   scoreBreakdown: M41Summary['score_breakdown'];
-  /** Optional Chloé callout shown below exec summary (passed from orchestrator) */
-  chloeCallout?: React.ReactNode;
+  /** Opens the chat launcher — if provided and findings contain CRIT, GhostChat widget renders */
+  onAskChloe?: () => void;
 }
 
 export function SlideShellAlt({
   moduleName, score, headline, execSummary, scan, sourceLabel,
   vizContent, findings = [], recommendations = [], scoreBreakdown = [],
-  chloeCallout,
+  onAskChloe,
 }: SlideShellAltProps) {
+  const critFinding = findings?.find((f) => f.severity === 'critical');
+  const topRec = recommendations?.find((r) => r.priority === 'P0') ?? recommendations?.[0];
+  const showGhostChat = !!(onAskChloe && critFinding);
+  const ghostChatQuestion = topRec
+    ? `How do I ${topRec.action.charAt(0).toLowerCase()}${topRec.action.slice(1).replace(/\.$/, '')}?`
+    : `How do I fix the ${critFinding?.finding?.toLowerCase().slice(0, 80) ?? ''} issue?`;
   return (
     <div
       className="slide-card relative overflow-hidden select-none"
@@ -513,9 +534,6 @@ export function SlideShellAlt({
             {execSummary}
           </p>
         )}
-
-        {/* Chloé callout (optional — worst-scoring modules only) */}
-        {chloeCallout}
 
         {/* Two columns: Left (viz) | Right (findings + recs) */}
         <div style={{ display: 'flex', flex: '1 1 0', minHeight: 0, gap: '3%', borderTop: '1px solid rgba(255,178,239,0.06)', paddingTop: '0.5em' }}>
@@ -553,7 +571,7 @@ export function SlideShellAlt({
               </div>
             )}
             {recommendations && recommendations.length > 0 && (
-              <div>
+              <div style={{ display: 'flex', flexDirection: 'column', flex: showGhostChat ? 1 : undefined }}>
                 <h4 className="font-display uppercase" style={{ fontSize: 'clamp(1px, 0.90cqi, 13px)', letterSpacing: '0.18em', color: 'var(--gs-base)', marginBottom: '0.3em' }}>
                   Recommendations
                 </h4>
@@ -573,6 +591,16 @@ export function SlideShellAlt({
                     </div>
                   ))}
                 </div>
+                {showGhostChat && (
+                  <div style={{ marginTop: 'auto', paddingTop: '0.5em' }}>
+                    <ChloeCallout
+                      question={ghostChatQuestion}
+                      onAskChloe={onAskChloe!}
+                      scanId={scan.id}
+                      slideId={moduleName}
+                    />
+                  </div>
+                )}
               </div>
             )}
             {scoreBreakdown && scoreBreakdown.length > 0 && (

@@ -38,7 +38,7 @@ function fmtPrice(price: number, currency?: string): string {
   return `${sym}${price.toFixed(2)}`;
 }
 
-export function M36Slide({ scan, chloeCallout }: { scan: ScanWithResults; chloeCallout?: React.ReactNode }) {
+export function M36Slide({ scan, onAskChloe }: { scan: ScanWithResults; onAskChloe?: () => void }) {
   const syn = getM41Summary(scan, 'M36');
   const mod = getModuleResult(scan, 'M36');
   const raw = (mod?.data as Record<string, unknown> | undefined) ?? null;
@@ -210,7 +210,7 @@ export function M36Slide({ scan, chloeCallout }: { scan: ScanWithResults; chloeC
       findings={findings}
       recommendations={recs}
       scoreBreakdown={scores}
-      chloeCallout={chloeCallout}
+      onAskChloe={onAskChloe}
     />
   );
 }

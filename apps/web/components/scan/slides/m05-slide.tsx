@@ -29,7 +29,7 @@ interface AnalyticsTool {
   confidence?: number;
 }
 
-export function M05Slide({ scan, chloeCallout }: { scan: ScanWithResults; chloeCallout?: React.ReactNode }) {
+export function M05Slide({ scan, onAskChloe }: { scan: ScanWithResults; onAskChloe?: () => void }) {
   const syn = getM41Summary(scan, 'M05');
   const mod = getModuleResult(scan, 'M05');
   const raw = (mod?.data as Record<string, unknown> | undefined) ?? null;
@@ -83,7 +83,7 @@ export function M05Slide({ scan, chloeCallout }: { scan: ScanWithResults; chloeC
       findings={findings}
       recommendations={recs}
       scoreBreakdown={scores}
-      chloeCallout={chloeCallout}
+      onAskChloe={onAskChloe}
     >
       {/* ═══ Measurement Stack Viz ═══ */}
       <div style={{ marginBottom: '0.6em', flexShrink: 0, padding: '0.5em 0', borderTop: '1px solid rgba(255,178,239,0.06)', borderBottom: '1px solid rgba(255,178,239,0.06)' }}>
