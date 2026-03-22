@@ -112,12 +112,15 @@ const chatMarkdownComponents = {
 function CopyableMessage({ text, children }: { text: string; children: ReactNode }) {
   const [hovered, setHovered] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [pos, setPos] = useState({ x: 0, y: 0 });
+  const tooltipRef = useRef<HTMLDivElement>(null);
 
-  const handleMouseMove = (e: React.MouseEvent) => {
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (!tooltipRef.current) return;
     const rect = e.currentTarget.getBoundingClientRect();
-    setPos({ x: e.clientX - rect.left + 12, y: e.clientY - rect.top - 24 });
-  };
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top - 28;
+    tooltipRef.current.style.transform = `translate(${x}px, ${y}px)`;
+  }, []);
 
   const handleClick = async () => {
     try {
@@ -139,11 +142,13 @@ function CopyableMessage({ text, children }: { text: string; children: ReactNode
       {children}
       {hovered && (
         <div
+          ref={tooltipRef}
           className="pointer-events-none"
           style={{
             position: 'absolute',
-            left: pos.x,
-            top: pos.y,
+            left: 0,
+            top: 0,
+            willChange: 'transform',
             background: 'oklch(0.16 0.02 340)',
             border: '1px solid oklch(0.28 0.02 340)',
             borderRadius: 5,
