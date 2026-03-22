@@ -342,9 +342,9 @@ export default function ChatWindow({ windowId }: ChatWindowProps) {
 
   // ── Main chat UI ───────────────────────────────────────────
   return (
-    <div className="flex flex-col" style={{ position: 'absolute', inset: 0 }}>
+    <div className="flex flex-col" style={{ height: windowState?.height ? (windowState.height - 32) : 448, minHeight: 0 }}>
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto py-gs-3 space-y-gs-4" style={{ paddingLeft: 10, paddingRight: 10 }}>
+      <div className="flex-1 overflow-y-auto py-gs-3 space-y-gs-4" style={{ paddingLeft: 10, paddingRight: 10, minHeight: 0 }}>
         {messages.length === 0 && !sending && (
           <div className="text-center py-gs-6">
             <ChloeSprite state="chat" size={32} glowing className="mx-auto mb-gs-3" />
