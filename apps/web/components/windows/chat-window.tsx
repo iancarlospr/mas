@@ -439,21 +439,47 @@ export default function ChatWindow({ windowId }: ChatWindowProps) {
         className="px-gs-3 flex-shrink-0"
         style={{ borderTop: '1px solid oklch(0.20 0.02 340 / 0.6)' }}
       >
-        {/* Credits bar */}
-        <div className="flex items-center justify-between py-1.5">
-          <span className="font-data tabular-nums" style={{ fontSize: '10px', color: 'oklch(0.45 0.03 340)' }}>
-            <span style={{ color: 'var(--gs-base)', fontWeight: 600 }}>{credits ?? 0}</span>
-            {' '}credits
-          </span>
-          {credits != null && credits <= 5 && credits > 0 && (
-            <button
-              onClick={() => openCreditPurchase('chat_credits')}
-              className="font-data hover:opacity-80 transition-opacity"
-              style={{ fontSize: '10px', color: 'oklch(0.45 0.03 340)' }}
-            >
-              + more
-            </button>
-          )}
+        {/* Credits bar with progress */}
+        <div className="py-1.5 space-y-1">
+          <div className="flex items-center justify-between">
+            <span className="font-data tabular-nums" style={{ fontSize: '10px', color: 'oklch(0.45 0.03 340)' }}>
+              <span style={{ color: 'var(--gs-base)', fontWeight: 600 }}>{credits ?? 0}</span>
+              {' '}credits
+            </span>
+            {credits != null && credits <= 5 && credits > 0 && (
+              <button
+                onClick={() => openCreditPurchase('chat_credits')}
+                className="font-data hover:opacity-80 transition-opacity"
+                style={{ fontSize: '10px', color: 'oklch(0.45 0.03 340)' }}
+              >
+                + more
+              </button>
+            )}
+          </div>
+          {/* Progress bar */}
+          <div
+            style={{
+              height: 3,
+              borderRadius: 2,
+              background: 'oklch(0.15 0.01 340)',
+              overflow: 'hidden',
+            }}
+          >
+            <div
+              style={{
+                height: '100%',
+                borderRadius: 2,
+                width: `${Math.min(100, ((credits ?? 0) / 100) * 100)}%`,
+                background: (credits ?? 0) > 20
+                  ? 'var(--gs-base)'
+                  : (credits ?? 0) > 5
+                    ? 'var(--gs-warning)'
+                    : 'var(--gs-critical)',
+                transition: 'width 0.4s ease, background 0.4s ease',
+                opacity: 0.7,
+              }}
+            />
+          </div>
         </div>
         {credits != null && credits <= 0 ? (
           <div className="pb-gs-2">
