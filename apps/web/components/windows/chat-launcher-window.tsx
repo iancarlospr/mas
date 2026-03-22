@@ -18,7 +18,7 @@ import { useWindowManager, useWindowState } from '@/lib/window-manager';
 interface PaidScan {
   id: string;
   url: string;
-  marketing_iq_score: number | null;
+  marketing_iq: number | null;
   created_at: string;
 }
 
@@ -76,7 +76,7 @@ export default function ChatLauncherWindow() {
       const supabase = createClient();
       const { data } = await supabase
         .from('scans')
-        .select('id, url, marketing_iq_score, created_at')
+        .select('id, url, marketing_iq, created_at')
         .eq('user_id', user!.id)
         .eq('tier', 'paid')
         .eq('status', 'complete')
@@ -160,7 +160,7 @@ export default function ChatLauncherWindow() {
               <div className="flex-1 min-w-0">
                 <div className="font-data text-data-sm font-bold truncate">{domain}</div>
                 <div className="font-data text-data-xs text-gs-muted">
-                  Score: {scan.marketing_iq_score ?? '—'} · {new Date(scan.created_at).toLocaleDateString()}
+                  Score: {scan.marketing_iq ?? '—'} · {new Date(scan.created_at).toLocaleDateString()}
                 </div>
               </div>
               <span className="text-gs-muted text-data-sm">→</span>

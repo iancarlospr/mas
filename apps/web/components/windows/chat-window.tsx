@@ -436,26 +436,39 @@ export default function ChatWindow({ windowId }: ChatWindowProps) {
 
       {/* Input area */}
       <div
-        className="px-gs-3 py-gs-2 flex-shrink-0"
+        className="px-gs-3 flex-shrink-0"
         style={{ borderTop: '1px solid oklch(0.20 0.02 340 / 0.6)' }}
       >
-        {credits != null && credits <= 0 ? (
-          <div className="bevel-sunken p-gs-2 text-center rounded-lg" style={{ background: 'oklch(0.10 0.01 340 / 0.5)' }}>
-            <p className="font-data text-gs-muted" style={{ fontSize: '11px' }}>
-              No credits remaining.
-            </p>
+        {/* Credits bar */}
+        <div className="flex items-center justify-between py-1.5">
+          <span className="font-data tabular-nums" style={{ fontSize: '10px', color: 'oklch(0.45 0.03 340)' }}>
+            <span style={{ color: 'var(--gs-base)', fontWeight: 600 }}>{credits ?? 0}</span>
+            {' '}credits
+          </span>
+          {credits != null && credits <= 5 && credits > 0 && (
             <button
               onClick={() => openCreditPurchase('chat_credits')}
-              className="mt-gs-1 text-gs-base hover:text-gs-bright transition-colors font-data font-bold"
-              style={{ fontSize: '12px' }}
+              className="font-data hover:opacity-80 transition-opacity"
+              style={{ fontSize: '10px', color: 'oklch(0.45 0.03 340)' }}
             >
-              Purchase more &rarr;
+              + more
+            </button>
+          )}
+        </div>
+        {credits != null && credits <= 0 ? (
+          <div className="pb-gs-2">
+            <button
+              onClick={() => openCreditPurchase('chat_credits')}
+              className="w-full bevel-button-primary"
+              style={{ fontSize: '12px', height: 32 }}
+            >
+              Purchase credits to continue
             </button>
           </div>
         ) : (
           <form
             onSubmit={(e) => { e.preventDefault(); handleSend(); }}
-            className="flex gap-gs-2"
+            className="flex gap-gs-2 pb-gs-2"
           >
             <BevelInput
               type="text"
