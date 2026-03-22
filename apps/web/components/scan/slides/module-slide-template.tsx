@@ -69,9 +69,10 @@ export function SlideShell({
   flexViz = false, onAskChloe,
 }: SlideShellProps) {
   // Detect if this slide has a critical finding + derive a contextual question
+  // Skip GhostChat on flexViz slides (e.g., M25 world map) — no room
   const critFinding = findings?.find((f) => f.severity === 'critical');
   const topRec = recommendations?.find((r) => r.priority === 'P0') ?? recommendations?.[0];
-  const showGhostChat = !!(onAskChloe && critFinding);
+  const showGhostChat = !!(onAskChloe && critFinding && !flexViz);
   const ghostChatQuestion = topRec
     ? `How do I ${topRec.action.charAt(0).toLowerCase()}${topRec.action.slice(1).replace(/\.$/, '')}?`
     : `How do I fix the ${critFinding?.finding?.toLowerCase().slice(0, 80) ?? ''} issue?`;
