@@ -56,7 +56,10 @@ import { M36Slide } from './slides/m36-slide';
 import { M45Slide } from './slides/m45-slide';
 import { M43Slide } from './slides/m43-slide';
 import { ClosingSlide } from './slides/closing-slide';
+import { ChloeCallout } from './slides/chloe-callout';
 import { cn } from '@/lib/utils';
+import { CATEGORY_DISPLAY_NAMES, type ScoreCategory } from '@marketing-alpha/types';
+import { pickRandom, CHAT_CALLOUT_QUIPS } from '@/lib/chloe-ai-copy';
 
 /**
  * GhostScan OS — Scan Dashboard Content
@@ -109,6 +112,44 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
     }
     return map;
   }, [scan.marketingIqResult]);
+
+  // ── Chloé callout: worst-scoring modules (top 3 with score < 40) ──
+  const worstModules = useMemo(() => {
+    if (!isPaid) return new Map<string, number>();
+    return new Map(
+      scan.moduleResults
+        .filter((r) => r.score != null && r.score < 40 && (r.status === 'success' || r.status === 'partial'))
+        .sort((a, b) => (a.score ?? 100) - (b.score ?? 100))
+        .slice(0, 3)
+        .map((r) => [r.moduleId, r.score ?? 0]),
+    );
+  }, [scan.moduleResults, isPaid]);
+
+  // ── Chloé callout: category intro callouts (score < 70, max 3) ──
+  const categoryCallouts = useMemo(() => {
+    if (!isPaid) return new Map<string, { variant: 'margin-note' | 'cta'; quip?: string; question: string }>();
+    const result = new Map<string, { variant: 'margin-note' | 'cta'; quip?: string; question: string }>();
+    let count = 0;
+    for (const [catKey, score] of categoryScoreMap) {
+      if (count >= 3 || score >= 70) continue;
+      const displayName = CATEGORY_DISPLAY_NAMES[catKey as ScoreCategory] ?? catKey;
+      const rounded = Math.round(score);
+      if (score < 40) {
+        result.set(catKey, {
+          variant: 'margin-note',
+          quip: pickRandom(CHAT_CALLOUT_QUIPS.categoryCritical),
+          question: `Why is my ${displayName} score only ${rounded}, and what should I fix first?`,
+        });
+      } else {
+        result.set(catKey, {
+          variant: 'cta',
+          question: `What can I do to improve my ${displayName} score from ${rounded}?`,
+        });
+      }
+      count++;
+    }
+    return result;
+  }, [categoryScoreMap, isPaid]);
 
   const contentRef = useRef<HTMLDivElement>(null);
   const tabBarRef = useRef<HTMLDivElement>(null);
@@ -277,6 +318,42 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
     wm.openWindow('chat-launcher', { scanId: scan.id });
   }, [wm, scan.id]);
 
+  // ── Chloé callout: build ReactNode for worst-scoring module slides ──
+  const MODULE_NAMES: Record<string, string> = {
+    M01: 'Email Authentication', M02: 'HTTP Headers', M03: 'Performance & Web Vitals',
+    M04: 'SEO Fundamentals', M05: 'Google Analytics', M06: 'Tag Management',
+    M07: 'MarTech Stack', M08: 'Conversion Tracking', M09: 'Session Recording',
+    M10: 'Accessibility', M11: 'Mobile Experience', M12: 'Compliance',
+    M13: 'Core Web Vitals', M14: 'Page Speed', M15: 'Content Quality',
+    M16: 'Social Profiles', M17: 'Open Graph', M18: 'Press & Media',
+    M19: 'Support Channels', M20: 'JavaScript Analysis', M21: 'Ad Creative',
+    M22: 'Brand Consistency', M23: 'Visual Identity', M24: 'Competitor Analysis',
+    M25: 'Market Position', M26: 'Backlink Profile', M27: 'Share of Voice',
+    M28: 'PPC Analysis', M29: 'Social Advertising', M30: 'Industry Benchmarks',
+    M31: 'Keyword Rankings', M33: 'Content Gap', M34: 'Schema Markup',
+    M36: 'Local SEO', M37: 'Reviews & Reputation', M38: 'Email Marketing',
+    M39: 'Site Architecture', M40: 'Attack Surface', M45: 'Stack Analyzer',
+  };
+
+  const buildModuleCallout = useCallback(
+    (moduleId: string) => {
+      const score = worstModules.get(moduleId);
+      if (score == null) return undefined;
+      const name = MODULE_NAMES[moduleId] ?? moduleId;
+      return (
+        <ChloeCallout
+          variant="margin-note"
+          quip={pickRandom(CHAT_CALLOUT_QUIPS.moduleCritical).replace('{module}', name).replace('{score}', String(score))}
+          question={`Walk me through fixing my ${name} — it scored ${score}/100`}
+          onAskChloe={handleAskChloe}
+          scanId={scan.id}
+          slideId={moduleId}
+        />
+      );
+    },
+    [worstModules, handleAskChloe, scan.id],
+  );
+
   return (
     <div className="flex flex-col h-full">
       {/* ── Category Nav Bar ── */}
@@ -350,89 +427,89 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
             </div>
 
             <div id="nav-findings">
-              <FindingsSlide scan={scan} />
+              <FindingsSlide scan={scan} onAskChloe={handleAskChloe} />
             </div>
 
             {/* ── Category 1: Security & Compliance ── */}
             <div id="nav-security">
-              <CategoryIntroSlide scan={scan} category="security_compliance" />
+              <CategoryIntroSlide scan={scan} category="security_compliance" chloeCallout={categoryCallouts.get('security_compliance')} onAskChloe={handleAskChloe} />
             </div>
-            <M01Slide scan={scan} />
-            <M12Slide scan={scan} />
-            <M40Slide scan={scan} />
+            <M01Slide scan={scan} chloeCallout={buildModuleCallout('M01')} />
+            <M12Slide scan={scan} chloeCallout={buildModuleCallout('M12')} />
+            <M40Slide scan={scan} chloeCallout={buildModuleCallout('M40')} />
 
             {/* ── Category 2: Analytics & Measurement ── */}
             <div id="nav-analytics">
-              <CategoryIntroSlide scan={scan} category="analytics_measurement" />
+              <CategoryIntroSlide scan={scan} category="analytics_measurement" chloeCallout={categoryCallouts.get('analytics_measurement')} onAskChloe={handleAskChloe} />
             </div>
-            <M05Slide scan={scan} />
-            <M06Slide scan={scan} />
-            <M06bSlide scan={scan} />
-            <M08Slide scan={scan} />
-            <M09Slide scan={scan} />
+            <M05Slide scan={scan} chloeCallout={buildModuleCallout('M05')} />
+            <M06Slide scan={scan} chloeCallout={buildModuleCallout('M06')} />
+            <M06bSlide scan={scan} chloeCallout={buildModuleCallout('M06b')} />
+            <M08Slide scan={scan} chloeCallout={buildModuleCallout('M08')} />
+            <M09Slide scan={scan} chloeCallout={buildModuleCallout('M09')} />
 
             {/* ── Category 3: Performance & Experience ── */}
             <div id="nav-performance">
-              <CategoryIntroSlide scan={scan} category="performance_experience" />
+              <CategoryIntroSlide scan={scan} category="performance_experience" chloeCallout={categoryCallouts.get('performance_experience')} onAskChloe={handleAskChloe} />
             </div>
-            <M03Slide scan={scan} />
-            <M13Slide scan={scan} />
-            <M14Slide scan={scan} />
-            <M10Slide scan={scan} />
-            <M11Slide scan={scan} />
+            <M03Slide scan={scan} chloeCallout={buildModuleCallout('M03')} />
+            <M13Slide scan={scan} chloeCallout={buildModuleCallout('M13')} />
+            <M14Slide scan={scan} chloeCallout={buildModuleCallout('M14')} />
+            <M10Slide scan={scan} chloeCallout={buildModuleCallout('M10')} />
+            <M11Slide scan={scan} chloeCallout={buildModuleCallout('M11')} />
 
             {/* ── Category 4: SEO & Content ── */}
             <div id="nav-seo">
-              <CategoryIntroSlide scan={scan} category="seo_content" />
+              <CategoryIntroSlide scan={scan} category="seo_content" chloeCallout={categoryCallouts.get('seo_content')} onAskChloe={handleAskChloe} />
             </div>
-            <M04Slide scan={scan} />
-            <M15Slide scan={scan} />
-            <M26Slide scan={scan} />
-            <M34Slide scan={scan} />
-            <M39Slide scan={scan} />
+            <M04Slide scan={scan} chloeCallout={buildModuleCallout('M04')} />
+            <M15Slide scan={scan} chloeCallout={buildModuleCallout('M15')} />
+            <M26Slide scan={scan} chloeCallout={buildModuleCallout('M26')} />
+            <M34Slide scan={scan} chloeCallout={buildModuleCallout('M34')} />
+            <M39Slide scan={scan} chloeCallout={buildModuleCallout('M39')} />
 
             {/* ── Category 5: Paid Media ── */}
             <div id="nav-paid-media">
-              <CategoryIntroSlide scan={scan} category="paid_media" />
+              <CategoryIntroSlide scan={scan} category="paid_media" chloeCallout={categoryCallouts.get('paid_media')} onAskChloe={handleAskChloe} />
             </div>
-            <M21Slide scan={scan} />
-            <M28Slide scan={scan} />
-            <M29Slide scan={scan} />
+            <M21Slide scan={scan} chloeCallout={buildModuleCallout('M21')} />
+            <M28Slide scan={scan} chloeCallout={buildModuleCallout('M28')} />
+            <M29Slide scan={scan} chloeCallout={buildModuleCallout('M29')} />
           </>
         )}
 
         {/* ── Category 6: MarTech & Infrastructure (free + paid) ── */}
         <div id="nav-martech">
-          {isPaid && <CategoryIntroSlide scan={scan} category="martech_infrastructure" />}
+          {isPaid && <CategoryIntroSlide scan={scan} category="martech_infrastructure" chloeCallout={categoryCallouts.get('martech_infrastructure')} onAskChloe={handleAskChloe} />}
         </div>
-        <M02Slide scan={scan} />
-        <M07Slide scan={scan} />
-        <M20Slide scan={scan} />
+        <M02Slide scan={scan} chloeCallout={buildModuleCallout('M02')} />
+        <M07Slide scan={scan} chloeCallout={buildModuleCallout('M07')} />
+        <M20Slide scan={scan} chloeCallout={buildModuleCallout('M20')} />
 
         {isPaid && (
           <>
             {/* ── Category 7: Brand & Digital Presence ── */}
             <div id="nav-brand">
-              <CategoryIntroSlide scan={scan} category="brand_presence" />
+              <CategoryIntroSlide scan={scan} category="brand_presence" chloeCallout={categoryCallouts.get('brand_presence')} onAskChloe={handleAskChloe} />
             </div>
-            <M16Slide scan={scan} />
-            <M17Slide scan={scan} />
-            <M18M19Slide scan={scan} />
-            <M22M23Slide scan={scan} />
-            <M37Slide scan={scan} />
-            <M38Slide scan={scan} />
+            <M16Slide scan={scan} chloeCallout={buildModuleCallout('M16')} />
+            <M17Slide scan={scan} chloeCallout={buildModuleCallout('M17')} />
+            <M18M19Slide scan={scan} chloeCallout={buildModuleCallout('M18')} />
+            <M22M23Slide scan={scan} chloeCallout={buildModuleCallout('M22')} />
+            <M37Slide scan={scan} chloeCallout={buildModuleCallout('M37')} />
+            <M38Slide scan={scan} chloeCallout={buildModuleCallout('M38')} />
 
             {/* ── Category 8: Market Intelligence ── */}
             <div id="nav-market-intel">
-              <CategoryIntroSlide scan={scan} category="market_intelligence" />
+              <CategoryIntroSlide scan={scan} category="market_intelligence" chloeCallout={categoryCallouts.get('market_intelligence')} onAskChloe={handleAskChloe} />
             </div>
-            <M24Slide scan={scan} />
-            <M25Slide scan={scan} />
-            <M27Slide scan={scan} />
-            <M30Slide scan={scan} />
-            <M31Slide scan={scan} />
-            <M33Slide scan={scan} />
-            <M36Slide scan={scan} />
+            <M24Slide scan={scan} chloeCallout={buildModuleCallout('M24')} />
+            <M25Slide scan={scan} chloeCallout={buildModuleCallout('M25')} />
+            <M27Slide scan={scan} chloeCallout={buildModuleCallout('M27')} />
+            <M30Slide scan={scan} chloeCallout={buildModuleCallout('M30')} />
+            <M31Slide scan={scan} chloeCallout={buildModuleCallout('M31')} />
+            <M33Slide scan={scan} chloeCallout={buildModuleCallout('M33')} />
+            <M36Slide scan={scan} chloeCallout={buildModuleCallout('M36')} />
 
             {/* ── M43: PRD ── */}
             <div id="nav-prd">
@@ -525,13 +602,30 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
         )}
         {isPaid && (
           <div className="flex gap-3 items-center">
+            <style>{`
+              @keyframes statusbar-chloe-breathe {
+                0%, 100% { text-shadow: 0 0 8px rgba(255,178,239,0.15); }
+                50% { text-shadow: 0 0 16px rgba(255,178,239,0.35); }
+              }
+            `}</style>
             <button onClick={handleDownloadPdf} className="text-gs-base hover:text-gs-bright transition-colors" style={{ fontSize: '11px', fontFamily: 'var(--font-system)' }}>
               PRD &darr;
             </button>
             <span className="text-gs-mid" style={{ fontSize: '11px' }}>&middot;</span>
-            <button onClick={handleAskChloe} className="text-gs-base hover:text-gs-bright transition-colors flex items-center gap-1" style={{ fontSize: '11px', fontFamily: 'var(--font-system)' }}>
+            <button
+              onClick={handleAskChloe}
+              className="text-gs-base hover:text-gs-bright transition-colors flex items-center gap-1.5"
+              style={{ fontSize: '13px', fontFamily: 'var(--font-system)', animation: 'statusbar-chloe-breathe 4s ease-in-out infinite' }}
+            >
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor" style={{ flexShrink: 0 }}>
+                <path d="M8 1C5.2 1 3 3.2 3 6v6l1-1.5 1 1.5 1-1.5 1 1.5 1-1.5 1 1.5 1-1.5 1 1.5V6c0-2.8-2.2-5-5-5z"/>
+                <circle cx="6" cy="5.5" r="1" fill="var(--gs-void)"/>
+                <circle cx="10" cy="5.5" r="1" fill="var(--gs-void)"/>
+              </svg>
               Ask Chlo&eacute;
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+              </svg>
             </button>
           </div>
         )}

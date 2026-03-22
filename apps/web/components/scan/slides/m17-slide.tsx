@@ -20,7 +20,7 @@ import {
  * Benefits as pills, DEI flag.
  */
 
-export function M17Slide({ scan }: { scan: ScanWithResults }) {
+export function M17Slide({ scan, chloeCallout }: { scan: ScanWithResults; chloeCallout?: React.ReactNode }) {
   const syn = getM41Summary(scan, 'M17');
   const mod = getModuleResult(scan, 'M17');
   const raw = (mod?.data as Record<string, unknown> | undefined) ?? null;
@@ -79,6 +79,7 @@ export function M17Slide({ scan }: { scan: ScanWithResults }) {
       findings={findings}
       recommendations={recs}
       scoreBreakdown={scores}
+      chloeCallout={chloeCallout}
     >
       {/* ═══ Careers Stats & Checklist ═══ */}
       <div style={{

@@ -44,7 +44,7 @@ function sentimentColor(s?: string): string {
   return 'var(--gs-mid)';
 }
 
-export function M22M23Slide({ scan }: { scan: ScanWithResults }) {
+export function M22M23Slide({ scan, chloeCallout }: { scan: ScanWithResults; chloeCallout?: React.ReactNode }) {
   const syn22 = getM41Summary(scan, 'M22');
   const syn23 = getM41Summary(scan, 'M23');
   const mod22 = getModuleResult(scan, 'M22');
@@ -133,6 +133,7 @@ export function M22M23Slide({ scan }: { scan: ScanWithResults }) {
       findings={findings}
       recommendations={recs}
       scoreBreakdown={scores}
+      chloeCallout={chloeCallout}
     >
       {/* ═══ Two-panel sentiment visualization ═══ */}
       <div style={{

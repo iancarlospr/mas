@@ -27,7 +27,7 @@ interface TMSInfo {
   confidence?: number;
 }
 
-export function M08Slide({ scan }: { scan: ScanWithResults }) {
+export function M08Slide({ scan, chloeCallout }: { scan: ScanWithResults; chloeCallout?: React.ReactNode }) {
   const syn = getM41Summary(scan, 'M08');
   const mod = getModuleResult(scan, 'M08');
   const raw = (mod?.data as Record<string, unknown> | undefined) ?? null;
@@ -75,6 +75,7 @@ export function M08Slide({ scan }: { scan: ScanWithResults }) {
       findings={findings}
       recommendations={recs}
       scoreBreakdown={scores}
+      chloeCallout={chloeCallout}
     >
       {/* ═══ Hero Stats Row ═══ */}
       <div style={{

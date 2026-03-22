@@ -32,7 +32,7 @@ function fmtNum(n: number): string {
   return n.toLocaleString();
 }
 
-export function M33Slide({ scan }: { scan: ScanWithResults }) {
+export function M33Slide({ scan, chloeCallout }: { scan: ScanWithResults; chloeCallout?: React.ReactNode }) {
   const syn = getM41Summary(scan, 'M33');
   const mod = getModuleResult(scan, 'M33');
   const raw = (mod?.data as Record<string, unknown> | undefined) ?? null;
@@ -79,6 +79,7 @@ export function M33Slide({ scan }: { scan: ScanWithResults }) {
       findings={findings}
       recommendations={recs}
       scoreBreakdown={scores}
+      chloeCallout={chloeCallout}
     >
       <div style={{
         display: 'flex', gap: '3%', flexShrink: 0,

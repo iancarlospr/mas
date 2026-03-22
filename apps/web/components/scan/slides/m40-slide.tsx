@@ -41,7 +41,7 @@ function severityLabel(s: string) {
 }
 function scoreC(n: number) { return n >= 70 ? 'var(--gs-terminal)' : n >= 40 ? 'var(--gs-warning)' : 'var(--gs-critical)'; }
 
-export function M40Slide({ scan }: { scan: ScanWithResults }) {
+export function M40Slide({ scan }: { scan: ScanWithResults; chloeCallout?: import('react').ReactNode }) {
   const rm = new Map<string, ModuleResult>(scan.moduleResults.map((r) => [r.moduleId, r]));
   const m41 = rm.get('M41');
   const sums = (m41?.data?.['moduleSummaries'] as Record<string, M41Summary> | undefined) ?? {};

@@ -18,7 +18,7 @@ import {
  * feature checklist with detected tools, right panel has findings/recs.
  */
 
-export function M09Slide({ scan }: { scan: ScanWithResults }) {
+export function M09Slide({ scan, chloeCallout }: { scan: ScanWithResults; chloeCallout?: React.ReactNode }) {
   const syn = getM41Summary(scan, 'M09');
   const mod = getModuleResult(scan, 'M09');
   const raw = (mod?.data as Record<string, unknown> | undefined) ?? null;
@@ -175,6 +175,7 @@ export function M09Slide({ scan }: { scan: ScanWithResults }) {
       findings={findings}
       recommendations={recs}
       scoreBreakdown={scores}
+      chloeCallout={chloeCallout}
     />
   );
 }

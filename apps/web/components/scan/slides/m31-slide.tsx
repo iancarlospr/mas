@@ -150,7 +150,7 @@ function AnchorCloud({ anchors, totalCount }: {
   );
 }
 
-export function M31Slide({ scan }: { scan: ScanWithResults }) {
+export function M31Slide({ scan, chloeCallout }: { scan: ScanWithResults; chloeCallout?: React.ReactNode }) {
   const syn = getM41Summary(scan, 'M31');
   const mod = getModuleResult(scan, 'M31');
   const raw = (mod?.data as Record<string, unknown> | undefined) ?? null;
@@ -203,6 +203,7 @@ export function M31Slide({ scan }: { scan: ScanWithResults }) {
       findings={findings}
       recommendations={recs}
       scoreBreakdown={scores}
+      chloeCallout={chloeCallout}
     >
       {/* Stats left + Anchor text cloud right */}
       <div style={{

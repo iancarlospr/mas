@@ -81,4 +81,9 @@ export const analytics = {
   reportScrollDepth(scanId: string, depth: number) {
     posthog.capture('report_scroll_depth', { scan_id: scanId, depth_percent: depth });
   },
+
+  /** Chloé callout clicked within a slide */
+  chloeCalloutClicked(scanId: string, slideId: string, variant: 'margin-note' | 'cta') {
+    posthog.capture('chloe_callout_clicked', { scan_id: scanId, slide_id: slideId, variant });
+  },
 };

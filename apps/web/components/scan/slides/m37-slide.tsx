@@ -25,7 +25,7 @@ interface MonthlyBucket {
   count: number;
 }
 
-export function M37Slide({ scan }: { scan: ScanWithResults }) {
+export function M37Slide({ scan, chloeCallout }: { scan: ScanWithResults; chloeCallout?: React.ReactNode }) {
   const syn = getM41Summary(scan, 'M37');
   const mod = getModuleResult(scan, 'M37');
   const raw = (mod?.data as Record<string, unknown> | undefined) ?? null;
@@ -76,6 +76,7 @@ export function M37Slide({ scan }: { scan: ScanWithResults }) {
       findings={findings}
       recommendations={recs}
       scoreBreakdown={scores}
+      chloeCallout={chloeCallout}
     >
       {/* ═══ Review Viz ═══ */}
       <div style={{

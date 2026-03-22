@@ -20,7 +20,7 @@ import {
  *   - Social profile links & share button counts
  */
 
-export function M15Slide({ scan }: { scan: ScanWithResults }) {
+export function M15Slide({ scan, chloeCallout }: { scan: ScanWithResults; chloeCallout?: React.ReactNode }) {
   const syn = getM41Summary(scan, 'M15');
   const mod = getModuleResult(scan, 'M15');
   const raw = (mod?.data as Record<string, unknown> | undefined) ?? null;
@@ -89,6 +89,7 @@ export function M15Slide({ scan }: { scan: ScanWithResults }) {
       findings={findings}
       recommendations={recs}
       scoreBreakdown={scores}
+      chloeCallout={chloeCallout}
     >
       <div style={{
         display: 'flex', gap: '3%', marginBottom: '0.6em', flexShrink: 0,

@@ -31,7 +31,7 @@ interface TopKeyword {
   etv: number;
 }
 
-export function M26Slide({ scan }: { scan: ScanWithResults }) {
+export function M26Slide({ scan, chloeCallout }: { scan: ScanWithResults; chloeCallout?: React.ReactNode }) {
   const syn = getM41Summary(scan, 'M26');
   const mod = getModuleResult(scan, 'M26');
   const raw = (mod?.data as Record<string, unknown> | undefined) ?? null;
@@ -85,6 +85,7 @@ export function M26Slide({ scan }: { scan: ScanWithResults }) {
       findings={findings}
       recommendations={recs}
       scoreBreakdown={scores}
+      chloeCallout={chloeCallout}
     >
       <div style={{
         marginBottom: '0.6em', flexShrink: 0,

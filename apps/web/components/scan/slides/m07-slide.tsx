@@ -30,7 +30,7 @@ interface FormEntry {
   id?: string;
 }
 
-export function M07Slide({ scan }: { scan: ScanWithResults }) {
+export function M07Slide({ scan, chloeCallout }: { scan: ScanWithResults; chloeCallout?: React.ReactNode }) {
   const syn = getM41Summary(scan, 'M07');
   const mod = getModuleResult(scan, 'M07');
   const raw = (mod?.data as Record<string, unknown> | undefined) ?? null;
@@ -217,6 +217,7 @@ export function M07Slide({ scan }: { scan: ScanWithResults }) {
       findings={findings}
       recommendations={recs}
       scoreBreakdown={scores}
+      chloeCallout={chloeCallout}
     />
   );
 }

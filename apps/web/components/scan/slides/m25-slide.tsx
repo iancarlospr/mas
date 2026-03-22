@@ -57,7 +57,7 @@ function trafficColor(sharePct: number, maxPct: number): string {
   return `rgba(255,178,239,${alpha.toFixed(2)})`;
 }
 
-export function M25Slide({ scan }: { scan: ScanWithResults }) {
+export function M25Slide({ scan, chloeCallout }: { scan: ScanWithResults; chloeCallout?: React.ReactNode }) {
   const syn = getM41Summary(scan, 'M25');
   const mod = getModuleResult(scan, 'M25');
   const raw = (mod?.data as Record<string, unknown> | undefined) ?? null;
@@ -132,6 +132,7 @@ export function M25Slide({ scan }: { scan: ScanWithResults }) {
       recommendations={recs}
       scoreBreakdown={scores}
       flexViz
+      chloeCallout={chloeCallout}
     >
       <div style={{
         position: 'relative', flex: '1 1 0', minHeight: 0,

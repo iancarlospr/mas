@@ -275,3 +275,49 @@ export const MISCHIEF_LINES = [
   '*floats upside down briefly*',
   '*taps on the screen from inside*',
 ] as const;
+
+/* ── Chat Callout Quips (In-slide "Ask Chloé" prompts) ───── */
+
+export const CHAT_CALLOUT_QUIPS = {
+  /** Findings slide — reacts to the hero finding's urgency */
+  findings: {
+    immediate: [
+      "this is a five-alarm fire. ask me how to put it out.",
+      "I found the receipts. want me to walk you through them?",
+      "your agency should've caught this. let's fix it ourselves.",
+    ],
+    this_week: [
+      "this one's fixable by Friday. ask me how.",
+      "not a crisis yet, but it's getting there. let's talk.",
+      "I've seen this pattern before. let me show you the shortcut.",
+    ],
+    this_month: [
+      "this is the kind of thing that quietly bleeds money. curious?",
+      "your competitors probably already fixed this. want the play?",
+    ],
+    this_quarter: [
+      "not urgent, but you're leaving money on the table. want the details?",
+      "low priority doesn't mean low impact. ask me why.",
+    ],
+  } as Record<string, readonly string[]>,
+
+  /** Category intro — critical score (<40) */
+  categoryCritical: [
+    "this whole category needs a conversation.",
+    "this is where the real damage is. ask me anything.",
+    "I have a lot of opinions about this score. $1 worth, actually.",
+  ] as const,
+
+  /** Category intro — warning score (40-69) */
+  categoryWarning: [
+    "room for improvement here. want the game plan?",
+    "not terrible, not great. I can help you prioritize.",
+  ] as const,
+
+  /** Module-level critical (<40) — {module} and {score} are replaced */
+  moduleCritical: [
+    "this module is screaming for help. ask me what to do first.",
+    "I know exactly what's wrong here. want the fix list?",
+    "your {module} scored {score}. I have thoughts.",
+  ] as const,
+} as const;

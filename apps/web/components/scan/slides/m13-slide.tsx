@@ -29,7 +29,7 @@ interface ThirdPartyEntry {
   toolName?: string;
 }
 
-export function M13Slide({ scan }: { scan: ScanWithResults }) {
+export function M13Slide({ scan, chloeCallout }: { scan: ScanWithResults; chloeCallout?: React.ReactNode }) {
   const syn = getM41Summary(scan, 'M13');
   const mod = getModuleResult(scan, 'M13');
   const raw = (mod?.data as Record<string, unknown> | undefined) ?? null;
@@ -82,6 +82,7 @@ export function M13Slide({ scan }: { scan: ScanWithResults }) {
       findings={findings}
       recommendations={recs}
       scoreBreakdown={scores}
+      chloeCallout={chloeCallout}
     >
       {/* ═══ Hero CO2 + Green Hosting + Resource Bars ═══ */}
       <div style={{

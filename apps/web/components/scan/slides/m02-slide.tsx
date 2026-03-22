@@ -37,7 +37,7 @@ function extractConfidence(val: unknown): number | undefined {
   return undefined;
 }
 
-export function M02Slide({ scan }: { scan: ScanWithResults }) {
+export function M02Slide({ scan, chloeCallout }: { scan: ScanWithResults; chloeCallout?: React.ReactNode }) {
   const syn = getM41Summary(scan, 'M02');
   const mod = getModuleResult(scan, 'M02');
   const raw = (mod?.data as Record<string, unknown> | undefined) ?? null;
@@ -89,6 +89,7 @@ export function M02Slide({ scan }: { scan: ScanWithResults }) {
       findings={findings}
       recommendations={recs}
       scoreBreakdown={scores}
+      chloeCallout={chloeCallout}
     >
       {/* ═══ Infrastructure Blueprint ═══ */}
       <div style={{

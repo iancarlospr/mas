@@ -58,12 +58,14 @@ interface SlideShellProps {
   scoreBreakdown: M41Summary['score_breakdown'];
   /** When true, children area flexes to fill remaining space while bottom columns stay at natural height */
   flexViz?: boolean;
+  /** Optional Chloé callout shown below exec summary (passed from orchestrator) */
+  chloeCallout?: React.ReactNode;
 }
 
 export function SlideShell({
   moduleName, score, headline, execSummary, scan, sourceLabel,
   children, findings = [], recommendations = [], scoreBreakdown = [],
-  flexViz = false,
+  flexViz = false, chloeCallout,
 }: SlideShellProps) {
   return (
     <div
@@ -102,6 +104,9 @@ export function SlideShell({
             </p>
           </div>
         )}
+
+        {/* Chloé callout (optional — worst-scoring modules only) */}
+        {chloeCallout}
 
         {/* Custom visualization area */}
         {flexViz ? (
@@ -465,11 +470,14 @@ interface SlideShellAltProps {
   findings: M41Summary['key_findings'];
   recommendations: M41Summary['recommendations'];
   scoreBreakdown: M41Summary['score_breakdown'];
+  /** Optional Chloé callout shown below exec summary (passed from orchestrator) */
+  chloeCallout?: React.ReactNode;
 }
 
 export function SlideShellAlt({
   moduleName, score, headline, execSummary, scan, sourceLabel,
   vizContent, findings = [], recommendations = [], scoreBreakdown = [],
+  chloeCallout,
 }: SlideShellAltProps) {
   return (
     <div
@@ -505,6 +513,9 @@ export function SlideShellAlt({
             {execSummary}
           </p>
         )}
+
+        {/* Chloé callout (optional — worst-scoring modules only) */}
+        {chloeCallout}
 
         {/* Two columns: Left (viz) | Right (findings + recs) */}
         <div style={{ display: 'flex', flex: '1 1 0', minHeight: 0, gap: '3%', borderTop: '1px solid rgba(255,178,239,0.06)', paddingTop: '0.5em' }}>

@@ -24,7 +24,7 @@ function fmtNum(n: number): string {
   return n.toLocaleString();
 }
 
-export function M27Slide({ scan }: { scan: ScanWithResults }) {
+export function M27Slide({ scan, chloeCallout }: { scan: ScanWithResults; chloeCallout?: React.ReactNode }) {
   const syn = getM41Summary(scan, 'M27');
   const mod = getModuleResult(scan, 'M27');
   const raw = (mod?.data as Record<string, unknown> | undefined) ?? null;
@@ -66,6 +66,7 @@ export function M27Slide({ scan }: { scan: ScanWithResults }) {
       findings={findings}
       recommendations={recs}
       scoreBreakdown={scores}
+      chloeCallout={chloeCallout}
     >
       {/* Stats — 3-col grid aligned to findings/recs/scores below */}
       <div style={{

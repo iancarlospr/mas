@@ -1,6 +1,8 @@
 'use client';
 
 import type { ScanWithResults, ModuleResult } from '@marketing-alpha/types';
+import { ChloeCallout } from './chloe-callout';
+import { pickRandom, CHAT_CALLOUT_QUIPS } from '@/lib/chloe-ai-copy';
 
 /**
  * Key Findings Slide — 1+2 Hero Layout
@@ -57,6 +59,7 @@ interface M42Synthesis {
 
 interface FindingsSlideProps {
   scan: ScanWithResults;
+  onAskChloe?: () => void;
 }
 
 // Dev-only mock data for layout preview
@@ -90,7 +93,7 @@ const DEV_MOCK: { findings: KeyFinding[]; context: string } | null =
       }
     : null;
 
-export function FindingsSlide({ scan }: FindingsSlideProps) {
+export function FindingsSlide({ scan, onAskChloe }: FindingsSlideProps) {
   const isPaid = scan.tier === 'paid';
 
   const resultMap = new Map<string, ModuleResult>(
@@ -340,6 +343,22 @@ export function FindingsSlide({ scan }: FindingsSlideProps) {
             >
               {competitiveContext}
             </p>
+          </div>
+        )}
+
+        {/* ── Chloé callout — first chat touchpoint in the report ── */}
+        {onAskChloe && (
+          <div style={{ padding: '0 3.5%' }}>
+            <ChloeCallout
+              variant="margin-note"
+              quip={pickRandom(
+                CHAT_CALLOUT_QUIPS.findings[hero.urgency] ?? CHAT_CALLOUT_QUIPS.findings['this_quarter']!,
+              )}
+              question={`What's the fastest way to fix the ${hero.finding.toLowerCase().slice(0, 80)} issue?`}
+              onAskChloe={onAskChloe}
+              scanId={scan.id}
+              slideId="Findings"
+            />
           </div>
         )}
       </div>

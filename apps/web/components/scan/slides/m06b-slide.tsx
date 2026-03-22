@@ -19,7 +19,7 @@ import {
  * CTA analysis, and load time badge.
  */
 
-export function M06bSlide({ scan }: { scan: ScanWithResults }) {
+export function M06bSlide({ scan, chloeCallout }: { scan: ScanWithResults; chloeCallout?: React.ReactNode }) {
   const syn = getM41Summary(scan, 'M06b');
   const mod = getModuleResult(scan, 'M06b');
   const raw = (mod?.data as Record<string, unknown> | undefined) ?? null;
@@ -168,6 +168,7 @@ export function M06bSlide({ scan }: { scan: ScanWithResults }) {
       findings={findings}
       recommendations={recs}
       scoreBreakdown={scores}
+      chloeCallout={chloeCallout}
     />
   );
 }

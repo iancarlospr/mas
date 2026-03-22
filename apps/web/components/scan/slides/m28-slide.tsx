@@ -37,7 +37,7 @@ function formatCurrency(n: number): string {
   return `$${n.toLocaleString()}`;
 }
 
-export function M28Slide({ scan }: { scan: ScanWithResults }) {
+export function M28Slide({ scan, chloeCallout }: { scan: ScanWithResults; chloeCallout?: React.ReactNode }) {
   const syn = getM41Summary(scan, 'M28');
   const mod = getModuleResult(scan, 'M28');
   const raw = (mod?.data as Record<string, unknown> | undefined) ?? null;
@@ -77,6 +77,7 @@ export function M28Slide({ scan }: { scan: ScanWithResults }) {
       findings={findings}
       recommendations={recs}
       scoreBreakdown={scores}
+      chloeCallout={chloeCallout}
     >
       <div style={{
         marginBottom: '0.6em', flexShrink: 0,
