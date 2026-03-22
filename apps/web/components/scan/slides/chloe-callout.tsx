@@ -138,27 +138,18 @@ export function ChloeCallout({
           }}
         >
           {/* Title */}
-          <div
+          <p
+            className="font-display uppercase"
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.4em',
+              fontSize: T.title,
+              fontWeight: 700,
+              color: 'var(--gs-light)',
+              letterSpacing: '0.04em',
               marginBottom: '0.2em',
             }}
           >
-            <GhostIcon size={16} />
-            <p
-              className="font-display uppercase"
-              style={{
-                fontSize: T.title,
-                fontWeight: 700,
-                color: 'var(--gs-light)',
-                letterSpacing: '0.04em',
-              }}
-            >
-              GhostChat&trade;
-            </p>
-          </div>
+            GhostChat&trade;
+          </p>
 
           {/* Description */}
           <p
@@ -199,7 +190,7 @@ export function ChloeCallout({
               e.currentTarget.style.background = 'rgba(255,178,239,0.08)';
             }}
           >
-            <GhostIcon size={12} />
+            <GhostIcon size={16} />
             <span
               className="font-data italic gc-text-bloom"
               style={{
