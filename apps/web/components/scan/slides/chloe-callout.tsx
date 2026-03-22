@@ -13,6 +13,17 @@ import { analytics } from '@/lib/analytics';
  * Paid-only. Print-hidden.
  */
 
+// ── Ghost icon SVG ───────────────────────────────────────────────────
+function GhostIcon({ size = 14, className }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 16 16" fill="currentColor" className={className} style={{ flexShrink: 0 }}>
+      <path d="M8 1C5.2 1 3 3.2 3 6v6l1-1.5 1 1.5 1-1.5 1 1.5 1-1.5 1 1.5 1-1.5 1 1.5V6c0-2.8-2.2-5-5-5z"/>
+      <circle cx="6" cy="5.5" r="1" fill="var(--gs-void)"/>
+      <circle cx="10" cy="5.5" r="1" fill="var(--gs-void)"/>
+    </svg>
+  );
+}
+
 // ── Typography scale (cqi) ───────────────────────────────────────────
 const T = {
   title:  'clamp(12px, 1.20cqi, 18px)',
@@ -127,18 +138,27 @@ export function ChloeCallout({
           }}
         >
           {/* Title */}
-          <p
-            className="font-display uppercase"
+          <div
             style={{
-              fontSize: T.title,
-              fontWeight: 700,
-              color: 'var(--gs-light)',
-              letterSpacing: '0.04em',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.4em',
               marginBottom: '0.2em',
             }}
           >
-            GhostChat&trade;
-          </p>
+            <GhostIcon size={16} />
+            <p
+              className="font-display uppercase"
+              style={{
+                fontSize: T.title,
+                fontWeight: 700,
+                color: 'var(--gs-light)',
+                letterSpacing: '0.04em',
+              }}
+            >
+              GhostChat&trade;
+            </p>
+          </div>
 
           {/* Description */}
           <p
@@ -159,7 +179,7 @@ export function ChloeCallout({
             onClick={handleClick}
             style={{
               display: 'flex',
-              alignItems: 'baseline',
+              alignItems: 'center',
               gap: '0.4em',
               background: 'rgba(255,178,239,0.08)',
               padding: '0.3em 0.5em',
@@ -179,17 +199,7 @@ export function ChloeCallout({
               e.currentTarget.style.background = 'rgba(255,178,239,0.08)';
             }}
           >
-            <span
-              className="font-data"
-              style={{
-                fontSize: T.bubble,
-                color: 'var(--gs-base)',
-                opacity: 0.7,
-                flexShrink: 0,
-              }}
-            >
-              &rsaquo;
-            </span>
+            <GhostIcon size={12} />
             <span
               className="font-data italic gc-text-bloom"
               style={{

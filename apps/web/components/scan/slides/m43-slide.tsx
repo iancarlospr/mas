@@ -348,7 +348,7 @@ export function M43Slide({ scan, printMode }: { scan: ScanWithResults; printMode
             }}>
               {exampleQuestions.map((q, i) => (
                 <div key={i} style={{
-                  display: 'flex', alignItems: 'baseline', gap: '0.4em',
+                  display: 'flex', alignItems: i === 0 ? 'center' : 'baseline', gap: '0.4em',
                   ...(i === 0 ? {
                     background: 'rgba(255,178,239,0.08)',
                     borderLeft: '2px solid var(--gs-base)',
@@ -357,11 +357,19 @@ export function M43Slide({ scan, printMode }: { scan: ScanWithResults; printMode
                     marginLeft: '-0.5em',
                   } : {}),
                 }}>
-                  <span className="font-data" style={{
-                    fontSize: T.bubble, color: 'var(--gs-base)', opacity: i === 0 ? 0.7 : 0.4, flexShrink: 0,
-                  }}>
-                    &rsaquo;
-                  </span>
+                  {i === 0 ? (
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="var(--gs-base)" style={{ flexShrink: 0, opacity: 0.7 }}>
+                      <path d="M8 1C5.2 1 3 3.2 3 6v6l1-1.5 1 1.5 1-1.5 1 1.5 1-1.5 1 1.5 1-1.5 1 1.5V6c0-2.8-2.2-5-5-5z"/>
+                      <circle cx="6" cy="5.5" r="1" fill="var(--gs-void)"/>
+                      <circle cx="10" cy="5.5" r="1" fill="var(--gs-void)"/>
+                    </svg>
+                  ) : (
+                    <span className="font-data" style={{
+                      fontSize: T.bubble, color: 'var(--gs-base)', opacity: 0.4, flexShrink: 0,
+                    }}>
+                      &rsaquo;
+                    </span>
+                  )}
                   <span className={`font-data italic${i === 0 ? ' m43-text-bloom' : ''}`} style={{
                     fontSize: T.bubble,
                     ...(i === 0 ? {} : { color: 'var(--gs-light)', opacity: 0.55 }),

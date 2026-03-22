@@ -546,9 +546,6 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
                 <circle cx="10" cy="5.5" r="1" fill="var(--gs-void)"/>
               </svg>
               Ask Chlo&eacute;
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-              </svg>
             </button>
           </div>
         )}
