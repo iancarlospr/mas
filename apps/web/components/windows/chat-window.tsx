@@ -344,7 +344,7 @@ export default function ChatWindow({ windowId }: ChatWindowProps) {
   return (
     <div className="flex flex-col h-full">
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto py-gs-3 space-y-gs-3" style={{ paddingLeft: 10, paddingRight: 10 }}>
+      <div className="flex-1 overflow-y-auto py-gs-3 space-y-gs-4" style={{ paddingLeft: 10, paddingRight: 10 }}>
         {messages.length === 0 && !sending && (
           <div className="text-center py-gs-6">
             <ChloeSprite state="chat" size={32} glowing className="mx-auto mb-gs-3" />
@@ -361,26 +361,38 @@ export default function ChatWindow({ windowId }: ChatWindowProps) {
         {messages.map((msg) => (
           <div key={msg.id}>
             {msg.role === 'user' ? (
-              <div
-                className="font-data text-data-sm whitespace-pre-wrap leading-relaxed"
-                style={{
-                  textAlign: 'right',
-                  color: 'oklch(0.70 0.03 340)',
-                  padding: '2px 0',
-                }}
-              >
-                {msg.content}
+              /* User message — pill, right-aligned, stands out */
+              <div className="flex justify-end">
+                <div
+                  className="font-data text-data-sm whitespace-pre-wrap leading-relaxed"
+                  style={{
+                    background: 'oklch(0.20 0.03 340)',
+                    color: 'var(--gs-light)',
+                    padding: '6px 12px',
+                    borderRadius: '12px 12px 2px 12px',
+                    maxWidth: '85%',
+                  }}
+                >
+                  {msg.content}
+                </div>
               </div>
             ) : (
-              <div
-                style={{
-                  borderLeft: '2px solid var(--gs-base)',
-                  paddingLeft: 10,
-                }}
-              >
-                <ReactMarkdown components={chatMarkdownComponents as never}>
-                  {msg.content}
-                </ReactMarkdown>
+              /* Chloé message — ghost icon top-left corner, pink border, full width */
+              <div>
+                <div className="flex items-center gap-1.5 mb-1">
+                  <GhostIcon size={12} />
+                  <span className="font-data" style={{ fontSize: '10px', color: 'oklch(0.45 0.04 340)' }}>Chlo&eacute;</span>
+                </div>
+                <div
+                  style={{
+                    borderLeft: '2px solid var(--gs-base)',
+                    paddingLeft: 10,
+                  }}
+                >
+                  <ReactMarkdown components={chatMarkdownComponents as never}>
+                    {msg.content}
+                  </ReactMarkdown>
+                </div>
               </div>
             )}
           </div>
@@ -388,11 +400,17 @@ export default function ChatWindow({ windowId }: ChatWindowProps) {
 
         {/* Typing indicator */}
         {sending && (
-          <div style={{ borderLeft: '2px solid var(--gs-base)', paddingLeft: 10 }}>
-            <div className="flex gap-1 items-center" style={{ height: 18 }}>
-              <span className="w-[5px] h-[5px] rounded-full bg-gs-base animate-bounce" style={{ animationDelay: '0ms' }} />
-              <span className="w-[5px] h-[5px] rounded-full bg-gs-base animate-bounce" style={{ animationDelay: '150ms' }} />
-              <span className="w-[5px] h-[5px] rounded-full bg-gs-base animate-bounce" style={{ animationDelay: '300ms' }} />
+          <div>
+            <div className="flex items-center gap-1.5 mb-1">
+              <GhostIcon size={12} />
+              <span className="font-data" style={{ fontSize: '10px', color: 'oklch(0.45 0.04 340)' }}>Chlo&eacute;</span>
+            </div>
+            <div style={{ borderLeft: '2px solid var(--gs-base)', paddingLeft: 10 }}>
+              <div className="flex gap-1 items-center" style={{ height: 18 }}>
+                <span className="w-[5px] h-[5px] rounded-full bg-gs-base animate-bounce" style={{ animationDelay: '0ms' }} />
+                <span className="w-[5px] h-[5px] rounded-full bg-gs-base animate-bounce" style={{ animationDelay: '150ms' }} />
+                <span className="w-[5px] h-[5px] rounded-full bg-gs-base animate-bounce" style={{ animationDelay: '300ms' }} />
+              </div>
             </div>
           </div>
         )}
