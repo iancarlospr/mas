@@ -60,8 +60,15 @@ export function ChloeCallout({
           100% { background-position: 0% 50%; }
         }
         @keyframes gc-text-bloom {
-          0%, 100% { background-position: 200% center; }
-          50% { background-position: -200% center; }
+          0% { background-position: 100% center; }
+          100% { background-position: -100% center; }
+        }
+        @keyframes gc-text-glow {
+          0% { text-shadow: none; }
+          40% { text-shadow: none; }
+          50% { text-shadow: 0 0 8px rgba(220,215,230,0.6), 0 0 16px rgba(220,215,230,0.3); }
+          60% { text-shadow: none; }
+          100% { text-shadow: none; }
         }
         .gc-glow-border {
           position: relative;
@@ -81,19 +88,19 @@ export function ChloeCallout({
         .gc-text-bloom {
           background: linear-gradient(
             90deg,
-            var(--gs-light) 0%,
-            var(--gs-light) 35%,
-            #fff 48%,
-            var(--gs-base) 50%,
-            #fff 52%,
-            var(--gs-light) 65%,
-            var(--gs-light) 100%
+            rgba(220,215,230,0.85) 0%,
+            rgba(220,215,230,0.85) 40%,
+            #fff 49%,
+            rgba(240,238,245,1) 50%,
+            #fff 51%,
+            rgba(220,215,230,0.85) 60%,
+            rgba(220,215,230,0.85) 100%
           );
-          background-size: 500% 100%;
+          background-size: 400% 100%;
           -webkit-background-clip: text;
           background-clip: text;
           -webkit-text-fill-color: transparent;
-          animation: gc-text-bloom 8s ease-in-out infinite;
+          animation: gc-text-bloom 6s linear infinite, gc-text-glow 6s linear infinite;
         }
       `}</style>
 
