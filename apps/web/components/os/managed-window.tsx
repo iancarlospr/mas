@@ -232,7 +232,9 @@ export function ManagedWindow({
         top: isAuthGate ? '50%' : isMaximized ? 0 : windowState.y,
         transform: isAuthGate ? 'translate(-50%, -50%)' : undefined,
         width: (isMaximized && !windowState.alwaysOnTop) ? '100%' : windowState.width,
-        height: isMaximized ? '100%' : 'fit-content',
+        height: isMaximized
+          ? (windowState.alwaysOnTop ? 'calc(100% - 28px)' : '100%')
+          : 'fit-content',
         maxHeight: isMaximized ? '100%' : 'calc(85vh - 44px)',
         zIndex: isAuthGate ? 10001 : windowState.zIndex + ((windowState.alwaysOnTop || windowState.componentType === 'ghost-chat') ? 1000 : 0),
         transformOrigin: isAuthGate ? undefined : transformOrigin,
