@@ -434,10 +434,92 @@ export default function ChatWindow({ windowId }: ChatWindowProps) {
         </div>
       )}
 
-      {/* Input block — credits + progress + input as one cohesive unit */}
-      <div className="flex-shrink-0" style={{ background: 'oklch(0.11 0.01 340)' }}>
-        {/* Progress bar — flush top edge, no padding */}
-        <div style={{ height: 2, background: 'oklch(0.15 0.01 340)', overflow: 'hidden' }}>
+      {/* Fused input block — one solid piece */}
+      <div className="flex-shrink-0 mx-gs-3 mb-gs-2" style={{ borderRadius: 10, overflow: 'hidden', border: '1px solid oklch(0.25 0.02 340)' }}>
+        {credits != null && credits <= 0 ? (
+          <button
+            onClick={() => openCreditPurchase('chat_credits')}
+            className="w-full"
+            style={{
+              height: 38,
+              fontSize: '12px',
+              fontFamily: 'var(--font-data)',
+              fontWeight: 600,
+              color: 'var(--gs-light)',
+              background: 'oklch(0.14 0.02 340)',
+              border: 'none',
+              cursor: 'pointer',
+            }}
+          >
+            Purchase credits to continue
+          </button>
+        ) : (
+          <div className="flex items-stretch" style={{ background: 'var(--gs-light)', height: 36 }}>
+            {/* Input — fills available space */}
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
+              placeholder="Ask Chloé anything..."
+              disabled={sending}
+              className="font-data select-text"
+              style={{
+                flex: 1,
+                minWidth: 0,
+                border: 'none',
+                outline: 'none',
+                background: 'transparent',
+                padding: '0 12px',
+                fontSize: '13px',
+                color: 'var(--gs-void)',
+                caretColor: 'var(--gs-void)',
+              }}
+            />
+            {/* Credits badge — fused between input and send */}
+            <div
+              className="flex items-center gap-1 flex-shrink-0"
+              style={{
+                padding: '0 8px',
+                borderLeft: '1px solid oklch(0.88 0.01 340)',
+                color: 'oklch(0.55 0.04 340)',
+              }}
+            >
+              <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor" style={{ opacity: 0.7 }}>
+                <path d="M8 1C5.2 1 3 3.2 3 6v6l1-1.5 1 1.5 1-1.5 1 1.5 1-1.5 1 1.5 1-1.5 1 1.5V6c0-2.8-2.2-5-5-5z"/>
+                <circle cx="6" cy="5.5" r="1" fill="var(--gs-light)"/>
+                <circle cx="10" cy="5.5" r="1" fill="var(--gs-light)"/>
+              </svg>
+              <span className="font-data tabular-nums font-semibold" style={{ fontSize: '11px' }}>
+                {credits ?? 0}
+              </span>
+            </div>
+            {/* Send button — fused right edge */}
+            <button
+              type="button"
+              onClick={handleSend}
+              disabled={sending || !input.trim()}
+              className="flex-shrink-0 disabled:opacity-30 transition-opacity"
+              style={{
+                width: 42,
+                background: 'oklch(0.14 0.02 340)',
+                border: 'none',
+                borderLeft: '1px solid oklch(0.25 0.02 340)',
+                cursor: sending || !input.trim() ? 'default' : 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gs-base)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13" />
+                <polygon points="22 2 15 22 11 13 2 9 22 2" />
+              </svg>
+            </button>
+          </div>
+        )}
+        {/* Progress bar — bottom edge of the fused block */}
+        <div style={{ height: 2, background: 'oklch(0.13 0.01 340)' }}>
           <div
             style={{
               height: '100%',
@@ -448,47 +530,10 @@ export default function ChatWindow({ windowId }: ChatWindowProps) {
                   ? 'var(--gs-warning)'
                   : 'var(--gs-critical)',
               transition: 'width 0.4s ease, background 0.4s ease',
-              opacity: 0.7,
+              opacity: 0.8,
             }}
           />
         </div>
-        {credits != null && credits <= 0 ? (
-          <div className="px-gs-3 py-gs-2">
-            <button
-              onClick={() => openCreditPurchase('chat_credits')}
-              className="w-full bevel-button-primary"
-              style={{ fontSize: '12px', height: 32 }}
-            >
-              Purchase credits to continue
-            </button>
-          </div>
-        ) : (
-          <div className="px-gs-3 py-gs-2 flex items-center gap-gs-2">
-            <BevelInput
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
-              placeholder="Ask Chloé anything..."
-              disabled={sending}
-              fullWidth
-              className="!text-data-sm !min-h-[32px] !py-gs-1"
-            />
-            <button
-              type="button"
-              onClick={handleSend}
-              disabled={sending || !input.trim()}
-              className="bevel-button-primary flex-shrink-0 disabled:opacity-40"
-              style={{ fontSize: '12px', padding: '0 12px', height: 32 }}
-            >
-              Send
-            </button>
-            {/* Credits count — inline, compact */}
-            <span className="font-data tabular-nums flex-shrink-0" style={{ fontSize: '10px', color: 'oklch(0.40 0.03 340)' }}>
-              {credits ?? 0}
-            </span>
-          </div>
-        )}
       </div>
     </div>
   );
