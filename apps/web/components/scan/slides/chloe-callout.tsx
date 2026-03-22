@@ -60,17 +60,14 @@ export function ChloeCallout({
           100% { background-position: 0% 50%; }
         }
         @keyframes gc-text-bloom {
-          0% { background-position: 100% center; }
+          0% { background-position: 200% center; }
           100% { background-position: -100% center; }
         }
         @keyframes gc-text-glow {
           0% { text-shadow: none; }
-          22% { text-shadow: none; }
-          27% { text-shadow: 0 0 6px rgba(230,225,240,0.5), 0 0 14px rgba(230,225,240,0.2); }
-          32% { text-shadow: none; }
-          68% { text-shadow: none; }
-          73% { text-shadow: 0 0 6px rgba(230,225,240,0.5), 0 0 14px rgba(230,225,240,0.2); }
-          78% { text-shadow: none; }
+          35% { text-shadow: none; }
+          50% { text-shadow: 0 0 6px rgba(230,225,240,0.5), 0 0 14px rgba(230,225,240,0.2); }
+          65% { text-shadow: none; }
           100% { text-shadow: none; }
         }
         .gc-glow-border {
@@ -99,7 +96,7 @@ export function ChloeCallout({
             rgba(220,215,230,0.85) 60%,
             rgba(220,215,230,0.85) 100%
           );
-          background-size: 400% 100%;
+          background-size: 300% 100%;
           -webkit-background-clip: text;
           background-clip: text;
           -webkit-text-fill-color: transparent;
