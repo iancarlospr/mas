@@ -147,16 +147,64 @@ export function ChloeCallout({
               fontSize: T.body,
               color: 'var(--gs-mid)',
               lineHeight: 1.55,
-              marginBottom: '0.4em',
+              marginBottom: '0.5em',
             }}
           >
             Your AI marketing strategist who memorized every finding
             in your audit. Ask anything &mdash; she&apos;ll walk you through it.
           </p>
 
+          {/* Clickable question row — between description and recommendations */}
+          <button
+            onClick={handleClick}
+            style={{
+              display: 'flex',
+              alignItems: 'baseline',
+              gap: '0.4em',
+              background: 'rgba(255,178,239,0.08)',
+              padding: '0.3em 0.5em',
+              borderRadius: '0 3px 3px 0',
+              border: 'none',
+              borderLeft: '2px solid var(--gs-base)',
+              cursor: 'pointer',
+              textAlign: 'left',
+              width: '100%',
+              transition: 'background 0.2s',
+              marginBottom: '0.5em',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(255,178,239,0.15)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'rgba(255,178,239,0.08)';
+            }}
+          >
+            <span
+              className="font-data"
+              style={{
+                fontSize: T.bubble,
+                color: 'var(--gs-base)',
+                opacity: 0.7,
+                flexShrink: 0,
+              }}
+            >
+              &rsaquo;
+            </span>
+            <span
+              className="font-data italic gc-text-bloom"
+              style={{
+                fontSize: T.bubble,
+                lineHeight: 1.35,
+                fontWeight: 600,
+              }}
+            >
+              &ldquo;{question}&rdquo;
+            </span>
+          </button>
+
           {/* Recommendations list */}
           {recommendations && recommendations.length > 0 && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3em', marginBottom: '0.5em', marginTop: '0.3em' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3em' }}>
               <h4
                 className="font-display uppercase"
                 style={{
@@ -199,52 +247,6 @@ export function ChloeCallout({
             </div>
           )}
 
-          {/* Clickable question row — this IS the button, with text shine */}
-          <button
-            onClick={handleClick}
-            style={{
-              display: 'flex',
-              alignItems: 'baseline',
-              gap: '0.4em',
-              background: 'rgba(255,178,239,0.08)',
-              padding: '0.3em 0.5em',
-              borderRadius: '0 3px 3px 0',
-              border: 'none',
-              borderLeft: '2px solid var(--gs-base)',
-              cursor: 'pointer',
-              textAlign: 'left',
-              width: '100%',
-              transition: 'background 0.2s',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'rgba(255,178,239,0.15)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'rgba(255,178,239,0.08)';
-            }}
-          >
-            <span
-              className="font-data"
-              style={{
-                fontSize: T.bubble,
-                color: 'var(--gs-base)',
-                opacity: 0.7,
-                flexShrink: 0,
-              }}
-            >
-              &rsaquo;
-            </span>
-            <span
-              className="font-data italic gc-text-bloom"
-              style={{
-                fontSize: T.bubble,
-                lineHeight: 1.35,
-                fontWeight: 600,
-              }}
-            >
-              &ldquo;{question}&rdquo;
-            </span>
-          </button>
         </div>
       </div>
     </div>
