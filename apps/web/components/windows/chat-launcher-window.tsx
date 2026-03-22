@@ -41,6 +41,7 @@ function openChatWindow(
     minWidth: 340,
     minHeight: 400,
     componentType: 'ghost-chat',
+    alwaysOnTop: true,
   });
   wm.openWindow(chatId, { scanId, domain });
   // Pin to bottom-right corner

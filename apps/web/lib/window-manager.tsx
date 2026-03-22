@@ -33,6 +33,8 @@ export interface WindowState {
   zIndex: number;
   variant: 'default' | 'terminal' | 'ghost' | 'dialog';
   isRouteWindow?: boolean;
+  /** Window floats above normal windows (e.g., chat panels) */
+  alwaysOnTop?: boolean;
   /** Component type for dynamic windows (e.g., 'scan-report', 'payment') */
   componentType?: string;
   /** Data passed when opening — consumed by window content, cleared on close */
@@ -52,6 +54,8 @@ export interface WindowConfig {
   startOpen?: boolean;
   /** Component type for dynamic windows — tells renderer which component to use */
   componentType?: string;
+  /** Window floats above normal windows (e.g., chat panels) */
+  alwaysOnTop?: boolean;
 }
 
 interface WindowManagerState {
@@ -133,6 +137,7 @@ function windowReducer(state: WindowManagerState, action: WindowAction): WindowM
         variant: config.variant ?? 'default',
         isRouteWindow: config.isRouteWindow,
         componentType: config.componentType,
+        alwaysOnTop: config.alwaysOnTop,
       };
       return {
         ...state,

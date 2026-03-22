@@ -1,6 +1,6 @@
 'use client';
 
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useMemo } from 'react';
 import { useWindowManager } from '@/lib/window-manager';
 import { ManagedWindow } from './managed-window';
 
@@ -72,12 +72,19 @@ function WindowLoadingFallback() {
 }
 
 export function StaticWindowRenderer() {
-  const { visibleWindows } = useWindowManager();
+  const { windows } = useWindowManager();
+
+  // Render in stable insertion order — NOT sorted by z-index.
+  // CSS z-index handles visual stacking. Sorting causes React to reorder
+  // DOM nodes via insertBefore(), which resets scroll positions.
+  const visibleNonRouteWindows = useMemo(
+    () => Object.values(windows).filter((w) => w.isOpen && !w.isMinimized && !w.isRouteWindow),
+    [windows],
+  );
 
   return (
     <>
-      {visibleWindows
-        .filter((w) => !w.isRouteWindow)
+      {visibleNonRouteWindows
         .map((w) => {
           // Static window — exact ID match
           const StaticComponent = WINDOW_COMPONENTS[w.id];

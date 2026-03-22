@@ -291,6 +291,7 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
       minWidth: 340,
       minHeight: 400,
       componentType: 'ghost-chat',
+      alwaysOnTop: true,
     });
     wm.openWindow(chatId, { scanId: scan.id, domain: scan.domain });
     // Pin to bottom-right corner

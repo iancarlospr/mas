@@ -238,11 +238,22 @@ export default function ChatWindow({ windowId }: ChatWindowProps) {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const hasFetched = useRef(false);
+  const prevMessageCount = useRef(0);
 
-  // Scroll to bottom on new messages
+  // Scroll to bottom only when new messages arrive or typing starts (not on window focus changes)
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, sending]);
+    if (messages.length > prevMessageCount.current) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+    prevMessageCount.current = messages.length;
+  }, [messages.length]);
+
+  // Scroll to show typing indicator when it appears
+  useEffect(() => {
+    if (sending) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [sending]);
 
   // Fetch chat history on mount
   const fetchHistory = useCallback(async () => {

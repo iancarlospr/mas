@@ -232,7 +232,7 @@ export function ManagedWindow({
         width: isMaximized ? '100%' : windowState.width,
         height: isMaximized ? '100%' : 'fit-content',
         maxHeight: isMaximized ? '100%' : 'calc(85vh - 44px)',
-        zIndex: isAuthGate ? 10001 : windowState.zIndex,
+        zIndex: isAuthGate ? 10001 : windowState.zIndex + ((windowState.alwaysOnTop || windowState.componentType === 'ghost-chat') ? 1000 : 0),
         transformOrigin: isAuthGate ? undefined : transformOrigin,
       }}
       onMouseDown={handleFocus}
