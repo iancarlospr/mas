@@ -1,9 +1,9 @@
 /**
- * Boss Deck — HTML template renderer.
+ * Boss Deck v2 — HTML template renderer.
  *
- * Renders a 8-9 page landscape pitch deck as a printable HTML document.
- * Design: Navy (#0B1F3F) + Gold (#B8860B) + Pink (#FFB2EF) accents.
- * Cohesive with PRD but bolder, more visual, deck-like.
+ * 7-page landscape pitch deck with alternating dark/light backgrounds.
+ * McKinsey-inspired: bold numbers, split layouts, no card borders.
+ * Cover + Closer use AI-generated image for premium feel.
  */
 
 import type { BossDeckAIOutput } from './boss-deck-prompt';
@@ -18,7 +18,8 @@ export interface BossDeckRenderContext {
   marketingIQ: number | null;
   marketingIQLabel: string | null;
   ai: BossDeckAIOutput | null;
-  // Raw data for fallback / direct rendering
+  coverImage: string | null;
+  coverImageMime: string | null;
   m42Synthesis: Record<string, unknown> | null;
   m45StackAnalysis: Record<string, unknown> | null;
   categoryScores: { category: string; score: number; light: string }[];
@@ -41,34 +42,30 @@ function formatDate(iso: string): string {
   }
 }
 
-const URGENCY_COLORS: Record<string, { bg: string; text: string; label: string }> = {
-  immediate: { bg: '#C53030', text: '#fff', label: 'IMMEDIATE' },
-  this_week: { bg: '#C05621', text: '#fff', label: 'THIS WEEK' },
-  this_month: { bg: '#2B6CB0', text: '#fff', label: 'THIS MONTH' },
-};
-
-const OWNER_COLORS: Record<string, { bg: string; text: string }> = {
-  'Content Team': { bg: '#2B6CB0', text: '#fff' },
-  'Dev Team': { bg: '#0B1F3F', text: '#fff' },
-  'Marketing Ops': { bg: '#B8860B', text: '#fff' },
-  'Design Team': { bg: '#6B46C1', text: '#fff' },
-  'Leadership': { bg: '#C53030', text: '#fff' },
-};
-
-function ownerColor(owner: string): { bg: string; text: string } {
-  return OWNER_COLORS[owner] ?? { bg: '#4A5568', text: '#fff' };
-}
-
 function lightColor(light: string): string {
   if (light === 'green') return '#38A169';
   if (light === 'yellow') return '#D69E2E';
   return '#E53E3E';
 }
 
-function lightEmoji(light: string): string {
-  if (light === 'green') return '●';
-  if (light === 'yellow') return '●';
-  return '●';
+function ownerColor(owner: string): string {
+  const map: Record<string, string> = {
+    'Content Team': '#2B6CB0',
+    'Dev Team': '#0B1F3F',
+    'Marketing Ops': '#B8860B',
+    'Design Team': '#6B46C1',
+    'Leadership': '#C53030',
+  };
+  return map[owner] ?? '#4A5568';
+}
+
+function footer(pageNum: number, variant: 'dark' | 'light'): string {
+  const bg = variant === 'dark' ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.04)';
+  const color = variant === 'dark' ? '#5A6A80' : '#A0AEC0';
+  return `<div class="slide-footer" style="background:${bg};color:${color}">
+    <span>Confidential — Prepared with AlphaScan</span>
+    <span>${String(pageNum).padStart(2, '0')}</span>
+  </div>`;
 }
 
 // ── Render ───────────────────────────────────────────────────
@@ -78,16 +75,12 @@ export function renderBossDeck(ctx: BossDeckRenderContext): string {
   const domainSafe = esc(ctx.domain);
   const dateFmt = formatDate(ctx.scanDate);
 
-  // Fallback values when AI is null
   const coverSubtitle = ai?.cover_subtitle ?? `Marketing Technology Assessment — ${dateFmt}`;
-  const winsNarrative = ai?.wins_narrative ?? (ctx.m42Synthesis?.['executive_brief'] as string ?? '').split('\n')[0] ?? '';
+  const winsNarrative = ai?.wins_narrative ?? '';
   const winsHighlights = ai?.wins_highlights ?? [];
   const topIssues = ai?.top_issues ?? [];
   const initiatives = ai?.initiatives ?? [];
   const toolPitches = ai?.tool_pitches ?? [];
-  const businessCaseHeadline = ai?.business_case_headline ?? 'The Business Case for Action';
-  const businessCaseNarrative = ai?.business_case_narrative ?? '';
-  const businessCaseMetrics = ai?.business_case_metrics ?? [];
   const impactHeadline = ai?.implementation_impact_headline ?? 'What This Means For The Business';
   const impactOutcomes = ai?.implementation_outcomes ?? [];
   const categoryProjections = ai?.category_projections ?? [];
@@ -96,49 +89,38 @@ export function renderBossDeck(ctx: BossDeckRenderContext): string {
   const nextSteps = ai?.next_steps ?? [];
   const closingMessage = ai?.closing_message ?? 'Ready to move forward when you are.';
 
-  // Build pages
   const pages: string[] = [];
 
-  // ── Page 1: Cover ──
+  // 1. Cover (DARK)
   pages.push(renderCover(ctx, coverSubtitle, dateFmt));
 
-  // ── Page 2: What's Working ──
-  if (winsHighlights.length > 0 || winsNarrative) {
+  // 2. What's Working (LIGHT)
+  if (winsHighlights.length > 0) {
     pages.push(renderWins(winsNarrative, winsHighlights, ctx));
   }
 
-  // ── Page 3: Top 3 Issues ──
+  // 3. Top 3 Issues (DARK)
   if (topIssues.length > 0) {
     pages.push(renderIssues(topIssues));
   }
 
-  // ── Page 4: Initiatives ──
-  if (initiatives.length > 0) {
-    pages.push(renderInitiatives(initiatives));
+  // 4. Roadmap — Initiatives + Timeline merged (LIGHT)
+  if (initiatives.length > 0 || timelineItems.length > 0) {
+    pages.push(renderRoadmap(initiatives, timelineSummary, timelineItems, nextSteps));
   }
 
-  // ── Page 5: Tool Pitches (conditional) ──
+  // 5. Results — Before/After + Outcomes (DARK)
+  if (categoryProjections.length > 0 || impactOutcomes.length > 0) {
+    pages.push(renderResults(impactHeadline, impactOutcomes, categoryProjections));
+  }
+
+  // 6. Tool Investment (LIGHT) — conditional
   if (toolPitches.length > 0 && ctx.hasM45) {
-    pages.push(renderToolPitches(toolPitches));
+    pages.push(renderTools(toolPitches));
   }
 
-  // ── Page 6: Business Case ──
-  if (businessCaseMetrics.length > 0) {
-    pages.push(renderBusinessCase(businessCaseHeadline, businessCaseNarrative, businessCaseMetrics, ctx));
-  }
-
-  // ── Page 7: Implementation Impact ──
-  if (impactOutcomes.length > 0 || categoryProjections.length > 0) {
-    pages.push(renderImpact(impactHeadline, impactOutcomes, categoryProjections));
-  }
-
-  // ── Page 8: Timeline ──
-  if (timelineItems.length > 0) {
-    pages.push(renderTimeline(timelineSummary, timelineItems));
-  }
-
-  // ── Page 9: Next Steps ──
-  pages.push(renderCloser(nextSteps, closingMessage, domainSafe));
+  // 7. Closer (DARK)
+  pages.push(renderCloser(ctx, closingMessage));
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -149,9 +131,7 @@ export function renderBossDeck(ctx: BossDeckRenderContext): string {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@500;600;700&family=Source+Sans+3:wght@300;400;600;700&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
-<style>
-${CSS}
-</style>
+<style>${CSS}</style>
 </head>
 <body>
 <div class="print-banner">
@@ -163,65 +143,88 @@ ${pages.join('\n')}
 </html>`;
 }
 
-// ── Page Renderers ───────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// PAGE 1: COVER (DARK)
+// ═══════════════════════════════════════════════════════════════
 
 function renderCover(ctx: BossDeckRenderContext, subtitle: string, dateFmt: string): string {
   const score = ctx.marketingIQ;
   const label = ctx.marketingIQLabel ?? '';
   const scoreColor = score != null && score >= 70 ? '#38A169' : score != null && score >= 40 ? '#D69E2E' : '#E53E3E';
 
-  return `<div class="page cover-page">
-  <div class="cover-accent"></div>
-  <div class="cover-center">
-    <div class="cover-label">MARKETING AUDIT BRIEFING</div>
-    <div class="cover-domain-name">${esc(ctx.businessName || ctx.domain)}</div>
-    <div class="cover-divider"></div>
-    <div class="cover-subtitle">${esc(subtitle)}</div>
-    ${score != null ? `
-    <div class="cover-score-ring">
-      <div class="cover-score-value" style="color:${scoreColor}">${score}</div>
-      <div class="cover-score-label">MarketingIQ™</div>
-      <div class="cover-score-tier">${esc(label)}</div>
-    </div>` : ''}
+  const imageHtml = ctx.coverImage
+    ? `<img class="cover-image" src="data:${ctx.coverImageMime ?? 'image/png'};base64,${ctx.coverImage}" alt="" />`
+    : `<div class="cover-arcs">
+        <div class="arc arc-1"></div>
+        <div class="arc arc-2"></div>
+        <div class="arc arc-3"></div>
+        <div class="arc arc-4"></div>
+        <div class="arc arc-5"></div>
+      </div>`;
+
+  return `<div class="page dark-page cover-page">
+  <div class="cover-accent-top"></div>
+  <div class="cover-layout">
+    <div class="cover-left">
+      <div class="cover-wordmark">AlphaScan</div>
+      <div class="cover-type-label">MARKETING AUDIT BRIEFING</div>
+      <div class="cover-business-name">${esc(ctx.businessName || ctx.domain)}</div>
+      <div class="cover-gold-line"></div>
+      <div class="cover-subtitle">${esc(subtitle)}</div>
+      ${score != null ? `
+      <div class="cover-meta-row">
+        <div class="cover-score">
+          <span class="cover-score-num" style="color:${scoreColor}">${score}</span>
+          <span class="cover-score-label">MarketingIQ™ · ${esc(label)}</span>
+        </div>
+      </div>` : ''}
+    </div>
+    <div class="cover-right">
+      ${imageHtml}
+    </div>
   </div>
-  <div class="cover-footer">
+  <div class="cover-bottom">
     <span>Prepared by ${esc(ctx.userEmail)} · ${esc(dateFmt)}</span>
     <span class="cover-powered">Powered by AlphaScan</span>
   </div>
-  <div class="cover-bottom-accent"></div>
+  <div class="cover-accent-bottom"></div>
 </div>`;
 }
+
+// ═══════════════════════════════════════════════════════════════
+// PAGE 2: WHAT'S WORKING (LIGHT)
+// ═══════════════════════════════════════════════════════════════
 
 function renderWins(narrative: string, highlights: BossDeckAIOutput['wins_highlights'], ctx: BossDeckRenderContext): string {
-  const strengthsList = getStrengths(ctx);
+  const strengths = getStrengths(ctx);
 
-  return `<div class="page wins-page">
-  <div class="page-header">
-    <div class="page-number">02</div>
-    <div class="page-title">Here's What's Already Working</div>
-  </div>
-  <div class="wins-narrative">${esc(narrative)}</div>
-  <div class="wins-grid">
-    ${highlights.map(h => `
-    <div class="wins-card">
-      <div class="wins-card-value">${esc(h.metric_value)}</div>
-      <div class="wins-card-label">${esc(h.metric_label)}</div>
-      <div class="wins-card-context">${esc(h.context)}</div>
-    </div>`).join('')}
-  </div>
-  ${strengthsList.length > 0 ? `
-  <div class="wins-strengths">
-    <div class="wins-strengths-title">Category Strengths</div>
-    <div class="wins-strengths-list">
-      ${strengthsList.map(s => `<div class="wins-strength-item"><span class="wins-strength-dot" style="background:${lightColor(s.light)}">●</span> ${esc(s.name)}: ${esc(s.note)}</div>`).join('')}
+  return `<div class="page light-page">
+  <div class="split-layout">
+    <div class="split-left" style="width:38%">
+      <div class="slide-title-light">Here's What's<br/>Already Working</div>
+      <div class="wins-narrative">${esc(narrative)}</div>
+      ${strengths.length > 0 ? `
+      <div class="wins-strengths">
+        ${strengths.map(s => `<div class="strength-row"><span class="strength-dot" style="background:${lightColor(s.light)}"></span>${esc(s.name)}</div>`).join('')}
+      </div>` : ''}
     </div>
-  </div>` : ''}
+    <div class="split-right" style="width:60%">
+      <div class="wins-metrics-grid">
+        ${highlights.map(h => `
+        <div class="win-metric">
+          <div class="win-metric-value">${esc(h.metric_value)}</div>
+          <div class="win-metric-label">${esc(h.metric_label)}</div>
+          <div class="win-metric-context">${esc(h.context)}</div>
+        </div>`).join('')}
+      </div>
+    </div>
+  </div>
+  ${footer(2, 'light')}
 </div>`;
 }
 
-function getStrengths(ctx: BossDeckRenderContext): { name: string; note: string; light: string }[] {
-  const strengths: { name: string; note: string; light: string }[] = [];
-  // From category assessments in M42
+function getStrengths(ctx: BossDeckRenderContext): { name: string; light: string }[] {
+  const strengths: { name: string; light: string }[] = [];
   const assessments = ctx.m42Synthesis?.['category_assessments'] as Record<string, Record<string, unknown>> | undefined;
   if (assessments) {
     for (const [, val] of Object.entries(assessments)) {
@@ -230,208 +233,248 @@ function getStrengths(ctx: BossDeckRenderContext): { name: string; note: string;
         const catName = val['category_name'] as string ?? '';
         const matching = ctx.categoryScores.find(c => c.category.toLowerCase().includes(catName.toLowerCase().split(' ')[0] ?? ''));
         if (matching && (matching.light === 'green' || matching.score >= 60)) {
-          strengths.push({ name: catName, note: strArr[0] ?? '', light: matching.light });
+          strengths.push({ name: catName, light: matching.light });
         }
       }
     }
   }
-  return strengths.slice(0, 4);
+  return strengths.slice(0, 5);
 }
 
+// ═══════════════════════════════════════════════════════════════
+// PAGE 3: TOP 3 ISSUES (DARK)
+// ═══════════════════════════════════════════════════════════════
+
 function renderIssues(issues: BossDeckAIOutput['top_issues']): string {
-  return `<div class="page issues-page">
-  <div class="page-header">
-    <div class="page-number">03</div>
-    <div class="page-title">Three Things Holding Us Back</div>
-  </div>
-  <div class="issues-grid">
-    ${issues.map((issue, i) => {
-      const uc = URGENCY_COLORS[issue.urgency] ?? URGENCY_COLORS['this_month']!;
-      return `
-    <div class="issue-card">
-      <div class="issue-number">${i + 1}</div>
-      <div class="issue-content">
-        <div class="issue-badge" style="background:${uc.bg};color:${uc.text}">${uc.label}</div>
-        <div class="issue-headline">${esc(issue.headline)}</div>
-        <div class="issue-explanation">${esc(issue.explanation)}</div>
-        <div class="issue-impact">${esc(issue.dollar_impact)}</div>
+  return `<div class="page dark-page">
+  <div class="split-layout">
+    <div class="issues-main">
+      <div class="slide-title-dark">Three Things<br/>Holding Us Back</div>
+      <div class="issues-list">
+        ${issues.map((issue, i) => `
+        <div class="issue-row">
+          <div class="issue-num">${String(i + 1).padStart(2, '0')}</div>
+          <div class="issue-body">
+            <div class="issue-headline">${esc(issue.headline)}</div>
+            <div class="issue-explanation">${esc(issue.explanation)}</div>
+          </div>
+        </div>
+        ${i < issues.length - 1 ? '<div class="gold-divider"></div>' : ''}`).join('')}
       </div>
-    </div>`;
-    }).join('')}
+    </div>
+    <div class="issues-sidebar">
+      <div class="sidebar-label">BUSINESS IMPACT</div>
+      ${issues.map((issue, i) => `
+      <div class="impact-callout">
+        <div class="impact-num">${String(i + 1).padStart(2, '0')}</div>
+        <div class="impact-text">${esc(issue.dollar_impact)}</div>
+      </div>`).join('')}
+    </div>
   </div>
+  ${footer(3, 'dark')}
 </div>`;
 }
 
-function renderInitiatives(initiatives: BossDeckAIOutput['initiatives']): string {
-  return `<div class="page initiatives-page">
-  <div class="page-header">
-    <div class="page-number">04</div>
-    <div class="page-title">What We Need To Do</div>
-  </div>
-  <div class="initiatives-grid">
+// ═══════════════════════════════════════════════════════════════
+// PAGE 4: ROADMAP (LIGHT) — merged initiatives + timeline
+// ═══════════════════════════════════════════════════════════════
+
+function renderRoadmap(
+  initiatives: BossDeckAIOutput['initiatives'],
+  timelineSummary: string,
+  timelineItems: BossDeckAIOutput['timeline_items'],
+  nextSteps: string[],
+): string {
+  const phaseColors = ['#C53030', '#C05621', '#2B6CB0', '#718096'];
+
+  return `<div class="page light-page">
+  <div class="slide-title-light-full">The Roadmap</div>
+  ${timelineSummary ? `<div class="roadmap-summary">${esc(timelineSummary)}</div>` : ''}
+
+  <div class="roadmap-initiatives">
     ${initiatives.map(init => {
       const oc = ownerColor(init.owner);
       return `
-    <div class="initiative-card">
-      <div class="initiative-header">
-        <span class="initiative-owner" style="background:${oc.bg};color:${oc.text}">${esc(init.owner)}</span>
-        <span class="initiative-effort">${esc(init.effort)}</span>
-      </div>
+    <div class="initiative-block">
+      <div class="initiative-bar" style="background:${oc}"></div>
+      <div class="initiative-owner" style="background:${oc}">${esc(init.owner)}</div>
       <div class="initiative-name">${esc(init.name)}</div>
-      <ul class="initiative-items">
-        ${init.items.map(item => `<li>${esc(item)}</li>`).join('')}
-      </ul>
-      <div class="initiative-outcome">${esc(init.expected_outcome)}</div>
+      <div class="initiative-items">
+        ${init.items.map(item => `<div class="init-item">→ ${esc(item)}</div>`).join('')}
+      </div>
+      <div class="initiative-meta">
+        <span class="init-effort">${esc(init.effort)}</span>
+        <span class="init-outcome">${esc(init.expected_outcome)}</span>
+      </div>
     </div>`;
     }).join('')}
   </div>
-</div>`;
-}
 
-function renderToolPitches(pitches: BossDeckAIOutput['tool_pitches']): string {
-  return `<div class="page tools-page">
-  <div class="page-header">
-    <div class="page-number">05</div>
-    <div class="page-title">Tools We Should Invest In</div>
-  </div>
-  <div class="tools-grid">
-    ${pitches.map(p => `
-    <div class="tool-card">
-      <div class="tool-name">${esc(p.tool_name)}</div>
-      <div class="tool-pitch">${esc(p.why_we_need_it)}</div>
-      <div class="tool-meta">
-        ${p.what_it_replaces && p.what_it_replaces !== 'New addition' ? `<div class="tool-replaces"><span class="tool-meta-label">Replaces:</span> ${esc(p.what_it_replaces)}</div>` : '<div class="tool-replaces"><span class="tool-meta-label">Type:</span> New addition</div>'}
-        <div class="tool-gap"><span class="tool-meta-label">Fills gap:</span> ${esc(p.capability_gap)}</div>
+  ${timelineItems.length > 0 ? `
+  <div class="timeline-bar">
+    <div class="timeline-line"></div>
+    ${timelineItems.map((phase, i) => `
+    <div class="timeline-phase">
+      <div class="timeline-dot" style="background:${phaseColors[i] ?? '#718096'}"></div>
+      <div class="timeline-phase-label" style="color:${phaseColors[i] ?? '#718096'}">${esc(phase.phase)}</div>
+      <div class="timeline-phase-items">
+        ${phase.items.slice(0, 3).map(item => `<div class="tl-item">${esc(item)}</div>`).join('')}
       </div>
     </div>`).join('')}
-  </div>
-</div>`;
-}
-
-function renderBusinessCase(headline: string, narrative: string, metrics: BossDeckAIOutput['business_case_metrics'], ctx: BossDeckRenderContext): string {
-  return `<div class="page business-page">
-  <div class="page-header">
-    <div class="page-number">${ctx.hasM45 && (ctx.ai?.tool_pitches?.length ?? 0) > 0 ? '06' : '05'}</div>
-    <div class="page-title">${esc(headline)}</div>
-  </div>
-  <div class="business-narrative">${esc(narrative)}</div>
-  <div class="business-metrics-grid">
-    ${metrics.map(m => `
-    <div class="business-metric-card">
-      <div class="business-metric-value">${esc(m.value)}</div>
-      <div class="business-metric-label">${esc(m.label)}</div>
-      <div class="business-metric-comparison">${esc(m.comparison)}</div>
-      <div class="business-metric-insight">${esc(m.insight)}</div>
-    </div>`).join('')}
-  </div>
-  <div class="business-score-bar">
-    <div class="business-score-title">Category Health Overview</div>
-    <div class="business-score-grid">
-      ${ctx.categoryScores.map(c => `
-      <div class="score-chip">
-        <span class="score-dot" style="color:${lightColor(c.light)}">${lightEmoji(c.light)}</span>
-        <span class="score-cat-name">${esc(c.category.replace(/_/g, ' '))}</span>
-        <span class="score-cat-val">${c.score}</span>
-      </div>`).join('')}
-    </div>
-  </div>
-</div>`;
-}
-
-function renderImpact(headline: string, outcomes: BossDeckAIOutput['implementation_outcomes'], projections: BossDeckAIOutput['category_projections']): string {
-  return `<div class="page impact-page">
-  <div class="page-header">
-    <div class="page-number">07</div>
-    <div class="page-title">${esc(headline)}</div>
-  </div>
-  ${outcomes.length > 0 ? `
-  <div class="impact-outcomes">
-    ${outcomes.map(o => `
-    <div class="impact-outcome">
-      <div class="impact-outcome-text">${esc(o.outcome)}</div>
-      <div class="impact-outcome-evidence">${esc(o.evidence)}</div>
-      <div class="impact-outcome-source">Depends on: ${esc(o.source_work)}</div>
-    </div>`).join('')}
   </div>` : ''}
+
+  ${nextSteps.length > 0 ? `
+  <div class="next-steps-row">
+    <span class="ns-label">FIRST ACTIONS:</span>
+    ${nextSteps.slice(0, 3).map(s => `<span class="ns-item">${esc(s)}</span>`).join('<span class="ns-sep">·</span>')}
+  </div>` : ''}
+
+  ${footer(4, 'light')}
+</div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PAGE 5: RESULTS — BEFORE & AFTER (DARK)
+// ═══════════════════════════════════════════════════════════════
+
+function renderResults(
+  headline: string,
+  outcomes: BossDeckAIOutput['implementation_outcomes'],
+  projections: BossDeckAIOutput['category_projections'],
+): string {
+  return `<div class="page dark-page">
+  <div class="slide-title-dark-full">${esc(headline)}</div>
+
   ${projections.length > 0 ? `
-  <div class="impact-projections">
-    <div class="impact-projections-title">Category Health — Before & After</div>
-    <div class="impact-projections-grid">
-      ${projections.map(p => `
-      <div class="projection-row">
-        <span class="projection-cat">${esc(p.category)}</span>
-        <span class="projection-lights">
-          <span class="projection-dot" style="color:${lightColor(p.current_light)}">${lightEmoji(p.current_light)}</span>
-          <span class="projection-arrow">→</span>
-          <span class="projection-dot" style="color:${lightColor(p.projected_light)}">${lightEmoji(p.projected_light)}</span>
-        </span>
-        <span class="projection-note">${esc(p.explanation)}</span>
-      </div>`).join('')}
+  <div class="comparison-table">
+    <div class="comp-header">
+      <span class="comp-cat-header">Category</span>
+      <span class="comp-now-header">Now</span>
+      <span class="comp-after-header">After Implementation</span>
+      <span class="comp-note-header">What Changes</span>
     </div>
-  </div>` : ''}
-</div>`;
-}
-
-function renderTimeline(summary: string, items: BossDeckAIOutput['timeline_items']): string {
-  const phaseColors = ['#C53030', '#C05621', '#2B6CB0', '#718096'];
-  return `<div class="page timeline-page">
-  <div class="page-header">
-    <div class="page-number">08</div>
-    <div class="page-title">Implementation Timeline</div>
-  </div>
-  <div class="timeline-summary">${esc(summary)}</div>
-  <div class="timeline-columns">
-    ${items.map((phase, i) => `
-    <div class="timeline-column">
-      <div class="timeline-phase-header" style="border-top-color:${phaseColors[i] ?? '#718096'}">${esc(phase.phase)}</div>
-      <ul class="timeline-phase-items">
-        ${phase.items.map(item => `<li>${esc(item)}</li>`).join('')}
-      </ul>
+    ${projections.map(p => `
+    <div class="comp-row">
+      <span class="comp-cat">${esc(p.category)}</span>
+      <span class="comp-now">
+        <span class="comp-dot" style="color:${lightColor(p.current_light)}">●</span>
+      </span>
+      <span class="comp-arrow">→</span>
+      <span class="comp-after">
+        <span class="comp-dot" style="color:${lightColor(p.projected_light)}">●</span>
+      </span>
+      <span class="comp-note">${esc(p.explanation)}</span>
     </div>`).join('')}
-  </div>
+  </div>` : ''}
+
+  ${outcomes.length > 0 ? `
+  <div class="outcomes-section">
+    ${outcomes.map(o => `
+    <div class="outcome-row">
+      <div class="outcome-bar"></div>
+      <div class="outcome-content">
+        <div class="outcome-text">${esc(o.outcome)}</div>
+        <div class="outcome-evidence">${esc(o.evidence)}</div>
+      </div>
+    </div>`).join('')}
+  </div>` : ''}
+
+  ${footer(5, 'dark')}
 </div>`;
 }
 
-function renderCloser(nextSteps: string[], closingMessage: string, domainSafe: string): string {
-  return `<div class="page closer-page">
-  <div class="closer-content">
-    <div class="closer-title">What Happens Next</div>
-    <div class="closer-steps">
-      ${nextSteps.map((step, i) => `
-      <div class="closer-step">
-        <div class="closer-step-num">${i + 1}</div>
-        <div class="closer-step-text">${esc(step)}</div>
-      </div>`).join('')}
+// ═══════════════════════════════════════════════════════════════
+// PAGE 6: TOOL INVESTMENT (LIGHT)
+// ═══════════════════════════════════════════════════════════════
+
+function renderTools(pitches: BossDeckAIOutput['tool_pitches']): string {
+  return `<div class="page light-page">
+  <div class="slide-title-light-full">Technology Investment Recommendations</div>
+
+  <div class="tools-list">
+    ${pitches.map((p, i) => {
+      const isReplace = p.what_it_replaces && p.what_it_replaces !== 'New addition';
+      return `
+    <div class="tool-comparison">
+      <div class="tool-current">
+        <div class="tool-side-label">${isReplace ? 'CURRENT' : 'GAP'}</div>
+        <div class="tool-side-name ${isReplace ? '' : 'tool-gap'}">${isReplace ? esc(p.what_it_replaces) : 'No coverage'}</div>
+        ${!isReplace ? `<div class="tool-side-dot-red">●</div>` : ''}
+      </div>
+      <div class="tool-arrow-col">→</div>
+      <div class="tool-proposed">
+        <div class="tool-side-label">RECOMMENDED</div>
+        <div class="tool-side-name tool-highlight">${esc(p.tool_name)}</div>
+        <div class="tool-pitch-text">${esc(p.why_we_need_it)}</div>
+      </div>
+      <div class="tool-gap-text">${esc(p.capability_gap)}</div>
     </div>
-    <div class="closer-message">${esc(closingMessage)}</div>
-    <div class="closer-cta">
-      <div class="closer-cta-text">Full audit report and remediation plan available at</div>
-      <div class="closer-cta-domain">${domainSafe}</div>
-    </div>
+    ${i < pitches.length - 1 ? '<div class="tool-divider"></div>' : ''}`;
+    }).join('')}
   </div>
-  <div class="closer-footer">
-    <span class="closer-powered">Powered by AlphaScan</span>
-  </div>
+
+  ${footer(6, 'light')}
 </div>`;
 }
 
-// ── CSS ──────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// PAGE 7: CLOSER (DARK)
+// ═══════════════════════════════════════════════════════════════
+
+function renderCloser(ctx: BossDeckRenderContext, closingMessage: string): string {
+  const score = ctx.marketingIQ;
+  const label = ctx.marketingIQLabel ?? '';
+  const scoreColor = score != null && score >= 70 ? '#38A169' : score != null && score >= 40 ? '#D69E2E' : '#E53E3E';
+
+  const imageHtml = ctx.coverImage
+    ? `<img class="closer-image" src="data:${ctx.coverImageMime ?? 'image/png'};base64,${ctx.coverImage}" alt="" style="transform:scaleX(-1)" />`
+    : `<div class="cover-arcs" style="transform:scaleX(-1)">
+        <div class="arc arc-1"></div><div class="arc arc-2"></div><div class="arc arc-3"></div>
+        <div class="arc arc-4"></div><div class="arc arc-5"></div>
+      </div>`;
+
+  return `<div class="page dark-page closer-page">
+  <div class="cover-accent-top"></div>
+  <div class="cover-layout">
+    <div class="cover-right closer-img-container">
+      ${imageHtml}
+    </div>
+    <div class="cover-left closer-right">
+      ${score != null ? `
+      <div class="closer-score" style="color:${scoreColor}">${score}</div>
+      <div class="closer-score-label">MarketingIQ™ · ${esc(label)}</div>
+      ` : ''}
+      <div class="closer-message">${esc(closingMessage)}</div>
+      <div class="closer-domain">${esc(ctx.domain)}</div>
+    </div>
+  </div>
+  <div class="cover-bottom">
+    <span></span>
+    <span class="cover-powered">Powered by AlphaScan</span>
+  </div>
+  <div class="cover-accent-bottom"></div>
+</div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CSS
+// ═══════════════════════════════════════════════════════════════
 
 const CSS = `
-/* ── Reset & Page ──────────────────────────────────── */
+/* ── Reset & Page ─────────────────────────────────── */
 @page { size: 14in 8.5in; margin: 0; }
 * { margin: 0; padding: 0; box-sizing: border-box;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important; }
-html, body { width: 14in; min-height: 8.5in; background: #fff; }
-body { font-family: 'Source Sans 3', system-ui, sans-serif; font-size: 13px; color: #2D3748; }
+html, body { width: 14in; background: #fff; }
+body { font-family: 'Source Sans 3', system-ui, sans-serif; font-size: 13px; }
 
-/* ── Print Banner ──────────────────────────────────── */
+/* ── Print Banner ─────────────────────────────────── */
 .print-banner {
   position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
-  background: #0B1F3F; color: #E2E8F0; text-align: center;
-  padding: 11px 20px; font-size: 13.5px; font-weight: 400;
-  display: flex; align-items: center; justify-content: center; gap: 16px;
+  background: #0B1F3F; color: #E2E8F0; padding: 11px 20px;
+  font-size: 13.5px; display: flex; align-items: center;
+  justify-content: center; gap: 16px;
   box-shadow: 0 2px 12px rgba(11,31,63,0.3);
 }
 .print-banner button {
@@ -443,396 +486,356 @@ body { font-family: 'Source Sans 3', system-ui, sans-serif; font-size: 13px; col
 @media print { .print-banner { display: none; } body { margin-top: 0; } }
 @media screen { body { margin-top: 52px; } }
 
-/* ── Page Container ────────────────────────────────── */
+/* ── Page base ────────────────────────────────────── */
 .page {
   width: 14in; height: 8.5in; position: relative; overflow: hidden;
   page-break-after: always; break-inside: avoid;
 }
 .page:last-child { page-break-after: auto; }
+.dark-page { background: #0B1F3F; color: #E2E8F0; }
+.light-page { background: #FAFBFD; color: #2D3748; }
 
-/* ── Page Header (shared) ──────────────────────────── */
-.page-header {
-  display: flex; align-items: baseline; gap: 16px;
-  padding: 0.55in 0.75in 0 0.75in;
+/* ── Shared ───────────────────────────────────────── */
+.split-layout {
+  display: flex; height: calc(100% - 32px); /* minus footer */
 }
-.page-number {
-  font-family: 'EB Garamond', Georgia, serif; font-size: 32px; font-weight: 700;
-  color: #B8860B; line-height: 1;
+.split-left, .split-right {
+  padding: 0.6in 0.55in;
 }
-.page-title {
-  font-family: 'EB Garamond', Georgia, serif; font-size: 28px; font-weight: 600;
-  color: #0B1F3F; line-height: 1.2;
+.slide-footer {
+  position: absolute; bottom: 0; left: 0; right: 0; height: 32px;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0 0.75in; font-size: 10px; letter-spacing: 0.03em;
+}
+.gold-divider {
+  height: 1px; margin: 16px 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(184,134,11,0.35) 15%, rgba(184,134,11,0.35) 85%, transparent 100%);
+}
+.slide-title-dark {
+  font-family: 'EB Garamond', Georgia, serif; font-size: 34px; font-weight: 700;
+  color: #fff; line-height: 1.15; margin-bottom: 28px;
+}
+.slide-title-light {
+  font-family: 'EB Garamond', Georgia, serif; font-size: 34px; font-weight: 700;
+  color: #0B1F3F; line-height: 1.15; margin-bottom: 28px;
+}
+.slide-title-dark-full {
+  font-family: 'EB Garamond', Georgia, serif; font-size: 28px; font-weight: 700;
+  color: #fff; padding: 0.5in 0.75in 0;
+}
+.slide-title-light-full {
+  font-family: 'EB Garamond', Georgia, serif; font-size: 28px; font-weight: 700;
+  color: #0B1F3F; padding: 0.5in 0.75in 0;
 }
 
-/* ═══════════════════════════════════════════════════════
-   PAGE 1: COVER
-   ═══════════════════════════════════════════════════════ */
-.cover-page {
-  background: #0B1F3F; color: #fff;
-  display: flex; flex-direction: column;
-}
-.cover-accent {
-  height: 6px;
+/* ═══ COVER ═══════════════════════════════════════ */
+.cover-accent-top {
+  height: 5px;
   background: linear-gradient(90deg, #B8860B 0%, #D4A017 40%, #FFB2EF 70%, #B8860B 100%);
 }
-.cover-center {
-  flex: 1; display: flex; flex-direction: column;
-  justify-content: center; align-items: center; text-align: center;
-  padding: 0 1.5in;
+.cover-accent-bottom {
+  height: 3px;
+  background: linear-gradient(90deg, #B8860B 0%, #D4A017 50%, transparent 100%);
 }
-.cover-label {
+.cover-layout {
+  display: flex; flex: 1; height: calc(100% - 5px - 3px - 36px);
+}
+.cover-left {
+  width: 55%; padding: 0.65in 0.75in; display: flex;
+  flex-direction: column; justify-content: center;
+}
+.cover-right {
+  width: 45%; position: relative; overflow: hidden;
+}
+.cover-wordmark {
+  font-family: 'EB Garamond', Georgia, serif; font-size: 14px; font-weight: 600;
+  color: #B8860B; letter-spacing: 0.15em; text-transform: uppercase;
+  margin-bottom: 40px;
+}
+.cover-type-label {
   font-size: 11px; font-weight: 600; letter-spacing: 0.25em;
-  text-transform: uppercase; color: #B8860B; margin-bottom: 24px;
+  text-transform: uppercase; color: #718096; margin-bottom: 16px;
 }
-.cover-domain-name {
-  font-family: 'EB Garamond', Georgia, serif; font-size: 48px; font-weight: 700;
-  color: #fff; line-height: 1.1; margin-bottom: 16px;
+.cover-business-name {
+  font-family: 'EB Garamond', Georgia, serif; font-size: 50px; font-weight: 700;
+  color: #fff; line-height: 1.08; margin-bottom: 16px;
 }
-.cover-divider {
-  width: 120px; height: 3px; border-radius: 2px;
-  background: linear-gradient(90deg, #B8860B, #D4A017, transparent);
-  margin: 0 auto 20px;
+.cover-gold-line {
+  width: 80px; height: 3px; border-radius: 2px;
+  background: linear-gradient(90deg, #B8860B, #D4A017);
+  margin-bottom: 18px;
 }
 .cover-subtitle {
   font-size: 16px; font-weight: 300; color: #CBD5E0;
-  letter-spacing: 0.02em; max-width: 500px;
+  letter-spacing: 0.02em; max-width: 420px; line-height: 1.5;
 }
-.cover-score-ring {
-  margin-top: 40px; text-align: center;
-  border: 2px solid #B8860B; border-radius: 12px;
-  padding: 20px 36px; display: inline-block;
+.cover-meta-row { margin-top: 36px; }
+.cover-score { display: flex; align-items: baseline; gap: 12px; }
+.cover-score-num {
+  font-family: 'EB Garamond', Georgia, serif; font-size: 44px; font-weight: 700;
 }
-.cover-score-value {
-  font-family: 'EB Garamond', Georgia, serif; font-size: 56px; font-weight: 700;
-  line-height: 1;
-}
-.cover-score-label {
-  font-size: 10px; font-weight: 600; letter-spacing: 0.15em;
-  text-transform: uppercase; color: #718096; margin-top: 4px;
-}
-.cover-score-tier {
-  font-size: 14px; font-weight: 600; color: #B8860B; margin-top: 2px;
-}
-.cover-footer {
+.cover-score-label { font-size: 12px; color: #718096; letter-spacing: 0.06em; }
+.cover-bottom {
   display: flex; justify-content: space-between; align-items: center;
-  padding: 0 0.85in 0.45in; font-size: 11px; color: #718096;
+  padding: 0 0.75in; height: 36px; font-size: 11px; color: #5A6A80;
 }
 .cover-powered { font-style: italic; }
-.cover-bottom-accent {
-  height: 4px;
-  background: linear-gradient(90deg, #B8860B 0%, #D4A017 50%, transparent 100%);
+
+/* Cover image */
+.cover-image {
+  width: 100%; height: 100%; object-fit: cover;
 }
 
-/* ═══════════════════════════════════════════════════════
-   PAGE 2: WINS
-   ═══════════════════════════════════════════════════════ */
-.wins-page { background: #FAFBFD; padding: 0; }
+/* Cover CSS fallback arcs */
+.cover-arcs {
+  position: absolute; inset: 0; overflow: hidden;
+}
+.arc {
+  position: absolute; border-radius: 50%;
+  border: 1px solid rgba(184,134,11,0.12);
+}
+.arc-1 { width: 600px; height: 600px; top: -100px; right: -150px; transform: rotate(-15deg); }
+.arc-2 { width: 480px; height: 480px; top: -40px; right: -80px; transform: rotate(-25deg);
+         border-color: rgba(184,134,11,0.08); }
+.arc-3 { width: 360px; height: 360px; top: 30px; right: -30px; transform: rotate(-35deg);
+         border-color: rgba(184,134,11,0.15); }
+.arc-4 { width: 520px; height: 520px; top: 60px; right: -200px; transform: rotate(10deg);
+         border-color: rgba(184,134,11,0.06); }
+.arc-5 { width: 280px; height: 280px; bottom: 40px; right: 20px; transform: rotate(-45deg);
+         border-color: rgba(184,134,11,0.1); }
+
+/* ═══ WINS ════════════════════════════════════════ */
 .wins-narrative {
-  font-size: 15px; color: #4A5568; line-height: 1.6;
-  padding: 20px 0.75in 0; max-width: 10in;
+  font-size: 14px; color: #4A5568; line-height: 1.65; margin-bottom: 24px;
 }
-.wins-grid {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;
-  padding: 28px 0.75in 0;
+.wins-metrics-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 32px 40px;
+  padding-top: 8px;
 }
-.wins-card {
-  background: #fff; border: 1px solid #E2E8F0; border-radius: 8px;
-  padding: 24px 20px; text-align: center;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+.win-metric { }
+.win-metric-value {
+  font-family: 'EB Garamond', Georgia, serif; font-size: 46px; font-weight: 700;
+  color: #0B1F3F; line-height: 1.1;
 }
-.wins-card-value {
-  font-family: 'EB Garamond', Georgia, serif; font-size: 36px; font-weight: 700;
-  color: #B8860B; line-height: 1.1;
+.win-metric-label {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.12em;
+  text-transform: uppercase; color: #718096; margin-top: 4px;
 }
-.wins-card-label {
-  font-size: 11px; font-weight: 600; letter-spacing: 0.1em;
-  text-transform: uppercase; color: #718096; margin-top: 6px;
+.win-metric-context {
+  font-size: 13px; color: #4A5568; margin-top: 8px; line-height: 1.5;
 }
-.wins-card-context {
-  font-size: 12px; color: #4A5568; margin-top: 10px; line-height: 1.5;
+.wins-strengths { margin-top: 24px; }
+.strength-row {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; color: #2D3748; margin-bottom: 6px;
 }
-.wins-strengths {
-  padding: 24px 0.75in 0;
-}
-.wins-strengths-title {
-  font-family: 'EB Garamond', Georgia, serif; font-size: 16px; font-weight: 600;
-  color: #0B1F3F; margin-bottom: 10px;
-}
-.wins-strengths-list { display: flex; flex-wrap: wrap; gap: 8px 24px; }
-.wins-strength-item {
-  font-size: 13px; color: #2D3748; display: flex; align-items: center; gap: 6px;
-}
-.wins-strength-dot { font-size: 10px; }
-
-/* ═══════════════════════════════════════════════════════
-   PAGE 3: ISSUES
-   ═══════════════════════════════════════════════════════ */
-.issues-page { background: #FAFBFD; }
-.issues-grid {
-  display: flex; flex-direction: column; gap: 20px;
-  padding: 28px 0.75in 0;
-}
-.issue-card {
-  display: flex; gap: 20px; align-items: flex-start;
-  background: #fff; border: 1px solid #E2E8F0; border-radius: 8px;
-  padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-}
-.issue-number {
-  font-family: 'EB Garamond', Georgia, serif; font-size: 42px; font-weight: 700;
-  color: #E2E8F0; line-height: 1; flex-shrink: 0; width: 48px; text-align: center;
-}
-.issue-content { flex: 1; }
-.issue-badge {
-  display: inline-block; padding: 3px 10px; border-radius: 3px;
-  font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
-  text-transform: uppercase; margin-bottom: 8px;
-}
-.issue-headline {
-  font-family: 'EB Garamond', Georgia, serif; font-size: 20px; font-weight: 600;
-  color: #0B1F3F; margin-bottom: 6px; line-height: 1.3;
-}
-.issue-explanation { font-size: 13px; color: #4A5568; line-height: 1.6; margin-bottom: 8px; }
-.issue-impact {
-  font-size: 13px; font-weight: 600; color: #B8860B;
-  padding-top: 8px; border-top: 1px solid #E2E8F0;
+.strength-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
 }
 
-/* ═══════════════════════════════════════════════════════
-   PAGE 4: INITIATIVES
-   ═══════════════════════════════════════════════════════ */
-.initiatives-page { background: #FAFBFD; }
-.initiatives-grid {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;
-  padding: 28px 0.75in 0;
+/* ═══ ISSUES ══════════════════════════════════════ */
+.issues-main {
+  width: 63%; padding: 0.6in 0.55in;
 }
-.initiative-card {
-  background: #fff; border: 1px solid #E2E8F0; border-radius: 8px;
-  padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-}
-.initiative-header {
-  display: flex; justify-content: space-between; align-items: center;
-  margin-bottom: 10px;
-}
-.initiative-owner {
-  display: inline-block; padding: 3px 10px; border-radius: 3px;
-  font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
-}
-.initiative-effort {
-  font-size: 11px; color: #718096; font-weight: 600;
-}
-.initiative-name {
-  font-family: 'EB Garamond', Georgia, serif; font-size: 17px; font-weight: 600;
-  color: #0B1F3F; margin-bottom: 10px; line-height: 1.3;
-}
-.initiative-items {
-  list-style: none; padding: 0; margin: 0 0 12px 0;
-}
-.initiative-items li {
-  font-size: 12.5px; color: #4A5568; line-height: 1.5;
-  padding: 3px 0 3px 16px; position: relative;
-}
-.initiative-items li::before {
-  content: '→'; position: absolute; left: 0; color: #B8860B; font-weight: 600;
-}
-.initiative-outcome {
-  font-size: 12px; color: #2B6CB0; font-style: italic;
-  padding-top: 10px; border-top: 1px solid #E2E8F0;
-}
-
-/* ═══════════════════════════════════════════════════════
-   PAGE 5: TOOL PITCHES
-   ═══════════════════════════════════════════════════════ */
-.tools-page { background: #FAFBFD; }
-.tools-grid {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;
-  padding: 28px 0.75in 0;
-}
-.tool-card {
-  background: #fff; border: 1px solid #E2E8F0; border-left: 4px solid #B8860B;
-  border-radius: 8px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-}
-.tool-name {
-  font-family: 'EB Garamond', Georgia, serif; font-size: 20px; font-weight: 600;
-  color: #0B1F3F; margin-bottom: 8px;
-}
-.tool-pitch { font-size: 13.5px; color: #4A5568; line-height: 1.6; margin-bottom: 14px; }
-.tool-meta { font-size: 12px; color: #718096; }
-.tool-meta-label { font-weight: 600; color: #4A5568; }
-.tool-replaces, .tool-gap { margin-top: 4px; }
-
-/* ═══════════════════════════════════════════════════════
-   PAGE 6: BUSINESS CASE
-   ═══════════════════════════════════════════════════════ */
-.business-page { background: #FAFBFD; }
-.business-narrative {
-  font-size: 14px; color: #4A5568; line-height: 1.6;
-  padding: 16px 0.75in 0; max-width: 10in;
-}
-.business-metrics-grid {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;
-  padding: 24px 0.75in 0;
-}
-.business-metric-card {
-  background: #0B1F3F; border-radius: 8px; padding: 24px; color: #fff;
-  text-align: center;
-}
-.business-metric-value {
-  font-family: 'EB Garamond', Georgia, serif; font-size: 34px; font-weight: 700;
-  color: #B8860B; line-height: 1.1;
-}
-.business-metric-label {
-  font-size: 11px; font-weight: 600; letter-spacing: 0.1em;
-  text-transform: uppercase; color: #718096; margin-top: 6px;
-}
-.business-metric-comparison {
-  font-size: 12px; color: #CBD5E0; margin-top: 10px; font-style: italic;
-}
-.business-metric-insight {
-  font-size: 12.5px; color: #E2E8F0; margin-top: 8px; line-height: 1.5;
-}
-.business-score-bar {
-  padding: 24px 0.75in 0;
-}
-.business-score-title {
-  font-size: 13px; font-weight: 600; color: #0B1F3F; margin-bottom: 10px;
-  letter-spacing: 0.04em; text-transform: uppercase;
-}
-.business-score-grid {
-  display: flex; flex-wrap: wrap; gap: 10px;
-}
-.score-chip {
-  display: flex; align-items: center; gap: 6px;
-  background: #fff; border: 1px solid #E2E8F0; border-radius: 20px;
-  padding: 5px 14px; font-size: 12px;
-}
-.score-dot { font-size: 10px; }
-.score-cat-name {
-  font-weight: 400; color: #4A5568; text-transform: capitalize;
-}
-.score-cat-val { font-weight: 700; color: #0B1F3F; }
-
-/* ═══════════════════════════════════════════════════════
-   PAGE 7: IMPLEMENTATION IMPACT
-   ═══════════════════════════════════════════════════════ */
-.impact-page { background: #FAFBFD; }
-.impact-outcomes { padding: 20px 0.75in 0; }
-.impact-outcome {
-  background: #fff; border: 1px solid #E2E8F0; border-left: 4px solid #38A169;
-  border-radius: 6px; padding: 16px 20px; margin-bottom: 12px;
-}
-.impact-outcome-text {
-  font-family: 'EB Garamond', Georgia, serif; font-size: 16px; font-weight: 600;
-  color: #0B1F3F; margin-bottom: 4px;
-}
-.impact-outcome-evidence { font-size: 12.5px; color: #4A5568; line-height: 1.5; }
-.impact-outcome-source {
-  font-size: 11px; color: #718096; font-style: italic; margin-top: 6px;
-}
-.impact-projections { padding: 24px 0.75in 0; }
-.impact-projections-title {
-  font-family: 'EB Garamond', Georgia, serif; font-size: 17px; font-weight: 600;
-  color: #0B1F3F; margin-bottom: 12px;
-}
-.impact-projections-grid { display: flex; flex-direction: column; gap: 6px; }
-.projection-row {
-  display: grid; grid-template-columns: 200px 100px 1fr; gap: 12px;
-  align-items: center; padding: 6px 12px; border-radius: 4px;
-  background: #fff; border: 1px solid #f0f0f0;
-}
-.projection-cat {
-  font-size: 13px; font-weight: 600; color: #0B1F3F; text-transform: capitalize;
-}
-.projection-lights {
-  display: flex; align-items: center; gap: 8px; font-size: 14px;
-}
-.projection-arrow { color: #718096; font-size: 12px; }
-.projection-dot { font-size: 16px; }
-.projection-note { font-size: 12px; color: #4A5568; }
-
-/* ═══════════════════════════════════════════════════════
-   PAGE 8: TIMELINE
-   ═══════════════════════════════════════════════════════ */
-.timeline-page { background: #FAFBFD; }
-.timeline-summary {
-  font-size: 14px; color: #4A5568; line-height: 1.6;
-  padding: 16px 0.75in 0; max-width: 10in;
-}
-.timeline-columns {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
-  padding: 24px 0.75in 0;
-}
-.timeline-column {
-  background: #fff; border: 1px solid #E2E8F0; border-radius: 8px;
-  padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-}
-.timeline-phase-header {
-  font-family: 'EB Garamond', Georgia, serif; font-size: 15px; font-weight: 600;
-  color: #0B1F3F; padding-bottom: 8px; margin-bottom: 10px;
-  border-top: 4px solid #718096; padding-top: 8px;
-}
-.timeline-phase-items {
-  list-style: none; padding: 0; margin: 0;
-}
-.timeline-phase-items li {
-  font-size: 12px; color: #4A5568; line-height: 1.5;
-  padding: 4px 0 4px 14px; position: relative;
-}
-.timeline-phase-items li::before {
-  content: '•'; position: absolute; left: 0; color: #B8860B; font-weight: 700;
-}
-
-/* ═══════════════════════════════════════════════════════
-   PAGE 9: CLOSER
-   ═══════════════════════════════════════════════════════ */
-.closer-page {
-  background: #0B1F3F; color: #fff;
+.issues-sidebar {
+  width: 37%; background: #132D54; padding: 0.6in 0.45in;
   display: flex; flex-direction: column;
 }
-.closer-content {
-  flex: 1; display: flex; flex-direction: column;
+.sidebar-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.2em;
+  color: #B8860B; margin-bottom: 24px;
+}
+.issues-list { display: flex; flex-direction: column; gap: 0; }
+.issue-row { display: flex; gap: 16px; align-items: flex-start; }
+.issue-num {
+  font-family: 'EB Garamond', Georgia, serif; font-size: 38px; font-weight: 700;
+  color: #B8860B; line-height: 1; flex-shrink: 0; width: 50px;
+}
+.issue-body { flex: 1; }
+.issue-headline {
+  font-family: 'EB Garamond', Georgia, serif; font-size: 19px; font-weight: 600;
+  color: #fff; line-height: 1.3; margin-bottom: 6px;
+}
+.issue-explanation { font-size: 13px; color: #CBD5E0; line-height: 1.55; }
+
+.impact-callout {
+  margin-bottom: 20px; padding-top: 16px;
+  border-top: 2px solid #B8860B;
+}
+.impact-num {
+  font-family: 'EB Garamond', Georgia, serif; font-size: 14px;
+  color: #718096; margin-bottom: 4px;
+}
+.impact-text {
+  font-family: 'EB Garamond', Georgia, serif; font-size: 18px; font-weight: 600;
+  color: #B8860B; line-height: 1.4;
+}
+
+/* ═══ ROADMAP ═════════════════════════════════════ */
+.roadmap-summary {
+  font-size: 14px; color: #4A5568; line-height: 1.6;
+  padding: 12px 0.75in 0; max-width: 10in;
+}
+.roadmap-initiatives {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;
+  padding: 16px 0.75in 0;
+}
+.initiative-block { }
+.initiative-bar {
+  height: 4px; border-radius: 2px; margin-bottom: 8px;
+}
+.initiative-owner {
+  display: inline-block; padding: 2px 10px; border-radius: 3px;
+  font-size: 9px; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: #fff; margin-bottom: 6px;
+}
+.initiative-name {
+  font-family: 'EB Garamond', Georgia, serif; font-size: 16px; font-weight: 600;
+  color: #0B1F3F; margin-bottom: 6px; line-height: 1.25;
+}
+.initiative-items { margin-bottom: 8px; }
+.init-item {
+  font-size: 12px; color: #4A5568; line-height: 1.5; padding: 1px 0;
+}
+.initiative-meta {
+  font-size: 11px; color: #718096; display: flex; gap: 12px;
+}
+.init-effort { font-weight: 600; color: #0B1F3F; }
+.init-outcome { font-style: italic; }
+
+/* Timeline bar */
+.timeline-bar {
+  display: flex; gap: 0; padding: 16px 0.75in 0; position: relative;
+}
+.timeline-line {
+  position: absolute; top: 30px; left: 0.75in; right: 0.75in;
+  height: 2px; background: linear-gradient(90deg, #B8860B, #D4A017, transparent);
+}
+.timeline-phase {
+  flex: 1; padding-right: 12px; position: relative;
+}
+.timeline-dot {
+  width: 10px; height: 10px; border-radius: 50%; margin-bottom: 8px;
+  position: relative; z-index: 1;
+}
+.timeline-phase-label {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase; margin-bottom: 6px;
+}
+.timeline-phase-items { }
+.tl-item { font-size: 11px; color: #4A5568; line-height: 1.5; }
+
+/* Next steps row */
+.next-steps-row {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+  padding: 14px 0.75in 0; font-size: 11px;
+}
+.ns-label {
+  font-weight: 700; color: #B8860B; letter-spacing: 0.08em; text-transform: uppercase;
+}
+.ns-item { color: #4A5568; }
+.ns-sep { color: #CBD5E0; }
+
+/* ═══ RESULTS ═════════════════════════════════════ */
+.comparison-table {
+  padding: 20px 0.75in 0;
+}
+.comp-header {
+  display: grid; grid-template-columns: 200px 60px 20px 80px 1fr;
+  gap: 8px; padding: 8px 12px; margin-bottom: 4px;
+}
+.comp-cat-header { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #718096; }
+.comp-now-header { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #E53E3E; text-align: center; }
+.comp-after-header { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #38A169; text-align: center; }
+.comp-note-header { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #718096; }
+.comp-row {
+  display: grid; grid-template-columns: 200px 60px 20px 80px 1fr;
+  gap: 8px; align-items: center; padding: 6px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.comp-cat { font-size: 13px; font-weight: 600; color: #fff; text-transform: capitalize; }
+.comp-now, .comp-after { text-align: center; }
+.comp-dot { font-size: 18px; }
+.comp-arrow { color: #5A6A80; font-size: 12px; text-align: center; }
+.comp-note { font-size: 12px; color: #8CA0B8; }
+
+.outcomes-section { padding: 20px 0.75in 0; }
+.outcome-row {
+  display: flex; gap: 12px; margin-bottom: 10px; align-items: flex-start;
+}
+.outcome-bar {
+  width: 3px; min-height: 100%; background: #38A169; border-radius: 2px;
+  flex-shrink: 0; align-self: stretch;
+}
+.outcome-content { }
+.outcome-text {
+  font-size: 13.5px; font-weight: 600; color: #fff; line-height: 1.4;
+}
+.outcome-evidence { font-size: 12px; color: #8CA0B8; margin-top: 2px; }
+
+/* ═══ TOOLS ═══════════════════════════════════════ */
+.tools-list { padding: 20px 0.75in 0; }
+.tool-comparison {
+  display: grid; grid-template-columns: 1fr 40px 1fr; gap: 0;
+  align-items: start; margin-bottom: 8px;
+}
+.tool-current {
+  background: #F0F0F0; border-radius: 6px 0 0 6px; padding: 16px 20px;
+  border-left: 3px solid #CBD5E0;
+}
+.tool-proposed {
+  background: #fff; border-radius: 0 6px 6px 0; padding: 16px 20px;
+  border-left: 3px solid #B8860B;
+}
+.tool-arrow-col {
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; color: #B8860B; font-weight: 700;
+  background: linear-gradient(90deg, #F0F0F0, #fff);
+}
+.tool-side-label {
+  font-size: 9px; font-weight: 700; letter-spacing: 0.15em;
+  text-transform: uppercase; color: #718096; margin-bottom: 4px;
+}
+.tool-side-name {
+  font-family: 'EB Garamond', Georgia, serif; font-size: 18px; font-weight: 600;
+  color: #0B1F3F; margin-bottom: 4px;
+}
+.tool-gap { color: #A0AEC0; font-style: italic; }
+.tool-side-dot-red { color: #E53E3E; font-size: 14px; margin-top: 4px; }
+.tool-highlight { color: #B8860B; }
+.tool-pitch-text { font-size: 13px; color: #4A5568; line-height: 1.5; margin-top: 6px; }
+.tool-gap-text {
+  grid-column: 1 / -1; font-size: 12px; color: #718096;
+  font-style: italic; padding: 4px 20px 0;
+}
+.tool-divider {
+  height: 1px; margin: 12px 0;
+  background: linear-gradient(90deg, transparent, #E2E8F0 20%, #E2E8F0 80%, transparent);
+}
+
+/* ═══ CLOSER ══════════════════════════════════════ */
+.closer-page .cover-layout { flex-direction: row-reverse; }
+.closer-img-container { width: 45%; }
+.closer-image {
+  width: 100%; height: 100%; object-fit: cover;
+}
+.closer-right {
+  width: 55%; display: flex; flex-direction: column;
   justify-content: center; align-items: center; text-align: center;
-  padding: 0 1.5in;
 }
-.closer-title {
-  font-family: 'EB Garamond', Georgia, serif; font-size: 32px; font-weight: 600;
-  color: #fff; margin-bottom: 36px;
+.closer-score {
+  font-family: 'EB Garamond', Georgia, serif; font-size: 72px; font-weight: 700;
+  line-height: 1;
 }
-.closer-steps {
-  display: flex; flex-direction: column; gap: 16px;
-  text-align: left; width: 100%; max-width: 600px;
-}
-.closer-step {
-  display: flex; align-items: flex-start; gap: 16px;
-}
-.closer-step-num {
-  font-family: 'EB Garamond', Georgia, serif; font-size: 28px; font-weight: 700;
-  color: #B8860B; line-height: 1; flex-shrink: 0; width: 36px; text-align: center;
-}
-.closer-step-text {
-  font-size: 15px; color: #E2E8F0; line-height: 1.5; padding-top: 4px;
+.closer-score-label {
+  font-size: 13px; color: #718096; letter-spacing: 0.1em; margin-top: 8px;
 }
 .closer-message {
-  font-size: 16px; color: #CBD5E0; font-style: italic;
-  margin-top: 40px; max-width: 500px;
+  font-size: 17px; color: #CBD5E0; font-style: italic;
+  margin-top: 36px; max-width: 380px; line-height: 1.6;
 }
-.closer-cta {
-  margin-top: 32px; padding: 16px 28px;
-  border: 1px solid #B8860B; border-radius: 8px;
-}
-.closer-cta-text {
-  font-size: 11px; color: #718096; text-transform: uppercase; letter-spacing: 0.1em;
-}
-.closer-cta-domain {
-  font-family: 'Source Code Pro', monospace; font-size: 14px; color: #B8860B;
-  margin-top: 4px;
-}
-.closer-footer {
-  padding: 0 0.85in 0.45in; text-align: right;
-}
-.closer-powered { font-size: 11px; color: #4A5568; font-style: italic; }
-
-/* ── Responsive for 3-col wins when only 3 highlights ─ */
-@media print {
-  .wins-grid { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+.closer-domain {
+  font-family: 'Source Code Pro', monospace; font-size: 14px;
+  color: #B8860B; margin-top: 24px; letter-spacing: 0.03em;
 }
 `;

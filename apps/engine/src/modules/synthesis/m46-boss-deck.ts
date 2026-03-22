@@ -15,7 +15,7 @@ import { registerModuleExecutor } from '../runner.js';
 import type { ModuleContext } from '../types.js';
 import type { ModuleResult, ModuleId, Signal, Checkpoint } from '@marketing-alpha/types';
 import { createCheckpoint } from '../../utils/signals.js';
-import { callPro } from '../../services/gemini.js';
+import { callPro, generateImage } from '../../services/gemini.js';
 import { z } from 'zod';
 
 // ─── Output schema ──────────────────────────────────────────────────────
@@ -346,10 +346,35 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
     checkpoints.push(createCheckpoint({
       id: 'm46-synthesis',
       name: 'Boss Deck Synthesis',
-      weight: 1.0,
+      weight: 0.8,
       health: 'excellent',
       evidence: `Generated boss deck: ${result.data.wins_highlights.length} wins, ${result.data.top_issues.length} issues, ${result.data.initiatives.length} initiatives, ${result.data.tool_pitches.length} tool pitches`,
     }));
+
+    // ── Generate cover image ──
+    const imageResult = await generateImage(
+      'Premium abstract consulting presentation cover visual. Deep navy blue (#0B1F3F) background. Flowing golden luminous arcs and thin geometric lines sweeping elegantly from bottom-right upward. Subtle warm light gradient glow where arcs intersect. A few scattered small golden dots like data constellation points. The composition should feel sophisticated, premium, and professional — like a top-tier management consulting firm cover. No text, no people, no logos, no icons. Pure abstract geometric art. Landscape orientation, 16:9 aspect ratio.',
+    );
+
+    if (imageResult) {
+      data.coverImage = imageResult.base64;
+      data.coverImageMime = imageResult.mimeType;
+      checkpoints.push(createCheckpoint({
+        id: 'm46-cover-image',
+        name: 'Cover Image',
+        weight: 0.2,
+        health: 'excellent',
+        evidence: `Cover image generated: ${imageResult.mimeType}, ${Math.round(imageResult.base64.length / 1024)}KB base64`,
+      }));
+    } else {
+      checkpoints.push(createCheckpoint({
+        id: 'm46-cover-image',
+        name: 'Cover Image',
+        weight: 0.2,
+        health: 'warning',
+        evidence: 'Cover image generation failed — CSS fallback will be used',
+      }));
+    }
   } catch (error) {
     checkpoints.push(createCheckpoint({
       id: 'm46-synthesis',

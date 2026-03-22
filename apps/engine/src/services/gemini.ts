@@ -383,6 +383,42 @@ export async function generateText(
 }
 
 /**
+ * Generate an image using Gemini's multimodal image generation.
+ * Returns base64-encoded image data or null if generation fails.
+ */
+export async function generateImage(
+  prompt: string,
+): Promise<{ base64: string; mimeType: string } | null> {
+  try {
+    const client = getClient();
+    const response = await client.models.generateContent({
+      model: 'gemini-2.0-flash-exp',
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      config: {
+        responseModalities: ['IMAGE', 'TEXT'],
+      },
+    });
+
+    const candidates = response.candidates;
+    if (!candidates?.[0]?.content?.parts) return null;
+
+    for (const part of candidates[0].content.parts) {
+      if (part.inlineData?.data) {
+        logger.info({ mimeType: part.inlineData.mimeType, size: part.inlineData.data.length }, 'Image generated');
+        return {
+          base64: part.inlineData.data,
+          mimeType: part.inlineData.mimeType ?? 'image/png',
+        };
+      }
+    }
+    return null;
+  } catch (error) {
+    logger.warn({ error: (error as Error).message }, 'Image generation failed');
+    return null;
+  }
+}
+
+/**
  * Check if an error is a configuration error that won't self-resolve.
  */
 function isConfigurationError(error: Error): boolean {
