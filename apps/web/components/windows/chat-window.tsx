@@ -453,36 +453,28 @@ export default function ChatWindow({ windowId }: ChatWindowProps) {
             </button>
           </div>
         ) : (
-          <div>
-            <form
-              onSubmit={(e) => { e.preventDefault(); handleSend(); }}
-              className="flex gap-gs-2"
+          <form
+            onSubmit={(e) => { e.preventDefault(); handleSend(); }}
+            className="flex gap-gs-2"
+          >
+            <BevelInput
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Ask Chloé anything..."
+              disabled={sending}
+              fullWidth
+              className="!text-data-sm !min-h-[32px] !py-gs-1"
+            />
+            <button
+              type="submit"
+              disabled={sending || !input.trim()}
+              className="bevel-button-primary flex-shrink-0 disabled:opacity-40"
+              style={{ fontSize: '12px', padding: '0 12px', height: 32 }}
             >
-              <BevelInput
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask Chloé anything..."
-                disabled={sending}
-                fullWidth
-                className="!text-data-sm !min-h-[32px] !py-gs-1"
-              />
-              <button
-                type="submit"
-                disabled={sending || !input.trim()}
-                className="bevel-button-primary flex-shrink-0 disabled:opacity-40"
-                style={{ fontSize: '12px', padding: '0 12px', height: 32 }}
-              >
-                Send
-              </button>
-            </form>
-            {/* Credits — subtle, below input */}
-            <div className="flex justify-end mt-1">
-              <span className="font-data tabular-nums" style={{ fontSize: '9px', color: 'oklch(0.30 0.02 340)', opacity: 0.6 }}>
-                {credits ?? 0} remaining
-              </span>
-            </div>
-          </div>
+              Send
+            </button>
+          </form>
         )}
       </div>
     </div>
