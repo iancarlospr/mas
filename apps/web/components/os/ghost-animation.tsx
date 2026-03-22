@@ -124,12 +124,12 @@ const SPRITE_W = 65;
 // ── Messages ────────────────────────────────────────────────────
 
 const MESSAGES = [
-  'hi i\'m chloe',
+  'hi i\'m chloé',
   'boo!',
   'did i scare you?',
   'probably not lol',
   'i\'m a friendly ghost',
-  'chloe tv // always on',
+  'chloé tv // always on',
 ];
 
 // ── Overlay types ───────────────────────────────────────────────
