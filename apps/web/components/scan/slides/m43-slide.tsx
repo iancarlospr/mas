@@ -180,6 +180,31 @@ export function M43Slide({ scan, printMode }: { scan: ScanWithResults; printMode
           background: rgba(255,178,239,0.06) !important;
           border-color: rgba(255,178,239,0.3) !important;
         }
+        @keyframes m43-text-bloom {
+          0% { background-position: 200% center; }
+          100% { background-position: -100% center; }
+        }
+        @keyframes m43-text-glow {
+          0% { text-shadow: none; }
+          35% { text-shadow: none; }
+          50% { text-shadow: 0 0 6px rgba(230,225,240,0.5), 0 0 14px rgba(230,225,240,0.2); }
+          65% { text-shadow: none; }
+          100% { text-shadow: none; }
+        }
+        .m43-text-bloom {
+          background: linear-gradient(90deg,
+            rgba(220,215,230,0.85) 0%,
+            rgba(220,215,230,0.85) 40%,
+            #fff 49%, rgba(240,238,245,1) 50%, #fff 51%,
+            rgba(220,215,230,0.85) 60%,
+            rgba(220,215,230,0.85) 100%
+          );
+          background-size: 300% 100%;
+          -webkit-background-clip: text;
+          background-clip: text;
+          -webkit-text-fill-color: transparent;
+          animation: m43-text-bloom 6s linear infinite, m43-text-glow 6s linear infinite;
+        }
       `}</style>
 
       {/* Atmospheric radial glow — top center behind logo */}
@@ -337,9 +362,10 @@ export function M43Slide({ scan, printMode }: { scan: ScanWithResults; printMode
                   }}>
                     &rsaquo;
                   </span>
-                  <span className="font-data italic" style={{
-                    fontSize: T.bubble, color: 'var(--gs-light)',
-                    opacity: i === 0 ? 0.85 : 0.55, lineHeight: 1.35,
+                  <span className={`font-data italic${i === 0 ? ' m43-text-bloom' : ''}`} style={{
+                    fontSize: T.bubble,
+                    ...(i === 0 ? {} : { color: 'var(--gs-light)', opacity: 0.55 }),
+                    lineHeight: 1.35,
                     fontWeight: i === 0 ? 600 : 400,
                   }}>
                     &ldquo;{q}&rdquo;
