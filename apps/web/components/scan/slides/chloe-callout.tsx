@@ -65,9 +65,12 @@ export function ChloeCallout({
         }
         @keyframes gc-text-glow {
           0% { text-shadow: none; }
-          40% { text-shadow: none; }
-          50% { text-shadow: 0 0 8px rgba(220,215,230,0.6), 0 0 16px rgba(220,215,230,0.3); }
-          60% { text-shadow: none; }
+          22% { text-shadow: none; }
+          27% { text-shadow: 0 0 6px rgba(230,225,240,0.5), 0 0 14px rgba(230,225,240,0.2); }
+          32% { text-shadow: none; }
+          68% { text-shadow: none; }
+          73% { text-shadow: 0 0 6px rgba(230,225,240,0.5), 0 0 14px rgba(230,225,240,0.2); }
+          78% { text-shadow: none; }
           100% { text-shadow: none; }
         }
         .gc-glow-border {
