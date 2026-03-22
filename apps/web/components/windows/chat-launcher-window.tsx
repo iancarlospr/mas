@@ -20,6 +20,7 @@ interface PaidScan {
   url: string;
   marketing_iq: number | null;
   created_at: string;
+  chat_messages: { count: number }[];
 }
 
 /** Register + open a dynamic GhostChat window for a specific scan */
@@ -76,10 +77,11 @@ export default function ChatLauncherWindow() {
       const supabase = createClient();
       const { data } = await supabase
         .from('scans')
-        .select('id, url, marketing_iq, created_at')
+        .select('id, url, marketing_iq, created_at, chat_messages(count)')
         .eq('user_id', user!.id)
         .eq('tier', 'paid')
         .eq('status', 'complete')
+        .eq('chat_messages.role', 'user')
         .order('created_at', { ascending: false })
         .limit(20);
 
@@ -160,7 +162,9 @@ export default function ChatLauncherWindow() {
               <div className="flex-1 min-w-0">
                 <div className="font-data text-data-sm font-bold truncate">{domain}</div>
                 <div className="font-data text-data-xs text-gs-muted">
-                  Score: {scan.marketing_iq ?? '—'} · {new Date(scan.created_at).toLocaleDateString()}
+                  {scan.chat_messages?.[0]?.count
+                    ? `${scan.chat_messages[0].count} message${scan.chat_messages[0].count === 1 ? '' : 's'} sent`
+                    : 'No messages yet'}
                 </div>
               </div>
               <span className="text-gs-muted text-data-sm">→</span>
