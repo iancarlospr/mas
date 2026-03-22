@@ -18,8 +18,6 @@ export interface BossDeckRenderContext {
   marketingIQ: number | null;
   marketingIQLabel: string | null;
   ai: BossDeckAIOutput | null;
-  coverImage: string | null;
-  coverImageMime: string | null;
   m42Synthesis: Record<string, unknown> | null;
   m45StackAnalysis: Record<string, unknown> | null;
   categoryScores: { category: string; score: number; light: string }[];
@@ -152,15 +150,7 @@ function renderCover(ctx: BossDeckRenderContext, subtitle: string, dateFmt: stri
   const label = ctx.marketingIQLabel ?? '';
   const scoreColor = score != null && score >= 70 ? '#38A169' : score != null && score >= 40 ? '#D69E2E' : '#E53E3E';
 
-  const imageHtml = ctx.coverImage
-    ? `<img class="cover-image" src="data:${ctx.coverImageMime ?? 'image/png'};base64,${ctx.coverImage}" alt="" />`
-    : `<div class="cover-arcs">
-        <div class="arc arc-1"></div>
-        <div class="arc arc-2"></div>
-        <div class="arc arc-3"></div>
-        <div class="arc arc-4"></div>
-        <div class="arc arc-5"></div>
-      </div>`;
+  const imageHtml = `<img class="cover-image" src="/boss-deck-cover.png" alt="" />`;
 
   return `<div class="page dark-page cover-page">
   <div class="cover-accent-top"></div>
@@ -426,12 +416,7 @@ function renderCloser(ctx: BossDeckRenderContext, closingMessage: string): strin
   const label = ctx.marketingIQLabel ?? '';
   const scoreColor = score != null && score >= 70 ? '#38A169' : score != null && score >= 40 ? '#D69E2E' : '#E53E3E';
 
-  const imageHtml = ctx.coverImage
-    ? `<img class="closer-image" src="data:${ctx.coverImageMime ?? 'image/png'};base64,${ctx.coverImage}" alt="" style="transform:scaleX(-1)" />`
-    : `<div class="cover-arcs" style="transform:scaleX(-1)">
-        <div class="arc arc-1"></div><div class="arc arc-2"></div><div class="arc arc-3"></div>
-        <div class="arc arc-4"></div><div class="arc arc-5"></div>
-      </div>`;
+  const imageHtml = `<img class="closer-image" src="/boss-deck-cover.png" alt="" style="transform:scaleX(-1)" />`;
 
   return `<div class="page dark-page closer-page">
   <div class="cover-accent-top"></div>

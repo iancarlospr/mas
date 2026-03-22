@@ -94,8 +94,6 @@ export async function GET(
   }
 
   const aiOutput = (m46Raw['bossDeck'] as BossDeckAIOutput) ?? null;
-  const coverImage = (m46Raw['coverImage'] as string) ?? null;
-  const coverImageMime = (m46Raw['coverImageMime'] as string) ?? null;
   const m46CategoryScores = m46Raw['categoryScores'] as { category: string; score: number; light: string }[] | undefined;
 
   // Fallback category scores from scan.marketing_iq_result
@@ -142,8 +140,6 @@ export async function GET(
     marketingIQ: scan.marketing_iq as number | null,
     marketingIQLabel: scan.marketing_iq != null ? getMarketingIQLabel(scan.marketing_iq as number) : null,
     ai: aiOutput,
-    coverImage,
-    coverImageMime,
     m42Synthesis,
     m45StackAnalysis,
     categoryScores,
