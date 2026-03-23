@@ -36,7 +36,10 @@ export async function generatePresentationPDF(
   try {
     const page = await browser.newPage({
       viewport: { width: PRES_PAGE_W, height: PRES_PAGE_H * 3 },
-      deviceScaleFactor: 2, // 2x for crisp text
+      // 1x DPI for 52-slide deck — keeps memory under 768MB Docker limit.
+      // At 1875px wide, text is already sharp in the PDF.
+      // Boss Deck (7 pages) uses 2x since it fits in memory.
+      deviceScaleFactor: 1,
     });
 
     page.on('console', (msg) => {
@@ -86,21 +89,23 @@ export async function generatePresentationPDF(
       throw new Error('No slides rendered on the page');
     }
 
-    // Assemble PDF incrementally — screenshot → embed → discard buffer.
-    // Avoids holding all 52 PNGs in memory (would exceed 768MB Docker limit).
+    // Assemble PDF incrementally — screenshot → compress → embed → discard.
+    // At 1x DPI, each PNG is ~3-5MB. Process one at a time to stay under 768MB.
+    // Hero/tail slides: PNG (lossless gradients). Middle: JPEG 90%.
     const pdf = await PDFDocument.create();
     const HERO_COUNT = 3;
     const TAIL_COUNT = 3;
 
     for (let i = 0; i < total; i++) {
-      const png = Buffer.from(await slides[i]!.screenshot({ type: 'png' }));
+      const screenshot = await slides[i]!.screenshot({ type: 'png' });
+      const png = Buffer.from(screenshot);
       const isHero = i < HERO_COUNT || i >= total - TAIL_COUNT;
       let img;
 
       if (isHero) {
         img = await pdf.embedPng(png);
       } else {
-        const jpegBuf = await sharp(png).jpeg({ quality: 85 }).toBuffer();
+        const jpegBuf = await sharp(png).jpeg({ quality: 90 }).toBuffer();
         img = await pdf.embedJpg(jpegBuf);
       }
 
