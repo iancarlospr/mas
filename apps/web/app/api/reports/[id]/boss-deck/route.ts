@@ -60,10 +60,8 @@ export async function GET(
     return NextResponse.json({ error: 'Invalid scan ID' }, { status: 400 });
   }
 
-  // Auth: either logged-in owner OR valid share token
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  const shareToken = request.nextUrl.searchParams.get('share');
+  // Engine calls with ?print=1 for server-side PDF generation (already HMAC-authenticated)
+  const isPrintMode = request.nextUrl.searchParams.get('print') === '1';
 
   const serviceClient = createServiceClient();
   const { data: scan } = await serviceClient
@@ -76,12 +74,20 @@ export async function GET(
     return NextResponse.json({ error: 'Report not found' }, { status: 404 });
   }
 
-  // Verify access: owner or valid share token
-  const isOwner = user != null && scan.user_id === user.id;
-  const isSharedAccess = await verifyShareToken(shareToken, scanId);
+  // Auth: engine print mode bypasses user auth, otherwise require owner or share token
+  let user: { id: string; email?: string; user_metadata?: Record<string, unknown> } | null = null;
+  if (!isPrintMode) {
+    const supabase = await createClient();
+    const { data: { user: authUser } } = await supabase.auth.getUser();
+    user = authUser;
+    const shareToken = request.nextUrl.searchParams.get('share');
 
-  if (!isOwner && !isSharedAccess) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const isOwner = user != null && scan.user_id === user.id;
+    const isSharedAccess = await verifyShareToken(shareToken, scanId);
+
+    if (!isOwner && !isSharedAccess) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
   }
 
   // Fetch M46 (Boss Deck) + M42 (for fallback data)
@@ -172,6 +178,7 @@ export async function GET(
     m24Data: resultMap.get('M24') ?? null,
     m25Data: resultMap.get('M25') ?? null,
     m26Data: resultMap.get('M26') ?? null,
+    scanId,
   };
 
   const html = renderBossDeck(renderCtx);

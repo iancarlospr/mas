@@ -3,7 +3,12 @@ import { z } from 'zod';
 import { enqueueScanJob, getJobState, getQueueDepth } from '../queue/scan-queue.js';
 import { getScanById } from '../services/supabase.js';
 import { normalizeUrl, getRegistrableDomain } from '../utils/url.js';
-import { generatePresentationPDF, uploadPresentationPDF } from '../services/pdf-generator.js';
+import {
+  generatePresentationPDF,
+  uploadPresentationPDF,
+  generateBossDeckPDF,
+  uploadBossDeckPDF,
+} from '../services/pdf-generator.js';
 import type { ModuleTier } from '@marketing-alpha/types';
 
 /**
@@ -245,6 +250,48 @@ export async function scanRoutes(fastify: FastifyInstance): Promise<void> {
         request.log.error(
           { scanId, error: (error as Error).message },
           'Failed to generate presentation PDF',
+        );
+        reply.code(500).send({
+          error: 'PDF generation failed',
+          message: (error as Error).message,
+        });
+      }
+    },
+  );
+
+  /**
+   * POST /engine/reports/:id/boss-deck-pdf
+   *
+   * Generate Boss Deck PDF via element screenshots (screen mode).
+   * Returns a signed Supabase Storage URL (24h expiry).
+   */
+  fastify.post(
+    '/engine/reports/:id/boss-deck-pdf',
+    async (
+      request: FastifyRequest<{ Params: ScanIdParamsType }>,
+      reply: FastifyReply,
+    ) => {
+      const parseResult = ScanIdParams.safeParse(request.params);
+      if (!parseResult.success) {
+        reply.code(400).send({ error: 'Invalid scan ID' });
+        return;
+      }
+
+      const { id: scanId } = parseResult.data;
+
+      try {
+        const reportBaseUrl = process.env['REPORT_BASE_URL'] ?? 'http://localhost:3000';
+        request.log.info({ scanId }, 'Generating Boss Deck PDF');
+
+        const pdf = await generateBossDeckPDF(scanId, reportBaseUrl);
+        const signedUrl = await uploadBossDeckPDF(scanId, pdf);
+
+        request.log.info({ scanId }, 'Boss Deck PDF generated and uploaded');
+        reply.send({ url: signedUrl });
+      } catch (error) {
+        request.log.error(
+          { scanId, error: (error as Error).message },
+          'Failed to generate Boss Deck PDF',
         );
         reply.code(500).send({
           error: 'PDF generation failed',

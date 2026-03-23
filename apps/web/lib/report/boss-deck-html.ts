@@ -35,6 +35,8 @@ export interface BossDeckRenderContext {
   m24Data?: Record<string, unknown> | null;
   m25Data?: Record<string, unknown> | null;
   m26Data?: Record<string, unknown> | null;
+  /** Scan ID for PDF download link */
+  scanId?: string;
 }
 
 // ── Helpers ──────────────────────────────────────────────────
@@ -404,7 +406,7 @@ export function renderBossDeck(ctx: BossDeckRenderContext): string {
 </defs></svg>
 <div class="print-banner">
   <span>Boss Deck — ${domainSafe}</span>
-  <button onclick="window.print()">Save as PDF</button>
+  <button onclick="this.textContent='Generating PDF…';this.disabled=true;window.open('/api/reports/${esc(ctx.scanId ?? '')}/boss-deck-pdf','_blank');setTimeout(()=>{this.textContent='Download PDF';this.disabled=false},8000)">Download PDF</button>
 </div>
 ${pages.join('\n')}
 </body>
@@ -942,122 +944,8 @@ body { font-family: 'DM Sans', system-ui, sans-serif; font-size: 13px; color: #1
   text-transform: uppercase; transition: background 0.2s;
 }
 .print-banner button:hover { background: #2563EB; }
-@media print {
-  .print-banner { display: none; }
-  html, body { width: auto; margin: 0; padding: 0; }
-  .page {
-    width: 100vw !important; height: 100vh !important;
-    overflow: hidden !important;
-  }
-  .cover-bottom-bar,
-  .footer-dark,
-  .actions-band {
-    background: linear-gradient(135deg, rgba(6,10,20,0.92) 0%, rgba(10,22,40,0.90) 30%, rgba(14,31,58,0.90) 60%, rgba(10,22,40,0.92) 100%) !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-  }
-  .cover-bottom-bar > span,
-  .footer-dark > span {
-    color: rgba(255,255,255,0.55) !important;
-  }
-  .footer-light {
-    background: linear-gradient(135deg, rgba(235,238,243,0.92) 0%, rgba(232,236,242,0.90) 30%, rgba(234,236,240,0.90) 60%, rgba(235,238,243,0.92) 100%) !important;
-  }
-  .cover-bottom-bar::before,
-  .cover-bottom-bar::after,
-  .footer-dark::before,
-  .footer-dark::after,
-  .footer-light::before,
-  .footer-light::after,
-  .actions-band::before,
-  .actions-band::after {
-    content: '' !important;
-    display: block !important;
-  }
-  /* Kill all grain/noise layers — filter:url(#grain) renders as artifacts */
-  .bar-grain,
-  .bar-grain-light,
-  .results-grain,
-  .closer-grain,
-  .wins-grain {
-    display: none !important;
-  }
-
-  /* Kill all backdrop-filter — renders as opaque boxes in PDF */
-  * {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-  }
-
-  /*
-   * Chrome PDF renderer breaks on:
-   *   - filter: url(#grain)  → SVG filter ref = artifacts
-   *   - filter: blur()       → pixelates at low DPI
-   *   - filter: drop-shadow()→ renders as visible box
-   *   - backdrop-filter      → opaque box
-   *   - text-shadow (multi-layer glow stacks) → blurry mess
-   *   - box-shadow with large spread/blur → square artifacts
-   *
-   * What works fine:
-   *   - linear-gradient, radial-gradient → perfect
-   *   - opacity → perfect
-   *   - simple box-shadow (no spread glow) → fine
-   *   - images without filter → fine
-   */
-
-  /* Global: kill only backdrop-filter (universally broken) */
-  * {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-  }
-
-  /* ── Closer page ── */
-  /* BG image: replace filter with opacity (filter pixelates, opacity doesn't) */
-  .closer-bg {
-    filter: none !important;
-    opacity: 0.15 !important;
-    transform: scale(1.15) !important;
-  }
-  /* Keep plasma, glow layers, vignette — they're all gradients and render fine */
-  /* Kill grain (SVG filter) */
-  .closer-grain { display: none !important; }
-  /* Seal: drop-shadow breaks, remove just the filter */
-  .closer-seal { filter: none !important; }
-  /* Score number: drop-shadow breaks */
-  .closer-score-num { filter: none !important; }
-  /* ASCII glow: multi-layer text-shadow pixelates, simplify to single layer */
-  .closer-ascii {
-    text-shadow: 0 0 6px rgba(59,130,246,0.4) !important;
-  }
-  /* Signoff glow: simplify multi-layer */
-  .closer-signoff {
-    text-shadow: 0 0 6px rgba(201,169,110,0.3) !important;
-  }
-  /* Line box-shadow glow */
-  .closer-line-top { box-shadow: none !important; }
-  .closer-rule { box-shadow: none !important; }
-
-  /* ── Cover page ── */
-  .cover-business-name { text-shadow: none !important; }
-
-  /* ── Results page ── */
-  .results-grain { display: none !important; }
-  .results-gold-line { box-shadow: none !important; }
-  /* Keep all glow layers + vignette (gradients work) */
-
-  /* ── Wins page ── */
-  .wins-grain { display: none !important; }
-
-  /* ── Actions band ── */
-  .actions-icon { box-shadow: none !important; }
-
-  /* ── Projection dots: large spread glow → square artifact ── */
-  .proj-dot { box-shadow: none !important; }
-
-  /* ── Tool cards: box-shadow renders as thick outline ── */
-  .tool-card { box-shadow: none !important; }
-}
-@media screen { body { margin-top: 50px; } }
+body { margin-top: 50px; }
+.print-banner ~ .page:first-of-type { /* space for fixed banner */ }
 
 /* ── Page base ────────────────────────────────────── */
 .page {
