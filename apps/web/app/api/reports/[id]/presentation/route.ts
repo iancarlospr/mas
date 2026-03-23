@@ -48,7 +48,17 @@ export async function GET(
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  // Generate via engine with long timeout (52 slides takes ~60-90s)
+  // Check cache: if PDF already exists in Supabase Storage, return signed URL instantly
+  const storagePath = `reports/${scanId}/presentation.pdf`;
+  const { data: cached } = await serviceClient.storage
+    .from('reports')
+    .createSignedUrl(storagePath, 60 * 60 * 24); // 24h
+
+  if (cached?.signedUrl) {
+    return NextResponse.redirect(cached.signedUrl);
+  }
+
+  // Generate via engine (52 slides takes ~60-90s on first request)
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 110_000); // 110s
@@ -71,7 +81,6 @@ export async function GET(
     console.error('[presentation] Engine error:', (error as Error).message);
   }
 
-  // No fallback to window.print() — return error so user knows to retry
   return NextResponse.json(
     { error: 'PDF generation failed. Please try again in a moment.' },
     { status: 503 },

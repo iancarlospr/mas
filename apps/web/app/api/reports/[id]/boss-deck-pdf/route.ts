@@ -48,7 +48,17 @@ export async function GET(
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  // Generate via engine (7 pages takes ~15-25s)
+  // Check cache: if PDF already exists in Supabase Storage, return signed URL instantly
+  const storagePath = `reports/${scanId}/boss-deck.pdf`;
+  const { data: cached } = await serviceClient.storage
+    .from('reports')
+    .createSignedUrl(storagePath, 60 * 60 * 24); // 24h
+
+  if (cached?.signedUrl) {
+    return NextResponse.redirect(cached.signedUrl);
+  }
+
+  // Generate via engine (7 pages takes ~30-60s on first request)
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 110_000); // 110s
