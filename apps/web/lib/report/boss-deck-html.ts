@@ -83,8 +83,8 @@ function footer(pageNum: number, totalPages: number, variant: 'dark' | 'light' |
   const cls = variant === 'light' ? 'slide-footer footer-light' : 'slide-footer footer-dark';
   const grainCls = variant === 'light' ? 'bar-grain-light' : 'bar-grain';
   return `<div class="${cls}" style="color:${color}">
-    <div class="${grainCls}"></div>
-    <span>${left}</span>
+    <div class="${grainCls}" aria-hidden="true"></div>
+    <span style="flex:1;text-align:left">${left}</span>
     <span>${pageNum} / ${totalPages}</span>
   </div>`;
 }
