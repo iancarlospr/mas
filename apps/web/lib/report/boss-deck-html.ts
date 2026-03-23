@@ -447,7 +447,7 @@ function renderWins(narrative: string, highlights: BossDeckAIOutput['wins_highli
   const gridCols = widgets.length >= 4 ? Math.ceil(widgets.length / 2) : widgets.length;
 
   return `<div class="page light-page">
-  <div class="page-inner wins-v2">
+  <div class="page-inner">
     <div class="section-header-light">
       <div class="section-number">02</div>
       <div class="section-label">CURRENT PERFORMANCE</div>
@@ -461,22 +461,18 @@ function renderWins(narrative: string, highlights: BossDeckAIOutput['wins_highli
       ${pillsHtml ? `<div class="wins-pills">${pillsHtml}</div>` : ''}
     </div>
 
-    <div class="wins-body">
-      ${widgets.length > 0 ? `
-      <div class="wins-widget-grid" style="grid-template-columns:repeat(${gridCols}, 1fr)">
-        ${widgets.join('\n')}
-      </div>` : ''}
+    ${widgets.length > 0 ? `
+    <div class="wins-widget-grid" style="grid-template-columns:repeat(${gridCols}, 1fr)">
+      ${widgets.join('\n')}
+    </div>` : ''}
 
-      <div class="wins-divider-h"></div>
-
-      <div class="wins-stats-row">
-        ${highlights.map(h => `
-        <div class="stat-card-sm">
-          <div class="stat-val-sm">${esc(h.metric_value)}</div>
-          <div class="stat-lbl-sm">${esc(h.metric_label)}</div>
-          <div class="stat-ctx-sm">${esc(h.context)}</div>
-        </div>`).join('')}
-      </div>
+    <div class="wins-stats-row">
+      ${highlights.map(h => `
+      <div class="stat-card-sm">
+        <div class="stat-val-sm">${esc(h.metric_value)}</div>
+        <div class="stat-lbl-sm">${esc(h.metric_label)}</div>
+        <div class="stat-ctx-sm">${esc(h.context)}</div>
+      </div>`).join('')}
     </div>
   </div>
   ${footer(pageNum, totalPages, 'light', ctx.userEmail)}
@@ -1118,22 +1114,19 @@ body { font-family: 'DM Sans', system-ui, sans-serif; font-size: 13px; color: #1
 .cover-powered { font-style: italic; }
 
 /* ═══ WINS v2 ═════════════════════════════════════ */
-.wins-v2 {
-  display: flex; flex-direction: column; height: 100%;
-}
 .wins-header-strip {
-  display: flex; align-items: flex-start; gap: 40px; margin-bottom: 24px;
+  display: flex; align-items: flex-start; gap: 40px; margin-bottom: 20px;
 }
 .wins-header-left { flex: 1; min-width: 0; }
 .wins-title-sm {
-  font-size: 28px !important; margin-bottom: 8px !important; line-height: 1.1;
+  font-size: 28px !important; margin-bottom: 6px !important; line-height: 1.1;
 }
 .wins-narrative-sm {
-  font-size: 13px; color: #475569; line-height: 1.65;
-  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+  font-size: 13px; color: #475569; line-height: 1.6;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
 .wins-pills {
-  display: flex; flex-wrap: wrap; gap: 6px; flex-shrink: 0; padding-top: 8px;
+  display: flex; flex-wrap: wrap; gap: 6px; flex-shrink: 0; padding-top: 6px;
 }
 .str-pill {
   display: inline-block; font-family: 'Sora', sans-serif; font-size: 9px; font-weight: 700;
@@ -1141,73 +1134,63 @@ body { font-family: 'DM Sans', system-ui, sans-serif; font-size: 13px; color: #1
   padding: 4px 12px; border-radius: 4px; white-space: nowrap;
 }
 
-/* Body fills remaining space */
-.wins-body {
-  flex: 1; display: flex; flex-direction: column; gap: 0;
-}
-
-/* Widget grid */
+/* Widget grid — auto height, no stretch */
 .wins-widget-grid {
-  display: grid; gap: 16px; flex: 1;
+  display: grid; gap: 16px; margin-bottom: 20px;
 }
 .widget {
-  background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px;
-  padding: 20px 22px; box-shadow: 0 1px 4px rgba(0,0,0,0.05), 0 0 0 1px rgba(59,130,246,0.04);
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+  background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 10px;
+  padding: 16px 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
 }
 .widget-hdr {
-  display: flex; align-items: center; gap: 6px; margin-bottom: 4px; width: 100%;
+  margin-bottom: 10px;
 }
 .widget-title {
   font-family: 'Sora', sans-serif; font-size: 9px; font-weight: 700;
   letter-spacing: 0.14em; color: #94A3B8; text-transform: uppercase;
 }
 .widget-verdict {
-  font-family: 'Sora', sans-serif; font-size: 11px; font-weight: 700;
-  letter-spacing: 0.08em; text-transform: uppercase; margin-top: 4px;
+  font-family: 'Sora', sans-serif; font-size: 10px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase; text-align: center;
+  margin-top: 6px;
 }
 .widget-badge {
   display: inline-block; font-family: 'Sora', sans-serif; font-size: 10px; font-weight: 700;
-  letter-spacing: 0.06em; padding: 4px 12px; border-radius: 4px;
+  letter-spacing: 0.06em; padding: 3px 10px; border-radius: 4px;
   background: rgba(59,130,246,0.1); color: #3B82F6;
 }
 
-/* Horizontal divider between widgets and stat cards */
-.wins-divider-h {
-  height: 1px; margin: 20px 0;
-  background: linear-gradient(90deg, transparent 0%, #CBD5E1 15%, #CBD5E1 85%, transparent 100%);
-}
-
 /* CWV gauges */
-.cwv-row { display: flex; justify-content: center; gap: 24px; }
+.cwv-row { display: flex; justify-content: center; gap: 20px; }
 .cwv-gauge { text-align: center; }
 .cwv-val {
-  font-family: 'Sora', sans-serif; font-size: 22px; font-weight: 800;
+  font-family: 'Sora', sans-serif; font-size: 20px; font-weight: 800;
   margin-top: -2px; line-height: 1;
 }
 .cwv-lbl {
   font-family: 'Sora', sans-serif; font-size: 9px; font-weight: 700;
-  letter-spacing: 0.12em; color: #94A3B8; margin-top: 3px;
+  letter-spacing: 0.12em; color: #94A3B8; margin-top: 2px;
 }
 
 /* Paid ads */
 .ads-hero {
-  font-family: 'Sora', sans-serif; font-size: 36px; font-weight: 800;
-  color: #0F172A; line-height: 1; text-align: center;
+  font-family: 'Sora', sans-serif; font-size: 32px; font-weight: 800;
+  color: #0F172A; line-height: 1; text-align: center; margin-bottom: 4px;
 }
 .ads-row {
-  display: flex; align-items: center; gap: 8px; width: 100%;
-  font-size: 12px; color: #334155; font-weight: 500;
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12px; color: #334155; font-weight: 500; margin-top: 4px;
 }
 .ads-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
 .ads-name { flex: 1; }
 .ads-pixels {
-  font-size: 11px; color: #64748B; font-style: italic; text-align: center;
+  font-size: 11px; color: #64748B; font-style: italic; margin-top: 4px;
 }
 
 /* Sentiment */
 .sentiment-total {
-  font-family: 'Sora', sans-serif; font-size: 32px; font-weight: 800;
+  font-family: 'Sora', sans-serif; font-size: 28px; font-weight: 800;
   color: #0F172A; line-height: 1; text-align: center;
 }
 .sentiment-sub {
@@ -1215,33 +1198,34 @@ body { font-family: 'DM Sans', system-ui, sans-serif; font-size: 13px; color: #1
   letter-spacing: 0.08em; color: #94A3B8; margin-top: 2px;
 }
 .sentiment-bar {
-  display: flex; height: 8px; border-radius: 4px; overflow: hidden;
-  background: #E2E8F0; gap: 1px; width: 100%;
+  display: flex; height: 7px; border-radius: 4px; overflow: hidden;
+  background: #E2E8F0; gap: 1px; margin: 8px 0 6px;
 }
 .sentiment-legend {
-  display: flex; justify-content: space-between; width: 100%;
+  display: flex; justify-content: space-between;
   font-size: 11px; font-weight: 600;
 }
 .sentiment-overall {
   font-family: 'Sora', sans-serif; font-size: 10px; font-weight: 700;
   letter-spacing: 0.1em; text-transform: uppercase; color: #22C55E;
+  text-align: center; margin-top: 4px;
 }
 
 /* Traffic */
 .traffic-hero {
-  font-family: 'Sora', sans-serif; font-size: 36px; font-weight: 800;
+  font-family: 'Sora', sans-serif; font-size: 32px; font-weight: 800;
   color: #0F172A; line-height: 1; text-align: center;
 }
 .traffic-sub {
   font-size: 10px; color: #94A3B8; text-align: center;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.04em; margin: 2px 0 6px;
 }
 .traffic-split {
   display: flex; justify-content: center; gap: 14px;
-  font-size: 11px; font-weight: 600;
+  font-size: 11px; font-weight: 600; margin-top: 4px;
 }
 .traffic-country {
-  font-size: 12px; color: #64748B; text-align: center;
+  font-size: 12px; color: #64748B; text-align: center; margin-top: 4px;
 }
 .traffic-country strong {
   font-family: 'Sora', sans-serif; font-weight: 800; color: #0F172A; font-size: 14px;
@@ -1249,36 +1233,35 @@ body { font-family: 'DM Sans', system-ui, sans-serif; font-size: 13px; color: #1
 
 /* Top keyword */
 .kw-name {
-  font-family: 'Source Code Pro', monospace; font-size: 18px; font-weight: 700;
+  font-family: 'Source Code Pro', monospace; font-size: 17px; font-weight: 700;
   color: #0F172A; text-align: center; line-height: 1.2;
   word-break: break-word;
 }
 .kw-pos {
-  font-size: 13px; color: #334155; text-align: center; font-weight: 500;
+  font-size: 13px; color: #334155; text-align: center; font-weight: 500; margin-top: 4px;
 }
 .kw-vol, .kw-total {
   font-size: 11px; color: #64748B; text-align: center;
 }
 
-/* AI stat cards (compact row at bottom) */
+/* AI stat cards */
 .wins-stats-row {
   display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
-  flex-shrink: 0;
 }
 .stat-card-sm {
-  padding: 18px 20px; border-radius: 10px;
+  padding: 20px 22px; border-radius: 10px;
   background: #FFFFFF; border: 1px solid #E2E8F0;
   box-shadow: 0 1px 3px rgba(0,0,0,0.04);
 }
 .stat-val-sm {
-  font-family: 'Sora', sans-serif; font-size: 28px; font-weight: 800;
+  font-family: 'Sora', sans-serif; font-size: 30px; font-weight: 800;
   color: #0F172A; line-height: 1; letter-spacing: -0.02em;
-  margin-bottom: 5px;
+  margin-bottom: 6px;
 }
 .stat-lbl-sm {
   font-family: 'Sora', sans-serif; font-size: 9px; font-weight: 700;
   letter-spacing: 0.1em; text-transform: uppercase;
-  color: #3B82F6; margin-bottom: 5px;
+  color: #3B82F6; margin-bottom: 6px;
 }
 .stat-ctx-sm {
   font-size: 12px; color: #64748B; line-height: 1.45;
