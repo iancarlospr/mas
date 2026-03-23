@@ -1053,6 +1053,9 @@ body { font-family: 'DM Sans', system-ui, sans-serif; font-size: 13px; color: #1
 
   /* ── Projection dots: large spread glow → square artifact ── */
   .proj-dot { box-shadow: none !important; }
+
+  /* ── Tool cards: box-shadow renders as thick outline ── */
+  .tool-card { box-shadow: none !important; }
 }
 @media screen { body { margin-top: 50px; } }
 
