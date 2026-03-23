@@ -193,17 +193,18 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
   return (
     <div className="fixed inset-0 bg-gs-void flex flex-col overflow-hidden">
       <style>{`
-        .mobile-scan-input-stack form > div:first-child {
-          flex-direction: column;
-          align-items: stretch;
+        .mobile-scan-input-stack .flex.items-end {
+          flex-direction: column !important;
+          align-items: stretch !important;
+          gap: 8px !important;
         }
-        .mobile-scan-input-stack form > div:first-child > .flex-1 {
-          flex: none;
-          width: 100%;
+        .mobile-scan-input-stack .flex.items-end > .flex-1 {
+          flex: none !important;
+          width: 100% !important;
         }
-        .mobile-scan-input-stack form > div:first-child > button {
-          flex: none;
-          width: 100%;
+        .mobile-scan-input-stack .flex.items-end > button {
+          flex: none !important;
+          width: 100% !important;
         }
       `}</style>
       <div className="noise-grain opacity-[0.03]" aria-hidden="true" />
@@ -212,7 +213,7 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
       <main className="flex-1 overflow-y-auto overscroll-contain">
 
         {/* ═══════ SECTION 1: HERO ═══════ */}
-        <section ref={heroRef} className="flex flex-col items-center pt-gs-6 pb-gs-4">
+        <section ref={heroRef} className="flex flex-col items-center pb-gs-4">
 
           {/* Dither strip — full bleed, top */}
           <DitherStrip />
