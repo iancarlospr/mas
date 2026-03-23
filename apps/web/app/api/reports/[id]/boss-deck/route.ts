@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { createClient, createServiceClient } from '@/lib/supabase/server';
 import { verifyShareToken } from '@/lib/report/share';
 import { isValidUUID } from '@/lib/utils';
@@ -6,6 +8,18 @@ import { getMarketingIQLabel, getTrafficLight } from '@marketing-alpha/types';
 import type { ScoreCategory, MarketingIQResult } from '@marketing-alpha/types';
 import type { BossDeckAIOutput } from '@/lib/report/boss-deck-prompt';
 import { renderBossDeck, type BossDeckRenderContext } from '@/lib/report/boss-deck-html';
+
+// ── Embed images as base64 data URIs (public/ not reliably served in standalone mode) ──
+
+function loadImageAsDataUri(relativePath: string, mime: string): string | undefined {
+  try {
+    const filePath = join(process.cwd(), 'public', relativePath);
+    const buf = readFileSync(filePath);
+    return `data:${mime};base64,${buf.toString('base64')}`;
+  } catch {
+    return undefined;
+  }
+}
 
 // ── Category metadata ────────────────────────────────────────
 
@@ -149,6 +163,8 @@ export async function GET(
     categoryScores,
     hasM43: m43Raw != null,
     hasM45: m45StackAnalysis != null,
+    coverImageDataUri: loadImageAsDataUri('boss-deck/hero-cover.jpg', 'image/jpeg'),
+    closerImageDataUri: loadImageAsDataUri('boss-deck/hero-horizon.jpg', 'image/jpeg'),
   };
 
   const html = renderBossDeck(renderCtx);

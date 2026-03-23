@@ -23,6 +23,10 @@ export interface BossDeckRenderContext {
   categoryScores: { category: string; score: number; light: string }[];
   hasM43: boolean;
   hasM45: boolean;
+  /** Base64 data URI for cover image (hero-cover.jpg) */
+  coverImageDataUri?: string;
+  /** Base64 data URI for closer image (hero-horizon.jpg) */
+  closerImageDataUri?: string;
 }
 
 // ── Helpers ──────────────────────────────────────────────────
@@ -186,7 +190,7 @@ ${pages.join('\n')}
 
 function renderCover(ctx: BossDeckRenderContext, subtitle: string, dateFmt: string, _pageNum: number, _totalPages: number): string {
   return `<div class="page cover-page">
-  <img class="cover-bg" src="/boss-deck/hero-cover.jpg" alt="" />
+  <img class="cover-bg" src="${ctx.coverImageDataUri ?? '/boss-deck/hero-cover.jpg'}" alt="" />
   <div class="cover-gradient"></div>
   <div class="cover-accent-line"></div>
 
@@ -530,7 +534,7 @@ function renderCloser(ctx: BossDeckRenderContext, _closingMessage: string, _page
 
   return `<div class="page closer-page">
   <!-- Layer 0: Horizon image — heavily blurred as texture base -->
-  <img class="closer-bg" src="/boss-deck/hero-horizon.jpg" alt="" />
+  <img class="closer-bg" src="${ctx.closerImageDataUri ?? '/boss-deck/hero-horizon.jpg'}" alt="" />
 
   <!-- Layer 1: Deep gradient overlay -->
   <div class="closer-plasma"></div>
