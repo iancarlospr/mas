@@ -264,11 +264,11 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
             </div>
           </div>
 
-          {/* Spacer — flex-grow to push content down and fill viewport */}
-          <div className="flex-1 min-h-[40px]" />
+          {/* Spacer — distributes space evenly */}
+          <div className="flex-1 min-h-[24px]" />
 
           {/* Nudge CTA + Arrow */}
-          <div className="flex flex-col items-center select-none" style={{ marginBottom: '12px' }}>
+          <div className="flex flex-col items-center select-none">
             <p
               className="font-data text-center"
               style={{
@@ -284,6 +284,9 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
             </p>
             <CurvedArrow />
           </div>
+
+          {/* Spacer */}
+          <div className="flex-1 min-h-[16px]" />
 
           {/* Scan input — stacked vertically on mobile */}
           <div className="w-full max-w-md px-gs-4 mobile-scan-input-stack">
