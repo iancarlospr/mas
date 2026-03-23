@@ -192,6 +192,20 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="fixed inset-0 bg-gs-void flex flex-col overflow-hidden">
+      <style>{`
+        .mobile-scan-input-stack form > div:first-child {
+          flex-direction: column;
+          align-items: stretch;
+        }
+        .mobile-scan-input-stack form > div:first-child > .flex-1 {
+          flex: none;
+          width: 100%;
+        }
+        .mobile-scan-input-stack form > div:first-child > button {
+          flex: none;
+          width: 100%;
+        }
+      `}</style>
       <div className="noise-grain opacity-[0.03]" aria-hidden="true" />
 
       {/* Scrollable content */}
@@ -199,6 +213,9 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
 
         {/* ═══════ SECTION 1: HERO ═══════ */}
         <section ref={heroRef} className="flex flex-col items-center pt-gs-6 pb-gs-4">
+
+          {/* Dither strip — full bleed, top */}
+          <DitherStrip />
 
           {/* ASCII Title — full-bleed, scaled for mobile */}
           <div className="w-full overflow-hidden flex justify-center" style={{ padding: '0 4px' }}>
@@ -214,9 +231,6 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
               {ASCII_TITLE}
             </pre>
           </div>
-
-          {/* Dither strip — full bleed */}
-          <DitherStrip />
 
           {/* Chloe + Headline */}
           <div className="flex items-start gap-gs-3 select-none px-gs-4" style={{ marginTop: '24px' }}>
@@ -263,13 +277,15 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
                 color: 'var(--gs-mid)',
               }}
             >
-              MarTech breakdown. Strategic insights. Actionable recommendations.
+              MarTech breakdown.<br />
+              Strategic insights.<br />
+              Actionable recommendations.
             </p>
             <CurvedArrow />
           </div>
 
-          {/* Scan input */}
-          <div className="w-full max-w-md px-gs-4">
+          {/* Scan input — stacked vertically on mobile */}
+          <div className="w-full max-w-md px-gs-4 mobile-scan-input-stack">
             <ScanInput variant="dialog" />
           </div>
         </section>
