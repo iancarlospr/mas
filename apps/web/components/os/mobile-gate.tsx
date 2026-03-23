@@ -202,6 +202,9 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
           flex: none !important;
           width: 100% !important;
         }
+        .mobile-scan-input-stack input[type="text"] {
+          height: 42px !important;
+        }
         .mobile-scan-input-stack .flex.items-end > button {
           flex: none !important;
           width: 100% !important;
