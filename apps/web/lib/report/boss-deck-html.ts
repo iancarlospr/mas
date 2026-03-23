@@ -944,8 +944,11 @@ body { font-family: 'DM Sans', system-ui, sans-serif; font-size: 13px; color: #1
 .print-banner button:hover { background: #2563EB; }
 @media print {
   .print-banner { display: none; }
-  body { margin-top: 0; }
-  .page { overflow: visible !important; }
+  html, body { width: auto; margin: 0; padding: 0; }
+  .page {
+    width: 100vw !important; height: 100vh !important;
+    overflow: hidden !important;
+  }
   .cover-bottom-bar,
   .footer-dark,
   .actions-band {
