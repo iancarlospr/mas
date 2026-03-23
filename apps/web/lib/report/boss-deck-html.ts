@@ -1,9 +1,9 @@
 /**
- * Boss Deck v2 — HTML template renderer.
+ * Boss Deck v3 — Editorial Intelligence design.
  *
- * 7-page landscape pitch deck with alternating dark/light backgrounds.
- * McKinsey-inspired: bold numbers, split layouts, no card borders.
- * Cover + Closer use AI-generated image for premium feel.
+ * 7-page landscape pitch deck with full-bleed photography,
+ * bold stat callouts, McKinsey-grade typography and composition.
+ * Images are shared assets in /boss-deck/ (not per-scan).
  */
 
 import type { BossDeckAIOutput } from './boss-deck-prompt';
@@ -41,28 +41,47 @@ function formatDate(iso: string): string {
 }
 
 function lightColor(light: string): string {
-  if (light === 'green') return '#38A169';
-  if (light === 'yellow') return '#D69E2E';
-  return '#E53E3E';
+  if (light === 'green') return '#22C55E';
+  if (light === 'yellow') return '#EAB308';
+  return '#EF4444';
+}
+
+function lightBg(light: string): string {
+  if (light === 'green') return 'rgba(34,197,94,0.12)';
+  if (light === 'yellow') return 'rgba(234,179,8,0.12)';
+  return 'rgba(239,68,68,0.12)';
+}
+
+function urgencyTag(urgency: string): string {
+  const colors: Record<string, { bg: string; text: string; label: string }> = {
+    immediate: { bg: 'rgba(239,68,68,0.15)', text: '#EF4444', label: 'IMMEDIATE' },
+    this_week: { bg: 'rgba(234,179,8,0.15)', text: '#EAB308', label: 'THIS WEEK' },
+    this_month: { bg: 'rgba(59,130,246,0.15)', text: '#3B82F6', label: 'THIS MONTH' },
+  };
+  const c = colors[urgency] ?? colors['this_month']!;
+  return `<span class="urgency-tag" style="background:${c.bg};color:${c.text}">${c.label}</span>`;
 }
 
 function ownerColor(owner: string): string {
   const map: Record<string, string> = {
-    'Content Team': '#2B6CB0',
-    'Dev Team': '#0B1F3F',
-    'Marketing Ops': '#B8860B',
-    'Design Team': '#6B46C1',
-    'Leadership': '#C53030',
+    'Content Team': '#3B82F6',
+    'Dev Team': '#8B5CF6',
+    'Marketing Ops': '#F59E0B',
+    'Design Team': '#EC4899',
+    'Leadership': '#EF4444',
   };
-  return map[owner] ?? '#4A5568';
+  return map[owner] ?? '#64748B';
 }
 
-function footer(pageNum: number, variant: 'dark' | 'light'): string {
-  const bg = variant === 'dark' ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.04)';
-  const color = variant === 'dark' ? '#5A6A80' : '#A0AEC0';
-  return `<div class="slide-footer" style="background:${bg};color:${color}">
-    <span>Confidential — Prepared with AlphaScan</span>
-    <span>${String(pageNum).padStart(2, '0')}</span>
+function footer(pageNum: number, totalPages: number, variant: 'dark' | 'light' | 'image', userName?: string): string {
+  const color = variant === 'light' ? '#94A3B8' : 'rgba(255,255,255,0.4)';
+  const left = userName ? `Prepared by ${esc(userName)}` : 'Powered by AlphaScan';
+  const cls = variant === 'light' ? 'slide-footer footer-light' : 'slide-footer footer-dark';
+  const grainCls = variant === 'light' ? 'bar-grain-light' : 'bar-grain';
+  return `<div class="${cls}" style="color:${color}">
+    <div class="${grainCls}"></div>
+    <span>${left}</span>
+    <span>${pageNum} / ${totalPages}</span>
   </div>`;
 }
 
@@ -89,36 +108,53 @@ export function renderBossDeck(ctx: BossDeckRenderContext): string {
 
   const pages: string[] = [];
 
-  // 1. Cover (DARK)
-  pages.push(renderCover(ctx, coverSubtitle, dateFmt));
+  // Count total pages first
+  let totalPages = 2; // cover + closer always present
+  if (winsHighlights.length > 0) totalPages++;
+  if (topIssues.length > 0) totalPages++;
+  if (initiatives.length > 0 || timelineItems.length > 0) totalPages++;
+  if (categoryProjections.length > 0 || impactOutcomes.length > 0) totalPages++;
+  if (toolPitches.length > 0 && ctx.hasM45) totalPages++;
 
-  // 2. What's Working (LIGHT)
+  let pageNum = 0;
+
+  // 1. Cover
+  pageNum++;
+  pages.push(renderCover(ctx, coverSubtitle, dateFmt, pageNum, totalPages));
+
+  // 2. What's Working
   if (winsHighlights.length > 0) {
-    pages.push(renderWins(winsNarrative, winsHighlights, ctx));
+    pageNum++;
+    pages.push(renderWins(winsNarrative, winsHighlights, ctx, pageNum, totalPages));
   }
 
-  // 3. Top 3 Issues (DARK)
+  // 3. Top 3 Issues
   if (topIssues.length > 0) {
-    pages.push(renderIssues(topIssues));
+    pageNum++;
+    pages.push(renderIssues(topIssues, pageNum, totalPages, ctx.userEmail));
   }
 
-  // 4. Roadmap — Initiatives + Timeline merged (LIGHT)
+  // 4. Roadmap
   if (initiatives.length > 0 || timelineItems.length > 0) {
-    pages.push(renderRoadmap(initiatives, timelineSummary, timelineItems, nextSteps));
+    pageNum++;
+    pages.push(renderRoadmap(initiatives, timelineSummary, timelineItems, nextSteps, pageNum, totalPages, ctx.userEmail));
   }
 
-  // 5. Results — Before/After + Outcomes (DARK)
+  // 5. Results
   if (categoryProjections.length > 0 || impactOutcomes.length > 0) {
-    pages.push(renderResults(impactHeadline, impactOutcomes, categoryProjections));
+    pageNum++;
+    pages.push(renderResults(impactHeadline, impactOutcomes, categoryProjections, pageNum, totalPages, ctx.userEmail));
   }
 
-  // 6. Tool Investment (LIGHT) — conditional
+  // 6. Tools
   if (toolPitches.length > 0 && ctx.hasM45) {
-    pages.push(renderTools(toolPitches));
+    pageNum++;
+    pages.push(renderTools(toolPitches, pageNum, totalPages, ctx.userEmail));
   }
 
-  // 7. Closer (DARK)
-  pages.push(renderCloser(ctx, closingMessage));
+  // 7. Closer
+  pageNum++;
+  pages.push(renderCloser(ctx, closingMessage, pageNum, totalPages));
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -128,10 +164,13 @@ export function renderBossDeck(ctx: BossDeckRenderContext): string {
 <title>Boss Deck — ${domainSafe}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@500;600;700&family=Source+Sans+3:wght@300;400;600;700&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Source+Code+Pro:wght@400;600;700&family=Permanent+Marker&display=swap" rel="stylesheet">
 <style>${CSS}</style>
 </head>
 <body>
+<svg width="0" height="0" aria-hidden="true" style="position:absolute"><defs>
+  <filter id="grain"><feTurbulence type="fractalNoise" baseFrequency="0.6" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
+</defs></svg>
 <div class="print-banner">
   <span>Boss Deck — ${domainSafe}</span>
   <button onclick="window.print()">Save as PDF</button>
@@ -142,74 +181,77 @@ ${pages.join('\n')}
 }
 
 // ═══════════════════════════════════════════════════════════════
-// PAGE 1: COVER (DARK)
+// PAGE 1: COVER — Full-bleed hero image
 // ═══════════════════════════════════════════════════════════════
 
-function renderCover(ctx: BossDeckRenderContext, subtitle: string, dateFmt: string): string {
-  const score = ctx.marketingIQ;
-  const label = ctx.marketingIQLabel ?? '';
-  const scoreColor = score != null && score >= 70 ? '#38A169' : score != null && score >= 40 ? '#D69E2E' : '#E53E3E';
+function renderCover(ctx: BossDeckRenderContext, subtitle: string, dateFmt: string, _pageNum: number, _totalPages: number): string {
+  return `<div class="page cover-page">
+  <img class="cover-bg" src="/boss-deck/hero-cover.jpg" alt="" />
+  <div class="cover-gradient"></div>
+  <div class="cover-accent-line"></div>
 
-  const imageHtml = `<img class="cover-image" src="/boss-deck-cover.png" alt="" />`;
-
-  return `<div class="page dark-page cover-page">
-  <div class="cover-accent-top"></div>
-  <div class="cover-layout">
+  <div class="cover-content">
     <div class="cover-left">
-      <div class="cover-wordmark">AlphaScan</div>
       <div class="cover-type-label">MARKETING AUDIT BRIEFING</div>
-      <div class="cover-business-name">${esc(ctx.businessName || ctx.domain)}</div>
-      <div class="cover-gold-line"></div>
-      <div class="cover-subtitle">${esc(subtitle)}</div>
-      ${score != null ? `
-      <div class="cover-meta-row">
-        <div class="cover-score">
-          <span class="cover-score-num" style="color:${scoreColor}">${score}</span>
-          <span class="cover-score-label">MarketingIQ™ · ${esc(label)}</span>
-        </div>
-      </div>` : ''}
-    </div>
-    <div class="cover-right">
-      ${imageHtml}
+      <h1 class="cover-business-name">${esc(ctx.businessName || ctx.domain)}</h1>
+      <div class="cover-divider"></div>
+      <p class="cover-subtitle">${esc(subtitle)}</p>
     </div>
   </div>
-  <div class="cover-bottom">
-    <span>Prepared by ${esc(ctx.userEmail)} · ${esc(dateFmt)}</span>
+
+  <div class="cover-bottom-bar">
+    <div class="bar-grain"></div>
+    <span>Prepared by ${esc(ctx.userEmail)}</span>
+    <span>${esc(dateFmt)}</span>
     <span class="cover-powered">Powered by AlphaScan</span>
   </div>
-  <div class="cover-accent-bottom"></div>
 </div>`;
 }
 
 // ═══════════════════════════════════════════════════════════════
-// PAGE 2: WHAT'S WORKING (LIGHT)
+// PAGE 2: WHAT'S WORKING — Light, big stats
 // ═══════════════════════════════════════════════════════════════
 
-function renderWins(narrative: string, highlights: BossDeckAIOutput['wins_highlights'], ctx: BossDeckRenderContext): string {
+function renderWins(narrative: string, highlights: BossDeckAIOutput['wins_highlights'], ctx: BossDeckRenderContext, pageNum: number, totalPages: number): string {
   const strengths = getStrengths(ctx);
 
   return `<div class="page light-page">
-  <div class="split-layout">
-    <div class="split-left" style="width:38%">
-      <div class="slide-title-light">Here's What's<br/>Already Working</div>
-      <div class="wins-narrative">${esc(narrative)}</div>
-      ${strengths.length > 0 ? `
-      <div class="wins-strengths">
-        ${strengths.map(s => `<div class="strength-row"><span class="strength-dot" style="background:${lightColor(s.light)}"></span>${esc(s.name)}</div>`).join('')}
-      </div>` : ''}
+  <div class="page-inner">
+    <div class="section-header-light">
+      <div class="section-number">02</div>
+      <div class="section-label">CURRENT PERFORMANCE</div>
     </div>
-    <div class="split-right" style="width:60%">
-      <div class="wins-metrics-grid">
-        ${highlights.map(h => `
-        <div class="win-metric">
-          <div class="win-metric-value">${esc(h.metric_value)}</div>
-          <div class="win-metric-label">${esc(h.metric_label)}</div>
-          <div class="win-metric-context">${esc(h.context)}</div>
-        </div>`).join('')}
+
+    <div class="wins-layout">
+      <div class="wins-left">
+        <h2 class="title-light">Here&rsquo;s What&rsquo;s<br/>Already Working</h2>
+        <p class="wins-narrative">${esc(narrative)}</p>
+        ${strengths.length > 0 ? `
+        <div class="wins-strengths">
+          <div class="strength-label">STRONG CATEGORIES</div>
+          ${strengths.map(s => `
+          <div class="strength-row">
+            <span class="strength-dot" style="background:${lightColor(s.light)}"></span>
+            <span>${esc(s.name)}</span>
+          </div>`).join('')}
+        </div>` : ''}
+      </div>
+
+      <div class="wins-divider"></div>
+
+      <div class="wins-right">
+        <div class="stats-grid">
+          ${highlights.map(h => `
+          <div class="stat-card">
+            <div class="stat-value">${esc(h.metric_value)}</div>
+            <div class="stat-label">${esc(h.metric_label)}</div>
+            <div class="stat-context">${esc(h.context)}</div>
+          </div>`).join('')}
+        </div>
       </div>
     </div>
   </div>
-  ${footer(2, 'light')}
+  ${footer(pageNum, totalPages, 'light', ctx.userEmail)}
 </div>`;
 }
 
@@ -232,41 +274,41 @@ function getStrengths(ctx: BossDeckRenderContext): { name: string; light: string
 }
 
 // ═══════════════════════════════════════════════════════════════
-// PAGE 3: TOP 3 ISSUES (DARK)
+// PAGE 3: TOP 3 ISSUES — Dark, dramatic
 // ═══════════════════════════════════════════════════════════════
 
-function renderIssues(issues: BossDeckAIOutput['top_issues']): string {
+function renderIssues(issues: BossDeckAIOutput['top_issues'], pageNum: number, totalPages: number, userName: string): string {
   return `<div class="page dark-page">
-  <div class="split-layout">
-    <div class="issues-main">
-      <div class="slide-title-dark">Three Things<br/>Holding Us Back</div>
-      <div class="issues-list">
-        ${issues.map((issue, i) => `
-        <div class="issue-row">
-          <div class="issue-num">${String(i + 1).padStart(2, '0')}</div>
-          <div class="issue-body">
-            <div class="issue-headline">${esc(issue.headline)}</div>
-            <div class="issue-explanation">${esc(issue.explanation)}</div>
-          </div>
-        </div>
-        ${i < issues.length - 1 ? '<div class="gold-divider"></div>' : ''}`).join('')}
-      </div>
+  <div class="page-inner">
+    <div class="section-header-dark">
+      <div class="section-number-dark">03</div>
+      <div class="section-label-dark">CRITICAL FINDINGS</div>
     </div>
-    <div class="issues-sidebar">
-      <div class="sidebar-label">BUSINESS IMPACT</div>
+
+    <h2 class="title-dark">Three Things<br/>Holding Us Back</h2>
+
+    <div class="issues-grid">
       ${issues.map((issue, i) => `
-      <div class="impact-callout">
-        <div class="impact-num">${String(i + 1).padStart(2, '0')}</div>
-        <div class="impact-text">${esc(issue.dollar_impact)}</div>
+      <div class="issue-card">
+        <div class="issue-top">
+          <span class="issue-num">${String(i + 1).padStart(2, '0')}</span>
+          ${urgencyTag(issue.urgency)}
+        </div>
+        <h3 class="issue-headline">${esc(issue.headline)}</h3>
+        <p class="issue-explanation">${esc(issue.explanation)}</p>
+        <div class="issue-impact">
+          <div class="impact-icon">↗</div>
+          <div class="impact-text">${esc(issue.dollar_impact)}</div>
+        </div>
       </div>`).join('')}
     </div>
   </div>
-  ${footer(3, 'dark')}
+  ${footer(pageNum, totalPages, 'dark', userName)}
 </div>`;
 }
 
 // ═══════════════════════════════════════════════════════════════
-// PAGE 4: ROADMAP (LIGHT) — merged initiatives + timeline
+// PAGE 4: ROADMAP — Light, initiative cards + timeline
 // ═══════════════════════════════════════════════════════════════
 
 function renderRoadmap(
@@ -274,171 +316,360 @@ function renderRoadmap(
   timelineSummary: string,
   timelineItems: BossDeckAIOutput['timeline_items'],
   nextSteps: string[],
+  pageNum: number,
+  totalPages: number,
+  userName: string,
 ): string {
-  const phaseColors = ['#C53030', '#C05621', '#2B6CB0', '#718096'];
+  const phaseColors = ['#EF4444', '#F59E0B', '#3B82F6', '#64748B'];
 
   return `<div class="page light-page">
-  <div class="slide-title-light-full">The Roadmap</div>
-  ${timelineSummary ? `<div class="roadmap-summary">${esc(timelineSummary)}</div>` : ''}
+  <div class="page-inner">
+    <div class="section-header-light">
+      <div class="section-number">04</div>
+      <div class="section-label">ACTION PLAN</div>
+    </div>
 
-  <div class="roadmap-initiatives">
-    ${initiatives.map(init => {
-      const oc = ownerColor(init.owner);
-      return `
-    <div class="initiative-block">
-      <div class="initiative-bar" style="background:${oc}"></div>
-      <div class="initiative-owner" style="background:${oc}">${esc(init.owner)}</div>
-      <div class="initiative-name">${esc(init.name)}</div>
-      <div class="initiative-items">
-        ${init.items.map(item => `<div class="init-item">→ ${esc(item)}</div>`).join('')}
+    <h2 class="title-light">The Roadmap</h2>
+    ${timelineSummary ? `<p class="roadmap-summary">${esc(timelineSummary)}</p>` : ''}
+
+    <div class="initiatives-grid">
+      ${initiatives.map(init => {
+        const oc = ownerColor(init.owner);
+        return `
+      <div class="initiative-card">
+        <div class="init-accent" style="background:${oc}"></div>
+        <div class="init-content">
+          <span class="init-owner" style="color:${oc}">${esc(init.owner)}</span>
+          <h4 class="init-name">${esc(init.name)}</h4>
+          <ul class="init-items">
+            ${init.items.map(item => `<li>${esc(item)}</li>`).join('')}
+          </ul>
+          <div class="init-meta">
+            <span class="init-outcome">${esc(init.expected_outcome)}</span>
+          </div>
+        </div>
+      </div>`;
+      }).join('')}
+    </div>
+
+    ${timelineItems.length > 0 ? `
+    <div class="timeline-section">
+      <div class="timeline-track">
+        ${timelineItems.map((phase, i) => `
+        <div class="timeline-phase" style="flex:1">
+          <div class="tl-dot" style="background:${phaseColors[i] ?? '#64748B'}"></div>
+          <div class="tl-label" style="color:${phaseColors[i] ?? '#64748B'}">${esc(phase.phase)}</div>
+          ${phase.items.slice(0, 3).map(item => `<div class="tl-item">${esc(item)}</div>`).join('')}
+        </div>`).join('')}
       </div>
-      <div class="initiative-meta">
-        <span class="init-effort">${esc(init.effort)}</span>
-        <span class="init-outcome">${esc(init.expected_outcome)}</span>
-      </div>
-    </div>`;
-    }).join('')}
+      <div class="timeline-line"></div>
+    </div>` : ''}
+
   </div>
 
-  ${timelineItems.length > 0 ? `
-  <div class="timeline-bar">
-    <div class="timeline-line"></div>
-    ${timelineItems.map((phase, i) => `
-    <div class="timeline-phase">
-      <div class="timeline-dot" style="background:${phaseColors[i] ?? '#718096'}"></div>
-      <div class="timeline-phase-label" style="color:${phaseColors[i] ?? '#718096'}">${esc(phase.phase)}</div>
-      <div class="timeline-phase-items">
-        ${phase.items.slice(0, 3).map(item => `<div class="tl-item">${esc(item)}</div>`).join('')}
-      </div>
-    </div>`).join('')}
-  </div>` : ''}
-
   ${nextSteps.length > 0 ? `
-  <div class="next-steps-row">
-    <span class="ns-label">FIRST ACTIONS:</span>
-    ${nextSteps.slice(0, 3).map(s => `<span class="ns-item">${esc(s)}</span>`).join('<span class="ns-sep">·</span>')}
+  <div class="actions-band">
+    <div class="bar-grain"></div>
+    <div class="actions-inner">
+      <div class="actions-left">
+        <div class="actions-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="10" stroke="#fff" stroke-width="1.5" opacity="0.4"/></svg>
+        </div>
+        <div class="actions-title-block">
+          <div class="actions-label">READY TO APPROVE</div>
+          <div class="actions-subtitle">Three things to greenlight today</div>
+        </div>
+      </div>
+      <div class="actions-list">
+        ${nextSteps.slice(0, 3).map((s, i) => `
+        <div class="action-item">
+          <div class="action-num">${i + 1}</div>
+          <div class="action-text">${esc(s)}</div>
+        </div>`).join('')}
+      </div>
+    </div>
   </div>` : ''}
 
-  ${footer(4, 'light')}
+  ${footer(pageNum, totalPages, 'light', userName)}
 </div>`;
 }
 
 // ═══════════════════════════════════════════════════════════════
-// PAGE 5: RESULTS — BEFORE & AFTER (DARK)
+// PAGE 5: RESULTS — Dark with background image
 // ═══════════════════════════════════════════════════════════════
 
 function renderResults(
   headline: string,
   outcomes: BossDeckAIOutput['implementation_outcomes'],
   projections: BossDeckAIOutput['category_projections'],
+  pageNum: number,
+  totalPages: number,
+  userName: string,
 ): string {
-  return `<div class="page dark-page">
-  <div class="slide-title-dark-full">${esc(headline)}</div>
+  return `<div class="page dark-page results-page">
+  <div class="results-plasma"></div>
+  <div class="results-glow-1"></div>
+  <div class="results-glow-2"></div>
+  <div class="results-glow-3"></div>
+  <div class="results-grain"></div>
+  <div class="results-vignette"></div>
+  <div class="results-gold-line"></div>
 
-  ${projections.length > 0 ? `
-  <div class="comparison-table">
-    <div class="comp-header">
-      <span class="comp-cat-header">Category</span>
-      <span class="comp-now-header">Now</span>
-      <span class="comp-after-header">After Implementation</span>
-      <span class="comp-note-header">What Changes</span>
+  <div class="page-inner results-inner">
+    <div class="section-header-dark">
+      <div class="section-number-dark">05</div>
+      <div class="section-label-dark">PROJECTED IMPACT</div>
     </div>
-    ${projections.map(p => `
-    <div class="comp-row">
-      <span class="comp-cat">${esc(p.category)}</span>
-      <span class="comp-now">
-        <span class="comp-dot" style="color:${lightColor(p.current_light)}">●</span>
-      </span>
-      <span class="comp-arrow">→</span>
-      <span class="comp-after">
-        <span class="comp-dot" style="color:${lightColor(p.projected_light)}">●</span>
-      </span>
-      <span class="comp-note">${esc(p.explanation)}</span>
-    </div>`).join('')}
-  </div>` : ''}
 
-  ${outcomes.length > 0 ? `
-  <div class="outcomes-section">
-    ${outcomes.map(o => `
-    <div class="outcome-row">
-      <div class="outcome-bar"></div>
-      <div class="outcome-content">
-        <div class="outcome-text">${esc(o.outcome)}</div>
-        <div class="outcome-evidence">${esc(o.evidence)}</div>
+    <h2 class="title-dark">${esc(headline)}</h2>
+
+    ${projections.length > 0 ? `
+    <div class="projection-table">
+      <div class="proj-header">
+        <span class="proj-h-cat">Category</span>
+        <span class="proj-h-now">Current</span>
+        <span class="proj-h-after">Projected</span>
+        <span class="proj-h-note">What Changes</span>
       </div>
-    </div>`).join('')}
-  </div>` : ''}
+      ${projections.map(p => `
+      <div class="proj-row">
+        <span class="proj-cat">${esc(p.category)}</span>
+        <span class="proj-light">
+          <span class="proj-dot-ring" style="border-color:${lightColor(p.current_light)}30">
+            <span class="proj-dot" style="background:${lightColor(p.current_light)};box-shadow:0 0 10px ${lightColor(p.current_light)}50"></span>
+          </span>
+        </span>
+        <span class="proj-light">
+          <span class="proj-dot-ring" style="border-color:${lightColor(p.projected_light)}30">
+            <span class="proj-dot" style="background:${lightColor(p.projected_light)};box-shadow:0 0 10px ${lightColor(p.projected_light)}50"></span>
+          </span>
+        </span>
+        <span class="proj-note">${esc(p.explanation)}</span>
+      </div>`).join('')}
+    </div>` : ''}
 
-  ${footer(5, 'dark')}
-</div>`;
-}
-
-// ═══════════════════════════════════════════════════════════════
-// PAGE 6: TOOL INVESTMENT (LIGHT)
-// ═══════════════════════════════════════════════════════════════
-
-function renderTools(pitches: BossDeckAIOutput['tool_pitches']): string {
-  return `<div class="page light-page">
-  <div class="slide-title-light-full">Technology Investment Recommendations</div>
-
-  <div class="tools-list">
-    ${pitches.map((p, i) => {
-      const isReplace = p.what_it_replaces && p.what_it_replaces !== 'New addition';
-      return `
-    <div class="tool-comparison">
-      <div class="tool-current">
-        <div class="tool-side-label">${isReplace ? 'CURRENT' : 'GAP'}</div>
-        <div class="tool-side-name ${isReplace ? '' : 'tool-gap'}">${isReplace ? esc(p.what_it_replaces) : 'No coverage'}</div>
-        ${!isReplace ? `<div class="tool-side-dot-red">●</div>` : ''}
-      </div>
-      <div class="tool-arrow-col">→</div>
-      <div class="tool-proposed">
-        <div class="tool-side-label">RECOMMENDED</div>
-        <div class="tool-side-name tool-highlight">${esc(p.tool_name)}</div>
-        <div class="tool-pitch-text">${esc(p.why_we_need_it)}</div>
-      </div>
-      <div class="tool-gap-text">${esc(p.capability_gap)}</div>
-    </div>
-    ${i < pitches.length - 1 ? '<div class="tool-divider"></div>' : ''}`;
-    }).join('')}
+    ${outcomes.length > 0 ? `
+    <div class="outcomes-grid">
+      ${outcomes.map(o => `
+      <div class="outcome-card">
+        <div class="outcome-accent"></div>
+        <div class="outcome-body">
+          <div class="outcome-text">${esc(o.outcome)}</div>
+          <div class="outcome-evidence">${esc(o.evidence)}</div>
+        </div>
+      </div>`).join('')}
+    </div>` : ''}
   </div>
-
-  ${footer(6, 'light')}
+  ${footer(pageNum, totalPages, 'image', userName)}
 </div>`;
 }
 
 // ═══════════════════════════════════════════════════════════════
-// PAGE 7: CLOSER (DARK)
+// PAGE 6: TOOL INVESTMENT — Light
 // ═══════════════════════════════════════════════════════════════
 
-function renderCloser(ctx: BossDeckRenderContext, closingMessage: string): string {
+function renderTools(pitches: BossDeckAIOutput['tool_pitches'], pageNum: number, totalPages: number, userName: string): string {
+  return `<div class="page light-page">
+  <div class="page-inner">
+    <div class="section-header-light">
+      <div class="section-number">06</div>
+      <div class="section-label">TECHNOLOGY</div>
+    </div>
+
+    <h2 class="title-light">Technology Investment</h2>
+
+    <div class="tools-grid">
+      ${pitches.map(p => {
+        const isReplace = p.what_it_replaces && p.what_it_replaces !== 'New addition';
+        return `
+      <div class="tool-card">
+        <div class="tool-left">
+          <div class="tool-label">${isReplace ? 'CURRENTLY USING' : 'CURRENT GAP'}</div>
+          <div class="tool-current-name ${isReplace ? '' : 'tool-no-coverage'}">${isReplace ? esc(p.what_it_replaces) : 'Nothing in place'}</div>
+          ${!isReplace ? '<div class="tool-gap-dot">●</div>' : ''}
+        </div>
+        <div class="tool-arrow">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0l-4-4m4 4l-4 4" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="tool-right">
+          <div class="tool-label">RECOMMENDED</div>
+          <div class="tool-rec-name">${esc(p.tool_name)}</div>
+          <div class="tool-pitch">${esc(p.why_we_need_it)}</div>
+        </div>
+        <div class="tool-gap-row">${esc(p.capability_gap)}</div>
+      </div>`;
+      }).join('')}
+    </div>
+  </div>
+  ${footer(pageNum, totalPages, 'light', userName)}
+</div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PAGE 7: CLOSER — Full-bleed horizon image
+// ═══════════════════════════════════════════════════════════════
+
+function renderCloser(ctx: BossDeckRenderContext, _closingMessage: string, _pageNum: number, _totalPages: number): string {
   const score = ctx.marketingIQ;
   const label = ctx.marketingIQLabel ?? '';
-  const scoreColor = score != null && score >= 70 ? '#38A169' : score != null && score >= 40 ? '#D69E2E' : '#E53E3E';
+  const scoreColor = score != null && score >= 70 ? '#22C55E' : score != null && score >= 40 ? '#EAB308' : '#EF4444';
+  const dateFmt = formatDate(ctx.scanDate);
 
-  const imageHtml = `<img class="closer-image" src="/boss-deck-cover.png" alt="" style="transform:scaleX(-1)" />`;
+  const ASCII_BRAND = ` █████╗ ██╗     ██████╗ ██╗  ██╗ █████╗     ███████╗ ██████╗ █████╗ ███╗   ██╗
+██╔══██╗██║     ██╔══██╗██║  ██║██╔══██╗    ██╔════╝██╔════╝██╔══██╗████╗  ██║
+███████║██║     ██████╔╝███████║███████║    ███████╗██║     ███████║██╔██╗ ██║
+██╔══██║██║     ██╔═══╝ ██╔══██║██╔══██║    ╚════██║██║     ██╔══██║██║╚██╗██║
+██║  ██║███████╗██║     ██║  ██║██║  ██║    ███████║╚██████╗██║  ██║██║ ╚████║
+╚═╝  ╚═╝╚══════╝╚═╝     ╚═╝  ╚═╝╚═╝  ╚═╝    ╚══════╝ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═══╝`;
 
-  return `<div class="page dark-page closer-page">
-  <div class="cover-accent-top"></div>
-  <div class="cover-layout">
-    <div class="cover-right closer-img-container">
-      ${imageHtml}
-    </div>
-    <div class="cover-left closer-right">
-      ${score != null ? `
-      <div class="closer-score" style="color:${scoreColor}">${score}</div>
-      <div class="closer-score-label">MarketingIQ™ · ${esc(label)}</div>
-      ` : ''}
-      <div class="closer-message">${esc(closingMessage)}</div>
-      <div class="closer-domain">${esc(ctx.domain)}</div>
-    </div>
+  // Build Bayer 8x8 dither as inline SVG (since no canvas/JS in server HTML)
+  const ditherSvg = buildDitherSVG();
+
+  // Seal SVG
+  const sealSvg = buildSealSVG(score);
+
+  return `<div class="page closer-page">
+  <!-- Layer 0: Horizon image — heavily blurred as texture base -->
+  <img class="closer-bg" src="/boss-deck/hero-horizon.jpg" alt="" />
+
+  <!-- Layer 1: Deep gradient overlay -->
+  <div class="closer-plasma"></div>
+
+  <!-- Layer 2: Radial color glows -->
+  <div class="closer-glow-blue"></div>
+  <div class="closer-glow-gold"></div>
+  <div class="closer-glow-center"></div>
+  <div class="closer-glow-top"></div>
+
+  <!-- Layer 3: Noise grain -->
+  <div class="closer-grain"></div>
+
+  <!-- Layer 4: Vignette -->
+  <div class="closer-vignette"></div>
+
+  <!-- Layer 5: Gold accent lines -->
+  <div class="closer-line-top"></div>
+  <div class="closer-line-bottom"></div>
+
+  <!-- Centered vertical stack -->
+  <div class="closer-stack">
+    <!-- ASCII Brand with bloom glow -->
+    <pre class="closer-ascii">${ASCII_BRAND}</pre>
+
+    <!-- Subtitle -->
+    <div class="closer-subtitle">Marketing Technology Audit</div>
+
+    <!-- Glowing divider -->
+    <div class="closer-rule"></div>
+
+    <!-- Domain -->
+    <h2 class="closer-domain-name">${esc(ctx.domain)}</h2>
+
+    <!-- Score -->
+    ${score != null ? `
+    <div class="closer-score-num" style="color:${scoreColor};filter:drop-shadow(0 0 20px ${scoreColor}30)">${score}</div>
+    <div class="closer-score-sub">MARKETINGIQ&trade;</div>
+    <div class="closer-score-label" style="color:${scoreColor}">${esc(label)}</div>
+    ` : ''}
+
+    <!-- Glowing divider -->
+    <div class="closer-rule"></div>
+
+    <!-- Date + meta -->
+    <div class="closer-meta">${esc(dateFmt)}</div>
+
+    <!-- Sign-off -->
+    <p class="closer-signoff">Now you know.</p>
   </div>
-  <div class="cover-bottom">
-    <span></span>
-    <span class="cover-powered">Powered by AlphaScan</span>
+
+  <!-- Footer -->
+  <div class="closer-footer-text">
+    <span>Automated MarTech Assessment &middot; AlphaScan</span>
   </div>
-  <div class="cover-accent-bottom"></div>
+
+  <!-- Verification seal — bottom right -->
+  ${score != null ? `
+  <div class="closer-seal">${sealSvg}</div>
+  ` : ''}
+
+  <!-- Bayer dither strip -->
+  <div class="closer-dither">${ditherSvg}</div>
 </div>`;
+}
+
+// ── Bayer 8x8 dither as inline SVG ──────────────────────────────────
+
+function buildDitherSVG(): string {
+  const BAYER8 = [
+    [ 0,32, 8,40, 2,34,10,42],
+    [48,16,56,24,50,18,58,26],
+    [12,44, 4,36,14,46, 6,38],
+    [60,28,52,20,62,30,54,22],
+    [ 3,35,11,43, 1,33, 9,41],
+    [51,19,59,27,49,17,57,25],
+    [15,47, 7,39,13,45, 5,37],
+    [63,31,55,23,61,29,53,21],
+  ];
+
+  const cols = 300;
+  const rows = 20;
+  const rects: string[] = [];
+  const r = 59, g = 130, b = 246; // #3B82F6
+
+  for (let y = 0; y < rows; y++) {
+    const yRatio = y / rows;
+    const vDensity = Math.min(0.35, Math.pow(yRatio, 2));
+    for (let x = 0; x < cols; x++) {
+      const xRatio = x / cols;
+      const hFade = Math.sin(xRatio * Math.PI);
+      const intensity = vDensity * hFade * 0.5;
+      const threshold = (BAYER8[y % 8]![x % 8]!) / 64;
+      if (intensity > threshold) {
+        const alpha = Math.round(intensity * 0.6 * 100) / 100;
+        rects.push(`<rect x="${x}" y="${y}" width="1" height="1" fill="rgba(${r},${g},${b},${alpha})"/>`);
+      }
+    }
+  }
+
+  return `<svg viewBox="0 0 ${cols} ${rows}" preserveAspectRatio="none" style="width:100%;height:100%;image-rendering:pixelated">${rects.join('')}</svg>`;
+}
+
+// ── Verification seal SVG ───────────────────────────────────────────
+
+function buildSealSVG(score: number | null): string {
+  const s = 120, cx = 60, cy = 60;
+  const bl = 'rgba(59,130,246,'; // blue accent
+
+  const dots: string[] = [];
+  for (let i = 0; i < 24; i++) {
+    const angle = ((i * 15) - 90) * Math.PI / 180;
+    const x = cx + 54 * Math.cos(angle);
+    const y = cy + 54 * Math.sin(angle);
+    const r = i % 3 === 0 ? 2 : 1;
+    dots.push(`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r}" fill="${bl}${r > 1 ? '0.5' : '0.25'})"/>`);
+  }
+
+  const diamonds: string[] = [];
+  for (let i = 0; i < 8; i++) {
+    const angle = ((i * 45) - 90) * Math.PI / 180;
+    const x = cx + 57 * Math.cos(angle);
+    const y = cy + 57 * Math.sin(angle);
+    diamonds.push(`<path d="M ${x.toFixed(1)} ${(y - 2.5).toFixed(1)} L ${(x + 1).toFixed(1)} ${y.toFixed(1)} L ${x.toFixed(1)} ${(y + 2.5).toFixed(1)} L ${(x - 1).toFixed(1)} ${y.toFixed(1)} Z" fill="${bl}0.4)"/>`);
+  }
+
+  return `<svg viewBox="0 0 ${s} ${s}" style="width:100%;height:100%">
+    <circle cx="${cx}" cy="${cy}" r="56" fill="none" stroke="${bl}0.35)" stroke-width="1.2"/>
+    ${dots.join('')}
+    ${diamonds.join('')}
+    <circle cx="${cx}" cy="${cy}" r="44" fill="none" stroke="${bl}0.18)" stroke-width="0.5" stroke-dasharray="3 3"/>
+    <circle cx="${cx}" cy="${cy}" r="40" fill="none" stroke="${bl}0.12)" stroke-width="0.5"/>
+    <text x="${cx}" y="${cy - 18}" text-anchor="middle" dominant-baseline="central" style="font-size:6.5px;font-family:'Sora',sans-serif;fill:${bl}0.55);letter-spacing:2.5px">ALPHASCAN</text>
+    <line x1="${cx - 22}" y1="${cy - 10}" x2="${cx + 22}" y2="${cy - 10}" stroke="${bl}0.2)" stroke-width="0.5"/>
+    <text x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="central" style="font-size:11px;font-family:'Sora',sans-serif;font-weight:700;fill:${bl}0.65);letter-spacing:2px">VERIFIED</text>
+    <text x="${cx}" y="${cy + 13}" text-anchor="middle" dominant-baseline="central" style="font-size:7px;font-family:'Sora',sans-serif;fill:${bl}0.45);letter-spacing:3px">AUDIT</text>
+    <line x1="${cx - 22}" y1="${cy + 21}" x2="${cx + 22}" y2="${cy + 21}" stroke="${bl}0.2)" stroke-width="0.5"/>
+    ${score != null ? `<text x="${cx}" y="${cy + 32}" text-anchor="middle" dominant-baseline="central" style="font-size:9px;font-family:'Sora',sans-serif;font-weight:700;fill:${bl}0.5);letter-spacing:1px">MIQ ${score}</text>` : ''}
+  </svg>`;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -451,25 +682,61 @@ const CSS = `
 * { margin: 0; padding: 0; box-sizing: border-box;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important; }
-html, body { width: 14in; background: #fff; }
-body { font-family: 'Source Sans 3', system-ui, sans-serif; font-size: 13px; }
+html, body { width: 14in; background: #0A0E1A; }
+body { font-family: 'DM Sans', system-ui, sans-serif; font-size: 13px; color: #1E293B; }
 
 /* ── Print Banner ─────────────────────────────────── */
 .print-banner {
   position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
-  background: #0B1F3F; color: #E2E8F0; padding: 11px 20px;
-  font-size: 13.5px; display: flex; align-items: center;
-  justify-content: center; gap: 16px;
-  box-shadow: 0 2px 12px rgba(11,31,63,0.3);
+  background: #0A0E1A; color: #E2E8F0; padding: 10px 24px;
+  font-family: 'Sora', sans-serif; font-size: 13px; font-weight: 500;
+  display: flex; align-items: center; justify-content: center; gap: 16px;
+  border-bottom: 1px solid rgba(59,130,246,0.3);
 }
 .print-banner button {
-  background: #B8860B; color: #fff; border: none; padding: 7px 24px;
-  font-weight: 600; font-size: 13px; border-radius: 3px; cursor: pointer;
-  letter-spacing: 0.04em; text-transform: uppercase;
+  background: #3B82F6; color: #fff; border: none; padding: 8px 28px;
+  font-family: 'Sora', sans-serif; font-weight: 600; font-size: 12px;
+  border-radius: 6px; cursor: pointer; letter-spacing: 0.05em;
+  text-transform: uppercase; transition: background 0.2s;
 }
-.print-banner button:hover { background: #D4A017; }
-@media print { .print-banner { display: none; } body { margin-top: 0; } }
-@media screen { body { margin-top: 52px; } }
+.print-banner button:hover { background: #2563EB; }
+@media print {
+  .print-banner { display: none; }
+  body { margin-top: 0; }
+  .page { overflow: visible !important; }
+  .cover-bottom-bar,
+  .footer-dark,
+  .actions-band {
+    background: linear-gradient(135deg, rgba(6,10,20,0.92) 0%, rgba(10,22,40,0.90) 30%, rgba(14,31,58,0.90) 60%, rgba(10,22,40,0.92) 100%) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  .cover-bottom-bar > span,
+  .footer-dark > span {
+    color: rgba(255,255,255,0.55) !important;
+  }
+  .footer-light {
+    background: linear-gradient(135deg, rgba(235,238,243,0.92) 0%, rgba(232,236,242,0.90) 30%, rgba(234,236,240,0.90) 60%, rgba(235,238,243,0.92) 100%) !important;
+  }
+  .cover-bottom-bar::before,
+  .cover-bottom-bar::after,
+  .footer-dark::before,
+  .footer-dark::after,
+  .footer-light::before,
+  .footer-light::after,
+  .actions-band::before,
+  .actions-band::after {
+    content: '' !important;
+    display: block !important;
+  }
+  .bar-grain,
+  .bar-grain-light,
+  .results-grain,
+  .closer-grain {
+    opacity: 0 !important;
+  }
+}
+@media screen { body { margin-top: 50px; } }
 
 /* ── Page base ────────────────────────────────────── */
 .page {
@@ -477,350 +744,699 @@ body { font-family: 'Source Sans 3', system-ui, sans-serif; font-size: 13px; }
   page-break-after: always; break-inside: avoid;
 }
 .page:last-child { page-break-after: auto; }
-.dark-page { background: #0B1F3F; color: #E2E8F0; }
-.light-page { background: #FAFBFD; color: #2D3748; }
+.dark-page { background: #0A0E1A; color: #E2E8F0; }
+.light-page { background: #F8FAFC; color: #1E293B; }
+.page-inner { padding: 0.6in 0.75in; height: calc(100% - 36px); position: relative; z-index: 2; }
 
 /* ── Shared ───────────────────────────────────────── */
-.split-layout {
-  display: flex; height: calc(100% - 32px); /* minus footer */
+/* Grain overlays */
+.bar-grain {
+  position: absolute; inset: 0; pointer-events: none;
+  filter: url(#grain); opacity: 0.08; z-index: 0;
 }
-.split-left, .split-right {
-  padding: 0.6in 0.55in;
+.bar-grain-light {
+  position: absolute; inset: 0; pointer-events: none;
+  filter: url(#grain); opacity: 0.08; z-index: 0;
 }
+
 .slide-footer {
-  position: absolute; bottom: 0; left: 0; right: 0; height: 32px;
+  position: absolute; bottom: 0; left: 0; right: 0; height: 36px;
   display: flex; justify-content: space-between; align-items: center;
-  padding: 0 0.75in; font-size: 10px; letter-spacing: 0.03em;
+  padding: 0 0.75in; font-size: 11px; letter-spacing: 0.04em;
+  font-family: 'DM Sans', sans-serif; z-index: 10;
+  overflow: hidden;
 }
-.gold-divider {
-  height: 1px; margin: 16px 0;
-  background: linear-gradient(90deg, transparent 0%, rgba(184,134,11,0.35) 15%, rgba(184,134,11,0.35) 85%, transparent 100%);
+.slide-footer > span, .slide-footer > div { position: relative; z-index: 1; }
+.slide-footer.footer-dark { position: absolute; }
+.footer-dark {
+  background: linear-gradient(135deg, rgba(6,10,20,0.8) 0%, rgba(10,22,40,0.75) 30%, rgba(14,31,58,0.75) 60%, rgba(10,22,40,0.8) 100%);
 }
-.slide-title-dark {
-  font-family: 'EB Garamond', Georgia, serif; font-size: 34px; font-weight: 700;
-  color: #fff; line-height: 1.15; margin-bottom: 28px;
+.footer-light {
+  background: linear-gradient(135deg, #DFE3EA 0%, #E4E8EF 25%, #EAECF0 50%, #E4E8EF 75%, #DFE3EA 100%);
+  position: relative;
 }
-.slide-title-light {
-  font-family: 'EB Garamond', Georgia, serif; font-size: 34px; font-weight: 700;
-  color: #0B1F3F; line-height: 1.15; margin-bottom: 28px;
+.footer-light::before {
+  content: ''; position: absolute; top: -50%; left: -5%; width: 45%; height: 200%;
+  background: radial-gradient(ellipse at center, rgba(59,130,246,0.06) 0%, rgba(148,163,184,0.12) 30%, transparent 60%);
+  pointer-events: none;
 }
-.slide-title-dark-full {
-  font-family: 'EB Garamond', Georgia, serif; font-size: 28px; font-weight: 700;
-  color: #fff; padding: 0.5in 0.75in 0;
+.footer-light::after {
+  content: ''; position: absolute; top: -50%; right: 0; width: 35%; height: 200%;
+  background: radial-gradient(ellipse at center, rgba(201,169,110,0.08) 0%, rgba(148,163,184,0.06) 30%, transparent 55%);
+  pointer-events: none;
 }
-.slide-title-light-full {
-  font-family: 'EB Garamond', Georgia, serif; font-size: 28px; font-weight: 700;
-  color: #0B1F3F; padding: 0.5in 0.75in 0;
+
+/* Section headers */
+.section-header-light, .section-header-dark {
+  display: flex; align-items: center; gap: 16px; margin-bottom: 8px;
+}
+.section-number {
+  font-family: 'Sora', sans-serif; font-size: 12px; font-weight: 800;
+  color: #3B82F6; letter-spacing: 0.02em;
+}
+.section-label {
+  font-family: 'Sora', sans-serif; font-size: 10px; font-weight: 700;
+  letter-spacing: 0.2em; color: #94A3B8; text-transform: uppercase;
+}
+.section-number-dark {
+  font-family: 'Sora', sans-serif; font-size: 12px; font-weight: 800;
+  color: #3B82F6;
+}
+.section-label-dark {
+  font-family: 'Sora', sans-serif; font-size: 10px; font-weight: 700;
+  letter-spacing: 0.2em; color: #64748B; text-transform: uppercase;
+}
+
+/* Titles */
+.title-light {
+  font-family: 'Sora', sans-serif; font-size: 36px; font-weight: 800;
+  color: #0F172A; line-height: 1.1; margin-bottom: 16px;
+  letter-spacing: -0.02em;
+}
+.title-dark {
+  font-family: 'Sora', sans-serif; font-size: 36px; font-weight: 800;
+  color: #FFFFFF; line-height: 1.1; margin-bottom: 20px;
+  letter-spacing: -0.02em;
 }
 
 /* ═══ COVER ═══════════════════════════════════════ */
-.cover-accent-top {
-  height: 5px;
-  background: linear-gradient(90deg, #B8860B 0%, #D4A017 40%, #FFB2EF 70%, #B8860B 100%);
+.cover-page { position: relative; }
+.cover-bg {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; z-index: 0;
 }
-.cover-accent-bottom {
-  height: 3px;
-  background: linear-gradient(90deg, #B8860B 0%, #D4A017 50%, transparent 100%);
+.cover-gradient {
+  position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(
+    105deg,
+    rgba(10,14,26,0.92) 0%,
+    rgba(10,14,26,0.85) 35%,
+    rgba(10,14,26,0.55) 60%,
+    rgba(10,14,26,0.25) 80%,
+    rgba(10,14,26,0.15) 100%
+  );
 }
-.cover-layout {
-  display: flex; flex: 1; height: calc(100% - 5px - 3px - 36px);
+.cover-accent-line {
+  position: absolute; top: 0; left: 0; right: 0; height: 4px; z-index: 3;
+  background: linear-gradient(90deg, #3B82F6 0%, #60A5FA 30%, #F59E0B 70%, #3B82F6 100%);
+}
+.cover-content {
+  position: relative; z-index: 2; height: calc(100% - 44px);
+  display: flex; align-items: center;
 }
 .cover-left {
-  width: 55%; padding: 0.65in 0.75in; display: flex;
-  flex-direction: column; justify-content: center;
-}
-.cover-right {
-  width: 45%; position: relative; overflow: hidden;
-}
-.cover-wordmark {
-  font-family: 'EB Garamond', Georgia, serif; font-size: 14px; font-weight: 600;
-  color: #B8860B; letter-spacing: 0.15em; text-transform: uppercase;
-  margin-bottom: 40px;
+  width: 55%; padding: 0 0.75in;
 }
 .cover-type-label {
-  font-size: 11px; font-weight: 600; letter-spacing: 0.25em;
-  text-transform: uppercase; color: #718096; margin-bottom: 16px;
+  font-family: 'Sora', sans-serif; font-size: 11px; font-weight: 600;
+  letter-spacing: 0.25em; text-transform: uppercase;
+  color: rgba(255,255,255,0.45); margin-bottom: 16px;
 }
 .cover-business-name {
-  font-family: 'EB Garamond', Georgia, serif; font-size: 50px; font-weight: 700;
-  color: #fff; line-height: 1.08; margin-bottom: 16px;
+  font-family: 'Sora', sans-serif; font-size: 72px; font-weight: 800;
+  color: #FFFFFF; line-height: 1.0; margin-bottom: 24px;
+  letter-spacing: -0.04em;
+  text-shadow: 0 2px 30px rgba(0,0,0,0.4);
 }
-.cover-gold-line {
-  width: 80px; height: 3px; border-radius: 2px;
-  background: linear-gradient(90deg, #B8860B, #D4A017);
-  margin-bottom: 18px;
+.cover-divider {
+  width: 64px; height: 3px; border-radius: 2px; margin-bottom: 20px;
+  background: linear-gradient(90deg, #3B82F6, #60A5FA);
 }
 .cover-subtitle {
-  font-size: 16px; font-weight: 300; color: #CBD5E0;
-  letter-spacing: 0.02em; max-width: 420px; line-height: 1.5;
+  font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 400;
+  color: rgba(255,255,255,0.65); max-width: 440px; line-height: 1.6;
 }
-.cover-meta-row { margin-top: 36px; }
-.cover-score { display: flex; align-items: baseline; gap: 12px; }
-.cover-score-num {
-  font-family: 'EB Garamond', Georgia, serif; font-size: 44px; font-weight: 700;
-}
-.cover-score-label { font-size: 12px; color: #718096; letter-spacing: 0.06em; }
-.cover-bottom {
+.cover-bottom-bar {
+  position: absolute; bottom: 0; left: 0; right: 0; z-index: 3;
   display: flex; justify-content: space-between; align-items: center;
-  padding: 0 0.75in; height: 36px; font-size: 11px; color: #5A6A80;
+  padding: 0 0.75in; height: 44px;
+  font-family: 'DM Sans', sans-serif; font-size: 11px;
+  color: rgba(255,255,255,0.45);
+  background: linear-gradient(135deg, rgba(6,10,20,0.75) 0%, rgba(10,22,40,0.7) 30%, rgba(14,31,58,0.7) 60%, rgba(10,22,40,0.75) 100%);
+  backdrop-filter: blur(8px);
+  overflow: hidden; z-index: 10;
+}
+.cover-bottom-bar > span { position: relative; z-index: 1; }
+.cover-bottom-bar::before {
+  content: ''; position: absolute; top: -50%; left: -5%; width: 40%; height: 200%;
+  background: radial-gradient(ellipse at center, rgba(59,130,246,0.06) 0%, transparent 60%);
+  pointer-events: none;
+}
+.cover-bottom-bar::after {
+  content: ''; position: absolute; top: -50%; right: 0; width: 30%; height: 200%;
+  background: radial-gradient(ellipse at center, rgba(201,169,110,0.04) 0%, transparent 55%);
+  pointer-events: none;
 }
 .cover-powered { font-style: italic; }
 
-/* Cover image */
-.cover-image {
-  width: 100%; height: 100%; object-fit: cover;
-}
-
-/* Cover CSS fallback arcs */
-.cover-arcs {
-  position: absolute; inset: 0; overflow: hidden;
-}
-.arc {
-  position: absolute; border-radius: 50%;
-  border: 1px solid rgba(184,134,11,0.12);
-}
-.arc-1 { width: 600px; height: 600px; top: -100px; right: -150px; transform: rotate(-15deg); }
-.arc-2 { width: 480px; height: 480px; top: -40px; right: -80px; transform: rotate(-25deg);
-         border-color: rgba(184,134,11,0.08); }
-.arc-3 { width: 360px; height: 360px; top: 30px; right: -30px; transform: rotate(-35deg);
-         border-color: rgba(184,134,11,0.15); }
-.arc-4 { width: 520px; height: 520px; top: 60px; right: -200px; transform: rotate(10deg);
-         border-color: rgba(184,134,11,0.06); }
-.arc-5 { width: 280px; height: 280px; bottom: 40px; right: 20px; transform: rotate(-45deg);
-         border-color: rgba(184,134,11,0.1); }
-
 /* ═══ WINS ════════════════════════════════════════ */
+.wins-layout {
+  display: flex; gap: 0; flex: 1;
+}
+.wins-left {
+  width: 36%; padding-right: 40px;
+}
+.wins-divider {
+  width: 1px; background: linear-gradient(180deg, transparent 0%, #CBD5E1 15%, #CBD5E1 85%, transparent 100%);
+  flex-shrink: 0;
+}
+.wins-right {
+  width: 64%; padding-left: 40px;
+}
 .wins-narrative {
-  font-size: 14px; color: #4A5568; line-height: 1.65; margin-bottom: 24px;
+  font-size: 14px; color: #475569; line-height: 1.7; margin-bottom: 28px;
 }
-.wins-metrics-grid {
-  display: grid; grid-template-columns: repeat(2, 1fr); gap: 32px 40px;
-  padding-top: 8px;
+.wins-strengths { margin-top: 0; }
+.strength-label {
+  font-family: 'Sora', sans-serif; font-size: 10px; font-weight: 700;
+  letter-spacing: 0.15em; color: #94A3B8; margin-bottom: 12px;
 }
-.win-metric { }
-.win-metric-value {
-  font-family: 'EB Garamond', Georgia, serif; font-size: 46px; font-weight: 700;
-  color: #0B1F3F; line-height: 1.1;
-}
-.win-metric-label {
-  font-size: 11px; font-weight: 600; letter-spacing: 0.12em;
-  text-transform: uppercase; color: #718096; margin-top: 4px;
-}
-.win-metric-context {
-  font-size: 13px; color: #4A5568; margin-top: 8px; line-height: 1.5;
-}
-.wins-strengths { margin-top: 24px; }
 .strength-row {
-  display: flex; align-items: center; gap: 8px;
-  font-size: 13px; color: #2D3748; margin-bottom: 6px;
+  display: flex; align-items: center; gap: 10px;
+  font-size: 13px; color: #334155; margin-bottom: 8px; font-weight: 500;
 }
 .strength-dot {
   width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
 }
+.stats-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 32px;
+}
+.stat-card {
+  padding: 24px; border-radius: 12px;
+  background: #FFFFFF; border: 1px solid #E2E8F0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.stat-value {
+  font-family: 'Sora', sans-serif; font-size: 42px; font-weight: 800;
+  color: #0F172A; line-height: 1; letter-spacing: -0.02em;
+  margin-bottom: 6px;
+}
+.stat-label {
+  font-family: 'Sora', sans-serif; font-size: 10px; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: #3B82F6; margin-bottom: 8px;
+}
+.stat-context {
+  font-size: 13px; color: #64748B; line-height: 1.5;
+}
 
 /* ═══ ISSUES ══════════════════════════════════════ */
-.issues-main {
-  width: 63%; padding: 0.6in 0.55in;
+.issues-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+  margin-top: 8px;
 }
-.issues-sidebar {
-  width: 37%; background: #132D54; padding: 0.6in 0.45in;
+.issue-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px; padding: 28px;
   display: flex; flex-direction: column;
 }
-.sidebar-label {
-  font-size: 10px; font-weight: 700; letter-spacing: 0.2em;
-  color: #B8860B; margin-bottom: 24px;
+.issue-top {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px;
 }
-.issues-list { display: flex; flex-direction: column; gap: 0; }
-.issue-row { display: flex; gap: 16px; align-items: flex-start; }
 .issue-num {
-  font-family: 'EB Garamond', Georgia, serif; font-size: 38px; font-weight: 700;
-  color: #B8860B; line-height: 1; flex-shrink: 0; width: 50px;
+  font-family: 'Sora', sans-serif; font-size: 32px; font-weight: 800;
+  color: #3B82F6; line-height: 1;
 }
-.issue-body { flex: 1; }
+.urgency-tag {
+  font-family: 'Sora', sans-serif; font-size: 9px; font-weight: 700;
+  letter-spacing: 0.1em; padding: 4px 10px; border-radius: 4px;
+}
 .issue-headline {
-  font-family: 'EB Garamond', Georgia, serif; font-size: 19px; font-weight: 600;
-  color: #fff; line-height: 1.3; margin-bottom: 6px;
+  font-family: 'Sora', sans-serif; font-size: 18px; font-weight: 700;
+  color: #FFFFFF; line-height: 1.3; margin-bottom: 12px;
 }
-.issue-explanation { font-size: 13px; color: #CBD5E0; line-height: 1.55; }
-
-.impact-callout {
-  margin-bottom: 20px; padding-top: 16px;
-  border-top: 2px solid #B8860B;
+.issue-explanation {
+  font-size: 13px; color: #94A3B8; line-height: 1.6; flex: 1;
+  margin-bottom: 16px;
 }
-.impact-num {
-  font-family: 'EB Garamond', Georgia, serif; font-size: 14px;
-  color: #718096; margin-bottom: 4px;
+.issue-impact {
+  display: flex; gap: 10px; align-items: flex-start;
+  padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.08);
+}
+.impact-icon {
+  font-size: 14px; color: #F59E0B; font-weight: 700; flex-shrink: 0;
+  width: 20px; height: 20px; display: flex; align-items: center;
+  justify-content: center; background: rgba(245,158,11,0.15);
+  border-radius: 4px;
 }
 .impact-text {
-  font-family: 'EB Garamond', Georgia, serif; font-size: 18px; font-weight: 600;
-  color: #B8860B; line-height: 1.4;
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
+  color: #F59E0B; line-height: 1.4;
 }
 
 /* ═══ ROADMAP ═════════════════════════════════════ */
 .roadmap-summary {
-  font-size: 14px; color: #4A5568; line-height: 1.6;
-  padding: 12px 0.75in 0; max-width: 10in;
+  font-size: 14px; color: #475569; line-height: 1.6;
+  margin-bottom: 20px; max-width: 10in;
 }
-.roadmap-initiatives {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;
-  padding: 16px 0.75in 0;
+.initiatives-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px;
+  margin-bottom: 24px;
 }
-.initiative-block { }
-.initiative-bar {
-  height: 4px; border-radius: 2px; margin-bottom: 8px;
+.initiative-card {
+  display: flex; border-radius: 8px; overflow: hidden;
+  background: #FFFFFF; border: 1px solid #E2E8F0;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
 }
-.initiative-owner {
-  display: inline-block; padding: 2px 10px; border-radius: 3px;
-  font-size: 9px; font-weight: 700; letter-spacing: 0.1em;
-  text-transform: uppercase; color: #fff; margin-bottom: 6px;
+.init-accent {
+  width: 4px; flex-shrink: 0;
 }
-.initiative-name {
-  font-family: 'EB Garamond', Georgia, serif; font-size: 16px; font-weight: 600;
-  color: #0B1F3F; margin-bottom: 6px; line-height: 1.25;
+.init-content { padding: 16px; flex: 1; display: flex; flex-direction: column; }
+.init-owner {
+  font-family: 'Sora', sans-serif; font-size: 9px; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 6px;
+  display: block;
 }
-.initiative-items { margin-bottom: 8px; }
-.init-item {
-  font-size: 12px; color: #4A5568; line-height: 1.5; padding: 1px 0;
+.init-name {
+  font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 700;
+  color: #0F172A; line-height: 1.25; margin-bottom: 8px;
 }
-.initiative-meta {
-  font-size: 11px; color: #718096; display: flex; gap: 12px;
+.init-items {
+  list-style: none; padding: 0; margin-bottom: 12px; flex: 1;
 }
-.init-effort { font-weight: 600; color: #0B1F3F; }
-.init-outcome { font-style: italic; }
+.init-items li {
+  font-size: 12px; color: #475569; line-height: 1.5; padding: 2px 0;
+  padding-left: 14px; position: relative;
+}
+.init-items li::before {
+  content: '→'; position: absolute; left: 0; color: #94A3B8;
+}
+.init-meta {
+  display: flex; gap: 8px; font-size: 11px; flex-wrap: wrap;
+}
+.init-effort {
+  font-weight: 700; color: #0F172A;
+  padding: 2px 8px; background: #F1F5F9; border-radius: 4px;
+}
+.init-outcome { color: #64748B; font-style: italic; }
 
-/* Timeline bar */
-.timeline-bar {
-  display: flex; gap: 0; padding: 16px 0.75in 0; position: relative;
+/* Timeline */
+.timeline-section { position: relative; padding-top: 4px; }
+.timeline-track {
+  display: flex; position: relative; z-index: 1;
 }
 .timeline-line {
-  position: absolute; top: 30px; left: 0.75in; right: 0.75in;
-  height: 2px; background: linear-gradient(90deg, #B8860B, #D4A017, transparent);
+  position: absolute; top: 19px; left: 4px; right: 4px; height: 2px;
+  background: linear-gradient(90deg, #EF4444, #F59E0B, #3B82F6, #64748B);
+  border-radius: 1px; z-index: 0;
 }
-.timeline-phase {
-  flex: 1; padding-right: 12px; position: relative;
-}
-.timeline-dot {
+.timeline-phase { padding-right: 16px; }
+.tl-dot {
   width: 10px; height: 10px; border-radius: 50%; margin-bottom: 8px;
+  position: relative; z-index: 2;
+  box-shadow: 0 0 0 3px #F8FAFC;
+}
+.tl-label {
+  font-family: 'Sora', sans-serif; font-size: 11px; font-weight: 700;
+  letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 6px;
+}
+.tl-item { font-size: 11px; color: #475569; line-height: 1.5; }
+
+/* Actions band — bottom 20% of roadmap page */
+.actions-band {
+  position: absolute; bottom: 36px; left: 0; right: 0; z-index: 3;
+  background: linear-gradient(135deg, #060A14 0%, #0A1628 30%, #0E1F3A 60%, #0A1628 100%);
+  padding: 20px 0.75in;
+  border-top: 3px solid #3B82F6;
+  overflow: hidden;
+}
+/* Radial glows inside the band */
+.actions-band::before {
+  content: ''; position: absolute; top: -40%; left: -5%; width: 45%; height: 180%;
+  background: radial-gradient(ellipse at center, rgba(59,130,246,0.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+.actions-band::after {
+  content: ''; position: absolute; top: -30%; right: 0; width: 35%; height: 160%;
+  background: radial-gradient(ellipse at center, rgba(201,169,110,0.05) 0%, transparent 55%);
+  pointer-events: none;
+}
+.actions-inner {
+  display: flex; align-items: flex-start; gap: 40px;
   position: relative; z-index: 1;
 }
-.timeline-phase-label {
-  font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
-  text-transform: uppercase; margin-bottom: 6px;
+.actions-left {
+  display: flex; align-items: center; gap: 14px; flex-shrink: 0;
+  min-width: 220px;
 }
-.timeline-phase-items { }
-.tl-item { font-size: 11px; color: #4A5568; line-height: 1.5; }
-
-/* Next steps row */
-.next-steps-row {
-  display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
-  padding: 14px 0.75in 0; font-size: 11px;
+.actions-icon {
+  width: 44px; height: 44px; border-radius: 10px;
+  background: linear-gradient(135deg, #3B82F6, #2563EB);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 14px rgba(59,130,246,0.3);
 }
-.ns-label {
-  font-weight: 700; color: #B8860B; letter-spacing: 0.08em; text-transform: uppercase;
+.actions-title-block { }
+.actions-label {
+  font-family: 'Sora', sans-serif; font-size: 11px; font-weight: 800;
+  letter-spacing: 0.15em; color: #3B82F6;
 }
-.ns-item { color: #4A5568; }
-.ns-sep { color: #CBD5E0; }
+.actions-subtitle {
+  font-family: 'DM Sans', sans-serif; font-size: 12px;
+  color: #64748B; margin-top: 2px;
+}
+.actions-list {
+  display: flex; flex-direction: column; gap: 6px; flex: 1;
+}
+.action-item {
+  display: flex; align-items: baseline; gap: 12px;
+}
+.action-num {
+  font-family: 'Sora', sans-serif; font-size: 13px; font-weight: 800;
+  color: #3B82F6; flex-shrink: 0;
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 1.5px solid rgba(59,130,246,0.3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px;
+}
+.action-text {
+  font-family: 'DM Sans', sans-serif; font-size: 13px;
+  color: #E2E8F0; line-height: 1.4;
+}
 
 /* ═══ RESULTS ═════════════════════════════════════ */
-.comparison-table {
-  padding: 20px 0.75in 0;
+.results-page { position: relative; background: #060A14; }
+
+/* Layer 1: Deep gradient base */
+.results-plasma {
+  position: absolute; inset: 0; z-index: 0;
+  background: linear-gradient(
+    135deg,
+    #060A14 0%,
+    #0A1628 20%,
+    #0C1A30 40%,
+    #0E1F3A 55%,
+    #0A1628 75%,
+    #060A14 100%
+  );
 }
-.comp-header {
-  display: grid; grid-template-columns: 200px 60px 20px 80px 1fr;
-  gap: 8px; padding: 8px 12px; margin-bottom: 4px;
+
+/* Layer 2-4: Radial color glows */
+.results-glow-1 {
+  position: absolute; z-index: 0; pointer-events: none;
+  top: -10%; left: -5%; width: 60%; height: 60%;
+  background: radial-gradient(ellipse at center, rgba(59,130,246,0.08) 0%, transparent 65%);
 }
-.comp-cat-header { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #718096; }
-.comp-now-header { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #E53E3E; text-align: center; }
-.comp-after-header { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #38A169; text-align: center; }
-.comp-note-header { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #718096; }
-.comp-row {
-  display: grid; grid-template-columns: 200px 60px 20px 80px 1fr;
-  gap: 8px; align-items: center; padding: 6px 12px;
+.results-glow-2 {
+  position: absolute; z-index: 0; pointer-events: none;
+  bottom: -15%; right: -10%; width: 55%; height: 55%;
+  background: radial-gradient(ellipse at center, rgba(245,158,11,0.06) 0%, transparent 55%);
+}
+.results-glow-3 {
+  position: absolute; z-index: 0; pointer-events: none;
+  top: 20%; right: 5%; width: 35%; height: 50%;
+  background: radial-gradient(ellipse at center, rgba(201,169,110,0.05) 0%, transparent 55%);
+}
+
+/* Layer 5: Noise grain */
+.results-grain {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  filter: url(#grain); opacity: 0.10;
+}
+
+/* Layer 6: Vignette */
+.results-vignette {
+  position: absolute; top: 0; left: 0; right: 0; bottom: 36px;
+  z-index: 1; pointer-events: none;
+  background: radial-gradient(ellipse 85% 80% at 50% 45%, transparent 0%, rgba(6,10,20,0.3) 55%, rgba(6,10,20,0.7) 100%);
+}
+
+/* Gold accent line at top */
+.results-gold-line {
+  position: absolute; top: 0; left: 0; right: 0; height: 3px; z-index: 2;
+  background: linear-gradient(90deg, transparent 5%, rgba(201,169,110,0.5) 25%, rgba(245,158,11,0.7) 50%, rgba(201,169,110,0.5) 75%, transparent 95%);
+  box-shadow: 0 0 20px rgba(245,158,11,0.15), 0 2px 12px rgba(245,158,11,0.1);
+}
+
+.results-inner { z-index: 2; }
+
+.projection-table { margin-bottom: 24px; }
+.proj-header {
+  display: grid; grid-template-columns: 200px 80px 80px 1fr;
+  gap: 8px; padding: 10px 16px; margin-bottom: 4px;
   border-bottom: 1px solid rgba(255,255,255,0.06);
 }
-.comp-cat { font-size: 13px; font-weight: 600; color: #fff; text-transform: capitalize; }
-.comp-now, .comp-after { text-align: center; }
-.comp-dot { font-size: 18px; }
-.comp-arrow { color: #5A6A80; font-size: 12px; text-align: center; }
-.comp-note { font-size: 12px; color: #8CA0B8; }
+.proj-h-cat, .proj-h-note {
+  font-family: 'Sora', sans-serif; font-size: 10px; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase; color: #64748B;
+}
+.proj-h-now {
+  font-family: 'Sora', sans-serif; font-size: 10px; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase; color: #EF4444;
+  text-align: center;
+}
+.proj-h-after {
+  font-family: 'Sora', sans-serif; font-size: 10px; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase; color: #22C55E;
+  text-align: center;
+}
+.proj-row {
+  display: grid; grid-template-columns: 200px 80px 80px 1fr;
+  gap: 8px; align-items: center; padding: 10px 16px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.04);
+  margin-bottom: 3px;
+  border-left: 3px solid transparent;
+  transition: background 0.15s;
+}
+.proj-row:nth-child(odd) { background: rgba(255,255,255,0.02); }
+.proj-row:hover { background: rgba(255,255,255,0.07); }
+.proj-cat {
+  font-family: 'Sora', sans-serif; font-size: 13px; font-weight: 600;
+  color: #FFFFFF;
+}
+.proj-light { text-align: center; }
+.proj-dot-ring {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 1.5px solid;
+}
+.proj-dot {
+  display: inline-block; width: 10px; height: 10px; border-radius: 50%;
+}
+.proj-note { font-size: 12px; color: #94A3B8; }
 
-.outcomes-section { padding: 20px 0.75in 0; }
-.outcome-row {
-  display: flex; gap: 12px; margin-bottom: 10px; align-items: flex-start;
+.outcomes-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px;
 }
-.outcome-bar {
-  width: 3px; min-height: 100%; background: #38A169; border-radius: 2px;
-  flex-shrink: 0; align-self: stretch;
+.outcome-card {
+  display: flex; gap: 12px; padding: 18px; border-radius: 10px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(201,169,110,0.12);
+  backdrop-filter: blur(6px);
 }
-.outcome-content { }
+.outcome-accent {
+  width: 3px; border-radius: 2px; flex-shrink: 0;
+  align-self: stretch;
+  background: linear-gradient(180deg, #F59E0B, #C9A96E);
+}
+.outcome-body { flex: 1; }
 .outcome-text {
-  font-size: 13.5px; font-weight: 600; color: #fff; line-height: 1.4;
+  font-size: 13px; font-weight: 600; color: #FFFFFF; line-height: 1.4;
+  margin-bottom: 4px;
 }
-.outcome-evidence { font-size: 12px; color: #8CA0B8; margin-top: 2px; }
+.outcome-evidence { font-size: 12px; color: #64748B; line-height: 1.4; }
 
 /* ═══ TOOLS ═══════════════════════════════════════ */
-.tools-list { padding: 20px 0.75in 0; }
-.tool-comparison {
-  display: grid; grid-template-columns: 1fr 40px 1fr; gap: 0;
-  align-items: start; margin-bottom: 8px;
+.tools-grid {
+  display: flex; flex-direction: column; gap: 16px; margin-top: 8px;
 }
-.tool-current {
-  background: #F0F0F0; border-radius: 6px 0 0 6px; padding: 16px 20px;
-  border-left: 3px solid #CBD5E0;
+.tool-card {
+  display: grid; grid-template-columns: 1fr 48px 1.5fr;
+  align-items: center; gap: 0;
+  border: 1px solid #E2E8F0; border-radius: 12px; overflow: hidden;
+  background: #FFFFFF; box-shadow: 0 1px 3px rgba(0,0,0,0.04);
 }
-.tool-proposed {
-  background: #fff; border-radius: 0 6px 6px 0; padding: 16px 20px;
-  border-left: 3px solid #B8860B;
+.tool-left {
+  padding: 20px 24px;
+  background: #F1F5F9;
+  height: 100%; display: flex; flex-direction: column; justify-content: center;
 }
-.tool-arrow-col {
+.tool-arrow {
   display: flex; align-items: center; justify-content: center;
-  font-size: 18px; color: #B8860B; font-weight: 700;
-  background: linear-gradient(90deg, #F0F0F0, #fff);
+  background: linear-gradient(90deg, #F1F5F9, #FFFFFF);
 }
-.tool-side-label {
-  font-size: 9px; font-weight: 700; letter-spacing: 0.15em;
-  text-transform: uppercase; color: #718096; margin-bottom: 4px;
+.tool-right {
+  padding: 20px 24px;
 }
-.tool-side-name {
-  font-family: 'EB Garamond', Georgia, serif; font-size: 18px; font-weight: 600;
-  color: #0B1F3F; margin-bottom: 4px;
+.tool-label {
+  font-family: 'Sora', sans-serif; font-size: 9px; font-weight: 700;
+  letter-spacing: 0.15em; text-transform: uppercase; color: #94A3B8;
+  margin-bottom: 6px;
 }
-.tool-gap { color: #A0AEC0; font-style: italic; }
-.tool-side-dot-red { color: #E53E3E; font-size: 14px; margin-top: 4px; }
-.tool-highlight { color: #B8860B; }
-.tool-pitch-text { font-size: 13px; color: #4A5568; line-height: 1.5; margin-top: 6px; }
-.tool-gap-text {
-  grid-column: 1 / -1; font-size: 12px; color: #718096;
-  font-style: italic; padding: 4px 20px 0;
+.tool-current-name {
+  font-family: 'Sora', sans-serif; font-size: 17px; font-weight: 700;
+  color: #0F172A;
 }
-.tool-divider {
-  height: 1px; margin: 12px 0;
-  background: linear-gradient(90deg, transparent, #E2E8F0 20%, #E2E8F0 80%, transparent);
+.tool-no-coverage { color: #94A3B8; font-style: italic; }
+.tool-gap-dot { color: #EF4444; font-size: 12px; margin-top: 4px; }
+.tool-rec-name {
+  font-family: 'Sora', sans-serif; font-size: 17px; font-weight: 700;
+  color: #3B82F6; margin-bottom: 6px;
+}
+.tool-pitch { font-size: 13px; color: #475569; line-height: 1.5; }
+.tool-gap-row {
+  grid-column: 1 / -1; font-size: 12px; color: #64748B;
+  padding: 0 24px 12px; font-style: italic;
+  border-top: 1px solid #F1F5F9;
+  padding-top: 10px;
 }
 
-/* ═══ CLOSER ══════════════════════════════════════ */
-.closer-page .cover-layout { flex-direction: row-reverse; }
-.closer-img-container { width: 45%; }
-.closer-image {
-  width: 100%; height: 100%; object-fit: cover;
+/* ═══ CLOSER — Certificate style (opus magnus) ═══ */
+.closer-page { position: relative; background: #040610; }
+
+/* Horizon image as blurred texture base */
+.closer-bg {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; z-index: 0;
+  filter: blur(30px) saturate(0.4) brightness(0.2);
+  transform: scale(1.15);
 }
-.closer-right {
-  width: 55%; display: flex; flex-direction: column;
-  justify-content: center; align-items: center; text-align: center;
+
+/* Deep gradient overlay */
+.closer-plasma {
+  position: absolute; inset: 0; z-index: 1;
+  background: linear-gradient(
+    160deg,
+    rgba(4,6,16,0.85) 0%,
+    rgba(8,14,32,0.7) 20%,
+    rgba(12,22,44,0.55) 40%,
+    rgba(16,28,52,0.5) 50%,
+    rgba(12,22,44,0.55) 60%,
+    rgba(8,14,32,0.7) 80%,
+    rgba(4,6,16,0.85) 100%
+  );
 }
-.closer-score {
-  font-family: 'EB Garamond', Georgia, serif; font-size: 72px; font-weight: 700;
-  line-height: 1;
+
+/* Radial glows — 4 layers for depth */
+.closer-glow-blue {
+  position: absolute; z-index: 1; pointer-events: none;
+  top: -15%; left: -10%; width: 60%; height: 70%;
+  background: radial-gradient(ellipse at center, rgba(59,130,246,0.1) 0%, transparent 55%);
+}
+.closer-glow-gold {
+  position: absolute; z-index: 1; pointer-events: none;
+  bottom: -20%; right: -10%; width: 65%; height: 65%;
+  background: radial-gradient(ellipse at center, rgba(245,158,11,0.08) 0%, rgba(201,169,110,0.03) 40%, transparent 60%);
+}
+.closer-glow-center {
+  position: absolute; z-index: 1; pointer-events: none;
+  top: 30%; left: 50%; transform: translate(-50%, -50%);
+  width: 50%; height: 50%;
+  background: radial-gradient(circle, rgba(99,102,241,0.06) 0%, rgba(59,130,246,0.03) 30%, transparent 55%);
+}
+.closer-glow-top {
+  position: absolute; z-index: 1; pointer-events: none;
+  top: -5%; left: 30%; width: 40%; height: 30%;
+  background: radial-gradient(ellipse at center, rgba(201,169,110,0.06) 0%, transparent 55%);
+}
+
+/* Noise grain */
+.closer-grain {
+  position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  filter: url(#grain); opacity: 0.12;
+}
+
+/* Heavy vignette — cinematic edges */
+.closer-vignette {
+  position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background: radial-gradient(
+    ellipse 70% 65% at 50% 45%,
+    transparent 0%,
+    rgba(4,6,16,0.15) 40%,
+    rgba(4,6,16,0.5) 65%,
+    rgba(4,6,16,0.85) 100%
+  );
+}
+
+/* Gold accent lines */
+.closer-line-top {
+  position: absolute; top: 0; left: 0; right: 0; height: 3px; z-index: 3;
+  background: linear-gradient(90deg, transparent 10%, rgba(201,169,110,0.4) 30%, rgba(245,158,11,0.6) 50%, rgba(201,169,110,0.4) 70%, transparent 90%);
+  box-shadow: 0 0 20px rgba(245,158,11,0.12), 0 2px 8px rgba(245,158,11,0.08);
+}
+.closer-line-bottom {
+  position: absolute; bottom: 50px; left: 10%; right: 10%; height: 1px; z-index: 3;
+  background: linear-gradient(90deg, transparent, rgba(59,130,246,0.2) 20%, rgba(201,169,110,0.25) 50%, rgba(59,130,246,0.2) 80%, transparent);
+}
+.closer-stack {
+  position: relative; z-index: 4;
+  height: 100%; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; padding: 2% 5% 0;
+}
+.closer-ascii {
+  font-family: 'Source Code Pro', monospace; font-size: 8px;
+  line-height: 1.1; white-space: pre; color: #3B82F6;
+  text-shadow:
+    0 0 8px rgba(59,130,246,0.5),
+    0 0 20px rgba(59,130,246,0.3),
+    0 0 40px rgba(59,130,246,0.15),
+    0 0 80px rgba(59,130,246,0.08),
+    0 0 160px rgba(59,130,246,0.04);
+  margin-bottom: 6px;
+}
+.closer-subtitle {
+  font-family: 'Sora', sans-serif; font-size: 13px; font-weight: 600;
+  letter-spacing: 0.25em; text-transform: uppercase;
+  color: rgba(148,163,184,0.5); margin-bottom: 20px;
+}
+.closer-rule {
+  width: 25%; height: 1px; margin-bottom: 16px;
+  background: linear-gradient(to right, transparent, rgba(201,169,110,0.4), rgba(59,130,246,0.3), transparent);
+  box-shadow: 0 0 12px rgba(201,169,110,0.08);
+}
+.closer-domain-name {
+  font-family: 'Sora', sans-serif; font-size: 52px; font-weight: 800;
+  letter-spacing: -0.02em; text-transform: uppercase;
+  color: #FFFFFF; line-height: 1; margin-bottom: 14px;
+  text-shadow: 0 0 40px rgba(255,255,255,0.08);
+}
+.closer-score-num {
+  font-family: 'Sora', sans-serif; font-size: 80px; font-weight: 800;
+  line-height: 0.9; margin-bottom: 4px;
+  text-shadow: 0 0 30px currentColor;
+}
+.closer-score-sub {
+  font-family: 'Sora', sans-serif; font-size: 12px; font-weight: 700;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: rgba(148,163,184,0.45); margin-bottom: 2px;
 }
 .closer-score-label {
-  font-size: 13px; color: #718096; letter-spacing: 0.1em; margin-top: 8px;
+  font-family: 'Sora', sans-serif; font-size: 17px; font-weight: 600;
+  letter-spacing: 0.08em; margin-bottom: 16px;
 }
-.closer-message {
-  font-size: 17px; color: #CBD5E0; font-style: italic;
-  margin-top: 36px; max-width: 380px; line-height: 1.6;
+.closer-meta {
+  font-family: 'Source Code Pro', monospace; font-size: 13px;
+  color: rgba(148,163,184,0.4); letter-spacing: 0.12em;
+  margin-bottom: 18px;
 }
-.closer-domain {
-  font-family: 'Source Code Pro', monospace; font-size: 14px;
-  color: #B8860B; margin-top: 24px; letter-spacing: 0.03em;
+.closer-signoff {
+  font-family: 'Permanent Marker', cursive; font-size: 34px;
+  color: #C9A96E;
+  text-shadow:
+    0 0 12px rgba(201,169,110,0.35),
+    0 0 30px rgba(201,169,110,0.15),
+    0 0 60px rgba(201,169,110,0.06);
+  line-height: 1;
+}
+.closer-footer-text {
+  position: absolute; bottom: 54px; left: 0; right: 0; z-index: 4;
+  text-align: center;
+  font-family: 'Source Code Pro', monospace; font-size: 11px;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: rgba(148,163,184,0.2);
+}
+.closer-seal {
+  position: absolute; z-index: 4; pointer-events: none;
+  bottom: 65px; right: 50px; width: 120px; height: 120px;
+  opacity: 0.45;
+  filter: drop-shadow(0 0 14px rgba(59,130,246,0.15));
+}
+.closer-dither {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 50px; z-index: 5; pointer-events: none;
 }
 `;

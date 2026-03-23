@@ -122,13 +122,17 @@ export async function GET(
     ?? scan.domain
     ?? '';
 
-  // Get user email for "Prepared by"
-  let userEmail = '';
-  if (user?.email) {
-    userEmail = user.email;
+  // Get user display name for "Prepared by"
+  let userName = '';
+  if (user) {
+    userName = user.user_metadata?.['full_name'] as string
+      ?? user.user_metadata?.['name'] as string
+      ?? user.email ?? '';
   } else if (scan.user_id) {
     const { data: scanUser } = await serviceClient.auth.admin.getUserById(scan.user_id);
-    userEmail = scanUser?.user?.email ?? '';
+    userName = scanUser?.user?.user_metadata?.['full_name'] as string
+      ?? scanUser?.user?.user_metadata?.['name'] as string
+      ?? scanUser?.user?.email ?? '';
   }
 
   // Build render context
@@ -136,7 +140,7 @@ export async function GET(
     domain: scan.domain ?? scanId,
     businessName,
     scanDate: scan.created_at ?? new Date().toISOString(),
-    userEmail,
+    userEmail: userName,
     marketingIQ: scan.marketing_iq as number | null,
     marketingIQLabel: scan.marketing_iq != null ? getMarketingIQLabel(scan.marketing_iq as number) : null,
     ai: aiOutput,
