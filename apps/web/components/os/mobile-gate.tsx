@@ -270,8 +270,8 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
             </div>
           </div>
 
-          {/* ③ Space between headline and nudge */}
-          <div style={{ flex: 4 }} />
+          {/* ③ Space between headline and nudge — largest gap, pushes CTA block down */}
+          <div style={{ flex: 8 }} />
 
           {/* Nudge CTA + Arrow */}
           <div className="flex flex-col items-center select-none">
@@ -292,15 +292,15 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
           </div>
 
           {/* ④ Space between nudge and input */}
-          <div style={{ flex: 2 }} />
+          <div style={{ flex: 1 }} />
 
           {/* Scan input — stacked vertically on mobile */}
           <div className="w-full max-w-md px-gs-4 mobile-scan-input-stack">
             <ScanInput variant="dialog" />
           </div>
 
-          {/* ⑤ Bottom breathing room */}
-          <div style={{ flex: 1 }} />
+          {/* ⑤ Bottom breathing room — small, keeps Turnstile off viewport edge */}
+          <div style={{ minHeight: '16px' }} />
         </section>
 
         <SectionDivider />
