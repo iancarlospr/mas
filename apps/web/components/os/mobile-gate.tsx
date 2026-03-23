@@ -201,11 +201,11 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
         <section ref={heroRef} className="flex flex-col items-center pt-gs-6 pb-gs-4">
 
           {/* ASCII Title — full-bleed, scaled for mobile */}
-          <div className="w-full px-gs-2 flex justify-center">
+          <div className="w-full overflow-hidden flex justify-center" style={{ padding: '0 4px' }}>
             <pre
-              className="font-data leading-none whitespace-pre select-none text-center w-full"
+              className="font-data leading-none whitespace-pre select-none text-center"
               style={{
-                fontSize: 'clamp(3.8px, 2.35vw, 12px)',
+                fontSize: 'clamp(3.2px, 1.92vw, 12px)',
                 lineHeight: '1.05',
                 color: 'var(--gs-base)',
                 textShadow: '0 0 8px var(--gs-base), 0 0 20px rgba(255,178,239,0.3)',
