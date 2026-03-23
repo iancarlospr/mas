@@ -218,8 +218,11 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
           {/* Dither strip — full bleed, top */}
           <DitherStrip />
 
+          {/* ① Space above logo */}
+          <div style={{ flex: 2 }} />
+
           {/* ASCII Title — full-bleed, scaled for mobile */}
-          <div className="w-full overflow-hidden flex justify-center mt-gs-4" style={{ padding: '0 4px' }}>
+          <div className="w-full overflow-hidden flex justify-center" style={{ padding: '0 4px' }}>
             <pre
               className="font-data leading-none whitespace-pre select-none text-center"
               style={{
@@ -233,8 +236,11 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
             </pre>
           </div>
 
+          {/* ② Space between logo and headline */}
+          <div style={{ flex: 3 }} />
+
           {/* Chloe + Headline */}
-          <div className="flex items-start gap-gs-3 select-none px-gs-4" style={{ marginTop: '32px' }}>
+          <div className="flex items-start gap-gs-3 select-none px-gs-4">
             <ChloeSprite state="idle" size={64} className="flex-shrink-0 mt-[4px]" />
             <div>
               <p
@@ -264,8 +270,8 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
             </div>
           </div>
 
-          {/* Spacer — distributes space evenly */}
-          <div className="flex-1 min-h-[24px]" />
+          {/* ③ Space between headline and nudge */}
+          <div style={{ flex: 4 }} />
 
           {/* Nudge CTA + Arrow */}
           <div className="flex flex-col items-center select-none">
@@ -285,13 +291,16 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
             <CurvedArrow />
           </div>
 
-          {/* Spacer */}
-          <div className="flex-1 min-h-[16px]" />
+          {/* ④ Space between nudge and input */}
+          <div style={{ flex: 2 }} />
 
           {/* Scan input — stacked vertically on mobile */}
           <div className="w-full max-w-md px-gs-4 mobile-scan-input-stack">
             <ScanInput variant="dialog" />
           </div>
+
+          {/* ⑤ Bottom breathing room */}
+          <div style={{ flex: 1 }} />
         </section>
 
         <SectionDivider />
