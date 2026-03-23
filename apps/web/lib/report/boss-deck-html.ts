@@ -483,9 +483,6 @@ function renderWins(narrative: string, highlights: BossDeckAIOutput['wins_highli
     `<span class="str-pill" style="background:${lightBg(s.light)};color:${lightColor(s.light)}">${esc(s.name)}</span>`
   ).join('') : '';
 
-  // Dynamic grid sizing: if 4+ widgets use 2 rows, otherwise 1 row
-  const gridCols = widgets.length >= 4 ? Math.ceil(widgets.length / 2) : widgets.length;
-
   return `<div class="page wins-page">
   <!-- Light header section -->
   <div class="wins-top-section">
@@ -1013,8 +1010,16 @@ body { font-family: 'DM Sans', system-ui, sans-serif; font-size: 13px; color: #1
   .bar-grain,
   .bar-grain-light,
   .results-grain,
-  .closer-grain {
+  .closer-grain,
+  .wins-band-grain {
     opacity: 0 !important;
+  }
+  .wins-dark-band {
+    background: linear-gradient(135deg, rgba(6,10,20,0.95) 0%, rgba(10,22,40,0.93) 30%, rgba(14,31,58,0.93) 60%, rgba(10,22,40,0.95) 100%) !important;
+  }
+  .widget {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
   }
 }
 @media screen { body { margin-top: 50px; } }
@@ -1172,7 +1177,7 @@ body { font-family: 'DM Sans', system-ui, sans-serif; font-size: 13px; color: #1
 
 /* ═══ WINS v3 — Split layout (light header → dark data band → light stats) ═══ */
 .wins-page {
-  background: #F8FAFC;
+  background: #F8FAFC; color: #1E293B;
   display: flex; flex-direction: column;
 }
 .wins-top-section {
