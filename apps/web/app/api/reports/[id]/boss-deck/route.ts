@@ -89,7 +89,7 @@ export async function GET(
     .from('module_results')
     .select('module_id, data')
     .eq('scan_id', scanId)
-    .in('module_id', ['M46', 'M42', 'M43', 'M45']);
+    .in('module_id', ['M46', 'M42', 'M43', 'M45', 'M03', 'M06', 'M21', 'M22', 'M24', 'M25', 'M26']);
 
   const resultMap = new Map<string, Record<string, unknown>>();
   for (const row of moduleResults ?? []) {
@@ -165,6 +165,13 @@ export async function GET(
     hasM45: m45StackAnalysis != null,
     coverImageDataUri: loadImageAsDataUri('boss-deck/hero-cover.jpg', 'image/jpeg'),
     closerImageDataUri: loadImageAsDataUri('boss-deck/hero-horizon.jpg', 'image/jpeg'),
+    m03Data: resultMap.get('M03') ?? null,
+    m06Data: resultMap.get('M06') ?? null,
+    m21Data: resultMap.get('M21') ?? null,
+    m22Data: resultMap.get('M22') ?? null,
+    m24Data: resultMap.get('M24') ?? null,
+    m25Data: resultMap.get('M25') ?? null,
+    m26Data: resultMap.get('M26') ?? null,
   };
 
   const html = renderBossDeck(renderCtx);
