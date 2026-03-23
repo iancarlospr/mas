@@ -974,12 +974,83 @@ body { font-family: 'DM Sans', system-ui, sans-serif; font-size: 13px; color: #1
     content: '' !important;
     display: block !important;
   }
+  /* Kill all grain/noise layers — filter:url(#grain) renders as artifacts */
   .bar-grain,
   .bar-grain-light,
   .results-grain,
   .closer-grain,
   .wins-grain {
-    opacity: 0 !important;
+    display: none !important;
+  }
+
+  /* Kill all backdrop-filter — renders as opaque boxes in PDF */
+  * {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  /* Closer page — filter:blur() on bg image renders as visible box */
+  .closer-bg {
+    filter: saturate(0.4) brightness(0.2) !important;
+  }
+  .closer-vignette {
+    background: radial-gradient(
+      ellipse 70% 65% at 50% 45%,
+      transparent 0%,
+      rgba(4,6,16,0.2) 40%,
+      rgba(4,6,16,0.6) 65%,
+      rgba(4,6,16,0.9) 100%
+    ) !important;
+  }
+  /* Kill text-shadow glows that render as artifacts */
+  .closer-ascii {
+    text-shadow: none !important;
+    color: #60A5FA !important;
+  }
+  .closer-domain-name {
+    text-shadow: none !important;
+  }
+  .closer-score-num {
+    text-shadow: none !important;
+    filter: none !important;
+  }
+  .closer-signoff {
+    text-shadow: none !important;
+  }
+  .closer-rule {
+    box-shadow: none !important;
+  }
+  .closer-seal {
+    filter: none !important;
+  }
+  .closer-line-top {
+    box-shadow: none !important;
+  }
+
+  /* Glow layers — radial-gradient renders fine, but filter:url breaks */
+  .closer-glow-blue,
+  .closer-glow-gold,
+  .closer-glow-center,
+  .closer-glow-top {
+    opacity: 0.7 !important;
+  }
+
+  /* Results page glow layers */
+  .results-grain {
+    display: none !important;
+  }
+  .results-gold-line {
+    box-shadow: none !important;
+  }
+
+  /* Projection dots — box-shadow glow renders as squares */
+  .proj-dot {
+    box-shadow: none !important;
+  }
+
+  /* Wins page */
+  .wins-glow-1, .wins-glow-2 {
+    opacity: 0.7 !important;
   }
 }
 @media screen { body { margin-top: 50px; } }
