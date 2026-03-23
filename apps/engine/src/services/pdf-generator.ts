@@ -79,38 +79,37 @@ export async function generatePresentationPDF(
 
     // Screenshot every slide in screen mode
     const slides = await page.$$('.slide-page');
-    console.log(`[presentation-pdf] Found ${slides.length} slides, capturing...`);
+    const total = slides.length;
+    console.log(`[presentation-pdf] Found ${total} slides, capturing...`);
 
-    if (slides.length === 0) {
+    if (total === 0) {
       throw new Error('No slides rendered on the page');
     }
 
-    const pngBuffers: Buffer[] = [];
-    for (let i = 0; i < slides.length; i++) {
-      const png = await slides[i]!.screenshot({ type: 'png' });
-      pngBuffers.push(Buffer.from(png));
-    }
-    console.log(`[presentation-pdf] Captured ${pngBuffers.length} slides`);
-
-    // Assemble PDF — hero/tail as PNG, bulk as JPEG
+    // Assemble PDF incrementally — screenshot → embed → discard buffer.
+    // Avoids holding all 52 PNGs in memory (would exceed 768MB Docker limit).
     const pdf = await PDFDocument.create();
-    const total = pngBuffers.length;
     const HERO_COUNT = 3;
     const TAIL_COUNT = 3;
 
     for (let i = 0; i < total; i++) {
+      const png = Buffer.from(await slides[i]!.screenshot({ type: 'png' }));
       const isHero = i < HERO_COUNT || i >= total - TAIL_COUNT;
       let img;
 
       if (isHero) {
-        img = await pdf.embedPng(pngBuffers[i]!);
+        img = await pdf.embedPng(png);
       } else {
-        const jpegBuf = await sharp(pngBuffers[i]!).jpeg({ quality: 85 }).toBuffer();
+        const jpegBuf = await sharp(png).jpeg({ quality: 85 }).toBuffer();
         img = await pdf.embedJpg(jpegBuf);
       }
 
       const p = pdf.addPage([PRES_PAGE_W, PRES_PAGE_H]);
       p.drawImage(img, { x: 0, y: 0, width: PRES_PAGE_W, height: PRES_PAGE_H });
+
+      if ((i + 1) % 10 === 0) {
+        console.log(`[presentation-pdf] Processed ${i + 1}/${total} slides`);
+      }
     }
 
     const pdfBytes = await pdf.save();
