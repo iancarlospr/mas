@@ -106,35 +106,43 @@ function fmtNum(n: number): string {
   return n.toLocaleString();
 }
 
-interface CWVData { lcpSec: number; fcpSec: number; lcpHealth: string; fcpHealth: string; }
+interface CWVMetric { sec: number; health: string; label: string; max: number; }
+interface CWVData { metrics: CWVMetric[]; }
 function extractCWV(m03: Record<string, unknown> | null | undefined): CWVData | null {
   if (!m03) return null;
-  const metrics = m03['metrics'] as Record<string, unknown> | undefined;
+  const raw = m03['metrics'] as Record<string, unknown> | undefined;
   const crux = m03['cruxFieldData'] as Record<string, unknown> | undefined;
   const cruxP75 = (f: string) => { const m = crux?.[f] as Record<string, unknown> | undefined; return typeof m?.['p75'] === 'number' ? m['p75'] as number : null; };
-  const lcpMs = typeof metrics?.['lcp'] === 'number' ? metrics['lcp'] as number : cruxP75('lcp');
-  const fcpMs = typeof metrics?.['fcp'] === 'number' ? metrics['fcp'] as number : cruxP75('fcp');
-  if (lcpMs == null && fcpMs == null) return null;
-  const lcpSec = lcpMs != null ? lcpMs / 1000 : 0;
-  const fcpSec = fcpMs != null ? fcpMs / 1000 : 0;
   const health = (sec: number, good: number, warn: number) => sec <= good ? 'good' : sec <= warn ? 'warn' : 'poor';
-  return { lcpSec, fcpSec, lcpHealth: health(lcpSec, 2.5, 4.0), fcpHealth: health(fcpSec, 1.8, 3.0) };
+  const good: CWVMetric[] = [];
+  // LCP — only show if valid (> 0) and good (< 2.5s)
+  const lcpMs = typeof raw?.['lcp'] === 'number' ? raw['lcp'] as number : cruxP75('lcp');
+  if (lcpMs != null && lcpMs > 0) { const s = lcpMs / 1000; const h = health(s, 2.5, 4.0); if (h === 'good') good.push({ sec: s, health: h, label: 'LCP', max: 6 }); }
+  // FCP — only show if valid and good (< 1.8s)
+  const fcpMs = typeof raw?.['fcp'] === 'number' ? raw['fcp'] as number : cruxP75('fcp');
+  if (fcpMs != null && fcpMs > 0) { const s = fcpMs / 1000; const h = health(s, 1.8, 3.0); if (h === 'good') good.push({ sec: s, health: h, label: 'FCP', max: 5 }); }
+  // CLS — only show if excellent (< 0.1)
+  const cls = typeof raw?.['cls'] === 'number' ? raw['cls'] as number : cruxP75('cls');
+  if (cls != null && cls >= 0 && cls < 0.1) good.push({ sec: cls, health: 'good', label: 'CLS', max: 0.5 });
+  if (good.length === 0) return null;
+  return { metrics: good };
 }
 
-interface PaidAdsData { fbActive: boolean; googleActive: boolean; fbAds: number; googleAds: number; totalAds: number; tierLabel: string | null; pixelCount: number; }
+interface PaidAdsData { fbActive: boolean; googleActive: boolean; fbAds: number; googleAds: number; totalAds: number; tierLabel: string; pixelCount: number; }
 function extractPaidAds(m21: Record<string, unknown> | null | undefined, m06: Record<string, unknown> | null | undefined): PaidAdsData | null {
-  if (!m21 && !m06) return null;
-  const summary = (m21?.['summary'] as Record<string, unknown>) ?? {};
+  if (!m21) return null;
+  const summary = (m21['summary'] as Record<string, unknown>) ?? {};
   const fbActive = summary['facebookActive'] === true;
   const googleActive = summary['googleSearchActive'] === true;
-  const fbObj = m21?.['facebook'] as Record<string, unknown> | undefined;
-  const googleObj = m21?.['google'] as Record<string, unknown> | undefined;
+  const fbObj = m21['facebook'] as Record<string, unknown> | undefined;
+  const googleObj = m21['google'] as Record<string, unknown> | undefined;
   const fbAds = typeof fbObj?.['totalAdsVisible'] === 'number' ? fbObj['totalAdsVisible'] as number : 0;
   const googleAds = typeof googleObj?.['totalAdsVisible'] === 'number' ? googleObj['totalAdsVisible'] as number : 0;
   const totalAds = fbAds + googleAds;
+  // Only noteworthy if 10+ total ads — below that it's not impressive
+  if (totalAds < 10) return null;
+  const tierLabel = totalAds >= 1000 ? '1,000+' : totalAds >= 200 ? '200+' : totalAds >= 50 ? '50+' : totalAds >= 20 ? '20+' : '10+';
   const pixelCount = typeof m06?.['pixelCount'] === 'number' ? m06['pixelCount'] as number : 0;
-  if (!fbActive && !googleActive && totalAds === 0 && pixelCount === 0) return null;
-  const tierLabel = totalAds >= 1000 ? '1,000+' : totalAds >= 200 ? '200+' : totalAds >= 50 ? '50+' : totalAds >= 20 ? '20+' : totalAds >= 10 ? '10+' : null;
   return { fbActive, googleActive, fbAds, googleAds, totalAds, tierLabel, pixelCount };
 }
 
@@ -150,6 +158,9 @@ function extractSentiment(m22: Record<string, unknown> | null | undefined): Sent
   const neutral = articles.filter(a => a.sentiment === 'neutral').length;
   const negative = articles.filter(a => a.sentiment === 'negative').length;
   const overall = (sentRaw['overallSentiment'] as string) ?? 'neutral';
+  // Only show on "What's Working" if sentiment is positive — negative/mixed is not a win
+  if (overall === 'negative' || overall === 'mixed') return null;
+  if (positive <= negative) return null;
   const pct = (n: number) => total > 0 ? Math.round(n / total * 100) : 0;
   return { positive, neutral, negative, total, overall, posPct: pct(positive), negPct: pct(negative), neuPct: pct(neutral) };
 }
@@ -202,45 +213,45 @@ function extractTopKeyword(m26: Record<string, unknown> | null | undefined): Top
 // ── Slide 2 Widget Renderers ────────────────────────────────
 
 function healthColor(h: string): string { return h === 'good' ? '#22C55E' : h === 'warn' ? '#EAB308' : '#EF4444'; }
-function healthLabel(h: string): string { return h === 'good' ? 'Good' : h === 'warn' ? 'Needs Work' : 'Poor'; }
 
-function svgGauge(valueSec: number, maxSec: number, health: string, label: string): string {
-  const pct = Math.max(0, Math.min(1, valueSec / maxSec));
+function svgGauge(value: number, max: number, health: string, label: string, isCls: boolean): string {
+  const pct = Math.max(0, Math.min(1, value / max));
   const r = 34;
   const circumHalf = Math.PI * r;
   const dash = circumHalf * pct;
   const color = healthColor(health);
+  const display = isCls ? value.toFixed(3) : value.toFixed(1) + 's';
   return `<div class="cwv-gauge">
     <svg width="86" height="50" viewBox="0 0 80 46">
       <path d="M 6 44 A ${r} ${r} 0 0 1 74 44" fill="none" stroke="#E2E8F0" stroke-width="6" stroke-linecap="round" />
       <path d="M 6 44 A ${r} ${r} 0 0 1 74 44" fill="none" stroke="${color}" stroke-width="6" stroke-linecap="round"
         stroke-dasharray="${dash.toFixed(1)} ${circumHalf.toFixed(1)}" />
     </svg>
-    <div class="cwv-val" style="color:${color}">${valueSec.toFixed(1)}s</div>
+    <div class="cwv-val" style="color:${color}">${display}</div>
     <div class="cwv-lbl">${label}</div>
   </div>`;
 }
 
 function renderCWVWidget(cwv: CWVData): string {
-  const worstHealth = cwv.lcpHealth === 'poor' || cwv.fcpHealth === 'poor' ? 'poor' : cwv.lcpHealth === 'warn' || cwv.fcpHealth === 'warn' ? 'warn' : 'good';
   return `<div class="widget">
-    <div class="widget-hdr"><span class="widget-title">CORE WEB VITALS</span></div>
+    <div class="widget-hdr"><span class="widget-title">SITE SPEED</span></div>
     <div class="cwv-row">
-      ${svgGauge(cwv.lcpSec, 6, cwv.lcpHealth, 'LCP')}
-      ${svgGauge(cwv.fcpSec, 5, cwv.fcpHealth, 'FCP')}
+      ${cwv.metrics.map(m => svgGauge(m.sec, m.max, m.health, m.label, m.label === 'CLS')).join('')}
     </div>
-    <div class="widget-verdict" style="color:${healthColor(worstHealth)}">${healthLabel(worstHealth)}</div>
+    <div class="widget-verdict" style="color:#22C55E">Passing</div>
   </div>`;
 }
 
 function renderAdsWidget(ads: PaidAdsData): string {
   const dot = (active: boolean) => `<span class="ads-dot" style="background:${active ? '#22C55E' : '#CBD5E1'}"></span>`;
-  const status = (active: boolean, count: number) => active ? `<span style="color:#22C55E">${count} ad${count !== 1 ? 's' : ''}</span>` : `<span style="color:#94A3B8">None</span>`;
+  const platforms: string[] = [];
+  if (ads.fbActive) platforms.push(`<div class="ads-row">${dot(true)}<span class="ads-name">Facebook / Meta</span><span style="color:#22C55E">${ads.fbAds} ads</span></div>`);
+  if (ads.googleActive) platforms.push(`<div class="ads-row">${dot(true)}<span class="ads-name">Google Search</span><span style="color:#22C55E">${ads.googleAds} ads</span></div>`);
   return `<div class="widget">
-    <div class="widget-hdr"><span class="widget-title">PAID ADS</span></div>
-    <div class="ads-row">${dot(ads.fbActive)}<span class="ads-name">Facebook / Meta</span>${status(ads.fbActive, ads.fbAds)}</div>
-    <div class="ads-row">${dot(ads.googleActive)}<span class="ads-name">Google Search</span>${status(ads.googleActive, ads.googleAds)}</div>
-    ${ads.tierLabel ? `<div class="widget-badge">${ads.tierLabel} Active Ads</div>` : ''}
+    <div class="widget-hdr"><span class="widget-title">ACTIVE ADS</span></div>
+    <div class="ads-hero">${ads.totalAds}</div>
+    <div class="widget-badge">${ads.tierLabel} Ads Running</div>
+    ${platforms.join('')}
     ${ads.pixelCount > 0 ? `<div class="ads-pixels">${ads.pixelCount} tracking pixel${ads.pixelCount !== 1 ? 's' : ''}</div>` : ''}
   </div>`;
 }
@@ -413,7 +424,7 @@ function renderCover(ctx: BossDeckRenderContext, subtitle: string, dateFmt: stri
 function renderWins(narrative: string, highlights: BossDeckAIOutput['wins_highlights'], ctx: BossDeckRenderContext, pageNum: number, totalPages: number): string {
   const strengths = getStrengths(ctx);
 
-  // Extract widget data from raw modules
+  // Extract widget data — only shows noteworthy wins
   const cwv = extractCWV(ctx.m03Data);
   const ads = extractPaidAds(ctx.m21Data, ctx.m06Data);
   const sentiment = extractSentiment(ctx.m22Data);
@@ -429,8 +440,11 @@ function renderWins(narrative: string, highlights: BossDeckAIOutput['wins_highli
 
   // Strength pills (inline)
   const pillsHtml = strengths.length > 0 ? strengths.map(s =>
-    `<span class="str-pill" style="border-color:${lightColor(s.light)};color:${lightColor(s.light)}">${esc(s.name)}</span>`
+    `<span class="str-pill" style="background:${lightBg(s.light)};color:${lightColor(s.light)}">${esc(s.name)}</span>`
   ).join('') : '';
+
+  // Dynamic grid sizing: if 4+ widgets use 2 rows, otherwise 1 row
+  const gridCols = widgets.length >= 4 ? Math.ceil(widgets.length / 2) : widgets.length;
 
   return `<div class="page light-page">
   <div class="page-inner wins-v2">
@@ -447,18 +461,22 @@ function renderWins(narrative: string, highlights: BossDeckAIOutput['wins_highli
       ${pillsHtml ? `<div class="wins-pills">${pillsHtml}</div>` : ''}
     </div>
 
-    ${widgets.length > 0 ? `
-    <div class="wins-widget-grid" style="grid-template-columns:repeat(${widgets.length}, 1fr)">
-      ${widgets.join('\n')}
-    </div>` : ''}
+    <div class="wins-body">
+      ${widgets.length > 0 ? `
+      <div class="wins-widget-grid" style="grid-template-columns:repeat(${gridCols}, 1fr)">
+        ${widgets.join('\n')}
+      </div>` : ''}
 
-    <div class="wins-stats-row">
-      ${highlights.map(h => `
-      <div class="stat-card-sm">
-        <div class="stat-val-sm">${esc(h.metric_value)}</div>
-        <div class="stat-lbl-sm">${esc(h.metric_label)}</div>
-        <div class="stat-ctx-sm">${esc(h.context)}</div>
-      </div>`).join('')}
+      <div class="wins-divider-h"></div>
+
+      <div class="wins-stats-row">
+        ${highlights.map(h => `
+        <div class="stat-card-sm">
+          <div class="stat-val-sm">${esc(h.metric_value)}</div>
+          <div class="stat-lbl-sm">${esc(h.metric_label)}</div>
+          <div class="stat-ctx-sm">${esc(h.context)}</div>
+        </div>`).join('')}
+      </div>
     </div>
   </div>
   ${footer(pageNum, totalPages, 'light', ctx.userEmail)}
@@ -1101,39 +1119,44 @@ body { font-family: 'DM Sans', system-ui, sans-serif; font-size: 13px; color: #1
 
 /* ═══ WINS v2 ═════════════════════════════════════ */
 .wins-v2 {
-  display: flex; flex-direction: column; gap: 0;
+  display: flex; flex-direction: column; height: 100%;
 }
 .wins-header-strip {
-  display: flex; align-items: flex-start; gap: 32px; margin-bottom: 20px;
+  display: flex; align-items: flex-start; gap: 40px; margin-bottom: 24px;
 }
 .wins-header-left { flex: 1; min-width: 0; }
 .wins-title-sm {
-  font-size: 28px !important; margin-bottom: 6px !important; line-height: 1.1;
+  font-size: 28px !important; margin-bottom: 8px !important; line-height: 1.1;
 }
 .wins-narrative-sm {
-  font-size: 13px; color: #475569; line-height: 1.6;
-  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  font-size: 13px; color: #475569; line-height: 1.65;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
 }
 .wins-pills {
-  display: flex; flex-wrap: wrap; gap: 6px; flex-shrink: 0; padding-top: 6px;
+  display: flex; flex-wrap: wrap; gap: 6px; flex-shrink: 0; padding-top: 8px;
 }
 .str-pill {
   display: inline-block; font-family: 'Sora', sans-serif; font-size: 9px; font-weight: 700;
   letter-spacing: 0.08em; text-transform: uppercase;
-  padding: 3px 10px; border-radius: 4px; border: 1px solid; white-space: nowrap;
+  padding: 4px 12px; border-radius: 4px; white-space: nowrap;
+}
+
+/* Body fills remaining space */
+.wins-body {
+  flex: 1; display: flex; flex-direction: column; gap: 0;
 }
 
 /* Widget grid */
 .wins-widget-grid {
-  display: grid; gap: 14px; margin-bottom: 18px;
+  display: grid; gap: 16px; flex: 1;
 }
 .widget {
-  background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 10px;
-  padding: 16px 18px; box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-  display: flex; flex-direction: column; gap: 6px;
+  background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px;
+  padding: 20px 22px; box-shadow: 0 1px 4px rgba(0,0,0,0.05), 0 0 0 1px rgba(59,130,246,0.04);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
 }
 .widget-hdr {
-  display: flex; align-items: center; gap: 6px; margin-bottom: 2px;
+  display: flex; align-items: center; gap: 6px; margin-bottom: 4px; width: 100%;
 }
 .widget-title {
   font-family: 'Sora', sans-serif; font-size: 9px; font-weight: 700;
@@ -1141,40 +1164,50 @@ body { font-family: 'DM Sans', system-ui, sans-serif; font-size: 13px; color: #1
 }
 .widget-verdict {
   font-family: 'Sora', sans-serif; font-size: 11px; font-weight: 700;
-  letter-spacing: 0.06em; text-align: center; margin-top: 2px;
+  letter-spacing: 0.08em; text-transform: uppercase; margin-top: 4px;
 }
 .widget-badge {
   display: inline-block; font-family: 'Sora', sans-serif; font-size: 10px; font-weight: 700;
-  letter-spacing: 0.06em; padding: 3px 10px; border-radius: 4px;
-  background: rgba(59,130,246,0.1); color: #3B82F6; align-self: flex-start;
+  letter-spacing: 0.06em; padding: 4px 12px; border-radius: 4px;
+  background: rgba(59,130,246,0.1); color: #3B82F6;
+}
+
+/* Horizontal divider between widgets and stat cards */
+.wins-divider-h {
+  height: 1px; margin: 20px 0;
+  background: linear-gradient(90deg, transparent 0%, #CBD5E1 15%, #CBD5E1 85%, transparent 100%);
 }
 
 /* CWV gauges */
-.cwv-row { display: flex; justify-content: center; gap: 20px; }
+.cwv-row { display: flex; justify-content: center; gap: 24px; }
 .cwv-gauge { text-align: center; }
 .cwv-val {
-  font-family: 'Sora', sans-serif; font-size: 20px; font-weight: 800;
-  margin-top: -4px; line-height: 1;
+  font-family: 'Sora', sans-serif; font-size: 22px; font-weight: 800;
+  margin-top: -2px; line-height: 1;
 }
 .cwv-lbl {
   font-family: 'Sora', sans-serif; font-size: 9px; font-weight: 700;
-  letter-spacing: 0.12em; color: #94A3B8; margin-top: 2px;
+  letter-spacing: 0.12em; color: #94A3B8; margin-top: 3px;
 }
 
 /* Paid ads */
+.ads-hero {
+  font-family: 'Sora', sans-serif; font-size: 36px; font-weight: 800;
+  color: #0F172A; line-height: 1; text-align: center;
+}
 .ads-row {
-  display: flex; align-items: center; gap: 8px;
+  display: flex; align-items: center; gap: 8px; width: 100%;
   font-size: 12px; color: #334155; font-weight: 500;
 }
 .ads-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
 .ads-name { flex: 1; }
 .ads-pixels {
-  font-size: 11px; color: #64748B; font-style: italic;
+  font-size: 11px; color: #64748B; font-style: italic; text-align: center;
 }
 
 /* Sentiment */
 .sentiment-total {
-  font-family: 'Sora', sans-serif; font-size: 28px; font-weight: 800;
+  font-family: 'Sora', sans-serif; font-size: 32px; font-weight: 800;
   color: #0F172A; line-height: 1; text-align: center;
 }
 .sentiment-sub {
@@ -1183,26 +1216,25 @@ body { font-family: 'DM Sans', system-ui, sans-serif; font-size: 13px; color: #1
 }
 .sentiment-bar {
   display: flex; height: 8px; border-radius: 4px; overflow: hidden;
-  background: #E2E8F0; gap: 1px;
+  background: #E2E8F0; gap: 1px; width: 100%;
 }
 .sentiment-legend {
-  display: flex; justify-content: space-between;
+  display: flex; justify-content: space-between; width: 100%;
   font-size: 11px; font-weight: 600;
 }
 .sentiment-overall {
   font-family: 'Sora', sans-serif; font-size: 10px; font-weight: 700;
-  letter-spacing: 0.1em; text-transform: uppercase; color: #64748B;
-  text-align: center;
+  letter-spacing: 0.1em; text-transform: uppercase; color: #22C55E;
 }
 
 /* Traffic */
 .traffic-hero {
-  font-family: 'Sora', sans-serif; font-size: 32px; font-weight: 800;
+  font-family: 'Sora', sans-serif; font-size: 36px; font-weight: 800;
   color: #0F172A; line-height: 1; text-align: center;
 }
 .traffic-sub {
   font-size: 10px; color: #94A3B8; text-align: center;
-  letter-spacing: 0.04em; margin-bottom: 2px;
+  letter-spacing: 0.04em;
 }
 .traffic-split {
   display: flex; justify-content: center; gap: 14px;
@@ -1217,7 +1249,7 @@ body { font-family: 'DM Sans', system-ui, sans-serif; font-size: 13px; color: #1
 
 /* Top keyword */
 .kw-name {
-  font-family: 'Source Code Pro', monospace; font-size: 16px; font-weight: 700;
+  font-family: 'Source Code Pro', monospace; font-size: 18px; font-weight: 700;
   color: #0F172A; text-align: center; line-height: 1.2;
   word-break: break-word;
 }
@@ -1228,28 +1260,28 @@ body { font-family: 'DM Sans', system-ui, sans-serif; font-size: 13px; color: #1
   font-size: 11px; color: #64748B; text-align: center;
 }
 
-/* AI stat cards (compact) */
+/* AI stat cards (compact row at bottom) */
 .wins-stats-row {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
-  margin-top: auto;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+  flex-shrink: 0;
 }
 .stat-card-sm {
-  padding: 14px 16px; border-radius: 8px;
+  padding: 18px 20px; border-radius: 10px;
   background: #FFFFFF; border: 1px solid #E2E8F0;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
 }
 .stat-val-sm {
-  font-family: 'Sora', sans-serif; font-size: 26px; font-weight: 800;
+  font-family: 'Sora', sans-serif; font-size: 28px; font-weight: 800;
   color: #0F172A; line-height: 1; letter-spacing: -0.02em;
-  margin-bottom: 4px;
+  margin-bottom: 5px;
 }
 .stat-lbl-sm {
   font-family: 'Sora', sans-serif; font-size: 9px; font-weight: 700;
   letter-spacing: 0.1em; text-transform: uppercase;
-  color: #3B82F6; margin-bottom: 4px;
+  color: #3B82F6; margin-bottom: 5px;
 }
 .stat-ctx-sm {
-  font-size: 12px; color: #64748B; line-height: 1.4;
+  font-size: 12px; color: #64748B; line-height: 1.45;
 }
 
 /* ═══ ISSUES ══════════════════════════════════════ */
