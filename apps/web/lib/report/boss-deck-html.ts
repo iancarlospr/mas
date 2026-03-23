@@ -989,69 +989,46 @@ body { font-family: 'DM Sans', system-ui, sans-serif; font-size: 13px; color: #1
     -webkit-backdrop-filter: none !important;
   }
 
-  /* Closer page — filter:blur() on bg image renders as visible box */
-  .closer-bg {
-    filter: saturate(0.4) brightness(0.2) !important;
-  }
-  .closer-vignette {
-    background: radial-gradient(
-      ellipse 70% 65% at 50% 45%,
-      transparent 0%,
-      rgba(4,6,16,0.2) 40%,
-      rgba(4,6,16,0.6) 65%,
-      rgba(4,6,16,0.9) 100%
-    ) !important;
-  }
-  /* Kill text-shadow glows that render as artifacts */
-  .closer-ascii {
-    text-shadow: none !important;
-    color: #60A5FA !important;
-  }
-  .closer-domain-name {
-    text-shadow: none !important;
-  }
-  .closer-score-num {
-    text-shadow: none !important;
+  /* ── Kill ALL filters, box-shadows, text-shadows in print ── */
+  * {
     filter: none !important;
-  }
-  .closer-signoff {
+    -webkit-filter: none !important;
     text-shadow: none !important;
-  }
-  .closer-rule {
-    box-shadow: none !important;
-  }
-  .closer-seal {
-    filter: none !important;
-  }
-  .closer-line-top {
     box-shadow: none !important;
   }
 
-  /* Glow layers — radial-gradient renders fine, but filter:url breaks */
+  /* Closer page — hide bg image entirely, use solid dark bg */
+  .closer-bg { display: none !important; }
+  .closer-plasma {
+    background: linear-gradient(160deg, #040610 0%, #0A1628 30%, #0E1F3A 50%, #0A1628 70%, #040610 100%) !important;
+    opacity: 1 !important;
+  }
+  .closer-vignette { display: none !important; }
   .closer-glow-blue,
   .closer-glow-gold,
   .closer-glow-center,
-  .closer-glow-top {
-    opacity: 0.7 !important;
+  .closer-glow-top { display: none !important; }
+  .closer-line-top {
+    background: linear-gradient(90deg, transparent 10%, rgba(201,169,110,0.4) 30%, rgba(245,158,11,0.6) 50%, rgba(201,169,110,0.4) 70%, transparent 90%) !important;
   }
+  .closer-ascii { color: #60A5FA !important; }
 
-  /* Results page glow layers */
-  .results-grain {
-    display: none !important;
-  }
-  .results-gold-line {
-    box-shadow: none !important;
-  }
+  /* Cover page — hide glow pseudo-elements */
+  .cover-bottom-bar::before,
+  .cover-bottom-bar::after { display: none !important; }
 
-  /* Projection dots — box-shadow glow renders as squares */
-  .proj-dot {
-    box-shadow: none !important;
-  }
+  /* Results page — simplify glow layers */
+  .results-glow-1,
+  .results-glow-2,
+  .results-glow-3 { opacity: 0.5 !important; }
+  .results-vignette { display: none !important; }
 
-  /* Wins page */
-  .wins-glow-1, .wins-glow-2 {
-    opacity: 0.7 !important;
-  }
+  /* Wins page — simplify */
+  .wins-glow-1, .wins-glow-2 { opacity: 0.5 !important; }
+
+  /* Actions band — kill pseudo-element glows */
+  .actions-band::before,
+  .actions-band::after { display: none !important; }
 }
 @media screen { body { margin-top: 50px; } }
 
