@@ -223,7 +223,7 @@ function svgGauge(value: number, max: number, health: string, label: string, isC
   const display = isCls ? value.toFixed(3) : value.toFixed(1) + 's';
   return `<div class="cwv-gauge">
     <svg width="86" height="50" viewBox="0 0 80 46">
-      <path d="M 6 44 A ${r} ${r} 0 0 1 74 44" fill="none" stroke="#E2E8F0" stroke-width="6" stroke-linecap="round" />
+      <path d="M 6 44 A ${r} ${r} 0 0 1 74 44" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="6" stroke-linecap="round" />
       <path d="M 6 44 A ${r} ${r} 0 0 1 74 44" fill="none" stroke="${color}" stroke-width="6" stroke-linecap="round"
         stroke-dasharray="${dash.toFixed(1)} ${circumHalf.toFixed(1)}" />
     </svg>
@@ -234,63 +234,103 @@ function svgGauge(value: number, max: number, health: string, label: string, isC
 
 function renderCWVWidget(cwv: CWVData): string {
   return `<div class="widget">
-    <div class="widget-hdr"><span class="widget-title">SITE SPEED</span></div>
-    <div class="cwv-row">
-      ${cwv.metrics.map(m => svgGauge(m.sec, m.max, m.health, m.label, m.label === 'CLS')).join('')}
+    <div class="widget-accent" style="background:linear-gradient(180deg,#22C55E,#16A34A)"></div>
+    <div class="widget-body">
+      <div class="widget-hdr">
+        <span class="widget-icon">&#x26A1;</span>
+        <span class="widget-title">SITE SPEED</span>
+      </div>
+      <div class="cwv-row">
+        ${cwv.metrics.map(m => svgGauge(m.sec, m.max, m.health, m.label, m.label === 'CLS')).join('')}
+      </div>
+      <div class="widget-verdict">PASSING</div>
     </div>
-    <div class="widget-verdict" style="color:#22C55E">Passing</div>
   </div>`;
 }
 
 function renderAdsWidget(ads: PaidAdsData): string {
-  const dot = (active: boolean) => `<span class="ads-dot" style="background:${active ? '#22C55E' : '#CBD5E1'}"></span>`;
+  const dot = (active: boolean) => `<span class="ads-dot" style="background:${active ? '#22C55E' : '#475569'}"></span>`;
   const platforms: string[] = [];
-  if (ads.fbActive) platforms.push(`<div class="ads-row">${dot(true)}<span class="ads-name">Facebook / Meta</span><span style="color:#22C55E">${ads.fbAds} ads</span></div>`);
-  if (ads.googleActive) platforms.push(`<div class="ads-row">${dot(true)}<span class="ads-name">Google Search</span><span style="color:#22C55E">${ads.googleAds} ads</span></div>`);
+  if (ads.fbActive) platforms.push(`<div class="ads-row">${dot(true)}<span class="ads-name">Facebook / Meta</span><span class="ads-count">${ads.fbAds}</span></div>`);
+  if (ads.googleActive) platforms.push(`<div class="ads-row">${dot(true)}<span class="ads-name">Google Search</span><span class="ads-count">${ads.googleAds}</span></div>`);
   return `<div class="widget">
-    <div class="widget-hdr"><span class="widget-title">ACTIVE ADS</span></div>
-    <div class="ads-hero">${ads.totalAds}</div>
-    <div class="widget-badge">${ads.tierLabel} Ads Running</div>
-    ${platforms.join('')}
-    ${ads.pixelCount > 0 ? `<div class="ads-pixels">${ads.pixelCount} tracking pixel${ads.pixelCount !== 1 ? 's' : ''}</div>` : ''}
+    <div class="widget-accent" style="background:linear-gradient(180deg,#3B82F6,#2563EB)"></div>
+    <div class="widget-body">
+      <div class="widget-hdr">
+        <span class="widget-icon">&#x1F4E2;</span>
+        <span class="widget-title">ACTIVE ADS</span>
+      </div>
+      <div class="ads-hero">${ads.totalAds}</div>
+      <div class="widget-badge">${ads.tierLabel} Running</div>
+      <div class="ads-platforms">${platforms.join('')}</div>
+      ${ads.pixelCount > 0 ? `<div class="ads-pixels">${ads.pixelCount} tracking pixel${ads.pixelCount !== 1 ? 's' : ''}</div>` : ''}
+    </div>
   </div>`;
 }
 
 function renderSentimentWidget(s: SentimentData): string {
   const barSeg = (pct: number, color: string) => pct > 0 ? `<div style="width:${pct}%;background:${color};height:100%;border-radius:3px"></div>` : '';
   return `<div class="widget">
-    <div class="widget-hdr"><span class="widget-title">NEWS SENTIMENT</span></div>
-    <div class="sentiment-total">${s.total}<span class="sentiment-sub">Mentions</span></div>
-    <div class="sentiment-bar">${barSeg(s.posPct, '#22C55E')}${barSeg(s.neuPct, '#94A3B8')}${barSeg(s.negPct, '#EF4444')}</div>
-    <div class="sentiment-legend">
-      <span style="color:#22C55E">+${s.positive} (${s.posPct}%)</span>
-      <span style="color:#EF4444">&minus;${s.negative} (${s.negPct}%)</span>
+    <div class="widget-accent" style="background:linear-gradient(180deg,#22C55E,#16A34A)"></div>
+    <div class="widget-body">
+      <div class="widget-hdr">
+        <span class="widget-icon">&#x1F4F0;</span>
+        <span class="widget-title">NEWS SENTIMENT</span>
+      </div>
+      <div class="sentiment-total">${s.total}</div>
+      <div class="sentiment-sub-label">Media Mentions</div>
+      <div class="sentiment-bar">${barSeg(s.posPct, '#22C55E')}${barSeg(s.neuPct, '#475569')}${barSeg(s.negPct, '#EF4444')}</div>
+      <div class="sentiment-legend">
+        <span class="sent-pos">+${s.positive} (${s.posPct}%)</span>
+        <span class="sent-neg">&minus;${s.negative} (${s.negPct}%)</span>
+      </div>
+      <div class="widget-verdict">${esc(s.overall.charAt(0).toUpperCase() + s.overall.slice(1))}</div>
     </div>
-    <div class="sentiment-overall">${esc(s.overall.charAt(0).toUpperCase() + s.overall.slice(1))}</div>
   </div>`;
 }
 
 function renderTrafficWidget(t: TrafficData): string {
+  const orgPct = t.total > 0 ? Math.round(t.organic / t.total * 100) : 0;
+  const paidPct = 100 - orgPct;
   return `<div class="widget">
-    <div class="widget-hdr"><span class="widget-title">TRAFFIC VOLUME</span></div>
-    <div class="traffic-hero">${t.totalFmt}</div>
-    <div class="traffic-sub">monthly visits (est.)</div>
-    <div class="widget-badge">${t.tierLabel}</div>
-    <div class="traffic-split">
-      <span style="color:#22C55E">Organic ${fmtNum(t.organic)}</span>
-      <span style="color:#EAB308">Paid ${fmtNum(t.paid)}</span>
+    <div class="widget-accent" style="background:linear-gradient(180deg,#8B5CF6,#6D28D9)"></div>
+    <div class="widget-body">
+      <div class="widget-hdr">
+        <span class="widget-icon">&#x1F4C8;</span>
+        <span class="widget-title">TRAFFIC VOLUME</span>
+      </div>
+      <div class="traffic-hero">${t.totalFmt}</div>
+      <div class="traffic-tier">${t.tierLabel} monthly visits</div>
+      <div class="traffic-bar-wrap">
+        <div class="traffic-bar">
+          <div class="traffic-bar-org" style="width:${orgPct}%"></div>
+          <div class="traffic-bar-paid" style="width:${paidPct}%"></div>
+        </div>
+        <div class="traffic-legend">
+          <span class="traf-org"><span class="traf-dot" style="background:#22C55E"></span>Organic ${fmtNum(t.organic)}</span>
+          <span class="traf-paid"><span class="traf-dot" style="background:#F59E0B"></span>Paid ${fmtNum(t.paid)}</span>
+        </div>
+      </div>
+      ${t.topCountryCode ? `<div class="traffic-country">#1 Market <span class="country-code">${t.topCountryCode}</span></div>` : ''}
     </div>
-    ${t.topCountryCode ? `<div class="traffic-country">#1 Market: <strong>${t.topCountryCode}</strong></div>` : ''}
   </div>`;
 }
 
 function renderKeywordWidget(kw: TopKeywordData): string {
   return `<div class="widget">
-    <div class="widget-hdr"><span class="widget-title">TOP KEYWORD</span></div>
-    <div class="kw-name">&ldquo;${esc(kw.keyword)}&rdquo;</div>
-    <div class="kw-pos">Position <strong style="color:#3B82F6">#${kw.position}</strong></div>
-    <div class="kw-vol">${kw.volumeFmt} monthly searches</div>
-    <div class="kw-total">${fmtNum(kw.totalOrganic)} keywords ranked</div>
+    <div class="widget-accent" style="background:linear-gradient(180deg,#F59E0B,#D97706)"></div>
+    <div class="widget-body">
+      <div class="widget-hdr">
+        <span class="widget-icon">&#x1F50D;</span>
+        <span class="widget-title">TOP KEYWORD</span>
+      </div>
+      <div class="kw-name">&ldquo;${esc(kw.keyword)}&rdquo;</div>
+      <div class="kw-pos">Position <span class="kw-rank">#${kw.position}</span></div>
+      <div class="kw-meta">
+        <span class="kw-vol">${kw.volumeFmt} searches/mo</span>
+        <span class="kw-total">${fmtNum(kw.totalOrganic)} ranked</span>
+      </div>
+    </div>
   </div>`;
 }
 
@@ -446,32 +486,49 @@ function renderWins(narrative: string, highlights: BossDeckAIOutput['wins_highli
   // Dynamic grid sizing: if 4+ widgets use 2 rows, otherwise 1 row
   const gridCols = widgets.length >= 4 ? Math.ceil(widgets.length / 2) : widgets.length;
 
-  return `<div class="page light-page">
-  <div class="page-inner">
-    <div class="section-header-light">
-      <div class="section-number">02</div>
-      <div class="section-label">CURRENT PERFORMANCE</div>
-    </div>
-
-    <div class="wins-header-strip">
-      <div class="wins-header-left">
-        <h2 class="title-light wins-title-sm">Here&rsquo;s What&rsquo;s Already Working</h2>
-        <p class="wins-narrative-sm">${esc(narrative)}</p>
+  return `<div class="page wins-page">
+  <!-- Light header section -->
+  <div class="wins-top-section">
+    <div class="wins-top-inner">
+      <div class="section-header-light">
+        <div class="section-number">02</div>
+        <div class="section-label">CURRENT PERFORMANCE</div>
       </div>
-      ${pillsHtml ? `<div class="wins-pills">${pillsHtml}</div>` : ''}
+
+      <div class="wins-header-strip">
+        <div class="wins-header-left">
+          <h2 class="title-light wins-title-sm">Here&rsquo;s What&rsquo;s Already Working</h2>
+          <p class="wins-narrative-sm">${esc(narrative)}</p>
+        </div>
+        ${pillsHtml ? `<div class="wins-pills">${pillsHtml}</div>` : ''}
+      </div>
     </div>
+  </div>
 
-    ${widgets.length > 0 ? `
-    <div class="wins-widget-grid" style="grid-template-columns:repeat(${gridCols}, 1fr)">
-      ${widgets.join('\n')}
-    </div>` : ''}
+  ${widgets.length > 0 ? `
+  <!-- Dark data band -->
+  <div class="wins-dark-band">
+    <div class="wins-band-glow-1"></div>
+    <div class="wins-band-glow-2"></div>
+    <div class="wins-band-grain"></div>
+    <div class="wins-band-inner">
+      <div class="wins-widget-grid" style="grid-template-columns:repeat(${widgets.length > 3 ? Math.ceil(widgets.length / 2) : widgets.length}, 1fr)">
+        ${widgets.join('\n')}
+      </div>
+    </div>
+  </div>` : ''}
 
+  <!-- AI stat cards -->
+  <div class="wins-bottom-section">
     <div class="wins-stats-row">
       ${highlights.map(h => `
       <div class="stat-card-sm">
-        <div class="stat-val-sm">${esc(h.metric_value)}</div>
-        <div class="stat-lbl-sm">${esc(h.metric_label)}</div>
-        <div class="stat-ctx-sm">${esc(h.context)}</div>
+        <div class="stat-accent"></div>
+        <div class="stat-content">
+          <div class="stat-val-sm">${esc(h.metric_value)}</div>
+          <div class="stat-lbl-sm">${esc(h.metric_label)}</div>
+          <div class="stat-ctx-sm">${esc(h.context)}</div>
+        </div>
       </div>`).join('')}
     </div>
   </div>
@@ -1113,9 +1170,18 @@ body { font-family: 'DM Sans', system-ui, sans-serif; font-size: 13px; color: #1
 }
 .cover-powered { font-style: italic; }
 
-/* ═══ WINS v2 ═════════════════════════════════════ */
+/* ═══ WINS v3 — Split layout (light header → dark data band → light stats) ═══ */
+.wins-page {
+  background: #F8FAFC;
+  display: flex; flex-direction: column;
+}
+.wins-top-section {
+  padding: 0.55in 0.75in 0;
+  flex-shrink: 0;
+}
+.wins-top-inner { }
 .wins-header-strip {
-  display: flex; align-items: flex-start; gap: 40px; margin-bottom: 20px;
+  display: flex; align-items: flex-start; gap: 40px; margin-bottom: 16px;
 }
 .wins-header-left { flex: 1; min-width: 0; }
 .wins-title-sm {
@@ -1134,31 +1200,72 @@ body { font-family: 'DM Sans', system-ui, sans-serif; font-size: 13px; color: #1
   padding: 4px 12px; border-radius: 4px; white-space: nowrap;
 }
 
+/* ── Dark data band ─────────────────────────────── */
+.wins-dark-band {
+  position: relative; overflow: hidden;
+  background: linear-gradient(135deg, #060A14 0%, #0A1628 30%, #0E1F3A 60%, #0A1628 100%);
+  border-top: 3px solid #3B82F6;
+  margin: 0 0.35in;
+  border-radius: 14px;
+  flex: 1;
+}
+.wins-band-glow-1 {
+  position: absolute; z-index: 0; pointer-events: none;
+  top: -30%; left: -10%; width: 55%; height: 160%;
+  background: radial-gradient(ellipse at center, rgba(59,130,246,0.1) 0%, transparent 60%);
+}
+.wins-band-glow-2 {
+  position: absolute; z-index: 0; pointer-events: none;
+  bottom: -40%; right: -10%; width: 50%; height: 160%;
+  background: radial-gradient(ellipse at center, rgba(139,92,246,0.06) 0%, transparent 55%);
+}
+.wins-band-grain {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  filter: url(#grain); opacity: 0.08;
+}
+.wins-band-inner {
+  position: relative; z-index: 2;
+  padding: 24px 28px;
+}
+
 /* Widget grid — auto height, no stretch */
 .wins-widget-grid {
-  display: grid; gap: 16px; margin-bottom: 20px;
+  display: grid; gap: 16px;
 }
 .widget {
-  background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 10px;
-  padding: 16px 20px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  display: flex; overflow: hidden;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  backdrop-filter: blur(6px);
+}
+.widget-accent {
+  width: 4px; flex-shrink: 0; border-radius: 2px 0 0 2px;
+}
+.widget-body {
+  flex: 1; padding: 14px 18px;
 }
 .widget-hdr {
+  display: flex; align-items: center; gap: 7px;
   margin-bottom: 10px;
+}
+.widget-icon {
+  font-size: 12px; line-height: 1;
 }
 .widget-title {
   font-family: 'Sora', sans-serif; font-size: 9px; font-weight: 700;
-  letter-spacing: 0.14em; color: #94A3B8; text-transform: uppercase;
+  letter-spacing: 0.14em; color: #64748B; text-transform: uppercase;
 }
 .widget-verdict {
   font-family: 'Sora', sans-serif; font-size: 10px; font-weight: 700;
-  letter-spacing: 0.08em; text-transform: uppercase; text-align: center;
-  margin-top: 6px;
+  letter-spacing: 0.1em; text-transform: uppercase; text-align: center;
+  margin-top: 8px; color: #22C55E;
 }
 .widget-badge {
   display: inline-block; font-family: 'Sora', sans-serif; font-size: 10px; font-weight: 700;
   letter-spacing: 0.06em; padding: 3px 10px; border-radius: 4px;
-  background: rgba(59,130,246,0.1); color: #3B82F6;
+  background: rgba(59,130,246,0.15); color: #60A5FA;
+  text-align: center;
 }
 
 /* CWV gauges */
@@ -1170,91 +1277,119 @@ body { font-family: 'DM Sans', system-ui, sans-serif; font-size: 13px; color: #1
 }
 .cwv-lbl {
   font-family: 'Sora', sans-serif; font-size: 9px; font-weight: 700;
-  letter-spacing: 0.12em; color: #94A3B8; margin-top: 2px;
+  letter-spacing: 0.12em; color: #64748B; margin-top: 2px;
 }
 
 /* Paid ads */
 .ads-hero {
   font-family: 'Sora', sans-serif; font-size: 32px; font-weight: 800;
-  color: #0F172A; line-height: 1; text-align: center; margin-bottom: 4px;
+  color: #FFFFFF; line-height: 1; text-align: center; margin-bottom: 4px;
 }
+.ads-platforms { margin-top: 8px; }
 .ads-row {
   display: flex; align-items: center; gap: 8px;
-  font-size: 12px; color: #334155; font-weight: 500; margin-top: 4px;
+  font-size: 12px; color: #CBD5E1; font-weight: 500; margin-top: 4px;
 }
 .ads-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
 .ads-name { flex: 1; }
+.ads-count {
+  font-family: 'Sora', sans-serif; font-weight: 700; color: #22C55E; font-size: 12px;
+}
 .ads-pixels {
-  font-size: 11px; color: #64748B; font-style: italic; margin-top: 4px;
+  font-size: 11px; color: #64748B; font-style: italic; margin-top: 6px;
 }
 
 /* Sentiment */
 .sentiment-total {
   font-family: 'Sora', sans-serif; font-size: 28px; font-weight: 800;
-  color: #0F172A; line-height: 1; text-align: center;
+  color: #FFFFFF; line-height: 1; text-align: center;
 }
-.sentiment-sub {
-  display: block; font-size: 10px; font-weight: 500;
-  letter-spacing: 0.08em; color: #94A3B8; margin-top: 2px;
+.sentiment-sub-label {
+  font-size: 10px; font-weight: 500; letter-spacing: 0.08em;
+  color: #64748B; text-align: center; margin-top: 2px;
 }
 .sentiment-bar {
   display: flex; height: 7px; border-radius: 4px; overflow: hidden;
-  background: #E2E8F0; gap: 1px; margin: 8px 0 6px;
+  background: rgba(255,255,255,0.08); gap: 1px; margin: 8px 0 6px;
 }
 .sentiment-legend {
-  display: flex; justify-content: space-between;
-  font-size: 11px; font-weight: 600;
+  display: flex; justify-content: space-between; font-size: 11px; font-weight: 600;
 }
-.sentiment-overall {
-  font-family: 'Sora', sans-serif; font-size: 10px; font-weight: 700;
-  letter-spacing: 0.1em; text-transform: uppercase; color: #22C55E;
-  text-align: center; margin-top: 4px;
-}
+.sent-pos { color: #22C55E; }
+.sent-neg { color: #EF4444; }
 
 /* Traffic */
 .traffic-hero {
   font-family: 'Sora', sans-serif; font-size: 32px; font-weight: 800;
-  color: #0F172A; line-height: 1; text-align: center;
+  color: #FFFFFF; line-height: 1; text-align: center;
 }
-.traffic-sub {
-  font-size: 10px; color: #94A3B8; text-align: center;
-  letter-spacing: 0.04em; margin: 2px 0 6px;
+.traffic-tier {
+  font-size: 10px; color: #64748B; text-align: center;
+  letter-spacing: 0.04em; margin: 2px 0 8px;
 }
-.traffic-split {
-  display: flex; justify-content: center; gap: 14px;
-  font-size: 11px; font-weight: 600; margin-top: 4px;
+.traffic-bar-wrap { margin-bottom: 4px; }
+.traffic-bar {
+  display: flex; height: 6px; border-radius: 3px; overflow: hidden;
+  background: rgba(255,255,255,0.06);
 }
+.traffic-bar-org { background: #22C55E; border-radius: 3px 0 0 3px; }
+.traffic-bar-paid { background: #F59E0B; border-radius: 0 3px 3px 0; }
+.traffic-legend {
+  display: flex; justify-content: space-between; margin-top: 4px;
+  font-size: 11px; font-weight: 600; color: #CBD5E1;
+}
+.traf-org, .traf-paid { display: flex; align-items: center; gap: 5px; }
+.traf-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
 .traffic-country {
-  font-size: 12px; color: #64748B; text-align: center; margin-top: 4px;
+  font-size: 12px; color: #64748B; text-align: center; margin-top: 6px;
 }
-.traffic-country strong {
-  font-family: 'Sora', sans-serif; font-weight: 800; color: #0F172A; font-size: 14px;
+.country-code {
+  font-family: 'Sora', sans-serif; font-weight: 800; color: #FFFFFF; font-size: 14px;
+  margin-left: 4px;
 }
 
 /* Top keyword */
 .kw-name {
   font-family: 'Source Code Pro', monospace; font-size: 17px; font-weight: 700;
-  color: #0F172A; text-align: center; line-height: 1.2;
+  color: #FFFFFF; text-align: center; line-height: 1.2;
   word-break: break-word;
 }
 .kw-pos {
-  font-size: 13px; color: #334155; text-align: center; font-weight: 500; margin-top: 4px;
+  font-size: 13px; color: #CBD5E1; text-align: center; font-weight: 500; margin-top: 4px;
+}
+.kw-rank {
+  font-family: 'Sora', sans-serif; font-weight: 800; color: #60A5FA; font-size: 15px;
+}
+.kw-meta {
+  display: flex; justify-content: center; gap: 12px; margin-top: 6px;
 }
 .kw-vol, .kw-total {
-  font-size: 11px; color: #64748B; text-align: center;
+  font-size: 11px; color: #64748B;
 }
 
-/* AI stat cards */
+/* ── AI stat cards (below dark band) ─────────────── */
+.wins-bottom-section {
+  padding: 16px 0.75in 0;
+  flex-shrink: 0;
+}
 .wins-stats-row {
   display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
 }
 .stat-card-sm {
-  padding: 20px 22px; border-radius: 10px;
+  display: flex; overflow: hidden;
+  border-radius: 10px;
   background: #FFFFFF; border: 1px solid #E2E8F0;
   box-shadow: 0 1px 3px rgba(0,0,0,0.04);
 }
+.stat-accent {
+  width: 4px; flex-shrink: 0;
+  background: linear-gradient(180deg, #3B82F6, #6366F1);
+}
+.stat-content {
+  padding: 18px 20px; flex: 1;
+}
 .stat-val-sm {
-  font-family: 'Sora', sans-serif; font-size: 30px; font-weight: 800;
+  font-family: 'Sora', sans-serif; font-size: 28px; font-weight: 800;
   color: #0F172A; line-height: 1; letter-spacing: -0.02em;
   margin-bottom: 6px;
 }
