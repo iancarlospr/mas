@@ -1037,7 +1037,8 @@ body { font-family: 'DM Sans', system-ui, sans-serif; font-size: 13px; color: #1
   .closer-line-top { box-shadow: none !important; }
   .closer-rule { box-shadow: none !important; }
 
-  /* ── Cover page — bg image has no filter, renders fine ── */
+  /* ── Cover page ── */
+  .cover-business-name { text-shadow: none !important; }
 
   /* ── Results page ── */
   .results-grain { display: none !important; }
