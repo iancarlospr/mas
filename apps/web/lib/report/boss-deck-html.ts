@@ -1154,7 +1154,10 @@ body { font-family: 'DM Sans', system-ui, sans-serif; font-size: 13px; color: #1
   position: absolute; inset: 0; z-index: 1; pointer-events: none;
   filter: url(#grain); opacity: 0.10;
 }
-.wins-inner { z-index: 2; }
+.wins-inner {
+  z-index: 2;
+  display: flex; flex-direction: column;
+}
 .wins-section-num {
   font-family: 'Sora', sans-serif; font-size: 12px; font-weight: 800;
   color: #C9A96E;
@@ -1174,7 +1177,7 @@ body { font-family: 'DM Sans', system-ui, sans-serif; font-size: 13px; color: #1
 
 /* Widget grid — flat on dark page, no container card */
 .wins-widget-grid {
-  display: grid; gap: 20px; margin-bottom: 28px;
+  display: grid; gap: 20px;
 }
 .widget {
   background: rgba(255,255,255,0.04);
@@ -1307,6 +1310,7 @@ body { font-family: 'DM Sans', system-ui, sans-serif; font-size: 13px; color: #1
 /* ── AI stat cards — frosted glass on dark, same as outcome cards ── */
 .wins-stats-row {
   display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+  margin-top: auto;
 }
 .stat-card-win {
   padding: 20px 24px; border-radius: 12px;
