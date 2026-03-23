@@ -1310,12 +1310,12 @@ body { font-family: 'DM Sans', system-ui, sans-serif; font-size: 13px; color: #1
 }
 .stat-card-win {
   padding: 20px 24px; border-radius: 12px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
+  background: #F1F5F9;
+  border: 1px solid #E2E8F0;
 }
 .stat-val-win {
   font-family: 'Sora', sans-serif; font-size: 28px; font-weight: 800;
-  color: #FFFFFF; line-height: 1; letter-spacing: -0.02em;
+  color: #0F172A; line-height: 1; letter-spacing: -0.02em;
   margin-bottom: 6px;
 }
 .stat-lbl-win {
@@ -1324,7 +1324,7 @@ body { font-family: 'DM Sans', system-ui, sans-serif; font-size: 13px; color: #1
   color: #C9A96E; margin-bottom: 6px;
 }
 .stat-ctx-win {
-  font-size: 12px; color: #64748B; line-height: 1.45;
+  font-size: 12px; color: #475569; line-height: 1.45;
 }
 
 /* ═══ ISSUES ══════════════════════════════════════ */
