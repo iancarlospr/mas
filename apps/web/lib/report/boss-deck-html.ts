@@ -471,8 +471,8 @@ function renderWins(narrative: string, highlights: BossDeckAIOutput['wins_highli
   return `<div class="page ${hasDarkBand ? 'dark-page wins-page-dark' : 'light-page'}">
   ${hasDarkBand ? `<div class="wins-plasma"></div><div class="wins-glow-1"></div><div class="wins-glow-2"></div><div class="wins-grain"></div>` : ''}
   <div class="page-inner${hasDarkBand ? ' wins-inner' : ''}">
-    <div class="${hasDarkBand ? 'section-header-dark' : 'section-header-light'}">
-      <div class="${hasDarkBand ? 'section-number-dark' : 'section-number'}">02</div>
+    <div class="${hasDarkBand ? 'section-header-dark wins-section' : 'section-header-light'}">
+      <div class="${hasDarkBand ? 'wins-section-num' : 'section-number'}">02</div>
       <div class="${hasDarkBand ? 'section-label-dark' : 'section-label'}">CURRENT PERFORMANCE</div>
     </div>
 
@@ -1134,27 +1134,31 @@ body { font-family: 'DM Sans', system-ui, sans-serif; font-size: 13px; color: #1
 
 /* ═══ WINS v4 — Full dark page, same language as Issues/Impact ═══ */
 
-/* Full-bleed dark background with glow layers (same as issues page) */
+/* Full-bleed warm dark background — charcoal/grey with gold glow */
 .wins-page-dark { position: relative; }
 .wins-plasma {
   position: absolute; inset: 0; z-index: 0;
-  background: linear-gradient(135deg, #060A14 0%, #0A1628 20%, #0C1A30 40%, #0E1F3A 55%, #0A1628 75%, #060A14 100%);
+  background: linear-gradient(135deg, #0C0C0E 0%, #141418 20%, #1A1A20 40%, #1E1E26 55%, #141418 75%, #0C0C0E 100%);
 }
 .wins-glow-1 {
   position: absolute; z-index: 0; pointer-events: none;
   top: -10%; left: -5%; width: 60%; height: 60%;
-  background: radial-gradient(ellipse at center, rgba(59,130,246,0.08) 0%, transparent 65%);
+  background: radial-gradient(ellipse at center, rgba(201,169,110,0.08) 0%, transparent 65%);
 }
 .wins-glow-2 {
   position: absolute; z-index: 0; pointer-events: none;
   bottom: -15%; right: -10%; width: 55%; height: 55%;
-  background: radial-gradient(ellipse at center, rgba(139,92,246,0.05) 0%, transparent 55%);
+  background: radial-gradient(ellipse at center, rgba(245,158,11,0.05) 0%, transparent 55%);
 }
 .wins-grain {
   position: absolute; inset: 0; z-index: 1; pointer-events: none;
   filter: url(#grain); opacity: 0.10;
 }
 .wins-inner { z-index: 2; }
+.wins-section-num {
+  font-family: 'Sora', sans-serif; font-size: 12px; font-weight: 800;
+  color: #C9A96E;
+}
 .wins-title-sm {
   font-size: 28px !important; margin-bottom: 6px !important; line-height: 1.1;
 }
@@ -1194,12 +1198,12 @@ body { font-family: 'DM Sans', system-ui, sans-serif; font-size: 13px; color: #1
   background: rgba(34,197,94,0.15); color: #22C55E;
 }
 .widget-status-blue {
-  background: rgba(59,130,246,0.15); color: #60A5FA;
+  background: rgba(201,169,110,0.15); color: #C9A96E;
 }
 .widget-badge {
   font-family: 'Sora', sans-serif; font-size: 9px; font-weight: 700;
   letter-spacing: 0.08em; padding: 3px 10px; border-radius: 4px;
-  background: rgba(59,130,246,0.15); color: #60A5FA;
+  background: rgba(201,169,110,0.15); color: #C9A96E;
 }
 
 /* CWV gauges */
@@ -1229,7 +1233,7 @@ body { font-family: 'DM Sans', system-ui, sans-serif; font-size: 13px; color: #1
 .ads-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
 .ads-name { flex: 1; }
 .ads-count {
-  font-family: 'Sora', sans-serif; font-weight: 700; color: #60A5FA; font-size: 13px;
+  font-family: 'Sora', sans-serif; font-weight: 700; color: #C9A96E; font-size: 13px;
 }
 .ads-pixels {
   font-size: 11px; color: #475569; margin-top: 8px;
@@ -1317,7 +1321,7 @@ body { font-family: 'DM Sans', system-ui, sans-serif; font-size: 13px; color: #1
 .stat-lbl-win {
   font-family: 'Sora', sans-serif; font-size: 9px; font-weight: 700;
   letter-spacing: 0.1em; text-transform: uppercase;
-  color: #3B82F6; margin-bottom: 6px;
+  color: #C9A96E; margin-bottom: 6px;
 }
 .stat-ctx-win {
   font-size: 12px; color: #64748B; line-height: 1.45;
