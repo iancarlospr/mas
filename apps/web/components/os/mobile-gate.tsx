@@ -365,13 +365,13 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
           <ChloeSprite state="idle" size={32} className="flex-shrink-0" />
           <button
             onClick={scrollToHero}
-            className="bevel-button-primary flex-1 py-gs-1 font-system text-os-sm font-bold"
+            className="bevel-button-primary flex-1 h-[34px] font-system text-os-sm font-bold"
           >
             Scan Your Site
           </button>
           <button
             onClick={scrollToPricing}
-            className="bevel-button px-gs-3 py-gs-1 font-system text-os-xs font-bold flex-shrink-0"
+            className="bevel-button px-gs-3 h-[34px] font-system text-os-sm font-bold flex-shrink-0"
           >
             Pricing
           </button>
