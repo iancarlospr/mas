@@ -1,54 +1,39 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { createClient } from '@/lib/supabase/client';
-import { useWindowManager } from '@/lib/window-manager';
+import { useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { TIERS, FAQ, FaqItem, PRICING_GLOW_STYLE } from '@/lib/pricing-data';
 import type { Tier } from '@/lib/pricing-data';
 
 /* ═══════════════════════════════════════════════════════════════
-   Pricing — CRO-Optimized Window
+   Mobile Pricing Section — Single-column layout
 
-   Center bias: Plus in the middle (highlighted, taller).
-   Price anchoring: crossed-out original price.
-   Per-unit economics: $/scan on Plus.
-   Loss aversion: features list shows what free is MISSING.
-   Social proof: live scan counter.
+   No useWindowManager() dependency. Uses callbacks for
+   free-tier CTA and router.push for auth gating.
    ═══════════════════════════════════════════════════════════════ */
 
-export default function PricingWindow() {
-  const wm = useWindowManager();
+interface MobilePricingSectionProps {
+  onFreeScan: () => void;
+}
+
+export function MobilePricingSection({ onFreeScan }: MobilePricingSectionProps) {
+  const router = useRouter();
   const { isAuthenticated } = useAuth();
-  const [scanCount, setScanCount] = useState<number | null>(null);
   const [loadingProduct, setLoadingProduct] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const supabase = createClient();
-    supabase
-      .from('scans')
-      .select('*', { count: 'exact', head: true })
-      .then(({ count }) => {
-        setScanCount((count ?? 0) + 101);
-      });
-  }, []);
-
   const handleTierClick = useCallback(async (tier: Tier) => {
-    // Free tier — just open scan-input
     if (!tier.product) {
-      wm.closeWindow('pricing');
-      wm.openWindow('scan-input');
+      onFreeScan();
       return;
     }
 
-    // Paid tiers — require auth
     if (!isAuthenticated) {
-      wm.openWindow('auth');
+      router.push('/register');
       return;
     }
 
-    // Checkout for scan credits (no scanId needed)
     setLoadingProduct(tier.product);
     setError(null);
 
@@ -72,27 +57,22 @@ export default function PricingWindow() {
       setError('Network error. Try again.');
       setLoadingProduct(null);
     }
-  }, [wm, isAuthenticated]);
+  }, [isAuthenticated, onFreeScan, router]);
 
   return (
-    <div className="px-gs-6 pt-gs-3 pb-gs-6 space-y-gs-6">
+    <div className="space-y-gs-6">
       <style>{PRICING_GLOW_STYLE}</style>
 
-      {/* Header + social proof */}
+      {/* Header */}
       <div className="text-center space-y-gs-2">
-        <h1 className="font-display text-display-sm">Choose Your Edition</h1>
+        <h2 className="font-display text-display-sm">Choose Your Edition</h2>
         <p className="font-data text-data-xs text-gs-muted">
           No subscriptions. No hidden fees. One-time per scan.
         </p>
-        {scanCount != null && (
-          <p className="font-data text-[10px] text-gs-mid">
-            Join {scanCount.toLocaleString()}+ marketers who already scanned
-          </p>
-        )}
       </div>
 
-      {/* Pricing Tiers — center bias layout */}
-      <div className="grid grid-cols-3 gap-gs-3 items-start">
+      {/* Tiers — single column */}
+      <div className="space-y-gs-4">
         {TIERS.map((tier) => (
           <div
             key={tier.name}
@@ -102,38 +82,39 @@ export default function PricingWindow() {
                 : 'bg-gs-chrome p-gs-3'
             }`}
           >
-            {/* Badge */}
             {tier.badge && (
               <div className="absolute -top-[10px] left-1/2 -translate-x-1/2 bg-gs-red text-gs-void font-system text-[9px] font-bold uppercase tracking-wider px-gs-2 py-[2px] rounded-sm whitespace-nowrap">
                 {tier.badge}
               </div>
             )}
 
-            {/* Name + Price */}
-            <div className={tier.badge ? 'pt-gs-1' : ''}>
-              <h3 className="font-system text-os-sm font-bold">{tier.name}</h3>
-              <div className="flex items-baseline gap-gs-1 mt-gs-1">
-                {tier.originalPrice && (
-                  <span className="font-data text-data-sm text-gs-mid line-through">
-                    {tier.originalPrice}
+            <div className={`flex items-start justify-between ${tier.badge ? 'pt-gs-1' : ''}`}>
+              <div>
+                <h3 className="font-system text-os-sm font-bold">{tier.name}</h3>
+                <p className="font-data text-data-xs text-gs-muted mt-gs-1">{tier.desc}</p>
+              </div>
+              <div className="text-right flex-shrink-0 ml-gs-3">
+                <div className="flex items-baseline gap-gs-1">
+                  {tier.originalPrice && (
+                    <span className="font-data text-data-sm text-gs-mid line-through">
+                      {tier.originalPrice}
+                    </span>
+                  )}
+                  <span className={`font-data font-bold ${tier.highlighted ? 'text-[24px]' : 'text-data-2xl'}`}>
+                    {tier.price}
+                  </span>
+                </div>
+                {tier.perUnit && (
+                  <span className="font-data text-[10px] text-gs-red font-bold">
+                    {tier.perUnit}
                   </span>
                 )}
-                <span className={`font-data font-bold ${tier.highlighted ? 'text-[24px]' : 'text-data-2xl'}`}>
-                  {tier.price}
-                </span>
               </div>
-              {tier.perUnit && (
-                <span className="font-data text-[10px] text-gs-red font-bold">
-                  {tier.perUnit}
-                </span>
-              )}
-              <p className="font-data text-data-xs text-gs-muted mt-gs-1">{tier.desc}</p>
             </div>
 
-            {/* Feature checklist — included vs excluded */}
             <ul className="space-y-[5px]">
               {tier.features.map((f) => (
-                <li key={f.text} className="flex items-start gap-gs-1 text-[11px]">
+                <li key={f.text} className="flex items-start gap-gs-1 text-[12px]">
                   {f.included ? (
                     <>
                       <span className="text-gs-terminal flex-shrink-0 font-bold">+</span>
@@ -149,11 +130,10 @@ export default function PricingWindow() {
               ))}
             </ul>
 
-            {/* CTA */}
             <button
               onClick={() => handleTierClick(tier)}
               disabled={loadingProduct === tier.product}
-              className={`${tier.highlighted ? 'bevel-button-primary' : 'bevel-button'} w-full py-gs-1 font-system text-os-xs font-bold`}
+              className={`${tier.highlighted ? 'bevel-button-primary' : 'bevel-button'} w-full py-gs-2 font-system text-os-sm font-bold`}
             >
               {loadingProduct === tier.product ? 'Processing...' : tier.cta}
             </button>
@@ -167,7 +147,7 @@ export default function PricingWindow() {
 
       {/* FAQ */}
       <div className="space-y-gs-2">
-        <h2 className="font-system text-os-sm font-bold">FAQ</h2>
+        <h3 className="font-system text-os-sm font-bold">FAQ</h3>
         {FAQ.map((item) => (
           <FaqItem key={item.q} q={item.q} a={item.a} />
         ))}

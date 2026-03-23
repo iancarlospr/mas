@@ -54,33 +54,41 @@ export function MobileBottomBar({ scanId, isPaid, activeTab = 'dashboard' }: Mob
   }
 
   return (
-    <div className="h-[48px] flex items-center gap-gs-1 px-gs-2 bg-gs-chrome bevel-raised flex-shrink-0">
-      <button
-        className={cn(
-          'flex-1 text-os-xs py-gs-1',
-          activeTab === 'dashboard' ? 'bevel-sunken bg-gs-ink text-gs-paper' : 'bevel-button',
-        )}
-      >
-        Dashboard
-      </button>
-      <Link
-        href={`/chat/${scanId}`}
-        className={cn(
-          'flex-1 text-os-xs py-gs-1 text-center',
-          activeTab === 'chat' ? 'bevel-sunken bg-gs-ink text-gs-paper' : 'bevel-button',
-        )}
-      >
-        Chat
-      </Link>
-      <Link
-        href={`/report/${scanId}`}
-        className={cn(
-          'flex-1 text-os-xs py-gs-1 text-center',
-          activeTab === 'report' ? 'bevel-sunken bg-gs-ink text-gs-paper' : 'bevel-button',
-        )}
-      >
-        Report
-      </Link>
+    <div className="flex-shrink-0 bg-gs-chrome bevel-raised">
+      <div className="h-[48px] flex items-center gap-gs-1 px-gs-2">
+        <button
+          className={cn(
+            'flex-1 text-os-xs py-gs-1',
+            activeTab === 'dashboard' ? 'bevel-sunken bg-gs-ink text-gs-paper' : 'bevel-button',
+          )}
+        >
+          Dashboard
+        </button>
+        <Link
+          href={`/chat/${scanId}`}
+          className={cn(
+            'flex-1 text-os-xs py-gs-1 text-center',
+            activeTab === 'chat' ? 'bevel-sunken bg-gs-ink text-gs-paper' : 'bevel-button',
+          )}
+        >
+          Chat
+        </Link>
+        <button
+          onClick={() => window.open(`/api/reports/${scanId}/boss-deck`, '_blank')}
+          className="flex-1 text-os-xs py-gs-1 bevel-button text-center"
+        >
+          Boss Deck ↓
+        </button>
+        <button
+          onClick={() => window.open(`/api/reports/${scanId}/prd`, '_blank')}
+          className="flex-1 text-os-xs py-gs-1 bevel-button text-center"
+        >
+          PRD ↓
+        </button>
+      </div>
+      <p className="text-center font-data text-[9px] text-gs-mid/40 pb-[4px] -mt-[2px]">
+        Full interactive report available on desktop
+      </p>
     </div>
   );
 }

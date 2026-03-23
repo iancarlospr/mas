@@ -10,6 +10,7 @@ import { ChloeSprite } from '@/components/chloe/chloe-sprite';
 import { CATEGORY_META, MODULE_NAMES } from './slide-sidebar';
 import { MobileScoreHero } from './mobile-score-hero';
 import { MobileBottomBar } from './mobile-bottom-bar';
+import { DesktopBridgeCard } from './desktop-bridge-card';
 
 /**
  * GhostScan Mobile — Portrait Summary View
@@ -128,6 +129,9 @@ export function MobilePortraitSummary({
               </p>
             </div>
           )}
+
+          {/* Desktop bridge card */}
+          <DesktopBridgeCard scanId={scan.id} />
         </div>
       </main>
 
