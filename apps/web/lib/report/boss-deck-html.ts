@@ -989,46 +989,69 @@ body { font-family: 'DM Sans', system-ui, sans-serif; font-size: 13px; color: #1
     -webkit-backdrop-filter: none !important;
   }
 
-  /* ── Kill ALL filters, box-shadows, text-shadows in print ── */
+  /*
+   * Chrome PDF renderer breaks on:
+   *   - filter: url(#grain)  → SVG filter ref = artifacts
+   *   - filter: blur()       → pixelates at low DPI
+   *   - filter: drop-shadow()→ renders as visible box
+   *   - backdrop-filter      → opaque box
+   *   - text-shadow (multi-layer glow stacks) → blurry mess
+   *   - box-shadow with large spread/blur → square artifacts
+   *
+   * What works fine:
+   *   - linear-gradient, radial-gradient → perfect
+   *   - opacity → perfect
+   *   - simple box-shadow (no spread glow) → fine
+   *   - images without filter → fine
+   */
+
+  /* Global: kill only backdrop-filter (universally broken) */
   * {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  /* ── Closer page ── */
+  /* BG image: replace filter with opacity (filter pixelates, opacity doesn't) */
+  .closer-bg {
     filter: none !important;
-    -webkit-filter: none !important;
-    text-shadow: none !important;
-    box-shadow: none !important;
+    opacity: 0.15 !important;
+    transform: scale(1.15) !important;
   }
-
-  /* Closer page — hide bg image entirely, use solid dark bg */
-  .closer-bg { display: none !important; }
-  .closer-plasma {
-    background: linear-gradient(160deg, #040610 0%, #0A1628 30%, #0E1F3A 50%, #0A1628 70%, #040610 100%) !important;
-    opacity: 1 !important;
+  /* Keep plasma, glow layers, vignette — they're all gradients and render fine */
+  /* Kill grain (SVG filter) */
+  .closer-grain { display: none !important; }
+  /* Seal: drop-shadow breaks, remove just the filter */
+  .closer-seal { filter: none !important; }
+  /* Score number: drop-shadow breaks */
+  .closer-score-num { filter: none !important; }
+  /* ASCII glow: multi-layer text-shadow pixelates, simplify to single layer */
+  .closer-ascii {
+    text-shadow: 0 0 6px rgba(59,130,246,0.4) !important;
   }
-  .closer-vignette { display: none !important; }
-  .closer-glow-blue,
-  .closer-glow-gold,
-  .closer-glow-center,
-  .closer-glow-top { display: none !important; }
-  .closer-line-top {
-    background: linear-gradient(90deg, transparent 10%, rgba(201,169,110,0.4) 30%, rgba(245,158,11,0.6) 50%, rgba(201,169,110,0.4) 70%, transparent 90%) !important;
+  /* Signoff glow: simplify multi-layer */
+  .closer-signoff {
+    text-shadow: 0 0 6px rgba(201,169,110,0.3) !important;
   }
-  .closer-ascii { color: #60A5FA !important; }
+  /* Line box-shadow glow */
+  .closer-line-top { box-shadow: none !important; }
+  .closer-rule { box-shadow: none !important; }
 
-  /* Cover page — hide glow pseudo-elements */
-  .cover-bottom-bar::before,
-  .cover-bottom-bar::after { display: none !important; }
+  /* ── Cover page — bg image has no filter, renders fine ── */
 
-  /* Results page — simplify glow layers */
-  .results-glow-1,
-  .results-glow-2,
-  .results-glow-3 { opacity: 0.5 !important; }
-  .results-vignette { display: none !important; }
+  /* ── Results page ── */
+  .results-grain { display: none !important; }
+  .results-gold-line { box-shadow: none !important; }
+  /* Keep all glow layers + vignette (gradients work) */
 
-  /* Wins page — simplify */
-  .wins-glow-1, .wins-glow-2 { opacity: 0.5 !important; }
+  /* ── Wins page ── */
+  .wins-grain { display: none !important; }
 
-  /* Actions band — kill pseudo-element glows */
-  .actions-band::before,
-  .actions-band::after { display: none !important; }
+  /* ── Actions band ── */
+  .actions-icon { box-shadow: none !important; }
+
+  /* ── Projection dots: large spread glow → square artifact ── */
+  .proj-dot { box-shadow: none !important; }
 }
 @media screen { body { margin-top: 50px; } }
 
