@@ -213,13 +213,13 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
       <main className="flex-1 overflow-y-auto overscroll-contain">
 
         {/* ═══════ SECTION 1: HERO ═══════ */}
-        <section ref={heroRef} className="flex flex-col items-center pb-gs-4">
+        <section ref={heroRef} className="flex flex-col items-center min-h-[100svh] pb-gs-6">
 
           {/* Dither strip — full bleed, top */}
           <DitherStrip />
 
           {/* ASCII Title — full-bleed, scaled for mobile */}
-          <div className="w-full overflow-hidden flex justify-center" style={{ padding: '0 4px' }}>
+          <div className="w-full overflow-hidden flex justify-center mt-gs-4" style={{ padding: '0 4px' }}>
             <pre
               className="font-data leading-none whitespace-pre select-none text-center"
               style={{
@@ -234,7 +234,7 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
           </div>
 
           {/* Chloe + Headline */}
-          <div className="flex items-start gap-gs-3 select-none px-gs-4" style={{ marginTop: '24px' }}>
+          <div className="flex items-start gap-gs-3 select-none px-gs-4" style={{ marginTop: '32px' }}>
             <ChloeSprite state="idle" size={64} className="flex-shrink-0 mt-[4px]" />
             <div>
               <p
@@ -264,8 +264,8 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
             </div>
           </div>
 
-          {/* Spacer */}
-          <div style={{ height: '48px' }} />
+          {/* Spacer — flex-grow to push content down and fill viewport */}
+          <div className="flex-1 min-h-[40px]" />
 
           {/* Nudge CTA + Arrow */}
           <div className="flex flex-col items-center select-none" style={{ marginBottom: '12px' }}>
