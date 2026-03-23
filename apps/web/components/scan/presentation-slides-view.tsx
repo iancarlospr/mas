@@ -102,15 +102,13 @@ export function PresentationSlidesView({ scan, autoPrint = false }: { scan: Scan
           @page { size: 14in 8.5in; margin: 0; }
 
           @media print {
-            /* Preserve all colors, shadows, backgrounds exactly */
+            /* Preserve all colors and backgrounds in print */
             [data-slides-loaded] *,
             [data-slides-loaded] *::before,
             [data-slides-loaded] *::after {
               -webkit-print-color-adjust: exact !important;
               print-color-adjust: exact !important;
               color-adjust: exact !important;
-              box-shadow: revert !important;
-              text-shadow: revert !important;
             }
 
             html, body {

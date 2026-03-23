@@ -12,14 +12,18 @@ import { PDFDocument } from 'pdf-lib';
 import sharp from 'sharp';
 import { getSupabaseAdmin } from './supabase.js';
 
-// ─── Presentation PDF (slide deck) ──────────────────────────────────────
+// ─── Presentation PDF (screenshot-based, pixel-perfect) ─────────────────
+
+// Presentation slides are 14:8.5 aspect ratio. Use 1875px design width (matches frontend).
+const PRES_PAGE_W = 1875;
+const PRES_PAGE_H = Math.round(PRES_PAGE_W * (8.5 / 14)); // 1138
 
 export async function generatePresentationPDF(
   scanId: string,
   reportBaseUrl: string,
 ): Promise<Buffer> {
   const url = `${reportBaseUrl}/report/${scanId}/slides?print=1`;
-  console.log(`[pdf-generator] Generating presentation PDF for ${scanId}: ${url}`);
+  console.log(`[presentation-pdf] Generating for ${scanId}: ${url}`);
 
   const browser = await chromium.launch({
     headless: true,
@@ -31,48 +35,88 @@ export async function generatePresentationPDF(
   });
   try {
     const page = await browser.newPage({
-      viewport: { width: 1920, height: 1165 },
+      viewport: { width: PRES_PAGE_W, height: PRES_PAGE_H * 3 },
+      deviceScaleFactor: 2, // 2x for crisp text
     });
 
-    // Capture page errors for debugging
     page.on('console', (msg) => {
       if (msg.type() === 'error') {
-        console.log(`[pdf-generator] Page console error: ${msg.text()}`);
+        console.log(`[presentation-pdf] Page console error: ${msg.text()}`);
       }
     });
     page.on('pageerror', (err) => {
-      console.log(`[pdf-generator] Page JS error: ${err.message}`);
+      console.log(`[presentation-pdf] Page JS error: ${err.message}`);
     });
 
-    console.log(`[pdf-generator] Navigating to ${url}`);
+    console.log(`[presentation-pdf] Navigating to ${url}`);
     const response = await page.goto(url, { waitUntil: 'networkidle', timeout: 60_000 });
-    console.log(`[pdf-generator] Page loaded: status=${response?.status()}, url=${page.url()}`);
+    console.log(`[presentation-pdf] Page loaded: status=${response?.status()}, url=${page.url()}`);
 
-    // Wait for slide cards to render
-    await page.waitForSelector('.slide-card', { timeout: 30_000 });
-    const cardCount = await page.evaluate(() => document.querySelectorAll('.slide-card').length);
-    console.log(`[pdf-generator] Found ${cardCount} slide cards`);
+    // Wait for slides to render
+    await page.waitForSelector('[data-slides-loaded="true"]', { timeout: 30_000 });
+    await page.evaluate(() => document.fonts.ready);
 
-    if (cardCount === 0) {
+    // Force exact dimensions in screen mode (bypass print CSS entirely)
+    await page.addStyleTag({
+      content: `
+        .slide-page {
+          width: ${PRES_PAGE_W}px !important;
+          height: ${PRES_PAGE_H}px !important;
+          overflow: hidden !important;
+        }
+        .slide-page .slide-card {
+          width: ${PRES_PAGE_W}px !important;
+          height: ${PRES_PAGE_H}px !important;
+          aspect-ratio: unset !important;
+          overflow: hidden !important;
+          border-radius: 0 !important;
+        }
+      `,
+    });
+
+    // Settle for fonts + canvas paint
+    await page.waitForTimeout(2000);
+
+    // Screenshot every slide in screen mode
+    const slides = await page.$$('.slide-page');
+    console.log(`[presentation-pdf] Found ${slides.length} slides, capturing...`);
+
+    if (slides.length === 0) {
       throw new Error('No slides rendered on the page');
     }
 
-    // Wait for rendering to settle (canvas animations, fonts, layout)
-    await page.waitForTimeout(3500);
+    const pngBuffers: Buffer[] = [];
+    for (let i = 0; i < slides.length; i++) {
+      const png = await slides[i]!.screenshot({ type: 'png' });
+      pngBuffers.push(Buffer.from(png));
+    }
+    console.log(`[presentation-pdf] Captured ${pngBuffers.length} slides`);
 
-    // Generate PDF directly — print CSS in presentation-slides-view.tsx
-    // handles page dimensions (14in × 8.5in), overflow:hidden, and breaks
-    console.log(`[pdf-generator] Generating PDF via page.pdf()`);
-    const pdf = await page.pdf({
-      width: '14in',
-      height: '8.5in',
-      printBackground: true,
-      margin: { top: '0', bottom: '0', left: '0', right: '0' },
-      displayHeaderFooter: false,
-    });
+    // Assemble PDF — hero/tail as PNG, bulk as JPEG
+    const pdf = await PDFDocument.create();
+    const total = pngBuffers.length;
+    const HERO_COUNT = 3;
+    const TAIL_COUNT = 3;
 
-    console.log(`[pdf-generator] PDF generated: ${pdf.length} bytes, ${cardCount} slides`);
-    return Buffer.from(pdf);
+    for (let i = 0; i < total; i++) {
+      const isHero = i < HERO_COUNT || i >= total - TAIL_COUNT;
+      let img;
+
+      if (isHero) {
+        img = await pdf.embedPng(pngBuffers[i]!);
+      } else {
+        const jpegBuf = await sharp(pngBuffers[i]!).jpeg({ quality: 85 }).toBuffer();
+        img = await pdf.embedJpg(jpegBuf);
+      }
+
+      const p = pdf.addPage([PRES_PAGE_W, PRES_PAGE_H]);
+      p.drawImage(img, { x: 0, y: 0, width: PRES_PAGE_W, height: PRES_PAGE_H });
+    }
+
+    const pdfBytes = await pdf.save();
+    console.log(`[presentation-pdf] PDF assembled: ${pdfBytes.length} bytes, ${total} slides`);
+
+    return Buffer.from(pdfBytes);
   } finally {
     await browser.close();
   }
