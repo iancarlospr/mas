@@ -311,7 +311,7 @@ export function ScanInput({
               disabled={loading}
               fullWidth
               autoFocus
-              className="!h-[36px] !py-0 !text-gs-void !bg-gs-light/90 !placeholder:text-gs-mid !border-0 !ring-0 !rounded-[7px]"
+              className="!h-[42px] !py-0 !text-gs-void !bg-gs-light/90 !placeholder:text-gs-mid !border-0 !ring-0 !rounded-[7px]"
             />
           </div>
         </div>
