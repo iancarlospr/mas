@@ -920,7 +920,7 @@ function buildSealSVG(score: number | null): string {
 
 const CSS = `
 /* ── Reset & Page ─────────────────────────────────── */
-@page { size: 14in 8.5in landscape; margin: 0; }
+@page { size: 14in 8.5in; margin: 0; }
 * { margin: 0; padding: 0; box-sizing: border-box;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important; }
@@ -944,12 +944,8 @@ body { font-family: 'DM Sans', system-ui, sans-serif; font-size: 13px; color: #1
 .print-banner button:hover { background: #2563EB; }
 @media print {
   .print-banner { display: none; }
-  html, body { width: 100%; margin: 0; padding: 0; }
-  .page {
-    width: 100% !important; height: 100vh !important;
-    overflow: visible !important;
-    page-break-after: always; break-inside: avoid;
-  }
+  body { margin-top: 0; }
+  .page { overflow: visible !important; }
   .cover-bottom-bar,
   .footer-dark,
   .actions-band {
