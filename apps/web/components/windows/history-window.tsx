@@ -127,7 +127,7 @@ export default function HistoryWindow() {
         <span className="w-14 text-center">Score</span>
         <span className="w-6 text-center" />
         <span className="w-14 text-center">Tier</span>
-        <span className="w-28 text-center">Actions</span>
+        <span className="w-44 text-center">Actions</span>
         <span className="w-16 text-right">Date</span>
         <span className="w-6" />
       </div>
@@ -181,16 +181,34 @@ export default function HistoryWindow() {
                   {scan.tier === 'paid' ? 'PRO' : 'FREE'}
                 </span>
               </span>
-              <span className="w-28 text-center flex items-center justify-center gap-1 whitespace-nowrap">
+              <span className="w-44 text-center flex items-center justify-center gap-2 whitespace-nowrap">
                 {scan.tier === 'paid' && scan.status === 'complete' ? (
-                  <button
-                    onClick={(e) => { e.stopPropagation(); window.open(`/api/reports/${scan.id}/prd`, '_blank'); }}
-                    className="text-gs-base hover:text-gs-bright transition-colors"
-                    title="Download PRD"
-                    style={{ fontSize: '11px', fontFamily: 'var(--font-system)' }}
-                  >
-                    PRD&nbsp;&darr;
-                  </button>
+                  <>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); window.open(`/api/reports/${scan.id}/presentation`, '_blank'); }}
+                      className="text-gs-base hover:text-gs-bright transition-colors"
+                      title="Download Audit Deck"
+                      style={{ fontSize: '11px', fontFamily: 'var(--font-system)' }}
+                    >
+                      Audit&nbsp;&darr;
+                    </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); window.open(`/api/reports/${scan.id}/prd`, '_blank'); }}
+                      className="text-gs-base hover:text-gs-bright transition-colors"
+                      title="Download PRD"
+                      style={{ fontSize: '11px', fontFamily: 'var(--font-system)' }}
+                    >
+                      PRD&nbsp;&darr;
+                    </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); window.open(`/api/reports/${scan.id}/boss-deck-pdf`, '_blank'); }}
+                      className="text-gs-base hover:text-gs-bright transition-colors"
+                      title="Download Boss Deck"
+                      style={{ fontSize: '11px', fontFamily: 'var(--font-system)' }}
+                    >
+                      Boss&nbsp;&darr;
+                    </button>
+                  </>
                 ) : scan.tier !== 'paid' && scan.status === 'complete' ? (
                   <button
                     onClick={(e) => {

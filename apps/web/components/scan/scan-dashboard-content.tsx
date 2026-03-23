@@ -268,6 +268,11 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
     });
   }, [wm, scan.id, scan.domain]);
 
+  const handleDownloadAuditDeck = useCallback(() => {
+    analytics.pdfDownloaded(scan.id, scan.domain ?? '', 'audit_deck');
+    window.open(`/api/reports/${scan.id}/presentation`, '_blank');
+  }, [scan.id, scan.domain]);
+
   const handleDownloadPdf = useCallback(() => {
     analytics.pdfDownloaded(scan.id, scan.domain ?? '', 'status_bar');
     window.open(`/api/reports/${scan.id}/prd`, '_blank');
@@ -556,6 +561,10 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
                 50% { text-shadow: 0 0 16px rgba(255,178,239,0.35); }
               }
             `}</style>
+            <button onClick={handleDownloadAuditDeck} className="text-gs-base hover:text-gs-bright transition-colors" style={{ fontSize: '11px', fontFamily: 'var(--font-system)' }}>
+              Audit Deck &darr;
+            </button>
+            <span className="text-gs-mid" style={{ fontSize: '11px' }}>&middot;</span>
             <button onClick={handleDownloadPdf} className="text-gs-base hover:text-gs-bright transition-colors" style={{ fontSize: '11px', fontFamily: 'var(--font-system)' }}>
               PRD &darr;
             </button>

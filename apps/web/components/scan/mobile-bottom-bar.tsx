@@ -74,16 +74,22 @@ export function MobileBottomBar({ scanId, isPaid, activeTab = 'dashboard' }: Mob
           Chat
         </Link>
         <button
-          onClick={() => window.open(`/api/reports/${scanId}/boss-deck-pdf`, '_blank')}
+          onClick={() => window.open(`/api/reports/${scanId}/presentation`, '_blank')}
           className="flex-1 text-os-xs py-gs-1 bevel-button text-center"
         >
-          Boss Deck ↓
+          Audit ↓
         </button>
         <button
           onClick={() => window.open(`/api/reports/${scanId}/prd`, '_blank')}
           className="flex-1 text-os-xs py-gs-1 bevel-button text-center"
         >
           PRD ↓
+        </button>
+        <button
+          onClick={() => window.open(`/api/reports/${scanId}/boss-deck-pdf`, '_blank')}
+          className="flex-1 text-os-xs py-gs-1 bevel-button text-center"
+        >
+          Boss ↓
         </button>
       </div>
       <p className="text-center font-data text-[9px] text-gs-mid/40 pb-[4px] -mt-[2px]">
