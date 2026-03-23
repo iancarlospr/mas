@@ -198,14 +198,14 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
       <main className="flex-1 overflow-y-auto overscroll-contain">
 
         {/* ═══════ SECTION 1: HERO ═══════ */}
-        <section ref={heroRef} className="flex flex-col items-center px-gs-4 pt-gs-6 pb-gs-4">
+        <section ref={heroRef} className="flex flex-col items-center pt-gs-6 pb-gs-4">
 
-          {/* ASCII Title — scaled for mobile */}
-          <div className="flex justify-center w-full overflow-hidden">
+          {/* ASCII Title — full-bleed, scaled for mobile */}
+          <div className="w-full px-gs-2 flex justify-center">
             <pre
-              className="font-data leading-none whitespace-pre select-none text-center"
+              className="font-data leading-none whitespace-pre select-none text-center w-full"
               style={{
-                fontSize: 'clamp(4.5px, 2.6vw, 12px)',
+                fontSize: 'clamp(3.8px, 2.35vw, 12px)',
                 lineHeight: '1.05',
                 color: 'var(--gs-base)',
                 textShadow: '0 0 8px var(--gs-base), 0 0 20px rgba(255,178,239,0.3)',
@@ -215,11 +215,11 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
             </pre>
           </div>
 
-          {/* Dither strip */}
+          {/* Dither strip — full bleed */}
           <DitherStrip />
 
           {/* Chloe + Headline */}
-          <div className="flex items-start gap-gs-3 select-none" style={{ marginTop: '24px' }}>
+          <div className="flex items-start gap-gs-3 select-none px-gs-4" style={{ marginTop: '24px' }}>
             <ChloeSprite state="idle" size={64} className="flex-shrink-0 mt-[4px]" />
             <div>
               <p
@@ -269,7 +269,7 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
           </div>
 
           {/* Scan input */}
-          <div className="w-full max-w-md">
+          <div className="w-full max-w-md px-gs-4">
             <ScanInput variant="dialog" />
           </div>
         </section>
