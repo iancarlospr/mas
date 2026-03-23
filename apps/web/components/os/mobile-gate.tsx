@@ -7,6 +7,7 @@ import { MobilePricingSection } from '@/components/mobile/mobile-pricing-section
 import FeaturesWindow from '@/components/windows/features-window';
 import ProductsWindow from '@/components/windows/products-window';
 import CustomersWindow from '@/components/windows/customers-window';
+import AboutWindow from '@/components/windows/about-window';
 
 /**
  * Mobile Landing Page (replaces old MobileGate)
@@ -316,6 +317,13 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
           <p className="font-data text-[10px] text-gs-mid/40 mt-gs-2">
             marketingalphascan.com
           </p>
+        </section>
+
+        <SectionDivider />
+
+        {/* ═══════ SECTION 7: ABOUT (doubles as footer) ═══════ */}
+        <section className="py-gs-2">
+          <AboutWindow />
         </section>
 
         {/* Bottom padding for sticky bar */}
