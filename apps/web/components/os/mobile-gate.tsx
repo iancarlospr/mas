@@ -560,7 +560,7 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
             onClick={scrollToHero}
             className="bevel-button-primary flex-1 h-[34px] font-system text-os-sm font-bold"
           >
-            Scan Your Site
+            GhostScan&trade;
           </button>
           {!authLoading && (
             isAuthenticated ? (
