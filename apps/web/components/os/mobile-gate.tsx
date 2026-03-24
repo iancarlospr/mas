@@ -562,7 +562,7 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
           <ChloeSprite state="idle" size={32} className="flex-shrink-0" />
           <button
             onClick={scrollToHero}
-            className="bevel-button-primary flex-1 h-[34px] font-system text-os-sm font-bold"
+            className="bevel-button-primary flex-1 h-[34px] font-system text-os-sm font-bold min-w-0"
           >
             GhostScan&trade;
           </button>
@@ -571,7 +571,13 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
               <>
                 <button
                   onClick={scrollToMyScans}
-                  className="bevel-button px-gs-3 h-[34px] font-system text-os-sm font-bold flex-shrink-0"
+                  className="flex-1 h-[34px] font-system text-os-sm font-bold min-w-0 rounded-[4px] transition-colors"
+                  style={{
+                    border: '1px solid var(--gs-base)',
+                    background: 'oklch(0.12 0.03 340)',
+                    color: 'var(--gs-base)',
+                    boxShadow: '0 0 8px oklch(0.72 0.17 340 / 0.15), inset 0 1px 0 oklch(0.72 0.17 340 / 0.08)',
+                  }}
                 >
                   My Scans
                 </button>
