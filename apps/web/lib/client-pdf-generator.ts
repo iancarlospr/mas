@@ -19,11 +19,57 @@ const TAIL_COUNT = 3;
 const BD_W = 1344;
 const BD_H = 816;
 
-/** SVG grain filter markup — same as verdict slide's inline SVG pattern. */
-const GRAIN_SVG = `<svg width="0" height="0" aria-hidden="true" style="position:absolute"><defs><filter id="bd-grain"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter></defs></svg>`;
-
 /** Grain overlay selectors used in boss-deck-html.ts */
 const GRAIN_SELECTORS = '.bar-grain, .bar-grain-light, .wins-grain, .results-grain, .closer-grain';
+
+/**
+ * Render SVG feTurbulence through the browser's native SVG engine onto a
+ * canvas. Produces the EXACT same grain as the web view — same algorithm,
+ * same parameters — just rasterized so html2canvas can capture it.
+ */
+function renderGrainToCanvas(w: number, h: number): Promise<HTMLCanvasElement> {
+  return new Promise((resolve, reject) => {
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="100%" height="100%" filter="url(#n)"/></svg>`;
+    const img = new Image();
+    img.onload = () => {
+      const c = document.createElement('canvas');
+      c.width = w;
+      c.height = h;
+      const ctx = c.getContext('2d');
+      if (ctx) ctx.drawImage(img, 0, 0);
+      resolve(c);
+    };
+    img.onerror = () => reject(new Error('Failed to render grain SVG'));
+    img.src = `data:image/svg+xml,${encodeURIComponent(svg)}`;
+  });
+}
+
+/**
+ * Inject rasterized feTurbulence grain into each grain overlay element.
+ * The source canvas was rendered by the browser's native SVG engine,
+ * so it's visually identical to the web view's filter: url(#grain).
+ */
+function injectGrainCanvases(container: HTMLElement, grainSource: HTMLCanvasElement): void {
+  const grainEls = container.querySelectorAll<HTMLElement>(GRAIN_SELECTORS);
+  for (const el of grainEls) {
+    el.style.filter = 'none';
+    const clone = grainSource.cloneNode(true) as HTMLCanvasElement;
+    // cloneNode doesn't copy canvas pixel data — redraw it
+    const srcCtx = grainSource.getContext('2d');
+    const dstCtx = clone.getContext('2d');
+    if (srcCtx && dstCtx) {
+      dstCtx.drawImage(grainSource, 0, 0);
+    }
+    Object.assign(clone.style, {
+      position: 'absolute',
+      inset: '0',
+      width: '100%',
+      height: '100%',
+      pointerEvents: 'none',
+    });
+    el.appendChild(clone);
+  }
+}
 
 export type PDFProgress = {
   phase: 'capturing' | 'assembling' | 'done';
@@ -145,13 +191,14 @@ export async function generatePresentationPDFClientSide(
  * First and last pages as lossless PNG, middle as JPEG 85%.
  *
  * Boss Deck pages are rendered via dangerouslySetInnerHTML. html2canvas's
- * DocumentCloner can't find those elements directly ("Unable to find element
- * in cloned iframe"), so each page's HTML is copied into a fresh wrapper.
+ * DocumentCloner can't find those elements directly, so each page's HTML
+ * is copied into a fresh wrapper element.
  *
- * Grain texture: uses html2canvas's `onclone` callback to inject the SVG
- * feTurbulence filter definition and inline filter styles into the CLONED
- * document — same pattern as the verdict slide (verdict-slide.tsx).
- * This ensures the filter renders in html2canvas's internal iframe.
+ * Grain texture: SVG feTurbulence is rendered through the browser's native
+ * SVG engine onto a canvas (renderGrainToCanvas), then injected into each
+ * grain overlay element. This produces the exact same visual as the web
+ * view — same feTurbulence algorithm, same parameters — just rasterized
+ * so html2canvas can capture it.
  */
 export async function generateBossDeckPDFClientSide(
   onProgress?: (progress: PDFProgress) => void,
@@ -162,6 +209,9 @@ export async function generateBossDeckPDFClientSide(
   if (total === 0) {
     throw new Error('No pages found on the page');
   }
+
+  // Pre-render the feTurbulence grain to a reusable canvas
+  const grainCanvas = await renderGrainToCanvas(BD_W, BD_H);
 
   // Temporarily remove external Google Fonts <link> elements from <head>.
   const fontLinks: { el: HTMLElement; parent: Node }[] = [];
@@ -194,7 +244,7 @@ export async function generateBossDeckPDFClientSide(
   for (let i = 0; i < total; i++) {
     onProgress?.({ phase: 'capturing', current: i + 1, total });
 
-    // Copy page HTML into a fresh wrapper (avoids "Unable to find element" error)
+    // Copy page HTML into a fresh wrapper (avoids clone iframe error)
     const wrapper = document.createElement('div');
     wrapper.className = 'bd-capture-wrapper';
     wrapper.style.position = 'absolute';
@@ -204,6 +254,9 @@ export async function generateBossDeckPDFClientSide(
     document.body.appendChild(wrapper);
 
     const captureTarget = wrapper.querySelector('.page') as HTMLElement;
+
+    // Inject rasterized feTurbulence grain into grain overlays
+    injectGrainCanvases(captureTarget, grainCanvas);
 
     await new Promise((r) => requestAnimationFrame(r));
 
@@ -216,26 +269,6 @@ export async function generateBossDeckPDFClientSide(
       width: BD_W,
       height: BD_H,
       logging: false,
-      // Inject SVG feTurbulence filter + inline styles into the CLONED
-      // document before html2canvas renders it — same pattern as the
-      // verdict slide where the filter is inside the captured element.
-      onclone: (clonedDoc: Document) => {
-        // Find the .page inside html2canvas's clone
-        const clonedPage = clonedDoc.querySelector('.bd-capture-wrapper .page');
-        if (!clonedPage) return;
-
-        // Inject SVG filter def inside the cloned .page
-        const svgContainer = clonedDoc.createElement('div');
-        svgContainer.innerHTML = GRAIN_SVG;
-        const svg = svgContainer.firstElementChild;
-        if (svg) clonedPage.insertBefore(svg, clonedPage.firstChild);
-
-        // Apply filter as inline style on grain overlays in the clone
-        const grainEls = clonedPage.querySelectorAll<HTMLElement>(GRAIN_SELECTORS);
-        for (const el of grainEls) {
-          el.style.filter = 'url(#bd-grain)';
-        }
-      },
     });
 
     wrapper.remove();
