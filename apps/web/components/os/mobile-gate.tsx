@@ -563,16 +563,16 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
           {!authLoading && (
             isAuthenticated ? (
               <>
-                <div className="flex-1 flex gap-gs-2 min-w-0">
+                <div className="flex-1 grid grid-cols-2 gap-gs-2 min-w-0">
                   <button
                     onClick={scrollToHero}
-                    className="bevel-button-primary flex-1 h-[34px] font-system text-os-sm font-bold min-w-0"
+                    className="bevel-button-primary h-[34px] font-system text-os-sm font-bold min-w-0 !px-0"
                   >
                     GhostScan&trade;
                   </button>
                   <button
                     onClick={scrollToMyScans}
-                    className="flex-1 h-[34px] font-system text-os-sm font-bold min-w-0 rounded-[8px] transition-colors neon-outline-btn"
+                    className="h-[34px] font-system text-os-sm font-bold min-w-0 rounded-[8px] transition-colors neon-outline-btn"
                     style={{
                       border: '1.5px solid var(--gs-base)',
                       background: 'oklch(0.12 0.03 340)',
