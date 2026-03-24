@@ -281,7 +281,7 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
 
   const handleDownloadBossDeck = useCallback(() => {
     analytics.pdfDownloaded(scan.id, scan.domain ?? '', 'boss_deck');
-    window.open(`/api/reports/${scan.id}/boss-deck-pdf`, '_blank');
+    window.open(`/report/${scan.id}/boss-deck?download=1`, '_blank');
   }, [scan.id, scan.domain]);
 
   const handleAskChloe = useCallback(() => {

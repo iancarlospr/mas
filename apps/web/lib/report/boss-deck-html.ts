@@ -406,7 +406,7 @@ export function renderBossDeck(ctx: BossDeckRenderContext): string {
 </defs></svg>
 <div class="print-banner">
   <span>Boss Deck — ${domainSafe}</span>
-  <button onclick="this.textContent='Generating PDF…';this.disabled=true;window.open('/api/reports/${esc(ctx.scanId ?? '')}/boss-deck-pdf','_blank');setTimeout(()=>{this.textContent='Download PDF';this.disabled=false},8000)">Download PDF</button>
+  <button onclick="this.textContent='Generating PDF…';this.disabled=true;window.open('/report/${esc(ctx.scanId ?? '')}/boss-deck?download=1','_blank');setTimeout(()=>{this.textContent='Download PDF';this.disabled=false},8000)">Download PDF</button>
 </div>
 ${pages.join('\n')}
 </body>

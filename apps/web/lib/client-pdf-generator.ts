@@ -1,21 +1,23 @@
 /**
- * Client-side PDF generation for Presentation (Audit Deck).
+ * Client-side PDF generation for Presentation (Audit Deck) and Boss Deck.
  *
- * Uses html2canvas-pro to screenshot each .slide-page element in the
- * user's browser, then assembles them into a PDF with pdf-lib.
+ * Uses html2canvas-pro to screenshot each page element in the user's
+ * browser, then assembles them into a PDF with pdf-lib.
  * Zero server involvement — all compute happens on the client.
- *
- * Matches the engine's output: 1875×1138 point pages, hero/tail slides
- * as lossless PNG, middle slides as JPEG 90%.
  */
 
 import html2canvas from 'html2canvas-pro';
 import { PDFDocument } from 'pdf-lib';
 
-const PAGE_W = 1875;
-const PAGE_H = 1138;
+// ── Presentation (Audit Deck) ────────────────────────────────
+const PRES_W = 1875;
+const PRES_H = 1138;
 const HERO_COUNT = 3;
 const TAIL_COUNT = 3;
+
+// ── Boss Deck ────────────────────────────────────────────────
+const BD_W = 1344;
+const BD_H = 816;
 
 export type PDFProgress = {
   phase: 'capturing' | 'assembling' | 'done';
@@ -74,13 +76,13 @@ export async function generatePresentationPDFClientSide(
   const style = document.createElement('style');
   style.textContent = `
     .slide-page {
-      width: ${PAGE_W}px !important;
-      height: ${PAGE_H}px !important;
+      width: ${PRES_W}px !important;
+      height: ${PRES_H}px !important;
       overflow: hidden !important;
     }
     .slide-page .slide-card {
-      width: ${PAGE_W}px !important;
-      height: ${PAGE_H}px !important;
+      width: ${PRES_W}px !important;
+      height: ${PRES_H}px !important;
       aspect-ratio: unset !important;
       overflow: hidden !important;
       border-radius: 0 !important;
@@ -101,9 +103,9 @@ export async function generatePresentationPDFClientSide(
       useCORS: true,
       allowTaint: true,
       backgroundColor: '#080808',
-      windowWidth: PAGE_W,
-      width: PAGE_W,
-      height: PAGE_H,
+      windowWidth: PRES_W,
+      width: PRES_W,
+      height: PRES_H,
       logging: false,
     });
 
@@ -118,11 +120,80 @@ export async function generatePresentationPDFClientSide(
       img = await pdf.embedJpg(jpegBytes);
     }
 
-    const page = pdf.addPage([PAGE_W, PAGE_H]);
-    page.drawImage(img, { x: 0, y: 0, width: PAGE_W, height: PAGE_H });
+    const page = pdf.addPage([PRES_W, PRES_H]);
+    page.drawImage(img, { x: 0, y: 0, width: PRES_W, height: PRES_H });
   }
 
   // Remove the dimension override
+  style.remove();
+
+  onProgress?.({ phase: 'assembling', current: total, total });
+  const pdfBytes = await pdf.save();
+  onProgress?.({ phase: 'done', current: total, total });
+
+  return pdfBytes;
+}
+
+/**
+ * Generate a PDF from all .page elements (Boss Deck).
+ * First and last pages as lossless PNG, middle as JPEG 85%.
+ */
+export async function generateBossDeckPDFClientSide(
+  onProgress?: (progress: PDFProgress) => void,
+): Promise<Uint8Array> {
+  const pages = document.querySelectorAll<HTMLElement>('.page');
+  const total = pages.length;
+
+  if (total === 0) {
+    throw new Error('No pages found on the page');
+  }
+
+  // Force exact dimensions
+  const style = document.createElement('style');
+  style.textContent = `
+    .page {
+      width: ${BD_W}px !important;
+      height: ${BD_H}px !important;
+      overflow: hidden !important;
+    }
+    .print-banner { display: none !important; }
+    body { margin-top: 0 !important; }
+  `;
+  document.head.appendChild(style);
+
+  await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+  const pdf = await PDFDocument.create();
+
+  for (let i = 0; i < total; i++) {
+    onProgress?.({ phase: 'capturing', current: i + 1, total });
+
+    const canvas = await html2canvas(pages[i]!, {
+      scale: 1.5,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: '#080808',
+      windowWidth: BD_W,
+      width: BD_W,
+      height: BD_H,
+      logging: false,
+    });
+
+    const isHeroOrTail = i === 0 || i === total - 1;
+    let img;
+
+    if (isHeroOrTail) {
+      const pngBytes = await canvasToPng(canvas);
+      img = await pdf.embedPng(pngBytes);
+    } else {
+      const jpegBytes = await canvasToJpeg(canvas, 0.85);
+      img = await pdf.embedJpg(jpegBytes);
+    }
+
+    const page = pdf.addPage([BD_W, BD_H]);
+    page.drawImage(img, { x: 0, y: 0, width: BD_W, height: BD_H });
+  }
+
   style.remove();
 
   onProgress?.({ phase: 'assembling', current: total, total });

@@ -86,7 +86,7 @@ export function MobileBottomBar({ scanId, isPaid, activeTab = 'dashboard' }: Mob
           PRD ↓
         </button>
         <button
-          onClick={() => window.open(`/api/reports/${scanId}/boss-deck-pdf`, '_blank')}
+          onClick={() => window.open(`/report/${scanId}/boss-deck?download=1`, '_blank')}
           className="flex-1 text-os-xs py-gs-1 bevel-button text-center"
         >
           Boss ↓

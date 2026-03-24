@@ -201,7 +201,7 @@ export default function HistoryWindow() {
                       PRD&nbsp;&darr;
                     </button>
                     <button
-                      onClick={(e) => { e.stopPropagation(); window.open(`/api/reports/${scan.id}/boss-deck-pdf`, '_blank'); }}
+                      onClick={(e) => { e.stopPropagation(); window.open(`/report/${scan.id}/boss-deck?download=1`, '_blank'); }}
                       className="text-gs-base hover:text-gs-bright transition-colors"
                       title="Download Boss Deck"
                       style={{ fontSize: '11px', fontFamily: 'var(--font-system)' }}

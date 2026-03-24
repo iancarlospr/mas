@@ -3,18 +3,7 @@ import { z } from 'zod';
 import { enqueueScanJob, getJobState, getQueueDepth } from '../queue/scan-queue.js';
 import { getScanById } from '../services/supabase.js';
 import { normalizeUrl, getRegistrableDomain } from '../utils/url.js';
-import {
-  generatePresentationPDF,
-  uploadPresentationPDF,
-  generateBossDeckPDF,
-  uploadBossDeckPDF,
-} from '../services/pdf-generator.js';
 import type { ModuleTier } from '@marketing-alpha/types';
-
-// Per-scan generation locks — prevents multiple browsers for the same PDF.
-// Duplicate requests piggyback on the in-flight Promise instead of spawning another Chromium.
-const presentationLocks = new Map<string, Promise<string>>();
-const bossDeckLocks = new Map<string, Promise<string>>();
 
 /**
  * Request body schema for POST /engine/scans.
@@ -213,129 +202,6 @@ export async function scanRoutes(fastify: FastifyInstance): Promise<void> {
 
         reply.code(500).send({
           error: 'Failed to get scan status',
-          message: (error as Error).message,
-        });
-      }
-    },
-  );
-
-  /**
-   * POST /engine/reports/:id/presentation-pdf
-   *
-   * Generate presentation slide deck PDF via element screenshots.
-   * Returns a signed Supabase Storage URL (24h expiry).
-   */
-  fastify.post(
-    '/engine/reports/:id/presentation-pdf',
-    async (
-      request: FastifyRequest<{ Params: ScanIdParamsType }>,
-      reply: FastifyReply,
-    ) => {
-      const parseResult = ScanIdParams.safeParse(request.params);
-      if (!parseResult.success) {
-        reply.code(400).send({ error: 'Invalid scan ID' });
-        return;
-      }
-
-      const { id: scanId } = parseResult.data;
-
-      // Auth + tier + status already validated by the web API route
-      // before calling the engine. No need to re-check here.
-
-      try {
-        // If already generating for this scan, piggyback on the in-flight Promise.
-        // Prevents multiple Chromium browsers competing for memory on duplicate clicks.
-        const inflight = presentationLocks.get(scanId);
-        if (inflight) {
-          request.log.info({ scanId }, 'Presentation PDF already generating — waiting for in-flight result');
-          const signedUrl = await inflight;
-          reply.send({ url: signedUrl });
-          return;
-        }
-
-        const body = request.body as Record<string, unknown> | undefined;
-        const reportBaseUrl = (body?.['reportBaseUrl'] as string) || process.env['REPORT_BASE_URL'] || 'http://localhost:3000';
-        request.log.info({ scanId, reportBaseUrl }, 'Generating presentation PDF');
-
-        const promise = (async () => {
-          const pdf = await generatePresentationPDF(scanId, reportBaseUrl);
-          return uploadPresentationPDF(scanId, pdf);
-        })();
-        presentationLocks.set(scanId, promise);
-
-        try {
-          const signedUrl = await promise;
-          request.log.info({ scanId }, 'Presentation PDF generated and uploaded');
-          reply.send({ url: signedUrl });
-        } finally {
-          presentationLocks.delete(scanId);
-        }
-      } catch (error) {
-        request.log.error(
-          { scanId, error: (error as Error).message },
-          'Failed to generate presentation PDF',
-        );
-        reply.code(500).send({
-          error: 'PDF generation failed',
-          message: (error as Error).message,
-        });
-      }
-    },
-  );
-
-  /**
-   * POST /engine/reports/:id/boss-deck-pdf
-   *
-   * Generate Boss Deck PDF via element screenshots (screen mode).
-   * Returns a signed Supabase Storage URL (24h expiry).
-   */
-  fastify.post(
-    '/engine/reports/:id/boss-deck-pdf',
-    async (
-      request: FastifyRequest<{ Params: ScanIdParamsType }>,
-      reply: FastifyReply,
-    ) => {
-      const parseResult = ScanIdParams.safeParse(request.params);
-      if (!parseResult.success) {
-        reply.code(400).send({ error: 'Invalid scan ID' });
-        return;
-      }
-
-      const { id: scanId } = parseResult.data;
-
-      try {
-        const inflight = bossDeckLocks.get(scanId);
-        if (inflight) {
-          request.log.info({ scanId }, 'Boss Deck PDF already generating — waiting for in-flight result');
-          const signedUrl = await inflight;
-          reply.send({ url: signedUrl });
-          return;
-        }
-
-        const body = request.body as Record<string, unknown> | undefined;
-        const reportBaseUrl = (body?.['reportBaseUrl'] as string) || process.env['REPORT_BASE_URL'] || 'http://localhost:3000';
-        request.log.info({ scanId, reportBaseUrl }, 'Generating Boss Deck PDF');
-
-        const promise = (async () => {
-          const pdf = await generateBossDeckPDF(scanId, reportBaseUrl);
-          return uploadBossDeckPDF(scanId, pdf);
-        })();
-        bossDeckLocks.set(scanId, promise);
-
-        try {
-          const signedUrl = await promise;
-          request.log.info({ scanId }, 'Boss Deck PDF generated and uploaded');
-          reply.send({ url: signedUrl });
-        } finally {
-          bossDeckLocks.delete(scanId);
-        }
-      } catch (error) {
-        request.log.error(
-          { scanId, error: (error as Error).message },
-          'Failed to generate Boss Deck PDF',
-        );
-        reply.code(500).send({
-          error: 'PDF generation failed',
           message: (error as Error).message,
         });
       }
