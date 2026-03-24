@@ -221,6 +221,21 @@
     transform: scale(0.97);
   }
 
+  /* -- Neon Outline Button (secondary CTA) -------------------- */
+  .neon-outline-btn {
+    box-shadow:
+      0 0 12px oklch(0.72 0.17 340 / 0.25),
+      inset 0 1px 0 oklch(0.72 0.17 340 / 0.1);
+    animation: neon-pulse 2s ease-in-out infinite;
+  }
+  .neon-outline-btn:active {
+    transform: scale(0.97);
+  }
+  @keyframes neon-pulse {
+    0%, 100% { box-shadow: 0 0 12px oklch(0.72 0.17 340 / 0.15), inset 0 1px 0 oklch(0.72 0.17 340 / 0.08); }
+    50% { box-shadow: 0 0 16px oklch(0.72 0.17 340 / 0.35), inset 0 1px 0 oklch(0.72 0.17 340 / 0.12); }
+  }
+
   /* -- Window Chrome ------------------------------------------ */
   .window {
     background: oklch(0.14 0.02 340 / 0.75);

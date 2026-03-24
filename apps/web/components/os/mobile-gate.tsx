@@ -571,12 +571,11 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
               <>
                 <button
                   onClick={scrollToMyScans}
-                  className="flex-1 h-[34px] font-system text-os-sm font-bold min-w-0 rounded-[4px] transition-colors"
+                  className="flex-1 h-[34px] font-system text-os-sm font-bold min-w-0 rounded-[8px] transition-colors neon-outline-btn"
                   style={{
-                    border: '1px solid var(--gs-base)',
+                    border: '1.5px solid var(--gs-base)',
                     background: 'oklch(0.12 0.03 340)',
                     color: 'var(--gs-base)',
-                    boxShadow: '0 0 8px oklch(0.72 0.17 340 / 0.15), inset 0 1px 0 oklch(0.72 0.17 340 / 0.08)',
                   }}
                 >
                   My Scans
