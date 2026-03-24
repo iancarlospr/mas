@@ -4,7 +4,7 @@
  *
  * WHAT: Maps SSE scan phases to animation phases and defines the
  *       choreography for the Hollywood Hack loading sequence.
- * WHY:  The 90-second scan wait is the single most important moment
+ * WHY:  The 7–10 minute scan wait is the single most important moment
  *       in the product. This timing map orchestrates the entire
  *       theatrical experience (Plan Section 5, Section 20).
  * HOW:  Each SSE phase (passive, browser, ghostscan, external, synthesis)

@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'Alpha Scan — Forensic Marketing Intelligence',
     short_name: 'Alpha Scan',
-    description: 'Reverse-engineer any marketing stack in 90 seconds.',
+    description: 'Reverse-engineer any marketing stack in minutes.',
     start_url: '/',
     display: 'standalone',
     background_color: '#080808',

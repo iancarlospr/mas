@@ -28,7 +28,7 @@ export function ReEngagementEmail({
         You verified your email a week ago but haven&apos;t run a scan yet.
       </Text>
       <Text style={body}>
-        Here&apos;s what you&apos;re missing: paste any URL and in 3 minutes
+        Here&apos;s what you&apos;re missing: paste any URL and in about 10 minutes
         you&apos;ll see exactly what marketing technology they&apos;re running —
         every analytics tool, ad pixel, consent configuration, and performance
         metric.

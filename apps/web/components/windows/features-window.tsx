@@ -42,8 +42,8 @@ const DIFFERENTIATORS = [
   },
   {
     icon: '04',
-    title: '90 seconds',
-    desc: 'Not hours. Not days. A full forensic analysis in under 90 seconds. Results you can share immediately.',
+    title: '7–10 minutes',
+    desc: 'Not hours. Not days. A full forensic analysis in under 10 minutes. Results you can share immediately.',
   },
 ];
 

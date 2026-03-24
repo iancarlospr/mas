@@ -89,7 +89,7 @@ export const FAQ = [
   },
   {
     q: 'What happens when I upgrade?',
-    a: 'We run the full 45-module forensic scan across all 5 phases — passive, browser, GhostScan, external intelligence, and AI synthesis. Takes about 90 seconds.',
+    a: 'We run the full 45-module forensic scan across all 5 phases — passive, browser, GhostScan, external intelligence, and AI synthesis. Takes about 7–10 minutes — we go deep.',
   },
   {
     q: 'Why scan competitors?',

@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
           to: email,
           userId,
           template: 'scan-started',
-          subject: `Scanning ${d.targetDomain} — results in ~3 minutes`,
+          subject: `Scanning ${d.targetDomain} — results in ~10 minutes`,
           react: ScanStartedEmail({
             targetDomain: d.targetDomain,
             scanId: d.scanId,

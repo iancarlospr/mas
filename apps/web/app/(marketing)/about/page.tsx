@@ -24,7 +24,7 @@ export const metadata: Metadata = {
 
 const techStack = [
   { label: 'Forensic Modules', value: '45' },
-  { label: 'Scan Time', value: '~90 seconds' },
+  { label: 'Scan Time', value: '~7–10 min' },
   { label: 'Detection Engine', value: 'GhostScan v2.0' },
   { label: 'AI Synthesis', value: 'Proprietary LLM Pipeline' },
   { label: 'Market Intelligence', value: 'Third-Party APIs' },

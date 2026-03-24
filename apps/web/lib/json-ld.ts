@@ -14,7 +14,7 @@ export function organizationJsonLd() {
     url: 'https://marketingalphascan.com',
     logo: 'https://marketingalphascan.com/apple-icon',
     description:
-      'Forensic marketing intelligence platform. Reverse-engineer any marketing stack in 90 seconds.',
+      'Forensic marketing intelligence platform. Reverse-engineer any marketing stack in minutes.',
   };
 }
 
@@ -26,7 +26,7 @@ export function softwareApplicationJsonLd() {
     applicationCategory: 'BusinessApplication',
     operatingSystem: 'Web',
     description:
-      'Forensic marketing intelligence platform that reverse-engineers any marketing stack in 90 seconds. 45 modules, GhostScan™ detection, AI synthesis, MarketingIQ™ scoring.',
+      'Forensic marketing intelligence platform that reverse-engineers any marketing stack in minutes. 45 modules, GhostScan™ detection, AI synthesis, MarketingIQ™ scoring.',
     url: 'https://marketingalphascan.com',
     offers: {
       '@type': 'Offer',

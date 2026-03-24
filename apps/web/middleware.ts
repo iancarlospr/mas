@@ -65,11 +65,11 @@ export async function middleware(request: NextRequest) {
       const ogImageUrl = `${request.nextUrl.origin}/opengraph-image`;
       return new NextResponse(
         `<!DOCTYPE html><html><head><title>Alpha Scan — Forensic Marketing Intelligence</title>
-        <meta name="description" content="Your MarTech stack is a landfill. Alpha Scan reverse-engineers any URL in 90 seconds — infrastructure, tracking, performance, compliance.">
+        <meta name="description" content="Your MarTech stack is a landfill. Alpha Scan reverse-engineers any URL in minutes — infrastructure, tracking, performance, compliance.">
         <meta property="og:type" content="website">
         <meta property="og:site_name" content="Alpha Scan">
         <meta property="og:title" content="Alpha Scan — Forensic Marketing Intelligence">
-        <meta property="og:description" content="Serve an unclockable audit in 90 seconds. Extract the ground truth from any marketing stack.">
+        <meta property="og:description" content="Serve an unclockable audit in minutes. Extract the ground truth from any marketing stack.">
         <meta property="og:url" content="https://marketingalphascan.com">
         <meta property="og:image" content="${ogImageUrl}">
         <meta property="og:image:width" content="1200">

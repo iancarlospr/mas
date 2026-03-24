@@ -128,7 +128,7 @@ export default async function Image() {
             marginBottom: '12px',
           }}
         >
-          Reverse-engineer any marketing stack in 90 seconds
+          Reverse-engineer any marketing stack in minutes
         </div>
 
         {/* Feature pills */}

@@ -26,7 +26,7 @@ import {
  * ═══════════════════════════════════════════════════
  *
  * WHAT: Full-screen choreographed loading experience that plays during
- *       the 90-second scan. THE most important moment in the product.
+ *       the 7–10 minute scan. THE most important moment in the product.
  * WHY:  Transforms dead loading time into the most memorable, shareable
  *       moment. Users will screen-record this (Plan Section 5).
  * HOW:  4-phase sequence driven by a state machine:

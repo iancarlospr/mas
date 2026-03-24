@@ -4,11 +4,11 @@ import { softwareApplicationJsonLd } from '@/lib/json-ld';
 export const metadata: Metadata = {
   title: 'Alpha Scan — Forensic Marketing Intelligence',
   description:
-    'Your MarTech stack is a landfill. Alpha Scan reverse-engineers any URL in 90 seconds — infrastructure, tracking, performance, compliance. Free scan, no card required.',
+    'Your MarTech stack is a landfill. Alpha Scan reverse-engineers any URL in minutes — infrastructure, tracking, performance, compliance. Free scan, no card required.',
   openGraph: {
     title: 'Alpha Scan — Forensic Marketing Intelligence',
     description:
-      'Serve an unclockable audit in 90 seconds. Extract the ground truth from any marketing stack.',
+      'Serve an unclockable audit in minutes. Extract the ground truth from any marketing stack.',
   },
 };
 

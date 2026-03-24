@@ -68,7 +68,7 @@ export const SCAN_EVENTS = {
   /** Scan starting */
   start: [
     "Initiating protocol. Don't touch anything.",
-    'Scanning. This takes 90 seconds. Watch the show.',
+    'Scanning. This takes a few minutes. Watch the show, babe.',
     "Running 42 forensic modules. Sit tight, babe.",
     "Let's see what they're hiding.",
   ],

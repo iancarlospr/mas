@@ -44,7 +44,7 @@
 
 ### your website is losing you money. let's fix that.
 
-**The marketing audit you'd pay an agency $5,000 for — in 90 seconds.**
+**The marketing audit you'd pay an agency $5,000 for — in under 10 minutes.**
 
 [![CI](https://github.com/iancarlospr/mas/actions/workflows/ci.yml/badge.svg)](https://github.com/iancarlospr/mas/actions)
 [![TypeScript](https://img.shields.io/badge/typescript-strict-blue?logo=typescript)](https://www.typescriptlang.org/)
@@ -65,7 +65,7 @@ She's not a chatbot pretending to be helpful. She's a ghost who's genuinely disa
 
 ## 🔮 What Is This?
 
-AlphaScan is a **full-stack marketing intelligence platform** disguised as a retro desktop operating system. You type in any website URL, and in 90 seconds you get a comprehensive audit of everything that's happening (and going wrong) under the hood.
+AlphaScan is a **full-stack marketing intelligence platform** disguised as a retro desktop operating system. You type in any website URL, and in about 10 minutes you get a comprehensive audit of everything that's happening (and going wrong) under the hood.
 
 We're talking **45 analysis modules** across 8 categories. Not 45 checkboxes — 45 deep, specialized scans that examine your analytics setup, paid media pixels, security posture, SEO health, tech stack, accessibility compliance, competitive position, and market intelligence.
 

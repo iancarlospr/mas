@@ -10,8 +10,8 @@ export interface ScanStartedEmailProps {
 
 export function ScanStartedEmail({ targetDomain, scanId, scanUrl }: ScanStartedEmailProps) {
   return (
-    <EmailLayout preview={`Scanning ${targetDomain} — results in ~3 minutes`}>
-      <Preview>Scanning {targetDomain} — results in ~3 minutes</Preview>
+    <EmailLayout preview={`Scanning ${targetDomain} — results in ~10 minutes`}>
+      <Preview>Scanning {targetDomain} — results in ~10 minutes</Preview>
       <Heading style={h1}>Your scan is underway</Heading>
       <Text style={domain}>{targetDomain}</Text>
 
@@ -25,7 +25,7 @@ export function ScanStartedEmail({ targetDomain, scanId, scanUrl }: ScanStartedE
 
       <Text style={body}>
         We&apos;re running 45 modules across analytics, performance, compliance, and
-        more. Results typically arrive in about 3 minutes.
+        more. Results typically arrive in about 7–10 minutes. We run 45 deep modules — it&apos;s worth the wait.
       </Text>
       <div style={{ textAlign: 'center' as const, margin: '32px 0' }}>
         <CTAButton href={scanUrl}>Watch Live Progress</CTAButton>

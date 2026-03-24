@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     siteName: 'Alpha Scan',
     title: 'Alpha Scan — Forensic Marketing Intelligence',
     description:
-      'Serve an unclockable audit in 90 seconds. Extract the ground truth from any marketing stack.',
+      'Serve an unclockable audit in minutes. Extract the ground truth from any marketing stack.',
     url: 'https://marketingalphascan.com',
   },
   twitter: {
