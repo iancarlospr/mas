@@ -150,6 +150,19 @@ export async function generateBossDeckPDFClientSide(
     throw new Error('No pages found on the page');
   }
 
+  // Clone the grain SVG filter def into each .page element so html2canvas
+  // finds it in the subtree — same pattern as the Audit Deck's verdict slide
+  // where <filter id="verdict-noise"> lives inside .slide-card.
+  const grainSvg = document.querySelector('svg[width="0"][height="0"]');
+  const clonedSvgs: ChildNode[] = [];
+  if (grainSvg) {
+    for (const page of pages) {
+      const clone = grainSvg.cloneNode(true) as ChildNode;
+      page.appendChild(clone);
+      clonedSvgs.push(clone);
+    }
+  }
+
   const style = document.createElement('style');
   style.textContent = `
     .page {
@@ -159,9 +172,6 @@ export async function generateBossDeckPDFClientSide(
     }
     .print-banner { display: none !important; }
     body { margin-top: 0 !important; }
-    /* Hide SVG filter defs so html2canvas clone doesn't choke on them.
-       The grain overlays become invisible but everything else captures. */
-    svg[aria-hidden="true"] { display: none !important; }
   `;
   document.head.appendChild(style);
 
@@ -198,6 +208,8 @@ export async function generateBossDeckPDFClientSide(
     page.drawImage(img, { x: 0, y: 0, width: BD_W, height: BD_H });
   }
 
+  // Cleanup: remove cloned SVG filter defs and style override
+  clonedSvgs.forEach(svg => svg.remove());
   style.remove();
 
   onProgress?.({ phase: 'assembling', current: total, total });
