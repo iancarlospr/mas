@@ -20,14 +20,15 @@ export default async function PresentationSlidesPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ print?: string }>;
+  searchParams: Promise<{ print?: string; download?: string }>;
 }) {
   const { id: scanId } = await params;
-  const { print } = await searchParams;
+  const { print, download } = await searchParams;
 
   if (!isValidUUID(scanId)) notFound();
 
   const isPrintMode = print === '1' || print === 'true';
+  const isDownloadMode = download === '1' || download === 'true';
 
   let scanRow: Record<string, unknown> | null = null;
   let moduleRows: Record<string, unknown>[] = [];
@@ -106,5 +107,5 @@ export default async function PresentationSlidesPage({
     marketingIqResult: scanRow!.marketing_iq_result as ScanWithResults['marketingIqResult'],
   };
 
-  return <PresentationSlidesView scan={scan} autoPrint={isPrintMode} />;
+  return <PresentationSlidesView scan={scan} autoPrint={isPrintMode} autoDownload={isDownloadMode} />;
 }

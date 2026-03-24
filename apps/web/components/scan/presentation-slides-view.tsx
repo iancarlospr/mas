@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import type { ScanWithResults } from '@marketing-alpha/types';
 import { WindowManagerProvider } from '@/lib/window-manager';
+import type { PDFProgress } from '@/lib/client-pdf-generator';
 import { TitleSlide } from './slides/title-slide';
 import { VerdictSlide } from './slides/verdict-slide';
 import { OverviewExecSlide } from './slides/overview-exec-slide';
@@ -60,8 +61,18 @@ import { ClosingSlide } from './slides/closing-slide';
  * Sets data-slides-loaded="true" after fonts are ready + 300ms settle.
  */
 
-export function PresentationSlidesView({ scan, autoPrint = false }: { scan: ScanWithResults; autoPrint?: boolean }) {
+export function PresentationSlidesView({
+  scan,
+  autoPrint = false,
+  autoDownload = false,
+}: {
+  scan: ScanWithResults;
+  autoPrint?: boolean;
+  autoDownload?: boolean;
+}) {
   const [ready, setReady] = useState(false);
+  const [progress, setProgress] = useState<PDFProgress | null>(null);
+  const downloadStarted = useRef(false);
   const isPaid = scan.tier === 'paid';
 
   useEffect(() => {
@@ -79,8 +90,81 @@ export function PresentationSlidesView({ scan, autoPrint = false }: { scan: Scan
     }
   }, [ready, autoPrint]);
 
+  // Client-side PDF generation — screenshots each slide and assembles a PDF
+  const startDownload = useCallback(async () => {
+    if (downloadStarted.current) return;
+    downloadStarted.current = true;
+
+    try {
+      // Dynamic import to keep the bundle lean for non-download visitors
+      const { generatePresentationPDFClientSide, downloadPdf } = await import(
+        '@/lib/client-pdf-generator'
+      );
+
+      const pdfBytes = await generatePresentationPDFClientSide(setProgress);
+      const domain = scan.domain ?? 'report';
+      downloadPdf(pdfBytes, `${domain}-audit-deck.pdf`);
+    } catch (err) {
+      console.error('[presentation-pdf] Client-side generation failed:', err);
+      setProgress(null);
+      downloadStarted.current = false;
+    }
+  }, [scan.domain]);
+
+  // Auto-trigger download when slides are ready and autoDownload is requested
+  useEffect(() => {
+    if (ready && autoDownload) {
+      const timer = setTimeout(() => startDownload(), 500);
+      return () => clearTimeout(timer);
+    }
+  }, [ready, autoDownload, startDownload]);
+
   return (
     <WindowManagerProvider>
+      {/* Progress overlay during client-side PDF generation */}
+      {progress && progress.phase !== 'done' && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 99999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'rgba(8, 8, 8, 0.92)',
+            backdropFilter: 'blur(8px)',
+            fontFamily: 'var(--font-geist-mono), monospace',
+            color: '#FFB2EF',
+          }}
+        >
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: 18, marginBottom: 12, letterSpacing: '0.05em' }}>
+              {progress.phase === 'capturing'
+                ? `Capturing slide ${progress.current} of ${progress.total}...`
+                : 'Assembling PDF...'}
+            </div>
+            <div
+              style={{
+                width: 320,
+                height: 6,
+                background: 'rgba(255,178,239,0.15)',
+                borderRadius: 3,
+                overflow: 'hidden',
+              }}
+            >
+              <div
+                style={{
+                  width: `${Math.round((progress.current / progress.total) * 100)}%`,
+                  height: '100%',
+                  background: '#FFB2EF',
+                  borderRadius: 3,
+                  transition: 'width 0.3s ease',
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
       <div
         data-slides-loaded={ready ? 'true' : 'false'}
         style={{

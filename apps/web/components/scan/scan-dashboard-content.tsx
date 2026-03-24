@@ -270,7 +270,8 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
 
   const handleDownloadAuditDeck = useCallback(() => {
     analytics.pdfDownloaded(scan.id, scan.domain ?? '', 'audit_deck');
-    window.open(`/api/reports/${scan.id}/presentation`, '_blank');
+    // Client-side PDF generation — renders slides in user's browser, no engine needed
+    window.open(`/report/${scan.id}/slides?download=1`, '_blank');
   }, [scan.id, scan.domain]);
 
   const handleDownloadPdf = useCallback(() => {
