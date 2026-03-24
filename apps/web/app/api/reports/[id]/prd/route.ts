@@ -714,9 +714,12 @@ body {
     padding: 0 !important;
   }
   .cover-page {
-    width: 8.5in !important;
-    min-height: 14in !important;
-    margin: 0 auto !important;
+    width: 100% !important;
+    min-height: 0 !important;
+    height: 100vh !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
     break-inside: avoid;
     page-break-inside: avoid;
   }
