@@ -613,7 +613,7 @@ export function M43Slide({ scan, printMode }: { scan: ScanWithResults; printMode
 
                 {!printMode && (
                   <a
-                    href={`/api/reports/${scan.id}/presentation`}
+                    href={`/report/${scan.id}/slides?download=1`}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => analytics.pdfDownloaded(scan.id, scan.domain ?? '', 'm43_audit_deck')}

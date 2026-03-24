@@ -74,7 +74,7 @@ export function MobileBottomBar({ scanId, isPaid, activeTab = 'dashboard' }: Mob
           Chat
         </Link>
         <button
-          onClick={() => window.open(`/api/reports/${scanId}/presentation`, '_blank')}
+          onClick={() => window.open(`/report/${scanId}/slides?download=1`, '_blank')}
           className="flex-1 text-os-xs py-gs-1 bevel-button text-center"
         >
           Audit ↓

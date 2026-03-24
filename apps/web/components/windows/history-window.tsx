@@ -185,7 +185,7 @@ export default function HistoryWindow() {
                 {scan.tier === 'paid' && scan.status === 'complete' ? (
                   <>
                     <button
-                      onClick={(e) => { e.stopPropagation(); window.open(`/api/reports/${scan.id}/presentation`, '_blank'); }}
+                      onClick={(e) => { e.stopPropagation(); window.open(`/report/${scan.id}/slides?download=1`, '_blank'); }}
                       className="text-gs-base hover:text-gs-bright transition-colors"
                       title="Download Audit Deck"
                       style={{ fontSize: '11px', fontFamily: 'var(--font-system)' }}
