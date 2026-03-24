@@ -1,225 +1,158 @@
-'use client';
+import { notFound } from 'next/navigation';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { createClient, createServiceClient } from '@/lib/supabase/server';
+import { isValidUUID } from '@/lib/utils';
+import { getMarketingIQLabel, getTrafficLight } from '@marketing-alpha/types';
+import type { ScoreCategory, MarketingIQResult } from '@marketing-alpha/types';
+import type { BossDeckAIOutput } from '@/lib/report/boss-deck-prompt';
+import { renderBossDeck, type BossDeckRenderContext } from '@/lib/report/boss-deck-html';
+import { BossDeckView } from '@/components/scan/boss-deck-view';
 
-import { useEffect, useState, useRef, useCallback } from 'react';
-import { useParams, useSearchParams } from 'next/navigation';
-import type { PDFProgress } from '@/lib/client-pdf-generator';
+// ── Embed images as base64 data URIs ──
+
+function loadImageAsDataUri(relativePath: string, mime: string): string | undefined {
+  try {
+    const filePath = join(process.cwd(), 'public', relativePath);
+    const buf = readFileSync(filePath);
+    return `data:${mime};base64,${buf.toString('base64')}`;
+  } catch {
+    return undefined;
+  }
+}
+
+// ── Category metadata ──
+
+const CATEGORY_META: Record<ScoreCategory, string> = {
+  security_compliance: 'Security & Compliance',
+  analytics_measurement: 'Analytics & Measurement',
+  performance_experience: 'Performance & Experience',
+  seo_content: 'SEO & Content',
+  paid_media: 'Paid Media',
+  martech_infrastructure: 'MarTech & Infrastructure',
+  brand_presence: 'Brand & Digital Presence',
+  market_intelligence: 'Market Intelligence',
+};
+
+const ALL_CATEGORIES: ScoreCategory[] = [
+  'security_compliance', 'analytics_measurement', 'performance_experience',
+  'seo_content', 'paid_media', 'martech_infrastructure',
+  'brand_presence', 'market_intelligence',
+];
 
 /**
- * /report/[id]/boss-deck — Client-side Boss Deck PDF download page.
+ * /report/[id]/boss-deck — Boss Deck download page (server component)
  *
- * Loads the server-rendered Boss Deck HTML in an iframe (preserves fonts,
- * CSS, SVG filters — everything renders natively). Then uses html2canvas
- * + pdf-lib to capture each .page element from the iframe and assemble
- * a PDF on the client.
+ * Same pattern as /report/[id]/slides:
+ *   - Data fetched server-side (fast, single request)
+ *   - HTML rendered server-side via renderBossDeck()
+ *   - Passed to BossDeckView client component for PDF capture
+ *
+ * Auth: user ownership + paid tier.
  */
-export default function BossDeckDownloadPage() {
-  const params = useParams<{ id: string }>();
-  const searchParams = useSearchParams();
-  const scanId = params.id;
-  const isDownload = searchParams.get('download') === '1';
+export default async function BossDeckPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ download?: string }>;
+}) {
+  const { id: scanId } = await params;
+  const { download } = await searchParams;
 
-  const [progress, setProgress] = useState<PDFProgress | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const downloadStarted = useRef(false);
-  const iframeRef = useRef<HTMLIFrameElement>(null);
+  if (!isValidUUID(scanId)) notFound();
 
-  const startDownload = useCallback(async () => {
-    if (downloadStarted.current) return;
-    downloadStarted.current = true;
+  const isDownloadMode = download === '1' || download === 'true';
 
-    try {
-      const iframe = iframeRef.current;
-      if (!iframe?.contentDocument) throw new Error('iframe not ready');
+  // Auth — user must own the scan and it must be paid + complete
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) notFound();
 
-      const pages = iframe.contentDocument.querySelectorAll<HTMLElement>('.page');
-      if (pages.length === 0) throw new Error('No .page elements found in Boss Deck');
+  const serviceClient = createServiceClient();
+  const { data: scan } = await serviceClient
+    .from('scans')
+    .select('id, user_id, tier, status, domain, marketing_iq, marketing_iq_result, created_at')
+    .eq('id', scanId)
+    .single();
 
-      const { PDFDocument } = await import('pdf-lib');
-      const html2canvas = (await import('html2canvas-pro')).default;
-
-      const BD_W = 1344;
-      const BD_H = 816;
-
-      // Force exact dimensions inside iframe
-      const style = iframe.contentDocument.createElement('style');
-      style.textContent = `
-        .page {
-          width: ${BD_W}px !important;
-          height: ${BD_H}px !important;
-          overflow: hidden !important;
-        }
-        .print-banner { display: none !important; }
-        body { margin-top: 0 !important; }
-      `;
-      iframe.contentDocument.head.appendChild(style);
-
-      // Let layout settle
-      await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
-
-      const pdf = await PDFDocument.create();
-      const total = pages.length;
-
-      for (let i = 0; i < total; i++) {
-        setProgress({ phase: 'capturing', current: i + 1, total });
-
-        const canvas = await html2canvas(pages[i]!, {
-          scale: 1.5,
-          useCORS: true,
-          allowTaint: true,
-          backgroundColor: '#080808',
-          windowWidth: BD_W,
-          width: BD_W,
-          height: BD_H,
-          logging: false,
-        });
-
-        const isHeroOrTail = i === 0 || i === total - 1;
-
-        if (isHeroOrTail) {
-          const blob = await new Promise<Blob>((res, rej) =>
-            canvas.toBlob((b) => (b ? res(b) : rej(new Error('toBlob null'))), 'image/png'),
-          );
-          const img = await pdf.embedPng(await blob.arrayBuffer());
-          const page = pdf.addPage([BD_W, BD_H]);
-          page.drawImage(img, { x: 0, y: 0, width: BD_W, height: BD_H });
-        } else {
-          const blob = await new Promise<Blob>((res, rej) =>
-            canvas.toBlob((b) => (b ? res(b) : rej(new Error('toBlob null'))), 'image/jpeg', 0.85),
-          );
-          const img = await pdf.embedJpg(await blob.arrayBuffer());
-          const page = pdf.addPage([BD_W, BD_H]);
-          page.drawImage(img, { x: 0, y: 0, width: BD_W, height: BD_H });
-        }
-      }
-
-      style.remove();
-
-      setProgress({ phase: 'assembling', current: total, total });
-      const pdfBytes = await pdf.save();
-      setProgress({ phase: 'done', current: total, total });
-
-      // Trigger download
-      const blob = new Blob([pdfBytes.buffer as ArrayBuffer], { type: 'application/pdf' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'boss-deck.pdf';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error('[boss-deck-pdf] Client-side generation failed:', err);
-      setError((err as Error).message);
-      setProgress(null);
-      downloadStarted.current = false;
-    }
-  }, []);
-
-  // When iframe loads and download mode is active, start capture
-  const handleIframeLoad = useCallback(() => {
-    if (!isDownload) return;
-
-    // Wait for fonts + images inside the iframe to settle
-    const iframe = iframeRef.current;
-    if (!iframe?.contentDocument) return;
-
-    iframe.contentDocument.fonts.ready.then(() => {
-      setTimeout(() => startDownload(), 1500);
-    });
-  }, [isDownload, startDownload]);
-
-  if (error) {
-    return (
-      <div style={{ color: '#FFB2EF', background: '#080808', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'monospace' }}>
-        Error: {error}
-      </div>
-    );
+  if (!scan || scan.user_id !== user.id || scan.tier !== 'paid' || scan.status !== 'complete') {
+    notFound();
   }
 
-  return (
-    <>
-      {/* Progress overlay */}
-      {progress && progress.phase !== 'done' && (
-        <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            zIndex: 99999,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'rgba(8, 8, 8, 0.92)',
-            backdropFilter: 'blur(8px)',
-            fontFamily: 'monospace',
-            color: '#FFB2EF',
-          }}
-        >
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 18, marginBottom: 12, letterSpacing: '0.05em' }}>
-              {progress.phase === 'capturing'
-                ? `Capturing page ${progress.current} of ${progress.total}...`
-                : 'Assembling PDF...'}
-            </div>
-            <div
-              style={{
-                width: 320,
-                height: 6,
-                background: 'rgba(255,178,239,0.15)',
-                borderRadius: 3,
-                overflow: 'hidden',
-              }}
-            >
-              <div
-                style={{
-                  width: `${Math.round((progress.current / progress.total) * 100)}%`,
-                  height: '100%',
-                  background: '#FFB2EF',
-                  borderRadius: 3,
-                  transition: 'width 0.3s ease',
-                }}
-              />
-            </div>
-          </div>
-        </div>
-      )}
+  // Fetch module data (same as /api/reports/[id]/boss-deck)
+  const { data: moduleResults } = await serviceClient
+    .from('module_results')
+    .select('module_id, data')
+    .eq('scan_id', scanId)
+    .in('module_id', ['M46', 'M42', 'M43', 'M45', 'M03', 'M06', 'M21', 'M22', 'M24', 'M25', 'M26']);
 
-      {/* Loading state before iframe loads */}
-      {!progress && (
-        <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            zIndex: 99998,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: '#080808',
-            fontFamily: 'monospace',
-            color: '#FFB2EF',
-            fontSize: 16,
-          }}
-        >
-          Loading Boss Deck...
-        </div>
-      )}
+  const resultMap = new Map<string, Record<string, unknown>>();
+  for (const row of moduleResults ?? []) {
+    if (row.data) {
+      resultMap.set(row.module_id, row.data as Record<string, unknown>);
+    }
+  }
 
-      {/* Iframe loads the full boss deck HTML with all fonts/CSS/SVG natively */}
-      <iframe
-        ref={iframeRef}
-        src={`/api/reports/${scanId}/boss-deck`}
-        onLoad={handleIframeLoad}
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '1400px',
-          height: '900px',
-          border: 'none',
-          opacity: 0,
-          pointerEvents: 'none',
-        }}
-      />
-    </>
-  );
+  const m46Raw = resultMap.get('M46');
+  if (!m46Raw) notFound();
+
+  const aiOutput = (m46Raw['bossDeck'] as BossDeckAIOutput) ?? null;
+  const m46CategoryScores = m46Raw['categoryScores'] as { category: string; score: number; light: string }[] | undefined;
+
+  const iqResult = scan.marketing_iq_result as MarketingIQResult | null;
+  const categoryScores = m46CategoryScores ?? ALL_CATEGORIES.map(key => {
+    const cat = iqResult?.categories?.find(c => c.category === key);
+    const score = cat ? Math.round(cat.score) : 0;
+    return {
+      category: CATEGORY_META[key],
+      score,
+      light: getTrafficLight(score),
+    };
+  });
+
+  const m42Raw = resultMap.get('M42');
+  const m42Synthesis = (m42Raw?.['synthesis'] as Record<string, unknown>) ?? null;
+  const m45Raw = resultMap.get('M45');
+  const m45StackAnalysis = (m45Raw?.['stackAnalysis'] as Record<string, unknown>) ?? null;
+  const m43Raw = resultMap.get('M43');
+
+  const m43Metadata = (m43Raw?.['metadata'] as Record<string, unknown>) ?? null;
+  const businessName = (m43Metadata?.['businessName'] as string)
+    ?? (m42Synthesis?.['business_name'] as string)
+    ?? scan.domain
+    ?? '';
+
+  const userName = user.user_metadata?.['full_name'] as string
+    ?? user.user_metadata?.['name'] as string
+    ?? user.email ?? '';
+
+  const renderCtx: BossDeckRenderContext = {
+    domain: scan.domain ?? scanId,
+    businessName,
+    scanDate: scan.created_at ?? new Date().toISOString(),
+    userEmail: userName,
+    marketingIQ: scan.marketing_iq as number | null,
+    marketingIQLabel: scan.marketing_iq != null ? getMarketingIQLabel(scan.marketing_iq as number) : null,
+    ai: aiOutput,
+    m42Synthesis,
+    m45StackAnalysis,
+    categoryScores,
+    hasM43: m43Raw != null,
+    hasM45: m45StackAnalysis != null,
+    coverImageDataUri: loadImageAsDataUri('boss-deck/hero-cover.jpg', 'image/jpeg'),
+    closerImageDataUri: loadImageAsDataUri('boss-deck/hero-horizon.jpg', 'image/jpeg'),
+    m03Data: resultMap.get('M03') ?? null,
+    m06Data: resultMap.get('M06') ?? null,
+    m21Data: resultMap.get('M21') ?? null,
+    m22Data: resultMap.get('M22') ?? null,
+    m24Data: resultMap.get('M24') ?? null,
+    m25Data: resultMap.get('M25') ?? null,
+    m26Data: resultMap.get('M26') ?? null,
+    scanId,
+  };
+
+  const html = renderBossDeck(renderCtx);
+
+  return <BossDeckView html={html} domain={scan.domain ?? 'report'} autoDownload={isDownloadMode} />;
 }
