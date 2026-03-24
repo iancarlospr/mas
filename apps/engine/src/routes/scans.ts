@@ -11,6 +11,11 @@ import {
 } from '../services/pdf-generator.js';
 import type { ModuleTier } from '@marketing-alpha/types';
 
+// Per-scan generation locks — prevents multiple browsers for the same PDF.
+// Duplicate requests piggyback on the in-flight Promise instead of spawning another Chromium.
+const presentationLocks = new Map<string, Promise<string>>();
+const bossDeckLocks = new Map<string, Promise<string>>();
+
 /**
  * Request body schema for POST /engine/scans.
  * When synthesisOnly is true, url/domain can be empty (read from DB).
@@ -238,15 +243,33 @@ export async function scanRoutes(fastify: FastifyInstance): Promise<void> {
       // before calling the engine. No need to re-check here.
 
       try {
+        // If already generating for this scan, piggyback on the in-flight Promise.
+        // Prevents multiple Chromium browsers competing for memory on duplicate clicks.
+        const inflight = presentationLocks.get(scanId);
+        if (inflight) {
+          request.log.info({ scanId }, 'Presentation PDF already generating — waiting for in-flight result');
+          const signedUrl = await inflight;
+          reply.send({ url: signedUrl });
+          return;
+        }
+
         const body = request.body as Record<string, unknown> | undefined;
         const reportBaseUrl = (body?.['reportBaseUrl'] as string) || process.env['REPORT_BASE_URL'] || 'http://localhost:3000';
         request.log.info({ scanId, reportBaseUrl }, 'Generating presentation PDF');
 
-        const pdf = await generatePresentationPDF(scanId, reportBaseUrl);
-        const signedUrl = await uploadPresentationPDF(scanId, pdf);
+        const promise = (async () => {
+          const pdf = await generatePresentationPDF(scanId, reportBaseUrl);
+          return uploadPresentationPDF(scanId, pdf);
+        })();
+        presentationLocks.set(scanId, promise);
 
-        request.log.info({ scanId }, 'Presentation PDF generated and uploaded');
-        reply.send({ url: signedUrl });
+        try {
+          const signedUrl = await promise;
+          request.log.info({ scanId }, 'Presentation PDF generated and uploaded');
+          reply.send({ url: signedUrl });
+        } finally {
+          presentationLocks.delete(scanId);
+        }
       } catch (error) {
         request.log.error(
           { scanId, error: (error as Error).message },
@@ -281,15 +304,31 @@ export async function scanRoutes(fastify: FastifyInstance): Promise<void> {
       const { id: scanId } = parseResult.data;
 
       try {
+        const inflight = bossDeckLocks.get(scanId);
+        if (inflight) {
+          request.log.info({ scanId }, 'Boss Deck PDF already generating — waiting for in-flight result');
+          const signedUrl = await inflight;
+          reply.send({ url: signedUrl });
+          return;
+        }
+
         const body = request.body as Record<string, unknown> | undefined;
         const reportBaseUrl = (body?.['reportBaseUrl'] as string) || process.env['REPORT_BASE_URL'] || 'http://localhost:3000';
         request.log.info({ scanId, reportBaseUrl }, 'Generating Boss Deck PDF');
 
-        const pdf = await generateBossDeckPDF(scanId, reportBaseUrl);
-        const signedUrl = await uploadBossDeckPDF(scanId, pdf);
+        const promise = (async () => {
+          const pdf = await generateBossDeckPDF(scanId, reportBaseUrl);
+          return uploadBossDeckPDF(scanId, pdf);
+        })();
+        bossDeckLocks.set(scanId, promise);
 
-        request.log.info({ scanId }, 'Boss Deck PDF generated and uploaded');
-        reply.send({ url: signedUrl });
+        try {
+          const signedUrl = await promise;
+          request.log.info({ scanId }, 'Boss Deck PDF generated and uploaded');
+          reply.send({ url: signedUrl });
+        } finally {
+          bossDeckLocks.delete(scanId);
+        }
       } catch (error) {
         request.log.error(
           { scanId, error: (error as Error).message },
