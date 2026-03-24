@@ -34,24 +34,22 @@ function injectGrainCanvases(container: HTMLElement): void {
     // Remove the SVG filter (html2canvas can't render it)
     el.style.filter = 'none';
 
-    // Create canvas with noise — same algorithm as GrainCanvas component
+    // Create canvas at full page resolution — avoids visible pixelation
+    // from stretching a small canvas. Uses bilinear interpolation (no pixelated).
     const canvas = document.createElement('canvas');
-    const w = 256;
-    const h = 256;
-    canvas.width = w;
-    canvas.height = h;
+    canvas.width = BD_W;
+    canvas.height = BD_H;
     Object.assign(canvas.style, {
       position: 'absolute',
       inset: '0',
       width: '100%',
       height: '100%',
       pointerEvents: 'none',
-      imageRendering: 'pixelated',
     });
 
     const ctx = canvas.getContext('2d');
     if (ctx) {
-      const imageData = ctx.createImageData(w, h);
+      const imageData = ctx.createImageData(BD_W, BD_H);
       const d = imageData.data;
       for (let i = 0; i < d.length; i += 4) {
         const v = Math.random() * 255;
