@@ -376,6 +376,9 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
         .mobile-my-scans .w-44 { width: auto !important; }
         .mobile-my-scans .gap-gs-2 { gap: 4px !important; }
         .mobile-my-scans .px-gs-3 { padding-left: 8px !important; padding-right: 8px !important; }
+        /* ── About footer: tighter bottom spacing ── */
+        .mobile-about-footer > div { padding-bottom: 8px !important; }
+        .mobile-about-footer > div > .space-y-gs-6:last-child { gap: 8px !important; }
       `}</style>
       <div className="noise-grain opacity-[0.03]" aria-hidden="true" />
 
@@ -544,12 +547,12 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
         <SectionDivider />
 
         {/* ═══════ SECTION 7: ABOUT (doubles as footer) ═══════ */}
-        <section className="py-gs-2">
+        <section className="py-gs-2 mobile-about-footer">
           <AboutWindow />
         </section>
 
         {/* Bottom padding for sticky bar */}
-        <div style={{ height: '56px' }} />
+        <div style={{ height: '48px' }} />
       </main>
 
       {/* ═══════ STICKY BOTTOM BAR ═══════ */}
