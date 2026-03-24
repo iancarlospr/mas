@@ -6,6 +6,8 @@ import { useAuth } from '@/lib/auth-context';
 import { useWindowManager } from '@/lib/window-manager';
 import { useScanOrchestrator } from '@/lib/scan-orchestrator';
 import { analytics } from '@/lib/analytics';
+import { generateAuditMarkdown } from '@/lib/report/markdown-export';
+import type { ScanWithResults } from '@marketing-alpha/types';
 
 /* ═══════════════════════════════════════════════════════════════
    My Scans — Window Content
@@ -40,6 +42,22 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
   const [scans, setScans] = useState<ScanRow[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [mdCopiedId, setMdCopiedId] = useState<string | null>(null);
+
+  const handleCopyMarkdown = useCallback(async (e: React.MouseEvent, scanId: string, domain: string) => {
+    e.stopPropagation();
+    if (mdCopiedId === scanId) return;
+    try {
+      const res = await fetch(`/api/scans/${scanId}`);
+      if (!res.ok) return;
+      const data: ScanWithResults = await res.json();
+      const markdown = generateAuditMarkdown(data);
+      await navigator.clipboard.writeText(markdown);
+      setMdCopiedId(scanId);
+      analytics.markdownCopied(scanId, domain);
+      setTimeout(() => setMdCopiedId(null), 2000);
+    } catch { /* clipboard API not available */ }
+  }, [mdCopiedId]);
 
   const handleScanClick = useCallback((scanId: string, domain: string, status: string) => {
     if (status === 'complete' || status === 'failed' || status === 'cancelled') {
@@ -131,7 +149,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
         <span className="w-14 text-center">Score</span>
         <span className="w-6 text-center" />
         <span className="w-14 text-center">Tier</span>
-        <span className="w-44 text-center">Actions</span>
+        <span className="w-56 text-center">Actions</span>
         <span className="w-16 text-right">Date</span>
         <span className="w-6" />
       </div>
@@ -185,7 +203,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                   {scan.tier === 'paid' ? 'PRO' : 'FREE'}
                 </span>
               </span>
-              <span className="w-44 text-center flex items-center justify-center gap-2 whitespace-nowrap">
+              <span className="w-56 text-center flex items-center justify-center gap-2 whitespace-nowrap">
                 {scan.tier === 'paid' && scan.status === 'complete' ? (
                   <>
                     <button
@@ -211,6 +229,14 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                       style={{ fontSize: '11px', fontFamily: 'var(--font-system)' }}
                     >
                       Boss&nbsp;&darr;
+                    </button>
+                    <button
+                      onClick={(e) => handleCopyMarkdown(e, scan.id, domain)}
+                      className="text-gs-base hover:text-gs-bright transition-colors"
+                      title="Copy audit as Markdown"
+                      style={{ fontSize: '11px', fontFamily: 'var(--font-system)' }}
+                    >
+                      {mdCopiedId === scan.id ? '\u2713' : '.MD\u00a0\u2193'}
                     </button>
                     <button
                       onClick={(e) => {

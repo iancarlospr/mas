@@ -587,7 +587,7 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
             </button>
             <span className="text-gs-mid" style={{ fontSize: '11px' }}>&middot;</span>
             <button onClick={handleCopyMarkdown} className="text-gs-base hover:text-gs-bright transition-colors" style={{ fontSize: '11px', fontFamily: 'var(--font-system)' }}>
-              {mdCopied ? '\u2713 Copied!' : '.markdown \u2193'}
+              {mdCopied ? '\u2713 Copied!' : '.MD \u2193'}
             </button>
             <span className="text-gs-mid" style={{ fontSize: '11px' }}>&middot;</span>
             <button
