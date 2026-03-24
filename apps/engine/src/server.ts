@@ -50,7 +50,9 @@ export async function buildServer() {
           : undefined,
     },
     trustProxy: true,
-    requestTimeout: 30_000,
+    // 3min — must exceed PDF generation time (60-120s for 52-slide presentation).
+    // All routes are HMAC-authenticated; Caddy enforces its own 300s upstream timeout.
+    requestTimeout: 180_000,
     bodyLimit: 1_048_576, // 1MB
   });
 
