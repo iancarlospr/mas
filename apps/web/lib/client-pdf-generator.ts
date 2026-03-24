@@ -19,50 +19,11 @@ const TAIL_COUNT = 3;
 const BD_W = 1344;
 const BD_H = 816;
 
-/**
- * Inject full-resolution canvas noise into grain overlay elements.
- * html2canvas captures <canvas> pixel data natively — this is the same
- * mechanism that makes the Audit Deck verdict slide's PlasmaCanvas
- * render grain in the PDF. SVG feTurbulence cannot be captured.
- */
-function injectGrainCanvases(pageEl: HTMLElement): void {
-  const grainEls = pageEl.querySelectorAll<HTMLElement>(
-    '.bar-grain, .bar-grain-light, .wins-grain, .results-grain, .closer-grain',
-  );
+/** SVG grain filter markup — same as verdict slide's inline SVG pattern. */
+const GRAIN_SVG = `<svg width="0" height="0" aria-hidden="true" style="position:absolute"><defs><filter id="bd-grain"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter></defs></svg>`;
 
-  for (const el of grainEls) {
-    // Remove the SVG filter reference
-    el.style.filter = 'none';
-
-    // Create full-resolution noise canvas (no pixelated stretching)
-    const c = document.createElement('canvas');
-    c.width = BD_W;
-    c.height = BD_H;
-    Object.assign(c.style, {
-      position: 'absolute',
-      inset: '0',
-      width: '100%',
-      height: '100%',
-      pointerEvents: 'none',
-    });
-
-    const ctx = c.getContext('2d');
-    if (ctx) {
-      const imageData = ctx.createImageData(BD_W, BD_H);
-      const d = imageData.data;
-      for (let i = 0; i < d.length; i += 4) {
-        const v = Math.random() * 255;
-        d[i] = v;
-        d[i + 1] = v;
-        d[i + 2] = v;
-        d[i + 3] = 255;
-      }
-      ctx.putImageData(imageData, 0, 0);
-    }
-
-    el.appendChild(c);
-  }
-}
+/** Grain overlay selectors used in boss-deck-html.ts */
+const GRAIN_SELECTORS = '.bar-grain, .bar-grain-light, .wins-grain, .results-grain, .closer-grain';
 
 export type PDFProgress = {
   phase: 'capturing' | 'assembling' | 'done';
@@ -183,14 +144,14 @@ export async function generatePresentationPDFClientSide(
  * Generate a PDF from all .page elements (Boss Deck).
  * First and last pages as lossless PNG, middle as JPEG 85%.
  *
- * Same capture pipeline as the Audit Deck (generatePresentationPDFClientSide).
+ * Uses the same direct-capture approach as the Audit Deck: capture live
+ * DOM elements, not innerHTML copies. The verdict slide proves that SVG
+ * feTurbulence grain renders correctly when html2canvas captures live
+ * elements with inline filter styles.
  *
- * Boss Deck pages are rendered via dangerouslySetInnerHTML. html2canvas-pro's
- * DocumentCloner fails to locate the reference element in its custom DOM
- * traversal for innerHTML-parsed nodes. To work around this, each page's HTML
- * is copied into a fresh container element that html2canvas can clone normally.
- * Global styles (from <style> tags in the document) still apply because they
- * match on class names, which the copied elements retain.
+ * Before capture: inject SVG filter def inside each .page + set inline
+ * filter styles on grain overlays (same pattern as verdict-slide.tsx).
+ * After capture: clean up injected elements.
  */
 export async function generateBossDeckPDFClientSide(
   onProgress?: (progress: PDFProgress) => void,
@@ -215,9 +176,10 @@ export async function generateBossDeckPDFClientSide(
     }
   });
 
+  // Force exact dimensions on all pages (same approach as Audit Deck)
   const style = document.createElement('style');
   style.textContent = `
-    .bd-capture-wrapper .page {
+    .page {
       width: ${BD_W}px !important;
       height: ${BD_H}px !important;
       overflow: hidden !important;
@@ -232,27 +194,38 @@ export async function generateBossDeckPDFClientSide(
 
   const pdf = await PDFDocument.create();
 
+  // Track injected elements for cleanup
+  const injectedSvgs: Element[] = [];
+  const grainStyleBackups: { el: HTMLElement; original: string }[] = [];
+
+  // Pre-capture: inject SVG filter inside each .page + set inline styles
+  // on grain overlays (same pattern as verdict slide)
+  for (let i = 0; i < total; i++) {
+    const page = pages[i]!;
+
+    // Inject SVG filter def inside .page (verdict slide has it inside .slide-card)
+    const svgWrapper = document.createElement('div');
+    svgWrapper.innerHTML = GRAIN_SVG;
+    const svg = svgWrapper.firstElementChild!;
+    page.insertBefore(svg, page.firstChild);
+    injectedSvgs.push(svg);
+
+    // Apply filter as inline style (verdict slide uses inline style, not CSS class)
+    const grainEls = page.querySelectorAll<HTMLElement>(GRAIN_SELECTORS);
+    for (const el of grainEls) {
+      grainStyleBackups.push({ el, original: el.style.filter });
+      el.style.filter = 'url(#bd-grain)';
+    }
+  }
+
+  // Let layout settle after injections
+  await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+  // Capture each page directly from the live DOM (same as Audit Deck)
   for (let i = 0; i < total; i++) {
     onProgress?.({ phase: 'capturing', current: i + 1, total });
 
-    // Create a fresh container and copy the page HTML into it.
-    const wrapper = document.createElement('div');
-    wrapper.className = 'bd-capture-wrapper';
-    wrapper.style.position = 'absolute';
-    wrapper.style.left = '-9999px';
-    wrapper.style.top = '0';
-    wrapper.innerHTML = pages[i]!.outerHTML;
-    document.body.appendChild(wrapper);
-
-    const captureTarget = wrapper.querySelector('.page') as HTMLElement;
-
-    // Inject canvas-rendered noise into grain overlays for capture
-    injectGrainCanvases(captureTarget);
-
-    // Let layout settle
-    await new Promise((r) => requestAnimationFrame(r));
-
-    const canvas = await html2canvas(captureTarget, {
+    const canvas = await html2canvas(pages[i]!, {
       scale: 1.5,
       useCORS: true,
       allowTaint: true,
@@ -262,9 +235,6 @@ export async function generateBossDeckPDFClientSide(
       height: BD_H,
       logging: false,
     });
-
-    // Remove the temporary wrapper immediately to free memory
-    wrapper.remove();
 
     const isHeroOrTail = i === 0 || i === total - 1;
     let img;
@@ -281,7 +251,9 @@ export async function generateBossDeckPDFClientSide(
     page.drawImage(img, { x: 0, y: 0, width: BD_W, height: BD_H });
   }
 
-  // Cleanup: restore font links, remove style override
+  // Cleanup: remove injected SVGs, restore original filter styles, restore fonts
+  for (const svg of injectedSvgs) svg.remove();
+  for (const { el, original } of grainStyleBackups) el.style.filter = original;
   fontLinks.forEach(({ el, parent }) => parent.appendChild(el));
   style.remove();
 
