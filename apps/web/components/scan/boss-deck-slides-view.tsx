@@ -1,24 +1,27 @@
 'use client';
 
 import { useEffect, useState, useCallback, useRef } from 'react';
+import type { BossDeckRenderContext } from '@/lib/report/boss-deck-html';
 import type { PDFProgress } from '@/lib/client-pdf-generator';
+import { BOSS_DECK_CSS } from './boss-deck-slides/boss-deck-css';
+import { CoverPage, WinsPage, IssuesPage, RoadmapPage, ResultsPage, ToolsPage, CloserPage } from './boss-deck-slides';
 
 const GOOGLE_FONTS_URL =
   'https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Source+Code+Pro:wght@400;600;700&family=Permanent+Marker&display=swap';
 
 /**
- * BossDeckView — client wrapper for Boss Deck PDF capture.
+ * BossDeckSlidesView — React component renderer for Boss Deck PDF capture.
  *
- * Receives the pre-rendered boss deck HTML from the server component,
- * injects fonts + CSS, renders the content, and optionally triggers
- * client-side PDF generation.
+ * Renders ALL pages as real React components (not dangerouslySetInnerHTML),
+ * matching the PresentationSlidesView pattern. html2canvas can clone these
+ * elements without issues.
  */
-export function BossDeckView({
-  html,
+export function BossDeckSlidesView({
+  ctx,
   domain,
   autoDownload = false,
 }: {
-  html: string;
+  ctx: BossDeckRenderContext;
   domain: string;
   autoDownload?: boolean;
 }) {
@@ -27,18 +30,7 @@ export function BossDeckView({
   const [error, setError] = useState<string | null>(null);
   const downloadStarted = useRef(false);
 
-  // Extract <style> content from the HTML <head>, strip body margin-top (print banner artifact)
-  const headStyles = (html.match(/<style[^>]*>[\s\S]*?<\/style>/gi) ?? [])
-    .join('\n')
-    .replace(/body\s*\{\s*margin-top:\s*50px;\s*\}/g, '');
-
-  // Extract <body> content, strip the old print banner
-  const bodyContent = html
-    .replace(/^[\s\S]*<body[^>]*>/i, '')
-    .replace(/<\/body>[\s\S]*$/i, '')
-    .replace(/<div class="print-banner">[\s\S]*?<\/div>\s*/i, '');
-
-  // Inject Google Fonts link into <head>
+  // ── Font loading ──────────────────────────────────
   useEffect(() => {
     const preconnect1 = document.createElement('link');
     preconnect1.rel = 'preconnect';
@@ -56,14 +48,12 @@ export function BossDeckView({
     fontLink.href = GOOGLE_FONTS_URL;
     document.head.appendChild(fontLink);
 
-    // Wait for fonts to load, then mark ready
     fontLink.onload = () => {
       document.fonts.ready.then(() => {
         setTimeout(() => setReady(true), 500);
       });
     };
 
-    // Fallback if onload doesn't fire
     const fallback = setTimeout(() => setReady(true), 3000);
 
     return () => {
@@ -74,6 +64,7 @@ export function BossDeckView({
     };
   }, []);
 
+  // ── PDF download ──────────────────────────────────
   const startDownload = useCallback(async () => {
     if (downloadStarted.current) return;
     downloadStarted.current = true;
@@ -92,15 +83,42 @@ export function BossDeckView({
       setProgress(null);
       downloadStarted.current = false;
     }
-  }, [html, domain]);
+  }, [domain]);
 
-  // Auto-trigger download when ready
   useEffect(() => {
     if (ready && autoDownload) {
       const timer = setTimeout(() => startDownload(), 500);
       return () => clearTimeout(timer);
     }
   }, [ready, autoDownload, startDownload]);
+
+  // ── Determine which pages to render ───────────────
+  const ai = ctx.ai;
+  const winsHighlights = ai?.wins_highlights ?? [];
+  const topIssues = ai?.top_issues ?? [];
+  const initiatives = ai?.initiatives ?? [];
+  const timelineItems = ai?.timeline_items ?? [];
+  const projections = ai?.category_projections ?? [];
+  const outcomes = ai?.implementation_outcomes ?? [];
+  const toolPitches = ai?.tool_pitches ?? [];
+
+  const showWins = winsHighlights.length > 0;
+  const showIssues = topIssues.length > 0;
+  const showRoadmap = initiatives.length > 0 || timelineItems.length > 0;
+  const showResults = projections.length > 0 || outcomes.length > 0;
+  const showTools = toolPitches.length > 0 && ctx.hasM45;
+
+  // Build ordered page list for sequential numbering
+  const pages: string[] = ['cover'];
+  if (showWins) pages.push('wins');
+  if (showIssues) pages.push('issues');
+  if (showRoadmap) pages.push('roadmap');
+  if (showResults) pages.push('results');
+  if (showTools) pages.push('tools');
+  pages.push('closer');
+
+  const totalPages = pages.length;
+  const pn = (name: string) => pages.indexOf(name) + 1;
 
   return (
     <>
@@ -182,7 +200,7 @@ export function BossDeckView({
         </div>
       )}
 
-      {/* Override globals.css body { overflow: hidden } — pages must be visible for html2canvas */}
+      {/* Override globals.css body { overflow: hidden } */}
       <style>{`
         html, body {
           overflow: auto !important;
@@ -192,11 +210,86 @@ export function BossDeckView({
         }
       `}</style>
 
-      {/* Boss deck styles extracted from the HTML <head> */}
-      <div dangerouslySetInnerHTML={{ __html: headStyles }} />
+      {/* Boss Deck CSS */}
+      <style>{BOSS_DECK_CSS}</style>
 
-      {/* Boss deck body content (pages, SVG defs, print banner) */}
-      <div dangerouslySetInnerHTML={{ __html: bodyContent }} />
+      {/* ── Pages ─────────────────────────────────── */}
+
+      {/* Cover */}
+      <div className="bd-page dark-page cover-page">
+        <CoverPage ctx={ctx} subtitle={ai?.cover_subtitle ?? ''} />
+      </div>
+
+      {/* Wins */}
+      {showWins && (
+        <div className={`bd-page ${winsHighlights.length > 0 ? 'dark-page wins-page-dark' : 'light-page'}`}>
+          <WinsPage
+            narrative={ai?.wins_narrative ?? ''}
+            highlights={winsHighlights}
+            ctx={ctx}
+            pageNum={pn('wins')}
+            totalPages={totalPages}
+          />
+        </div>
+      )}
+
+      {/* Issues */}
+      {showIssues && (
+        <div className="bd-page dark-page">
+          <IssuesPage
+            issues={topIssues}
+            pageNum={pn('issues')}
+            totalPages={totalPages}
+            userName={ctx.userEmail}
+          />
+        </div>
+      )}
+
+      {/* Roadmap */}
+      {showRoadmap && (
+        <div className="bd-page light-page">
+          <RoadmapPage
+            initiatives={initiatives}
+            timelineSummary={ai?.timeline_summary ?? ''}
+            timelineItems={timelineItems}
+            nextSteps={ai?.next_steps ?? []}
+            pageNum={pn('roadmap')}
+            totalPages={totalPages}
+            userName={ctx.userEmail}
+          />
+        </div>
+      )}
+
+      {/* Results */}
+      {showResults && (
+        <div className="bd-page dark-page results-page">
+          <ResultsPage
+            headline={ai?.implementation_impact_headline ?? 'Expected Impact'}
+            outcomes={outcomes}
+            projections={projections}
+            pageNum={pn('results')}
+            totalPages={totalPages}
+            userName={ctx.userEmail}
+          />
+        </div>
+      )}
+
+      {/* Tools */}
+      {showTools && (
+        <div className="bd-page light-page">
+          <ToolsPage
+            pitches={toolPitches}
+            pageNum={pn('tools')}
+            totalPages={totalPages}
+            userName={ctx.userEmail}
+          />
+        </div>
+      )}
+
+      {/* Closer */}
+      <div className="bd-page dark-page closer-page">
+        <CloserPage ctx={ctx} />
+      </div>
     </>
   );
 }
