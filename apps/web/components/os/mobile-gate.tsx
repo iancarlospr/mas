@@ -16,6 +16,8 @@ import AboutWindow from '@/components/windows/about-window';
 import HistoryWindow from '@/components/windows/history-window';
 import ProfileWindow from '@/components/windows/profile-window';
 import AuthWindow from '@/components/windows/auth-window';
+import { MobileGhostChat, type MobilePaidScan } from '@/components/mobile/mobile-ghost-chat';
+import { createClient } from '@/lib/supabase/client';
 
 /**
  * Mobile Landing Page (replaces old MobileGate)
@@ -171,7 +173,7 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
   const pricingRef = useRef<HTMLDivElement>(null);
   const myScansRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
-  const { isAuthenticated, loading: authLoading } = useAuth();
+  const { user, isAuthenticated, loading: authLoading } = useAuth();
   const wm = useWindowManager();
   const orchestrator = useScanOrchestrator();
   // Key to force HistoryWindow remount after scan completes (re-fetches data)
@@ -179,6 +181,10 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
   const prevScanIdRef = useRef<string | null>(null);
   // Overlay state for auth + profile
   const [mobileOverlay, setMobileOverlay] = useState<'login' | 'register' | 'profile' | null>(null);
+  // Paid scan detection for conditional layout
+  const [paidScans, setPaidScans] = useState<MobilePaidScan[]>([]);
+  const [paidScansLoaded, setPaidScansLoaded] = useState(false);
+  const chatRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 1024);
@@ -205,6 +211,32 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
     }
     prevScanIdRef.current = orchestrator.activeScanId;
   }, [orchestrator.activeScanId]);
+
+  // Fetch paid scans for conditional layout (GhostChat section)
+  useEffect(() => {
+    if (authLoading) return;
+    if (!user) {
+      setPaidScans([]);
+      setPaidScansLoaded(true);
+      return;
+    }
+    const supabase = createClient();
+    supabase
+      .from('scans')
+      .select('id, url, marketing_iq, created_at, chat_messages(count)')
+      .eq('user_id', user.id)
+      .eq('tier', 'paid')
+      .eq('status', 'complete')
+      .eq('chat_messages.role', 'user')
+      .order('created_at', { ascending: false })
+      .limit(20)
+      .then(({ data }) => {
+        setPaidScans((data as MobilePaidScan[] | null) ?? []);
+        setPaidScansLoaded(true);
+      });
+  }, [user?.id, authLoading, historyKey]); // refetch when historyKey changes (scan completes)
+
+  const isPaidUser = paidScans.length > 0;
 
   // Clear auth overlay when user logs in
   useEffect(() => {
@@ -268,6 +300,10 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
 
   const scrollToMyScans = useCallback(() => {
     myScansRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, []);
+
+  const scrollToChat = useCallback(() => {
+    chatRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, []);
 
   const openAuthOverlay = useCallback((mode: 'login' | 'register') => {
@@ -413,6 +449,24 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
           <div style={{ minHeight: '16px' }} />
         </section>
 
+        {/* ═══════ GHOSTCHAT (paid users only) ═══════ */}
+        {isPaidUser && paidScansLoaded && (
+          <>
+            <SectionDivider />
+            <section ref={chatRef} className="py-gs-2">
+              <div className="px-gs-4 mb-gs-2">
+                <h2 className="font-system text-os-sm font-bold" style={{ color: 'var(--gs-light)' }}>
+                  GhostChat
+                </h2>
+              </div>
+              <MobileGhostChat
+                paidScans={paidScans}
+                onAuthRequired={() => openAuthOverlay('login')}
+              />
+            </section>
+          </>
+        )}
+
         {/* ═══════ MY SCANS (authenticated users only) ═══════ */}
         {isAuthenticated && (
           <>
@@ -430,37 +484,42 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
           </>
         )}
 
+        {/* ═══════ Marketing sections — hidden for paid users ═══════ */}
+        {!isPaidUser && (
+          <>
+            <SectionDivider />
+
+            {/* ═══════ SECTION 2: HOW IT WORKS ═══════ */}
+            <section className="py-gs-2">
+              <FeaturesWindow />
+            </section>
+
+            <SectionDivider />
+
+            {/* ═══════ SECTION 3: WHAT YOU GET ═══════ */}
+            <section className="py-gs-2">
+              <ProductsWindow />
+            </section>
+
+            <SectionDivider />
+
+            {/* ═══════ SECTION 4: PRICING ═══════ */}
+            <section ref={pricingRef} className="px-gs-4 py-gs-4">
+              <MobilePricingSection onFreeScan={scrollToHero} />
+            </section>
+
+            <SectionDivider />
+
+            {/* ═══════ SECTION 5: SOCIAL PROOF ═══════ */}
+            <section className="py-gs-2">
+              <CustomersWindow />
+            </section>
+          </>
+        )}
+
         <SectionDivider />
 
-        {/* ═══════ SECTION 2: HOW IT WORKS ═══════ */}
-        <section className="py-gs-2">
-          <FeaturesWindow />
-        </section>
-
-        <SectionDivider />
-
-        {/* ═══════ SECTION 3: WHAT YOU GET ═══════ */}
-        <section className="py-gs-2">
-          <ProductsWindow />
-        </section>
-
-        <SectionDivider />
-
-        {/* ═══════ SECTION 4: PRICING ═══════ */}
-        <section ref={pricingRef} className="px-gs-4 py-gs-4">
-          <MobilePricingSection onFreeScan={scrollToHero} />
-        </section>
-
-        <SectionDivider />
-
-        {/* ═══════ SECTION 5: SOCIAL PROOF ═══════ */}
-        <section className="py-gs-2">
-          <CustomersWindow />
-        </section>
-
-        <SectionDivider />
-
-        {/* ═══════ SECTION 6: DESKTOP CTA ═══════ */}
+        {/* ═══════ DESKTOP CTA ═══════ */}
         <section className="px-gs-6 py-gs-8 text-center space-y-gs-4">
           <ChloeSprite state="smug" size={64} className="mx-auto" />
           <p className="font-data italic text-data-sm text-gs-red">
@@ -497,7 +556,28 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
             Scan Your Site
           </button>
           {!authLoading && (
-            isAuthenticated ? (
+            isAuthenticated && isPaidUser ? (
+              <>
+                <button
+                  onClick={scrollToChat}
+                  className="bevel-button px-gs-3 h-[34px] font-system text-os-sm font-bold flex-shrink-0"
+                >
+                  Chat
+                </button>
+                <button
+                  onClick={scrollToMyScans}
+                  className="bevel-button px-gs-3 h-[34px] font-system text-os-sm font-bold flex-shrink-0"
+                >
+                  My Scans
+                </button>
+                <button
+                  onClick={() => setMobileOverlay('profile')}
+                  className="bevel-button px-gs-3 h-[34px] font-system text-os-sm font-bold flex-shrink-0"
+                >
+                  Profile
+                </button>
+              </>
+            ) : isAuthenticated ? (
               <>
                 <button
                   onClick={scrollToMyScans}

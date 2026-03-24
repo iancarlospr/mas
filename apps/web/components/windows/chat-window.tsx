@@ -29,7 +29,17 @@ interface Message {
 }
 
 interface ChatWindowProps {
-  windowId: string;
+  windowId?: string;
+  /** Direct scanId prop — bypasses windowState (used by mobile inline chat) */
+  scanId?: string;
+  /** Direct domain prop — bypasses windowState (used by mobile inline chat) */
+  domain?: string;
+  /** Explicit container height override (e.g. '100%' for mobile) */
+  containerHeight?: number | string;
+  /** Mobile: open auth overlay instead of desktop auth window */
+  onAuthRequired?: () => void;
+  /** Mobile: handle credit purchase directly instead of opening desktop payment window */
+  onPurchaseCredits?: (product: string, scanId: string, domain?: string) => void;
 }
 
 // ── Ghost icon SVG (matches chloe-callout.tsx) ──────────────
@@ -217,13 +227,13 @@ function CopyableMessage({ text, children }: { text: string; children: ReactNode
   );
 }
 
-export default function ChatWindow({ windowId }: ChatWindowProps) {
+export default function ChatWindow({ windowId, scanId: propScanId, domain: propDomain, containerHeight, onAuthRequired, onPurchaseCredits }: ChatWindowProps) {
   const wm = useWindowManager();
-  const windowState = useWindowState(windowId);
+  const windowState = useWindowState(windowId ?? '__noop__');
   const { user, loading: authLoading, isAuthenticated } = useAuth();
 
-  const scanId = windowState?.openData?.scanId as string | undefined;
-  const domain = windowState?.openData?.domain as string | undefined;
+  const scanId = propScanId ?? (windowState?.openData?.scanId as string | undefined);
+  const domain = propDomain ?? (windowState?.openData?.domain as string | undefined);
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [credits, setCredits] = useState<number | null>(null);
@@ -388,6 +398,12 @@ export default function ChatWindow({ windowId }: ChatWindowProps) {
   // Open payment window for credits
   const openCreditPurchase = useCallback((product: string) => {
     if (!scanId) return;
+    // Mobile: use direct callback (Stripe redirect)
+    if (onPurchaseCredits) {
+      onPurchaseCredits(product, scanId, domain);
+      return;
+    }
+    // Desktop: open payment window
     const paymentId = `payment-chat-${scanId}`;
     wm.registerWindow(paymentId, {
       title: 'Purchase Credits',
@@ -401,7 +417,7 @@ export default function ChatWindow({ windowId }: ChatWindowProps) {
       domain,
       product,
     });
-  }, [wm, scanId, domain]);
+  }, [wm, scanId, domain, onPurchaseCredits]);
 
   // ── Loading state ──────────────────────────────────────────
   if (loading || authLoading) {
@@ -428,7 +444,7 @@ export default function ChatWindow({ windowId }: ChatWindowProps) {
           </p>
           {errorState.type === 'auth' && (
             <button
-              onClick={() => wm.openWindow('auth')}
+              onClick={() => onAuthRequired ? onAuthRequired() : wm.openWindow('auth')}
               className="bevel-button-primary text-os-xs px-gs-4"
             >
               Log In
@@ -462,7 +478,7 @@ export default function ChatWindow({ windowId }: ChatWindowProps) {
 
   // ── Main chat UI ───────────────────────────────────────────
   return (
-    <div className="flex flex-col" style={{ height: windowState?.isMaximized ? '100%' : (windowState?.height ? (windowState.height - 32) : 448), minHeight: 0 }}>
+    <div className="flex flex-col" style={{ height: containerHeight ?? (windowState?.isMaximized ? '100%' : (windowState?.height ? (windowState.height - 32) : 448)), minHeight: 0 }}>
       {/* Messages */}
       <div className="flex-1 overflow-y-auto py-gs-3 space-y-gs-4 select-text" style={{ paddingLeft: 10, paddingRight: 10, minHeight: 0 }}>
         {messages.length === 0 && !sending && (
