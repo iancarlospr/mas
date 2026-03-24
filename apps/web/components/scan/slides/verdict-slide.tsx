@@ -95,7 +95,7 @@ export function VerdictSlide({ scan }: VerdictSlideProps) {
             textShadow: '0 0 20px rgba(255,178,239,0.4)',
           }}
         >
-          AlphaScan Verdict by Prof G.
+          AlphaScan ROAST by Prof Scott Galloway
         </p>
 
         {/* Headline */}
