@@ -481,7 +481,7 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
           <>
             <SectionDivider />
             <section ref={myScansRef} className="py-gs-2">
-              <div className="px-gs-6 pt-gs-3 pb-gs-2 text-center space-y-gs-1">
+              <div className="px-gs-6 pt-gs-3 pb-gs-6 text-center space-y-gs-2">
                 <h2 className="font-display text-display-sm">My Scans</h2>
                 <p className="font-data text-data-xs text-gs-muted">
                   Your scan history &amp; reports
