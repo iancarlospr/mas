@@ -138,7 +138,14 @@ export async function generatePresentationPDFClientSide(
  * Generate a PDF from all .page elements (Boss Deck).
  * First and last pages as lossless PNG, middle as JPEG 85%.
  *
- * Same pattern as generatePresentationPDFClientSide — direct DOM capture.
+ * Same capture pipeline as the Audit Deck (generatePresentationPDFClientSide).
+ *
+ * Boss Deck pages are rendered via dangerouslySetInnerHTML. html2canvas-pro's
+ * DocumentCloner fails to locate the reference element in its custom DOM
+ * traversal for innerHTML-parsed nodes. To work around this, each page's HTML
+ * is copied into a fresh container element that html2canvas can clone normally.
+ * Global styles (from <style> tags in the document) still apply because they
+ * match on class names, which the copied elements retain.
  */
 export async function generateBossDeckPDFClientSide(
   onProgress?: (progress: PDFProgress) => void,
@@ -150,23 +157,9 @@ export async function generateBossDeckPDFClientSide(
     throw new Error('No pages found on the page');
   }
 
-  // Clone the grain SVG filter def into each .page element so html2canvas
-  // finds it in the subtree — same pattern as the Audit Deck's verdict slide
-  // where <filter id="verdict-noise"> lives inside .slide-card.
-  const grainSvg = document.querySelector('svg[width="0"][height="0"]');
-  const clonedSvgs: ChildNode[] = [];
-  if (grainSvg) {
-    for (const page of pages) {
-      const clone = grainSvg.cloneNode(true) as ChildNode;
-      page.appendChild(clone);
-      clonedSvgs.push(clone);
-    }
-  }
-
   // Temporarily remove external Google Fonts <link> elements from <head>.
   // html2canvas clones the document into an iframe whose CSP blocks external
-  // stylesheets ("style-src 'self' 'unsafe-inline'"), causing the clone to fail.
-  // The fonts are already loaded and cached — removing the links doesn't unload them.
+  // stylesheets — the fonts are already loaded and cached in memory.
   const fontLinks: { el: HTMLElement; parent: Node }[] = [];
   document.querySelectorAll<HTMLElement>(
     'link[href*="fonts.googleapis.com"], link[href*="fonts.gstatic.com"]',
@@ -179,10 +172,11 @@ export async function generateBossDeckPDFClientSide(
 
   const style = document.createElement('style');
   style.textContent = `
-    .page {
+    .bd-capture-wrapper .page {
       width: ${BD_W}px !important;
       height: ${BD_H}px !important;
       overflow: hidden !important;
+      position: relative !important;
     }
     .print-banner { display: none !important; }
     body { margin-top: 0 !important; }
@@ -196,7 +190,24 @@ export async function generateBossDeckPDFClientSide(
   for (let i = 0; i < total; i++) {
     onProgress?.({ phase: 'capturing', current: i + 1, total });
 
-    const canvas = await html2canvas(pages[i]!, {
+    // Create a fresh container and copy the page HTML into it.
+    // html2canvas can clone these fresh elements without the
+    // "Unable to find element in cloned iframe" error that occurs
+    // with dangerouslySetInnerHTML-parsed nodes.
+    const wrapper = document.createElement('div');
+    wrapper.className = 'bd-capture-wrapper';
+    wrapper.style.position = 'absolute';
+    wrapper.style.left = '-9999px';
+    wrapper.style.top = '0';
+    wrapper.innerHTML = pages[i]!.outerHTML;
+    document.body.appendChild(wrapper);
+
+    const captureTarget = wrapper.querySelector('.page') as HTMLElement;
+
+    // Let layout settle
+    await new Promise((r) => requestAnimationFrame(r));
+
+    const canvas = await html2canvas(captureTarget, {
       scale: 1.5,
       useCORS: true,
       allowTaint: true,
@@ -206,6 +217,9 @@ export async function generateBossDeckPDFClientSide(
       height: BD_H,
       logging: false,
     });
+
+    // Remove the temporary wrapper immediately to free memory
+    wrapper.remove();
 
     const isHeroOrTail = i === 0 || i === total - 1;
     let img;
@@ -222,8 +236,7 @@ export async function generateBossDeckPDFClientSide(
     page.drawImage(img, { x: 0, y: 0, width: BD_W, height: BD_H });
   }
 
-  // Cleanup: remove cloned SVG filter defs, restore font links, remove style override
-  clonedSvgs.forEach(svg => svg.remove());
+  // Cleanup: restore font links, remove style override
   fontLinks.forEach(({ el, parent }) => parent.appendChild(el));
   style.remove();
 
