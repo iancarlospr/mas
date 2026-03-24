@@ -77,7 +77,7 @@ function buildVerdict(map: ResultMap): string {
   if (!verdict) return '';
 
   return [
-    `### Roast by Prof. Scott Galloway`,
+    `### Roast by Prof. Scott Galloway: YouTube Professor, the most relevant person in Marketing, Best-selling Author, and with more followers than your CMO`,
     '',
     `> ${verdict}`,
     '',
