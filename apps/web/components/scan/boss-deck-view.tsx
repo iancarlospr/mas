@@ -143,6 +143,16 @@ export function BossDeckView({
         </div>
       )}
 
+      {/* Override globals.css body { overflow: hidden } — pages must be visible for html2canvas */}
+      <style>{`
+        html, body {
+          overflow: auto !important;
+          height: auto !important;
+          min-height: 100vh;
+          background: #0A0E1A !important;
+        }
+      `}</style>
+
       {/* Boss deck styles extracted from the HTML <head> */}
       <div dangerouslySetInnerHTML={{ __html: headStyles }} />
 
