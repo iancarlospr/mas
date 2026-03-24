@@ -191,15 +191,16 @@ export async function generateBossDeckPDFClientSide(
     onProgress?.({ phase: 'capturing', current: i + 1, total });
 
     // Create a fresh container and copy the page HTML into it.
-    // html2canvas can clone these fresh elements without the
-    // "Unable to find element in cloned iframe" error that occurs
-    // with dangerouslySetInnerHTML-parsed nodes.
+    // Also include the SVG grain filter definition so filter: url(#grain)
+    // resolves within the subtree — same as how the Audit Deck's verdict
+    // slide has <filter id="verdict-noise"> inside .slide-card.
+    const grainSvg = document.querySelector('svg[width="0"][height="0"]');
     const wrapper = document.createElement('div');
     wrapper.className = 'bd-capture-wrapper';
     wrapper.style.position = 'absolute';
     wrapper.style.left = '-9999px';
     wrapper.style.top = '0';
-    wrapper.innerHTML = pages[i]!.outerHTML;
+    wrapper.innerHTML = (grainSvg?.outerHTML ?? '') + pages[i]!.outerHTML;
     document.body.appendChild(wrapper);
 
     const captureTarget = wrapper.querySelector('.page') as HTMLElement;
