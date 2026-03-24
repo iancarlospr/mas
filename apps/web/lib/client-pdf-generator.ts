@@ -159,6 +159,9 @@ export async function generateBossDeckPDFClientSide(
     }
     .print-banner { display: none !important; }
     body { margin-top: 0 !important; }
+    /* Hide SVG filter defs so html2canvas clone doesn't choke on them.
+       The grain overlays become invisible but everything else captures. */
+    svg[aria-hidden="true"] { display: none !important; }
   `;
   document.head.appendChild(style);
 
