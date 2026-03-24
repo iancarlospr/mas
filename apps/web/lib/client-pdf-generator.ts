@@ -135,75 +135,141 @@ export async function generatePresentationPDFClientSide(
 }
 
 /**
- * Generate a PDF from all .bd-page elements (Boss Deck).
+ * Generate a canvas-based noise data URI to replace SVG feTurbulence
+ * which html2canvas cannot render. Returns a tiled noise texture.
+ */
+function generateGrainDataUri(): string {
+  const c = document.createElement('canvas');
+  c.width = 256;
+  c.height = 256;
+  const ctx = c.getContext('2d')!;
+  const img = ctx.createImageData(256, 256);
+  const d = img.data;
+  for (let i = 0; i < d.length; i += 4) {
+    const v = Math.random() * 255;
+    d[i] = v; d[i + 1] = v; d[i + 2] = v; d[i + 3] = 255;
+  }
+  ctx.putImageData(img, 0, 0);
+  return c.toDataURL('image/png');
+}
+
+/**
+ * Generate a PDF from all .page elements (Boss Deck).
  * First and last pages as lossless PNG, middle as JPEG 85%.
  *
- * Captures directly from the live DOM — Boss Deck pages are rendered
- * as real React components with canvas-based grain (not SVG filters),
- * so html2canvas captures everything including textures.
+ * Renders the full HTML in a hidden iframe (the boss deck uses
+ * dangerouslySetInnerHTML which breaks html2canvas's direct DOM cloning).
+ * SVG feTurbulence grain is replaced with a canvas-generated noise PNG
+ * so the PDF grain matches the web view.
  */
 export async function generateBossDeckPDFClientSide(
+  fullHtml: string,
   onProgress?: (progress: PDFProgress) => void,
 ): Promise<Uint8Array> {
-  const pages = document.querySelectorAll<HTMLElement>('.bd-page');
-  const total = pages.length;
+  const iframe = document.createElement('iframe');
+  Object.assign(iframe.style, {
+    position: 'fixed',
+    top: '0',
+    left: '0',
+    width: `${BD_W}px`,
+    height: `${BD_H * 8}px`,
+    opacity: '0',
+    pointerEvents: 'none',
+    zIndex: '-1',
+    border: 'none',
+  });
+  document.body.appendChild(iframe);
 
-  if (total === 0) {
-    throw new Error('No pages found on the page');
-  }
+  try {
+    const iDoc = iframe.contentDocument ?? iframe.contentWindow?.document;
+    if (!iDoc) throw new Error('Failed to access iframe document');
 
-  // Force exact dimensions for capture
-  const style = document.createElement('style');
-  style.textContent = `
-    .bd-page {
-      width: ${BD_W}px !important;
-      height: ${BD_H}px !important;
-      overflow: hidden !important;
-    }
-  `;
-  document.head.appendChild(style);
+    iDoc.open();
+    iDoc.write(fullHtml);
+    iDoc.close();
 
-  await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
-
-  const pdf = await PDFDocument.create();
-
-  for (let i = 0; i < total; i++) {
-    onProgress?.({ phase: 'capturing', current: i + 1, total });
-
-    const canvas = await html2canvas(pages[i]!, {
-      scale: 1.5,
-      useCORS: true,
-      allowTaint: true,
-      backgroundColor: '#0A0E1A',
-      windowWidth: BD_W,
-      width: BD_W,
-      height: BD_H,
-      logging: false,
+    await new Promise<void>((resolve) => {
+      if (iDoc.readyState === 'complete') return resolve();
+      iframe.addEventListener('load', () => resolve(), { once: true });
     });
 
-    const isHeroOrTail = i === 0 || i === total - 1;
-    let img;
+    try { await iDoc.fonts.ready; } catch { /* fallback below */ }
+    await new Promise((r) => setTimeout(r, 1500));
 
-    if (isHeroOrTail) {
-      const pngBytes = await canvasToPng(canvas);
-      img = await pdf.embedPng(pngBytes);
-    } else {
-      const jpegBytes = await canvasToJpeg(canvas, 0.85);
-      img = await pdf.embedJpg(jpegBytes);
+    // Generate a noise texture as a data URI to replace SVG feTurbulence
+    const grainDataUri = generateGrainDataUri();
+
+    const captureStyle = iDoc.createElement('style');
+    captureStyle.textContent = `
+      .page {
+        width: ${BD_W}px !important;
+        height: ${BD_H}px !important;
+        overflow: hidden !important;
+      }
+      .print-banner { display: none !important; }
+      html, body {
+        margin: 0 !important;
+        margin-top: 0 !important;
+        overflow: auto !important;
+        height: auto !important;
+      }
+      /* Replace SVG feTurbulence grain with canvas-generated noise PNG.
+         html2canvas can render background-image but not filter:url(#grain). */
+      .bar-grain, .bar-grain-light, .wins-grain, .results-grain, .closer-grain {
+        filter: none !important;
+        background: url('${grainDataUri}') repeat !important;
+      }
+    `;
+    iDoc.head.appendChild(captureStyle);
+
+    const iWin = iframe.contentWindow ?? window;
+    await new Promise<void>((r) =>
+      iWin.requestAnimationFrame(() => iWin.requestAnimationFrame(() => r())),
+    );
+
+    const pages = iDoc.querySelectorAll<HTMLElement>('.page');
+    const total = pages.length;
+    if (total === 0) throw new Error('No pages found in Boss Deck');
+
+    const pdf = await PDFDocument.create();
+
+    for (let i = 0; i < total; i++) {
+      onProgress?.({ phase: 'capturing', current: i + 1, total });
+
+      const canvas = await html2canvas(pages[i]!, {
+        scale: 1.5,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#0A0E1A',
+        windowWidth: BD_W,
+        width: BD_W,
+        height: BD_H,
+        logging: false,
+      });
+
+      const isHeroOrTail = i === 0 || i === total - 1;
+      let img;
+
+      if (isHeroOrTail) {
+        const pngBytes = await canvasToPng(canvas);
+        img = await pdf.embedPng(pngBytes);
+      } else {
+        const jpegBytes = await canvasToJpeg(canvas, 0.85);
+        img = await pdf.embedJpg(jpegBytes);
+      }
+
+      const page = pdf.addPage([BD_W, BD_H]);
+      page.drawImage(img, { x: 0, y: 0, width: BD_W, height: BD_H });
     }
 
-    const page = pdf.addPage([BD_W, BD_H]);
-    page.drawImage(img, { x: 0, y: 0, width: BD_W, height: BD_H });
+    onProgress?.({ phase: 'assembling', current: total, total });
+    const pdfBytes = await pdf.save();
+    onProgress?.({ phase: 'done', current: total, total });
+
+    return pdfBytes;
+  } finally {
+    iframe.remove();
   }
-
-  // Remove the dimension/grain override
-  style.remove();
-
-  onProgress?.({ phase: 'assembling', current: total, total });
-  const pdfBytes = await pdf.save();
-  onProgress?.({ phase: 'done', current: total, total });
-
-  return pdfBytes;
 }
 
 /**

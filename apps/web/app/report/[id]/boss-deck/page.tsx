@@ -6,8 +6,8 @@ import { isValidUUID } from '@/lib/utils';
 import { getMarketingIQLabel, getTrafficLight } from '@marketing-alpha/types';
 import type { ScoreCategory, MarketingIQResult } from '@marketing-alpha/types';
 import type { BossDeckAIOutput } from '@/lib/report/boss-deck-prompt';
-import type { BossDeckRenderContext } from '@/lib/report/boss-deck-html';
-import { BossDeckSlidesView } from '@/components/scan/boss-deck-slides-view';
+import { renderBossDeck, type BossDeckRenderContext } from '@/lib/report/boss-deck-html';
+import { BossDeckView } from '@/components/scan/boss-deck-view';
 
 // ── Embed images as base64 data URIs ──
 
@@ -152,5 +152,7 @@ export default async function BossDeckPage({
     scanId,
   };
 
-  return <BossDeckSlidesView ctx={renderCtx} domain={scan.domain ?? 'report'} autoDownload={isDownloadMode} />;
+  const html = renderBossDeck(renderCtx);
+
+  return <BossDeckView html={html} domain={scan.domain ?? 'report'} autoDownload={isDownloadMode} />;
 }
