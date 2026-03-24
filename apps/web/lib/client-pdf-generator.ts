@@ -137,85 +137,126 @@ export async function generatePresentationPDFClientSide(
 /**
  * Generate a PDF from all .page elements (Boss Deck).
  * First and last pages as lossless PNG, middle as JPEG 85%.
+ *
+ * Renders the full HTML in a hidden iframe to avoid the
+ * dangerouslySetInnerHTML cloning bug in html2canvas
+ * ("Unable to find element in cloned iframe").
  */
 export async function generateBossDeckPDFClientSide(
+  fullHtml: string,
   onProgress?: (progress: PDFProgress) => void,
 ): Promise<Uint8Array> {
-  const pages = document.querySelectorAll<HTMLElement>('.page');
-  const total = pages.length;
+  // Create a hidden same-origin iframe and render the boss deck HTML
+  // as a proper document. This ensures html2canvas can clone the DOM
+  // correctly (the main page uses dangerouslySetInnerHTML which breaks
+  // html2canvas's element-to-clone mapping).
+  const iframe = document.createElement('iframe');
+  Object.assign(iframe.style, {
+    position: 'fixed',
+    top: '0',
+    left: '0',
+    width: `${BD_W}px`,
+    height: `${BD_H * 8}px`,
+    opacity: '0',
+    pointerEvents: 'none',
+    zIndex: '-1',
+    border: 'none',
+  });
+  document.body.appendChild(iframe);
 
-  if (total === 0) {
-    throw new Error('No pages found on the page');
-  }
+  try {
+    const iDoc = iframe.contentDocument ?? iframe.contentWindow?.document;
+    if (!iDoc) throw new Error('Failed to access iframe document');
 
-  // Force exact dimensions
-  const style = document.createElement('style');
-  style.textContent = `
-    .page {
-      width: ${BD_W}px !important;
-      height: ${BD_H}px !important;
-      overflow: hidden !important;
-    }
-    .print-banner { display: none !important; }
-    body { margin-top: 0 !important; }
-  `;
-  document.head.appendChild(style);
+    iDoc.open();
+    iDoc.write(fullHtml);
+    iDoc.close();
 
-  await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
-
-  const pdf = await PDFDocument.create();
-
-  for (let i = 0; i < total; i++) {
-    onProgress?.({ phase: 'capturing', current: i + 1, total });
-
-    const canvas = await html2canvas(pages[i]!, {
-      scale: 1.5,
-      useCORS: true,
-      allowTaint: true,
-      backgroundColor: '#0A0E1A',
-      windowWidth: BD_W,
-      width: BD_W,
-      height: BD_H,
-      logging: false,
-      // Clean up the cloned document before html2canvas renders it.
-      // SVG filter refs (filter: url(#grain)) break because the <filter>
-      // definition lives outside each .page subtree in the clone.
-      onclone: (clonedDoc: Document) => {
-        // Remove all grain overlay elements that reference SVG filters
-        clonedDoc.querySelectorAll(
-          '.bar-grain, .bar-grain-light, .wins-grain, .results-grain, .closer-grain'
-        ).forEach((el) => el.remove());
-        // Remove the SVG <filter> defs entirely
-        clonedDoc.querySelectorAll('svg[aria-hidden] filter')
-          .forEach((f) => f.closest('svg')?.remove());
-        // Simplify closer-bg (blur + saturate breaks html2canvas)
-        const closerBg = clonedDoc.querySelector('.closer-bg') as HTMLElement | null;
-        if (closerBg) closerBg.style.filter = 'brightness(0.2)';
-      },
+    // Wait for document to finish loading
+    await new Promise<void>((resolve) => {
+      if (iDoc.readyState === 'complete') return resolve();
+      iframe.addEventListener('load', () => resolve(), { once: true });
     });
 
-    const isHeroOrTail = i === 0 || i === total - 1;
-    let img;
+    // Wait for Google Fonts to load inside the iframe
+    try { await iDoc.fonts.ready; } catch { /* fallback below */ }
+    await new Promise((r) => setTimeout(r, 1500));
 
-    if (isHeroOrTail) {
-      const pngBytes = await canvasToPng(canvas);
-      img = await pdf.embedPng(pngBytes);
-    } else {
-      const jpegBytes = await canvasToJpeg(canvas, 0.85);
-      img = await pdf.embedJpg(jpegBytes);
+    // Inject capture overrides into the iframe's <head>
+    const captureStyle = iDoc.createElement('style');
+    captureStyle.textContent = `
+      .page {
+        width: ${BD_W}px !important;
+        height: ${BD_H}px !important;
+        overflow: hidden !important;
+      }
+      .print-banner { display: none !important; }
+      html, body {
+        margin: 0 !important;
+        margin-top: 0 !important;
+        overflow: auto !important;
+        height: auto !important;
+      }
+      /* Neutralise SVG grain overlays — keep elements in DOM to preserve
+         tree structure, but make them invisible + strip the filter ref
+         that html2canvas can't render. */
+      .bar-grain, .bar-grain-light, .wins-grain, .results-grain, .closer-grain {
+        opacity: 0 !important;
+        filter: none !important;
+      }
+      .closer-bg { filter: brightness(0.2) !important; }
+    `;
+    iDoc.head.appendChild(captureStyle);
+
+    // Let layout settle inside the iframe
+    const iWin = iframe.contentWindow ?? window;
+    await new Promise<void>((r) =>
+      iWin.requestAnimationFrame(() => iWin.requestAnimationFrame(() => r())),
+    );
+
+    const pages = iDoc.querySelectorAll<HTMLElement>('.page');
+    const total = pages.length;
+    if (total === 0) throw new Error('No pages found in Boss Deck');
+
+    const pdf = await PDFDocument.create();
+
+    for (let i = 0; i < total; i++) {
+      onProgress?.({ phase: 'capturing', current: i + 1, total });
+
+      const canvas = await html2canvas(pages[i]!, {
+        scale: 1.5,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#0A0E1A',
+        windowWidth: BD_W,
+        width: BD_W,
+        height: BD_H,
+        logging: false,
+      });
+
+      const isHeroOrTail = i === 0 || i === total - 1;
+      let img;
+
+      if (isHeroOrTail) {
+        const pngBytes = await canvasToPng(canvas);
+        img = await pdf.embedPng(pngBytes);
+      } else {
+        const jpegBytes = await canvasToJpeg(canvas, 0.85);
+        img = await pdf.embedJpg(jpegBytes);
+      }
+
+      const page = pdf.addPage([BD_W, BD_H]);
+      page.drawImage(img, { x: 0, y: 0, width: BD_W, height: BD_H });
     }
 
-    const page = pdf.addPage([BD_W, BD_H]);
-    page.drawImage(img, { x: 0, y: 0, width: BD_W, height: BD_H });
+    onProgress?.({ phase: 'assembling', current: total, total });
+    const pdfBytes = await pdf.save();
+    onProgress?.({ phase: 'done', current: total, total });
+
+    return pdfBytes;
+  } finally {
+    iframe.remove();
   }
-
-  style.remove();
-
-  onProgress?.({ phase: 'assembling', current: total, total });
-  const pdfBytes = await pdf.save();
-  onProgress?.({ phase: 'done', current: total, total });
-
-  return pdfBytes;
 }
 
 /**

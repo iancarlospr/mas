@@ -83,7 +83,7 @@ export function BossDeckView({
         '@/lib/client-pdf-generator'
       );
 
-      const pdfBytes = await generateBossDeckPDFClientSide(setProgress);
+      const pdfBytes = await generateBossDeckPDFClientSide(html, setProgress);
       downloadPdf(pdfBytes, `${domain}-boss-deck.pdf`);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
@@ -92,7 +92,7 @@ export function BossDeckView({
       setProgress(null);
       downloadStarted.current = false;
     }
-  }, [domain]);
+  }, [html, domain]);
 
   // Auto-trigger download when ready
   useEffect(() => {
