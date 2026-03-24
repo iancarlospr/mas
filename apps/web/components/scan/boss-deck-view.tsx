@@ -83,7 +83,7 @@ export function BossDeckView({
         '@/lib/client-pdf-generator'
       );
 
-      const pdfBytes = await generateBossDeckPDFClientSide(html, setProgress);
+      const pdfBytes = await generateBossDeckPDFClientSide(setProgress);
       downloadPdf(pdfBytes, `${domain}-boss-deck.pdf`);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
