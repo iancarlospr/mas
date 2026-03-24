@@ -714,8 +714,26 @@ body {
     padding: 0 !important;
   }
   .cover-page {
-    width: 100% !important;
-    margin: 0 !important;
+    width: 8.5in !important;
+    min-height: 14in !important;
+    margin: 0 auto !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .cover-content {
+    padding: 0.9in 0.85in 0 !important;
+  }
+  .cover-footer {
+    padding: 0.2in 0.85in !important;
+  }
+  .cover-title {
+    font-size: 36pt !important;
+  }
+  .cover-metrics {
+    flex-direction: row !important;
+    gap: 0.4in !important;
+    align-items: flex-end !important;
+    flex-wrap: wrap !important;
   }
   .document-body {
     margin-top: 0 !important;
