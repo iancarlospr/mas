@@ -144,14 +144,14 @@ export async function generatePresentationPDFClientSide(
  * Generate a PDF from all .page elements (Boss Deck).
  * First and last pages as lossless PNG, middle as JPEG 85%.
  *
- * Uses the same direct-capture approach as the Audit Deck: capture live
- * DOM elements, not innerHTML copies. The verdict slide proves that SVG
- * feTurbulence grain renders correctly when html2canvas captures live
- * elements with inline filter styles.
+ * Boss Deck pages are rendered via dangerouslySetInnerHTML. html2canvas's
+ * DocumentCloner can't find those elements directly ("Unable to find element
+ * in cloned iframe"), so each page's HTML is copied into a fresh wrapper.
  *
- * Before capture: inject SVG filter def inside each .page + set inline
- * filter styles on grain overlays (same pattern as verdict-slide.tsx).
- * After capture: clean up injected elements.
+ * Grain texture: uses html2canvas's `onclone` callback to inject the SVG
+ * feTurbulence filter definition and inline filter styles into the CLONED
+ * document — same pattern as the verdict slide (verdict-slide.tsx).
+ * This ensures the filter renders in html2canvas's internal iframe.
  */
 export async function generateBossDeckPDFClientSide(
   onProgress?: (progress: PDFProgress) => void,
@@ -164,8 +164,6 @@ export async function generateBossDeckPDFClientSide(
   }
 
   // Temporarily remove external Google Fonts <link> elements from <head>.
-  // html2canvas clones the document into an iframe whose CSP blocks external
-  // stylesheets — the fonts are already loaded and cached in memory.
   const fontLinks: { el: HTMLElement; parent: Node }[] = [];
   document.querySelectorAll<HTMLElement>(
     'link[href*="fonts.googleapis.com"], link[href*="fonts.gstatic.com"]',
@@ -176,10 +174,9 @@ export async function generateBossDeckPDFClientSide(
     }
   });
 
-  // Force exact dimensions on all pages (same approach as Audit Deck)
   const style = document.createElement('style');
   style.textContent = `
-    .page {
+    .bd-capture-wrapper .page {
       width: ${BD_W}px !important;
       height: ${BD_H}px !important;
       overflow: hidden !important;
@@ -194,38 +191,23 @@ export async function generateBossDeckPDFClientSide(
 
   const pdf = await PDFDocument.create();
 
-  // Track injected elements for cleanup
-  const injectedSvgs: Element[] = [];
-  const grainStyleBackups: { el: HTMLElement; original: string }[] = [];
-
-  // Pre-capture: inject SVG filter inside each .page + set inline styles
-  // on grain overlays (same pattern as verdict slide)
-  for (let i = 0; i < total; i++) {
-    const page = pages[i]!;
-
-    // Inject SVG filter def inside .page (verdict slide has it inside .slide-card)
-    const svgWrapper = document.createElement('div');
-    svgWrapper.innerHTML = GRAIN_SVG;
-    const svg = svgWrapper.firstElementChild!;
-    page.insertBefore(svg, page.firstChild);
-    injectedSvgs.push(svg);
-
-    // Apply filter as inline style (verdict slide uses inline style, not CSS class)
-    const grainEls = page.querySelectorAll<HTMLElement>(GRAIN_SELECTORS);
-    for (const el of grainEls) {
-      grainStyleBackups.push({ el, original: el.style.filter });
-      el.style.filter = 'url(#bd-grain)';
-    }
-  }
-
-  // Let layout settle after injections
-  await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
-
-  // Capture each page directly from the live DOM (same as Audit Deck)
   for (let i = 0; i < total; i++) {
     onProgress?.({ phase: 'capturing', current: i + 1, total });
 
-    const canvas = await html2canvas(pages[i]!, {
+    // Copy page HTML into a fresh wrapper (avoids "Unable to find element" error)
+    const wrapper = document.createElement('div');
+    wrapper.className = 'bd-capture-wrapper';
+    wrapper.style.position = 'absolute';
+    wrapper.style.left = '-9999px';
+    wrapper.style.top = '0';
+    wrapper.innerHTML = pages[i]!.outerHTML;
+    document.body.appendChild(wrapper);
+
+    const captureTarget = wrapper.querySelector('.page') as HTMLElement;
+
+    await new Promise((r) => requestAnimationFrame(r));
+
+    const canvas = await html2canvas(captureTarget, {
       scale: 1.5,
       useCORS: true,
       allowTaint: true,
@@ -234,7 +216,29 @@ export async function generateBossDeckPDFClientSide(
       width: BD_W,
       height: BD_H,
       logging: false,
+      // Inject SVG feTurbulence filter + inline styles into the CLONED
+      // document before html2canvas renders it — same pattern as the
+      // verdict slide where the filter is inside the captured element.
+      onclone: (clonedDoc: Document) => {
+        // Find the .page inside html2canvas's clone
+        const clonedPage = clonedDoc.querySelector('.bd-capture-wrapper .page');
+        if (!clonedPage) return;
+
+        // Inject SVG filter def inside the cloned .page
+        const svgContainer = clonedDoc.createElement('div');
+        svgContainer.innerHTML = GRAIN_SVG;
+        const svg = svgContainer.firstElementChild;
+        if (svg) clonedPage.insertBefore(svg, clonedPage.firstChild);
+
+        // Apply filter as inline style on grain overlays in the clone
+        const grainEls = clonedPage.querySelectorAll<HTMLElement>(GRAIN_SELECTORS);
+        for (const el of grainEls) {
+          el.style.filter = 'url(#bd-grain)';
+        }
+      },
     });
+
+    wrapper.remove();
 
     const isHeroOrTail = i === 0 || i === total - 1;
     let img;
@@ -251,9 +255,6 @@ export async function generateBossDeckPDFClientSide(
     page.drawImage(img, { x: 0, y: 0, width: BD_W, height: BD_H });
   }
 
-  // Cleanup: remove injected SVGs, restore original filter styles, restore fonts
-  for (const svg of injectedSvgs) svg.remove();
-  for (const { el, original } of grainStyleBackups) el.style.filter = original;
   fontLinks.forEach(({ el, parent }) => parent.appendChild(el));
   style.remove();
 
