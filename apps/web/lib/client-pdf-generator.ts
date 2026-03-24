@@ -20,48 +20,33 @@ const BD_W = 1344;
 const BD_H = 816;
 
 /**
- * Inject canvas-rendered noise into grain overlay elements before capture.
- * Same technique as PlasmaCanvas (verdict slide) — html2canvas captures
- * <canvas> pixel data natively. Replaces SVG feTurbulence which
- * html2canvas cannot render (filter is not a supported CSS property).
+ * Prepare grain overlays for html2canvas capture using the same pattern
+ * as the Audit Deck's verdict slide (verdict-slide.tsx lines 58-71):
+ *
+ * 1. Inject the SVG <filter> definition INSIDE each .page element
+ *    (verdict slide has it inside .slide-card)
+ * 2. Apply filter: url(#grain) as INLINE STYLE on each grain overlay
+ *    (verdict slide uses style={{ filter: 'url(#verdict-noise)' }})
+ *
+ * This ensures the filter definition is within the captured subtree
+ * and the filter reference resolves correctly during html2canvas capture.
  */
-function injectGrainCanvases(container: HTMLElement): void {
-  const grainEls = container.querySelectorAll<HTMLElement>(
+function prepareGrainForCapture(pageEl: HTMLElement): void {
+  // Inject SVG filter definition inside the .page element (same as verdict slide)
+  const svgFilter = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svgFilter.setAttribute('width', '0');
+  svgFilter.setAttribute('height', '0');
+  svgFilter.setAttribute('aria-hidden', 'true');
+  svgFilter.style.position = 'absolute';
+  svgFilter.innerHTML = `<filter id="grain"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>`;
+  pageEl.insertBefore(svgFilter, pageEl.firstChild);
+
+  // Apply filter as inline style on each grain overlay (same as verdict slide)
+  const grainEls = pageEl.querySelectorAll<HTMLElement>(
     '.bar-grain, .bar-grain-light, .wins-grain, .results-grain, .closer-grain',
   );
-
   for (const el of grainEls) {
-    // Remove the SVG filter (html2canvas can't render it)
-    el.style.filter = 'none';
-
-    // Create canvas at full page resolution — avoids visible pixelation
-    // from stretching a small canvas. Uses bilinear interpolation (no pixelated).
-    const canvas = document.createElement('canvas');
-    canvas.width = BD_W;
-    canvas.height = BD_H;
-    Object.assign(canvas.style, {
-      position: 'absolute',
-      inset: '0',
-      width: '100%',
-      height: '100%',
-      pointerEvents: 'none',
-    });
-
-    const ctx = canvas.getContext('2d');
-    if (ctx) {
-      const imageData = ctx.createImageData(BD_W, BD_H);
-      const d = imageData.data;
-      for (let i = 0; i < d.length; i += 4) {
-        const v = Math.random() * 255;
-        d[i] = v;
-        d[i + 1] = v;
-        d[i + 2] = v;
-        d[i + 3] = 255;
-      }
-      ctx.putImageData(imageData, 0, 0);
-    }
-
-    el.appendChild(canvas);
+    el.style.filter = 'url(#grain)';
   }
 }
 
@@ -237,23 +222,19 @@ export async function generateBossDeckPDFClientSide(
     onProgress?.({ phase: 'capturing', current: i + 1, total });
 
     // Create a fresh container and copy the page HTML into it.
-    // Also include the SVG grain filter definition so filter: url(#grain)
-    // resolves within the subtree — same as how the Audit Deck's verdict
-    // slide has <filter id="verdict-noise"> inside .slide-card.
-    const grainSvg = document.querySelector('svg[width="0"][height="0"]');
     const wrapper = document.createElement('div');
     wrapper.className = 'bd-capture-wrapper';
     wrapper.style.position = 'absolute';
     wrapper.style.left = '-9999px';
     wrapper.style.top = '0';
-    wrapper.innerHTML = (grainSvg?.outerHTML ?? '') + pages[i]!.outerHTML;
+    wrapper.innerHTML = pages[i]!.outerHTML;
     document.body.appendChild(wrapper);
 
-    // Replace SVG feTurbulence grain with canvas-rendered noise.
-    // html2canvas captures <canvas> pixel data natively (same as PlasmaCanvas).
-    injectGrainCanvases(wrapper);
-
     const captureTarget = wrapper.querySelector('.page') as HTMLElement;
+
+    // Prepare grain: inject SVG filter INSIDE .page + apply inline styles
+    // (same pattern as verdict slide in Audit Deck)
+    prepareGrainForCapture(captureTarget);
 
     // Let layout settle
     await new Promise((r) => requestAnimationFrame(r));
