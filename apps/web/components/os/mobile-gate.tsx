@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { ChloeSprite } from '@/components/chloe/chloe-sprite';
 import { MobileScanFlow } from '@/components/mobile/mobile-scan-flow';
 import { MobilePricingSection } from '@/components/mobile/mobile-pricing-section';
@@ -13,6 +13,8 @@ import ProductsWindow from '@/components/windows/products-window';
 import CustomersWindow from '@/components/windows/customers-window';
 import AboutWindow from '@/components/windows/about-window';
 import HistoryWindow from '@/components/windows/history-window';
+import ProfileWindow from '@/components/windows/profile-window';
+import { AuthForm } from '@/components/auth/auth-form';
 
 /**
  * Mobile Landing Page (replaces old MobileGate)
@@ -168,12 +170,13 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
   const pricingRef = useRef<HTMLDivElement>(null);
   const myScansRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
-  const router = useRouter();
   const { isAuthenticated, loading: authLoading } = useAuth();
   const orchestrator = useScanOrchestrator();
   // Key to force HistoryWindow remount after scan completes (re-fetches data)
   const [historyKey, setHistoryKey] = useState(0);
   const prevScanIdRef = useRef<string | null>(null);
+  // Overlay state for auth + profile
+  const [mobileOverlay, setMobileOverlay] = useState<'login' | 'register' | 'profile' | null>(null);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 1024);
@@ -200,6 +203,13 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
     }
     prevScanIdRef.current = orchestrator.activeScanId;
   }, [orchestrator.activeScanId]);
+
+  // Clear auth overlay when user logs in
+  useEffect(() => {
+    if (isAuthenticated && (mobileOverlay === 'login' || mobileOverlay === 'register')) {
+      setMobileOverlay(null);
+    }
+  }, [isAuthenticated, mobileOverlay]);
 
   // Auto-scan after registration: detect pending URL in localStorage
   useEffect(() => {
@@ -473,29 +483,73 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
           >
             Scan Your Site
           </button>
-          <button
-            onClick={scrollToPricing}
-            className="bevel-button px-gs-3 h-[34px] font-system text-os-sm font-bold flex-shrink-0"
-          >
-            Pricing
-          </button>
           {!authLoading && (
             isAuthenticated ? (
-              <button
-                onClick={scrollToMyScans}
-                className="bevel-button px-gs-3 h-[34px] font-system text-os-sm font-bold flex-shrink-0"
-              >
-                My Scans
-              </button>
+              <>
+                <button
+                  onClick={scrollToMyScans}
+                  className="bevel-button px-gs-3 h-[34px] font-system text-os-sm font-bold flex-shrink-0"
+                >
+                  My Scans
+                </button>
+                <button
+                  onClick={() => setMobileOverlay('profile')}
+                  className="bevel-button px-gs-3 h-[34px] font-system text-os-sm font-bold flex-shrink-0"
+                >
+                  Profile
+                </button>
+              </>
             ) : (
-              <button
-                onClick={() => router.push('/register')}
-                className="bevel-button px-gs-3 h-[34px] font-system text-os-sm font-bold flex-shrink-0"
-              >
-                Sign Up
-              </button>
+              <>
+                <button
+                  onClick={scrollToPricing}
+                  className="bevel-button px-gs-3 h-[34px] font-system text-os-sm font-bold flex-shrink-0"
+                >
+                  Pricing
+                </button>
+                <button
+                  onClick={() => setMobileOverlay('register')}
+                  className="bevel-button px-gs-3 h-[34px] font-system text-os-sm font-bold flex-shrink-0"
+                >
+                  Register
+                </button>
+              </>
             )
           )}
+        </div>
+      )}
+
+      {/* ═══════ OVERLAYS ═══════ */}
+
+      {/* Auth overlay — AuthForm already renders fixed inset-0 */}
+      {(mobileOverlay === 'login' || mobileOverlay === 'register') && (
+        <div className="fixed inset-0 z-50">
+          <button
+            onClick={() => setMobileOverlay(null)}
+            className="fixed top-gs-3 right-gs-3 z-[51] w-[32px] h-[32px] flex items-center justify-center rounded-full bg-gs-deep/80 backdrop-blur-sm border border-gs-mid/20 text-gs-light font-system text-os-sm"
+            aria-label="Close"
+          >
+            &times;
+          </button>
+          <AuthForm mode={mobileOverlay} />
+        </div>
+      )}
+
+      {/* Profile overlay */}
+      {mobileOverlay === 'profile' && (
+        <div className="fixed inset-0 z-50 bg-gs-void flex flex-col overflow-hidden">
+          <div className="flex-shrink-0 h-[44px] flex items-center gap-gs-3 px-gs-4 bg-gs-deep/95 backdrop-blur-md border-b border-gs-mid/15">
+            <button
+              onClick={() => setMobileOverlay(null)}
+              className="font-data text-data-sm text-gs-base"
+            >
+              &larr; Back
+            </button>
+            <span className="font-system text-os-sm font-bold text-gs-light">Profile</span>
+          </div>
+          <div className="flex-1 overflow-auto">
+            <ProfileWindow />
+          </div>
         </div>
       )}
     </div>
