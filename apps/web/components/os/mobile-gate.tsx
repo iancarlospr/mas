@@ -16,8 +16,16 @@ import AboutWindow from '@/components/windows/about-window';
 import HistoryWindow from '@/components/windows/history-window';
 import ProfileWindow from '@/components/windows/profile-window';
 import AuthWindow from '@/components/windows/auth-window';
-import { MobileGhostChat, type MobilePaidScan } from '@/components/mobile/mobile-ghost-chat';
+import ChatWindow from '@/components/windows/chat-window';
 import { createClient } from '@/lib/supabase/client';
+
+interface MobilePaidScan {
+  id: string;
+  url: string;
+  marketing_iq: number | null;
+  created_at: string;
+  chat_messages: { count: number }[];
+}
 
 /**
  * Mobile Landing Page (replaces old MobileGate)
@@ -179,12 +187,12 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
   // Key to force HistoryWindow remount after scan completes (re-fetches data)
   const [historyKey, setHistoryKey] = useState(0);
   const prevScanIdRef = useRef<string | null>(null);
-  // Overlay state for auth + profile
-  const [mobileOverlay, setMobileOverlay] = useState<'login' | 'register' | 'profile' | null>(null);
+  // Overlay state for auth + profile + chat
+  const [mobileOverlay, setMobileOverlay] = useState<'login' | 'register' | 'profile' | 'chat' | null>(null);
+  const [chatContext, setChatContext] = useState<{ scanId: string; domain: string } | null>(null);
   // Paid scan detection for conditional layout
   const [paidScans, setPaidScans] = useState<MobilePaidScan[]>([]);
   const [paidScansLoaded, setPaidScansLoaded] = useState(false);
-  const chatRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 1024);
@@ -302,8 +310,24 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
     myScansRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, []);
 
-  const scrollToChat = useCallback(() => {
-    chatRef.current?.scrollIntoView({ behavior: 'smooth' });
+  const openChatOverlay = useCallback((scanId: string, domain: string) => {
+    setChatContext({ scanId, domain });
+    setMobileOverlay('chat');
+  }, []);
+
+  // Mobile credit purchase: POST to checkout API, redirect to Stripe
+  const handlePurchaseCredits = useCallback(async (product: string, scanId: string) => {
+    try {
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ product, scanId }),
+      });
+      if (res.ok) {
+        const { url } = await res.json();
+        if (url) window.location.href = url;
+      }
+    } catch { /* ignore — Stripe redirect failed */ }
   }, []);
 
   const openAuthOverlay = useCallback((mode: 'login' | 'register') => {
@@ -449,32 +473,6 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
           <div style={{ minHeight: '16px' }} />
         </section>
 
-        {/* ═══════ GHOSTCHAT (paid users only) ═══════ */}
-        {isPaidUser && paidScansLoaded && (
-          <>
-            <SectionDivider />
-            <section ref={chatRef} className="py-gs-2">
-              <div className="px-gs-4 mb-gs-2 flex items-center gap-gs-2">
-                <svg width="14" height="14" viewBox="0 0 16 16" fill="var(--gs-base)" style={{ flexShrink: 0 }}>
-                  <path d="M8 1C5.2 1 3 3.2 3 6v6l1-1.5 1 1.5 1-1.5 1 1.5 1-1.5 1 1.5 1-1.5 1 1.5V6c0-2.8-2.2-5-5-5z"/>
-                  <circle cx="6" cy="5.5" r="1" fill="var(--gs-void)"/>
-                  <circle cx="10" cy="5.5" r="1" fill="var(--gs-void)"/>
-                </svg>
-                <h2 className="font-system text-os-sm font-bold" style={{ color: 'var(--gs-light)' }}>
-                  GhostChat
-                </h2>
-                <span className="font-data" style={{ fontSize: '9px', color: 'var(--gs-base)', opacity: 0.6, letterSpacing: '0.05em' }}>
-                  ™
-                </span>
-              </div>
-              <MobileGhostChat
-                paidScans={paidScans}
-                onAuthRequired={() => openAuthOverlay('login')}
-              />
-            </section>
-          </>
-        )}
-
         {/* ═══════ MY SCANS (authenticated users only) ═══════ */}
         {isAuthenticated && (
           <>
@@ -486,7 +484,7 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
                 </h2>
               </div>
               <div className="mobile-my-scans">
-                <HistoryWindow key={historyKey} />
+                <HistoryWindow key={historyKey} onChatOpen={openChatOverlay} />
               </div>
             </section>
           </>
@@ -564,28 +562,7 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
             Scan Your Site
           </button>
           {!authLoading && (
-            isAuthenticated && isPaidUser ? (
-              <>
-                <button
-                  onClick={scrollToChat}
-                  className="bevel-button px-gs-3 h-[34px] font-system text-os-sm font-bold flex-shrink-0"
-                >
-                  Chat
-                </button>
-                <button
-                  onClick={scrollToMyScans}
-                  className="bevel-button px-gs-3 h-[34px] font-system text-os-sm font-bold flex-shrink-0"
-                >
-                  My Scans
-                </button>
-                <button
-                  onClick={() => setMobileOverlay('profile')}
-                  className="bevel-button px-gs-3 h-[34px] font-system text-os-sm font-bold flex-shrink-0"
-                >
-                  Profile
-                </button>
-              </>
-            ) : isAuthenticated ? (
+            isAuthenticated ? (
               <>
                 <button
                   onClick={scrollToMyScans}
@@ -656,6 +633,33 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
           </div>
           <div className="flex-1 overflow-auto">
             <ProfileWindow />
+          </div>
+        </div>
+      )}
+
+      {/* Chat overlay — full viewport like auth/profile */}
+      {mobileOverlay === 'chat' && chatContext && (
+        <div className="fixed inset-0 z-50 bg-gs-void flex flex-col overflow-hidden">
+          <div className="flex-shrink-0 h-[44px] flex items-center gap-gs-3 px-gs-4 bg-gs-deep/95 backdrop-blur-md border-b border-gs-mid/15">
+            <button
+              onClick={() => setMobileOverlay(null)}
+              className="font-data text-data-sm text-gs-base"
+            >
+              &larr; Back
+            </button>
+            <span className="font-system text-os-sm font-bold text-gs-light truncate">
+              Ask Chlo&eacute; &mdash; {chatContext.domain}
+            </span>
+          </div>
+          <div className="flex-1 overflow-hidden">
+            <ChatWindow
+              key={chatContext.scanId}
+              scanId={chatContext.scanId}
+              domain={chatContext.domain}
+              containerHeight="100%"
+              onAuthRequired={() => openAuthOverlay('login')}
+              onPurchaseCredits={handlePurchaseCredits}
+            />
           </div>
         </div>
       )}

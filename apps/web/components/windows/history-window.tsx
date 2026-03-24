@@ -29,7 +29,11 @@ function getScoreColor(score: number): string {
   return 'traffic-dot-red';
 }
 
-export default function HistoryWindow() {
+interface HistoryWindowProps {
+  onChatOpen?: (scanId: string, domain: string) => void;
+}
+
+export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
   const { user, loading: authLoading, isAuthenticated } = useAuth();
   const wm = useWindowManager();
   const orchestrator = useScanOrchestrator();
@@ -208,6 +212,16 @@ export default function HistoryWindow() {
                     >
                       Boss&nbsp;&darr;
                     </button>
+                    {onChatOpen && (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); onChatOpen(scan.id, domain); }}
+                        className="text-gs-base hover:text-gs-bright transition-colors"
+                        title="Ask Chloe"
+                        style={{ fontSize: '11px', fontFamily: 'var(--font-system)' }}
+                      >
+                        Chat
+                      </button>
+                    )}
                   </>
                 ) : scan.tier !== 'paid' && scan.status === 'complete' ? (
                   <button
