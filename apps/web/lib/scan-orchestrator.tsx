@@ -159,6 +159,68 @@ function AuthGatePoller({
   return null;
 }
 
+/**
+ * Sign-in-only verification poller for mobile registration (no pending scan).
+ * Polls /api/auth/check-verified, signs in with stored credentials when confirmed.
+ * Session establishment triggers onAuthStateChange → isAuthenticated → overlay closes.
+ */
+function SignInPoller({
+  identityRef,
+  onComplete,
+}: {
+  identityRef: React.MutableRefObject<GateIdentity | null>;
+  onComplete: () => void;
+}) {
+  const firedRef = useRef(false);
+
+  useEffect(() => {
+    let attempts = 0;
+
+    const interval = setInterval(async () => {
+      if (firedRef.current) return;
+
+      const identity = identityRef.current;
+      if (!identity) return;
+
+      attempts++;
+      if (attempts > MAX_POLL_ATTEMPTS) {
+        firedRef.current = true;
+        clearInterval(interval);
+        identityRef.current = null;
+        onComplete();
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/auth/check-verified?userId=${identity.userId}`);
+        if (!res.ok) return;
+        const { confirmed } = await res.json();
+        if (!confirmed) return;
+      } catch {
+        return;
+      }
+
+      // Email confirmed — sign in to establish session in this browser context
+      firedRef.current = true;
+      clearInterval(interval);
+
+      const supabase = createClient();
+      await supabase.auth.signInWithPassword({
+        email: identity.email,
+        password: identity.password,
+      });
+      identityRef.current = null;
+      onComplete();
+    }, POLL_INTERVAL_MS);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps -- stable refs
+
+  return null;
+}
+
 export function ScanOrchestratorProvider({ children }: { children: ReactNode }) {
   const wm = useWindowManager();
   const [activeScan, setActiveScan] = useState<ActiveScan | null>(null);
@@ -170,8 +232,12 @@ export function ScanOrchestratorProvider({ children }: { children: ReactNode }) 
   // Using a ref (not state) so credentials never appear in React DevTools.
   const gateIdentityRef = useRef<GateIdentity | null>(null);
 
+  // Tracks whether we should poll for email verification (mobile registration without a pending scan)
+  const [gatePollingActive, setGatePollingActive] = useState(false);
+
   const setGateIdentity = useCallback((userId: string, email: string, password: string) => {
     gateIdentityRef.current = { userId, email, password };
+    setGatePollingActive(true);
   }, []);
 
   // Mobile completion handler — when set, scan complete calls this instead of openScanWindow
@@ -250,6 +316,7 @@ export function ScanOrchestratorProvider({ children }: { children: ReactNode }) 
 
   const handleAuthVerified = useCallback((scanId: string, domain: string, cached: boolean) => {
     gateIdentityRef.current = null;
+    setGatePollingActive(false);
     closeWindowRef.current('auth');
     if (scanId) {
       setVisualSequence(null);
@@ -307,6 +374,13 @@ export function ScanOrchestratorProvider({ children }: { children: ReactNode }) 
           domain={visualSequence.domain}
           identityRef={gateIdentityRef}
           onVerified={handleAuthVerified}
+        />
+      )}
+      {gatePollingActive && !visualSequence && (
+        <SignInPoller
+          key="sign-in-poller"
+          identityRef={gateIdentityRef}
+          onComplete={() => setGatePollingActive(false)}
         />
       )}
     </ScanOrchestratorContext.Provider>

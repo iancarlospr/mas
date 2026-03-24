@@ -276,7 +276,8 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
       wm.registerWindow('auth', { title: 'auth.exe', width: 440, height: 480, variant: 'dialog' });
     }
     // Set openData so AuthWindow reads the correct initial tab
-    wm.openWindow('auth', { tab: mode === 'register' ? 'register' : 'sign-in' });
+    // scanGate: true enables credential storage + verification polling (mobile email apps open links in webviews)
+    wm.openWindow('auth', { tab: mode === 'register' ? 'register' : 'sign-in', scanGate: true });
     setMobileOverlay(mode);
   }, [wm]);
 
