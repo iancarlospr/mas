@@ -163,6 +163,20 @@ export async function generateBossDeckPDFClientSide(
     }
   }
 
+  // Temporarily remove external Google Fonts <link> elements from <head>.
+  // html2canvas clones the document into an iframe whose CSP blocks external
+  // stylesheets ("style-src 'self' 'unsafe-inline'"), causing the clone to fail.
+  // The fonts are already loaded and cached — removing the links doesn't unload them.
+  const fontLinks: { el: HTMLElement; parent: Node }[] = [];
+  document.querySelectorAll<HTMLElement>(
+    'link[href*="fonts.googleapis.com"], link[href*="fonts.gstatic.com"]',
+  ).forEach((el) => {
+    if (el.parentNode) {
+      fontLinks.push({ el, parent: el.parentNode });
+      el.remove();
+    }
+  });
+
   const style = document.createElement('style');
   style.textContent = `
     .page {
@@ -208,8 +222,9 @@ export async function generateBossDeckPDFClientSide(
     page.drawImage(img, { x: 0, y: 0, width: BD_W, height: BD_H });
   }
 
-  // Cleanup: remove cloned SVG filter defs and style override
+  // Cleanup: remove cloned SVG filter defs, restore font links, remove style override
   clonedSvgs.forEach(svg => svg.remove());
+  fontLinks.forEach(({ el, parent }) => parent.appendChild(el));
   style.remove();
 
   onProgress?.({ phase: 'assembling', current: total, total });
