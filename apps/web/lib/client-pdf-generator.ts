@@ -68,17 +68,40 @@ export async function generatePresentationPDFClientSide(
     throw new Error('No slides found on the page');
   }
 
+  // Force exact dimensions on all slides + their inner cards (same as engine).
+  // The browser window may be narrower than 1875px, so slides render smaller.
+  // This CSS override makes them fill the full PDF page before capture.
+  const style = document.createElement('style');
+  style.textContent = `
+    .slide-page {
+      width: ${PAGE_W}px !important;
+      height: ${PAGE_H}px !important;
+      overflow: hidden !important;
+    }
+    .slide-page .slide-card {
+      width: ${PAGE_W}px !important;
+      height: ${PAGE_H}px !important;
+      aspect-ratio: unset !important;
+      overflow: hidden !important;
+      border-radius: 0 !important;
+    }
+  `;
+  document.head.appendChild(style);
+
+  // Let layout settle after dimension change
+  await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+
   const pdf = await PDFDocument.create();
 
   for (let i = 0; i < total; i++) {
     onProgress?.({ phase: 'capturing', current: i + 1, total });
 
-    // Capture at native dimensions — html2canvas reads the element's actual size
     const canvas = await html2canvas(slides[i]!, {
       scale: 1,
       useCORS: true,
       allowTaint: true,
       backgroundColor: '#080808',
+      windowWidth: PAGE_W,
       width: PAGE_W,
       height: PAGE_H,
       logging: false,
@@ -98,6 +121,9 @@ export async function generatePresentationPDFClientSide(
     const page = pdf.addPage([PAGE_W, PAGE_H]);
     page.drawImage(img, { x: 0, y: 0, width: PAGE_W, height: PAGE_H });
   }
+
+  // Remove the dimension override
+  style.remove();
 
   onProgress?.({ phase: 'assembling', current: total, total });
   const pdfBytes = await pdf.save();
