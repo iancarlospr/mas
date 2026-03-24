@@ -1,13 +1,18 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import { ChloeSprite } from '@/components/chloe/chloe-sprite';
-import { ScanInput } from '@/components/scan/scan-input';
+import { MobileScanFlow } from '@/components/mobile/mobile-scan-flow';
 import { MobilePricingSection } from '@/components/mobile/mobile-pricing-section';
+import { useAuth } from '@/lib/auth-context';
+import { useScanOrchestrator } from '@/lib/scan-orchestrator';
+import { analytics } from '@/lib/analytics';
 import FeaturesWindow from '@/components/windows/features-window';
 import ProductsWindow from '@/components/windows/products-window';
 import CustomersWindow from '@/components/windows/customers-window';
 import AboutWindow from '@/components/windows/about-window';
+import HistoryWindow from '@/components/windows/history-window';
 
 /**
  * Mobile Landing Page (replaces old MobileGate)
@@ -153,11 +158,22 @@ function SectionDivider() {
 
 /* ── Main component ──────────────────────────────────────────── */
 
+/* Routes that should render their own page content on mobile instead of the landing page */
+const MOBILE_PASSTHROUGH = ['/login', '/register', '/auth/', '/scan/', '/chat/', '/history', '/verify'];
+
 export function MobileGate({ children }: { children: React.ReactNode }) {
   const [isMobile, setIsMobile] = useState(false);
   const [heroVisible, setHeroVisible] = useState(true);
   const heroRef = useRef<HTMLDivElement>(null);
   const pricingRef = useRef<HTMLDivElement>(null);
+  const myScansRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
+  const router = useRouter();
+  const { isAuthenticated, loading: authLoading } = useAuth();
+  const orchestrator = useScanOrchestrator();
+  // Key to force HistoryWindow remount after scan completes (re-fetches data)
+  const [historyKey, setHistoryKey] = useState(0);
+  const prevScanIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 1024);
@@ -177,6 +193,59 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
     return () => observer.disconnect();
   }, [isMobile]);
 
+  // Force HistoryWindow remount when a scan completes (activeScanId goes from non-null to null)
+  useEffect(() => {
+    if (prevScanIdRef.current && !orchestrator.activeScanId) {
+      setHistoryKey((k) => k + 1);
+    }
+    prevScanIdRef.current = orchestrator.activeScanId;
+  }, [orchestrator.activeScanId]);
+
+  // Auto-scan after registration: detect pending URL in localStorage
+  useEffect(() => {
+    if (!isMobile || authLoading || !isAuthenticated) return;
+
+    let raw: string | null = null;
+    try { raw = localStorage.getItem('alphascan_pending_url'); } catch { /* */ }
+    if (!raw) return;
+
+    let parsed: { url: string; timestamp: number };
+    try {
+      parsed = JSON.parse(raw);
+      if (Date.now() - parsed.timestamp > 60 * 60 * 1000) {
+        localStorage.removeItem('alphascan_pending_url');
+        return;
+      }
+    } catch {
+      localStorage.removeItem('alphascan_pending_url');
+      return;
+    }
+
+    localStorage.removeItem('alphascan_pending_url');
+
+    // Fire auto-scan (Turnstile bypassed for recent sign-ins)
+    (async () => {
+      try {
+        const res = await fetch('/api/scans', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: parsed.url, turnstileToken: '', autoScan: true }),
+        });
+        if (!res.ok) return;
+        const { scanId, cached } = await res.json();
+        const domain = new URL(parsed.url).hostname;
+        analytics.scanStarted(domain, 'full');
+
+        orchestrator.setMobileCompleteHandler(() => {
+          setTimeout(() => {
+            myScansRef.current?.scrollIntoView({ behavior: 'smooth' });
+          }, 300);
+        });
+        orchestrator.startScan(scanId, domain, cached);
+      } catch { /* ignore */ }
+    })();
+  }, [isMobile, authLoading, isAuthenticated]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const scrollToHero = useCallback(() => {
     heroRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, []);
@@ -185,8 +254,17 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
     pricingRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, []);
 
+  const scrollToMyScans = useCallback(() => {
+    myScansRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, []);
+
   // Desktop: pass through
   if (!isMobile) {
+    return <>{children}</>;
+  }
+
+  // Mobile: pass through for auth, scan, and dashboard routes
+  if (MOBILE_PASSTHROUGH.some((prefix) => pathname.startsWith(prefix))) {
     return <>{children}</>;
   }
 
@@ -209,6 +287,12 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
           flex: none !important;
           width: 100% !important;
         }
+        /* ── My Scans: condensed for mobile ── */
+        .mobile-my-scans .w-16 { display: none !important; }
+        .mobile-my-scans .w-6:last-child { display: none !important; }
+        .mobile-my-scans .w-44 { width: auto !important; }
+        .mobile-my-scans .gap-gs-2 { gap: 4px !important; }
+        .mobile-my-scans .px-gs-3 { padding-left: 8px !important; padding-right: 8px !important; }
       `}</style>
       <div className="noise-grain opacity-[0.03]" aria-hidden="true" />
 
@@ -299,12 +383,29 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
 
           {/* Scan input — stacked vertically on mobile */}
           <div className="w-full max-w-md px-gs-4 mobile-scan-input-stack">
-            <ScanInput variant="dialog" />
+            <MobileScanFlow myScansRef={myScansRef} />
           </div>
 
           {/* ⑤ Bottom breathing room — small, keeps Turnstile off viewport edge */}
           <div style={{ minHeight: '16px' }} />
         </section>
+
+        {/* ═══════ MY SCANS (authenticated users only) ═══════ */}
+        {isAuthenticated && (
+          <>
+            <SectionDivider />
+            <section ref={myScansRef} className="py-gs-2">
+              <div className="px-gs-4 mb-gs-2">
+                <h2 className="font-system text-os-sm font-bold" style={{ color: 'var(--gs-light)' }}>
+                  My Scans
+                </h2>
+              </div>
+              <div className="mobile-my-scans">
+                <HistoryWindow key={historyKey} />
+              </div>
+            </section>
+          </>
+        )}
 
         <SectionDivider />
 
@@ -378,6 +479,23 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
           >
             Pricing
           </button>
+          {!authLoading && (
+            isAuthenticated ? (
+              <button
+                onClick={scrollToMyScans}
+                className="bevel-button px-gs-3 h-[34px] font-system text-os-sm font-bold flex-shrink-0"
+              >
+                My Scans
+              </button>
+            ) : (
+              <button
+                onClick={() => router.push('/register')}
+                className="bevel-button px-gs-3 h-[34px] font-system text-os-sm font-bold flex-shrink-0"
+              >
+                Sign Up
+              </button>
+            )
+          )}
         </div>
       )}
     </div>

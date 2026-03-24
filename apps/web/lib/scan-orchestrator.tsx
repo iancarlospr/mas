@@ -46,6 +46,8 @@ interface ScanOrchestratorValue {
   cancelVisualSequence(): void;
   /** Called by auth window after signUp() to pass identity for verification polling */
   setGateIdentity(userId: string, email: string, password: string): void;
+  /** Set a callback for mobile scan completion (skips openScanWindow). Pass null to clear. */
+  setMobileCompleteHandler(handler: ((scanId: string, domain: string) => void) | null): void;
   activeScanId: string | null;
   isVisualSequenceActive: boolean;
 }
@@ -172,6 +174,13 @@ export function ScanOrchestratorProvider({ children }: { children: ReactNode }) 
     gateIdentityRef.current = { userId, email, password };
   }, []);
 
+  // Mobile completion handler — when set, scan complete calls this instead of openScanWindow
+  const mobileCompleteRef = useRef<((scanId: string, domain: string) => void) | null>(null);
+
+  const setMobileCompleteHandler = useCallback((handler: ((scanId: string, domain: string) => void) | null) => {
+    mobileCompleteRef.current = handler;
+  }, []);
+
   const openScanWindow = useCallback(
     (scanId: string, domain: string) => {
       const windowId = `scan-${scanId}`;
@@ -203,7 +212,13 @@ export function ScanOrchestratorProvider({ children }: { children: ReactNode }) 
   const handleScanComplete = useCallback(
     (scanId: string, domain: string) => {
       setActiveScan(null);
-      openScanWindow(scanId, domain);
+      const mobileHandler = mobileCompleteRef.current;
+      if (mobileHandler) {
+        mobileCompleteRef.current = null;
+        mobileHandler(scanId, domain);
+      } else {
+        openScanWindow(scanId, domain);
+      }
     },
     [openScanWindow],
   );
@@ -254,10 +269,11 @@ export function ScanOrchestratorProvider({ children }: { children: ReactNode }) 
       connectScan,
       cancelVisualSequence,
       setGateIdentity,
+      setMobileCompleteHandler,
       activeScanId: activeScan?.scanId ?? null,
       isVisualSequenceActive: visualSequence != null,
     }),
-    [startScan, openScanWindow, startVisualSequence, pauseVisualSequence, resumeVisualSequence, connectScan, cancelVisualSequence, setGateIdentity, activeScan?.scanId, visualSequence],
+    [startScan, openScanWindow, startVisualSequence, pauseVisualSequence, resumeVisualSequence, connectScan, cancelVisualSequence, setGateIdentity, setMobileCompleteHandler, activeScan?.scanId, visualSequence],
   );
 
   return (
