@@ -63,9 +63,10 @@ export async function GET(
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 110_000); // 110s
 
+    const reportBaseUrl = new URL(request.url).origin;
     const response = await engineFetch(`/engine/reports/${scanId}/boss-deck-pdf`, {
       method: 'POST',
-      body: JSON.stringify({ scanId }),
+      body: JSON.stringify({ scanId, reportBaseUrl }),
       signal: controller.signal,
     });
 

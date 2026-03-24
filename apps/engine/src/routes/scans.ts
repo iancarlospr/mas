@@ -238,8 +238,9 @@ export async function scanRoutes(fastify: FastifyInstance): Promise<void> {
       // before calling the engine. No need to re-check here.
 
       try {
-        const reportBaseUrl = process.env['REPORT_BASE_URL'] ?? 'http://localhost:3000';
-        request.log.info({ scanId }, 'Generating presentation PDF');
+        const body = request.body as Record<string, unknown> | undefined;
+        const reportBaseUrl = (body?.['reportBaseUrl'] as string) || process.env['REPORT_BASE_URL'] || 'http://localhost:3000';
+        request.log.info({ scanId, reportBaseUrl }, 'Generating presentation PDF');
 
         const pdf = await generatePresentationPDF(scanId, reportBaseUrl);
         const signedUrl = await uploadPresentationPDF(scanId, pdf);
@@ -280,8 +281,9 @@ export async function scanRoutes(fastify: FastifyInstance): Promise<void> {
       const { id: scanId } = parseResult.data;
 
       try {
-        const reportBaseUrl = process.env['REPORT_BASE_URL'] ?? 'http://localhost:3000';
-        request.log.info({ scanId }, 'Generating Boss Deck PDF');
+        const body = request.body as Record<string, unknown> | undefined;
+        const reportBaseUrl = (body?.['reportBaseUrl'] as string) || process.env['REPORT_BASE_URL'] || 'http://localhost:3000';
+        request.log.info({ scanId, reportBaseUrl }, 'Generating Boss Deck PDF');
 
         const pdf = await generateBossDeckPDF(scanId, reportBaseUrl);
         const signedUrl = await uploadBossDeckPDF(scanId, pdf);
