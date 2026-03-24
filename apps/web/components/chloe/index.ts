@@ -14,8 +14,14 @@ export type { ChloeState, ChloeSpriteProps } from './chloe-sprite';
 export { ChloeReactionsProvider, useChloeReactions } from './chloe-reactions';
 export type { ChloeReactionEvent } from './chloe-reactions';
 
+// Laser beams (shared by desktop + mobile)
+export { LaserBeams } from './laser-beams';
+
 // Desktop screenmate
 export { ChloeScreenmate } from './chloe-screenmate';
+
+// Mobile screenmate (one-shot laser)
+export { MobileChloeLaser } from './mobile-chloe-laser';
 
 // Chat avatar
 export { ChloeChatAvatar, ChloeMessageAvatar } from './chloe-chat-avatar';

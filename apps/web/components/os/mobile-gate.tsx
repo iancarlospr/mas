@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
 import { ChloeSprite } from '@/components/chloe/chloe-sprite';
+import { MobileChloeLaser } from '@/components/chloe/mobile-chloe-laser';
 import { UserCircle } from 'lucide-react';
 import { MobileScanFlow } from '@/components/mobile/mobile-scan-flow';
 import { MobilePricingSection } from '@/components/mobile/mobile-pricing-section';
@@ -415,7 +416,7 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
 
           {/* Chloe + Headline */}
           <div className="flex items-start gap-gs-3 select-none px-gs-4">
-            <ChloeSprite state="idle" size={64} className="flex-shrink-0 mt-[4px]" />
+            <MobileChloeLaser size={64} />
             <div>
               <p
                 className="font-display"
