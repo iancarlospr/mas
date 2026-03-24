@@ -148,7 +148,8 @@ export async function generateBossDeckPDFClientSide(
     throw new Error('No pages found on the page');
   }
 
-  // Force exact dimensions
+  // Force exact dimensions + disable SVG filter refs (html2canvas can't resolve
+  // filter: url(#grain) when the <filter> SVG is outside the captured element)
   const style = document.createElement('style');
   style.textContent = `
     .page {
@@ -158,6 +159,11 @@ export async function generateBossDeckPDFClientSide(
     }
     .print-banner { display: none !important; }
     body { margin-top: 0 !important; }
+    .bar-grain, .bar-grain-light, .wins-grain, .results-grain, .closer-grain {
+      filter: none !important;
+      opacity: 0 !important;
+    }
+    .closer-bg { filter: brightness(0.2) !important; }
   `;
   document.head.appendChild(style);
 

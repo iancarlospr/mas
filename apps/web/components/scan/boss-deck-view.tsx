@@ -26,13 +26,16 @@ export function BossDeckView({
   const [progress, setProgress] = useState<PDFProgress | null>(null);
   const downloadStarted = useRef(false);
 
-  // Extract <style> content from the HTML <head>
-  const headStyles = (html.match(/<style[^>]*>[\s\S]*?<\/style>/gi) ?? []).join('\n');
+  // Extract <style> content from the HTML <head>, strip body margin-top (print banner artifact)
+  const headStyles = (html.match(/<style[^>]*>[\s\S]*?<\/style>/gi) ?? [])
+    .join('\n')
+    .replace(/body\s*\{\s*margin-top:\s*50px;\s*\}/g, '');
 
-  // Extract <body> content
+  // Extract <body> content, strip the old print banner
   const bodyContent = html
     .replace(/^[\s\S]*<body[^>]*>/i, '')
-    .replace(/<\/body>[\s\S]*$/i, '');
+    .replace(/<\/body>[\s\S]*$/i, '')
+    .replace(/<div class="print-banner">[\s\S]*?<\/div>\s*/i, '');
 
   // Inject Google Fonts link into <head>
   useEffect(() => {
