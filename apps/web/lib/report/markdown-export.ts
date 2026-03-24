@@ -77,7 +77,7 @@ function buildVerdict(map: ResultMap): string {
   if (!verdict) return '';
 
   return [
-    `### Verdict`,
+    `### Roast by Prof. Scott Galloway`,
     '',
     `> ${verdict}`,
     '',
