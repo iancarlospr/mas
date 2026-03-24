@@ -212,21 +212,38 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                     >
                       Boss&nbsp;&darr;
                     </button>
-                    {onChatOpen && (
-                      <button
-                        onClick={(e) => { e.stopPropagation(); onChatOpen(scan.id, domain); }}
-                        className="text-gs-base hover:text-gs-bright transition-colors flex items-center gap-[3px]"
-                        title="Ask Chloe"
-                        style={{ fontSize: '11px', fontFamily: 'var(--font-system)' }}
-                      >
-                        <svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor" style={{ flexShrink: 0 }}>
-                          <path d="M8 1C5.2 1 3 3.2 3 6v6l1-1.5 1 1.5 1-1.5 1 1.5 1-1.5 1 1.5 1-1.5 1 1.5V6c0-2.8-2.2-5-5-5z"/>
-                          <circle cx="6" cy="5.5" r="1" fill="var(--gs-void)"/>
-                          <circle cx="10" cy="5.5" r="1" fill="var(--gs-void)"/>
-                        </svg>
-                        Chat
-                      </button>
-                    )}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (onChatOpen) {
+                          onChatOpen(scan.id, domain);
+                        } else {
+                          const chatId = `chat-${scan.id}`;
+                          if (wm.windows[chatId]?.isOpen) {
+                            wm.focusWindow(chatId);
+                            return;
+                          }
+                          wm.registerWindow(chatId, {
+                            title: `Ask Chloé — ${domain}`,
+                            width: 380, height: 480,
+                            minWidth: 340, minHeight: 400,
+                            componentType: 'ghost-chat',
+                            alwaysOnTop: true,
+                          });
+                          wm.openWindow(chatId, { scanId: scan.id, domain });
+                        }
+                      }}
+                      className="text-gs-base hover:text-gs-bright transition-colors flex items-center gap-[3px]"
+                      title="Ask Chloe"
+                      style={{ fontSize: '11px', fontFamily: 'var(--font-system)' }}
+                    >
+                      <svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor" style={{ flexShrink: 0 }}>
+                        <path d="M8 1C5.2 1 3 3.2 3 6v6l1-1.5 1 1.5 1-1.5 1 1.5 1-1.5 1 1.5 1-1.5 1 1.5V6c0-2.8-2.2-5-5-5z"/>
+                        <circle cx="6" cy="5.5" r="1" fill="var(--gs-void)"/>
+                        <circle cx="10" cy="5.5" r="1" fill="var(--gs-void)"/>
+                      </svg>
+                      Chat
+                    </button>
                   </>
                 ) : scan.tier !== 'paid' && scan.status === 'complete' ? (
                   <button
