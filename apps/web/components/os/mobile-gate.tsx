@@ -6,6 +6,7 @@ import { ChloeSprite } from '@/components/chloe/chloe-sprite';
 import { MobileScanFlow } from '@/components/mobile/mobile-scan-flow';
 import { MobilePricingSection } from '@/components/mobile/mobile-pricing-section';
 import { useAuth } from '@/lib/auth-context';
+import { useWindowManager } from '@/lib/window-manager';
 import { useScanOrchestrator } from '@/lib/scan-orchestrator';
 import { analytics } from '@/lib/analytics';
 import FeaturesWindow from '@/components/windows/features-window';
@@ -14,7 +15,7 @@ import CustomersWindow from '@/components/windows/customers-window';
 import AboutWindow from '@/components/windows/about-window';
 import HistoryWindow from '@/components/windows/history-window';
 import ProfileWindow from '@/components/windows/profile-window';
-import { AuthForm } from '@/components/auth/auth-form';
+import AuthWindow from '@/components/windows/auth-window';
 
 /**
  * Mobile Landing Page (replaces old MobileGate)
@@ -171,6 +172,7 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
   const myScansRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
   const { isAuthenticated, loading: authLoading } = useAuth();
+  const wm = useWindowManager();
   const orchestrator = useScanOrchestrator();
   // Key to force HistoryWindow remount after scan completes (re-fetches data)
   const [historyKey, setHistoryKey] = useState(0);
@@ -267,6 +269,16 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
   const scrollToMyScans = useCallback(() => {
     myScansRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, []);
+
+  const openAuthOverlay = useCallback((mode: 'login' | 'register') => {
+    // Register auth window if not already (DesktopShell doesn't mount on mobile)
+    if (!wm.windows['auth']) {
+      wm.registerWindow('auth', { title: 'auth.exe', width: 440, height: 480, variant: 'dialog' });
+    }
+    // Set openData so AuthWindow reads the correct initial tab
+    wm.openWindow('auth', { tab: mode === 'register' ? 'register' : 'sign-in' });
+    setMobileOverlay(mode);
+  }, [wm]);
 
   // Desktop: pass through
   if (!isMobile) {
@@ -508,7 +520,7 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
                   Pricing
                 </button>
                 <button
-                  onClick={() => setMobileOverlay('register')}
+                  onClick={() => openAuthOverlay('register')}
                   className="bevel-button px-gs-3 h-[34px] font-system text-os-sm font-bold flex-shrink-0"
                 >
                   Register
@@ -521,17 +533,23 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
 
       {/* ═══════ OVERLAYS ═══════ */}
 
-      {/* Auth overlay — AuthForm already renders fixed inset-0 */}
+      {/* Auth overlay — uses AuthWindow (same as desktop, handles verify inline) */}
       {(mobileOverlay === 'login' || mobileOverlay === 'register') && (
-        <div className="fixed inset-0 z-50">
-          <button
-            onClick={() => setMobileOverlay(null)}
-            className="fixed top-gs-3 right-gs-3 z-[51] w-[32px] h-[32px] flex items-center justify-center rounded-full bg-gs-deep/80 backdrop-blur-sm border border-gs-mid/20 text-gs-light font-system text-os-sm"
-            aria-label="Close"
-          >
-            &times;
-          </button>
-          <AuthForm mode={mobileOverlay} />
+        <div className="fixed inset-0 z-50 bg-gs-void flex flex-col overflow-hidden">
+          <div className="flex-shrink-0 h-[44px] flex items-center gap-gs-3 px-gs-4 bg-gs-deep/95 backdrop-blur-md border-b border-gs-mid/15">
+            <button
+              onClick={() => setMobileOverlay(null)}
+              className="font-data text-data-sm text-gs-base"
+            >
+              &larr; Back
+            </button>
+            <span className="font-system text-os-sm font-bold text-gs-light">
+              {mobileOverlay === 'register' ? 'Create Account' : 'Sign In'}
+            </span>
+          </div>
+          <div className="flex-1 overflow-auto">
+            <AuthWindow />
+          </div>
         </div>
       )}
 
