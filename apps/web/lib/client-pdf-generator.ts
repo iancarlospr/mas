@@ -148,8 +148,7 @@ export async function generateBossDeckPDFClientSide(
     throw new Error('No pages found on the page');
   }
 
-  // Force exact dimensions + disable SVG filter refs (html2canvas can't resolve
-  // filter: url(#grain) when the <filter> SVG is outside the captured element)
+  // Force exact dimensions
   const style = document.createElement('style');
   style.textContent = `
     .page {
@@ -159,11 +158,6 @@ export async function generateBossDeckPDFClientSide(
     }
     .print-banner { display: none !important; }
     body { margin-top: 0 !important; }
-    .bar-grain, .bar-grain-light, .wins-grain, .results-grain, .closer-grain {
-      filter: none !important;
-      opacity: 0 !important;
-    }
-    .closer-bg { filter: brightness(0.2) !important; }
   `;
   document.head.appendChild(style);
 
@@ -178,11 +172,26 @@ export async function generateBossDeckPDFClientSide(
       scale: 1.5,
       useCORS: true,
       allowTaint: true,
-      backgroundColor: '#080808',
+      backgroundColor: '#0A0E1A',
       windowWidth: BD_W,
       width: BD_W,
       height: BD_H,
       logging: false,
+      // Clean up the cloned document before html2canvas renders it.
+      // SVG filter refs (filter: url(#grain)) break because the <filter>
+      // definition lives outside each .page subtree in the clone.
+      onclone: (clonedDoc: Document) => {
+        // Remove all grain overlay elements that reference SVG filters
+        clonedDoc.querySelectorAll(
+          '.bar-grain, .bar-grain-light, .wins-grain, .results-grain, .closer-grain'
+        ).forEach((el) => el.remove());
+        // Remove the SVG <filter> defs entirely
+        clonedDoc.querySelectorAll('svg[aria-hidden] filter')
+          .forEach((f) => f.closest('svg')?.remove());
+        // Simplify closer-bg (blur + saturate breaks html2canvas)
+        const closerBg = clonedDoc.querySelector('.closer-bg') as HTMLElement | null;
+        if (closerBg) closerBg.style.filter = 'brightness(0.2)';
+      },
     });
 
     const isHeroOrTail = i === 0 || i === total - 1;

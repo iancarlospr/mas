@@ -24,6 +24,7 @@ export function BossDeckView({
 }) {
   const [ready, setReady] = useState(false);
   const [progress, setProgress] = useState<PDFProgress | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const downloadStarted = useRef(false);
 
   // Extract <style> content from the HTML <head>, strip body margin-top (print banner artifact)
@@ -85,7 +86,9 @@ export function BossDeckView({
       const pdfBytes = await generateBossDeckPDFClientSide(setProgress);
       downloadPdf(pdfBytes, `${domain}-boss-deck.pdf`);
     } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
       console.error('[boss-deck-pdf] Client-side generation failed:', err);
+      setError(msg);
       setProgress(null);
       downloadStarted.current = false;
     }
@@ -142,6 +145,39 @@ export function BossDeckView({
                 }}
               />
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Error overlay */}
+      {error && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 99999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'rgba(8, 8, 8, 0.92)',
+            fontFamily: 'var(--font-geist-mono), monospace',
+            color: '#FFB2EF',
+            padding: 40,
+          }}
+        >
+          <div style={{ textAlign: 'center', maxWidth: 500 }}>
+            <div style={{ fontSize: 16, marginBottom: 16 }}>PDF generation failed</div>
+            <div style={{ fontSize: 12, color: '#f87171', wordBreak: 'break-all' }}>{error}</div>
+            <button
+              onClick={() => { setError(null); downloadStarted.current = false; startDownload(); }}
+              style={{
+                marginTop: 20, padding: '8px 24px', background: '#FFB2EF',
+                color: '#080808', border: 'none', borderRadius: 6, cursor: 'pointer',
+                fontFamily: 'inherit', fontWeight: 600,
+              }}
+            >
+              Retry
+            </button>
           </div>
         </div>
       )}
