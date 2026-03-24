@@ -25,15 +25,7 @@ body { font-family: 'DM Sans', system-ui, sans-serif; font-size: 13px; color: #1
 .page-inner { padding: 0.6in 0.75in; height: calc(100% - 36px); position: relative; z-index: 2; }
 
 /* ── Shared ───────────────────────────────────────── */
-/* Grain overlays */
-.bar-grain {
-  position: absolute; inset: 0; pointer-events: none;
-  filter: url(#grain); opacity: 0.08; z-index: 0;
-}
-.bar-grain-light {
-  position: absolute; inset: 0; pointer-events: none;
-  filter: url(#grain); opacity: 0.08; z-index: 0;
-}
+/* Grain overlays — now canvas-based (GrainCanvas component), CSS kept for layout */
 
 .slide-footer {
   position: absolute; bottom: 0; left: 0; right: 0; height: 36px;
@@ -185,7 +177,6 @@ body { font-family: 'DM Sans', system-ui, sans-serif; font-size: 13px; color: #1
 }
 .wins-grain {
   position: absolute; inset: 0; z-index: 1; pointer-events: none;
-  filter: url(#grain); opacity: 0.10;
 }
 .wins-inner {
   z-index: 2;
@@ -574,10 +565,9 @@ body { font-family: 'DM Sans', system-ui, sans-serif; font-size: 13px; color: #1
   background: radial-gradient(ellipse at center, rgba(201,169,110,0.05) 0%, transparent 55%);
 }
 
-/* Layer 5: Noise grain */
+/* Layer 5: Noise grain — canvas-based */
 .results-grain {
   position: absolute; inset: 0; z-index: 1; pointer-events: none;
-  filter: url(#grain); opacity: 0.10;
 }
 
 /* Layer 6: Vignette */
@@ -757,10 +747,9 @@ body { font-family: 'DM Sans', system-ui, sans-serif; font-size: 13px; color: #1
   background: radial-gradient(ellipse at center, rgba(201,169,110,0.06) 0%, transparent 55%);
 }
 
-/* Noise grain */
+/* Noise grain — canvas-based */
 .closer-grain {
   position: absolute; inset: 0; z-index: 2; pointer-events: none;
-  filter: url(#grain); opacity: 0.12;
 }
 
 /* Heavy vignette — cinematic edges */
