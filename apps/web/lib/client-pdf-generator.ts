@@ -23,6 +23,51 @@ const BD_H = 816;
 const GRAIN_SELECTORS = '.bar-grain, .bar-grain-light, .wins-grain, .results-grain, .closer-grain';
 
 /**
+ * Pre-rasterize the closer slide's background image with its CSS filters
+ * (blur 30px, saturate 0.4, brightness 0.2) baked in. html2canvas can't
+ * render CSS filter on img elements, so we draw the filtered result onto
+ * a canvas and replace the img. Uses canvas 2D context's filter property.
+ */
+function rasterizeCloserBg(container: HTMLElement): Promise<void> {
+  const img = container.querySelector<HTMLImageElement>('.closer-bg');
+  if (!img) return Promise.resolve();
+
+  return new Promise((resolve) => {
+    const apply = () => {
+      const c = document.createElement('canvas');
+      // Render at slightly larger size to account for scale(1.15) + blur bleed
+      const scale = 1.15;
+      c.width = Math.round(BD_W * scale);
+      c.height = Math.round(BD_H * scale);
+      const ctx = c.getContext('2d');
+      if (ctx) {
+        ctx.filter = 'blur(30px) saturate(0.4) brightness(0.2)';
+        ctx.drawImage(img, 0, 0, c.width, c.height);
+      }
+      // Replace img with the pre-filtered canvas
+      Object.assign(c.style, {
+        position: 'absolute',
+        inset: '0',
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover',
+        zIndex: '0',
+        transform: 'scale(1.15)',
+      });
+      img.replaceWith(c);
+      resolve();
+    };
+
+    if (img.complete && img.naturalWidth > 0) apply();
+    else {
+      img.onload = apply;
+      // Fallback if image never loads
+      setTimeout(resolve, 3000);
+    }
+  });
+}
+
+/**
  * Render SVG feTurbulence through the browser's native SVG engine onto a
  * canvas. Produces the EXACT same grain as the web view — same algorithm,
  * same parameters — just rasterized so html2canvas can capture it.
@@ -257,6 +302,10 @@ export async function generateBossDeckPDFClientSide(
 
     // Inject rasterized feTurbulence grain into grain overlays
     injectGrainCanvases(captureTarget, grainCanvas);
+
+    // Pre-rasterize closer slide's filtered background image
+    // (html2canvas can't render filter: blur(30px) saturate(0.4) brightness(0.2))
+    await rasterizeCloserBg(captureTarget);
 
     await new Promise((r) => requestAnimationFrame(r));
 
