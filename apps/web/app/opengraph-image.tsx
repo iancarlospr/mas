@@ -4,7 +4,7 @@ import { ImageResponse } from 'next/og';
  * Alpha Scan — Root OG Image (1200×630)
  *
  * Uses the REAL ASCII brand logo from the title/closing slides,
- * with the verdict slide's purple/pink plasma atmosphere.
+ * with the roast slide's purple/pink plasma atmosphere.
  * This is what shows when sharing marketingalphascan.com on social.
  */
 
@@ -27,11 +27,11 @@ export default async function Image() {
           fontFamily: 'monospace',
           position: 'relative',
           overflow: 'hidden',
-          /* Verdict-slide inspired dark bg */
+          /* Roast-slide inspired dark bg */
           backgroundColor: '#0C0A10',
         }}
       >
-        {/* Plasma-inspired atmospheric gradient layers (verdict slide vibe) */}
+        {/* Plasma-inspired atmospheric gradient layers (roast slide vibe) */}
         <div
           style={{
             position: 'absolute',

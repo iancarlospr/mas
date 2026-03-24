@@ -187,7 +187,7 @@ ${categoryScores.map(c => `  - ${c.category}: ${c.score}/100 (${c.light})`).join
   // M42 Executive Brief
   sections.push(`## EXECUTIVE BRIEF
 Synthesis Headline: ${m42Synthesis['synthesis_headline'] ?? ''}
-Verdict Headline: ${m42Synthesis['verdict_headline'] ?? ''}
+Roast Headline (Scott Galloway): ${m42Synthesis['verdict_headline'] ?? ''}
 
 Executive Brief:
 ${m42Synthesis['executive_brief'] ?? ''}

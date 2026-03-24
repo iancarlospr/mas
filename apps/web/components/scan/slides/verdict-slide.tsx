@@ -5,27 +5,27 @@ import type { ScanWithResults, ModuleResult } from '@marketing-alpha/types';
 import { getMarketingIQLabel } from '@marketing-alpha/types';
 
 /**
- * Verdict Slide — Psychedelic Hero Quote
- * ═══════════════════════════════════════
+ * Roast Slide — Psychedelic Hero Quote (Scott Galloway Roast)
+ * ════════════════════════════════════════════════════════════
  *
- * Slide 2. Full-bleed animated plasma background with the M42 verdict
+ * Slide 2. Full-bleed animated plasma background with the M42 roast
  * headline massive and centered. Breaks from the clean dark slides
  * around it — meant to punch.
  *
- * Paid: M42 verdict_headline in curly quotes
+ * Paid: M42 verdict_headline (roast) in curly quotes
  * Free: "MarketingIQ: {score} — {label}"
  */
 
-interface VerdictSlideProps {
+interface RoastSlideProps {
   scan: ScanWithResults;
 }
 
-export function VerdictSlide({ scan }: VerdictSlideProps) {
+export function RoastSlide({ scan }: RoastSlideProps) {
   const isPaid = scan.tier === 'paid';
   const score = scan.marketingIq;
   const label = score != null ? getMarketingIQLabel(score) : null;
 
-  // M42 verdict headline
+  // M42 roast headline (field: verdict_headline)
   const resultMap = new Map<string, ModuleResult>(
     scan.moduleResults.map((r) => [r.moduleId, r]),
   );
@@ -44,7 +44,7 @@ export function VerdictSlide({ scan }: VerdictSlideProps) {
   return (
     <div
       className="slide-card relative overflow-hidden select-none"
-      data-slide-id="Verdict"
+      data-slide-id="Roast"
       style={{
         aspectRatio: '14 / 8.5',
         borderRadius: '2px',
@@ -56,7 +56,7 @@ export function VerdictSlide({ scan }: VerdictSlideProps) {
 
       {/* Layer 2: Noise grain to break up color banding */}
       <svg className="absolute" width="0" height="0" aria-hidden="true">
-        <filter id="verdict-noise">
+        <filter id="roast-noise">
           <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" />
           <feColorMatrix type="saturate" values="0" />
         </filter>
@@ -64,7 +64,7 @@ export function VerdictSlide({ scan }: VerdictSlideProps) {
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          filter: 'url(#verdict-noise)',
+          filter: 'url(#roast-noise)',
           opacity: 0.12,
           zIndex: 2,
         }}

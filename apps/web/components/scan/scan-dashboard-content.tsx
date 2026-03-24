@@ -5,7 +5,7 @@ import type { ScanWithResults } from '@marketing-alpha/types';
 import { useWindowManager } from '@/lib/window-manager';
 import { analytics } from '@/lib/analytics';
 import { TitleSlide } from './slides/title-slide';
-import { VerdictSlide } from './slides/verdict-slide';
+import { RoastSlide } from './slides/verdict-slide';
 import { OverviewExecSlide } from './slides/overview-exec-slide';
 import { FindingsSlide } from './slides/findings-slide';
 import { CategoryIntroSlide } from './slides/category-intro-slide';
@@ -371,7 +371,7 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
 
         {isPaid && (
           <>
-            <VerdictSlide scan={scan} />
+            <RoastSlide scan={scan} />
             <div id="nav-about">
               <OverviewExecSlide scan={scan} slideNumber="A" />
             </div>

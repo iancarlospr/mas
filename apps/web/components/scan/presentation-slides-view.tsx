@@ -5,7 +5,7 @@ import type { ScanWithResults } from '@marketing-alpha/types';
 import { WindowManagerProvider } from '@/lib/window-manager';
 import type { PDFProgress } from '@/lib/client-pdf-generator';
 import { TitleSlide } from './slides/title-slide';
-import { VerdictSlide } from './slides/verdict-slide';
+import { RoastSlide } from './slides/verdict-slide';
 import { OverviewExecSlide } from './slides/overview-exec-slide';
 import { M45Slide } from './slides/m45-slide';
 import { FindingsSlide } from './slides/findings-slide';
@@ -246,8 +246,8 @@ export function PresentationSlidesView({
         {/* ── Title ── */}
         <div className="slide-page"><TitleSlide scan={scan} /></div>
 
-        {/* ── Verdict ── */}
-        <div className="slide-page"><VerdictSlide scan={scan} /></div>
+        {/* ── Roast ── */}
+        <div className="slide-page"><RoastSlide scan={scan} /></div>
 
         {/* ── Executive Overview ── */}
         <div className="slide-page"><OverviewExecSlide scan={scan} /></div>

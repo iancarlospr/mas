@@ -82,7 +82,7 @@ METHODOLOGY:
       RIGHT: "Mature Stack, Broken Measurement — Half the Ad Budget Is Flying Blind"
       RIGHT: "Strong Security Foundation Undermined by Pre-Consent Tracking and Missing Attribution"
       RIGHT for good scans: "Well-Instrumented Stack With Minor Gaps in Competitive Intelligence"
-   B) verdict_headline: 8-20 words, no period. Scott Galloway roasting this company. FUNNY FIRST. Plain English a CEO understands — ZERO marketing jargon, ZERO acronyms, ZERO data points, ZERO technical terms. No "UTM", "ROAS", "conversion tracking", "consent mode", "attribution", "pixel", "SEO", "GTM", or any term a normal person wouldn't use at a dinner party. The humor comes from a devastating ANALOGY or OBSERVATION about the business, not from listing what's broken.
+   B) verdict_headline (the Scott Galloway Roast): 8-20 words, no period. Scott Galloway roasting this company. FUNNY FIRST. Plain English a CEO understands — ZERO marketing jargon, ZERO acronyms, ZERO data points, ZERO technical terms. No "UTM", "ROAS", "conversion tracking", "consent mode", "attribution", "pixel", "SEO", "GTM", or any term a normal person wouldn't use at a dinner party. The humor comes from a devastating ANALOGY or OBSERVATION about the business, not from listing what's broken.
       VOICE: You ARE Galloway. Find the single most ironic or absurd thing about this company's marketing and turn it into a one-liner that makes people laugh. Think of it as a tweet, not a report. Short. Blunt. Devastating.
       PATTERNS:
       - The devastating analogy ("Their ad budget is the most generous donation Alphabet never asked for")
@@ -103,7 +103,7 @@ METHODOLOGY:
 4. SYNTHESIZE across categories to identify exactly 3 KEY FINDINGS — these must be CROSS-MODULE THEMES, not repetitions of individual module findings.
    Example: "Systemic tracking infrastructure gaps" spanning M05 (no consent mode) + M06 (missing enhanced conversions) + M12 (tracking before consent) is ONE finding that synthesizes a theme across modules.
 5. WRITE the executive_brief: 200-300 words, 3 paragraphs:
-   - Paragraph 1: The verdict — what kind of marketing operation is this? How mature is it?
+   - Paragraph 1: The assessment — what kind of marketing operation is this? How mature is it?
    - Paragraph 2: The biggest risk — what's actively hurting them right now?
    - Paragraph 3: The biggest opportunity — what single area would have the most impact if fixed?
 6. COMPILE the tech_stack_summary from tools detected across all modules.
@@ -378,7 +378,7 @@ ${categorySections.join('\n\n')}
 
 Produce your executive synthesis as valid JSON matching the schema. Ensure:
 - synthesis_headline is 8-20 words, serious authoritative executive verdict referencing specific findings
-- verdict_headline is 8-20 words, Scott Galloway FUNNY roast. Plain English a CEO understands — ZERO jargon, ZERO acronyms, ZERO data points. If it has any marketing technical term in it, rewrite it. The humor comes from an analogy or observation, not from listing broken things
+- verdict_headline (the Scott Galloway Roast) is 8-20 words, Scott Galloway FUNNY roast. Plain English a CEO understands — ZERO jargon, ZERO acronyms, ZERO data points. If it has any marketing technical term in it, rewrite it. The humor comes from an analogy or observation, not from listing broken things
 - category_assessments has an entry for each of the ${categoryGroups.length} categories above
 - Exactly 3 key_findings that synthesize THEMES across multiple modules
 - executive_brief is 200-300 words in 3 paragraphs

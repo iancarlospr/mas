@@ -9,7 +9,7 @@ import { aggregateDetectedTools, mergeWithAITools } from '@/lib/detected-tools';
  * ═════════════════════════════════════════════
  *
  * Left ~55%:  About this audit + report index (8 categories, no scores)
- * Right ~45%: Verdict headline (M42) + executive brief + key findings
+ * Right ~45%: Synthesis headline (M42) + executive brief + key findings
  *
  * REPORT TYPE SCALE — these slides are documents, not app UI.
  * Uses container-relative (cqi) units so text scales with the slide card
@@ -17,7 +17,7 @@ import { aggregateDetectedTools, mergeWithAITools } from '@/lib/detected-tools';
  * without container query support.
  *
  * Scale:
- *   --rpt-headline:  ~28-36px at full width   (verdict quote)
+ *   --rpt-headline:  ~28-36px at full width   (synthesis headline)
  *   --rpt-section:   ~14-16px                  (section headers)
  *   --rpt-body:      ~12-14px                  (body paragraphs)
  *   --rpt-index:     ~13-15px                  (index items)
@@ -101,7 +101,7 @@ export function OverviewExecSlide({ scan, slideNumber }: OverviewExecSlideProps)
     ? (m42?.data?.['synthesis'] as M42Synthesis | undefined) ?? null
     : null;
 
-  // Synthesis headline (serious executive take — distinct from Galloway verdict on slide 2)
+  // Synthesis headline (serious executive take — distinct from Galloway roast on slide 2)
   const headline = synthesis?.synthesis_headline ?? synthesis?.verdict_headline ?? null;
 
   // Executive brief
