@@ -97,7 +97,7 @@ export async function generatePresentationPDFClientSide(
     onProgress?.({ phase: 'capturing', current: i + 1, total });
 
     const canvas = await html2canvas(slides[i]!, {
-      scale: 1,
+      scale: 1.5,
       useCORS: true,
       allowTaint: true,
       backgroundColor: '#080808',
@@ -114,7 +114,7 @@ export async function generatePresentationPDFClientSide(
       const pngBytes = await canvasToPng(canvas);
       img = await pdf.embedPng(pngBytes);
     } else {
-      const jpegBytes = await canvasToJpeg(canvas, 0.9);
+      const jpegBytes = await canvasToJpeg(canvas, 0.85);
       img = await pdf.embedJpg(jpegBytes);
     }
 
