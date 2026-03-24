@@ -560,26 +560,28 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
       {!heroVisible && (
         <div className="flex-shrink-0 h-[48px] flex items-center gap-gs-2 px-gs-3 bg-gs-deep/95 backdrop-blur-md border-t border-gs-mid/15">
           <ChloeSprite state="idle" size={32} className="flex-shrink-0" />
-          <button
-            onClick={scrollToHero}
-            className="bevel-button-primary flex-1 h-[34px] font-system text-os-sm font-bold min-w-0"
-          >
-            GhostScan&trade;
-          </button>
           {!authLoading && (
             isAuthenticated ? (
               <>
-                <button
-                  onClick={scrollToMyScans}
-                  className="flex-1 h-[34px] font-system text-os-sm font-bold min-w-0 rounded-[8px] transition-colors neon-outline-btn"
-                  style={{
-                    border: '1.5px solid var(--gs-base)',
-                    background: 'oklch(0.12 0.03 340)',
-                    color: 'var(--gs-base)',
-                  }}
-                >
-                  My Scans
-                </button>
+                <div className="flex-1 flex gap-gs-2 min-w-0">
+                  <button
+                    onClick={scrollToHero}
+                    className="bevel-button-primary flex-1 h-[34px] font-system text-os-sm font-bold min-w-0"
+                  >
+                    GhostScan&trade;
+                  </button>
+                  <button
+                    onClick={scrollToMyScans}
+                    className="flex-1 h-[34px] font-system text-os-sm font-bold min-w-0 rounded-[8px] transition-colors neon-outline-btn"
+                    style={{
+                      border: '1.5px solid var(--gs-base)',
+                      background: 'oklch(0.12 0.03 340)',
+                      color: 'var(--gs-base)',
+                    }}
+                  >
+                    My Scans
+                  </button>
+                </div>
                 <button
                   onClick={() => setMobileOverlay('profile')}
                   className="flex-shrink-0 text-gs-light/70 active:text-gs-base transition-colors"
@@ -590,6 +592,12 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
               </>
             ) : (
               <>
+                <button
+                  onClick={scrollToHero}
+                  className="bevel-button-primary flex-1 h-[34px] font-system text-os-sm font-bold min-w-0"
+                >
+                  GhostScan&trade;
+                </button>
                 <button
                   onClick={scrollToPricing}
                   className="bevel-button px-gs-3 h-[34px] font-system text-os-sm font-bold flex-shrink-0"
