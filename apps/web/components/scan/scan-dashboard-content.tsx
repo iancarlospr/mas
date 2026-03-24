@@ -4,6 +4,7 @@ import { useRef, useState, useMemo, useCallback, useEffect } from 'react';
 import type { ScanWithResults } from '@marketing-alpha/types';
 import { useWindowManager } from '@/lib/window-manager';
 import { analytics } from '@/lib/analytics';
+import { generateAuditMarkdown } from '@/lib/report/markdown-export';
 import { TitleSlide } from './slides/title-slide';
 import { RoastSlide } from './slides/verdict-slide';
 import { OverviewExecSlide } from './slides/overview-exec-slide';
@@ -283,6 +284,17 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
     analytics.pdfDownloaded(scan.id, scan.domain ?? '', 'boss_deck');
     window.open(`/report/${scan.id}/boss-deck?download=1`, '_blank');
   }, [scan.id, scan.domain]);
+
+  const [mdCopied, setMdCopied] = useState(false);
+  const handleCopyMarkdown = useCallback(async () => {
+    try {
+      const markdown = generateAuditMarkdown(scan);
+      await navigator.clipboard.writeText(markdown);
+      setMdCopied(true);
+      setTimeout(() => setMdCopied(false), 2000);
+      analytics.markdownCopied(scan.id, scan.domain ?? '');
+    } catch { /* clipboard API not available */ }
+  }, [scan]);
 
   const handleAskChloe = useCallback(() => {
     const chatId = `chat-${scan.id}`;
@@ -572,6 +584,10 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
             <span className="text-gs-mid" style={{ fontSize: '11px' }}>&middot;</span>
             <button onClick={handleDownloadBossDeck} className="text-gs-base hover:text-gs-bright transition-colors" style={{ fontSize: '11px', fontFamily: 'var(--font-system)' }}>
               Boss Deck &darr;
+            </button>
+            <span className="text-gs-mid" style={{ fontSize: '11px' }}>&middot;</span>
+            <button onClick={handleCopyMarkdown} className="text-gs-base hover:text-gs-bright transition-colors" style={{ fontSize: '11px', fontFamily: 'var(--font-system)' }}>
+              {mdCopied ? '\u2713 Copied!' : 'NotebookLM'}
             </button>
             <span className="text-gs-mid" style={{ fontSize: '11px' }}>&middot;</span>
             <button

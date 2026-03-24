@@ -62,7 +62,7 @@ function parseAmount(value: unknown): number {
 
 // ── Category metadata ────────────────────────────────────────
 
-const CATEGORY_META: Record<ScoreCategory, { name: string; shortName: string; description: string }> = {
+export const CATEGORY_META: Record<ScoreCategory, { name: string; shortName: string; description: string }> = {
   security_compliance: {
     name: 'Security & Compliance',
     shortName: 'Sec',
@@ -105,7 +105,7 @@ const CATEGORY_META: Record<ScoreCategory, { name: string; shortName: string; de
   },
 };
 
-const CATEGORY_MODULES: Record<ScoreCategory, string[]> = {
+export const CATEGORY_MODULES: Record<ScoreCategory, string[]> = {
   security_compliance: ['M01', 'M12', 'M40'],
   analytics_measurement: ['M05', 'M06', 'M06b', 'M08', 'M09'],
   performance_experience: ['M03', 'M10', 'M11', 'M13', 'M14'],
@@ -116,7 +116,7 @@ const CATEGORY_MODULES: Record<ScoreCategory, string[]> = {
   market_intelligence: ['M24', 'M25', 'M27', 'M30', 'M31', 'M32', 'M33', 'M35', 'M36'],
 };
 
-const MODULE_NAMES: Record<string, string> = {
+export const MODULE_NAMES: Record<string, string> = {
   M01: 'DNS & Security', M02: 'CMS & Infrastructure', M03: 'Performance',
   M04: 'Page Metadata', M05: 'Analytics Architecture', M06: 'Paid Media Pixels',
   M06b: 'PPC Landing Audit', M07: 'MarTech Stack', M08: 'Tag Governance',

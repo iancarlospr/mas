@@ -58,6 +58,10 @@ export const analytics = {
     posthog.capture('chat_activated', { scan_id: scanId });
   },
 
+  markdownCopied(scanId: string, domain: string) {
+    posthog.capture('markdown_copied', { scan_id: scanId, domain });
+  },
+
   authFailed(mode: string, errorMessage: string, context?: string) {
     posthog.capture('auth_failed', { mode, error_message: errorMessage, context });
   },
