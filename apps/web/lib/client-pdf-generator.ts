@@ -19,6 +19,54 @@ const TAIL_COUNT = 3;
 const BD_W = 1344;
 const BD_H = 816;
 
+/**
+ * Inject canvas-rendered noise into grain overlay elements before capture.
+ * Same technique as PlasmaCanvas (verdict slide) — html2canvas captures
+ * <canvas> pixel data natively. Replaces SVG feTurbulence which
+ * html2canvas cannot render (filter is not a supported CSS property).
+ */
+function injectGrainCanvases(container: HTMLElement): void {
+  const grainEls = container.querySelectorAll<HTMLElement>(
+    '.bar-grain, .bar-grain-light, .wins-grain, .results-grain, .closer-grain',
+  );
+
+  for (const el of grainEls) {
+    // Remove the SVG filter (html2canvas can't render it)
+    el.style.filter = 'none';
+
+    // Create canvas with noise — same algorithm as GrainCanvas component
+    const canvas = document.createElement('canvas');
+    const w = 256;
+    const h = 256;
+    canvas.width = w;
+    canvas.height = h;
+    Object.assign(canvas.style, {
+      position: 'absolute',
+      inset: '0',
+      width: '100%',
+      height: '100%',
+      pointerEvents: 'none',
+      imageRendering: 'pixelated',
+    });
+
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      const imageData = ctx.createImageData(w, h);
+      const d = imageData.data;
+      for (let i = 0; i < d.length; i += 4) {
+        const v = Math.random() * 255;
+        d[i] = v;
+        d[i + 1] = v;
+        d[i + 2] = v;
+        d[i + 3] = 255;
+      }
+      ctx.putImageData(imageData, 0, 0);
+    }
+
+    el.appendChild(canvas);
+  }
+}
+
 export type PDFProgress = {
   phase: 'capturing' | 'assembling' | 'done';
   current: number;
@@ -202,6 +250,10 @@ export async function generateBossDeckPDFClientSide(
     wrapper.style.top = '0';
     wrapper.innerHTML = (grainSvg?.outerHTML ?? '') + pages[i]!.outerHTML;
     document.body.appendChild(wrapper);
+
+    // Replace SVG feTurbulence grain with canvas-rendered noise.
+    // html2canvas captures <canvas> pixel data natively (same as PlasmaCanvas).
+    injectGrainCanvases(wrapper);
 
     const captureTarget = wrapper.querySelector('.page') as HTMLElement;
 
