@@ -377,8 +377,8 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
         .mobile-my-scans .gap-gs-2 { gap: 4px !important; }
         .mobile-my-scans .px-gs-3 { padding-left: 8px !important; padding-right: 8px !important; }
         /* ── About footer: tighter bottom spacing ── */
-        .mobile-about-footer > div { padding-bottom: 8px !important; }
-        .mobile-about-footer > div > .space-y-gs-6:last-child { gap: 8px !important; }
+        .mobile-about-footer > div { padding-bottom: 4px !important; }
+        .mobile-about-footer .border-t { margin-top: 8px !important; padding-top: 8px !important; }
       `}</style>
       <div className="noise-grain opacity-[0.03]" aria-hidden="true" />
 
