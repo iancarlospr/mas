@@ -454,10 +454,18 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
           <>
             <SectionDivider />
             <section ref={chatRef} className="py-gs-2">
-              <div className="px-gs-4 mb-gs-2">
+              <div className="px-gs-4 mb-gs-2 flex items-center gap-gs-2">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="var(--gs-base)" style={{ flexShrink: 0 }}>
+                  <path d="M8 1C5.2 1 3 3.2 3 6v6l1-1.5 1 1.5 1-1.5 1 1.5 1-1.5 1 1.5 1-1.5 1 1.5V6c0-2.8-2.2-5-5-5z"/>
+                  <circle cx="6" cy="5.5" r="1" fill="var(--gs-void)"/>
+                  <circle cx="10" cy="5.5" r="1" fill="var(--gs-void)"/>
+                </svg>
                 <h2 className="font-system text-os-sm font-bold" style={{ color: 'var(--gs-light)' }}>
                   GhostChat
                 </h2>
+                <span className="font-data" style={{ fontSize: '9px', color: 'var(--gs-base)', opacity: 0.6, letterSpacing: '0.05em' }}>
+                  ™
+                </span>
               </div>
               <MobileGhostChat
                 paidScans={paidScans}
