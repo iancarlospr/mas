@@ -182,7 +182,8 @@ export async function generateBossDeckPDFClientSide(
     try { await iDoc.fonts.ready; } catch { /* fallback below */ }
     await new Promise((r) => setTimeout(r, 1500));
 
-    // Inject capture overrides into the iframe's <head>
+    // Inject minimal capture overrides — keep ALL visual effects intact
+    // so the PDF matches the web render exactly.
     const captureStyle = iDoc.createElement('style');
     captureStyle.textContent = `
       .page {
@@ -197,14 +198,6 @@ export async function generateBossDeckPDFClientSide(
         overflow: auto !important;
         height: auto !important;
       }
-      /* Neutralise SVG grain overlays — keep elements in DOM to preserve
-         tree structure, but make them invisible + strip the filter ref
-         that html2canvas can't render. */
-      .bar-grain, .bar-grain-light, .wins-grain, .results-grain, .closer-grain {
-        opacity: 0 !important;
-        filter: none !important;
-      }
-      .closer-bg { filter: brightness(0.2) !important; }
     `;
     iDoc.head.appendChild(captureStyle);
 
