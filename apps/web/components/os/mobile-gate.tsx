@@ -577,10 +577,10 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
                 </button>
                 <button
                   onClick={() => setMobileOverlay('profile')}
-                  className="bevel-button h-[34px] w-[34px] flex items-center justify-center flex-shrink-0"
+                  className="flex-shrink-0 text-gs-light/70 active:text-gs-base transition-colors"
                   title="Profile"
                 >
-                  <UserCircle size={20} strokeWidth={1.5} />
+                  <UserCircle size={32} strokeWidth={1.5} />
                 </button>
               </>
             ) : (
