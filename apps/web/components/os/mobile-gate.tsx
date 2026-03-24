@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
 import { ChloeSprite } from '@/components/chloe/chloe-sprite';
+import { UserCircle } from 'lucide-react';
 import { MobileScanFlow } from '@/components/mobile/mobile-scan-flow';
 import { MobilePricingSection } from '@/components/mobile/mobile-pricing-section';
 import { useAuth } from '@/lib/auth-context';
@@ -576,9 +577,10 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
                 </button>
                 <button
                   onClick={() => setMobileOverlay('profile')}
-                  className="bevel-button px-gs-3 h-[34px] font-system text-os-sm font-bold flex-shrink-0"
+                  className="bevel-button h-[34px] w-[34px] flex items-center justify-center flex-shrink-0"
+                  title="Profile"
                 >
-                  Profile
+                  <UserCircle size={20} strokeWidth={1.5} />
                 </button>
               </>
             ) : (
