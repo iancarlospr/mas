@@ -20,33 +20,47 @@ const BD_W = 1344;
 const BD_H = 816;
 
 /**
- * Prepare grain overlays for html2canvas capture using the same pattern
- * as the Audit Deck's verdict slide (verdict-slide.tsx lines 58-71):
- *
- * 1. Inject the SVG <filter> definition INSIDE each .page element
- *    (verdict slide has it inside .slide-card)
- * 2. Apply filter: url(#grain) as INLINE STYLE on each grain overlay
- *    (verdict slide uses style={{ filter: 'url(#verdict-noise)' }})
- *
- * This ensures the filter definition is within the captured subtree
- * and the filter reference resolves correctly during html2canvas capture.
+ * Inject full-resolution canvas noise into grain overlay elements.
+ * html2canvas captures <canvas> pixel data natively — this is the same
+ * mechanism that makes the Audit Deck verdict slide's PlasmaCanvas
+ * render grain in the PDF. SVG feTurbulence cannot be captured.
  */
-function prepareGrainForCapture(pageEl: HTMLElement): void {
-  // Inject SVG filter definition inside the .page element (same as verdict slide)
-  const svgFilter = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  svgFilter.setAttribute('width', '0');
-  svgFilter.setAttribute('height', '0');
-  svgFilter.setAttribute('aria-hidden', 'true');
-  svgFilter.style.position = 'absolute';
-  svgFilter.innerHTML = `<filter id="grain"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>`;
-  pageEl.insertBefore(svgFilter, pageEl.firstChild);
-
-  // Apply filter as inline style on each grain overlay (same as verdict slide)
+function injectGrainCanvases(pageEl: HTMLElement): void {
   const grainEls = pageEl.querySelectorAll<HTMLElement>(
     '.bar-grain, .bar-grain-light, .wins-grain, .results-grain, .closer-grain',
   );
+
   for (const el of grainEls) {
-    el.style.filter = 'url(#grain)';
+    // Remove the SVG filter reference
+    el.style.filter = 'none';
+
+    // Create full-resolution noise canvas (no pixelated stretching)
+    const c = document.createElement('canvas');
+    c.width = BD_W;
+    c.height = BD_H;
+    Object.assign(c.style, {
+      position: 'absolute',
+      inset: '0',
+      width: '100%',
+      height: '100%',
+      pointerEvents: 'none',
+    });
+
+    const ctx = c.getContext('2d');
+    if (ctx) {
+      const imageData = ctx.createImageData(BD_W, BD_H);
+      const d = imageData.data;
+      for (let i = 0; i < d.length; i += 4) {
+        const v = Math.random() * 255;
+        d[i] = v;
+        d[i + 1] = v;
+        d[i + 2] = v;
+        d[i + 3] = 255;
+      }
+      ctx.putImageData(imageData, 0, 0);
+    }
+
+    el.appendChild(c);
   }
 }
 
@@ -232,9 +246,8 @@ export async function generateBossDeckPDFClientSide(
 
     const captureTarget = wrapper.querySelector('.page') as HTMLElement;
 
-    // Prepare grain: inject SVG filter INSIDE .page + apply inline styles
-    // (same pattern as verdict slide in Audit Deck)
-    prepareGrainForCapture(captureTarget);
+    // Inject canvas-rendered noise into grain overlays for capture
+    injectGrainCanvases(captureTarget);
 
     // Let layout settle
     await new Promise((r) => requestAnimationFrame(r));
