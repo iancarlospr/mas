@@ -35,6 +35,9 @@ export type { ScanFailedEmailProps } from './templates/scan-failed';
 export { AccountDeletionEmail } from './templates/account-deletion';
 export type { AccountDeletionEmailProps } from './templates/account-deletion';
 
+export { DesktopReminderEmail } from './templates/desktop-reminder';
+export type { DesktopReminderEmailProps } from './templates/desktop-reminder';
+
 export { ReEngagementEmail } from './templates/re-engagement';
 export type { ReEngagementEmailProps } from './templates/re-engagement';
 

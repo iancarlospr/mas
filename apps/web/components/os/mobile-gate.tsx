@@ -19,6 +19,7 @@ import HistoryWindow from '@/components/windows/history-window';
 import ProfileWindow from '@/components/windows/profile-window';
 import AuthWindow from '@/components/windows/auth-window';
 import ChatWindow from '@/components/windows/chat-window';
+import { DesktopReminderForm } from '@/components/mobile/desktop-reminder-form';
 import { createClient } from '@/lib/supabase/client';
 
 interface MobilePaidScan {
@@ -541,15 +542,13 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
         <section className="px-gs-6 py-gs-8 text-center space-y-gs-4">
           <ChloeSprite state="smug" size={64} className="mx-auto" />
           <p className="font-data italic text-data-sm text-gs-red">
-            the full OS experience hits different on desktop.
+            the full experience hits different on desktop.
           </p>
           <p className="font-data text-data-xs text-gs-muted leading-relaxed">
-            48 interactive slides, Chloé&apos;s Bedroom OS, window manager,
-            mini-games, ASCII movies — trust me.
+            window manager, 48 interactive slides, mini-games,
+            ASCII movies, Chloé&apos;s Bedroom OS.
           </p>
-          <p className="font-data text-[10px] text-gs-mid/40 mt-gs-2">
-            marketingalphascan.com
-          </p>
+          <DesktopReminderForm />
         </section>
 
         <SectionDivider />
