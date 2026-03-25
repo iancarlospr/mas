@@ -100,7 +100,9 @@ const CATEGORIES: ModuleCategory[] = [
       { id: 'M41', name: 'Module AI Synthesis' },
       { id: 'M42', name: 'Executive Brief' },
       { id: 'M43', name: 'PRD Generation' },
+      { id: 'M44', name: 'ROI Projections' },
       { id: 'M45', name: 'Stack Analyzer' },
+      { id: 'M46', name: 'Boss Deck' },
     ],
   },
 ];
@@ -154,7 +156,7 @@ export default function AboutWindow() {
       <div className="text-center space-y-gs-2">
         <h1 className="font-display text-display-sm">Module Directory</h1>
         <p className="font-data text-data-xs text-gs-muted">
-          45 forensic modules across 5 execution phases
+          {TOTAL_MODULES} forensic modules across 5 execution phases
         </p>
       </div>
 
@@ -174,9 +176,9 @@ export default function AboutWindow() {
           {[
             { phase: '01', name: 'Passive', desc: 'HTTP-only recon — headers, DNS, metadata' },
             { phase: '02', name: 'Browser', desc: 'Stealth Chromium render + data layer capture' },
-            { phase: '03', name: 'GhostScan', desc: 'Deep interaction — forms, modals, shadow DOM' },
+            { phase: '03', name: 'GhostScan\u2122', desc: 'Deep interaction — forms, modals, shadow DOM' },
             { phase: '04', name: 'External', desc: '3rd-party APIs — SEO, traffic, competitors' },
-            { phase: '05', name: 'Synthesis', desc: 'AI analysis — brief, roadmap, ROI, stack analysis' },
+            { phase: '05', name: 'Synthesis', desc: 'AI analysis — brief, PRD, Boss Deck, ROI, stack analysis, .MD export' },
           ].map((p) => (
             <div key={p.phase} className="flex items-baseline gap-gs-2">
               <span className="font-data text-[10px] text-gs-red font-bold w-[18px] flex-shrink-0">
