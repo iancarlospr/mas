@@ -143,18 +143,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
 
   return (
     <div className="h-full flex flex-col">
-      {/* Column headers */}
-      <div className="flex items-center gap-gs-2 px-gs-3 py-gs-2 bg-gs-chrome border-b border-gs-chrome-dark font-system text-os-xs" style={{ color: 'var(--gs-light)', opacity: 0.6 }}>
-        <span className="flex-1">Domain</span>
-        <span className="w-14 text-center">Score</span>
-        <span className="w-6 text-center" />
-        <span className="w-14 text-center">Tier</span>
-        <span className="w-56 text-center">Actions</span>
-        <span className="w-16 text-right">Date</span>
-        <span className="w-6" />
-      </div>
-
-      {/* Scan rows */}
+      {/* Scan cards */}
       <div className="flex-1 overflow-auto">
         {scans.map((scan) => {
           let domain: string;
@@ -164,6 +153,9 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
             domain = scan.url;
           }
 
+          const isPaid = scan.tier === 'paid';
+          const isComplete = scan.status === 'complete';
+
           return (
             <div
               key={scan.id}
@@ -171,138 +163,136 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
               tabIndex={0}
               onClick={() => handleScanClick(scan.id, domain, scan.status)}
               onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleScanClick(scan.id, domain, scan.status); } }}
-              className="flex items-center gap-gs-2 px-gs-3 py-gs-2 hover:bg-gs-red/5 border-b border-gs-chrome-dark/20 font-data text-data-sm w-full text-left cursor-pointer"
+              className="px-gs-4 py-gs-3 hover:bg-gs-red/5 border-b border-gs-chrome-dark/20 cursor-pointer"
             >
-              <span className="flex-1 truncate">
-                {domain}
-              </span>
-              <span className="w-14 text-center flex items-center justify-center gap-1">
-                {scan.marketing_iq != null && (
-                  <>
-                    <span className={`traffic-dot w-2 h-2 ${getScoreColor(scan.marketing_iq)}`} />
-                    <span>{scan.marketing_iq}</span>
-                  </>
-                )}
-              </span>
-              <span className="w-6 text-center" title={scan.status}>
-                {scan.status === 'complete' ? (
-                  <svg className="w-3.5 h-3.5 inline-block text-gs-terminal" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
-                ) : scan.status === 'failed' ? (
-                  <svg className="w-3.5 h-3.5 inline-block text-gs-critical" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
-                ) : (
-                  <svg className="w-3.5 h-3.5 inline-block text-gs-warning animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round"><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>
-                )}
-              </span>
-              <span className="w-14 text-center">
-                <span
-                  className="font-system text-os-xs px-gs-1 bevel-raised"
-                  style={scan.tier === 'paid'
-                    ? { background: 'var(--gs-base)', color: 'var(--gs-void)', fontWeight: 700 }
-                    : {}}
-                >
-                  {scan.tier === 'paid' ? 'PRO' : 'FREE'}
+              {/* Top row: domain + metadata */}
+              <div className="flex items-center gap-gs-2">
+                <span className="font-system text-os-sm text-gs-muted" style={{ flexShrink: 0 }}>{'>'}</span>
+                <span className="flex-1 min-w-0 font-data text-data-sm font-bold truncate">
+                  {domain}
                 </span>
-              </span>
-              <span className="w-56 text-center flex items-center justify-center gap-2 whitespace-nowrap">
-                {scan.tier === 'paid' && scan.status === 'complete' ? (
-                  <>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); window.open(`/report/${scan.id}/slides?download=1`, '_blank'); }}
-                      className="text-gs-base hover:text-gs-bright transition-colors"
-                      title="Download Audit Deck"
-                      style={{ fontSize: '11px', fontFamily: 'var(--font-system)' }}
-                    >
-                      Audit&nbsp;&darr;
-                    </button>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); window.open(`/api/reports/${scan.id}/prd`, '_blank'); }}
-                      className="text-gs-base hover:text-gs-bright transition-colors"
-                      title="Download PRD"
-                      style={{ fontSize: '11px', fontFamily: 'var(--font-system)' }}
-                    >
-                      PRD&nbsp;&darr;
-                    </button>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); window.open(`/report/${scan.id}/boss-deck?download=1`, '_blank'); }}
-                      className="text-gs-base hover:text-gs-bright transition-colors"
-                      title="Download Boss Deck"
-                      style={{ fontSize: '11px', fontFamily: 'var(--font-system)' }}
-                    >
-                      Boss&nbsp;&darr;
-                    </button>
-                    <button
-                      onClick={(e) => handleCopyMarkdown(e, scan.id, domain)}
-                      className="text-gs-base hover:text-gs-bright transition-colors"
-                      title="Copy audit as Markdown"
-                      style={{ fontSize: '11px', fontFamily: 'var(--font-system)' }}
-                    >
-                      {mdCopiedId === scan.id ? '\u2713' : '.MD\u00a0\u2193'}
-                    </button>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (onChatOpen) {
-                          onChatOpen(scan.id, domain);
-                        } else {
-                          const chatId = `chat-${scan.id}`;
-                          if (wm.windows[chatId]?.isOpen) {
-                            wm.focusWindow(chatId);
-                            return;
-                          }
-                          wm.registerWindow(chatId, {
-                            title: `Ask Chloé — ${domain}`,
-                            width: 380, height: 480,
-                            minWidth: 340, minHeight: 400,
-                            componentType: 'ghost-chat',
-                            alwaysOnTop: true,
-                          });
-                          wm.openWindow(chatId, { scanId: scan.id, domain });
-                        }
-                      }}
-                      className="text-gs-base hover:text-gs-bright transition-colors flex items-center gap-[3px]"
-                      title="Ask Chloe"
-                      style={{ fontSize: '11px', fontFamily: 'var(--font-system)' }}
-                    >
-                      <svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor" style={{ flexShrink: 0 }}>
-                        <path d="M8 1C5.2 1 3 3.2 3 6v6l1-1.5 1 1.5 1-1.5 1 1.5 1-1.5 1 1.5 1-1.5 1 1.5V6c0-2.8-2.2-5-5-5z"/>
-                        <circle cx="6" cy="5.5" r="1" fill="var(--gs-void)"/>
-                        <circle cx="10" cy="5.5" r="1" fill="var(--gs-void)"/>
-                      </svg>
-                      Chat
-                    </button>
-                  </>
-                ) : scan.tier !== 'paid' && scan.status === 'complete' ? (
+                {scan.marketing_iq != null && (
+                  <span className="flex items-center gap-1 font-data text-data-sm" style={{ flexShrink: 0 }}>
+                    <span className={`w-2 h-2 rounded-full ${getScoreColor(scan.marketing_iq)}`} />
+                    <span>{scan.marketing_iq}</span>
+                  </span>
+                )}
+                <span title={scan.status} style={{ flexShrink: 0 }}>
+                  {scan.status === 'complete' ? (
+                    <svg className="w-3.5 h-3.5 inline-block text-gs-terminal" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
+                  ) : scan.status === 'failed' ? (
+                    <svg className="w-3.5 h-3.5 inline-block text-gs-critical" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
+                  ) : (
+                    <svg className="w-3.5 h-3.5 inline-block text-gs-warning animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round"><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>
+                  )}
+                </span>
+                <span
+                  className="font-system text-os-sm px-gs-1 bevel-raised"
+                  style={isPaid
+                    ? { background: 'var(--gs-base)', color: 'var(--gs-void)', fontWeight: 700, flexShrink: 0 }
+                    : { flexShrink: 0 }}
+                >
+                  {isPaid ? 'PRO' : 'FREE'}
+                </span>
+                <span className="font-data text-data-sm text-gs-muted" style={{ flexShrink: 0 }}>
+                  {new Date(scan.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                </span>
+                <button
+                  onClick={(e) => handleDelete(e, scan.id)}
+                  disabled={deletingId === scan.id}
+                  className="text-gs-muted hover:text-gs-critical transition-colors font-data text-data-sm"
+                  title="Delete scan"
+                  style={{ flexShrink: 0 }}
+                >
+                  {deletingId === scan.id ? '...' : 'x'}
+                </button>
+              </div>
+
+              {/* Bottom row: action buttons */}
+              {isPaid && isComplete && (
+                <div className="flex items-center gap-gs-2 mt-gs-1" style={{ paddingLeft: 'calc(12px + var(--gs-2))' }}>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); window.open(`/report/${scan.id}/slides?download=1`, '_blank'); }}
+                    className="text-gs-base hover:text-gs-bright transition-colors font-system text-os-sm"
+                    title="Download Audit Deck"
+                  >
+                    Audit&nbsp;&darr;
+                  </button>
+                  <span className="text-gs-mid font-data text-data-sm">&middot;</span>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); window.open(`/api/reports/${scan.id}/prd`, '_blank'); }}
+                    className="text-gs-base hover:text-gs-bright transition-colors font-system text-os-sm"
+                    title="Download PRD"
+                  >
+                    PRD&nbsp;&darr;
+                  </button>
+                  <span className="text-gs-mid font-data text-data-sm">&middot;</span>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); window.open(`/report/${scan.id}/boss-deck?download=1`, '_blank'); }}
+                    className="text-gs-base hover:text-gs-bright transition-colors font-system text-os-sm"
+                    title="Download Boss Deck"
+                  >
+                    Boss&nbsp;&darr;
+                  </button>
+                  <span className="text-gs-mid font-data text-data-sm">&middot;</span>
+                  <button
+                    onClick={(e) => handleCopyMarkdown(e, scan.id, domain)}
+                    className="text-gs-base hover:text-gs-bright transition-colors font-system text-os-sm"
+                    title="Copy audit as Markdown"
+                  >
+                    {mdCopiedId === scan.id ? '\u2713' : '.MD\u00a0\u2193'}
+                  </button>
+                  <span className="text-gs-mid font-data text-data-sm">&middot;</span>
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      let domain: string;
-                      try { domain = new URL(scan.url).hostname; } catch { domain = scan.url; }
+                      if (onChatOpen) {
+                        onChatOpen(scan.id, domain);
+                      } else {
+                        const chatId = `chat-${scan.id}`;
+                        if (wm.windows[chatId]?.isOpen) {
+                          wm.focusWindow(chatId);
+                          return;
+                        }
+                        wm.registerWindow(chatId, {
+                          title: `Ask Chloé — ${domain}`,
+                          width: 380, height: 480,
+                          minWidth: 340, minHeight: 400,
+                          componentType: 'ghost-chat',
+                          alwaysOnTop: true,
+                        });
+                        wm.openWindow(chatId, { scanId: scan.id, domain });
+                      }
+                    }}
+                    className="text-gs-base hover:text-gs-bright transition-colors flex items-center gap-[3px] font-system text-os-sm"
+                    title="Ask Chloe"
+                  >
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" style={{ flexShrink: 0 }}>
+                      <path d="M8 1C5.2 1 3 3.2 3 6v6l1-1.5 1 1.5 1-1.5 1 1.5 1-1.5 1 1.5 1-1.5 1 1.5V6c0-2.8-2.2-5-5-5z"/>
+                      <circle cx="6" cy="5.5" r="1" fill="var(--gs-void)"/>
+                      <circle cx="10" cy="5.5" r="1" fill="var(--gs-void)"/>
+                    </svg>
+                    Chat
+                  </button>
+                </div>
+              )}
+              {!isPaid && isComplete && (
+                <div className="flex items-center gap-gs-2 mt-gs-1" style={{ paddingLeft: 'calc(12px + var(--gs-2))' }}>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
                       const paymentId = `payment-${scan.id}`;
                       wm.registerWindow(paymentId, { title: 'Checkout', width: 420, height: 300, variant: 'dialog', componentType: 'payment' });
                       wm.openWindow(paymentId, { scanId: scan.id, domain, product: 'alpha_brief' });
                     }}
-                    className="text-gs-base hover:text-gs-bright transition-colors flex items-center gap-1"
+                    className="text-gs-base hover:text-gs-bright transition-colors flex items-center gap-1 font-system text-os-sm"
                     title="Unlock full report"
-                    style={{ fontSize: '11px', fontFamily: 'var(--font-system)' }}
                   >
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                     Unlock
                   </button>
-                ) : null}
-              </span>
-              <span className="w-16 text-right text-data-xs text-gs-muted">
-                {new Date(scan.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-              </span>
-              <span className="w-6 flex justify-center">
-                <button
-                  onClick={(e) => handleDelete(e, scan.id)}
-                  disabled={deletingId === scan.id}
-                  className="text-gs-muted hover:text-gs-critical transition-colors text-data-xs"
-                  title="Delete scan"
-                >
-                  {deletingId === scan.id ? '...' : 'x'}
-                </button>
-              </span>
+                </div>
+              )}
             </div>
           );
         })}
