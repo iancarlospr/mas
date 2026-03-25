@@ -114,7 +114,7 @@ Coverage thresholds: engine 70%, web 60%, types 90%.
 
 ## Architecture
 
-**Monorepo layout**: `apps/web` (Next.js 15), `apps/engine` (Fastify 5 + BullMQ + Patchright), `packages/types` (shared TS types), `packages/email-service`, `packages/email-templates`.
+**Monorepo layout**: `apps/web` (Next.js 15), `apps/engine` (Fastify 5 + BullMQ + Patchright), `packages/types` (shared TS types), `packages/email-service`, `packages/email-templates`, `packages/video` (Remotion marketing reels).
 
 ### Scan Lifecycle
 
@@ -144,9 +144,9 @@ User submits URL on frontend
    - Mobile pass: separate context (Pixel 8 viewport, Android-consistent profile)
 3. **GhostScan** — Deep interaction (M09-M12), sequential on same page from Phase 2
 4. **External** — 3rd-party APIs (M21-M40), `Promise.allSettled` parallel
-5. **Synthesis** — AI analysis: M41 parallel, then M42-M45 sequential (dependency chain)
+5. **Synthesis** — AI analysis: M41 parallel, then M42, M43, M45, M46 sequential (dependency chain)
 
-**Synthesis-only mode**: After paid upgrade, `runSynthesisOnly()` loads existing M01-M41 results and runs M42-M45 only.
+**Synthesis-only mode**: After paid upgrade, `runSynthesisOnly()` loads existing M01-M41 results and runs M42, M43, M45, M46 only.
 
 ### Module System
 
@@ -214,7 +214,7 @@ Supabase (PostgreSQL). 8 migrations in `supabase/migrations/`.
 ## Payment Flow
 
 ```
-User clicks "Unlock $9.99"
+User clicks "Unlock $24.99"
   → POST /api/checkout { product: 'alpha_brief', scanId }
   → Validates ownership, tier, scan status
   → Creates Stripe checkout session (metadata: product, scanId, userId)
@@ -222,7 +222,7 @@ User clicks "Unlock $9.99"
   → User pays → Stripe webhook fires
   → POST /api/webhooks/stripe (signature verified)
   → Dedup check (idempotent if already completed)
-  → Updates scan tier='paid' (no chat credits — chat sold separately)
+  → Updates scan tier='paid', grants chat credits (25 for alpha_brief, 200 for alpha_brief_plus)
   → Triggers synthesis: engineFetch('/engine/scans', { synthesisOnly: true })
   → Sends payment receipt email (fire-and-forget)
 
@@ -261,9 +261,10 @@ Chat top-up ($4.99 → 100 credits):
 
 ## Tier System
 
-- **`full`** (free): Runs all 5 scan phases, shows limited data per module with frosted unlock overlay (bottom 38% of slide card)
-- **`paid`**: Same scan data unlocked, synthesis slides (M42-M45), PDF report. Chat sold separately ($1 activation, $4.99 top-up).
-- Paid modules: M42 (Executive Brief), M43 (Roadmap), M44 (ROI), M45 (Cost Cutter)
+- **`full`** (free): No real scan runs. Shows a 3-second mock preview of the scan sequence, then prompts registration. After registration without paying, no additional scans allowed. Only paid users can run real scans.
+- **`paid`**: Full 45-module forensic scan, synthesis slides (M42, M43, M45, M46), PDF report, Boss Deck PDF, .MD export for NotebookLM. Chat sold separately ($1 activation, $4.99 top-up).
+- Paid modules: M42 (Executive Brief), M43 (PRD), M45 (Stack Analyzer), M46 (Boss Deck)
+- M44 (ROI Simulator) exists in engine code but is **NOT active** — never reference in UI
 - Internal-only modules (no slide card): M41 (Module Synthesis)
 - Chat context assembled lazily from raw module_results per question (no pre-computed knowledge base)
 
@@ -272,8 +273,8 @@ Chat top-up ($4.99 → 100 credits):
 - **Route groups**: `(marketing)` (landing/pricing/blog), `(auth)` (login/register/verify), `(dashboard)` (scan/report/chat/history)
 - **Scan dashboard**: `components/scan/bento-dashboard.tsx` — Asana-style sidebar (240px fixed) + scrollable 16:9 slide cards
 - **Charts**: 26 components in `components/charts/`, config in `lib/chart-config.ts`
-- **Fonts**: Plus Jakarta Sans (headings), Inter (body), JetBrains Mono (data/numbers)
-- **Print mode**: `@media print` — landscape, each `.slide-card` = one page, sidebar/topbar hidden
+- **Fonts**: Geist Mono (system + data), Barlow Condensed (headlines), JetBrains Mono (terminal/scan sequence), Permanent Marker (Chloé personality)
+- **PDF generation**: Client-side via html2canvas-pro + pdf-lib (screenshot each page → assemble PDF). Used for Alpha Brief slides and Boss Deck.
 - **PostHog**: Reverse proxy via `/ingest/*` rewrites, client + server SDKs
 
 ### API Routes
@@ -288,6 +289,8 @@ Chat top-up ($4.99 → 100 credits):
 | `/api/webhooks/resend` | POST | Svix signature | Email delivery events |
 | `/api/chat/[scanId]` | GET/POST | User + credits | AI chat (Gemini Pro, 10 msg/min, 402 if no activation/credits) |
 | `/api/reports/[id]/pdf` | GET | Owner or share token | Generate/fetch PDF report |
+| `/api/reports/[id]/boss-deck` | GET | Owner or share token | Boss Deck HTML (rendered server-side) |
+| `/api/reports/[id]/prd` | GET | Owner or share token | PRD HTML rendering |
 | `/api/reports/[id]/share` | POST | Owner + paid | Generate JWT share token (30-day) |
 | `/api/auth/send-email` | POST | Internal secret | Supabase email hook (Standard Webhooks) |
 | `/api/health` | GET | None | Health check + engine status |
@@ -309,7 +312,7 @@ Chat top-up ($4.99 → 100 credits):
 **Web (`apps/web/.env.local`)** — needed locally with `NEXT_PUBLIC_*` stubs for static prerendering:
 - Supabase: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
 - Engine: `ENGINE_URL`, `ENGINE_HMAC_SECRET`
-- Stripe: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_ALPHA_BRIEF_PRICE_ID`, `STRIPE_CHAT_ACTIVATION_PRICE_ID`, `STRIPE_CHAT_CREDITS_PRICE_ID`
+- Stripe: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_ALPHA_BRIEF_PRICE_ID`, `STRIPE_ALPHA_BRIEF_PLUS_PRICE_ID`, `STRIPE_CHAT_ACTIVATION_PRICE_ID`, `STRIPE_CHAT_CREDITS_PRICE_ID`
 - PostHog: `NEXT_PUBLIC_POSTHOG_KEY`, `NEXT_PUBLIC_POSTHOG_HOST=/ingest`
 - Turnstile: `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`
 - Gemini: `GOOGLE_AI_API_KEY`
