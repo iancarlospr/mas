@@ -1,0 +1,27 @@
+/**
+ * Inline email logo images as base64 — used as CID attachments.
+ *
+ * logo-header: ALPHA SCAN pixel text (pink on transparent, 328x42)
+ * logo-footer: Chloé ghost icon (pixel art, 64x64)
+ */
+
+const LOGO_HEADER_B64 =
+  'iVBORw0KGgoAAAANSUhEUgAAAUgAAAAqCAYAAADRX8LYAAAACXBIWXMAAAPoAAAD6AG1e1JrAAADZ0lEQVR4nO2d23HjMAxF1YHacNlbQ5pxB/5NCdivzHoztiUSb/HcGfzFAgFeHZK27GwbQgghhBBCCCGEEEIIJUq+vnfP0ObrVm90/dHjWW3+svuXnX8zzuc936PXP5P85hy7Mt/erN6w+rXXi57/pvOX3b/s/LtxvtN+SOXFE3KxjMef+3/xM+iz+d69vmq9WfVrrxc9/13mL7t/2fkfxvlm/ZDNCwBZ1NAAEkACyA1ARq8IXVZ8AAkgAeQGICcBs68KyN/1dztia99U54h9rSO2HPjB+n4pA4w3A34O7ev3hoA0r19poNPjcah/aj6LAdKtf9n5H8b5Zv1g6O85SM4O4CgmCpppgBaS08CqVL9FPQXqn4Gk2/x511s9vxj7p4C/53ixIiCf6t6vUr+2ngL1D82n9/xlAyo7vxQCpJG/AaQClO0Bqa2nQP1TBgaQawDyRwDSe0W4GCDfBIBUzp/3fFfPL0UAaf2hzXKAWByQn8I1v0P97CABpHzw914akNbRDZDW9VqvwN79D8jvCsjs/k0scKPRrX6Z8QeAdL6hACSALAKIT2+RjAaA/HLiReMGA8jA/gfM/4o7yDYLvNjXP9UvdpAXNRhHbADZ2b8CINs1uJXBACSA7OxfqQFIHhSvCsgjwI1G92/yOORXHbEd5mdp/0qwf8r2u2uDqxvsRH9U76lk998hP4As5F8BkL0bDCBrGRxAXsu/AiB7Nzj6MYnR+k/0hx0kO8iy/hUAeQlAhj1oCyDZQa7kXwGQOkBaT9jR31tHAYPvnfofkL/1c5DRfi44f6LJb90/K3+Z/WKv948lFDXY9LGoW/8D8gPIOv69Bee/LiANrxcaVhM83PCm/Q/IDyAL+FcAZM8bFEDWNDiAbH3ETvePsIMEkOwg2UECyHtvQL5aBT/F0Qo0er1uYX3E7tZ/6/zaI3YRP7z90KFaVPKP/Nu1uvUPQBYxWNQNXsngnvV49c+rH1XG080/8utDoqh63QyW3eDsAJAA8pUfuvg/+/6V4PwAsojBVlmg2EG+7geAvJf0L4AEkAAy2AMA8n59QD4PajB24+t1C/XusXn/rfNr/8d5GT8UGc9q/rl5+et5UMPfBLG6XrdQNfsC/Y+uJ7ve0fFnj2c1/4izvxBCCCGEEEIIIYQQQmhT6C8YNdIGJd7jxgAAAABJRU5ErkJggg==';
+
+const LOGO_FOOTER_B64 =
+  'iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAAA7ElEQVR4nO2YTQrCMBCFc4pZvJu7E3qD3KdnMCsFNyMIghZqraZt6nwfzK4J4eXNT5oSAAAAQCVk8ufwcv0phvul1hECCAcoUgqo8o3vThAhgHCAIqWAVr7x5gQRAggHiBTQeA3Ip/cxldcz17dXAzIC+F2EB9864MP17TrAowuQqQFOEcx0AY/TBvvLa9Se+0f2RwBrxQGF16DzHC7jInSH46z4u/8BXXQBfKFAANvaAf1500AAwwFOChhdwGmDxhzgDELW4CSolb9HgKURDlDsFBgyPMDUgZb+fnWEAMIBipwCAAAAAACQ9sgNNY2NLqgo5iIAAAAASUVORK5CYII=';
+
+export const EMAIL_ATTACHMENTS = [
+  {
+    filename: 'logo-header.png',
+    content: Buffer.from(LOGO_HEADER_B64, 'base64'),
+    contentType: 'image/png',
+    contentId: 'logo-header',
+  },
+  {
+    filename: 'logo-footer.png',
+    content: Buffer.from(LOGO_FOOTER_B64, 'base64'),
+    contentType: 'image/png',
+    contentId: 'logo-footer',
+  },
+];

@@ -59,7 +59,7 @@ export function EmailLayout({
           {/* Header */}
           <Section style={header}>
             <Img
-              src="https://marketingalphascan.com/logo-white.png"
+              src="cid:logo-header"
               width="240"
               height="30"
               alt="MarketingAlphaScan"
@@ -75,7 +75,7 @@ export function EmailLayout({
           {/* Footer */}
           <Section style={footer}>
             <Img
-              src="https://marketingalphascan.com/logo-icon.png"
+              src="cid:logo-footer"
               width="40"
               height="40"
               alt=""

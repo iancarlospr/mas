@@ -5,6 +5,7 @@ import { checkSuppression } from './suppression';
 import { checkRateLimit } from './rate-limit';
 import { checkDedup } from './dedup';
 import type { SendEmailOptions, SendEmailResult } from './types';
+import { EMAIL_ATTACHMENTS } from './images';
 
 let _resend: Resend | undefined;
 function getResend(): Resend {
@@ -66,6 +67,7 @@ export async function sendEmail(options: SendEmailOptions): Promise<SendEmailRes
       html,
       headers,
       tags: [{ name: 'template', value: template }, ...tags],
+      attachments: EMAIL_ATTACHMENTS,
     });
 
     if (error) throw error;
