@@ -195,7 +195,7 @@ export function HeroScanFlow() {
       <div className="w-full space-y-gs-3">
         <div className="bevel-sunken bg-gs-paper p-gs-4 text-center">
           <p className="font-system text-os-sm font-bold" style={{ color: 'var(--gs-void)' }}>
-            You&apos;ve used your free scan
+            You&apos;ve used your free preview
           </p>
           <p className="font-data text-data-xs mt-gs-1" style={{ color: 'var(--gs-mid)' }}>
             Upgrade to unlock unlimited scans + AI-powered insights.

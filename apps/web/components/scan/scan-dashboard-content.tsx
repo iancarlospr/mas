@@ -525,8 +525,8 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
                 lineHeight: 1.5,
               }}
             >
-              Executive brief, remediation PRD, ROI scenarios, stack analyzer,
-              PDF export, and GhostChat&trade; — powered by 45 forensic modules.
+              Executive Brief, PRD, Boss Deck, stack analyzer,
+              PDF export, .MD for NotebookLM, and GhostChat&trade; — powered by 45 forensic modules.
             </p>
             <button
               onClick={handleDeclassify}
@@ -553,7 +553,7 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
         <div className="window-statusbar-section">
           {isPaid
             ? `${scan.moduleResults.filter((r) => r.status === 'success' || r.status === 'partial').length} modules analyzed`
-            : '3 modules analyzed'}
+            : 'Free preview'}
         </div>
         {isPaid && (
           <div className="window-statusbar-section">

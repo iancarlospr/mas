@@ -17,17 +17,17 @@ export const revalidate = 86400;
 
 export const metadata: Metadata = {
   title: 'Pricing',
-  description: 'Free MarTech scan. Full forensic intelligence from $24.99.',
+  description: 'Free GhostScan™ preview. Full forensic intelligence from $24.99.',
 };
 
 const faqs = [
   {
-    q: 'What does the free scan include?',
-    a: '3 MarTech modules — CMS & infrastructure detection, MarTech orchestration, and ecommerce/SaaS detection. Full results with no redaction. No credit card required.',
+    q: 'What does the free preview include?',
+    a: 'An instant GhostScan™ preview that shows you what our engine can see. To run a full forensic scan, upgrade to Alpha Brief — no subscription required.',
   },
   {
     q: 'What does the Alpha Brief unlock?',
-    a: 'The full 45-module forensic scan, executive brief, remediation PRD, ROI simulator, stack analyzer, PDF export, and 25 GhostChat credits. One-time $24.99 — no subscription.',
+    a: 'The full 45-module forensic scan, Executive Brief, PRD, Boss Deck, stack analyzer, PDF export, .MD for NotebookLM, and 25 GhostChat™ credits. One-time $24.99 — no subscription.',
   },
   {
     q: 'Do credits expire?',
@@ -61,7 +61,7 @@ export default function PricingPage() {
             Choose Your Edition
           </h1>
           <p className="font-data text-data-lg text-gs-muted max-w-xl mx-auto">
-            The free scan gives you everything. The paid upgrade gives you
+            The free preview shows you the signal. The paid upgrade gives you
             the receipts.
           </p>
         </div>

@@ -11,18 +11,17 @@ import { cn } from '@/lib/utils';
 
 const tiers = [
   {
-    name: 'Free Scan',
+    name: 'Free Preview',
     edition: 'Standard Edition',
     price: 'Free',
     originalPrice: null,
-    description: 'MarTech infrastructure analysis — 3 modules.',
-    cta: 'Register Free',
+    description: 'Instant GhostScan™ preview.',
+    cta: 'Try the Preview',
     ctaHref: '/register',
     features: [
-      'CMS & Infrastructure detection',
-      'MarTech Orchestration audit',
-      'Ecommerce/SaaS detection',
-      'Full results — no redaction',
+      'Instant GhostScan™ preview',
+      'See what Chloé finds',
+      'Create your account to continue',
     ],
     highlighted: false,
   },
@@ -36,9 +35,9 @@ const tiers = [
     ctaHref: '/register',
     features: [
       '1 full forensic scan (45 modules)',
-      'Executive Brief + PRD',
-      'Impact Scenarios + Stack Analyzer',
-      'PDF export + shareable link',
+      'Executive Brief + PRD + Boss Deck',
+      'Stack Analyzer',
+      'PDF export + .MD for NotebookLM',
       '25 GhostChat™ credits',
     ],
     highlighted: true,

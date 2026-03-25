@@ -32,7 +32,7 @@ export function softwareApplicationJsonLd() {
       '@type': 'Offer',
       price: '0',
       priceCurrency: 'USD',
-      description: 'Free MarTech scan with 45 forensic modules',
+      description: 'Free GhostScan™ preview — full forensic intelligence from $24.99',
     },
   };
 }
