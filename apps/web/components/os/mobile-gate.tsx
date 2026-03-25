@@ -482,7 +482,7 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
 
           {/* Scan input — stacked vertically on mobile */}
           <div className="w-full max-w-md px-gs-4 mobile-scan-input-stack">
-            <MobileScanFlow myScansRef={myScansRef} />
+            <MobileScanFlow myScansRef={myScansRef} onRequestAuth={openAuthOverlay} />
           </div>
 
           {/* ⑤ Bottom breathing room — small, keeps Turnstile off viewport edge */}

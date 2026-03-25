@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
 import { normalizeUrl } from '@/lib/utils';
 import { useAuth } from '@/lib/auth-context';
 import { useScanOrchestrator } from '@/lib/scan-orchestrator';
@@ -20,12 +19,13 @@ import { analytics } from '@/lib/analytics';
 interface MobileScanFlowProps {
   /** Ref to scroll to after scan completes (My Scans section) */
   myScansRef?: React.RefObject<HTMLDivElement | null>;
+  /** Open the mobile auth overlay instead of navigating to /register */
+  onRequestAuth?: (mode: 'login' | 'register') => void;
 }
 
-export function MobileScanFlow({ myScansRef }: MobileScanFlowProps) {
+export function MobileScanFlow({ myScansRef, onRequestAuth }: MobileScanFlowProps) {
   const { isAuthenticated, loading: authLoading } = useAuth();
   const orchestrator = useScanOrchestrator();
-  const router = useRouter();
   const [error, setError] = useState<string | null>(null);
 
   const handleCapture = useCallback(
@@ -78,18 +78,18 @@ export function MobileScanFlow({ myScansRef }: MobileScanFlowProps) {
         orchestrator.startVisualSequence(domain, url, turnstileToken);
         analytics.signupWallShown(domain);
 
-        // After 2.5s: pause the visual and redirect to register
+        // After 2.5s: pause the visual and show mobile auth overlay
         setTimeout(() => {
           orchestrator.pauseVisualSequence();
-          // Small delay so the pause is visible before navigation
+          // Small delay so the pause is visible before overlay opens
           setTimeout(() => {
             orchestrator.cancelVisualSequence();
-            router.push('/register?redirect=/');
+            onRequestAuth?.('register');
           }, 300);
         }, 2500);
       }
     },
-    [isAuthenticated, orchestrator, router, myScansRef],
+    [isAuthenticated, orchestrator, onRequestAuth, myScansRef],
   );
 
   return (
