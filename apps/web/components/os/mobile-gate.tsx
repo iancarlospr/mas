@@ -539,7 +539,7 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
         <SectionDivider />
 
         {/* ═══════ DESKTOP CTA ═══════ */}
-        <section className="px-gs-6 py-gs-8 space-y-gs-4">
+        <section className="px-gs-6 py-gs-8 space-y-gs-3">
           {/* Heading — full width, centered */}
           <div className="text-center">
             <p
@@ -567,14 +567,16 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
               hits different on desktop.
             </p>
           </div>
+          {/* Subtext — CRO nudge, below heading */}
+          <p className="font-data text-data-xs text-gs-muted leading-relaxed text-center">
+            send yourself a link. open it on your laptop later.
+            <br />
+            no signup, no spam — just a shortcut.
+          </p>
           {/* Form block (left) + Ghost (right) */}
           <div className="flex items-center gap-gs-4">
             <div className="flex-1 min-w-0">
               <DesktopReminderForm />
-              <p className="font-data text-data-xs text-gs-muted leading-relaxed mt-gs-3">
-                window manager, 48 interactive slides, mini-games,
-                ASCII movies, Chloé&apos;s desktop OS.
-              </p>
             </div>
             <ChloeSprite state="smug" size={64} className="flex-shrink-0" />
           </div>
