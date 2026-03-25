@@ -388,6 +388,8 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
         /* ── About footer: tighter bottom spacing ── */
         .mobile-about-footer > div { padding-bottom: 4px !important; }
         .mobile-about-footer .border-t { margin-top: 8px !important; padding-top: 8px !important; }
+        /* ── Module directory pills: solid bg on mobile (no managed window behind them) ── */
+        .mobile-about-footer .bevel-sunken { background: oklch(0.13 0.01 340) !important; }
       `}</style>
       <div className="noise-grain opacity-[0.03]" aria-hidden="true" />
 
