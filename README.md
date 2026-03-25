@@ -53,11 +53,11 @@
 
 ---
 
-## 💅 Meet Cholé
+## 💅 Meet Chloé
 
 She's a pixel ghost. She lives on your screen. She has laser eyes and strong opinions about your marketing stack.
 
-Cholé is the face of AlphaScan — she guides you through the scan, roasts your broken tracking pixels, and delivers the truth with zero corporate filter. She floats around your desktop, fires rainbow laser beams at your URL input, and occasionally watches ASCII movies while your scan runs.
+Chloé is the face of AlphaScan — she guides you through the scan, roasts your broken tracking pixels, and delivers the truth with zero corporate filter. She floats around your desktop, fires rainbow laser beams at your URL input, and occasionally watches ASCII movies while your scan runs.
 
 She's not a chatbot pretending to be helpful. She's a ghost who's genuinely disappointed in your DMARC policy.
 
@@ -67,7 +67,7 @@ She's not a chatbot pretending to be helpful. She's a ghost who's genuinely disa
 
 AlphaScan is a **full-stack marketing intelligence platform** disguised as a retro desktop operating system. You type in any website URL, and in about 10 minutes you get a comprehensive audit of everything that's happening (and going wrong) under the hood.
 
-We're talking **45 analysis modules** across 8 categories. Not 45 checkboxes — 45 deep, specialized scans that examine your analytics setup, paid media pixels, security posture, SEO health, tech stack, accessibility compliance, competitive position, and market intelligence.
+We're talking **45+ analysis modules** across 8 categories. Not checkboxes — deep, specialized scans that examine your analytics setup, paid media pixels, security posture, SEO health, tech stack, accessibility compliance, competitive position, and market intelligence.
 
 The kind of audit that takes a team of specialists weeks to produce. We do it while you watch ASCII Mean Girls.
 
@@ -77,17 +77,17 @@ The kind of audit that takes a team of specialists weeks to produce. We do it wh
 
 This isn't a dashboard. It's a **desktop OS**.
 
-When you land on AlphaScan, you're dropped into Cholé's bedroom — a dark, pink-tinted retro desktop with draggable windows, a taskbar, right-click context menus, and desktop icons. Everything is a window. Your scan results? A window. Payment? A window. Settings? Window. There's even a Minesweeper clone (Ghost Sweeper, obviously) and a 4-channel ASCII TV.
+When you land on AlphaScan, you're dropped into Chloé's bedroom — a dark, pink-tinted retro desktop with draggable windows, a taskbar, right-click context menus, and desktop icons. Everything is a window. Your scan results? A window. Payment? A window. Settings? Window. There's even a Minesweeper clone (Ghost Sweeper, obviously) and a 4-channel ASCII TV.
 
 ### The GhostScan™ Sequence
 
 When you start a scan, the whole screen takes over:
 
-1. 🟢 **Matrix Rain** — Green cascading characters with Cholé's intro: *"knock knock... follow the white ghost..."*
-2. 💻 **Terminal Boot** — System lines scroll like a Hollywood hacking scene, ending with Cholé going *"ugh, this part is boring. watch my movie instead"*
+1. 🟢 **Matrix Rain** — Green cascading characters with Chloé's intro: *"knock knock... follow the white ghost..."*
+2. 💻 **Terminal Boot** — System lines scroll like a Hollywood hacking scene, ending with Chloé going *"ugh, this part is boring. watch my movie instead"*
 3. 📺 **ASCII Cinema** — 4 channels of pixel art entertainment loop until your scan completes (yes, one of them is Rick Roll)
 
-Behind the curtain, 45 modules are running a real stealth browser session, querying market intelligence APIs, and feeding everything to AI for analysis.
+Behind the curtain, 45+ modules are running a real stealth browser session, querying market intelligence APIs, and feeding everything to AI for analysis.
 
 ---
 
@@ -129,25 +129,28 @@ Individual modules produce **scored checkpoints** — specific findings rated fr
 
 ## 💎 What You Get
 
-### Free Scan
-Run a full 45-module scan on any website. See your MarketingIQ score, checkpoint health levels, and detected tools across every category. That's enough to know exactly what's broken.
-
-The report is a **slide deck** — 16:9 cards that look like the first page of a strategy presentation, not a spreadsheet. Sidebar navigation, category grouping, scroll sync. Print it and it renders as landscape pages.
+### Free Preview
+A 3-second GhostScan™ preview that shows you what the engine can see. No real scan runs — registration and upgrade required to unlock forensic scanning.
 
 ### Alpha Brief — $24.99
-Unlock the full report with detailed evidence, actionable recommendations, and 3 AI-powered strategic deliverables:
+Unlock the full 45-module forensic scan with detailed evidence, actionable recommendations, and AI-powered strategic deliverables:
 
 - 🧠 **Executive Brief** — A C-suite synthesis with a verdict headline, category assessments, cross-cutting themes, and competitive context. The slide you'd show your CEO.
-- 🗺️ **Remediation Roadmap** — A consulting-grade implementation plan organized by priority (Immediate → This Week → This Month → Backlog) with step-by-step instructions, verification criteria, and effort estimates.
+- 📋 **PRD** — A structured technical breakdown of every fix from the audit — prioritized, scoped, and ready to hand off to your dev team.
+- 📊 **Boss Deck** — A 7-page executive pitch deck PDF that translates your audit into a boardroom-ready narrative with wins, issues, roadmap, and projected improvements.
 - ✂️ **Stack Optimizer** — Identifies abandoned tools, redundant tool pairs, and proposes lean and optimal stack configurations.
+- 📝 **.MD for NotebookLM** — Full audit exported as structured markdown. Paste into Google NotebookLM for an AI-generated audio briefing.
+- 📄 **PDF Export** — Downloadable slide deck PDF of the full report.
 
-Also includes 25 AI chat credits, and exportable PRD + PDF.
+Also includes 25 GhostChat™ credits.
+
+The report is a **slide deck** — 16:9 cards that look like the first page of a strategy presentation, not a spreadsheet. Sidebar navigation, category grouping, scroll sync.
 
 ### Alpha Brief Plus — $34.95
-Everything in Alpha Brief, plus 3 scan unlocks, 200 chat credits, and AI agents.
+Everything in Alpha Brief, plus 3 scan unlocks (your site + 2 competitors), 200 GhostChat™ credits, AI agents, and priority scan queue.
 
-### 💬 Ask Cholé
-Chat with an AI that has access to your entire scan data. Ask follow-up questions, get implementation guidance, or just let Cholé roast your consent banner configuration. Additional credits available ($1 for 15, $4.99 for 100).
+### 💬 GhostChat™
+Chat with an AI that has absorbed your entire scan — every module, every data point, every finding. Ask follow-up questions, get implementation guidance, or just let Chloé roast your consent banner configuration. Additional credits available ($1 for 15, $4.99 for 100).
 
 ---
 
