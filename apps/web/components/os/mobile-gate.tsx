@@ -383,12 +383,7 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
           flex: none !important;
           width: 100% !important;
         }
-        /* ── My Scans: condensed for mobile ── */
-        .mobile-my-scans .w-16 { display: none !important; }
-        .mobile-my-scans .w-6:last-child { display: none !important; }
-        .mobile-my-scans .w-44 { width: auto !important; }
-        .mobile-my-scans .gap-gs-2 { gap: 4px !important; }
-        .mobile-my-scans .px-gs-3 { padding-left: 8px !important; padding-right: 8px !important; }
+        /* ── My Scans: card layout handles its own spacing ── */
         /* ── About footer: tighter bottom spacing ── */
         .mobile-about-footer > div { padding-bottom: 4px !important; }
         .mobile-about-footer .border-t { margin-top: 8px !important; padding-top: 8px !important; }
