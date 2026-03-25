@@ -7,7 +7,7 @@ export interface DesktopReminderEmailProps {
 }
 
 export function DesktopReminderEmail({ email }: DesktopReminderEmailProps = {}) {
-  const greeting = email ? `hey ${email.split('@')[0]}` : 'hey babe';
+  const greeting = email ? `hey ${email.split('@')[0]}` : 'hey';
 
   return (
     <EmailLayout preview="Your desktop link to MarketingAlphaScan">

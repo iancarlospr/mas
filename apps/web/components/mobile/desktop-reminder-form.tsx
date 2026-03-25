@@ -87,7 +87,7 @@ export function DesktopReminderForm() {
   if (status === 'sent') {
     return (
       <p className="font-data text-data-xs text-gs-base italic">
-        sent! check your inbox, babe.
+        sent! check your inbox.
       </p>
     );
   }
