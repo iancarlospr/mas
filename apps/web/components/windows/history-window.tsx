@@ -163,47 +163,42 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                 key={scan.id}
                 className="transition-all"
                 style={{
-                  position: 'relative',
                   borderRadius: 12,
                   background: 'oklch(0.14 0.02 340 / 0.65)',
                   backdropFilter: 'blur(12px)',
                   WebkitBackdropFilter: 'blur(12px)',
                   border: '1px solid oklch(0.25 0.04 340)',
                   boxShadow: '0 2px 12px oklch(0.05 0.01 340 / 0.4), inset 0 1px 0 oklch(0.30 0.03 340 / 0.2)',
-                  overflow: 'visible',
-                  marginTop: 12,
+                  overflow: 'hidden',
                 }}
               >
-                {/* Top-centered notch badge */}
-                <span
-                  className="font-system font-bold"
-                  style={{
-                    position: 'absolute',
-                    top: -11,
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    zIndex: 1,
-                    fontSize: 12,
-                    letterSpacing: '0.08em',
-                    padding: '3px 14px 4px',
-                    borderRadius: '8px 8px 0 0',
-                    ...(isPaid
-                      ? {
-                          background: 'var(--gs-base)',
-                          color: 'var(--gs-void)',
-                          boxShadow: '0 -2px 10px oklch(0.72 0.17 340 / 0.35)',
-                        }
-                      : {
-                          background: 'oklch(0.18 0.02 340)',
-                          color: 'oklch(0.55 0.04 340)',
-                          border: '1px solid oklch(0.30 0.04 340)',
-                          borderBottom: 'none',
-                          fontWeight: 500,
-                        }),
-                  }}
-                >
-                  {isPaid ? 'PRO' : 'FREE'}
-                </span>
+                {/* Top-centered inward notch badge (iPhone-style, hangs into card) */}
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                  <span
+                    className="font-system font-bold"
+                    style={{
+                      fontSize: 12,
+                      letterSpacing: '0.08em',
+                      padding: '3px 16px 5px',
+                      borderRadius: '0 0 10px 10px',
+                      ...(isPaid
+                        ? {
+                            background: 'var(--gs-base)',
+                            color: 'var(--gs-void)',
+                            boxShadow: '0 2px 10px oklch(0.72 0.17 340 / 0.35)',
+                          }
+                        : {
+                            background: 'oklch(0.22 0.03 340)',
+                            color: 'oklch(0.55 0.04 340)',
+                            border: '1px solid oklch(0.30 0.04 340)',
+                            borderTop: 'none',
+                            fontWeight: 500,
+                          }),
+                    }}
+                  >
+                    {isPaid ? 'PRO' : 'FREE'}
+                  </span>
+                </div>
                 {/* Header: domain · dot · score · status · date ··· delete — one line */}
                 <div className="flex items-center" style={{ padding: '14px 10px 12px 16px', gap: 8 }}>
                   <span
