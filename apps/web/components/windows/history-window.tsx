@@ -261,7 +261,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                   <button
                     onClick={() => handleDelete(scan.id)}
                     disabled={deletingId === scan.id}
-                    className={`flex items-center justify-center transition-colors bg-transparent rounded ${deletingId === scan.id ? 'text-[oklch(0.40_0.03_340)]' : 'text-[oklch(0.45_0.04_340)] hover:text-gs-critical hover:bg-white/10'}`}
+                    className={`flex items-center justify-center transition-colors duration-100 bg-transparent rounded ${deletingId === scan.id ? 'text-[oklch(0.40_0.03_340)]' : 'text-[oklch(0.45_0.04_340)] hover:text-gs-critical hover:bg-white/10'}`}
                     title="Delete scan"
                     style={{
                       flexShrink: 0,
@@ -306,7 +306,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                           wm.openWindow(chatId, { scanId: scan.id, domain });
                         }
                       }}
-                      className="neon-outline-btn flex items-center justify-center w-full transition-colors bg-[oklch(0.11_0.04_340)] text-gs-base hover:bg-[oklch(0.15_0.06_340)] hover:brightness-110 active:bg-[oklch(0.18_0.07_340)]"
+                      className="neon-outline-btn flex items-center justify-center w-full transition-colors duration-100 bg-[oklch(0.11_0.04_340)] text-gs-base hover:bg-[oklch(0.15_0.06_340)] hover:brightness-110 active:bg-[oklch(0.18_0.07_340)]"
                       title="GhostChat™"
                       style={{
                         gap: 8,
@@ -332,7 +332,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                       {/* View Report — opens the slide deck in-app (same as card click) */}
                       <button
                         onClick={() => orchestrator.openScanWindow(scan.id, domain)}
-                        className="hidden md:flex flex-1 font-system items-center justify-center transition-colors bg-transparent text-gs-light hover:bg-white/10 hover:text-gs-base active:bg-white/15"
+                        className="hidden md:flex flex-1 font-system items-center justify-center transition-colors duration-100 bg-transparent text-gs-light hover:bg-white/10 hover:text-gs-base active:bg-white/15"
                         title="View audit report"
                         style={{ gap: 4, padding: '10px 0', fontSize: 12, fontWeight: 600, border: 'none', borderRight: '1px solid oklch(0.18 0.02 340)', cursor: 'pointer' }}
                       >
@@ -341,7 +341,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                       </button>
                       <button
                         onClick={() => window.open(`/report/${scan.id}/slides?download=1`, '_blank')}
-                        className="flex-1 font-system flex items-center justify-center transition-colors bg-transparent text-[oklch(0.60_0.04_340)] hover:bg-white/10 hover:text-gs-base active:bg-white/15"
+                        className="flex-1 font-system flex items-center justify-center transition-colors duration-100 bg-transparent text-[oklch(0.60_0.04_340)] hover:bg-white/10 hover:text-gs-base active:bg-white/15"
                         title="Download Audit Deck PDF"
                         style={{ gap: 4, padding: '10px 0', fontSize: 12, fontWeight: 600, border: 'none', borderRight: '1px solid oklch(0.18 0.02 340)', cursor: 'pointer' }}
                       >
@@ -350,7 +350,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                       </button>
                       <button
                         onClick={() => window.open(`/api/reports/${scan.id}/prd`, '_blank')}
-                        className="flex-1 font-system flex items-center justify-center transition-colors bg-transparent text-[oklch(0.60_0.04_340)] hover:bg-white/10 hover:text-gs-base active:bg-white/15"
+                        className="flex-1 font-system flex items-center justify-center transition-colors duration-100 bg-transparent text-[oklch(0.60_0.04_340)] hover:bg-white/10 hover:text-gs-base active:bg-white/15"
                         title="Download PRD"
                         style={{ gap: 4, padding: '10px 0', fontSize: 12, fontWeight: 600, border: 'none', borderRight: '1px solid oklch(0.18 0.02 340)', cursor: 'pointer' }}
                       >
@@ -359,7 +359,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                       </button>
                       <button
                         onClick={() => window.open(`/report/${scan.id}/boss-deck?download=1`, '_blank')}
-                        className="flex-1 font-system flex items-center justify-center transition-colors bg-transparent text-[oklch(0.60_0.04_340)] hover:bg-white/10 hover:text-gs-base active:bg-white/15"
+                        className="flex-1 font-system flex items-center justify-center transition-colors duration-100 bg-transparent text-[oklch(0.60_0.04_340)] hover:bg-white/10 hover:text-gs-base active:bg-white/15"
                         title="Download Boss Deck PDF"
                         style={{ gap: 4, padding: '10px 0', fontSize: 12, fontWeight: 600, border: 'none', borderRight: '1px solid oklch(0.18 0.02 340)', cursor: 'pointer' }}
                       >
@@ -368,7 +368,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                       </button>
                       <button
                         onClick={() => handleCopyMarkdown(scan.id, domain)}
-                        className={`flex-1 font-system flex items-center justify-center transition-colors bg-transparent hover:bg-white/10 hover:text-gs-base active:bg-white/15 ${mdCopiedId === scan.id ? 'text-gs-terminal' : 'text-[oklch(0.60_0.04_340)]'}`}
+                        className={`flex-1 font-system flex items-center justify-center transition-colors duration-100 bg-transparent hover:bg-white/10 hover:text-gs-base active:bg-white/15 ${mdCopiedId === scan.id ? 'text-gs-terminal' : 'text-[oklch(0.60_0.04_340)]'}`}
                         title="Copy audit as Markdown for NotebookLM"
                         style={{
                           gap: 4,
@@ -403,7 +403,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                       wm.registerWindow(paymentId, { title: 'Checkout', width: 420, height: 300, variant: 'dialog', componentType: 'payment' });
                       wm.openWindow(paymentId, { scanId: scan.id, domain, product: 'alpha_brief' });
                     }}
-                    className="neon-outline-btn flex items-center justify-center w-full transition-colors bg-[oklch(0.11_0.04_340)] text-gs-base hover:bg-[oklch(0.15_0.06_340)] hover:brightness-110 active:bg-[oklch(0.18_0.07_340)]"
+                    className="neon-outline-btn flex items-center justify-center w-full transition-colors duration-100 bg-[oklch(0.11_0.04_340)] text-gs-base hover:bg-[oklch(0.15_0.06_340)] hover:brightness-110 active:bg-[oklch(0.18_0.07_340)]"
                     title="Unlock full report"
                     style={{
                       gap: 8,
