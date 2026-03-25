@@ -336,7 +336,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                       {/* View Report — opens the slide deck in-app (same as card click) */}
                       <button
                         onClick={() => window.open(`/report/${scan.id}/slides`, '_blank')}
-                        className="flex-1 font-system flex items-center justify-center transition-colors hover:bg-white/5 active:bg-white/10"
+                        className="flex-1 font-system flex items-center justify-center transition-all hover:bg-white/10 hover:text-gs-base active:bg-white/15"
                         title="View audit report"
                         style={{ gap: 4, padding: '10px 0', fontSize: 12, fontWeight: 600, color: 'var(--gs-light)', background: 'transparent', border: 'none', borderRight: '1px solid oklch(0.18 0.02 340)', cursor: 'pointer' }}
                       >
@@ -345,7 +345,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                       </button>
                       <button
                         onClick={() => window.open(`/report/${scan.id}/slides?download=1`, '_blank')}
-                        className="flex-1 font-system flex items-center justify-center transition-colors hover:bg-white/5 active:bg-white/10"
+                        className="flex-1 font-system flex items-center justify-center transition-all hover:bg-white/10 hover:text-gs-base active:bg-white/15"
                         title="Download Audit Deck PDF"
                         style={{ gap: 4, padding: '10px 0', fontSize: 12, fontWeight: 600, color: 'oklch(0.60 0.04 340)', background: 'transparent', border: 'none', borderRight: '1px solid oklch(0.18 0.02 340)', cursor: 'pointer' }}
                       >
@@ -354,7 +354,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                       </button>
                       <button
                         onClick={() => window.open(`/api/reports/${scan.id}/prd`, '_blank')}
-                        className="flex-1 font-system flex items-center justify-center transition-colors hover:bg-white/5 active:bg-white/10"
+                        className="flex-1 font-system flex items-center justify-center transition-all hover:bg-white/10 hover:text-gs-base active:bg-white/15"
                         title="Download PRD"
                         style={{ gap: 4, padding: '10px 0', fontSize: 12, fontWeight: 600, color: 'oklch(0.60 0.04 340)', background: 'transparent', border: 'none', borderRight: '1px solid oklch(0.18 0.02 340)', cursor: 'pointer' }}
                       >
@@ -363,7 +363,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                       </button>
                       <button
                         onClick={() => window.open(`/report/${scan.id}/boss-deck?download=1`, '_blank')}
-                        className="flex-1 font-system flex items-center justify-center transition-colors hover:bg-white/5 active:bg-white/10"
+                        className="flex-1 font-system flex items-center justify-center transition-all hover:bg-white/10 hover:text-gs-base active:bg-white/15"
                         title="Download Boss Deck PDF"
                         style={{ gap: 4, padding: '10px 0', fontSize: 12, fontWeight: 600, color: 'oklch(0.60 0.04 340)', background: 'transparent', border: 'none', borderRight: '1px solid oklch(0.18 0.02 340)', cursor: 'pointer' }}
                       >
