@@ -67,11 +67,12 @@ export function SignupWall({ domain, scanUrl }: SignupWallProps) {
     try {
       if (mode === 'register') {
         storePendingUrl();
+        const inviteCode = document.cookie.match(/(?:^|;\s*)__alphascan_invite=([^;]+)/)?.[1];
         const { error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            data: { name },
+            data: { name, ...(inviteCode && { invite_code: decodeURIComponent(inviteCode) }) },
             emailRedirectTo: `${window.location.origin}/auth/callback?redirect_to=${encodeURIComponent(returnPath)}`,
           },
         });

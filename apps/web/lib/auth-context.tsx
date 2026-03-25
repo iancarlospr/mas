@@ -44,14 +44,18 @@ function identifyUser(u: User) {
   });
 }
 
-/** Attempt to redeem a beta invite code stored in cookie */
-async function maybeRedeemBetaInvite() {
+/** Attempt to redeem a beta invite code — checks cookie first, then user metadata */
+async function maybeRedeemBetaInvite(u: User | null) {
   if (typeof window === 'undefined') return;
 
-  const match = document.cookie.match(/(?:^|;\s*)__alphascan_invite=([^;]+)/);
-  if (!match) return;
+  // Source 1: cookie (same device as invite link)
+  const cookieMatch = document.cookie.match(/(?:^|;\s*)__alphascan_invite=([^;]+)/);
+  const cookieCode = cookieMatch ? decodeURIComponent(cookieMatch[1]!) : null;
 
-  const code = decodeURIComponent(match[1]!);
+  // Source 2: user metadata (cross-device — saved during signup)
+  const metadataCode = u?.user_metadata?.invite_code as string | undefined;
+
+  const code = cookieCode || metadataCode;
   if (!code) return;
 
   try {
@@ -64,7 +68,9 @@ async function maybeRedeemBetaInvite() {
     // Silent failure — invite redemption is best-effort
   } finally {
     // Always clear the cookie regardless of outcome
-    document.cookie = '__alphascan_invite=; path=/; max-age=0; secure; samesite=lax';
+    if (cookieCode) {
+      document.cookie = '__alphascan_invite=; path=/; max-age=0; secure; samesite=lax';
+    }
   }
 }
 
@@ -106,9 +112,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (event === 'SIGNED_IN' && u) {
           identifyUser(u);
           maybeTrackAccountCreation(u);
-          maybeRedeemBetaInvite();
+          maybeRedeemBetaInvite(u);
         } else if (event === 'TOKEN_REFRESHED' && u) {
           identifyUser(u);
+          maybeRedeemBetaInvite(u);
         } else if (event === 'SIGNED_OUT') {
           if (typeof window !== 'undefined' && posthog.__loaded) {
             posthog.reset();
