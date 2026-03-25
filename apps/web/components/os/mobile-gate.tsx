@@ -592,10 +592,12 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
           </div>
         </section>
 
-        <SectionDivider />
+        <div className="relative z-[1]">
+          <SectionDivider />
+        </div>
 
         {/* ═══════ SECTION 7: ABOUT (doubles as footer) ═══════ */}
-        <section className="py-gs-2 mobile-about-footer">
+        <section className="py-gs-2 mobile-about-footer relative z-[1]">
           <AboutWindow />
         </section>
 
