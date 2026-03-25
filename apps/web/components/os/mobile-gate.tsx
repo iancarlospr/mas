@@ -582,7 +582,7 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
               position: 'absolute',
               right: -30,
               bottom: -100,
-              zIndex: 10,
+              zIndex: 0,
               transform: 'rotate(-35deg) scale(2.5)',
               transformOrigin: 'center center',
               opacity: 0.9,
