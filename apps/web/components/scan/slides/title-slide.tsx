@@ -252,52 +252,67 @@ function DitherStrip() {
     const container = containerRef.current;
     if (!canvas || !container) return;
 
-    const w = container.offsetWidth;
-    const h = container.offsetHeight;
-    if (w === 0 || h === 0) return;
-
-    const px = 2;
-    const cols = Math.ceil(w / px);
-    const rows = Math.ceil(h / px);
-
-    canvas.width = cols;
-    canvas.height = rows;
-    canvas.style.width = w + 'px';
-    canvas.style.height = h + 'px';
-    canvas.style.imageRendering = 'pixelated';
-
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const imageData = ctx.createImageData(cols, rows);
-    const data = imageData.data;
-
+    const px = 2;
     // Pink: #FFB2EF
     const r = 255, g = 178, b = 239;
 
-    for (let y = 0; y < rows; y++) {
-      const yRatio = y / rows;
-      // Ramps up toward the bottom, stays at cap — overflow:hidden clips the edge
-      const vDensity = Math.min(0.35, Math.pow(yRatio, 2));
+    let prevW = 0;
+    let prevH = 0;
 
-      for (let x = 0; x < cols; x++) {
-        const xRatio = x / cols;
-        const hFade = 1.0 - Math.pow(1.0 - xRatio, 1.4) * 0.85;
+    function render() {
+      const w = container!.offsetWidth;
+      const h = container!.offsetHeight;
+      if (w === 0 || h === 0) return;
+      if (w === prevW && h === prevH) return;
+      prevW = w;
+      prevH = h;
 
-        const intensity = vDensity * hFade * 0.5;
-        const threshold = (BAYER8[y % 8]![x % 8]!) / 64;
-        const idx = (y * cols + x) * 4;
+      const cols = Math.ceil(w / px);
+      const rows = Math.ceil(h / px);
 
-        if (intensity > threshold) {
-          data[idx] = r;
-          data[idx + 1] = g;
-          data[idx + 2] = b;
-          data[idx + 3] = Math.round(intensity * 255 * 0.6);
+      canvas!.width = cols;
+      canvas!.height = rows;
+      canvas!.style.width = '100%';
+      canvas!.style.height = '100%';
+      canvas!.style.imageRendering = 'pixelated';
+
+      const imageData = ctx!.createImageData(cols, rows);
+      const data = imageData.data;
+
+      for (let y = 0; y < rows; y++) {
+        const yRatio = y / rows;
+        // Ramps up toward the bottom, stays at cap — overflow:hidden clips the edge
+        const vDensity = Math.min(0.35, Math.pow(yRatio, 2));
+
+        for (let x = 0; x < cols; x++) {
+          const xRatio = x / cols;
+          const hFade = 1.0 - Math.pow(1.0 - xRatio, 1.4) * 0.85;
+
+          const intensity = vDensity * hFade * 0.5;
+          const threshold = (BAYER8[y % 8]![x % 8]!) / 64;
+          const idx = (y * cols + x) * 4;
+
+          if (intensity > threshold) {
+            data[idx] = r;
+            data[idx + 1] = g;
+            data[idx + 2] = b;
+            data[idx + 3] = Math.round(intensity * 255 * 0.6);
+          }
         }
       }
+
+      ctx!.putImageData(imageData, 0, 0);
     }
 
-    ctx.putImageData(imageData, 0, 0);
+    render();
+
+    const ro = new ResizeObserver(() => render());
+    ro.observe(container);
+
+    return () => ro.disconnect();
   }, []);
 
   return (
