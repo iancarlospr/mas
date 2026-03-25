@@ -539,7 +539,7 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
         <SectionDivider />
 
         {/* ═══════ DESKTOP CTA ═══════ */}
-        <section className="px-gs-6 py-gs-8 space-y-gs-3">
+        <section className="px-gs-6 py-gs-8 space-y-gs-3" style={{ position: 'relative', overflow: 'visible' }}>
           {/* Heading — full width, centered */}
           <div className="text-center">
             <p
@@ -573,12 +573,22 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
             <br />
             no signup, no spam — just a shortcut.
           </p>
-          {/* Form block (left) + Ghost (right) */}
-          <div className="flex items-center gap-gs-4">
-            <div className="flex-1 min-w-0">
-              <DesktopReminderForm />
-            </div>
-            <ChloeSprite state="smug" size={64} className="flex-shrink-0" />
+          {/* Form block — full width */}
+          <DesktopReminderForm />
+          {/* Ghost — big, slanted, crashing in from right, bleeds into next section */}
+          <div
+            className="pointer-events-none select-none"
+            style={{
+              position: 'absolute',
+              right: -16,
+              bottom: -60,
+              zIndex: 10,
+              transform: 'rotate(-25deg)',
+              transformOrigin: 'center center',
+              opacity: 0.9,
+            }}
+          >
+            <ChloeSprite state="smug" size={128} />
           </div>
         </section>
 
