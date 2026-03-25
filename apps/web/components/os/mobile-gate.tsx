@@ -580,10 +580,10 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
             className="pointer-events-none select-none"
             style={{
               position: 'absolute',
-              right: -16,
-              bottom: -60,
+              right: -30,
+              bottom: -100,
               zIndex: 10,
-              transform: 'rotate(-25deg)',
+              transform: 'rotate(-35deg) scale(2.5)',
               transformOrigin: 'center center',
               opacity: 0.9,
             }}
