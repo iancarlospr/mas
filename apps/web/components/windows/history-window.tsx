@@ -312,7 +312,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                         }
                       }}
                       className="neon-outline-btn flex items-center justify-center w-full"
-                      title="GhostChat"
+                      title="GhostChat™"
                       style={{
                         gap: 8,
                         padding: '12px 18px',

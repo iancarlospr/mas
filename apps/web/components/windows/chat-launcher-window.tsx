@@ -138,7 +138,7 @@ export default function ChatLauncherWindow() {
       <div className="p-gs-8 text-center space-y-gs-4">
         <h2 className="font-system text-os-base font-bold">No paid scans yet</h2>
         <p className="font-data text-data-sm text-gs-muted">
-          Upgrade a scan to Alpha Brief to unlock GhostChat.
+          Upgrade a scan to Alpha Brief to unlock GhostChat™.
         </p>
       </div>
     );
