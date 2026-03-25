@@ -332,7 +332,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                       {/* View Report — opens the slide deck in-app (same as card click) */}
                       <button
                         onClick={() => orchestrator.openScanWindow(scan.id, domain)}
-                        className="flex-1 font-system flex items-center justify-center transition-colors bg-transparent text-gs-light hover:bg-white/10 hover:text-gs-base active:bg-white/15"
+                        className="hidden md:flex flex-1 font-system items-center justify-center transition-colors bg-transparent text-gs-light hover:bg-white/10 hover:text-gs-base active:bg-white/15"
                         title="View audit report"
                         style={{ gap: 4, padding: '10px 0', fontSize: 12, fontWeight: 600, border: 'none', borderRight: '1px solid oklch(0.18 0.02 340)', cursor: 'pointer' }}
                       >
