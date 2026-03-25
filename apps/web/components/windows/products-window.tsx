@@ -19,32 +19,42 @@ interface Product {
 const PRODUCTS: Product[] = [
   {
     name: 'The Alpha Brief',
-    tagline: 'The audit that agencies pray you never see.',
+    tagline: 'Agencies charge $3k+ for this and take weeks. You get it in minutes.',
     bullets: [
-      'See your entire digital presence the way a top-tier consultant would — every signal, every data point, every opportunity mapped out and ready for you to act on.',
-      'Your campaigns, your tracking, your infrastructure — scored across 45 dimensions. You\'ll immediately see which areas are already strong and which ones are one tweak away from performing at a completely different level.',
-      'A prioritized action plan that tells you exactly what can be done and why — each recommendation ranked by how quickly you\'ll see results.',
-      'The level of insight that puts you in a completely different conversation with agencies, freelancers, or your own team. You\'ll walk in knowing more about your site than the people before you.',
+      'Your entire digital presence scored across 45 dimensions — every signal, every gap, every opportunity mapped and downloadable as a PDF.',
+      'A prioritized action plan ranked by speed-to-impact. The kind of insight retainers bill quarterly for.',
     ],
   },
   {
-    name: 'The PRD (Product Requirements Document)',
-    tagline: 'Hand this to your boss. Watch their face.',
+    name: 'The PRD',
+    tagline: 'The technical blueprint your dev team actually needs.',
     bullets: [
-      'A polished, exportable document your leadership team will actually read. Step-by-step remediation that even non-technical stakeholders find themselves understanding immediately.',
-      'Every recommendation backed by data — traffic impact, revenue projections, competitive gaps. The kind of evidence that gets things approved before the meeting ends.',
-      'A step-by-step remediation plan you can follow yourself — or hand off to your dev team, freelancer, or agency. It works either way because every action is specific, prioritized, and self-contained.',
-      'Pair it with GhostChat™ and let Chloé walk you through implementation, clarify technical steps, or adapt the plan to your specific workflow.',
+      'A structured breakdown of every fix from the audit — prioritized, scoped, and ready to hand off to your developers or freelancers.',
+      'Each action is specific and self-contained. No interpretation needed, just implementation.',
+    ],
+  },
+  {
+    name: 'Boss Deck',
+    tagline: 'Walk into that meeting and own the room.',
+    bullets: [
+      'Seven beautifully designed slides that translate your audit into wins, issues, and a roadmap your boss will love you for presenting.',
+      'Dollar impact, team owners, projected improvements — all wrapped in a PDF that looks like a $20k agency deliverable.',
     ],
   },
   {
     name: 'GhostChat™',
-    tagline: 'Your $5k/month strategist. For the price of a coffee.',
+    tagline: 'This AI absorbed your entire audit. Use that.',
     bullets: [
-      'Ask anything about your scan — and get answers drawn from data that isn\'t even visible in the report. Chloé sees deeper than the dashboard shows you.',
-      'Walk through implementation together. "How do I implement step 3?" or "Show me videos on setting up GA4 ecommerce tracking" — becomes a guided conversation where you naturally discover you already know more than you think.',
-      'Context that remembers everything. Your full scan, every module, every finding — Chloé holds it all so you don\'t have to. You just ask.',
-      <>The strategist your competitors are already paying $5,000 a month for. Except yours actually knows your specific data, responds instantly, and <span className="text-shimmer">never ghosts you</span>.</>,
+      'Every module, every data point, every finding — Chloé holds it all. Ask anything about your URL and sound like the most prepared person in any meeting.',
+      <>The amount of data in here would break any document. That&apos;s why it&apos;s a conversation. And she <span className="text-shimmer">never ghosts you</span>.</>,
+    ],
+  },
+  {
+    name: '.MD for NotebookLM',
+    tagline: 'One click. Google turns your audit into a podcast.',
+    bullets: [
+      'Copy your full audit as structured markdown, paste it into Google NotebookLM, and get an AI-generated audio briefing you can listen to on the go.',
+      'Every module, every score, every recommendation — formatted for Google\'s AI to narrate. Brief your whole team without a single slide.',
     ],
   },
 ];

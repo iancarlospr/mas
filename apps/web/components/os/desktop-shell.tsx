@@ -29,7 +29,7 @@ import { BedroomIcon } from './bedroom-icons';
 /** Initial sizes — auto-sizer will snap to actual content on open */
 const WINDOW_CONFIGS: Record<string, WindowConfig> = {
   'about':         { title: 'About AlphaScan',                 icon: '~', width: 480, height: 520 },
-  'products':      { title: 'Products',                        icon: '~', width: 560, height: 520 },
+  'products':      { title: 'Products',                        icon: '~', width: 560, height: 580 },
   'pricing':       { title: 'Pricing',                         icon: '~', width: 700, height: 560 },
   'customers':     { title: 'Reviews',                         icon: '~', width: 440, height: 560 },
   'chill':         { title: 'chill.mov',                       icon: '~', width: 820, height: 500, variant: 'terminal' },
