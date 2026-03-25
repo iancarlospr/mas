@@ -539,16 +539,45 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
         <SectionDivider />
 
         {/* ═══════ DESKTOP CTA ═══════ */}
-        <section className="px-gs-6 py-gs-8 text-center space-y-gs-4">
-          <ChloeSprite state="smug" size={64} className="mx-auto" />
-          <p className="font-data italic text-data-sm text-gs-red">
-            the full experience hits different on desktop.
-          </p>
-          <p className="font-data text-data-xs text-gs-muted leading-relaxed">
-            window manager, 48 interactive slides, mini-games,
-            ASCII movies, Chloé&apos;s Bedroom OS.
-          </p>
-          <DesktopReminderForm />
+        <section className="px-gs-6 py-gs-8">
+          <div className="flex items-start gap-gs-4">
+            {/* Left — text */}
+            <div className="flex-1 min-w-0">
+              <p
+                className="font-display"
+                style={{
+                  fontSize: 'clamp(18px, 5vw, 24px)',
+                  fontWeight: 300,
+                  lineHeight: '1.3',
+                  letterSpacing: '-0.01em',
+                  color: 'var(--gs-light)',
+                }}
+              >
+                the full experience
+              </p>
+              <p
+                className="font-marker"
+                style={{
+                  fontSize: 'clamp(22px, 6vw, 30px)',
+                  lineHeight: '1.2',
+                  letterSpacing: '-0.06em',
+                  color: 'var(--gs-base)',
+                  marginTop: '4px',
+                }}
+              >
+                hits different on desktop.
+              </p>
+              <p className="font-data text-data-xs text-gs-muted leading-relaxed mt-gs-3">
+                window manager, 48 interactive slides, mini-games,
+                ASCII movies, Chloé&apos;s desktop OS.
+              </p>
+            </div>
+            {/* Right — ghost */}
+            <ChloeSprite state="smug" size={64} className="flex-shrink-0 mt-gs-1" />
+          </div>
+          <div className="mt-gs-4">
+            <DesktopReminderForm />
+          </div>
         </section>
 
         <SectionDivider />

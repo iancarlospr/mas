@@ -93,8 +93,9 @@ export function DesktopReminderForm() {
   }
 
   return (
-    <div className="space-y-gs-2">
-      <form onSubmit={handleSubmit} className="flex items-center gap-gs-2 max-w-xs mx-auto">
+    <div>
+      <form onSubmit={handleSubmit} className="flex flex-col">
+        {/* Input — top, rounded top corners only */}
         <input
           type="email"
           placeholder="your@email.com"
@@ -102,28 +103,32 @@ export function DesktopReminderForm() {
           onChange={(e) => setEmail(e.target.value)}
           required
           disabled={status === 'sending'}
-          className="flex-1 min-w-0 h-[36px] px-gs-3 rounded-[7px] font-data text-[13px]
+          className="w-full h-[42px] px-gs-3 font-data text-[13px]
                      border border-gs-mid/30 bg-gs-light/10 text-gs-light
                      placeholder:text-gs-mid/50 focus:border-gs-base/60
                      focus:outline-none transition-colors select-text"
-          style={{ caretColor: 'var(--gs-base)' }}
+          style={{
+            caretColor: 'var(--gs-base)',
+            borderRadius: '7px 7px 0 0',
+            borderBottom: 'none',
+          }}
         />
+        {/* Button — middle, no rounded corners */}
         <button
           type="submit"
           disabled={status === 'sending'}
-          className="flex-shrink-0 h-[36px] px-gs-4 rounded-[7px] font-data
-                     text-[13px] font-bold transition-colors"
+          className="w-full h-[42px] font-data text-[13px] font-bold transition-colors
+                     border border-transparent"
           style={{
             background: 'var(--gs-base)',
             color: 'var(--gs-void)',
+            borderRadius: siteKey ? '0' : '0 0 7px 7px',
           }}
         >
           {status === 'sending' ? '...' : 'Send link'}
         </button>
       </form>
-      {errorMsg && (
-        <p className="font-data text-data-xs text-gs-critical text-center">{errorMsg}</p>
-      )}
+      {/* Turnstile — bottom, rounded bottom corners */}
       {siteKey && (
         <>
           <Script
@@ -132,20 +137,19 @@ export function DesktopReminderForm() {
             onLoad={renderTurnstile}
           />
           <div
-            className="flex justify-center"
             style={{
-              opacity: 0.5,
-              transform: 'scale(0.85)',
-              transformOrigin: 'center',
-              filter: 'grayscale(0.3) brightness(0.8)',
-              borderRadius: '10px',
+              borderRadius: '0 0 7px 7px',
               overflow: 'hidden',
-              transition: 'opacity 300ms',
+              opacity: 0.6,
+              filter: 'grayscale(0.3) brightness(0.8)',
             }}
           >
             <div ref={turnstileContainerRef} />
           </div>
         </>
+      )}
+      {errorMsg && (
+        <p className="font-data text-data-xs text-gs-critical mt-gs-2">{errorMsg}</p>
       )}
     </div>
   );

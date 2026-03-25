@@ -27,7 +27,7 @@ export function DesktopReminderEmail({ email }: DesktopReminderEmailProps = {}) 
         &bull; 45-module forensic MarTech audit with interactive report slides
       </Text>
       <Text style={bullet}>
-        &bull; Chlo&eacute;&apos;s Bedroom OS — drag windows, play mini-games, watch ASCII movies
+        &bull; Chlo&eacute;&apos;s desktop OS — drag windows, play mini-games, watch ASCII movies
       </Text>
       <Text style={bullet}>
         &bull; Boss Deck PDF, executive brief, and full .MD export
