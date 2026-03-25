@@ -600,7 +600,7 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
                 <circle cx="6" cy="5.5" r="1" fill="var(--gs-void)"/>
                 <circle cx="10" cy="5.5" r="1" fill="var(--gs-void)"/>
               </svg>
-              Ask Chlo&eacute;
+              GhostChat&trade;
             </button>
           </div>
         )}

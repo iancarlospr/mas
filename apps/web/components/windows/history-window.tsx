@@ -312,7 +312,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                         }
                       }}
                       className="neon-outline-btn flex items-center justify-center w-full"
-                      title="Ask Chloe"
+                      title="GhostChat"
                       style={{
                         gap: 8,
                         padding: '12px 18px',
@@ -332,7 +332,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                         <circle cx="6" cy="5.5" r="1" fill="var(--gs-void)"/>
                         <circle cx="10" cy="5.5" r="1" fill="var(--gs-void)"/>
                       </svg>
-                      Ask Chloe
+                      GhostChat&trade;
                     </button>
                     {/* Export row — View Report + downloads + .MD with NotebookLM icon */}
                     <div className="flex" style={{ borderTop: '1px solid oklch(0.18 0.02 340)' }}>
