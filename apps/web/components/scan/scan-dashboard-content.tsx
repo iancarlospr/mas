@@ -575,7 +575,7 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
               }
             `}</style>
             <button onClick={handleDownloadAuditDeck} className="text-gs-base hover:text-gs-bright transition-colors" style={{ fontSize: '11px', fontFamily: 'var(--font-system)' }}>
-              Audit Deck &darr;
+              Alpha Brief &darr;
             </button>
             <span className="text-gs-mid" style={{ fontSize: '11px' }}>&middot;</span>
             <button onClick={handleDownloadPdf} className="text-gs-base hover:text-gs-bright transition-colors" style={{ fontSize: '11px', fontFamily: 'var(--font-system)' }}>
@@ -586,7 +586,7 @@ export function ScanDashboardContent({ scan }: ScanDashboardContentProps) {
               Boss Deck &darr;
             </button>
             <span className="text-gs-mid" style={{ fontSize: '11px' }}>&middot;</span>
-            <button onClick={handleCopyMarkdown} className="text-gs-base hover:text-gs-bright transition-colors" style={{ fontSize: '11px', fontFamily: 'var(--font-system)' }}>
+            <button onClick={handleCopyMarkdown} className="hover:text-gs-bright transition-all" style={{ fontSize: '11px', fontFamily: 'var(--font-system)', color: mdCopied ? 'var(--gs-terminal)' : 'var(--gs-base)', transform: mdCopied ? 'scale(1.15)' : 'scale(1)' }}>
               {mdCopied ? '\u2713 Copied!' : '.MD \u2193'}
             </button>
             <span className="text-gs-mid" style={{ fontSize: '11px' }}>&middot;</span>
