@@ -394,7 +394,7 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
       <div className="noise-grain opacity-[0.03]" aria-hidden="true" />
 
       {/* Scrollable content */}
-      <main className="flex-1 overflow-y-auto overscroll-contain">
+      <main className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain">
 
         {/* ═══════ SECTION 1: HERO ═══════ */}
         <section ref={heroRef} className="flex flex-col items-center min-h-[100svh] pb-gs-6">
