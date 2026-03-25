@@ -159,11 +159,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
             return (
               <div
                 key={scan.id}
-                role="button"
-                tabIndex={0}
-                onClick={() => handleScanClick(scan.id, domain, scan.status)}
-                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleScanClick(scan.id, domain, scan.status); } }}
-                className="cursor-pointer transition-all active:scale-[0.98]"
+                className="transition-all"
                 style={{
                   borderRadius: 12,
                   background: 'oklch(0.14 0.02 340 / 0.65)',
@@ -384,7 +380,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                         style={{ gap: 4, padding: '10px 0', fontSize: 12, fontWeight: 600, color: 'oklch(0.60 0.04 340)', background: 'transparent', border: 'none', cursor: 'pointer' }}
                       >
                         {mdCopiedId === scan.id ? (
-                          <span>\u2713</span>
+                          <span>{'\u2713'}</span>
                         ) : (
                           <>
                             .MD
