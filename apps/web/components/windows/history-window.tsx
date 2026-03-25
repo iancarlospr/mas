@@ -175,10 +175,10 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                 }}
               >
                 {/* Header: domain · dot · score · status · badge · date ··· delete — one line */}
-                <div className="flex items-center" style={{ padding: '14px 6px 12px 16px', gap: 8 }}>
+                <div className="flex items-center" style={{ padding: '14px 10px 12px 16px', gap: 8 }}>
                   <span
                     className="min-w-0 font-data font-bold truncate"
-                    style={{ fontSize: 15, color: 'var(--gs-light)', flex: '0 1 auto', maxWidth: '45%' }}
+                    style={{ fontSize: 15, color: 'var(--gs-light)', flex: '0 1 auto', maxWidth: '40%' }}
                   >
                     {domain}
                   </span>
@@ -210,20 +210,37 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                       <svg className="w-3.5 h-3.5 inline-block text-gs-warning animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round"><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>
                     )}
                   </span>
+                  {/* PRO: iPhone 12 Pro notch pill — center lip cutout at top */}
                   {isPaid ? (
                     <span
                       className="font-system font-bold"
                       style={{
                         flexShrink: 0,
+                        position: 'relative',
                         fontSize: 12,
                         letterSpacing: '0.08em',
-                        padding: '2px 8px',
+                        padding: '4px 10px 3px',
                         borderRadius: 10,
                         background: 'var(--gs-base)',
                         color: 'var(--gs-void)',
                         boxShadow: '0 0 10px oklch(0.72 0.17 340 / 0.35)',
                       }}
                     >
+                      {/* Notch lip — small centered bump on top edge */}
+                      <span
+                        aria-hidden="true"
+                        style={{
+                          position: 'absolute',
+                          top: -4,
+                          left: '50%',
+                          transform: 'translateX(-50%)',
+                          width: 18,
+                          height: 5,
+                          background: 'var(--gs-base)',
+                          borderRadius: '0 0 6px 6px',
+                          boxShadow: '0 0 8px oklch(0.72 0.17 340 / 0.25)',
+                        }}
+                      />
                       PRO
                     </span>
                   ) : (
@@ -246,26 +263,26 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                   <span className="font-data" style={{ flexShrink: 0, fontSize: 12, color: 'oklch(0.50 0.04 340)' }}>
                     {new Date(scan.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                   </span>
+                  {/* Trash icon — bare, no box */}
                   <button
                     onClick={(e) => handleDelete(e, scan.id)}
                     disabled={deletingId === scan.id}
-                    className="flex items-center justify-center transition-colors"
+                    className="flex items-center justify-center hover:text-gs-critical transition-colors"
                     title="Delete scan"
                     style={{
                       flexShrink: 0,
                       width: 28,
                       height: 28,
-                      borderRadius: 6,
-                      background: 'oklch(0.18 0.02 340)',
-                      border: '1px solid oklch(0.28 0.03 340)',
-                      color: deletingId === scan.id ? 'oklch(0.50 0.03 340)' : 'oklch(0.55 0.06 340)',
+                      background: 'none',
+                      border: 'none',
+                      color: deletingId === scan.id ? 'oklch(0.40 0.03 340)' : 'oklch(0.45 0.04 340)',
                       cursor: deletingId === scan.id ? 'default' : 'pointer',
                     }}
                   >
                     {deletingId === scan.id ? (
                       <svg className="w-3.5 h-3.5 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round"><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>
                     ) : (
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
                         <polyline points="3 6 5 6 21 6" />
                         <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
                       </svg>
@@ -276,7 +293,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                 {/* Action zone: flush to card edges, no gaps, no separators */}
                 {isPaid && isComplete && (
                   <>
-                    {/* Chat hero — full-bleed, no border-radius, flush to card edges */}
+                    {/* Chat hero — full-bleed */}
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -321,32 +338,43 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                       </svg>
                       Ask Chloe
                     </button>
-                    {/* Export row — flush grid, no gaps between buttons */}
+                    {/* Export row — full names, down arrows, NotebookLM logo for .MD */}
                     <div className="flex" style={{ borderTop: '1px solid oklch(0.18 0.02 340)' }}>
-                      {[
-                        { label: 'Audit', action: (e: React.MouseEvent) => { e.stopPropagation(); window.open(`/report/${scan.id}/slides?download=1`, '_blank'); } },
-                        { label: 'PRD', action: (e: React.MouseEvent) => { e.stopPropagation(); window.open(`/api/reports/${scan.id}/prd`, '_blank'); } },
-                        { label: 'Boss', action: (e: React.MouseEvent) => { e.stopPropagation(); window.open(`/report/${scan.id}/boss-deck?download=1`, '_blank'); } },
-                        { label: mdCopiedId === scan.id ? '\u2713' : '.MD', action: (e: React.MouseEvent) => handleCopyMarkdown(e, scan.id, domain) },
-                      ].map((btn, i) => (
-                        <button
-                          key={btn.label}
-                          onClick={btn.action}
-                          className="flex-1 font-system transition-colors hover:bg-white/5 active:bg-white/10"
-                          style={{
-                            padding: '10px 0',
-                            fontSize: 12,
-                            fontWeight: 600,
-                            color: 'oklch(0.60 0.04 340)',
-                            background: 'transparent',
-                            border: 'none',
-                            borderRight: i < 3 ? '1px solid oklch(0.18 0.02 340)' : 'none',
-                            cursor: 'pointer',
-                          }}
-                        >
-                          {btn.label}
-                        </button>
-                      ))}
+                      <button
+                        onClick={(e) => { e.stopPropagation(); window.open(`/report/${scan.id}/slides?download=1`, '_blank'); }}
+                        className="flex-1 font-system flex items-center justify-center transition-colors hover:bg-white/5 active:bg-white/10"
+                        style={{ gap: 4, padding: '10px 0', fontSize: 12, fontWeight: 600, color: 'oklch(0.60 0.04 340)', background: 'transparent', border: 'none', borderRight: '1px solid oklch(0.18 0.02 340)', cursor: 'pointer' }}
+                      >
+                        Audit Deck
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M19 12l-7 7-7-7" /></svg>
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); window.open(`/api/reports/${scan.id}/prd`, '_blank'); }}
+                        className="flex-1 font-system flex items-center justify-center transition-colors hover:bg-white/5 active:bg-white/10"
+                        style={{ gap: 4, padding: '10px 0', fontSize: 12, fontWeight: 600, color: 'oklch(0.60 0.04 340)', background: 'transparent', border: 'none', borderRight: '1px solid oklch(0.18 0.02 340)', cursor: 'pointer' }}
+                      >
+                        PRD
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M19 12l-7 7-7-7" /></svg>
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); window.open(`/report/${scan.id}/boss-deck?download=1`, '_blank'); }}
+                        className="flex-1 font-system flex items-center justify-center transition-colors hover:bg-white/5 active:bg-white/10"
+                        style={{ gap: 4, padding: '10px 0', fontSize: 12, fontWeight: 600, color: 'oklch(0.60 0.04 340)', background: 'transparent', border: 'none', borderRight: '1px solid oklch(0.18 0.02 340)', cursor: 'pointer' }}
+                      >
+                        Boss Deck
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M19 12l-7 7-7-7" /></svg>
+                      </button>
+                      <button
+                        onClick={(e) => handleCopyMarkdown(e, scan.id, domain)}
+                        className="flex-1 font-system flex items-center justify-center transition-colors hover:bg-white/5 active:bg-white/10"
+                        title="Copy audit as Markdown for NotebookLM"
+                        style={{ gap: 4, padding: '10px 0', fontSize: 12, fontWeight: 600, color: 'oklch(0.60 0.04 340)', background: 'transparent', border: 'none', cursor: 'pointer' }}
+                      >
+                        {mdCopiedId === scan.id ? '\u2713' : '.MD'}
+                        {mdCopiedId !== scan.id && (
+                          <img src="/logos/notebooklm.svg" alt="NotebookLM" style={{ height: 10, opacity: 0.7 }} />
+                        )}
+                      </button>
                     </div>
                   </>
                 )}
