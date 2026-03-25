@@ -372,7 +372,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                       </button>
                       <button
                         onClick={() => handleCopyMarkdown(scan.id, domain)}
-                        className={`flex-1 font-system flex items-center justify-center transition-colors duration-100 bg-transparent hover:bg-white/10 hover:text-gs-base active:bg-white/15 ${mdCopiedId === scan.id ? '!text-gs-terminal' : mdCopyingId === scan.id ? '!text-gs-warning' : 'text-[oklch(0.60_0.04_340)]'}`}
+                        className={`flex-1 font-system flex items-center justify-center transition-colors duration-100 bg-transparent ${mdCopiedId === scan.id || mdCopyingId === scan.id ? '' : 'hover:bg-white/10 hover:text-gs-base active:bg-white/15'} ${mdCopiedId === scan.id ? '!text-gs-terminal' : mdCopyingId === scan.id ? '!text-gs-warning' : 'text-[oklch(0.60_0.04_340)]'}`}
                         title="Copy audit as Markdown for NotebookLM"
                         style={{
                           gap: 4,
@@ -381,7 +381,6 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                           fontWeight: 600,
                           border: 'none',
                           cursor: mdCopyingId === scan.id ? 'wait' : 'pointer',
-                          transform: mdCopiedId === scan.id ? 'scale(1.15)' : 'scale(1)',
                         }}
                       >
                         {mdCopiedId === scan.id ? (
