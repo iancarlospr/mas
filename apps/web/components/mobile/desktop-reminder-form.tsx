@@ -92,8 +92,9 @@ export function DesktopReminderForm() {
     );
   }
 
+  /* Turnstile normal widget = 300px wide. Lock the entire block to that width. */
   return (
-    <div>
+    <div style={{ width: 300, maxWidth: '100%' }}>
       <form onSubmit={handleSubmit} className="flex flex-col">
         {/* Input — top, rounded top corners only */}
         <input
@@ -103,7 +104,7 @@ export function DesktopReminderForm() {
           onChange={(e) => setEmail(e.target.value)}
           required
           disabled={status === 'sending'}
-          className="w-full h-[42px] px-gs-3 font-data text-[13px]
+          className="w-full h-[38px] px-gs-3 font-data text-[13px]
                      border border-gs-mid/30 bg-gs-light/10 text-gs-light
                      placeholder:text-gs-mid/50 focus:border-gs-base/60
                      focus:outline-none transition-colors select-text"
@@ -117,7 +118,7 @@ export function DesktopReminderForm() {
         <button
           type="submit"
           disabled={status === 'sending'}
-          className="w-full h-[42px] font-data text-[13px] font-bold transition-colors
+          className="w-full h-[38px] font-data text-[13px] font-bold transition-colors
                      border border-transparent"
           style={{
             background: 'var(--gs-base)',
