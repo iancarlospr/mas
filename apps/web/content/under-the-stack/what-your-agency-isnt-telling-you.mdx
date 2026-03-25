@@ -12,7 +12,7 @@ Let's get something out of the way: this isn't a hit piece on agencies. Your SEO
 
 The problem isn't talent. The problem is **visibility**.
 
-Every specialist you hire sees their lane — and only their lane. Nobody is looking at the full picture. Not because they're lazy or dishonest, but because the full picture doesn't fit inside any single retainer. And that gap between what each specialist sees and what's actually happening across your entire marketing stack? That's where money goes to die.
+Every specialist you hire sees their lane, and only their lane. Nobody is looking at the full picture. Not because they're lazy or dishonest, but because the full picture doesn't fit inside any single retainer. The gap between what each specialist sees and what's actually happening across your entire marketing stack? That's where money goes to die.
 
 We call it the **visibility gap**, and almost every business we've scanned has one.
 
@@ -24,7 +24,7 @@ Your SEO agency reports that organic rankings improved 15% this quarter. Great n
 
 **Both teams are telling the truth. Neither sees the other.**
 
-This isn't a failure of competence. It's a structural problem. Agencies specialize. That's literally their value proposition — deep expertise in one domain. But modern marketing stacks aren't one domain. They're 15-40 interconnected tools that need to work together, and the seams between them are where the most expensive problems hide.
+This isn't a failure of competence. It's a structural problem. Agencies specialize. That's literally their value proposition: deep expertise in one domain. But modern marketing stacks aren't one domain. They're 15-40 interconnected tools that need to work together, and the seams between them are where the most expensive problems hide.
 
 Your paid media agency doesn't audit your tag manager. Your web developer doesn't check your email authentication records. Your content team doesn't verify that conversion pixels actually fire on the pages that matter. Everyone assumes someone else is handling it.
 
@@ -38,7 +38,7 @@ These aren't edge cases. These are the five most common blindspots we find on re
 
 Google's Consent Mode v2 became mandatory for EU-targeted advertising in March 2024. If you're running Google Ads or GA4 and serving any European traffic, this matters.
 
-Here's what we see constantly: the consent banner is installed and looks fine on the surface. But the actual consent signals being sent to Google are wrong — either granting consent by default (a GDPR violation), or blocking all tracking regardless of user choice (so you're flying blind on a continent).
+Here's what we see constantly: the consent banner is installed and looks fine on the surface. But the actual consent signals being sent to Google are wrong, either granting consent by default (a GDPR violation), or blocking all tracking regardless of user choice (so you're flying blind on a continent).
 
 The result? Your analytics dashboard shows EU traffic numbers that are either inflated (counting users who didn't consent) or artificially low (blocking users who did consent). Either way, you're making decisions based on data that doesn't reflect reality.
 
@@ -46,7 +46,7 @@ The result? Your analytics dashboard shows EU traffic numbers that are either in
 
 ### 2. Your Tracking Pixels Fire on the Wrong Pages
 
-This one hurts because it's so simple. Your Meta pixel, your Google Ads tag, your TikTok pixel — they're installed. They fire on your homepage. Your agency verified it. Job done.
+This one hurts because it's so simple. Your Meta pixel, your Google Ads tag, your TikTok pixel, they're installed. They fire on your homepage. Your agency verified it. Job done.
 
 Except nobody checked whether they fire on your checkout confirmation page. Or your lead form thank-you page. Or your pricing page. The pixel loads on pages where people browse, but not on pages where people convert.
 
@@ -56,11 +56,11 @@ So your retargeting audiences are huge (everyone who visited your site) but your
 
 ### 3. Tag Manager Sprawl (3 Tracking Systems Doing the Same Job)
 
-Here's a fun one. You hired Agency A in 2022 and they set up Google Tag Manager with their tracking configuration. In 2023, you switched to Agency B, who added their own GTM container — or worse, added a Segment or Tealium layer on top without removing the old setup. Now in 2026, Agency C is running your paid media and they've added hardcoded scripts directly into your site header because "GTM was causing latency."
+Here's a fun one. You hired Agency A in 2022 and they set up Google Tag Manager with their tracking configuration. In 2023, you switched to Agency B, who added their own GTM container, or worse, added a Segment or Tealium layer on top without removing the old setup. Now in 2026, Agency C is running your paid media and they've added hardcoded scripts directly into your site header because "GTM was causing latency."
 
 You now have **two or three tracking systems firing simultaneously**, some of them counting the same events, some of them conflicting, and all of them adding page load time. Your analytics show inflated numbers because events are being double-counted. Your site is slower because it's loading 300KB of redundant JavaScript on every page.
 
-Nobody cleans this up because nobody wants to touch what the previous agency built. It's the marketing tech equivalent of that junk drawer in your kitchen — everyone just keeps adding to it.
+Nobody cleans this up because nobody wants to touch what the previous agency built. It's the marketing tech equivalent of that junk drawer in your kitchen. Everyone just keeps adding to it.
 
 ### 4. Abandoned Tools Still Running in Production
 
@@ -70,9 +70,9 @@ There's a decent chance you'll see requests going out to Hotjar (that free trial
 
 These aren't just wasting bandwidth. They're:
 
-- **Slowing your site down** — every abandoned script adds latency
-- **Creating privacy liability** — those tools are still collecting user data, possibly without proper consent disclosure
-- **Muddying your analytics** — some of them inject their own tracking that conflicts with your primary setup
+- **Slowing your site down:** every abandoned script adds latency
+- **Creating privacy liability:** those tools are still collecting user data, possibly without proper consent disclosure
+- **Muddying your analytics:** some of them inject their own tracking that conflicts with your primary setup
 
 The average marketing site we scan has **2-4 tools that are installed but no longer actively used**. They're just... there. Quietly collecting data, quietly slowing things down, quietly creating compliance exposure that nobody knows about.
 
@@ -80,7 +80,7 @@ The average marketing site we scan has **2-4 tools that are installed but no lon
 
 This one sounds technical, but the consequences are very practical.
 
-**DMARC** is an email authentication protocol. If your DMARC policy is set to `none` (or doesn't exist), anyone can send emails that look like they come from your domain. That's not a hypothetical — it's how phishing attacks work. Your customers could receive scam emails from "you" and you'd never know. Beyond security, major email providers like Google and Yahoo now require proper DMARC for bulk senders. Without it, your legitimate marketing emails are more likely to land in spam.
+**DMARC** is an email authentication protocol. If your DMARC policy is set to `none` (or doesn't exist), anyone can send emails that look like they come from your domain. That's not a hypothetical. It's how phishing attacks work. Your customers could receive scam emails from "you" and you'd never know. Beyond security, major email providers like Google and Yahoo now require proper DMARC for bulk senders. Without it, your legitimate marketing emails are more likely to land in spam.
 
 **HSTS** tells browsers to always use HTTPS. Without it, there's a window where someone on public WiFi could intercept traffic to your site. More practically, search engines slightly favor sites with proper HSTS configuration.
 
@@ -100,11 +100,11 @@ The gap exists because **nobody's job description covers the seams between every
 
 ## The $5K Problem
 
-So who does cover the seams? Traditionally, the answer is a full-stack marketing technology audit — the kind run by large consultancies or specialized martech firms.
+So who does cover the seams? Traditionally, the answer is a full-stack marketing technology audit, the kind run by large consultancies or specialized martech firms.
 
 These audits are thorough. They're also **$5,000 to $15,000** for a mid-size business, and can run **$50,000 to $150,000+** for enterprise. They take weeks. They produce a 60-page PDF that sits in someone's inbox. And by the time the recommendations are implemented (if they ever are), half the findings are outdated because someone changed the tag manager configuration.
 
-For businesses spending $50K+ per month on marketing, that investment makes sense. For the freelancer running a Shopify store, the startup with a $3K/month ad budget, the marketing manager at a 20-person company — it's not realistic. You know the seams exist. You can feel that something isn't right. But you can't justify five figures to find out what.
+For businesses spending $50K+ per month on marketing, that investment makes sense. For the freelancer running a Shopify store, the startup with a $3K/month ad budget, the marketing manager at a 20-person company, it's not realistic. You know the seams exist. You can feel that something isn't right. But you can't justify five figures to find out what.
 
 So you don't. And the blindspots stay blind.
 
@@ -112,12 +112,12 @@ So you don't. And the blindspots stay blind.
 
 This is exactly why we built AlphaScan.
 
-A free preview shows you what Chloé can see in seconds. Upgrade to Alpha Brief and the full 45-module forensic scan checks all five of the blindspots above — plus about 40 other modules covering analytics integrity, paid media attribution, performance, compliance, SEO, and your broader martech stack.
+A free preview shows you what Chloé can see in seconds. Upgrade to Alpha Brief and the full 45-module forensic scan checks all five of the blindspots above, plus about 40 other modules covering analytics integrity, paid media attribution, performance, compliance, SEO, and your broader martech stack.
 
 But here's the part that matters: **it's not a replacement for your agency. It's a shared visibility tool.**
 
-Run a scan. See what's actually happening across your full stack. Then share the results with your agency — not as a "gotcha," but as a starting point for a conversation neither of you could have had before. "Hey, it looks like our consent mode might be misconfigured — can you take a look?" is a very different conversation than "I feel like something might be off but I don't know what."
+Run a scan. See what's actually happening across your full stack. Then share the results with your agency, not as a "gotcha," but as a starting point for a conversation neither of you could have had before. "Hey, it looks like our consent mode might be misconfigured, can you take a look?" is a very different conversation than "I feel like something might be off but I don't know what."
 
 Your agency will probably thank you. They want to do good work. They just can't fix what they can't see.
 
-**[Try a free preview on the homepage](/)** — you might be surprised what's hiding in your stack.
+**[Try a free preview on the homepage](/):** you might be surprised what's hiding in your stack.
