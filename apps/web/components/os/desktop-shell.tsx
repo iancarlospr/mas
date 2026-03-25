@@ -10,6 +10,7 @@ import { ChloeScreenmate } from '@/components/chloe/chloe-screenmate';
 import { useWindowManager, type WindowConfig } from '@/lib/window-manager';
 import { useScanOrchestrator } from '@/lib/scan-orchestrator';
 import { BedroomIcon } from './bedroom-icons';
+import { analytics } from '@/lib/analytics';
 
 /* =================================================================
    Chloé's Bedroom OS — Desktop Shell
@@ -68,6 +69,18 @@ export function DesktopShell({ children }: { children: ReactNode }) {
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Track beta invite link click (once per session)
+  useEffect(() => {
+    const match = document.cookie.match(/(?:^|;\s*)__alphascan_invite=([^;]+)/);
+    if (match) {
+      const code = decodeURIComponent(match[1]!);
+      if (code && !sessionStorage.getItem('invite_tracked')) {
+        analytics.betaInviteClicked(code);
+        sessionStorage.setItem('invite_tracked', '1');
+      }
+    }
   }, []);
 
   // Open Scan.exe centered after registration

@@ -90,4 +90,8 @@ export const analytics = {
   chloeCalloutClicked(scanId: string, slideId: string, variant: 'margin-note' | 'cta') {
     posthog.capture('chloe_callout_clicked', { scan_id: scanId, slide_id: slideId, variant });
   },
+
+  betaInviteClicked(code: string) {
+    posthog.capture('beta_invite_clicked', { invite_code: code });
+  },
 };

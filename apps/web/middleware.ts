@@ -51,6 +51,9 @@ export async function middleware(request: NextRequest) {
     const accessParam = request.nextUrl.searchParams.get('access');
     if (accessParam === STAGING_SECRET) {
       const url = new URL(pathname, request.url);
+      // Strip access and invite params from redirect URL
+      url.searchParams.delete('access');
+      url.searchParams.delete('invite');
       const response = NextResponse.redirect(url);
       response.cookies.set(STAGING_COOKIE, 'granted', {
         httpOnly: true,
@@ -58,6 +61,16 @@ export async function middleware(request: NextRequest) {
         sameSite: 'lax',
         maxAge: 60 * 60 * 24 * 30, // 30 days
       });
+      // Capture beta invite code into client-readable cookie
+      const inviteParam = request.nextUrl.searchParams.get('invite');
+      if (inviteParam && /^[a-z0-9-]+$/.test(inviteParam)) {
+        response.cookies.set('__alphascan_invite', inviteParam, {
+          httpOnly: false, // client JS needs to read this for redemption
+          secure: true,
+          sameSite: 'lax',
+          maxAge: 60 * 60 * 24 * 30, // 30 days
+        });
+      }
       return response;
     }
 

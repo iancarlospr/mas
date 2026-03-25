@@ -44,6 +44,30 @@ function identifyUser(u: User) {
   });
 }
 
+/** Attempt to redeem a beta invite code stored in cookie */
+async function maybeRedeemBetaInvite() {
+  if (typeof window === 'undefined') return;
+
+  const match = document.cookie.match(/(?:^|;\s*)__alphascan_invite=([^;]+)/);
+  if (!match) return;
+
+  const code = decodeURIComponent(match[1]!);
+  if (!code) return;
+
+  try {
+    await fetch('/api/beta/redeem', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code }),
+    });
+  } catch {
+    // Silent failure — invite redemption is best-effort
+  } finally {
+    // Always clear the cookie regardless of outcome
+    document.cookie = '__alphascan_invite=; path=/; max-age=0; secure; samesite=lax';
+  }
+}
+
 /** Detect new account creation (created_at within last 60s) */
 function maybeTrackAccountCreation(u: User) {
   if (typeof window === 'undefined' || !posthog.__loaded) return;
@@ -82,6 +106,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (event === 'SIGNED_IN' && u) {
           identifyUser(u);
           maybeTrackAccountCreation(u);
+          maybeRedeemBetaInvite();
         } else if (event === 'TOKEN_REFRESHED' && u) {
           identifyUser(u);
         } else if (event === 'SIGNED_OUT') {
