@@ -163,18 +163,20 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
               tabIndex={0}
               onClick={() => handleScanClick(scan.id, domain, scan.status)}
               onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleScanClick(scan.id, domain, scan.status); } }}
-              className="px-gs-4 py-gs-3 hover:bg-gs-red/5 border-b border-gs-chrome-dark/20 cursor-pointer"
+              className="px-gs-4 py-gs-3 hover:bg-gs-red/5 border-b border-gs-chrome-dark/20 cursor-pointer transition-colors"
             >
               {/* Top row: domain + metadata */}
               <div className="flex items-center gap-gs-2">
-                <span className="font-system text-os-sm text-gs-muted" style={{ flexShrink: 0 }}>{'>'}</span>
-                <span className="min-w-0 font-data text-data-sm font-bold truncate" style={{ maxWidth: '55%' }}>
+                <span className="min-w-0 font-data font-bold truncate" style={{ maxWidth: '50%', fontSize: '14px', color: 'var(--gs-light)' }}>
                   {domain}
                 </span>
                 {scan.marketing_iq != null && (
-                  <span className="flex items-center gap-1 font-data text-data-sm" style={{ flexShrink: 0 }}>
-                    <span className={`w-2 h-2 rounded-full ${getScoreColor(scan.marketing_iq)}`} />
-                    <span>{scan.marketing_iq}</span>
+                  <span className="flex items-center gap-[5px] font-data" style={{ flexShrink: 0, fontSize: '13px' }}>
+                    <span
+                      className={`rounded-full ${getScoreColor(scan.marketing_iq)}`}
+                      style={{ width: 7, height: 7, boxShadow: scan.marketing_iq >= 70 ? '0 0 6px oklch(0.72 0.2 145 / 0.6)' : scan.marketing_iq >= 40 ? '0 0 6px oklch(0.72 0.15 85 / 0.5)' : '0 0 6px oklch(0.65 0.2 25 / 0.5)' }}
+                    />
+                    <span style={{ color: 'oklch(0.75 0.04 340)' }}>{scan.marketing_iq}</span>
                   </span>
                 )}
                 <span title={scan.status} style={{ flexShrink: 0 }}>
@@ -186,64 +188,88 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                     <svg className="w-3.5 h-3.5 inline-block text-gs-warning animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round"><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>
                   )}
                 </span>
-                <span
-                  className="font-system text-os-sm px-gs-1 bevel-raised"
-                  style={isPaid
-                    ? { background: 'var(--gs-base)', color: 'var(--gs-void)', fontWeight: 700, flexShrink: 0 }
-                    : { flexShrink: 0 }}
-                >
-                  {isPaid ? 'PRO' : 'FREE'}
-                </span>
+                {isPaid ? (
+                  <span
+                    className="font-system font-bold"
+                    style={{
+                      flexShrink: 0,
+                      fontSize: '10px',
+                      letterSpacing: '0.08em',
+                      padding: '2px 7px',
+                      borderRadius: '10px',
+                      background: 'var(--gs-base)',
+                      color: 'var(--gs-void)',
+                      boxShadow: '0 0 10px oklch(0.72 0.17 340 / 0.35)',
+                    }}
+                  >
+                    PRO
+                  </span>
+                ) : (
+                  <span
+                    className="font-system"
+                    style={{
+                      flexShrink: 0,
+                      fontSize: '10px',
+                      letterSpacing: '0.06em',
+                      padding: '2px 6px',
+                      borderRadius: '10px',
+                      border: '1px solid oklch(0.35 0.04 340)',
+                      color: 'oklch(0.55 0.04 340)',
+                    }}
+                  >
+                    FREE
+                  </span>
+                )}
                 <span className="flex-1" />
-                <span className="font-data text-data-sm text-gs-muted" style={{ flexShrink: 0 }}>
+                <span className="font-data text-data-sm" style={{ flexShrink: 0, color: 'oklch(0.45 0.03 340)' }}>
                   {new Date(scan.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                 </span>
                 <button
                   onClick={(e) => handleDelete(e, scan.id)}
                   disabled={deletingId === scan.id}
-                  className="text-gs-muted hover:text-gs-critical transition-colors font-data text-data-sm"
+                  className="hover:text-gs-critical transition-colors font-data text-data-sm"
                   title="Delete scan"
-                  style={{ flexShrink: 0 }}
+                  style={{ flexShrink: 0, color: 'oklch(0.40 0.02 340)' }}
                 >
                   {deletingId === scan.id ? '...' : 'x'}
                 </button>
               </div>
 
-              {/* Bottom row: action buttons */}
+              {/* Bottom row: action buttons as pills */}
               {isPaid && isComplete && (
-                <div className="flex items-center gap-gs-2 mt-gs-1" style={{ paddingLeft: 'calc(12px + var(--gs-2))' }}>
+                <div className="flex items-center gap-gs-2 mt-gs-2" style={{ paddingLeft: 0 }}>
                   <button
                     onClick={(e) => { e.stopPropagation(); window.open(`/report/${scan.id}/slides?download=1`, '_blank'); }}
-                    className="text-gs-base hover:text-gs-bright transition-colors font-system text-os-sm"
+                    className="bevel-button"
                     title="Download Audit Deck"
+                    style={{ padding: '3px 10px', fontSize: '12px', minHeight: 0 }}
                   >
                     Audit&nbsp;&darr;
                   </button>
-                  <span className="text-gs-mid font-data text-data-sm">&middot;</span>
                   <button
                     onClick={(e) => { e.stopPropagation(); window.open(`/api/reports/${scan.id}/prd`, '_blank'); }}
-                    className="text-gs-base hover:text-gs-bright transition-colors font-system text-os-sm"
+                    className="bevel-button"
                     title="Download PRD"
+                    style={{ padding: '3px 10px', fontSize: '12px', minHeight: 0 }}
                   >
                     PRD&nbsp;&darr;
                   </button>
-                  <span className="text-gs-mid font-data text-data-sm">&middot;</span>
                   <button
                     onClick={(e) => { e.stopPropagation(); window.open(`/report/${scan.id}/boss-deck?download=1`, '_blank'); }}
-                    className="text-gs-base hover:text-gs-bright transition-colors font-system text-os-sm"
+                    className="bevel-button"
                     title="Download Boss Deck"
+                    style={{ padding: '3px 10px', fontSize: '12px', minHeight: 0 }}
                   >
                     Boss&nbsp;&darr;
                   </button>
-                  <span className="text-gs-mid font-data text-data-sm">&middot;</span>
                   <button
                     onClick={(e) => handleCopyMarkdown(e, scan.id, domain)}
-                    className="text-gs-base hover:text-gs-bright transition-colors font-system text-os-sm"
+                    className="bevel-button"
                     title="Copy audit as Markdown"
+                    style={{ padding: '3px 10px', fontSize: '12px', minHeight: 0 }}
                   >
                     {mdCopiedId === scan.id ? '\u2713' : '.MD\u00a0\u2193'}
                   </button>
-                  <span className="text-gs-mid font-data text-data-sm">&middot;</span>
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -265,10 +291,21 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                         wm.openWindow(chatId, { scanId: scan.id, domain });
                       }
                     }}
-                    className="text-gs-base hover:text-gs-bright transition-colors flex items-center gap-[3px] font-system text-os-sm"
+                    className="neon-outline-btn flex items-center gap-[4px]"
                     title="Ask Chloe"
+                    style={{
+                      padding: '3px 10px',
+                      fontSize: '12px',
+                      minHeight: 0,
+                      borderRadius: '8px',
+                      border: '1.5px solid var(--gs-base)',
+                      background: 'oklch(0.12 0.03 340)',
+                      color: 'var(--gs-base)',
+                      fontFamily: 'var(--font-system)',
+                      cursor: 'pointer',
+                    }}
                   >
-                    <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" style={{ flexShrink: 0 }}>
+                    <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor" style={{ flexShrink: 0 }}>
                       <path d="M8 1C5.2 1 3 3.2 3 6v6l1-1.5 1 1.5 1-1.5 1 1.5 1-1.5 1 1.5 1-1.5 1 1.5V6c0-2.8-2.2-5-5-5z"/>
                       <circle cx="6" cy="5.5" r="1" fill="var(--gs-void)"/>
                       <circle cx="10" cy="5.5" r="1" fill="var(--gs-void)"/>
@@ -278,7 +315,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                 </div>
               )}
               {!isPaid && isComplete && (
-                <div className="flex items-center gap-gs-2 mt-gs-1" style={{ paddingLeft: 'calc(12px + var(--gs-2))' }}>
+                <div className="flex items-center gap-gs-2 mt-gs-2">
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -286,10 +323,21 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                       wm.registerWindow(paymentId, { title: 'Checkout', width: 420, height: 300, variant: 'dialog', componentType: 'payment' });
                       wm.openWindow(paymentId, { scanId: scan.id, domain, product: 'alpha_brief' });
                     }}
-                    className="text-gs-base hover:text-gs-bright transition-colors flex items-center gap-1 font-system text-os-sm"
+                    className="neon-outline-btn flex items-center gap-[4px]"
                     title="Unlock full report"
+                    style={{
+                      padding: '3px 10px',
+                      fontSize: '12px',
+                      minHeight: 0,
+                      borderRadius: '8px',
+                      border: '1.5px solid var(--gs-base)',
+                      background: 'oklch(0.12 0.03 340)',
+                      color: 'var(--gs-base)',
+                      fontFamily: 'var(--font-system)',
+                      cursor: 'pointer',
+                    }}
                   >
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                     Unlock
                   </button>
                 </div>
