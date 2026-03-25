@@ -112,11 +112,10 @@ function CategorySection({ category }: { category: ModuleCategory }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="bevel-sunken overflow-hidden">
+    <div className="bevel-sunken overflow-hidden" style={{ backgroundColor: 'var(--gs-deep)' }}>
       <button
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between px-gs-3 py-gs-2 cursor-pointer hover:bg-gs-red/5 transition-colors"
-        style={{ backgroundColor: 'var(--gs-deep)' }}
       >
         <div className="flex items-center gap-gs-2">
           <span className="font-system text-os-xs font-bold text-gs-light">
