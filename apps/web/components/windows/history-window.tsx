@@ -173,19 +173,20 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                 }}
               >
                 {/* Top-centered inward notch badge (iPhone-style, hangs into card) */}
-                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: -8 }}>
                   <span
                     className="font-system font-bold"
                     style={{
-                      fontSize: 12,
-                      letterSpacing: '0.08em',
-                      padding: '3px 16px 5px',
-                      borderRadius: '0 0 10px 10px',
+                      fontSize: 10,
+                      lineHeight: 1,
+                      letterSpacing: '0.1em',
+                      padding: '2px 18px 3px',
+                      borderRadius: '0 0 7px 7px',
                       ...(isPaid
                         ? {
                             background: 'var(--gs-base)',
                             color: 'var(--gs-void)',
-                            boxShadow: '0 2px 10px oklch(0.72 0.17 340 / 0.35)',
+                            boxShadow: '0 2px 8px oklch(0.72 0.17 340 / 0.3)',
                           }
                         : {
                             background: 'oklch(0.22 0.03 340)',
@@ -200,7 +201,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                   </span>
                 </div>
                 {/* Header: domain · dot · score · status · date ··· delete — one line */}
-                <div className="flex items-center" style={{ padding: '14px 10px 12px 16px', gap: 8 }}>
+                <div className="flex items-center" style={{ padding: '10px 10px 12px 16px', gap: 8 }}>
                   <span
                     className="min-w-0 font-data font-bold truncate"
                     style={{ fontSize: 15, color: 'var(--gs-light)', flex: '0 1 auto', maxWidth: '40%' }}
