@@ -344,7 +344,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                         style={{ gap: 4, padding: '10px 0', fontSize: 12, fontWeight: 600, color: 'var(--gs-light)', background: 'transparent', border: 'none', borderRight: '1px solid oklch(0.18 0.02 340)', cursor: 'pointer' }}
                       >
                         Report
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
                       </button>
                       <button
                         onClick={(e) => { e.stopPropagation(); window.open(`/report/${scan.id}/slides?download=1`, '_blank'); }}
@@ -353,7 +353,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                         style={{ gap: 4, padding: '10px 0', fontSize: 12, fontWeight: 600, color: 'oklch(0.60 0.04 340)', background: 'transparent', border: 'none', borderRight: '1px solid oklch(0.18 0.02 340)', cursor: 'pointer' }}
                       >
                         Alpha Brief
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M19 12l-7 7-7-7" /></svg>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M19 12l-7 7-7-7" /></svg>
                       </button>
                       <button
                         onClick={(e) => { e.stopPropagation(); window.open(`/api/reports/${scan.id}/prd`, '_blank'); }}
@@ -362,7 +362,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                         style={{ gap: 4, padding: '10px 0', fontSize: 12, fontWeight: 600, color: 'oklch(0.60 0.04 340)', background: 'transparent', border: 'none', borderRight: '1px solid oklch(0.18 0.02 340)', cursor: 'pointer' }}
                       >
                         PRD
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M19 12l-7 7-7-7" /></svg>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M19 12l-7 7-7-7" /></svg>
                       </button>
                       <button
                         onClick={(e) => { e.stopPropagation(); window.open(`/report/${scan.id}/boss-deck?download=1`, '_blank'); }}
@@ -371,7 +371,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                         style={{ gap: 4, padding: '10px 0', fontSize: 12, fontWeight: 600, color: 'oklch(0.60 0.04 340)', background: 'transparent', border: 'none', borderRight: '1px solid oklch(0.18 0.02 340)', cursor: 'pointer' }}
                       >
                         Boss Deck
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M19 12l-7 7-7-7" /></svg>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M19 12l-7 7-7-7" /></svg>
                       </button>
                       <button
                         onClick={(e) => handleCopyMarkdown(e, scan.id, domain)}
@@ -398,6 +398,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                             <svg width="12" height="12" viewBox="0 0 175 132" fill="currentColor" style={{ flexShrink: 0, opacity: 0.7 }}>
                               <path d="M87.27,1.14C39.07,1.14,0,39.88,0,87.69v41.44h16.09v-4.13c0-19.39,15.84-35.11,35.39-35.11s35.39,15.72,35.39,35.11v4.13h16.09v-4.13c0-28.2-23.05-51.05-51.48-51.05-11.07,0-21.32,3.46-29.72,9.37,8.79-17.32,26.88-29.21,47.77-29.21,29.51,0,53.44,23.74,53.44,53v22.02h16.09v-22.02c0-38.08-31.13-68.96-69.53-68.96-17.27,0-33.06,6.24-45.22,16.58,11.94-22.39,35.65-37.64,62.97-37.64,39.32,0,71.19,31.61,71.19,70.6v41.44h16.09v-41.44C174.55,39.88,135.48,1.14,87.27,1.14Z"/>
                             </svg>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M19 12l-7 7-7-7" /></svg>
                           </>
                         )}
                       </button>
