@@ -168,7 +168,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
               {/* Top row: domain + metadata */}
               <div className="flex items-center gap-gs-2">
                 <span className="font-system text-os-sm text-gs-muted" style={{ flexShrink: 0 }}>{'>'}</span>
-                <span className="flex-1 min-w-0 font-data text-data-sm font-bold truncate">
+                <span className="min-w-0 font-data text-data-sm font-bold truncate" style={{ maxWidth: '55%' }}>
                   {domain}
                 </span>
                 {scan.marketing_iq != null && (
@@ -194,6 +194,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                 >
                   {isPaid ? 'PRO' : 'FREE'}
                 </span>
+                <span className="flex-1" />
                 <span className="font-data text-data-sm text-gs-muted" style={{ flexShrink: 0 }}>
                   {new Date(scan.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                 </span>
