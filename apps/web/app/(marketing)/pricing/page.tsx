@@ -23,11 +23,11 @@ export const metadata: Metadata = {
 const faqs = [
   {
     q: 'What does the free preview include?',
-    a: 'An instant GhostScan™ preview that shows you what our engine can see. To run a full forensic scan, upgrade to Alpha Brief — no subscription required.',
+    a: 'An instant GhostScan™ preview that shows you what our engine can see. To run a full forensic scan, upgrade to Alpha Brief. No subscription required.',
   },
   {
     q: 'What does the Alpha Brief unlock?',
-    a: 'The full 45-module forensic scan, Executive Brief, PRD, Boss Deck, stack analyzer, PDF export, .MD for NotebookLM, and 25 GhostChat™ credits. One-time $24.99 — no subscription.',
+    a: 'The full 45-module forensic scan, Executive Brief, PRD, Boss Deck, stack analyzer, PDF export, .MD for NotebookLM, and 25 GhostChat™ credits. One-time $24.99. No subscription.',
   },
   {
     q: 'Do credits expire?',

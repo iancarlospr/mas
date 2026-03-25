@@ -50,16 +50,16 @@ export default function TermsPage() {
             The following paid products are available:
           </p>
           <ul className="mt-2 list-disc pl-6 space-y-1">
-            <li><strong>Alpha Brief</strong> — $24.99 one-time. Includes 1 full
+            <li><strong>Alpha Brief</strong> · $24.99 one-time. Includes 1 full
               45-module forensic scan, executive brief, PRD, PDF export, and 25 chat credits.</li>
-            <li><strong>Alpha Brief Plus</strong> — $34.95 one-time. Includes
+            <li><strong>Alpha Brief Plus</strong> · $34.95 one-time. Includes
               3 full forensic scans, everything in Alpha Brief, 200 chat credits, and AI agent access.</li>
-            <li><strong>Chat Credits</strong> — $1.00 for 15 credits or $4.99 for 100 additional
+            <li><strong>Chat Credits</strong> · $1.00 for 15 credits or $4.99 for 100 additional
               chat credits.</li>
           </ul>
           <p className="mt-2">
             All payments are processed securely via Stripe. Prices are in USD.
-            All sales are final — no refunds are offered due to the automated nature
+            All sales are final. No refunds are offered due to the automated nature
             of the service.
           </p>
         </section>

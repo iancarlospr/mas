@@ -145,27 +145,27 @@ export default function AboutPage() {
                 {
                   phase: 'Phase 1',
                   title: 'Passive Reconnaissance',
-                  desc: 'HTTP-only analysis — DNS records, security headers, meta tags, structured data. No browser needed.',
+                  desc: 'HTTP-only analysis: DNS records, security headers, meta tags, structured data. No browser needed.',
                 },
                 {
                   phase: 'Phase 2',
                   title: 'Browser Forensics',
-                  desc: 'Stealth Chromium probing — JavaScript execution, cookie analysis, storage forensics, network capture.',
+                  desc: 'Stealth Chromium probing: JavaScript execution, cookie analysis, storage forensics, network capture.',
                 },
                 {
                   phase: 'Phase 3',
                   title: 'GhostScan Detection',
-                  desc: 'Deep interaction scanning — A/B test detection, session recording discovery, behavioral trigger mapping.',
+                  desc: 'Deep interaction scanning: A/B test detection, session recording discovery, behavioral trigger mapping.',
                 },
                 {
                   phase: 'Phase 4',
                   title: 'Market Intelligence',
-                  desc: 'External data enrichment — competitor analysis, keyword rankings, backlink profiles, ad spend estimation.',
+                  desc: 'External data enrichment: competitor analysis, keyword rankings, backlink profiles, ad spend estimation.',
                 },
                 {
                   phase: 'Phase 5',
                   title: 'AI Synthesis',
-                  desc: 'AI-powered analysis — editorial insights, remediation roadmaps, ROI modeling, executive briefs.',
+                  desc: 'AI-powered analysis: editorial insights, remediation roadmaps, ROI modeling, executive briefs.',
                 },
               ].map((phase) => (
                 <div key={phase.phase} className="flex gap-gs-4">

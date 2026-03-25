@@ -136,7 +136,7 @@ function CategorySection({ category }: { category: ModuleCategory }) {
         <div className="border-t border-gs-mid/15 px-gs-3 py-gs-2 space-y-[6px]">
           {category.modules.map((mod) => (
             <div key={mod.id} className="flex items-baseline gap-gs-2">
-              <span className="text-gs-red text-[8px] flex-shrink-0">—</span>
+              <span className="text-gs-red text-[8px] flex-shrink-0">·</span>
               <span className="font-data text-data-xs text-gs-light/80">
                 {mod.name}
               </span>
@@ -173,11 +173,11 @@ export default function AboutWindow() {
         </h2>
         <div className="space-y-[4px]">
           {[
-            { phase: '01', name: 'Passive', desc: 'HTTP-only recon — headers, DNS, metadata' },
+            { phase: '01', name: 'Passive', desc: 'HTTP-only recon: headers, DNS, metadata' },
             { phase: '02', name: 'Browser', desc: 'Stealth Chromium render + data layer capture' },
-            { phase: '03', name: 'GhostScan\u2122', desc: 'Deep interaction — forms, modals, shadow DOM' },
-            { phase: '04', name: 'External', desc: '3rd-party APIs — SEO, traffic, competitors' },
-            { phase: '05', name: 'Synthesis', desc: 'AI analysis — brief, PRD, Boss Deck, stack analysis, .MD export' },
+            { phase: '03', name: 'GhostScan\u2122', desc: 'Deep interaction: forms, modals, shadow DOM' },
+            { phase: '04', name: 'External', desc: '3rd-party APIs: SEO, traffic, competitors' },
+            { phase: '05', name: 'Synthesis', desc: 'AI analysis: brief, PRD, Boss Deck, stack analysis, .MD export' },
           ].map((p) => (
             <div key={p.phase} className="flex items-baseline gap-gs-2">
               <span className="font-data text-[10px] text-gs-red font-bold w-[18px] flex-shrink-0">
@@ -185,7 +185,7 @@ export default function AboutWindow() {
               </span>
               <span className="font-data text-data-xs">
                 <span className="font-bold text-gs-light/90">{p.name}</span>
-                <span className="text-gs-muted"> — {p.desc}</span>
+                <span className="text-gs-muted"> · {p.desc}</span>
               </span>
             </div>
           ))}

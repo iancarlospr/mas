@@ -21,7 +21,7 @@ const PRODUCTS: Product[] = [
     name: 'The Alpha Brief',
     tagline: 'Agencies charge $3k+ for this and take weeks. You get it in minutes.',
     bullets: [
-      'Your entire digital presence scored across 45 dimensions — every signal, every gap, every opportunity mapped and downloadable as a PDF.',
+      'Your entire digital presence scored across 45 dimensions. Every signal, every gap, every opportunity mapped and downloadable as a PDF.',
       'A prioritized action plan ranked by speed-to-impact. The kind of insight retainers bill quarterly for.',
     ],
   },
@@ -29,7 +29,7 @@ const PRODUCTS: Product[] = [
     name: 'The PRD',
     tagline: 'The technical blueprint your dev team actually needs.',
     bullets: [
-      'A structured breakdown of every fix from the audit — prioritized, scoped, and ready to hand off to your developers or freelancers.',
+      'A structured breakdown of every fix from the audit, prioritized, scoped, and ready to hand off to your developers or freelancers.',
       'Each action is specific and self-contained. No interpretation needed, just implementation.',
     ],
   },
@@ -38,14 +38,14 @@ const PRODUCTS: Product[] = [
     tagline: 'Walk into that meeting and own the room.',
     bullets: [
       'Seven beautifully designed slides that translate your audit into wins, issues, and a roadmap your boss will love you for presenting.',
-      'Dollar impact, team owners, projected improvements — all wrapped in a PDF that looks like a $20k agency deliverable.',
+      'Dollar impact, team owners, projected improvements. All wrapped in a PDF that looks like a $20k agency deliverable.',
     ],
   },
   {
     name: 'GhostChat™',
     tagline: 'This AI absorbed your entire audit. Use that.',
     bullets: [
-      'Every module, every data point, every finding — Chloé holds it all. Ask anything about your URL and sound like the most prepared person in any meeting.',
+      'Every module, every data point, every finding. Chloé holds it all. Ask anything about your URL and sound like the most prepared person in any meeting.',
       <>The amount of data in here would break any document. That&apos;s why it&apos;s a conversation. And she <span className="text-shimmer">never ghosts you</span>.</>,
     ],
   },
@@ -54,7 +54,7 @@ const PRODUCTS: Product[] = [
     tagline: 'One click. Google turns your audit into a podcast.',
     bullets: [
       'Copy your full audit as structured markdown, paste it into Google NotebookLM, and get an AI-generated audio briefing you can listen to on the go.',
-      'Every module, every score, every recommendation — formatted for Google\'s AI to narrate. Brief your whole team without a single slide.',
+      'Every module, every score, every recommendation, formatted for Google\'s AI to narrate. Brief your whole team without a single slide.',
     ],
   },
 ];
@@ -113,7 +113,7 @@ export default function ProductsWindow() {
           <div className="bevel-sunken p-gs-4 space-y-gs-3">
             {product.bullets.map((bullet, j) => (
               <div key={j} className="flex gap-gs-2">
-                <span className="text-gs-red font-data text-data-sm flex-shrink-0">—</span>
+                <span className="text-gs-red font-data text-data-sm flex-shrink-0">·</span>
                 <p className="font-data text-data-sm text-gs-light/85 leading-relaxed">
                   {bullet}
                 </p>

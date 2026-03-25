@@ -83,19 +83,19 @@ export const TIERS: Tier[] = [
 export const FAQ = [
   {
     q: 'What do I get with the free preview?',
-    a: 'A quick GhostScan™ preview that shows you what our engine can see. To run a full 45-module forensic scan, you\'ll need to upgrade — that\'s where the real insights live.',
+    a: 'A quick GhostScan™ preview that shows you what our engine can see. To run a full 45-module forensic scan, you\'ll need to upgrade. That\'s where the real insights live.',
   },
   {
     q: 'What happens when I upgrade?',
-    a: 'We run the full 45-module forensic scan across all 5 phases — passive, browser, GhostScan, external intelligence, and AI synthesis. You get the Executive Brief, PRD, Boss Deck, .MD for NotebookLM, and GhostChat™ access. Takes about 7–10 minutes — we go deep.',
+    a: 'We run the full 45-module forensic scan across all 5 phases: passive, browser, GhostScan, external intelligence, and AI synthesis. You get the Executive Brief, PRD, Boss Deck, .MD for NotebookLM, and GhostChat™ access. Takes about 7–10 minutes. We go deep.',
   },
   {
     q: 'Why scan competitors?',
-    a: 'Alpha Brief Plus gives you 3 scans — your site plus your top 2 competitors. See exactly what they\'re running, where they\'re ahead, and what you can take from their playbook.',
+    a: 'Alpha Brief Plus gives you 3 scans: your site plus your top 2 competitors. See exactly what they\'re running, where they\'re ahead, and what you can take from their playbook.',
   },
   {
     q: 'Need more chat credits?',
-    a: 'You can top up anytime — $1 for 15 credits or $4.99 for 100 credits. Available from the chat window after purchase.',
+    a: 'You can top up anytime. $1 for 15 credits or $4.99 for 100 credits. Available from the chat window after purchase.',
   },
 ];
 
