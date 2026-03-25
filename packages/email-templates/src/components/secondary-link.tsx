@@ -11,7 +11,7 @@ export function SecondaryLink({ href, children }: SecondaryLinkProps) {
     <Link
       href={href}
       style={{
-        color: '#0F3460',
+        color: '#FFB2EF',
         fontSize: '14px',
         fontWeight: 600,
         textDecoration: 'underline',

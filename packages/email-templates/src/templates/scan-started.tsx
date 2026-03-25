@@ -66,7 +66,7 @@ const progressTrack = {
 } as const;
 
 const progressFill = {
-  backgroundColor: '#E94560',
+  backgroundColor: '#FFB2EF',
   height: '8px',
   width: '25%',
   borderRadius: '8px',

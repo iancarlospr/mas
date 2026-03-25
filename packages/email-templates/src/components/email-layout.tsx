@@ -60,8 +60,8 @@ export function EmailLayout({
           <Section style={header}>
             <Img
               src="https://marketingalphascan.com/logo-white.png"
-              width="120"
-              height="32"
+              width="240"
+              height="30"
               alt="MarketingAlphaScan"
               style={{ display: 'block' }}
             />
@@ -121,7 +121,7 @@ const container = {
 } as const;
 
 const header = {
-  backgroundColor: '#1A1A2E',
+  backgroundColor: '#080808',
   padding: '24px 32px',
   borderRadius: '12px 12px 0 0',
 } as const;

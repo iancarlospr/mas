@@ -7,7 +7,7 @@ interface AlertBoxProps {
 }
 
 const styles = {
-  info: { borderColor: '#0F3460', backgroundColor: '#F0F4FF' },
+  info: { borderColor: '#FFB2EF', backgroundColor: '#FFF5FC' },
   warning: { borderColor: '#FFD166', backgroundColor: '#FFFBF0' },
   success: { borderColor: '#06D6A0', backgroundColor: '#F0FFF4' },
 } as const;

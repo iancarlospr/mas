@@ -14,8 +14,8 @@ export function CTAButton({ href, children, variant = 'primary' }: CTAButtonProp
     <Button
       href={href}
       style={{
-        backgroundColor: isPrimary ? '#E94560' : '#0F3460',
-        color: '#FFFFFF',
+        backgroundColor: isPrimary ? '#FFB2EF' : '#1A1A2E',
+        color: isPrimary ? '#080808' : '#FFFFFF',
         fontSize: '16px',
         fontWeight: 700,
         fontFamily: "'Inter', 'Helvetica Neue', Arial, sans-serif",
