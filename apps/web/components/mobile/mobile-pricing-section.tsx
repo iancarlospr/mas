@@ -122,7 +122,7 @@ export function MobilePricingSection({ onFreeScan }: MobilePricingSectionProps) 
                     </>
                   ) : (
                     <>
-                      <span className="text-gs-mid/30 flex-shrink-0">·</span>
+                      <span className="text-gs-mid/30 flex-shrink-0">—</span>
                       <span className="text-gs-mid/30 line-through">{f.text}</span>
                     </>
                   )}
