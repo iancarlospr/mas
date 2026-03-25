@@ -143,7 +143,6 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
 
   return (
     <div className="h-full flex flex-col">
-      {/* Scan cards */}
       <div className="flex-1 overflow-auto" style={{ padding: 16 }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           {scans.map((scan) => {
@@ -166,113 +165,115 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                 onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleScanClick(scan.id, domain, scan.status); } }}
                 className="cursor-pointer transition-all active:scale-[0.98]"
                 style={{
-                  padding: 20,
                   borderRadius: 12,
                   background: 'oklch(0.14 0.02 340 / 0.65)',
                   backdropFilter: 'blur(12px)',
                   WebkitBackdropFilter: 'blur(12px)',
                   border: '1px solid oklch(0.25 0.04 340)',
                   boxShadow: '0 2px 12px oklch(0.05 0.01 340 / 0.4), inset 0 1px 0 oklch(0.30 0.03 340 / 0.2)',
+                  overflow: 'hidden',
                 }}
               >
-                {/* Row 1: Domain + Delete */}
-                <div className="flex items-center">
-                  <span
-                    className="min-w-0 font-data font-bold truncate flex-1"
-                    style={{ fontSize: 16, color: 'var(--gs-light)' }}
-                  >
-                    {domain}
-                  </span>
-                  <button
-                    onClick={(e) => handleDelete(e, scan.id)}
-                    disabled={deletingId === scan.id}
-                    className="flex items-center justify-center hover:text-gs-critical transition-colors"
-                    title="Delete scan"
-                    style={{
-                      flexShrink: 0,
-                      width: 32,
-                      height: 32,
-                      color: 'oklch(0.45 0.03 340)',
-                      fontSize: 14,
-                      fontFamily: 'var(--font-data)',
-                    }}
-                  >
-                    {deletingId === scan.id ? '...' : '×'}
-                  </button>
-                </div>
-
-                {/* Row 2: Score · Status · Badge ··· Date */}
-                <div className="flex items-center" style={{ gap: 12, marginTop: 10 }}>
-                  {scan.marketing_iq != null && (
-                    <span className="flex items-center font-data" style={{ flexShrink: 0, gap: 6 }}>
-                      <span
-                        className={`rounded-full ${getScoreColor(scan.marketing_iq)}`}
-                        style={{
-                          width: 10,
-                          height: 10,
-                          boxShadow: scan.marketing_iq >= 70
-                            ? '0 0 8px oklch(0.72 0.2 145 / 0.6)'
-                            : scan.marketing_iq >= 40
-                              ? '0 0 8px oklch(0.72 0.15 85 / 0.5)'
-                              : '0 0 8px oklch(0.65 0.2 25 / 0.5)',
-                        }}
-                      />
-                      <span style={{ fontSize: 14, fontWeight: 700, color: 'oklch(0.75 0.04 340)' }}>
-                        {scan.marketing_iq}
+                {/* Header zone: domain + score + meta — single flush block */}
+                <div style={{ padding: '16px 16px 12px' }}>
+                  {/* Domain + delete */}
+                  <div className="flex items-center">
+                    <span
+                      className="min-w-0 font-data font-bold truncate flex-1"
+                      style={{ fontSize: 16, color: 'var(--gs-light)' }}
+                    >
+                      {domain}
+                    </span>
+                    <button
+                      onClick={(e) => handleDelete(e, scan.id)}
+                      disabled={deletingId === scan.id}
+                      className="flex items-center justify-center hover:text-gs-critical transition-colors"
+                      title="Delete scan"
+                      style={{
+                        flexShrink: 0,
+                        width: 32,
+                        height: 32,
+                        color: 'oklch(0.45 0.03 340)',
+                        fontSize: 14,
+                        fontFamily: 'var(--font-data)',
+                      }}
+                    >
+                      {deletingId === scan.id ? '...' : '×'}
+                    </button>
+                  </div>
+                  {/* Score · status · badge · date — tight inline, no extra margin */}
+                  <div className="flex items-center" style={{ gap: 10, marginTop: 4 }}>
+                    {scan.marketing_iq != null && (
+                      <span className="flex items-center font-data" style={{ flexShrink: 0, gap: 6 }}>
+                        <span
+                          className={`rounded-full ${getScoreColor(scan.marketing_iq)}`}
+                          style={{
+                            width: 10,
+                            height: 10,
+                            boxShadow: scan.marketing_iq >= 70
+                              ? '0 0 8px oklch(0.72 0.2 145 / 0.6)'
+                              : scan.marketing_iq >= 40
+                                ? '0 0 8px oklch(0.72 0.15 85 / 0.5)'
+                                : '0 0 8px oklch(0.65 0.2 25 / 0.5)',
+                          }}
+                        />
+                        <span style={{ fontSize: 14, fontWeight: 700, color: 'oklch(0.75 0.04 340)' }}>
+                          {scan.marketing_iq}
+                        </span>
                       </span>
-                    </span>
-                  )}
-                  <span title={scan.status} style={{ flexShrink: 0 }}>
-                    {scan.status === 'complete' ? (
-                      <svg className="w-4 h-4 inline-block text-gs-terminal" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
-                    ) : scan.status === 'failed' ? (
-                      <svg className="w-4 h-4 inline-block text-gs-critical" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
-                    ) : (
-                      <svg className="w-4 h-4 inline-block text-gs-warning animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round"><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>
                     )}
-                  </span>
-                  {isPaid ? (
-                    <span
-                      className="font-system font-bold"
-                      style={{
-                        flexShrink: 0,
-                        fontSize: 12,
-                        letterSpacing: '0.08em',
-                        padding: '3px 10px',
-                        borderRadius: 12,
-                        background: 'var(--gs-base)',
-                        color: 'var(--gs-void)',
-                        boxShadow: '0 0 10px oklch(0.72 0.17 340 / 0.35)',
-                      }}
-                    >
-                      PRO
+                    <span title={scan.status} style={{ flexShrink: 0 }}>
+                      {scan.status === 'complete' ? (
+                        <svg className="w-4 h-4 inline-block text-gs-terminal" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
+                      ) : scan.status === 'failed' ? (
+                        <svg className="w-4 h-4 inline-block text-gs-critical" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
+                      ) : (
+                        <svg className="w-4 h-4 inline-block text-gs-warning animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round"><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>
+                      )}
                     </span>
-                  ) : (
-                    <span
-                      className="font-system"
-                      style={{
-                        flexShrink: 0,
-                        fontSize: 12,
-                        letterSpacing: '0.06em',
-                        padding: '3px 10px',
-                        borderRadius: 12,
-                        border: '1px solid oklch(0.35 0.04 340)',
-                        color: 'oklch(0.55 0.04 340)',
-                      }}
-                    >
-                      FREE
+                    {isPaid ? (
+                      <span
+                        className="font-system font-bold"
+                        style={{
+                          flexShrink: 0,
+                          fontSize: 12,
+                          letterSpacing: '0.08em',
+                          padding: '3px 10px',
+                          borderRadius: 12,
+                          background: 'var(--gs-base)',
+                          color: 'var(--gs-void)',
+                          boxShadow: '0 0 10px oklch(0.72 0.17 340 / 0.35)',
+                        }}
+                      >
+                        PRO
+                      </span>
+                    ) : (
+                      <span
+                        className="font-system"
+                        style={{
+                          flexShrink: 0,
+                          fontSize: 12,
+                          letterSpacing: '0.06em',
+                          padding: '3px 10px',
+                          borderRadius: 12,
+                          border: '1px solid oklch(0.35 0.04 340)',
+                          color: 'oklch(0.55 0.04 340)',
+                        }}
+                      >
+                        FREE
+                      </span>
+                    )}
+                    <span className="flex-1" />
+                    <span className="font-data" style={{ flexShrink: 0, fontSize: 12, color: 'oklch(0.50 0.04 340)' }}>
+                      {new Date(scan.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                     </span>
-                  )}
-                  <span className="flex-1" />
-                  <span className="font-data" style={{ flexShrink: 0, fontSize: 12, color: 'oklch(0.50 0.04 340)' }}>
-                    {new Date(scan.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                  </span>
+                  </div>
                 </div>
 
-                {/* Row 3: Actions — Chat hero first, then secondary exports */}
+                {/* Action zone: flush to card edges, no gaps, no separators */}
                 {isPaid && isComplete && (
-                  <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid oklch(0.22 0.03 340)' }}>
-                    {/* Hero CTA: Ask Chloe */}
+                  <>
+                    {/* Chat hero — full-bleed, no border-radius, flush to card edges */}
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -298,12 +299,13 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                       title="Ask Chloe"
                       style={{
                         gap: 8,
-                        padding: '10px 18px',
+                        padding: '12px 18px',
                         fontSize: 13,
                         fontWeight: 700,
-                        borderRadius: 10,
-                        border: '1.5px solid var(--gs-base)',
-                        background: 'oklch(0.12 0.03 340)',
+                        borderRadius: 0,
+                        border: 'none',
+                        borderTop: '1px solid oklch(0.22 0.04 340)',
+                        background: 'oklch(0.11 0.04 340)',
                         color: 'var(--gs-base)',
                         fontFamily: 'var(--font-system)',
                         cursor: 'pointer',
@@ -316,67 +318,62 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                       </svg>
                       Ask Chloe
                     </button>
-                    {/* Secondary: export buttons */}
-                    <div className="flex flex-wrap" style={{ gap: 8, marginTop: 10 }}>
-                      <button
-                        onClick={(e) => { e.stopPropagation(); window.open(`/report/${scan.id}/slides?download=1`, '_blank'); }}
-                        className="bevel-button"
-                        title="Download Audit Deck"
-                      >
-                        Audit&nbsp;&darr;
-                      </button>
-                      <button
-                        onClick={(e) => { e.stopPropagation(); window.open(`/api/reports/${scan.id}/prd`, '_blank'); }}
-                        className="bevel-button"
-                        title="Download PRD"
-                      >
-                        PRD&nbsp;&darr;
-                      </button>
-                      <button
-                        onClick={(e) => { e.stopPropagation(); window.open(`/report/${scan.id}/boss-deck?download=1`, '_blank'); }}
-                        className="bevel-button"
-                        title="Download Boss Deck"
-                      >
-                        Boss&nbsp;&darr;
-                      </button>
-                      <button
-                        onClick={(e) => handleCopyMarkdown(e, scan.id, domain)}
-                        className="bevel-button"
-                        title="Copy audit as Markdown"
-                      >
-                        {mdCopiedId === scan.id ? '\u2713' : '.MD\u00a0\u2193'}
-                      </button>
+                    {/* Export row — flush grid, no gaps between buttons */}
+                    <div className="flex" style={{ borderTop: '1px solid oklch(0.18 0.02 340)' }}>
+                      {[
+                        { label: 'Audit', action: (e: React.MouseEvent) => { e.stopPropagation(); window.open(`/report/${scan.id}/slides?download=1`, '_blank'); } },
+                        { label: 'PRD', action: (e: React.MouseEvent) => { e.stopPropagation(); window.open(`/api/reports/${scan.id}/prd`, '_blank'); } },
+                        { label: 'Boss', action: (e: React.MouseEvent) => { e.stopPropagation(); window.open(`/report/${scan.id}/boss-deck?download=1`, '_blank'); } },
+                        { label: mdCopiedId === scan.id ? '\u2713' : '.MD', action: (e: React.MouseEvent) => handleCopyMarkdown(e, scan.id, domain) },
+                      ].map((btn, i) => (
+                        <button
+                          key={btn.label}
+                          onClick={btn.action}
+                          className="flex-1 font-system transition-colors hover:bg-white/5 active:bg-white/10"
+                          style={{
+                            padding: '10px 0',
+                            fontSize: 12,
+                            fontWeight: 600,
+                            color: 'oklch(0.60 0.04 340)',
+                            background: 'transparent',
+                            border: 'none',
+                            borderRight: i < 3 ? '1px solid oklch(0.18 0.02 340)' : 'none',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          {btn.label}
+                        </button>
+                      ))}
                     </div>
-                  </div>
+                  </>
                 )}
                 {!isPaid && isComplete && (
-                  <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid oklch(0.22 0.03 340)' }}>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        const paymentId = `payment-${scan.id}`;
-                        wm.registerWindow(paymentId, { title: 'Checkout', width: 420, height: 300, variant: 'dialog', componentType: 'payment' });
-                        wm.openWindow(paymentId, { scanId: scan.id, domain, product: 'alpha_brief' });
-                      }}
-                      className="neon-outline-btn flex items-center justify-center w-full"
-                      title="Unlock full report"
-                      style={{
-                        gap: 8,
-                        padding: '10px 18px',
-                        fontSize: 13,
-                        fontWeight: 700,
-                        borderRadius: 10,
-                        border: '1.5px solid var(--gs-base)',
-                        background: 'oklch(0.12 0.03 340)',
-                        color: 'var(--gs-base)',
-                        fontFamily: 'var(--font-system)',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                      Unlock Full Report
-                    </button>
-                  </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const paymentId = `payment-${scan.id}`;
+                      wm.registerWindow(paymentId, { title: 'Checkout', width: 420, height: 300, variant: 'dialog', componentType: 'payment' });
+                      wm.openWindow(paymentId, { scanId: scan.id, domain, product: 'alpha_brief' });
+                    }}
+                    className="neon-outline-btn flex items-center justify-center w-full"
+                    title="Unlock full report"
+                    style={{
+                      gap: 8,
+                      padding: '12px 18px',
+                      fontSize: 13,
+                      fontWeight: 700,
+                      borderRadius: 0,
+                      border: 'none',
+                      borderTop: '1px solid oklch(0.22 0.04 340)',
+                      background: 'oklch(0.11 0.04 340)',
+                      color: 'var(--gs-base)',
+                      fontFamily: 'var(--font-system)',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    Unlock Full Report
+                  </button>
                 )}
               </div>
             );
