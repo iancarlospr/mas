@@ -104,7 +104,7 @@ export function DesktopReminderForm() {
           onChange={(e) => setEmail(e.target.value)}
           required
           disabled={status === 'sending'}
-          className="w-full h-[38px] px-gs-3 font-data text-[13px]
+          className="w-full h-[38px] px-gs-3 font-data text-[13px] text-center
                      border border-gs-mid/30 bg-gs-light/10 text-gs-light
                      placeholder:text-gs-mid/50 focus:border-gs-base/60
                      focus:outline-none transition-colors select-text"
