@@ -261,15 +261,13 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                   <button
                     onClick={() => handleDelete(scan.id)}
                     disabled={deletingId === scan.id}
-                    className="flex items-center justify-center hover:text-gs-critical transition-colors"
+                    className={`flex items-center justify-center transition-colors bg-transparent rounded ${deletingId === scan.id ? 'text-[oklch(0.40_0.03_340)]' : 'text-[oklch(0.45_0.04_340)] hover:text-gs-critical hover:bg-white/10'}`}
                     title="Delete scan"
                     style={{
                       flexShrink: 0,
                       width: 28,
                       height: 28,
-                      background: 'none',
                       border: 'none',
-                      color: deletingId === scan.id ? 'oklch(0.40 0.03 340)' : 'oklch(0.45 0.04 340)',
                       cursor: deletingId === scan.id ? 'default' : 'pointer',
                     }}
                   >
@@ -308,7 +306,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                           wm.openWindow(chatId, { scanId: scan.id, domain });
                         }
                       }}
-                      className="neon-outline-btn flex items-center justify-center w-full"
+                      className="neon-outline-btn flex items-center justify-center w-full transition-colors bg-[oklch(0.11_0.04_340)] text-gs-base hover:bg-[oklch(0.15_0.06_340)] hover:brightness-110 active:bg-[oklch(0.18_0.07_340)]"
                       title="GhostChat™"
                       style={{
                         gap: 8,
@@ -318,8 +316,6 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                         borderRadius: 0,
                         border: 'none',
                         borderTop: '1px solid oklch(0.22 0.04 340)',
-                        background: 'oklch(0.11 0.04 340)',
-                        color: 'var(--gs-base)',
                         fontFamily: 'var(--font-system)',
                         cursor: 'pointer',
                       }}
@@ -407,7 +403,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                       wm.registerWindow(paymentId, { title: 'Checkout', width: 420, height: 300, variant: 'dialog', componentType: 'payment' });
                       wm.openWindow(paymentId, { scanId: scan.id, domain, product: 'alpha_brief' });
                     }}
-                    className="neon-outline-btn flex items-center justify-center w-full"
+                    className="neon-outline-btn flex items-center justify-center w-full transition-colors bg-[oklch(0.11_0.04_340)] text-gs-base hover:bg-[oklch(0.15_0.06_340)] hover:brightness-110 active:bg-[oklch(0.18_0.07_340)]"
                     title="Unlock full report"
                     style={{
                       gap: 8,
@@ -417,8 +413,6 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                       borderRadius: 0,
                       border: 'none',
                       borderTop: '1px solid oklch(0.22 0.04 340)',
-                      background: 'oklch(0.11 0.04 340)',
-                      color: 'var(--gs-base)',
                       fontFamily: 'var(--font-system)',
                       cursor: 'pointer',
                     }}
