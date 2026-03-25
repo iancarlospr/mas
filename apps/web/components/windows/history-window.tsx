@@ -163,16 +163,48 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                 key={scan.id}
                 className="transition-all"
                 style={{
+                  position: 'relative',
                   borderRadius: 12,
                   background: 'oklch(0.14 0.02 340 / 0.65)',
                   backdropFilter: 'blur(12px)',
                   WebkitBackdropFilter: 'blur(12px)',
                   border: '1px solid oklch(0.25 0.04 340)',
                   boxShadow: '0 2px 12px oklch(0.05 0.01 340 / 0.4), inset 0 1px 0 oklch(0.30 0.03 340 / 0.2)',
-                  overflow: 'hidden',
+                  overflow: 'visible',
+                  marginTop: 12,
                 }}
               >
-                {/* Header: domain · dot · score · status · badge · date ··· delete — one line */}
+                {/* Top-centered notch badge */}
+                <span
+                  className="font-system font-bold"
+                  style={{
+                    position: 'absolute',
+                    top: -11,
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    zIndex: 1,
+                    fontSize: 12,
+                    letterSpacing: '0.08em',
+                    padding: '3px 14px 4px',
+                    borderRadius: '8px 8px 0 0',
+                    ...(isPaid
+                      ? {
+                          background: 'var(--gs-base)',
+                          color: 'var(--gs-void)',
+                          boxShadow: '0 -2px 10px oklch(0.72 0.17 340 / 0.35)',
+                        }
+                      : {
+                          background: 'oklch(0.18 0.02 340)',
+                          color: 'oklch(0.55 0.04 340)',
+                          border: '1px solid oklch(0.30 0.04 340)',
+                          borderBottom: 'none',
+                          fontWeight: 500,
+                        }),
+                  }}
+                >
+                  {isPaid ? 'PRO' : 'FREE'}
+                </span>
+                {/* Header: domain · dot · score · status · date ··· delete — one line */}
                 <div className="flex items-center" style={{ padding: '14px 10px 12px 16px', gap: 8 }}>
                   <span
                     className="min-w-0 font-data font-bold truncate"
@@ -208,55 +240,6 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                       <svg className="w-3.5 h-3.5 inline-block text-gs-warning animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round"><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>
                     )}
                   </span>
-                  {/* PRO: iPhone 12 Pro notch pill — center lip cutout at top */}
-                  {isPaid ? (
-                    <span
-                      className="font-system font-bold"
-                      style={{
-                        flexShrink: 0,
-                        position: 'relative',
-                        fontSize: 12,
-                        letterSpacing: '0.08em',
-                        padding: '4px 10px 3px',
-                        borderRadius: 10,
-                        background: 'var(--gs-base)',
-                        color: 'var(--gs-void)',
-                        boxShadow: '0 0 10px oklch(0.72 0.17 340 / 0.35)',
-                      }}
-                    >
-                      {/* Notch lip — small centered bump on top edge */}
-                      <span
-                        aria-hidden="true"
-                        style={{
-                          position: 'absolute',
-                          top: -4,
-                          left: '50%',
-                          transform: 'translateX(-50%)',
-                          width: 18,
-                          height: 5,
-                          background: 'var(--gs-base)',
-                          borderRadius: '0 0 6px 6px',
-                          boxShadow: '0 0 8px oklch(0.72 0.17 340 / 0.25)',
-                        }}
-                      />
-                      PRO
-                    </span>
-                  ) : (
-                    <span
-                      className="font-system"
-                      style={{
-                        flexShrink: 0,
-                        fontSize: 12,
-                        letterSpacing: '0.06em',
-                        padding: '2px 8px',
-                        borderRadius: 10,
-                        border: '1px solid oklch(0.35 0.04 340)',
-                        color: 'oklch(0.55 0.04 340)',
-                      }}
-                    >
-                      FREE
-                    </span>
-                  )}
                   <span className="flex-1" />
                   <span className="font-data" style={{ flexShrink: 0, fontSize: 12, color: 'oklch(0.50 0.04 340)' }}>
                     {new Date(scan.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
