@@ -116,6 +116,7 @@ function CategorySection({ category }: { category: ModuleCategory }) {
       <button
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between px-gs-3 py-gs-2 cursor-pointer hover:bg-gs-red/5 transition-colors"
+        style={{ backgroundColor: 'var(--gs-deep)' }}
       >
         <div className="flex items-center gap-gs-2">
           <span className="font-system text-os-xs font-bold text-gs-light">
