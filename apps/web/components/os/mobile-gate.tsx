@@ -171,6 +171,17 @@ function SectionDivider() {
   );
 }
 
+/* ── Animated ghost for sticky bar ───────────────────────────── */
+
+function AnimatedChloe({ size, state, className }: { size: 32 | 64; state: 'idle'; className?: string }) {
+  const [frame, setFrame] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setFrame(f => (f + 1) % 8), 500);
+    return () => clearInterval(id);
+  }, []);
+  return <ChloeSprite state={state} size={size} frame={frame} className={className} />;
+}
+
 /* ── Main component ──────────────────────────────────────────── */
 
 /* Routes that should render their own page content on mobile instead of the landing page */
@@ -560,7 +571,7 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
       {/* ═══════ STICKY BOTTOM BAR ═══════ */}
       {!heroVisible && (
         <div className="flex-shrink-0 h-[48px] flex items-center gap-gs-2 px-gs-3 bg-gs-deep/95 backdrop-blur-md border-t border-gs-mid/15">
-          <ChloeSprite state="idle" size={32} className="flex-shrink-0" />
+          <AnimatedChloe state="idle" size={32} className="flex-shrink-0" />
           {!authLoading && (
             isAuthenticated ? (
               <>

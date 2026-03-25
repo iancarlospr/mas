@@ -20,6 +20,12 @@ export function MobileChloeLaser({ size = 64 }: MobileChloeLaserProps) {
   const zapTargetRef = useRef<{ x: number; y: number } | null>(null);
   const [laserTarget, setLaserTarget] = useState<{ x: number; y: number } | null>(null);
   const firedRef = useRef(false);
+  const [animFrame, setAnimFrame] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => setAnimFrame(f => (f + 1) % 8), 500);
+    return () => clearInterval(id);
+  }, []);
 
   useEffect(() => {
     if (firedRef.current) return;
@@ -82,7 +88,7 @@ export function MobileChloeLaser({ size = 64 }: MobileChloeLaserProps) {
       <ChloeSprite
         state={laserTarget ? 'scanning' : 'idle'}
         size={size}
-        frame={laserTarget ? 0 : undefined}
+        frame={laserTarget ? 0 : animFrame}
       />
       {laserTarget && (
         <LaserBeams
