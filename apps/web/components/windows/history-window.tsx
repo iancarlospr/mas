@@ -174,100 +174,103 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                   overflow: 'hidden',
                 }}
               >
-                {/* Header zone: domain + score + meta — single flush block */}
-                <div style={{ padding: '16px 16px 12px' }}>
-                  {/* Domain + delete */}
-                  <div className="flex items-center">
-                    <span
-                      className="min-w-0 font-data font-bold truncate flex-1"
-                      style={{ fontSize: 16, color: 'var(--gs-light)' }}
-                    >
-                      {domain}
+                {/* Header: domain · dot · score · status · badge · date ··· delete — one line */}
+                <div className="flex items-center" style={{ padding: '14px 6px 12px 16px', gap: 8 }}>
+                  <span
+                    className="min-w-0 font-data font-bold truncate"
+                    style={{ fontSize: 15, color: 'var(--gs-light)', flex: '0 1 auto', maxWidth: '45%' }}
+                  >
+                    {domain}
+                  </span>
+                  {scan.marketing_iq != null && (
+                    <span className="flex items-center font-data" style={{ flexShrink: 0, gap: 5 }}>
+                      <span
+                        className={`rounded-full ${getScoreColor(scan.marketing_iq)}`}
+                        style={{
+                          width: 9,
+                          height: 9,
+                          boxShadow: scan.marketing_iq >= 70
+                            ? '0 0 8px oklch(0.72 0.2 145 / 0.6)'
+                            : scan.marketing_iq >= 40
+                              ? '0 0 8px oklch(0.72 0.15 85 / 0.5)'
+                              : '0 0 8px oklch(0.65 0.2 25 / 0.5)',
+                        }}
+                      />
+                      <span style={{ fontSize: 13, fontWeight: 700, color: 'oklch(0.75 0.04 340)' }}>
+                        {scan.marketing_iq}
+                      </span>
                     </span>
-                    <button
-                      onClick={(e) => handleDelete(e, scan.id)}
-                      disabled={deletingId === scan.id}
-                      className="flex items-center justify-center hover:text-gs-critical transition-colors"
-                      title="Delete scan"
+                  )}
+                  <span title={scan.status} style={{ flexShrink: 0 }}>
+                    {scan.status === 'complete' ? (
+                      <svg className="w-3.5 h-3.5 inline-block text-gs-terminal" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
+                    ) : scan.status === 'failed' ? (
+                      <svg className="w-3.5 h-3.5 inline-block text-gs-critical" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
+                    ) : (
+                      <svg className="w-3.5 h-3.5 inline-block text-gs-warning animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round"><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>
+                    )}
+                  </span>
+                  {isPaid ? (
+                    <span
+                      className="font-system font-bold"
                       style={{
                         flexShrink: 0,
-                        width: 32,
-                        height: 32,
-                        color: 'oklch(0.45 0.03 340)',
-                        fontSize: 14,
-                        fontFamily: 'var(--font-data)',
+                        fontSize: 12,
+                        letterSpacing: '0.08em',
+                        padding: '2px 8px',
+                        borderRadius: 10,
+                        background: 'var(--gs-base)',
+                        color: 'var(--gs-void)',
+                        boxShadow: '0 0 10px oklch(0.72 0.17 340 / 0.35)',
                       }}
                     >
-                      {deletingId === scan.id ? '...' : '×'}
-                    </button>
-                  </div>
-                  {/* Score · status · badge · date — tight inline, no extra margin */}
-                  <div className="flex items-center" style={{ gap: 10, marginTop: 4 }}>
-                    {scan.marketing_iq != null && (
-                      <span className="flex items-center font-data" style={{ flexShrink: 0, gap: 6 }}>
-                        <span
-                          className={`rounded-full ${getScoreColor(scan.marketing_iq)}`}
-                          style={{
-                            width: 10,
-                            height: 10,
-                            boxShadow: scan.marketing_iq >= 70
-                              ? '0 0 8px oklch(0.72 0.2 145 / 0.6)'
-                              : scan.marketing_iq >= 40
-                                ? '0 0 8px oklch(0.72 0.15 85 / 0.5)'
-                                : '0 0 8px oklch(0.65 0.2 25 / 0.5)',
-                          }}
-                        />
-                        <span style={{ fontSize: 14, fontWeight: 700, color: 'oklch(0.75 0.04 340)' }}>
-                          {scan.marketing_iq}
-                        </span>
-                      </span>
-                    )}
-                    <span title={scan.status} style={{ flexShrink: 0 }}>
-                      {scan.status === 'complete' ? (
-                        <svg className="w-4 h-4 inline-block text-gs-terminal" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
-                      ) : scan.status === 'failed' ? (
-                        <svg className="w-4 h-4 inline-block text-gs-critical" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
-                      ) : (
-                        <svg className="w-4 h-4 inline-block text-gs-warning animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round"><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>
-                      )}
+                      PRO
                     </span>
-                    {isPaid ? (
-                      <span
-                        className="font-system font-bold"
-                        style={{
-                          flexShrink: 0,
-                          fontSize: 12,
-                          letterSpacing: '0.08em',
-                          padding: '3px 10px',
-                          borderRadius: 12,
-                          background: 'var(--gs-base)',
-                          color: 'var(--gs-void)',
-                          boxShadow: '0 0 10px oklch(0.72 0.17 340 / 0.35)',
-                        }}
-                      >
-                        PRO
-                      </span>
+                  ) : (
+                    <span
+                      className="font-system"
+                      style={{
+                        flexShrink: 0,
+                        fontSize: 12,
+                        letterSpacing: '0.06em',
+                        padding: '2px 8px',
+                        borderRadius: 10,
+                        border: '1px solid oklch(0.35 0.04 340)',
+                        color: 'oklch(0.55 0.04 340)',
+                      }}
+                    >
+                      FREE
+                    </span>
+                  )}
+                  <span className="flex-1" />
+                  <span className="font-data" style={{ flexShrink: 0, fontSize: 12, color: 'oklch(0.50 0.04 340)' }}>
+                    {new Date(scan.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  </span>
+                  <button
+                    onClick={(e) => handleDelete(e, scan.id)}
+                    disabled={deletingId === scan.id}
+                    className="flex items-center justify-center transition-colors"
+                    title="Delete scan"
+                    style={{
+                      flexShrink: 0,
+                      width: 28,
+                      height: 28,
+                      borderRadius: 6,
+                      background: 'oklch(0.18 0.02 340)',
+                      border: '1px solid oklch(0.28 0.03 340)',
+                      color: deletingId === scan.id ? 'oklch(0.50 0.03 340)' : 'oklch(0.55 0.06 340)',
+                      cursor: deletingId === scan.id ? 'default' : 'pointer',
+                    }}
+                  >
+                    {deletingId === scan.id ? (
+                      <svg className="w-3.5 h-3.5 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round"><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>
                     ) : (
-                      <span
-                        className="font-system"
-                        style={{
-                          flexShrink: 0,
-                          fontSize: 12,
-                          letterSpacing: '0.06em',
-                          padding: '3px 10px',
-                          borderRadius: 12,
-                          border: '1px solid oklch(0.35 0.04 340)',
-                          color: 'oklch(0.55 0.04 340)',
-                        }}
-                      >
-                        FREE
-                      </span>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="3 6 5 6 21 6" />
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                      </svg>
                     )}
-                    <span className="flex-1" />
-                    <span className="font-data" style={{ flexShrink: 0, fontSize: 12, color: 'oklch(0.50 0.04 340)' }}>
-                      {new Date(scan.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                    </span>
-                  </div>
+                  </button>
                 </div>
 
                 {/* Action zone: flush to card edges, no gaps, no separators */}
