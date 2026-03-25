@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
     await sendEmail({
       to: email,
       template: 'desktop-reminder',
-      subject: 'your desktop link is ready \u2014 Chloe',
+      subject: 'your desktop link is ready \u2014 Chlo\u00e9',
       react: DesktopReminderEmail({ email }),
     });
   } catch (err) {

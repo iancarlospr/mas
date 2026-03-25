@@ -27,7 +27,7 @@ export function DesktopReminderEmail({ email }: DesktopReminderEmailProps = {}) 
         &bull; 45-module forensic MarTech audit with interactive report slides
       </Text>
       <Text style={bullet}>
-        &bull; Chloe&apos;s Bedroom OS — drag windows, play mini-games, watch ASCII movies
+        &bull; Chlo&eacute;&apos;s Bedroom OS — drag windows, play mini-games, watch ASCII movies
       </Text>
       <Text style={bullet}>
         &bull; Boss Deck PDF, executive brief, and full .MD export
@@ -38,7 +38,7 @@ export function DesktopReminderEmail({ email }: DesktopReminderEmailProps = {}) 
       <Text style={body}>
         open that link on your laptop and run a scan. trust me, it hits different.
       </Text>
-      <Text style={signoff}>&mdash; Chloe</Text>
+      <Text style={signoff}>&mdash; Chlo&eacute;</Text>
     </EmailLayout>
   );
 }
