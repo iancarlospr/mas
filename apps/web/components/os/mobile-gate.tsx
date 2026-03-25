@@ -539,42 +539,45 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
         <SectionDivider />
 
         {/* ═══════ DESKTOP CTA ═══════ */}
-        <section className="px-gs-6 py-gs-8 space-y-gs-3" style={{ position: 'relative', overflow: 'visible' }}>
-          {/* Heading — full width, centered */}
-          <div className="text-center">
-            <p
-              className="font-display"
-              style={{
-                fontSize: 'clamp(18px, 5vw, 24px)',
-                fontWeight: 300,
-                lineHeight: '1.3',
-                letterSpacing: '-0.01em',
-                color: 'var(--gs-light)',
-              }}
-            >
-              the full experience
+        <section className="px-gs-6 py-gs-8" style={{ position: 'relative', overflow: 'visible' }}>
+          {/* Content — above ghost */}
+          <div className="relative z-[1] space-y-gs-3">
+            {/* Heading — full width, centered */}
+            <div className="text-center">
+              <p
+                className="font-display"
+                style={{
+                  fontSize: 'clamp(18px, 5vw, 24px)',
+                  fontWeight: 300,
+                  lineHeight: '1.3',
+                  letterSpacing: '-0.01em',
+                  color: 'var(--gs-light)',
+                }}
+              >
+                the full experience
+              </p>
+              <p
+                className="font-marker"
+                style={{
+                  fontSize: 'clamp(22px, 6vw, 30px)',
+                  lineHeight: '1.2',
+                  letterSpacing: '-0.06em',
+                  color: 'var(--gs-base)',
+                  marginTop: '4px',
+                }}
+              >
+                hits different on desktop.
+              </p>
+            </div>
+            {/* Subtext — CRO nudge, below heading */}
+            <p className="font-data text-data-xs text-gs-muted leading-relaxed text-center">
+              send yourself a link. open it on your laptop later.
+              <br />
+              no signup, no spam — just a shortcut.
             </p>
-            <p
-              className="font-marker"
-              style={{
-                fontSize: 'clamp(22px, 6vw, 30px)',
-                lineHeight: '1.2',
-                letterSpacing: '-0.06em',
-                color: 'var(--gs-base)',
-                marginTop: '4px',
-              }}
-            >
-              hits different on desktop.
-            </p>
+            {/* Form block — full width */}
+            <DesktopReminderForm />
           </div>
-          {/* Subtext — CRO nudge, below heading */}
-          <p className="font-data text-data-xs text-gs-muted leading-relaxed text-center">
-            send yourself a link. open it on your laptop later.
-            <br />
-            no signup, no spam — just a shortcut.
-          </p>
-          {/* Form block — full width */}
-          <DesktopReminderForm />
           {/* Ghost — big, slanted, crashing in from right, bleeds into next section */}
           <div
             className="pointer-events-none select-none"
