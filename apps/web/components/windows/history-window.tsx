@@ -44,8 +44,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [mdCopiedId, setMdCopiedId] = useState<string | null>(null);
 
-  const handleCopyMarkdown = useCallback(async (e: React.MouseEvent, scanId: string, domain: string) => {
-    e.stopPropagation();
+  const handleCopyMarkdown = useCallback(async (scanId: string, domain: string) => {
     if (mdCopiedId === scanId) return;
     try {
       const res = await fetch(`/api/scans/${scanId}`);
@@ -67,8 +66,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
     }
   }, [orchestrator]);
 
-  const handleDelete = useCallback(async (e: React.MouseEvent, scanId: string) => {
-    e.stopPropagation();
+  const handleDelete = useCallback(async (scanId: string) => {
     if (deletingId) return;
     setDeletingId(scanId);
     try {
@@ -261,7 +259,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                   </span>
                   {/* Trash icon — bare, no box */}
                   <button
-                    onClick={(e) => handleDelete(e, scan.id)}
+                    onClick={() => handleDelete(scan.id)}
                     disabled={deletingId === scan.id}
                     className="flex items-center justify-center hover:text-gs-critical transition-colors"
                     title="Delete scan"
@@ -291,8 +289,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                   <>
                     {/* Chat hero — full-bleed */}
                     <button
-                      onClick={(e) => {
-                        e.stopPropagation();
+                      onClick={() => {
                         if (onChatOpen) {
                           onChatOpen(scan.id, domain);
                         } else {
@@ -338,7 +335,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                     <div className="flex" style={{ borderTop: '1px solid oklch(0.18 0.02 340)' }}>
                       {/* View Report — opens the slide deck in-app (same as card click) */}
                       <button
-                        onClick={(e) => { e.stopPropagation(); handleScanClick(scan.id, domain, scan.status); }}
+                        onClick={() => handleScanClick(scan.id, domain, scan.status)}
                         className="flex-1 font-system flex items-center justify-center transition-colors hover:bg-white/5 active:bg-white/10"
                         title="View audit report"
                         style={{ gap: 4, padding: '10px 0', fontSize: 12, fontWeight: 600, color: 'var(--gs-light)', background: 'transparent', border: 'none', borderRight: '1px solid oklch(0.18 0.02 340)', cursor: 'pointer' }}
@@ -347,7 +344,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
                       </button>
                       <button
-                        onClick={(e) => { e.stopPropagation(); window.open(`/report/${scan.id}/slides?download=1`, '_blank'); }}
+                        onClick={() => window.open(`/report/${scan.id}/slides?download=1`, '_blank')}
                         className="flex-1 font-system flex items-center justify-center transition-colors hover:bg-white/5 active:bg-white/10"
                         title="Download Audit Deck PDF"
                         style={{ gap: 4, padding: '10px 0', fontSize: 12, fontWeight: 600, color: 'oklch(0.60 0.04 340)', background: 'transparent', border: 'none', borderRight: '1px solid oklch(0.18 0.02 340)', cursor: 'pointer' }}
@@ -356,7 +353,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M19 12l-7 7-7-7" /></svg>
                       </button>
                       <button
-                        onClick={(e) => { e.stopPropagation(); window.open(`/api/reports/${scan.id}/prd`, '_blank'); }}
+                        onClick={() => window.open(`/api/reports/${scan.id}/prd`, '_blank')}
                         className="flex-1 font-system flex items-center justify-center transition-colors hover:bg-white/5 active:bg-white/10"
                         title="Download PRD"
                         style={{ gap: 4, padding: '10px 0', fontSize: 12, fontWeight: 600, color: 'oklch(0.60 0.04 340)', background: 'transparent', border: 'none', borderRight: '1px solid oklch(0.18 0.02 340)', cursor: 'pointer' }}
@@ -365,7 +362,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M19 12l-7 7-7-7" /></svg>
                       </button>
                       <button
-                        onClick={(e) => { e.stopPropagation(); window.open(`/report/${scan.id}/boss-deck?download=1`, '_blank'); }}
+                        onClick={() => window.open(`/report/${scan.id}/boss-deck?download=1`, '_blank')}
                         className="flex-1 font-system flex items-center justify-center transition-colors hover:bg-white/5 active:bg-white/10"
                         title="Download Boss Deck PDF"
                         style={{ gap: 4, padding: '10px 0', fontSize: 12, fontWeight: 600, color: 'oklch(0.60 0.04 340)', background: 'transparent', border: 'none', borderRight: '1px solid oklch(0.18 0.02 340)', cursor: 'pointer' }}
@@ -374,7 +371,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M19 12l-7 7-7-7" /></svg>
                       </button>
                       <button
-                        onClick={(e) => handleCopyMarkdown(e, scan.id, domain)}
+                        onClick={() => handleCopyMarkdown(scan.id, domain)}
                         className="flex-1 font-system flex items-center justify-center transition-all hover:bg-white/5 active:bg-white/10"
                         title="Copy audit as Markdown for NotebookLM"
                         style={{
@@ -407,8 +404,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                 )}
                 {!isPaid && isComplete && (
                   <button
-                    onClick={(e) => {
-                      e.stopPropagation();
+                    onClick={() => {
                       const paymentId = `payment-${scan.id}`;
                       wm.registerWindow(paymentId, { title: 'Checkout', width: 420, height: 300, variant: 'dialog', componentType: 'payment' });
                       wm.openWindow(paymentId, { scanId: scan.id, domain, product: 'alpha_brief' });
