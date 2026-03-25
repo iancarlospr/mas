@@ -327,7 +327,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                         cursor: 'pointer',
                       }}
                     >
-                      <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" style={{ flexShrink: 0 }}>
+                      <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" style={{ flexShrink: 0 }}>
                         <path d="M8 1C5.2 1 3 3.2 3 6v6l1-1.5 1 1.5 1-1.5 1 1.5 1-1.5 1 1.5 1-1.5 1 1.5V6c0-2.8-2.2-5-5-5z"/>
                         <circle cx="6" cy="5.5" r="1" fill="var(--gs-void)"/>
                         <circle cx="10" cy="5.5" r="1" fill="var(--gs-void)"/>
