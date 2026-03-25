@@ -44,19 +44,23 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [mdCopiedId, setMdCopiedId] = useState<string | null>(null);
 
+  const [mdCopyingId, setMdCopyingId] = useState<string | null>(null);
+
   const handleCopyMarkdown = useCallback(async (scanId: string, domain: string) => {
-    if (mdCopiedId === scanId) return;
+    if (mdCopiedId === scanId || mdCopyingId === scanId) return;
+    setMdCopyingId(scanId);
     try {
       const res = await fetch(`/api/scans/${scanId}`);
-      if (!res.ok) return;
+      if (!res.ok) { setMdCopyingId(null); return; }
       const data: ScanWithResults = await res.json();
       const markdown = generateAuditMarkdown(data);
       await navigator.clipboard.writeText(markdown);
+      setMdCopyingId(null);
       setMdCopiedId(scanId);
       analytics.markdownCopied(scanId, domain);
       setTimeout(() => setMdCopiedId(null), 2000);
-    } catch { /* clipboard API not available */ }
-  }, [mdCopiedId]);
+    } catch { setMdCopyingId(null); }
+  }, [mdCopiedId, mdCopyingId]);
 
   const handleScanClick = useCallback((scanId: string, domain: string, status: string) => {
     if (status === 'complete' || status === 'failed' || status === 'cancelled') {
@@ -368,7 +372,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                       </button>
                       <button
                         onClick={() => handleCopyMarkdown(scan.id, domain)}
-                        className={`flex-1 font-system flex items-center justify-center transition-colors duration-100 bg-transparent hover:bg-white/10 hover:text-gs-base active:bg-white/15 ${mdCopiedId === scan.id ? 'text-gs-terminal' : 'text-[oklch(0.60_0.04_340)]'}`}
+                        className={`flex-1 font-system flex items-center justify-center transition-colors duration-100 bg-transparent hover:bg-white/10 hover:text-gs-base active:bg-white/15 ${mdCopiedId === scan.id ? '!text-gs-terminal' : mdCopyingId === scan.id ? '!text-gs-warning' : 'text-[oklch(0.60_0.04_340)]'}`}
                         title="Copy audit as Markdown for NotebookLM"
                         style={{
                           gap: 4,
@@ -376,12 +380,14 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                           fontSize: 12,
                           fontWeight: 600,
                           border: 'none',
-                          cursor: 'pointer',
+                          cursor: mdCopyingId === scan.id ? 'wait' : 'pointer',
                           transform: mdCopiedId === scan.id ? 'scale(1.15)' : 'scale(1)',
                         }}
                       >
                         {mdCopiedId === scan.id ? (
                           <>{'\u2713'} Copied!</>
+                        ) : mdCopyingId === scan.id ? (
+                          <>Copying...</>
                         ) : (
                           <>
                             .MD
