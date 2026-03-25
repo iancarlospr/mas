@@ -428,7 +428,7 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
                   color: 'var(--gs-light)',
                 }}
               >
-                Babe, your website is losing you money.
+                Your website is losing you money.
               </p>
               <p
                 className="font-marker"
@@ -539,7 +539,7 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
           </p>
           <p className="font-data text-data-xs text-gs-muted leading-relaxed">
             48 interactive slides, Chloé&apos;s Bedroom OS, window manager,
-            mini-games, ASCII movies — trust me babe.
+            mini-games, ASCII movies — trust me.
           </p>
           <p className="font-data text-[10px] text-gs-mid/40 mt-gs-2">
             marketingalphascan.com

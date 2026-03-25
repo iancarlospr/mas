@@ -68,8 +68,8 @@ export const SCAN_EVENTS = {
   /** Scan starting */
   start: [
     "Initiating protocol. Don't touch anything.",
-    'Scanning. This takes a few minutes. Watch the show, babe.',
-    "Running 42 forensic modules. Sit tight, babe.",
+    'Scanning. This takes a few minutes. Watch the show.',
+    "Running 42 forensic modules. Sit tight.",
     "Let's see what they're hiding.",
   ],
 
@@ -152,7 +152,7 @@ export const DASHBOARD_EVENTS = {
 export const CHAT_EVENTS = {
   /** No credits — activation prompt */
   noCreditGate: [
-    "I don't work for free, babe. $1 gets you 15 questions.",
+    "I don't work for free. $1 gets you 15 questions.",
     'Want me to talk? Activate chat first.',
     "My insights aren't free. $1 to start.",
   ],
@@ -223,7 +223,7 @@ export const IDLE_QUIPS = [
 export const ERROR_STATES = {
   /** Rate limited */
   rateLimited: [
-    "4 scans a day. You're out. Come back tomorrow, babe.",
+    "4 scans a day. You're out. Come back tomorrow.",
     "Daily limit hit. I need to rest too. (I don't. But still.)",
     "Slow down. 4 per day. Rules are rules.",
   ],
@@ -258,7 +258,7 @@ export const ERROR_STATES = {
 
   /** Auth error */
   authError: [
-    "Authentication failed. Try again, babe.",
+    "Authentication failed. Try again.",
     "Wrong credentials. I don't judge. Try again.",
     "Access denied. Are you sure you're you?",
   ],

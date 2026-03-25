@@ -220,7 +220,7 @@ export default function CustomersWindow() {
               lol got you again
             </p>
             <p className="font-data text-data-sm text-gs-light font-bold fade-up" style={{ animationDelay: '0.15s' }}>
-              babe you&apos;re out here reading reviews, turning every rock,
+              you&apos;re out here reading reviews, turning every rock,
               investigating every link — but you still haven&apos;t scanned
               your own website?
             </p>
@@ -251,7 +251,7 @@ export default function CustomersWindow() {
             <div className="text-center space-y-gs-2 py-gs-3 fade-up">
               <div className="font-data text-[28px] text-gs-red">★</div>
               <p className="font-data text-data-sm text-gs-red font-bold">
-                ty babe
+                ty so much
               </p>
               <p className="font-data text-data-xs text-gs-muted">
                 your feedback means everything to us.

@@ -79,7 +79,7 @@ export default function ProductsWindow() {
       <div className="text-center space-y-gs-2">
         <h1 className="font-display text-display-sm">What You Get</h1>
         <p className="font-data italic text-data-base text-gs-red">
-          babe, this isn&apos;t a feature list. this is the cheat code.
+          this isn&apos;t a feature list. this is the cheat code.
         </p>
       </div>
 

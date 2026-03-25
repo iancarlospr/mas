@@ -142,7 +142,7 @@ export default function ScanInputWindow() {
             color: 'var(--gs-light)',
           }}
         >
-          Babe, your website is losing you money.
+          Your website is losing you money.
         </p>
         <p
           className="font-marker"
