@@ -27,19 +27,17 @@ export interface Tier {
 
 export const TIERS: Tier[] = [
   {
-    name: 'Free Scan',
+    name: 'Free Preview',
     price: '$0',
-    desc: 'MarTech infrastructure snapshot.',
+    desc: 'See what Chloé finds in 3 seconds flat.',
     features: [
-      { text: '3 MarTech modules', included: true },
-      { text: 'CMS & stack detection', included: true },
-      { text: 'Full results — no redaction', included: true },
+      { text: 'Instant GhostScan™ preview', included: true },
       { text: '45-module forensic scan', included: false },
-      { text: 'Executive Brief + PRD', included: false },
-      { text: 'PDF export', included: false },
+      { text: 'Executive Brief + PRD + Boss Deck', included: false },
+      { text: 'PDF export + .MD for NotebookLM', included: false },
       { text: 'GhostChat™ credits', included: false },
     ],
-    cta: 'Start Free Scan',
+    cta: 'Try the Preview',
     highlighted: false,
     product: undefined,
   },
@@ -52,8 +50,8 @@ export const TIERS: Tier[] = [
     features: [
       { text: '3 full forensic scans', included: true },
       { text: 'All 45 modules per scan', included: true },
-      { text: 'Executive Brief + PRD', included: true },
-      { text: 'PDF export + shareable link', included: true },
+      { text: 'Executive Brief + PRD + Boss Deck', included: true },
+      { text: 'PDF export + .MD for NotebookLM', included: true },
       { text: '200 GhostChat™ credits', included: true },
       { text: 'Deploy AI agents', included: true },
       { text: 'Priority scan queue', included: true },
@@ -70,8 +68,8 @@ export const TIERS: Tier[] = [
     features: [
       { text: '1 full forensic scan', included: true },
       { text: 'All 45 modules', included: true },
-      { text: 'Executive Brief + PRD', included: true },
-      { text: 'PDF export + shareable link', included: true },
+      { text: 'Executive Brief + PRD + Boss Deck', included: true },
+      { text: 'PDF export + .MD for NotebookLM', included: true },
       { text: '25 GhostChat™ credits', included: true },
       { text: 'AI agents', included: false },
       { text: 'Priority queue', included: false },
@@ -84,12 +82,12 @@ export const TIERS: Tier[] = [
 
 export const FAQ = [
   {
-    q: 'What do I get with the free scan?',
-    a: 'A MarTech infrastructure analysis across 3 modules: CMS detection, MarTech orchestration, and ecommerce/SaaS detection. Full results, no redaction.',
+    q: 'What do I get with the free preview?',
+    a: 'A quick GhostScan™ preview that shows you what our engine can see. To run a full 45-module forensic scan, you\'ll need to upgrade — that\'s where the real insights live.',
   },
   {
     q: 'What happens when I upgrade?',
-    a: 'We run the full 45-module forensic scan across all 5 phases — passive, browser, GhostScan, external intelligence, and AI synthesis. Takes about 7–10 minutes — we go deep.',
+    a: 'We run the full 45-module forensic scan across all 5 phases — passive, browser, GhostScan, external intelligence, and AI synthesis. You get the Executive Brief, PRD, Boss Deck, .MD for NotebookLM, and GhostChat™ access. Takes about 7–10 minutes — we go deep.',
   },
   {
     q: 'Why scan competitors?',

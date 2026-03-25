@@ -30,8 +30,8 @@ const UPGRADE_PRODUCTS = [
     features: [
       { text: '1 full forensic scan', included: true },
       { text: 'All 45 modules', included: true },
-      { text: 'Executive Brief + PRD', included: true },
-      { text: 'PDF export + shareable link', included: true },
+      { text: 'Executive Brief + PRD + Boss Deck', included: true },
+      { text: 'PDF export + .MD for NotebookLM', included: true },
       { text: '25 GhostChat™ credits', included: true },
       { text: 'AI agents', included: false },
       { text: 'Priority queue', included: false },
@@ -48,8 +48,8 @@ const UPGRADE_PRODUCTS = [
     features: [
       { text: '3 full forensic scans', included: true },
       { text: 'All 45 modules per scan', included: true },
-      { text: 'Executive Brief + PRD', included: true },
-      { text: 'PDF export + shareable link', included: true },
+      { text: 'Executive Brief + PRD + Boss Deck', included: true },
+      { text: 'PDF export + .MD for NotebookLM', included: true },
       { text: '200 GhostChat™ credits', included: true },
       { text: 'Deploy AI agents', included: true },
       { text: 'Priority scan queue', included: true },
