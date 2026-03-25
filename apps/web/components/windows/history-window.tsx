@@ -335,7 +335,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                     <div className="flex" style={{ borderTop: '1px solid oklch(0.18 0.02 340)' }}>
                       {/* View Report — opens the slide deck in-app (same as card click) */}
                       <button
-                        onClick={() => handleScanClick(scan.id, domain, scan.status)}
+                        onClick={() => window.open(`/report/${scan.id}/slides`, '_blank')}
                         className="flex-1 font-system flex items-center justify-center transition-colors hover:bg-white/5 active:bg-white/10"
                         title="View audit report"
                         style={{ gap: 4, padding: '10px 0', fontSize: 12, fontWeight: 600, color: 'var(--gs-light)', background: 'transparent', border: 'none', borderRight: '1px solid oklch(0.18 0.02 340)', cursor: 'pointer' }}
