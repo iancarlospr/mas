@@ -577,8 +577,10 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
               <br />
               no signup, no spam — just a shortcut.
             </p>
-            {/* Form block — full width */}
-            <DesktopReminderForm />
+            {/* Form block — centered */}
+            <div className="flex justify-center">
+              <DesktopReminderForm />
+            </div>
           </div>
           {/* Ghost — big, slanted, crashing in from right, bleeds into next section */}
           <div
