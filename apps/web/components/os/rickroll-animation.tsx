@@ -536,7 +536,7 @@ export function RickRollAnimation() {
       }
       if (p > 0.5) {
         const tp2 = Math.min((p - 0.5) / 0.2, 1);
-        const msg2 = 'by chloe, with love  <3';
+        const msg2 = 'by chloé, with love  <3';
         overlay.line2 = msg2.slice(0, Math.floor(tp2 * msg2.length));
         overlay.pos = 'center';
       }

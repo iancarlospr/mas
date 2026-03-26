@@ -101,7 +101,7 @@ const CATCHPHRASES = [
   'i\'m a cool ghost',
   'SO fetch',
   'YOU CAN\'T SIT WITH US!',
-  'chloe x regina forever',
+  'chloé x regina forever',
 ];
 
 // ── Overlay ─────────────────────────────────────────────────────
@@ -567,7 +567,7 @@ export function MeanGirlsAnimation() {
       // Overlay: cycling catchphrases
       const catchIdx = Math.floor(f / 12) % CATCHPHRASES.length;
       const isLast = p > 0.85;
-      overlay.line1 = isLast ? 'chloe x regina forever' : CATCHPHRASES[catchIdx]!;
+      overlay.line1 = isLast ? 'chloé x regina forever' : CATCHPHRASES[catchIdx]!;
       overlay.pos = 'center';
       overlay.size = isLast ? 24 : (CATCHPHRASES[catchIdx]!.startsWith('YOU') ? 26 : 20);
       overlay.weight = isLast ? 300 : (CATCHPHRASES[catchIdx]!.startsWith('YOU') ? 700 : 500);
@@ -578,7 +578,7 @@ export function MeanGirlsAnimation() {
       const p = (sec - 52) / 3;
       shimmer((1 - p) * 0.1);
       if (p < 0.5) {
-        overlay.line1 = 'chloe x regina forever';
+        overlay.line1 = 'chloé x regina forever';
         overlay.pos = 'center';
         overlay.size = 22;
         overlay.weight = 300;
