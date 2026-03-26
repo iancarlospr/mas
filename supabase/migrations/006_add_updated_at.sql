@@ -12,10 +12,12 @@ $$ LANGUAGE plpgsql;
 -- Add updated_at to scans
 ALTER TABLE scans ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT now();
 
+DROP TRIGGER IF EXISTS scans_updated_at ON scans;
 CREATE TRIGGER scans_updated_at
   BEFORE UPDATE ON scans
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
 -- Add service role UPDATE policy for engine writes
+DROP POLICY IF EXISTS "Service role can update scans" ON scans;
 CREATE POLICY "Service role can update scans" ON scans
   FOR UPDATE USING (auth.role() = 'service_role');
