@@ -637,7 +637,7 @@ export function RickRollAnimation() {
         ref={preRef}
         className="font-data leading-none whitespace-pre select-none"
         style={{
-          fontSize: '6.5px',
+          fontSize: 'min(6.5px, calc(100vw / 120))',
           color: 'var(--gs-base)',
           textShadow: '0 0 5px var(--gs-base), 0 0 15px oklch(0.82 0.15 340 / 0.25)',
           lineHeight: '1.1',
