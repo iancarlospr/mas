@@ -41,15 +41,18 @@ ALTER TABLE public.email_log ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.email_preferences ENABLE ROW LEVEL SECURITY;
 -- email_suppression_list: NO RLS (service_role access only)
 
+DROP POLICY IF EXISTS "Users see own email log" ON public.email_log;
 CREATE POLICY "Users see own email log" ON public.email_log
   FOR SELECT USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users manage own preferences" ON public.email_preferences;
 CREATE POLICY "Users manage own preferences" ON public.email_preferences
   FOR ALL USING (auth.uid() = user_id);
 
 -- 5. Retention cleanup (requires pg_cron extension enabled in Supabase)
 -- Run daily at 3:00 AM UTC to delete email_log entries older than 90 days
 -- Enable in Supabase: Database > Extensions > pg_cron
+SELECT cron.unschedule('cleanup-email-log') WHERE EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'cleanup-email-log');
 SELECT cron.schedule(
   'cleanup-email-log',
   '0 3 * * *',
