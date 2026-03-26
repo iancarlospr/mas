@@ -101,7 +101,7 @@ const CATEGORIES: ModuleCategory[] = [
       { id: 'M43', name: 'PRD Generation' },
       { id: 'M45', name: 'Stack Analyzer' },
       { id: 'M46', name: 'Boss Deck' },
-      { id: 'MD', name: '.MD for NotebookLM' },
+      { id: 'MD', name: 'Markdown Export for NotebookLM' },
     ],
   },
 ];
