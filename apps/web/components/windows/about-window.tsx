@@ -97,11 +97,11 @@ const CATEGORIES: ModuleCategory[] = [
   {
     name: 'AI Synthesis',
     modules: [
-      { id: 'M41', name: 'Module AI Synthesis' },
-      { id: 'M42', name: 'Executive Brief' },
+      { id: 'M41', name: 'Individual Module AI Synthesis' },
       { id: 'M43', name: 'PRD Generation' },
       { id: 'M45', name: 'Stack Analyzer' },
       { id: 'M46', name: 'Boss Deck' },
+      { id: 'MD', name: '.MD for NotebookLM' },
     ],
   },
 ];
@@ -135,10 +135,15 @@ function CategorySection({ category }: { category: ModuleCategory }) {
       {open && (
         <div className="border-t border-gs-mid/15 px-gs-3 py-gs-2 space-y-[6px]">
           {category.modules.map((mod) => (
-            <div key={mod.id} className="flex items-baseline gap-gs-2">
+            <div key={mod.id} className="flex items-center gap-gs-2">
               <span className="text-gs-red text-[8px] flex-shrink-0">·</span>
-              <span className="font-data text-data-xs text-gs-light/80">
+              <span className="font-data text-data-xs text-gs-light/80 flex items-center gap-1">
                 {mod.name}
+                {mod.id === 'MD' && (
+                  <svg width="10" height="10" viewBox="0 0 175 132" fill="currentColor" style={{ flexShrink: 0, opacity: 0.6 }}>
+                    <path d="M87.27,1.14C39.07,1.14,0,39.88,0,87.69v41.44h16.09v-4.13c0-19.39,15.84-35.11,35.39-35.11s35.39,15.72,35.39,35.11v4.13h16.09v-4.13c0-28.2-23.05-51.05-51.48-51.05-11.07,0-21.32,3.46-29.72,9.37,8.79-17.32,26.88-29.21,47.77-29.21,29.51,0,53.44,23.74,53.44,53v22.02h16.09v-22.02c0-38.08-31.13-68.96-69.53-68.96-17.27,0-33.06,6.24-45.22,16.58,11.94-22.39,35.65-37.64,62.97-37.64,39.32,0,71.19,31.61,71.19,70.6v41.44h16.09v-41.44C174.55,39.88,135.48,1.14,87.27,1.14Z" />
+                  </svg>
+                )}
               </span>
             </div>
           ))}
