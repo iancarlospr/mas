@@ -131,6 +131,20 @@ function AuthGatePoller({
         return;
       }
 
+      // Redeem beta invite BEFORE creating scan so credits are ready.
+      // Idempotent — auth-context may also fire maybeRedeemBetaInvite(); 409 = no-op.
+      const inviteCookie = document.cookie.match(/(?:^|;\s*)__alphascan_invite=([^;]+)/);
+      const inviteCode = inviteCookie ? decodeURIComponent(inviteCookie[1]!) : null;
+      if (inviteCode) {
+        try {
+          await fetch('/api/beta/redeem', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code: inviteCode }),
+          });
+        } catch {} // silent — auth-context retries via onAuthStateChange
+      }
+
       try {
         const res = await fetch('/api/scans', {
           method: 'POST',

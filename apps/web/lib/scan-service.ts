@@ -69,8 +69,11 @@ export async function createScan(opts: CreateScanOpts): Promise<CreateScanResult
   }
 
   // Determine tier from remaining credits AFTER deduction:
-  // - remaining > 0 → user had 2+ credits (purchased), scan as paid (all modules)
-  // - remaining = 0 → user had exactly 1 credit (free scan), scan as free (MarTech only)
+  // - remaining > 0 → user had 2+ credits (purchased/beta), scan as paid (all modules)
+  // - remaining = 0 → user had exactly 1 credit (free signup scan), scan as free (MarTech only)
+  // NOTE: Last credit always yields 'full'. Beta invites compensate with scan_credits=3
+  // (one extra buffer credit) so both intended paid scans land with remaining > 0.
+  // See migration 014_fix_beta_scan_credits.sql.
   const tier: 'full' | 'paid' = (newRemaining as number) > 0 ? 'paid' : 'full';
 
   // ---------- Cache check (24h same domain) ----------

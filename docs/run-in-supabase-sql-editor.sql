@@ -1,7 +1,4 @@
 -- Beta invite system — unique codes for beta testers
--- Each code grants bonus scan + chat credits on signup redemption.
--- Flow: invite URL → cookie → signup → POST /api/beta/redeem → credits granted.
-
 CREATE TABLE IF NOT EXISTS beta_invites (
   code TEXT PRIMARY KEY,
   name TEXT NOT NULL,
@@ -13,7 +10,6 @@ CREATE TABLE IF NOT EXISTS beta_invites (
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
--- Redemption tracking (supports multi-use codes if needed in future)
 CREATE TABLE IF NOT EXISTS beta_invite_redemptions (
   id BIGSERIAL PRIMARY KEY,
   invite_code TEXT NOT NULL REFERENCES beta_invites(code),
@@ -22,12 +18,9 @@ CREATE TABLE IF NOT EXISTS beta_invite_redemptions (
   UNIQUE(invite_code, user_id)
 );
 
--- RLS: service role only (no public access)
 ALTER TABLE beta_invites ENABLE ROW LEVEL SECURITY;
 ALTER TABLE beta_invite_redemptions ENABLE ROW LEVEL SECURITY;
 
--- Seed all invite codes (standard tier: 3 scan credits → 2 paid scans, 25 chat credits)
--- scan_credits=3 because tier logic uses remaining>0, so last credit is always free (buffer).
 INSERT INTO beta_invites (code, name, tier, scan_credits, chat_credits, max_uses) VALUES
   ('juanita-a7x3',      'Juanita',        'standard', 3, 25, 1),
   ('jorge-k9m2',        'Jorge',          'standard', 3, 25, 1),
