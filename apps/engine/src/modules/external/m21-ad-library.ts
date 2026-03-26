@@ -41,6 +41,14 @@ function parseFacebookSlug(url: string): string | null {
     const pagesMatch = pathname.match(/^\/pages\/([^/]+)/);
     if (pagesMatch) return decodeURIComponent(pagesMatch[1]!).replace(/-/g, ' ');
 
+    // facebook.com/p/PageName-123456789 (newer profile URL format)
+    const pMatch = pathname.match(/^\/p\/([^/]+)/);
+    if (pMatch) {
+      // Strip trailing numeric ID: "Haleon-61556789012345" → "Haleon"
+      const raw = decodeURIComponent(pMatch[1]!);
+      return raw.replace(/-\d{8,}$/, '').replace(/-/g, ' ').trim() || raw;
+    }
+
     // facebook.com/profile.php?id=123456789
     if (pathname === '/profile.php') return parsed.searchParams.get('id');
 
