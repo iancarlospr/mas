@@ -7,6 +7,16 @@ const RedeemSchema = z.object({
   code: z.string().min(1).max(50).regex(/^[a-z0-9-]+$/),
 });
 
+/** Company beta invite codes → company display names (for PostHog group analytics) */
+const COMPANY_INVITE_CODES: Record<string, string> = {
+  'popular-bank-h6r1': 'Popular Bank',
+  'senzary-j2m9': 'Senzary',
+  'santander-q5w4': 'Santander USA',
+  'ryder-b7t6': 'Ryder',
+  'investpr-x3k8': 'InvestPR',
+  'torlanco-f9n2': 'Torlanco',
+};
+
 export async function POST(request: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -101,12 +111,31 @@ export async function POST(request: NextRequest) {
     },
   }).then(() => {});
 
-  // PostHog server-side tracking
+  // PostHog server-side tracking + group analytics
   const ph = getPostHog();
+  const companyName = COMPANY_INVITE_CODES[code];
+  const companyKey = companyName
+    ? companyName.toLowerCase().replace(/\s+/g, '-')
+    : undefined;
+
   if (ph) {
+    // If this is a company invite, register the company group
+    if (companyName && companyKey) {
+      ph.groupIdentify({
+        groupType: 'company',
+        groupKey: companyKey,
+        properties: {
+          name: companyName,
+          invite_code: code,
+          type: 'beta_company',
+        },
+      });
+    }
+
     ph.capture({
       distinctId: user.id,
       event: 'beta_invite_redeemed',
+      ...(companyKey ? { groups: { company: companyKey } } : {}),
       properties: {
         invite_code: code,
         invite_name: invite.name,
@@ -118,6 +147,7 @@ export async function POST(request: NextRequest) {
           invite_tier: invite.tier,
           invite_name: invite.name,
           beta_invitee: true,
+          ...(companyName ? { beta_company: companyName } : {}),
         },
       },
     });
@@ -129,5 +159,6 @@ export async function POST(request: NextRequest) {
     name: invite.name,
     scan_credits: invite.scan_credits,
     chat_credits: invite.chat_credits,
+    ...(companyName ? { beta_company: companyKey } : {}),
   });
 }

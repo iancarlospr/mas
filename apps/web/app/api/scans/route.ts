@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createScan, ScanError } from '@/lib/scan-service';
+import { getPostHog } from '@/lib/posthog-server';
 import { z } from 'zod';
 
 const CreateScanSchema = z.object({
@@ -40,6 +41,15 @@ export async function POST(request: NextRequest) {
 
   if (!user) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+  }
+
+  // Feature flag kill switch — disable all scans without deploy
+  const ph = getPostHog();
+  if (ph) {
+    const killScans = await ph.isFeatureEnabled('kill-switch-scans', user.id);
+    if (killScans) {
+      return NextResponse.json({ error: 'Scans are temporarily disabled' }, { status: 503 });
+    }
   }
 
   if (process.env.NODE_ENV === 'production' && !process.env.TURNSTILE_SECRET_KEY) {

@@ -234,6 +234,15 @@ export async function POST(
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
   }
 
+  // Feature flag kill switch — disable chat without deploy
+  const ph = getPostHog();
+  if (ph) {
+    const killChat = await ph.isFeatureEnabled('kill-switch-chat', user.id);
+    if (killChat) {
+      return NextResponse.json({ error: 'Chat is temporarily disabled' }, { status: 503 });
+    }
+  }
+
   // Rate limit: 10 messages per minute per user
   const rl = rateLimit(`chat:${user.id}`, 10, 60_000);
   if (!rl.allowed) {
@@ -251,24 +260,29 @@ export async function POST(
   }
 
   // Check credits — distinguish "never had" vs "used all"
+  // Beta users with unlimited chat flag bypass credit checks
+  const hasUnlimitedChat = ph ? await ph.isFeatureEnabled('beta-chat-unlimited', user.id) : false;
+
   const { data: credits } = await supabase
     .from('chat_credits')
     .select('remaining')
     .eq('user_id', user.id)
     .single();
 
-  if (!credits) {
-    return NextResponse.json(
-      { error: 'chat_activation_required' },
-      { status: 402 },
-    );
-  }
+  if (!hasUnlimitedChat) {
+    if (!credits) {
+      return NextResponse.json(
+        { error: 'chat_activation_required' },
+        { status: 402 },
+      );
+    }
 
-  if (credits.remaining <= 0) {
-    return NextResponse.json(
-      { error: 'no_credits_remaining' },
-      { status: 402 },
-    );
+    if (credits.remaining <= 0) {
+      return NextResponse.json(
+        { error: 'no_credits_remaining' },
+        { status: 402 },
+      );
+    }
   }
 
   // Verify scan exists and user has access
@@ -354,19 +368,21 @@ export async function POST(
   });
   if (assistantInsert.error) console.error(`[chat/${scanId}] assistant msg insert failed:`, assistantInsert.error);
 
-  // Decrement credit separately — failure here is a billing issue, not data loss
-  const { error: creditError } = await supabase.rpc('decrement_chat_credits', {
-    p_user_id: user.id,
-    p_amount: 1,
-  });
-  if (creditError) {
-    console.error(`[chat/${scanId}] credit decrement failed:`, creditError);
-    captureServerError(user.id, creditError, { route: 'chat/credits', scan_id: scanId });
+  // Decrement credit separately — skip if beta-chat-unlimited flag is on
+  if (!hasUnlimitedChat) {
+    const { error: creditError } = await supabase.rpc('decrement_chat_credits', {
+      p_user_id: user.id,
+      p_amount: 1,
+    });
+    if (creditError) {
+      console.error(`[chat/${scanId}] credit decrement failed:`, creditError);
+      captureServerError(user.id, creditError, { route: 'chat/credits', scan_id: scanId });
+    }
   }
 
   return NextResponse.json({
     message: assistantResponse,
-    creditsRemaining: Math.max(0, credits.remaining - 1),
+    creditsRemaining: hasUnlimitedChat ? 999 : Math.max(0, (credits?.remaining ?? 0) - 1),
   });
 }
 

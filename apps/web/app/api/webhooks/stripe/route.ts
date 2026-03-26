@@ -94,7 +94,14 @@ export async function POST(request: NextRequest) {
           amount_cents: amountCents,
           revenue: amountCents / 100,
           stripe_session_id: session.id,
-          $set: UPGRADE_PRODUCTS.has(product) ? { tier: 'paid' } : undefined,
+          $set: {
+            ...(UPGRADE_PRODUCTS.has(product) ? { tier: 'paid' } : {}),
+            last_payment_product: product,
+          },
+          $set_once: {
+            first_payment_at: new Date().toISOString(),
+            first_payment_product: product,
+          },
         },
       });
     }
