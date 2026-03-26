@@ -1,5 +1,31 @@
 import posthog from 'posthog-js';
 
+/** Human-readable names for desktop OS window IDs */
+const WINDOW_NAMES: Record<string, string> = {
+  'about': 'About AlphaScan',
+  'products': 'Products',
+  'pricing': 'Pricing',
+  'customers': 'Reviews',
+  'chill': 'chill.mov',
+  'history': 'My Scans',
+  'chat-launcher': 'GhostChat™',
+  'scan-input': 'Scan.exe',
+  'features': 'Why AlphaScan?',
+  'blog': 'UnderTheStack',
+  'games': 'Ghost Sweeper',
+  'trash': 'Log Out',
+  'auth': 'auth.exe (Login)',
+  'profile': 'Profile',
+};
+
+function windowDisplayName(windowId: string): string {
+  if (WINDOW_NAMES[windowId]) return WINDOW_NAMES[windowId]!;
+  if (windowId.startsWith('scan-')) return `Scan Report`;
+  if (windowId.startsWith('payment-')) return `Payment`;
+  if (windowId.startsWith('chat-')) return `GhostChat™`;
+  return windowId;
+}
+
 /**
  * Track PostHog analytics events.
  * Safe to call even if PostHog is not initialized — events are silently dropped.
@@ -53,7 +79,7 @@ export const analytics = {
   },
 
   windowOpened(windowId: string) {
-    posthog.capture('window_opened', { window_id: windowId, $event_description: windowId });
+    posthog.capture('window_opened', { window_id: windowId, window_name: windowDisplayName(windowId), $event_description: windowDisplayName(windowId) });
   },
 
   chatActivated(scanId: string) {
