@@ -24,20 +24,16 @@ async function main() {
 
   const pad = { top: PAD_Y, bottom: PAD_Y, left: PAD_X, right: PAD_X, background: { r: 0, g: 0, b: 0, alpha: 0 } };
 
-  // Wide ambient glow — heavily blurred so letter shapes dissolve
+  // Wide ambient glow — heavily blurred so letter shapes fully dissolve
   const glow1 = await sharp(SRC)
     .extend(pad)
-    .blur(20)
-    .ensureAlpha()
-    .linear(0.35, 0)   // ~35% opacity
+    .blur(25)
     .toBuffer();
 
-  // Tight glow — moderately blurred, subtle inner halo
+  // Tight glow — blurred enough to lose letter edges but still bright
   const glow2 = await sharp(SRC)
     .extend(pad)
-    .blur(10)
-    .ensureAlpha()
-    .linear(0.3, 0)    // ~30% opacity
+    .blur(14)
     .toBuffer();
 
   // Logo with padding (crisp)
