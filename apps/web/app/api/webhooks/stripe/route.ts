@@ -104,6 +104,7 @@ export async function POST(request: NextRequest) {
           },
         },
       });
+      await ph.flush();
     }
 
     if (UPGRADE_PRODUCTS.has(product)) {

@@ -534,7 +534,7 @@ const FLAG_DEFS: FlagDef[] = [
       groups: [
         {
           properties: [
-            { key: 'invite_code', type: 'person', value: [], operator: 'exact' },
+            { key: 'invite_code', type: 'person', operator: 'is_set' },
           ],
           rollout_percentage: 100,
         },
@@ -549,7 +549,7 @@ const FLAG_DEFS: FlagDef[] = [
       groups: [
         {
           properties: [
-            { key: 'invite_code', type: 'person', value: [], operator: 'exact' },
+            { key: 'invite_code', type: 'person', operator: 'is_set' },
           ],
           rollout_percentage: 100,
         },
@@ -626,9 +626,18 @@ async function main() {
       dashboardId = created.id;
     }
 
-    // Create insights for this dashboard
+    // Create insights for this dashboard (idempotent — skip if name already exists)
+    const existingInsights = await listAll<{ name: string; id: number }>(
+      `/insights/?dashboards=${dashboardId}&limit=100`,
+    );
+    const existingInsightNames = new Set(existingInsights.map((i) => i.name));
+
     const insightDefs = dashDef.insights(cohortIds);
     for (const insightDef of insightDefs) {
+      if (existingInsightNames.has(insightDef.name)) {
+        console.log(`    ✓ "${insightDef.name}" already exists`);
+        continue;
+      }
       try {
         await api('POST', '/insights', {
           name: insightDef.name,

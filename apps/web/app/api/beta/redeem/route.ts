@@ -122,6 +122,7 @@ export async function POST(request: NextRequest) {
         },
       },
     });
+    await ph.flush();
   }
 
   return NextResponse.json({
