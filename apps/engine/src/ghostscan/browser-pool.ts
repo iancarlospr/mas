@@ -90,6 +90,9 @@ export class BrowserPool {
       headless: true,
       channel,
       args: [
+        // Use new headless mode — identical to headed Chrome, undetectable by DataDome/Cloudflare.
+        // Old headless was a separate implementation with detectable differences.
+        '--headless=new',
         // Critical: removes navigator.webdriver automation flag at browser level
         '--disable-blink-features=AutomationControlled',
         // Sandbox & memory constraints for DigitalOcean
