@@ -59,18 +59,11 @@ async function maybeRedeemBetaInvite(u: User | null) {
   if (!code) return;
 
   try {
-    const res = await fetch('/api/beta/redeem', {
+    await fetch('/api/beta/redeem', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ code }),
     });
-    // If this is a company invite, associate the user with the company group
-    if (res.ok && posthog.__loaded) {
-      const data = await res.json();
-      if (data.beta_company) {
-        posthog.group('company', data.beta_company);
-      }
-    }
   } catch {
     // Silent failure — invite redemption is best-effort
   } finally {

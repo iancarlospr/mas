@@ -85,29 +85,6 @@ const COHORT_DEFS: CohortDef[] = [
     ],
   },
   {
-    name: 'Beta Companies',
-    description: 'Company/org beta testers (Popular Bank, Senzary, etc.)',
-    groups: [
-      {
-        properties: [
-          { key: 'beta_company', value: 'is_set', type: 'person', operator: 'is_set' },
-        ],
-      },
-    ],
-  },
-  {
-    name: 'Beta Individuals',
-    description: 'Individual beta testers (not company accounts)',
-    groups: [
-      {
-        properties: [
-          { key: 'beta_invitee', value: ['true'], type: 'person', operator: 'exact' },
-          { key: 'beta_company', value: 'is_not_set', type: 'person', operator: 'is_not_set' },
-        ],
-      },
-    ],
-  },
-  {
     name: 'Converted Beta',
     description: 'Beta testers who completed a payment',
     groups: [
@@ -257,7 +234,7 @@ function funnelInsight(
       funnelsFilter: {
         funnelWindowIntervalUnit: 'day',
         funnelWindowInterval: opts.funnel_window_days ?? 30,
-        layout: opts.layout ?? 'ordered',
+        layout: opts.layout ?? 'horizontal',
       },
       ...(opts.breakdown
         ? {
@@ -357,7 +334,7 @@ const DASHBOARD_DEFS: DashboardDef[] = [
         'scan_started',
       ], {
         funnel_window_days: 30,
-        layout: 'ordered',
+        layout: 'horizontal',
         properties: cohorts['Beta Invitees'] ? betaCohortFilter(cohorts['Beta Invitees']!) : [],
       }),
 
@@ -377,12 +354,13 @@ const DASHBOARD_DEFS: DashboardDef[] = [
         properties: cohorts['Beta Invitees'] ? betaCohortFilter(cohorts['Beta Invitees']!) : [],
       }),
 
-      trendInsight('Company Comparison', [
+      trendInsight('Scans by Beta User', [
         { id: 'scan_started' },
       ], {
         display: 'ActionsTable',
-        breakdown: '$group_0',
-        breakdown_type: 'group',
+        breakdown: 'invite_name',
+        breakdown_type: 'person',
+        properties: cohorts['Beta Invitees'] ? betaCohortFilter(cohorts['Beta Invitees']!) : [],
       }),
     ],
   },
@@ -698,10 +676,9 @@ async function main() {
 
   // Manual steps reminder
   console.log('📋 Manual steps remaining:');
-  console.log('  1. Project Settings > Groups > Create "company" group type');
-  console.log('  2. Data Management > Events > Set display names (see plan)');
-  console.log('  3. Data Management > Properties > Set types (revenue=Numeric, etc.)');
-  console.log('  4. Session Replay > Create 6 playlists (see plan)');
+  console.log('  1. Data Management > Events > Set display names (see plan)');
+  console.log('  2. Data Management > Properties > Set types (revenue=Numeric, etc.)');
+  console.log('  3. Session Replay > Create 6 playlists (see plan)');
 }
 
 main().catch((err) => {
