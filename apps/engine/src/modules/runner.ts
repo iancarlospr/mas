@@ -552,8 +552,16 @@ export class ModuleRunner {
       }
     }
 
-    // Check for bot wall and attempt auto-resolution
-    const botWall = await detectAndHandleBotWall(page, this.context.url);
+    // Check for bot wall and attempt auto-resolution (with timeout guard)
+    const botWall = await Promise.race([
+      detectAndHandleBotWall(page, this.context.url),
+      new Promise<{ detected: false; blocked: false; provider: null }>((resolve) =>
+        setTimeout(() => {
+          logger.warn('Bot wall detection timed out after 45s');
+          resolve({ detected: false, blocked: false, provider: null });
+        }, 45_000),
+      ),
+    ]);
     if (botWall.blocked) {
       logger.warn(
         { provider: botWall.provider, scanId: this.context.scanId },
@@ -1056,8 +1064,16 @@ export class ModuleRunner {
         }
       }
 
-      // Detect and resolve bot walls
-      const botWall = await detectAndHandleBotWall(page, paidUrl);
+      // Detect and resolve bot walls (with timeout guard to prevent indefinite hang)
+      const botWall = await Promise.race([
+        detectAndHandleBotWall(page, paidUrl),
+        new Promise<{ detected: false; blocked: false; provider: null }>((resolve) =>
+          setTimeout(() => {
+            logger.warn('Paid media bot wall detection timed out after 45s');
+            resolve({ detected: false, blocked: false, provider: null });
+          }, 45_000),
+        ),
+      ]);
       if (botWall.blocked) {
         logger.warn(
           { provider: botWall.provider, scanId: this.context.scanId },
@@ -1350,8 +1366,16 @@ export class ModuleRunner {
         } catch { /* best effort */ }
       }
 
-      // Check for bot wall on mobile — mobile UAs may get different treatment
-      const botWall = await detectAndHandleBotWall(mobilePage, this.context.url);
+      // Check for bot wall on mobile — mobile UAs may get different treatment (with timeout guard)
+      const botWall = await Promise.race([
+        detectAndHandleBotWall(mobilePage, this.context.url),
+        new Promise<{ detected: false; blocked: false; provider: null }>((resolve) =>
+          setTimeout(() => {
+            logger.warn('Mobile bot wall detection timed out after 45s');
+            resolve({ detected: false, blocked: false, provider: null });
+          }, 45_000),
+        ),
+      ]);
       if (botWall.blocked) {
         logger.debug(
           { scanId: this.context.scanId, provider: botWall.provider },
