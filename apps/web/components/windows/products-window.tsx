@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import type { ReactNode } from 'react';
 
 /* ═══════════════════════════════════════════════════════════════
@@ -118,13 +117,9 @@ export default function ProductsWindow() {
           {isNotebookLM && (
             <div className="flex items-center gap-gs-3 pl-[28px]">
               <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-md border border-gs-mid/25 bg-gs-deep/60">
-                <Image
-                  src="/logos/notebooklm.svg"
-                  alt="Google NotebookLM"
-                  width={20}
-                  height={15}
-                  className="opacity-80 invert"
-                />
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="15" viewBox="0 0 175 132" className="opacity-80" aria-label="Google NotebookLM">
+                  <path d="M87.27,1.14C39.07,1.14,0,39.88,0,87.69v41.44h16.09v-4.13c0-19.39,15.84-35.11,35.39-35.11s35.39,15.72,35.39,35.11v4.13h16.09v-4.13c0-28.2-23.05-51.05-51.48-51.05-11.07,0-21.32,3.46-29.72,9.37,8.79-17.32,26.88-29.21,47.77-29.21,29.51,0,53.44,23.74,53.44,53v22.02h16.09v-22.02c0-38.08-31.13-68.96-69.53-68.96-17.27,0-33.06,6.24-45.22,16.58,11.94-22.39,35.65-37.64,62.97-37.64,39.32,0,71.19,31.61,71.19,70.6v41.44h16.09v-41.44C174.55,39.88,135.48,1.14,87.27,1.14Z" fill="currentColor"/>
+                </svg>
                 <span className="font-data text-data-xs text-gs-light/70 tracking-wide uppercase">
                   Powered by Google NotebookLM
                 </span>
