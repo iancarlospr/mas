@@ -13,8 +13,8 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const SRC = resolve(__dirname, '../../../apps/web/public/logo-white.png');
 
 const SCALE = 2;             // nearest-neighbor upscale — bigger logo
-const PAD_X = 44;            // enough room for glow to fade to zero before edge
-const PAD_Y = 34;
+const PAD_X = 56;            // ≥ 3σ of wide blur so glow fades to <5% at edge
+const PAD_Y = 44;
 
 async function main() {
   const meta = await sharp(SRC).metadata();
@@ -30,16 +30,16 @@ async function main() {
 
   const pad = { top: PAD_Y, bottom: PAD_Y, left: PAD_X, right: PAD_X, background: { r: 0, g: 0, b: 0, alpha: 0 } };
 
-  // Wide ambient glow — soft halo, fades well within padding
+  // Wide ambient glow — σ=18, fades to ~5% at PAD_Y (44px ≈ 2.4σ)
   const glow1 = await sharp(upscaled)
     .extend(pad)
-    .blur(28)
+    .blur(18)
     .toBuffer();
 
-  // Tight glow — close bloom around letter edges
+  // Tight glow — σ=9, fades to ~0% well within padding
   const glow2 = await sharp(upscaled)
     .extend(pad)
-    .blur(14)
+    .blur(9)
     .toBuffer();
 
   // Logo with padding (crisp)
