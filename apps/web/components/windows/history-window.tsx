@@ -271,27 +271,25 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                       <svg className="w-3.5 h-3.5 animate-spin text-[oklch(0.40_0.03_340)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round"><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>
                     </span>
                   ) : confirmingDeleteId === scan.id ? (
-                    <span className="flex items-center animate-fade-in" style={{ flexShrink: 0, gap: 4 }}>
+                    <span className="flex items-center animate-fade-in" style={{ flexShrink: 0, gap: 6 }}>
                       <span className="font-system" style={{ fontSize: 11, fontWeight: 600, color: 'var(--gs-critical)', whiteSpace: 'nowrap' }}>
                         Delete?
                       </span>
                       <button
                         onClick={() => handleDeleteConfirm(scan.id)}
-                        className="flex items-center justify-center rounded transition-colors duration-100 text-gs-critical hover:bg-gs-critical/20"
-                        style={{ width: 24, height: 24, border: 'none', cursor: 'pointer', flexShrink: 0 }}
-                        title="Confirm delete"
+                        className="font-system rounded transition-colors duration-100 text-gs-light bg-gs-critical/80 hover:bg-gs-critical"
+                        style={{ fontSize: 11, fontWeight: 700, padding: '2px 8px', border: 'none', cursor: 'pointer', flexShrink: 0, lineHeight: '18px' }}
                         aria-label="Confirm delete"
                       >
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
+                        Yes
                       </button>
                       <button
                         onClick={handleDeleteCancel}
-                        className="flex items-center justify-center rounded transition-colors duration-100 text-[oklch(0.45_0.04_340)] hover:bg-white/10 hover:text-gs-light"
-                        style={{ width: 24, height: 24, border: 'none', cursor: 'pointer', flexShrink: 0 }}
-                        title="Cancel"
+                        className="font-system rounded transition-colors duration-100 text-[oklch(0.65_0.04_340)] hover:bg-white/10 hover:text-gs-light"
+                        style={{ fontSize: 11, fontWeight: 600, padding: '2px 8px', border: '1px solid oklch(0.30 0.04 340)', cursor: 'pointer', flexShrink: 0, lineHeight: '18px' }}
                         aria-label="Cancel delete"
                       >
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
+                        No
                       </button>
                     </span>
                   ) : (
