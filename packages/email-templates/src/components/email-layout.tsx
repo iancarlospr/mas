@@ -60,8 +60,8 @@ export function EmailLayout({
           <Section style={header}>
             <Img
               src="cid:logo-header"
-              width="480"
-              height="95"
+              width="536"
+              height="86"
               alt="MarketingAlphaScan"
               style={{ display: 'block' }}
             />

@@ -12,10 +12,9 @@ import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const SRC = resolve(__dirname, '../../../apps/web/public/logo-white.png');
 
-const SCALE = 1.5;          // nearest-neighbor upscale for crisp pixel art at larger display size
-const PAD_X = 36;            // glow breathing room (scaled)
-const PAD_Y = 24;
-const BG = '#080808';
+const SCALE = 2;             // nearest-neighbor upscale — bigger logo
+const PAD_X = 20;            // minimal padding (glow bleeds into transparency)
+const PAD_Y = 14;
 
 async function main() {
   const meta = await sharp(SRC).metadata();
@@ -34,13 +33,13 @@ async function main() {
   // Wide ambient glow — heavily blurred so letter shapes fully dissolve
   const glow1 = await sharp(upscaled)
     .extend(pad)
-    .blur(35)
+    .blur(40)
     .toBuffer();
 
   // Tight glow — blurred enough to lose letter edges but still bright
   const glow2 = await sharp(upscaled)
     .extend(pad)
-    .blur(19)
+    .blur(22)
     .toBuffer();
 
   // Logo with padding (crisp)
@@ -48,13 +47,13 @@ async function main() {
     .extend(pad)
     .toBuffer();
 
-  // Composite: dark bg → wide glow → tight glow → crisp logo
+  // Composite on TRANSPARENT bg — works on any email header color (light or dark theme)
   const result = await sharp({
-    create: { width: w, height: h, channels: 4, background: BG },
+    create: { width: w, height: h, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } },
   })
     .composite([
-      { input: glow1, blend: 'screen' },
-      { input: glow2, blend: 'screen' },
+      { input: glow1, blend: 'over' },
+      { input: glow2, blend: 'over' },
       { input: crispLogo, blend: 'over' },
     ])
     .png()
