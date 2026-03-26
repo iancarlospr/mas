@@ -21,6 +21,8 @@ if (
     },
     autocapture: {
       capture_copied_text: true,
+      dom_event_allowlist: ['click', 'submit'], // ignore change/input noise
+      element_allowlist: ['a', 'button', 'form', 'input'], // only interactive elements
     },
   });
 }
