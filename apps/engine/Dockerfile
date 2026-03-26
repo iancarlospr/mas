@@ -29,7 +29,8 @@ RUN npm run build --workspace=@marketing-alpha/engine
 # ─── Stage 2: Production ─────────────────────────────────────────────────────
 FROM node:22-slim AS production
 
-# Install Playwright system dependencies for Chromium
+# Install system dependencies + real Google Chrome (genuine JA3/JA4 TLS fingerprint
+# that DataDome/Cloudflare/Akamai won't flag as automation — bundled Chromium gets caught)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libnss3 \
     libnspr4 \
@@ -52,6 +53,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     fonts-liberation \
     ca-certificates \
     dumb-init \
+    wget \
+    gnupg \
+    && wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/google-chrome.gpg \
+    && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list \
+    && apt-get update && apt-get install -y --no-install-recommends google-chrome-stable \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
