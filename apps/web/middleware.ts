@@ -61,6 +61,16 @@ export async function middleware(request: NextRequest) {
         sameSite: 'lax',
         maxAge: 60 * 60 * 24 * 30, // 30 days
       });
+      // Capture admin token into client-readable cookie (Mission Control access)
+      const adminParam = request.nextUrl.searchParams.get('admin');
+      if (adminParam) {
+        response.cookies.set('__admin_token', adminParam, {
+          httpOnly: false,
+          secure: true,
+          sameSite: 'lax',
+          maxAge: 60 * 60 * 24 * 30, // 30 days
+        });
+      }
       // Capture beta invite code into client-readable cookie
       const inviteParam = request.nextUrl.searchParams.get('invite');
       if (inviteParam && /^[a-z0-9-]+$/.test(inviteParam)) {

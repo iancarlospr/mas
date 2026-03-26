@@ -154,13 +154,6 @@ export function DesktopShell({ children }: { children: ReactNode }) {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
 
-    // Admin token — set cookie for Mission Control access
-    const adminToken = params.get('admin');
-    if (adminToken) {
-      document.cookie = `__admin_token=${encodeURIComponent(adminToken)}; path=/; max-age=${60 * 60 * 24 * 30}; secure; samesite=lax`;
-      window.history.replaceState({}, '', window.location.pathname);
-    }
-
     const paymentScanId = params.get('payment_success');
     if (paymentScanId) {
       window.history.replaceState({}, '', '/');
