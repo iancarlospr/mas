@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import type { ReactNode } from 'react';
 
 /* ═══════════════════════════════════════════════════════════════
@@ -94,7 +95,10 @@ export default function ProductsWindow() {
       </div>
 
       {/* Product sections */}
-      {PRODUCTS.map((product, i) => (
+      {PRODUCTS.map((product, i) => {
+        const isNotebookLM = product.name === '.MD for NotebookLM';
+
+        return (
         <div key={product.name} className="space-y-gs-3">
           <div className="space-y-gs-1">
             <div className="flex items-center gap-gs-2">
@@ -109,6 +113,24 @@ export default function ProductsWindow() {
               {product.tagline}
             </p>
           </div>
+
+          {/* NotebookLM branded partnership badge */}
+          {isNotebookLM && (
+            <div className="flex items-center gap-gs-3 pl-[28px]">
+              <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-md border border-gs-mid/25 bg-gs-deep/60">
+                <Image
+                  src="/logos/notebooklm.svg"
+                  alt="Google NotebookLM"
+                  width={20}
+                  height={15}
+                  className="opacity-80 invert"
+                />
+                <span className="font-data text-data-xs text-gs-light/70 tracking-wide uppercase">
+                  Powered by Google NotebookLM
+                </span>
+              </div>
+            </div>
+          )}
 
           <div className="bevel-sunken p-gs-4 space-y-gs-3">
             {product.bullets.map((bullet, j) => (
@@ -126,7 +148,8 @@ export default function ProductsWindow() {
             <div className="border-b border-gs-mid/20 pt-gs-2" />
           )}
         </div>
-      ))}
+        );
+      })}
 
       {/* Closing urgency — no price, no CTA button, just heat */}
       <p className="text-center font-data text-data-xs text-gs-muted pb-gs-2">
