@@ -189,7 +189,13 @@ export async function detectAndHandleBotWall(
       try {
         const referer = `https://www.google.com/search?q=${encodeURIComponent(new URL(url).hostname)}`;
         await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 20_000, referer });
-        await page.waitForTimeout(3_000);
+        // Wait for networkidle so JS-rendered content (footers, social links) loads
+        try {
+          await page.waitForLoadState('networkidle', { timeout: 15_000 });
+        } catch {
+          // Best effort — some sites never reach networkidle
+          await page.waitForTimeout(3_000);
+        }
 
         let blockedAfterRetry = false;
         try {
@@ -220,7 +226,12 @@ export async function detectAndHandleBotWall(
         await page.waitForTimeout(1000 + Math.floor(Math.random() * 2000));
         const referer = `https://www.google.com/search?q=${encodeURIComponent(new URL(url).hostname)}`;
         await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 20_000, referer });
-        await page.waitForTimeout(3_000);
+        // Wait for networkidle so JS-rendered content (footers, social links) loads
+        try {
+          await page.waitForLoadState('networkidle', { timeout: 15_000 });
+        } catch {
+          await page.waitForTimeout(3_000);
+        }
 
         let blockedAfterClear = false;
         try {
