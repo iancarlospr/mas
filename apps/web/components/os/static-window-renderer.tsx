@@ -30,6 +30,7 @@ const GamesWindow = lazy(() => import('@/components/windows/games-window'));
 const TrashWindow = lazy(() => import('@/components/windows/trash-window'));
 const AuthWindow = lazy(() => import('@/components/windows/auth-window'));
 const ProfileWindow = lazy(() => import('@/components/windows/profile-window'));
+const BetaTrackerWindow = lazy(() => import('@/components/windows/beta-tracker-window'));
 
 // Lazy-loaded dynamic window content components (resolved by componentType)
 const ScanReportWindow = lazy(() => import('@/components/windows/scan-report-window'));
@@ -52,6 +53,7 @@ const WINDOW_COMPONENTS: Record<string, React.ComponentType> = {
   'trash': TrashWindow,
   'auth': AuthWindow,
   'profile': ProfileWindow,
+  'beta-tracker': BetaTrackerWindow,
 };
 
 /** Dynamic windows — keyed by componentType, accepts windowId prop */

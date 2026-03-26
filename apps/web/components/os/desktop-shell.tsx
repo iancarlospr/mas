@@ -43,6 +43,7 @@ const WINDOW_CONFIGS: Record<string, WindowConfig> = {
   'trash':         { title: 'Log Out',                         icon: '~', width: 340, height: 240 },
   'auth':          { title: 'auth.exe',                       icon: '~', width: 440, height: 480, variant: 'dialog' },
   'profile':       { title: 'Profile',                        icon: '~', width: 480, height: 520 },
+  'beta-tracker':  { title: 'Mission Control',                icon: '~', width: 820, height: 600, variant: 'terminal' },
 };
 
 export function DesktopShell({ children }: { children: ReactNode }) {
@@ -137,6 +138,12 @@ export function DesktopShell({ children }: { children: ReactNode }) {
           wm.closeWindow(wm.activeWindowId);
         }
       }
+
+      // Secret: Ctrl+Shift+B → Mission Control (beta tracker)
+      if (meta && e.shiftKey && e.key === 'B') {
+        e.preventDefault();
+        wm.openWindow('beta-tracker');
+      }
     }
 
     window.addEventListener('keydown', handleKeyDown);
@@ -146,6 +153,13 @@ export function DesktopShell({ children }: { children: ReactNode }) {
   // Handle URL params: ?payment_success={scanId} or ?open_scan={scanId}
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
+
+    // Admin token — set cookie for Mission Control access
+    const adminToken = params.get('admin');
+    if (adminToken) {
+      document.cookie = `__admin_token=${encodeURIComponent(adminToken)}; path=/; max-age=${60 * 60 * 24 * 30}; secure; samesite=lax`;
+      window.history.replaceState({}, '', window.location.pathname);
+    }
 
     const paymentScanId = params.get('payment_success');
     if (paymentScanId) {
