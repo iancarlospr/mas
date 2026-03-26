@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/auth-context';
 import { useWindowManager } from '@/lib/window-manager';
@@ -42,6 +42,8 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
   const [scans, setScans] = useState<ScanRow[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [confirmingDeleteId, setConfirmingDeleteId] = useState<string | null>(null);
+  const confirmTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [mdCopiedId, setMdCopiedId] = useState<string | null>(null);
 
   const [mdCopyingId, setMdCopyingId] = useState<string | null>(null);
@@ -87,6 +89,29 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
     } catch { /* ignore */ }
     setDeletingId(null);
   }, [deletingId, wm]);
+
+  const handleDeleteRequest = useCallback((scanId: string) => {
+    if (confirmTimeoutRef.current) clearTimeout(confirmTimeoutRef.current);
+    setConfirmingDeleteId(scanId);
+    confirmTimeoutRef.current = setTimeout(() => setConfirmingDeleteId(null), 4000);
+  }, []);
+
+  const handleDeleteConfirm = useCallback((scanId: string) => {
+    if (confirmTimeoutRef.current) clearTimeout(confirmTimeoutRef.current);
+    setConfirmingDeleteId(null);
+    handleDelete(scanId);
+  }, [handleDelete]);
+
+  const handleDeleteCancel = useCallback(() => {
+    if (confirmTimeoutRef.current) clearTimeout(confirmTimeoutRef.current);
+    setConfirmingDeleteId(null);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (confirmTimeoutRef.current) clearTimeout(confirmTimeoutRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     if (!user) {
@@ -240,29 +265,48 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                   <span className="font-data" style={{ flexShrink: 0, fontSize: 12, color: 'oklch(0.50 0.04 340)' }}>
                     {new Date(scan.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                   </span>
-                  {/* Trash icon — bare, no box */}
-                  <button
-                    onClick={() => handleDelete(scan.id)}
-                    disabled={deletingId === scan.id}
-                    className={`flex items-center justify-center transition-colors duration-100 bg-transparent rounded ${deletingId === scan.id ? 'text-[oklch(0.40_0.03_340)]' : 'text-[oklch(0.45_0.04_340)] hover:text-gs-critical hover:bg-white/10'}`}
-                    title="Delete scan"
-                    style={{
-                      flexShrink: 0,
-                      width: 28,
-                      height: 28,
-                      border: 'none',
-                      cursor: deletingId === scan.id ? 'default' : 'pointer',
-                    }}
-                  >
-                    {deletingId === scan.id ? (
-                      <svg className="w-3.5 h-3.5 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round"><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>
-                    ) : (
+                  {/* Delete — 3 states: spinner / inline confirm / trash icon */}
+                  {deletingId === scan.id ? (
+                    <span className="flex items-center justify-center" style={{ flexShrink: 0, width: 28, height: 28 }}>
+                      <svg className="w-3.5 h-3.5 animate-spin text-[oklch(0.40_0.03_340)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round"><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>
+                    </span>
+                  ) : confirmingDeleteId === scan.id ? (
+                    <span className="flex items-center animate-fade-in" style={{ flexShrink: 0, gap: 4 }}>
+                      <span className="font-system" style={{ fontSize: 11, fontWeight: 600, color: 'var(--gs-critical)', whiteSpace: 'nowrap' }}>
+                        Delete?
+                      </span>
+                      <button
+                        onClick={() => handleDeleteConfirm(scan.id)}
+                        className="flex items-center justify-center rounded transition-colors duration-100 text-gs-critical hover:bg-gs-critical/20"
+                        style={{ width: 24, height: 24, border: 'none', cursor: 'pointer', flexShrink: 0 }}
+                        title="Confirm delete"
+                        aria-label="Confirm delete"
+                      >
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
+                      </button>
+                      <button
+                        onClick={handleDeleteCancel}
+                        className="flex items-center justify-center rounded transition-colors duration-100 text-[oklch(0.45_0.04_340)] hover:bg-white/10 hover:text-gs-light"
+                        style={{ width: 24, height: 24, border: 'none', cursor: 'pointer', flexShrink: 0 }}
+                        title="Cancel"
+                        aria-label="Cancel delete"
+                      >
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
+                      </button>
+                    </span>
+                  ) : (
+                    <button
+                      onClick={() => handleDeleteRequest(scan.id)}
+                      className="flex items-center justify-center transition-colors duration-100 bg-transparent rounded text-[oklch(0.45_0.04_340)] hover:text-gs-critical hover:bg-white/10"
+                      title="Delete scan"
+                      style={{ flexShrink: 0, width: 28, height: 28, border: 'none', cursor: 'pointer' }}
+                    >
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
                         <polyline points="3 6 5 6 21 6" />
                         <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
                       </svg>
-                    )}
-                  </button>
+                    </button>
+                  )}
                 </div>
 
                 {/* Action zone: flush to card edges, no gaps, no separators */}
