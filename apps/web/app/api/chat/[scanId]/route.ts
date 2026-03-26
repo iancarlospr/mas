@@ -368,6 +368,21 @@ export async function POST(
   });
   if (assistantInsert.error) console.error(`[chat/${scanId}] assistant msg insert failed:`, assistantInsert.error);
 
+  // Track the full chat exchange server-side
+  if (ph) {
+    ph.capture({
+      distinctId: user.id,
+      event: 'chat_exchange',
+      properties: {
+        scan_id: scanId,
+        domain: scan.domain,
+        user_message_length: parsed.data.message.length,
+        response_length: assistantResponse.length,
+        credits_remaining: hasUnlimitedChat ? 999 : Math.max(0, (credits?.remaining ?? 0) - 1),
+      },
+    });
+  }
+
   // Decrement credit separately — skip if beta-chat-unlimited flag is on
   if (!hasUnlimitedChat) {
     const { error: creditError } = await supabase.rpc('decrement_chat_credits', {
