@@ -18,11 +18,13 @@ interface Dossier {
   redeemed: boolean;
   redeemedAt: string | null;
   user: { email: string; name: string; joinedAt: string } | null;
-  activity: { scansRun: number; scansCompleted: number; scansPaid: number } | null;
+  activity: { scansRun: number; scansCompleted: number; scansPaid: number; domains: string[] } | null;
+  chatMessages: number;
+  timeOnSiteMin: number | null;
 }
 
 interface BetaData {
-  stats: { total: number; redeemed: number; pending: number; totalScans: number };
+  stats: { total: number; redeemed: number; pending: number; totalScans: number; totalChats: number };
   dossiers: Dossier[];
 }
 
@@ -146,13 +148,27 @@ function DossierCard({ d }: { d: Dossier }) {
           <div className="font-data truncate" style={{ fontSize: 12, color: 'oklch(0.55 0.05 340)' }}>
             {d.user.email}
           </div>
-          <div className="flex items-center" style={{ gap: 8, marginTop: 3 }}>
+          {/* Stats row: date · scans · chats · time · paid badge */}
+          <div className="flex items-center flex-wrap" style={{ gap: 6, marginTop: 4 }}>
             <span className="font-data" style={{ fontSize: 12, color: 'oklch(0.45 0.03 340)' }}>
               {new Date(d.user.joinedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
             </span>
             {d.activity && d.activity.scansRun > 0 && (
-              <span className="font-data" style={{ fontSize: 12, color: 'var(--gs-base)' }}>
-                {d.activity.scansRun} scan{d.activity.scansRun !== 1 ? 's' : ''}
+              <span className="font-data flex items-center" style={{ gap: 3, fontSize: 12, color: 'var(--gs-base)' }}>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20M2 12h20"/></svg>
+                {d.activity.scansRun}
+              </span>
+            )}
+            {d.chatMessages > 0 && (
+              <span className="font-data flex items-center" style={{ gap: 3, fontSize: 12, color: 'oklch(0.65 0.12 340)' }}>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                {d.chatMessages}
+              </span>
+            )}
+            {d.timeOnSiteMin != null && d.timeOnSiteMin > 0 && (
+              <span className="font-data flex items-center" style={{ gap: 3, fontSize: 12, color: 'oklch(0.50 0.04 340)' }}>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                {d.timeOnSiteMin < 60 ? `${d.timeOnSiteMin}m` : `${Math.floor(d.timeOnSiteMin / 60)}h${d.timeOnSiteMin % 60 > 0 ? `${d.timeOnSiteMin % 60}m` : ''}`}
               </span>
             )}
             {d.activity && d.activity.scansPaid > 0 && (
@@ -161,6 +177,27 @@ function DossierCard({ d }: { d: Dossier }) {
               </span>
             )}
           </div>
+          {/* Scanned domains */}
+          {d.activity && d.activity.domains.length > 0 && (
+            <div className="flex flex-wrap" style={{ gap: 4, marginTop: 5 }}>
+              {d.activity.domains.map((domain) => (
+                <span
+                  key={domain}
+                  className="font-data"
+                  style={{
+                    fontSize: 10,
+                    padding: '1px 6px',
+                    borderRadius: 4,
+                    background: 'oklch(0.18 0.04 340)',
+                    color: 'oklch(0.60 0.08 340)',
+                    border: '1px solid oklch(0.25 0.05 340)',
+                  }}
+                >
+                  {domain}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
       ) : (
         /* Pending: show invite type */
@@ -296,6 +333,7 @@ export default function BetaTrackerWindow() {
           <StatBadge label="Active" value={stats.redeemed} glow={stats.redeemed > 0} />
           <StatBadge label="Pending" value={stats.pending} />
           <StatBadge label="Scans" value={stats.totalScans} glow={stats.totalScans > 0} />
+          <StatBadge label="Chats" value={stats.totalChats} glow={stats.totalChats > 0} />
           <div className="flex-1" />
           <div
             className="font-data"
