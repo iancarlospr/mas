@@ -992,7 +992,11 @@ async function scrapeGoogleAdsTransparency(
     // Use region=anywhere to get global results — country-specific regions often
     // show 0 ads because the advertiser targets different geos (e.g., US ads
     // don't appear when region=PR is auto-detected from server location).
-    const domain = new URL(brandUrl).hostname.replace('www.', '');
+    // Extract root domain — Google Ads TC doesn't find ads on subdomains
+    // e.g. estudia.northbridge.edu → northbridge.edu
+    const fullHost = new URL(brandUrl).hostname.replace('www.', '');
+    const parts = fullHost.split('.');
+    const domain = parts.length > 2 ? parts.slice(-2).join('.') : fullHost;
     await page.goto(`https://adstransparency.google.com/?hl=en&region=anywhere&domain=${domain}`, {
       waitUntil: 'domcontentloaded',
       timeout: 30_000,
