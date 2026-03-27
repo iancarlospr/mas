@@ -1057,36 +1057,16 @@ export class ModuleRunner {
 
       try {
         await page.goto(paidUrl, {
-          waitUntil: 'networkidle',
-          timeout: 30_000,
+          waitUntil: 'domcontentloaded',
+          timeout: 20_000,
           referer,
         });
+        // Short settle for JS to initialize tracking pixels
+        await page.waitForTimeout(3_000);
       } catch (error) {
         logger.warn(
           { error: (error as Error).message },
-          'Paid media page navigation did not reach networkidle, continuing',
-        );
-        try {
-          await page.waitForLoadState('domcontentloaded', { timeout: 10_000 });
-        } catch {
-          // Best effort
-        }
-      }
-
-      // Detect and resolve bot walls (with timeout guard to prevent indefinite hang)
-      const botWall = await Promise.race([
-        detectAndHandleBotWall(page, paidUrl),
-        new Promise<{ detected: false; blocked: false; provider: null }>((resolve) =>
-          setTimeout(() => {
-            logger.warn('Paid media bot wall detection timed out after 45s');
-            resolve({ detected: false, blocked: false, provider: null });
-          }, 45_000),
-        ),
-      ]);
-      if (botWall.blocked) {
-        logger.warn(
-          { provider: botWall.provider, scanId: this.context.scanId },
-          'Paid media page blocked by bot wall',
+          'Paid media page navigation failed, continuing',
         );
       }
 
@@ -1098,10 +1078,8 @@ export class ModuleRunner {
       // Collect data layer snapshots on the paid page
       await this.collectBrowserSnapshots(page, domain ?? new URL(paidUrl).hostname);
 
-      // Run M06 then M06b sequentially
-      for (const mod of modules) {
-        await this.executeModule(mod);
-      }
+      // Run M06 then M06b with crash recovery
+      await this.executeModulesWithCrashRecovery(modules, referer);
     } catch (error) {
       logger.error(
         { scanId: this.context.scanId, error: (error as Error).message },
