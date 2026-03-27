@@ -85,11 +85,14 @@ export async function upsertModuleResult(
 ): Promise<void> {
   const supabase = getSupabaseAdmin();
 
+  // Sanitize data: strip invalid Unicode escape sequences that PostgreSQL rejects
+  const sanitizedData = JSON.parse(JSON.stringify(result.data).replace(/\\u0000/g, ''));
+
   const row = {
     scan_id: scanId,
     module_id: result.moduleId,
     status: result.status,
-    data: result.data,
+    data: sanitizedData,
     signals: result.signals,
     score: result.score,
     checkpoints: result.checkpoints,
