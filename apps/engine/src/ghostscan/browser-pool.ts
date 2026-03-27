@@ -99,7 +99,7 @@ export class BrowserPool {
         '--no-sandbox',
         '--disable-setuid-sandbox',
         '--disable-dev-shm-usage',
-        '--js-flags=--max-old-space-size=256',
+        '--js-flags=--max-old-space-size=512',
         // Reduce noise & resource usage
         '--disable-accelerated-2d-canvas',
         '--no-first-run',

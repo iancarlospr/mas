@@ -205,12 +205,12 @@ export function startScanWorker(): Worker<ScanJobData, ScanJobResult> {
     processScanJob,
     {
       connection: connection as WorkerOptions['connection'],
-      concurrency: 1,
+      concurrency: 2,
       stalledInterval: 60_000,    // Check for stalled jobs every 60s
       lockDuration: 600_000,      // Job lock held for 10 minutes
       lockRenewTime: 300_000,     // Renew lock every 5 minutes
       limiter: {
-        max: 1,
+        max: 2,
         duration: 1_000,
       },
     },
