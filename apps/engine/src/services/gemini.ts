@@ -35,6 +35,15 @@ export const MODELS = {
   pro: 'gemini-3.1-pro-preview',
 } as const;
 
+/**
+ * Fallback models when the primary model is overloaded (503, empty responses).
+ * Each primary model gets 2 tries, then falls back to stable for 2 more tries.
+ */
+const FALLBACK_MODELS: Record<string, string> = {
+  'gemini-3-flash-preview': 'gemini-2.5-pro',
+  'gemini-3.1-pro-preview': 'gemini-2.5-pro',
+};
+
 export type ModelTier = keyof typeof MODELS;
 
 export interface ImageInput {
@@ -63,8 +72,9 @@ interface GenerateResult<T> {
   };
 }
 
-const DEFAULT_RETRIES = 3;
+const DEFAULT_RETRIES = 3; // 4 total attempts: 2 primary + 2 fallback
 const DEFAULT_RETRY_DELAY = 2_000;
+const FALLBACK_AFTER_ATTEMPT = 2; // Switch to fallback model after 2 tries on primary
 
 /**
  * Extract token usage from the new SDK response.
@@ -149,7 +159,8 @@ async function generateWithValidation<T>(
   } = options;
 
   const client = getClient();
-  const modelId = MODELS[modelTier];
+  const primaryModelId = MODELS[modelTier];
+  const fallbackModelId = FALLBACK_MODELS[primaryModelId];
 
   // Convert Zod schema to JSON Schema for native enforcement
   const jsonSchema = zodToJsonSchema(schema, { target: 'openApi3' });
@@ -158,9 +169,18 @@ async function generateWithValidation<T>(
   let zodRetryUsed = false;
 
   for (let attempt = 0; attempt <= retries; attempt++) {
+    // Switch to fallback model after FALLBACK_AFTER_ATTEMPT tries on primary
+    const modelId = (attempt >= FALLBACK_AFTER_ATTEMPT && fallbackModelId)
+      ? fallbackModelId
+      : primaryModelId;
+
     if (attempt > 0) {
-      const delay = retryDelay * Math.pow(2, attempt - 1);
-      logger.info({ attempt, delay, model: modelId }, 'Retrying Gemini call');
+      const delay = retryDelay * Math.pow(2, Math.min(attempt - 1, 2));
+      const switched = attempt === FALLBACK_AFTER_ATTEMPT && fallbackModelId;
+      logger.info(
+        { attempt, delay, model: modelId, ...(switched ? { fallbackFrom: primaryModelId } : {}) },
+        switched ? 'Switching to fallback model' : 'Retrying Gemini call',
+      );
       await sleep(delay);
     }
 
@@ -295,14 +315,24 @@ export async function callProRaw(
   const maxTokens = options?.maxTokens ?? 16384;
 
   const client = getClient();
-  const modelId = MODELS.pro;
+  const primaryModelId = MODELS.pro;
+  const fallbackModelId = FALLBACK_MODELS[primaryModelId];
 
   let lastError: Error | null = null;
 
   for (let attempt = 0; attempt <= retries; attempt++) {
+    // Switch to fallback model after FALLBACK_AFTER_ATTEMPT tries on primary
+    const modelId = (attempt >= FALLBACK_AFTER_ATTEMPT && fallbackModelId)
+      ? fallbackModelId
+      : primaryModelId;
+
     if (attempt > 0) {
-      const delay = retryDelay * Math.pow(2, attempt - 1);
-      logger.info({ attempt, delay, model: modelId }, 'Retrying Gemini raw call');
+      const delay = retryDelay * Math.pow(2, Math.min(attempt - 1, 2));
+      const switched = attempt === FALLBACK_AFTER_ATTEMPT && fallbackModelId;
+      logger.info(
+        { attempt, delay, model: modelId, ...(switched ? { fallbackFrom: primaryModelId } : {}) },
+        switched ? 'Switching to fallback model' : 'Retrying Gemini raw call',
+      );
       await sleep(delay);
     }
 
