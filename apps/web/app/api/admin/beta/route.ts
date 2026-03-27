@@ -55,10 +55,10 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  // Build scan stats per user (with domains list)
+  // Build scan stats per user (beta users only, with domains list)
   const userScans: Record<string, { total: number; completed: number; paid: number; domains: string[] }> = {};
   for (const s of scans) {
-    if (!s.user_id) continue;
+    if (!s.user_id || !userIds.includes(s.user_id)) continue;
     if (!userScans[s.user_id]) {
       userScans[s.user_id] = { total: 0, completed: 0, paid: 0, domains: [] };
     }
@@ -70,10 +70,10 @@ export async function GET(request: NextRequest) {
     if (domain && !stats.domains.includes(domain)) stats.domains.push(domain);
   }
 
-  // Build chat message counts per user
+  // Build chat message counts per user (beta users only)
   const userChats: Record<string, number> = {};
   for (const m of chatMessages) {
-    if (!m.user_id || m.role !== 'user') continue;
+    if (!m.user_id || m.role !== 'user' || !userIds.includes(m.user_id)) continue;
     userChats[m.user_id] = (userChats[m.user_id] ?? 0) + 1;
   }
 
