@@ -103,7 +103,7 @@ export function PresentationSlidesView({
 
       const pdfBytes = await generatePresentationPDFClientSide(setProgress);
       const domain = scan.domain ?? 'report';
-      downloadPdf(pdfBytes, `${domain}-audit-deck.pdf`);
+      await downloadPdf(pdfBytes, `${domain}-audit-deck.pdf`);
     } catch (err) {
       console.error('[presentation-pdf] Client-side generation failed:', err);
       setProgress(null);

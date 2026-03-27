@@ -347,11 +347,46 @@ export async function generateBossDeckPDFClientSide(
   return pdfBytes;
 }
 
+/** Detect iOS / iPadOS — all browsers on iOS use WebKit and share the blob-download limitation */
+function isIOSDevice(): boolean {
+  if (typeof navigator === 'undefined') return false;
+  const ua = navigator.userAgent;
+  const isIOS = /iPhone|iPad|iPod/.test(ua);
+  const isIPadOS = /Macintosh/.test(ua) && navigator.maxTouchPoints > 1;
+  return isIOS || isIPadOS;
+}
+
 /**
  * Trigger a browser download of the given bytes as a PDF file.
+ *
+ * iOS Safari (and all iOS browsers) silently ignore the `<a download>` +
+ * programmatic `.click()` pattern on blob URLs. On iOS we try the Web Share
+ * API first (native "Save to Files" sheet), then fall back to opening the
+ * blob URL in a new tab (built-in PDF viewer).
  */
-export function downloadPdf(bytes: Uint8Array, filename: string) {
+export async function downloadPdf(bytes: Uint8Array, filename: string) {
   const blob = new Blob([bytes.buffer as ArrayBuffer], { type: 'application/pdf' });
+
+  if (isIOSDevice()) {
+    // Try Web Share API — shows native share sheet with "Save to Files"
+    const file = new File([blob], filename, { type: 'application/pdf' });
+    if (navigator.canShare?.({ files: [file] })) {
+      try {
+        await navigator.share({ files: [file] });
+        return;
+      } catch {
+        // User cancelled or share failed — fall through to window.open
+      }
+    }
+
+    // Fallback: open blob URL in new tab (iOS PDF viewer with share button)
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank');
+    setTimeout(() => URL.revokeObjectURL(url), 60_000);
+    return;
+  }
+
+  // Desktop: proven anchor-click approach
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
@@ -359,5 +394,5 @@ export function downloadPdf(bytes: Uint8Array, filename: string) {
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  setTimeout(() => URL.revokeObjectURL(url), 10_000);
 }

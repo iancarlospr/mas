@@ -84,7 +84,7 @@ export function BossDeckView({
       );
 
       const pdfBytes = await generateBossDeckPDFClientSide(setProgress);
-      downloadPdf(pdfBytes, `${domain}-boss-deck.pdf`);
+      await downloadPdf(pdfBytes, `${domain}-boss-deck.pdf`);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       console.error('[boss-deck-pdf] Client-side generation failed:', err);
