@@ -330,8 +330,8 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     name: 'Google Shopping',
     phase: 'external',
     minimumTier: 'full',
-    timeout: 30_000,
-    retries: 5,
+    timeout: 45_000,
+    retries: 3,
     category: 'market_intelligence',
   },
   {
