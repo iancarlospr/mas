@@ -513,27 +513,33 @@ async function scrapeFacebookAdLibrary(
     }
     await sleep(2000);
 
-    // Facebook shows the total ad count as an <h3> heading: "~1 result", "~2,500 results".
-    // Target the heading directly instead of scanning entire body text (which is greedy
-    // and matches unrelated numbers like follower counts near the word "result").
+    // Facebook shows the total ad count as a badge like "~160 results" / "~160 resultados".
+    // The element tag varies (h3, div, span) and language depends on server locale, so
+    // scan all leaf elements for a number followed by a single word (language-agnostic).
     try {
       const countText = await page.evaluate(() => {
-        // The ad count is an <h3> with text like "~1 result" or "~2,500 results"
-        const headings = document.querySelectorAll('h3');
-        for (const h of headings) {
-          const text = h.textContent?.trim() ?? '';
-          const match = text.match(/^~?([\d,]+[KkMm]?)\s+results?$/);
-          if (match?.[1]) return match[1];
+        // Language-agnostic: "~160 results", "~2,500 resultados", "~1K Ergebnisse", etc.
+        // Matches: optional ~ + number (with commas/dots) + optional K/M + single word
+        const pattern = /^~?([\d,.]+[KkMm]?)\s+\w+$/;
+        // Exclude patterns that are clearly NOT ad counts (follower counts, dates, etc.)
+        const excludeWords = /follow|seguid|likes|me gusta|fans|joined|member|post|publi/i;
+        const all = document.querySelectorAll('*');
+        for (const el of all) {
+          if (el.children.length > 0) continue; // leaf nodes only
+          const text = el.textContent?.trim() ?? '';
+          if (text.length > 40) continue; // too long to be a badge
+          const match = text.match(pattern);
+          if (match?.[1] && !excludeWords.test(text)) return match[1];
         }
         return null;
       });
       if (countText) {
-        let count = parseFloat(countText.replace(/,/g, ''));
+        let count = parseFloat(countText.replace(/[,.]/g, (c) => c === '.' ? '' : ''));
         const multiplier = countText.slice(-1).toUpperCase();
         if (multiplier === 'K') count *= 1_000;
         if (multiplier === 'M') count *= 1_000_000;
         result.totalAdsVisible = Math.round(count);
-        logger.info({ scanId, totalFromBadge: result.totalAdsVisible, raw: countText }, 'Extracted Facebook ad count from h3 badge');
+        logger.info({ scanId, totalFromBadge: result.totalAdsVisible, raw: countText }, 'Extracted Facebook ad count from badge');
       }
     } catch {
       // Fall through — count stays 0
