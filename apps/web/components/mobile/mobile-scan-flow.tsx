@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { normalizeUrl } from '@/lib/utils';
 import { useAuth } from '@/lib/auth-context';
 import { useScanOrchestrator } from '@/lib/scan-orchestrator';
 import { ScanInput } from '@/components/scan/scan-input';
+import { createClient } from '@/lib/supabase/client';
 import { analytics } from '@/lib/analytics';
 
 /**
@@ -21,6 +22,64 @@ interface MobileScanFlowProps {
   myScansRef?: React.RefObject<HTMLDivElement | null>;
   /** Open the mobile auth overlay instead of navigating to /register */
   onRequestAuth?: (mode: 'login' | 'register') => void;
+}
+
+function CreditIndicator() {
+  const { user, isAuthenticated } = useAuth();
+  const [remaining, setRemaining] = useState<number | null>(null);
+  const [scanCount, setScanCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!isAuthenticated || !user) return;
+
+    async function load() {
+      const supabase = createClient();
+      const [creditsRes, scansRes] = await Promise.all([
+        supabase.from('scan_credits').select('remaining').eq('user_id', user!.id).maybeSingle(),
+        supabase.from('scans').select('id', { count: 'exact', head: true }).eq('user_id', user!.id),
+      ]);
+      setRemaining(creditsRes.data?.remaining ?? 0);
+      setScanCount(scansRes.count ?? 0);
+    }
+
+    load();
+  }, [isAuthenticated, user]);
+
+  if (!isAuthenticated || remaining == null || scanCount == null) return null;
+  if (remaining === 1 && scanCount === 0) return null;
+
+  const hasCredits = remaining > 0;
+
+  const content = hasCredits ? (
+    <span><span style={{ color: 'var(--gs-base)', fontWeight: 600 }}>{remaining}</span> scan{remaining !== 1 ? 's' : ''} remaining</span>
+  ) : (
+    <span>0 scans remaining — <span style={{ color: 'var(--gs-base)', fontWeight: 600 }}>Upgrade</span></span>
+  );
+
+  const pillClass = "font-data inline-flex items-center rounded-full";
+  const pillStyle: React.CSSProperties = {
+    fontSize: '11px',
+    padding: '3px 10px',
+    background: 'rgba(255,178,239,0.08)',
+    border: '1px solid rgba(255,178,239,0.15)',
+    color: 'var(--gs-mid)',
+  };
+
+  return (
+    <div className="flex justify-center select-none" style={{ marginBottom: '6px' }}>
+      {hasCredits ? (
+        <div className={pillClass} style={pillStyle}>{content}</div>
+      ) : (
+        <a
+          href="/pricing"
+          className={`${pillClass} transition-opacity hover:opacity-80`}
+          style={{ ...pillStyle, cursor: 'pointer' }}
+        >
+          {content}
+        </a>
+      )}
+    </div>
+  );
 }
 
 export function MobileScanFlow({ myScansRef, onRequestAuth }: MobileScanFlowProps) {
@@ -94,6 +153,7 @@ export function MobileScanFlow({ myScansRef, onRequestAuth }: MobileScanFlowProp
 
   return (
     <>
+      <CreditIndicator />
       <ScanInput
         variant="dialog"
         onCapture={!authLoading ? handleCapture : undefined}
