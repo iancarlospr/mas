@@ -74,6 +74,7 @@ export function PresentationSlidesView({
   const [progress, setProgress] = useState<PDFProgress | null>(null);
   const downloadStarted = useRef(false);
   const isPaid = scan.tier === 'paid';
+  const [iosPdfBytes, setIosPdfBytes] = useState<{ bytes: Uint8Array; filename: string } | null>(null);
 
   useEffect(() => {
     document.fonts.ready.then(() => {
@@ -97,19 +98,34 @@ export function PresentationSlidesView({
 
     try {
       // Dynamic import to keep the bundle lean for non-download visitors
-      const { generatePresentationPDFClientSide, downloadPdf } = await import(
+      const { generatePresentationPDFClientSide, downloadPdf, isIOSDevice } = await import(
         '@/lib/client-pdf-generator'
       );
 
       const pdfBytes = await generatePresentationPDFClientSide(setProgress);
       const domain = scan.domain ?? 'report';
-      await downloadPdf(pdfBytes, `${domain}-audit-deck.pdf`);
+      const filename = `${domain}-audit-deck.pdf`;
+
+      if (isIOSDevice()) {
+        // iOS: store bytes and show "Tap to Save" button (needs user gesture for share/download)
+        setIosPdfBytes({ bytes: pdfBytes, filename });
+      } else {
+        await downloadPdf(pdfBytes, filename);
+      }
     } catch (err) {
       console.error('[presentation-pdf] Client-side generation failed:', err);
       setProgress(null);
       downloadStarted.current = false;
     }
   }, [scan.domain]);
+
+  // iOS: user taps "Save" button → this runs in a user gesture context so share/download works
+  const handleIOSSave = useCallback(async () => {
+    if (!iosPdfBytes) return;
+    const { downloadPdf } = await import('@/lib/client-pdf-generator');
+    await downloadPdf(iosPdfBytes.bytes, iosPdfBytes.filename);
+    setIosPdfBytes(null);
+  }, [iosPdfBytes]);
 
   // Auto-trigger download when slides are ready and autoDownload is requested
   useEffect(() => {
@@ -162,6 +178,46 @@ export function PresentationSlidesView({
                 }}
               />
             </div>
+          </div>
+        </div>
+      )}
+      {/* iOS: "Tap to Save" overlay — needs real user gesture for navigator.share */}
+      {iosPdfBytes && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 99999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'rgba(8, 8, 8, 0.92)',
+            backdropFilter: 'blur(8px)',
+            fontFamily: 'var(--font-geist-mono), monospace',
+            color: '#FFB2EF',
+          }}
+        >
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: 18, marginBottom: 16, letterSpacing: '0.05em' }}>
+              PDF ready
+            </div>
+            <button
+              onClick={handleIOSSave}
+              style={{
+                padding: '14px 40px',
+                background: '#FFB2EF',
+                color: '#080808',
+                border: 'none',
+                borderRadius: 8,
+                cursor: 'pointer',
+                fontFamily: 'inherit',
+                fontWeight: 700,
+                fontSize: 16,
+                letterSpacing: '0.03em',
+              }}
+            >
+              Tap to Save PDF
+            </button>
           </div>
         </div>
       )}

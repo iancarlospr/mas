@@ -348,7 +348,7 @@ export async function generateBossDeckPDFClientSide(
 }
 
 /** Detect iOS / iPadOS — all browsers on iOS use WebKit and share the blob-download limitation */
-function isIOSDevice(): boolean {
+export function isIOSDevice(): boolean {
   if (typeof navigator === 'undefined') return false;
   const ua = navigator.userAgent;
   const isIOS = /iPhone|iPad|iPod/.test(ua);
