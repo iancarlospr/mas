@@ -78,10 +78,10 @@ function rasterizeCloserBg(container: HTMLElement): Promise<void> {
           d[p + 2] = (gray + 0.4 * (b - gray)) * 0.2;
         }
         ctx.putImageData(id, 0, 0);
-        // 3-pass scale-down blur (approximates heavy Gaussian blur)
-        const sw = Math.max(1, c.width >> 3);
-        const sh = Math.max(1, c.height >> 3);
-        for (let i = 0; i < 3; i++) {
+        // Scale-down blur to approximate CSS blur(30px) — 6 passes at 1/16
+        const sw = Math.max(1, c.width >> 4);
+        const sh = Math.max(1, c.height >> 4);
+        for (let i = 0; i < 6; i++) {
           ctx.drawImage(c, 0, 0, c.width, c.height, 0, 0, sw, sh);
           ctx.drawImage(c, 0, 0, sw, sh, 0, 0, c.width, c.height);
         }
