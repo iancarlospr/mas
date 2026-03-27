@@ -604,9 +604,8 @@ export class ModuleRunner {
     }
 
     // Run browser modules sequentially (shared page state)
-    for (const mod of modules) {
-      await this.executeModule(mod);
-    }
+    // If the renderer crashes, restart Chrome, re-navigate, and re-run all crashed modules
+    await this.executeModulesWithCrashRecovery(modules, referer);
 
     // ── Passive module retry ─────────────────────────────────────────────
     // If the initial HTTP fetch failed (e.g., Etsy-style 403 to non-browser
@@ -973,9 +972,8 @@ export class ModuleRunner {
     }
 
     // Run ghostscan modules sequentially
-    for (const mod of modules) {
-      await this.executeModule(mod);
-    }
+    // If the renderer crashes, restart Chrome, re-navigate, and re-run crashed modules
+    await this.executeModulesWithCrashRecovery(modules, this.getGoogleReferer());
   }
 
   /**
@@ -1278,6 +1276,107 @@ export class ModuleRunner {
       },
       'Module execution completed',
     );
+  }
+
+  /**
+   * Execute modules sequentially with crash recovery.
+   * If a renderer crash is detected (Target crashed), restart the browser,
+   * re-navigate, and re-run all modules that failed due to the crash.
+   */
+  private async executeModulesWithCrashRecovery(
+    modules: ModuleDefinition[],
+    referer: string,
+  ): Promise<void> {
+    const crashedModules: ModuleDefinition[] = [];
+    let crashDetected = false;
+
+    for (const mod of modules) {
+      await this.executeModule(mod);
+
+      const lastResult = this.context.previousResults.get(mod.id);
+      if (lastResult?.error?.includes('Target crashed')) {
+        crashDetected = true;
+        crashedModules.push(mod);
+      } else if (crashDetected) {
+        // Once crash is detected, all subsequent modules will also fail
+        // so collect them as crashed too
+        if (lastResult?.error?.includes('Target crashed')) {
+          crashedModules.push(mod);
+        }
+      }
+    }
+
+    // If we had crashes, attempt recovery and re-run failed modules
+    if (crashedModules.length > 0) {
+      logger.warn(
+        { scanId: this.context.scanId, crashedCount: crashedModules.length, modules: crashedModules.map((m) => m.id) },
+        'Renderer crash detected — attempting recovery',
+      );
+
+      const recovered = await this.recoverFromCrash(referer);
+      if (recovered) {
+        logger.info(
+          { scanId: this.context.scanId, retryCount: crashedModules.length },
+          'Browser recovered — re-running crashed modules',
+        );
+        for (const mod of crashedModules) {
+          await this.executeModule(mod);
+        }
+      }
+    }
+  }
+
+  /**
+   * Recover from a renderer crash by restarting the browser and re-navigating.
+   * Returns true if recovery was successful.
+   */
+  private async recoverFromCrash(referer: string): Promise<boolean> {
+    try {
+      // Close the crashed page/context
+      if (this.context.page) {
+        await this.context.page.close().catch(() => {});
+        this.context.page = null;
+      }
+
+      // Restart the browser entirely
+      await this.browserPool.restart();
+
+      // Create a fresh page and navigate
+      const page = await this.browserPool.createPage(this.context.url);
+      const domain = getRegistrableDomain(this.context.url);
+      const networkCollector = new NetworkCollector(domain);
+      networkCollector.attach(page);
+      const consoleCollector = new ConsoleCollector();
+      consoleCollector.attach(page);
+
+      try {
+        await page.goto(this.context.url, {
+          waitUntil: 'domcontentloaded',
+          timeout: 20_000,
+          referer,
+        });
+      } catch {
+        logger.warn({ scanId: this.context.scanId }, 'Recovery navigation failed');
+        return false;
+      }
+
+      // Wait for page to settle
+      await page.waitForTimeout(2_000);
+
+      // Update context with fresh page
+      this.context.page = page;
+      this.context.networkCollector = networkCollector;
+      this.context.consoleCollector = consoleCollector;
+
+      logger.info({ scanId: this.context.scanId }, 'Browser crash recovery successful');
+      return true;
+    } catch (error) {
+      logger.error(
+        { scanId: this.context.scanId, error: (error as Error).message },
+        'Browser crash recovery failed',
+      );
+      return false;
+    }
   }
 
   /**
