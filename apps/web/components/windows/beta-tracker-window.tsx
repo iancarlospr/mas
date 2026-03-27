@@ -148,37 +148,41 @@ function DossierCard({ d }: { d: Dossier }) {
           <div className="font-data truncate" style={{ fontSize: 12, color: 'oklch(0.55 0.05 340)' }}>
             {d.user.email}
           </div>
-          {/* Stats row: date · scans · chats · time · paid badge */}
+          {/* Stats row: date · scans · chats · time · paid badge — always visible */}
           <div className="flex items-center flex-wrap" style={{ gap: 6, marginTop: 4 }}>
             <span className="font-data" style={{ fontSize: 12, color: 'oklch(0.45 0.03 340)' }}>
               {new Date(d.user.joinedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
             </span>
-            {d.activity && d.activity.scansRun > 0 && (
-              <span className="font-data flex items-center" style={{ gap: 3, fontSize: 12, color: 'var(--gs-base)' }}>
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20M2 12h20"/></svg>
-                {d.activity.scansRun}
-              </span>
-            )}
-            {d.chatMessages > 0 && (
-              <span className="font-data flex items-center" style={{ gap: 3, fontSize: 12, color: 'oklch(0.65 0.12 340)' }}>
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                {d.chatMessages}
-              </span>
-            )}
-            {d.timeOnSiteMin != null && d.timeOnSiteMin > 0 && (
-              <span className="font-data flex items-center" style={{ gap: 3, fontSize: 12, color: 'oklch(0.50 0.04 340)' }}>
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                {d.timeOnSiteMin < 60 ? `${d.timeOnSiteMin}m` : `${Math.floor(d.timeOnSiteMin / 60)}h${d.timeOnSiteMin % 60 > 0 ? `${d.timeOnSiteMin % 60}m` : ''}`}
-              </span>
-            )}
-            {d.activity && d.activity.scansPaid > 0 && (
+            {/* Scans */}
+            <span className="font-data flex items-center" style={{ gap: 3, fontSize: 12, color: (d.activity?.scansRun ?? 0) > 0 ? 'var(--gs-base)' : 'oklch(0.30 0.03 340)' }}>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20M2 12h20"/></svg>
+              {d.activity?.scansRun ?? 0}
+            </span>
+            {/* Chats */}
+            <span className="font-data flex items-center" style={{ gap: 3, fontSize: 12, color: d.chatMessages > 0 ? 'oklch(0.65 0.12 340)' : 'oklch(0.30 0.03 340)' }}>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              {d.chatMessages}
+            </span>
+            {/* Time on site */}
+            <span className="font-data flex items-center" style={{ gap: 3, fontSize: 12, color: (d.timeOnSiteMin ?? 0) > 0 ? 'oklch(0.50 0.04 340)' : 'oklch(0.30 0.03 340)' }}>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              {d.timeOnSiteMin != null && d.timeOnSiteMin > 0
+                ? (d.timeOnSiteMin < 60 ? `${d.timeOnSiteMin}m` : `${Math.floor(d.timeOnSiteMin / 60)}h${d.timeOnSiteMin % 60 > 0 ? `${d.timeOnSiteMin % 60}m` : ''}`)
+                : '0m'}
+            </span>
+            {/* Paid badge */}
+            {d.activity && d.activity.scansPaid > 0 ? (
               <span className="font-system font-bold" style={{ fontSize: 10, color: 'var(--gs-terminal)', letterSpacing: '0.05em' }}>
                 PAID
+              </span>
+            ) : (
+              <span className="font-system" style={{ fontSize: 10, color: 'oklch(0.30 0.03 340)', letterSpacing: '0.05em' }}>
+                FREE
               </span>
             )}
           </div>
           {/* Scanned domains */}
-          {d.activity && d.activity.domains.length > 0 && (
+          {d.activity && d.activity.domains.length > 0 ? (
             <div className="flex flex-wrap" style={{ gap: 4, marginTop: 5 }}>
               {d.activity.domains.map((domain) => (
                 <span
@@ -196,6 +200,12 @@ function DossierCard({ d }: { d: Dossier }) {
                   {domain}
                 </span>
               ))}
+            </div>
+          ) : (
+            <div style={{ marginTop: 5 }}>
+              <span className="font-data" style={{ fontSize: 10, color: 'oklch(0.25 0.03 340)', fontStyle: 'italic' }}>
+                no scans yet
+              </span>
             </div>
           )}
         </div>
