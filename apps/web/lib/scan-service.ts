@@ -40,20 +40,27 @@ export async function createScan(opts: CreateScanOpts): Promise<CreateScanResult
   const domain = new URL(url).hostname.replace(/^www\./, '').toLowerCase();
 
   // ---------- Abuse protection (10/day absolute) ----------
-  const dayStart = new Date();
-  dayStart.setUTCHours(0, 0, 0, 0);
+  // Admin emails bypass the daily limit for testing
+  const ADMIN_EMAILS = ['ianramirezbba@gmail.com'];
+  const { data: profile } = await supabase.auth.getUser();
+  const isAdmin = ADMIN_EMAILS.includes(profile?.user?.email ?? '');
 
-  const { count: dailyCount } = await supabase
-    .from('scans')
-    .select('id', { count: 'exact', head: true })
-    .eq('user_id', userId)
-    .gte('created_at', dayStart.toISOString());
+  if (!isAdmin) {
+    const dayStart = new Date();
+    dayStart.setUTCHours(0, 0, 0, 0);
 
-  if ((dailyCount ?? 0) >= DAILY_ABUSE_LIMIT) {
-    throw new ScanError('Daily scan limit reached. Try again tomorrow.', 429, {
-      limit: DAILY_ABUSE_LIMIT,
-      used: dailyCount,
-    });
+    const { count: dailyCount } = await supabase
+      .from('scans')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', userId)
+      .gte('created_at', dayStart.toISOString());
+
+    if ((dailyCount ?? 0) >= DAILY_ABUSE_LIMIT) {
+      throw new ScanError('Daily scan limit reached. Try again tomorrow.', 429, {
+        limit: DAILY_ABUSE_LIMIT,
+        used: dailyCount,
+      });
+    }
   }
 
   // ---------- Deduct 1 scan credit (atomic) ----------
