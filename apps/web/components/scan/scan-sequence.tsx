@@ -294,9 +294,19 @@ export function ScanSequence({
           <div className="flex-1 overflow-hidden">
             <ScanMovieRotation />
           </div>
-          {/* Progress bar at bottom */}
-          <div className="flex-shrink-0 p-gs-2 border-t border-gs-chrome-dark">
-            <ProgressBar value={progress} variant="terminal" />
+          {/* Progress bar + exit button at bottom */}
+          <div className="flex-shrink-0 p-gs-2 border-t border-gs-chrome-dark flex items-center gap-gs-2">
+            <div className="flex-1 min-w-0">
+              <ProgressBar value={progress} variant="terminal" />
+            </div>
+            <button
+              onClick={onComplete}
+              className="flex-shrink-0 font-data text-data-sm text-gs-terminal hover:text-gs-bright
+                         border border-gs-terminal/40 hover:border-gs-terminal px-3 py-1
+                         transition-colors whitespace-nowrap"
+            >
+              [EXIT]
+            </button>
           </div>
         </div>
       )}
