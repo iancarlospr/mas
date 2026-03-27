@@ -1364,107 +1364,83 @@ export class ModuleRunner {
       mobilePage = result.page;
       mobileContext = result.context;
 
-      // Navigate with the same Google referrer used in the desktop phase
+      // Navigate with domcontentloaded — networkidle hangs on sites with chatbots,
+      // analytics pings, and third-party scripts that never stop. domcontentloaded
+      // gets the same CWV metrics in ~4s vs 25s+ timeout with networkidle.
       try {
         await mobilePage.goto(this.context.url, {
-          waitUntil: 'networkidle',
-          timeout: MOBILE_NAV_TIMEOUT,
+          waitUntil: 'domcontentloaded',
+          timeout: 15_000,
           referer: this.getGoogleReferer(),
         });
       } catch {
-        try {
-          await mobilePage.waitForLoadState('domcontentloaded', { timeout: 10_000 });
-        } catch { /* best effort */ }
-      }
-
-      // Check for bot wall on mobile — mobile UAs may get different treatment (with timeout guard)
-      const botWall = await Promise.race([
-        detectAndHandleBotWall(mobilePage, this.context.url),
-        new Promise<{ detected: false; blocked: false; provider: null }>((resolve) =>
-          setTimeout(() => {
-            logger.warn('Mobile bot wall detection timed out after 45s');
-            resolve({ detected: false, blocked: false, provider: null });
-          }, 45_000),
-        ),
-      ]);
-      if (botWall.blocked) {
-        logger.debug(
-          { scanId: this.context.scanId, provider: botWall.provider },
-          'Mobile pass blocked by bot wall, skipping metrics',
-        );
+        logger.debug({ scanId: this.context.scanId }, 'Mobile navigation failed — skipping metrics');
         return;
       }
 
-      // Wait for CWV to stabilize after page load
-      await mobilePage.waitForTimeout(CWV_STABILIZATION_DELAY);
+      // 3s settle for paint entries to register (LCP, CLS, FCP)
+      await mobilePage.waitForTimeout(3_000);
 
-      // Collect mobile performance metrics via Performance API (15s timeout to prevent hangs)
+      // Collect mobile performance metrics via Performance API (10s timeout)
       const metrics = await Promise.race([
         mobilePage.evaluate(() => {
-        const perf = performance;
-        const nav = perf.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
-        const resources = perf.getEntriesByType('resource') as PerformanceResourceTiming[];
+          const perf = performance;
+          const nav = perf.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
+          const resources = perf.getEntriesByType('resource') as PerformanceResourceTiming[];
 
-        // LCP — last entry is the final (largest) paint
-        let lcp: number | null = null;
-        const lcpEntries = perf.getEntriesByType('largest-contentful-paint');
-        if (lcpEntries.length > 0) {
-          lcp = lcpEntries[lcpEntries.length - 1]!.startTime;
-        }
+          let lcp: number | null = null;
+          const lcpEntries = perf.getEntriesByType('largest-contentful-paint');
+          if (lcpEntries.length > 0) {
+            lcp = lcpEntries[lcpEntries.length - 1]!.startTime;
+          }
 
-        // CLS — sum of layout shift values excluding user-input-triggered shifts
-        // PerformanceEntry doesn't expose hadRecentInput/value, but the LayoutShift
-        // performance entry does. Use typed interface for clarity.
-        interface LayoutShiftEntry extends PerformanceEntry {
-          hadRecentInput: boolean;
-          value: number;
-        }
-        let cls: number | null = null;
-        const layoutShifts = perf.getEntriesByType('layout-shift') as LayoutShiftEntry[];
-        if (layoutShifts.length > 0) {
-          cls = 0;
-          for (const entry of layoutShifts) {
-            if (!entry.hadRecentInput) {
-              cls += entry.value;
+          interface LayoutShiftEntry extends PerformanceEntry {
+            hadRecentInput: boolean;
+            value: number;
+          }
+          let cls: number | null = null;
+          const layoutShifts = perf.getEntriesByType('layout-shift') as LayoutShiftEntry[];
+          if (layoutShifts.length > 0) {
+            cls = 0;
+            for (const entry of layoutShifts) {
+              if (!entry.hadRecentInput) {
+                cls += entry.value;
+              }
             }
           }
-        }
 
-        // FCP — first-contentful-paint from paint timing entries
-        let fcp: number | null = null;
-        const paintEntries = perf.getEntriesByType('paint');
-        for (const entry of paintEntries) {
-          if (entry.name === 'first-contentful-paint') fcp = entry.startTime;
-        }
+          let fcp: number | null = null;
+          const paintEntries = perf.getEntriesByType('paint');
+          for (const entry of paintEntries) {
+            if (entry.name === 'first-contentful-paint') fcp = entry.startTime;
+          }
 
-        // TTFB — time from request start to first response byte
-        const ttfb = nav?.responseStart ? nav.responseStart - nav.requestStart : 0;
+          const ttfb = nav?.responseStart ? nav.responseStart - nav.requestStart : 0;
 
-        // Total transferred bytes across all resources
-        let totalBytes = 0;
-        for (const res of resources) {
-          totalBytes += res.transferSize || res.encodedBodySize || 0;
-        }
+          let totalBytes = 0;
+          for (const res of resources) {
+            totalBytes += res.transferSize || res.encodedBodySize || 0;
+          }
 
-        return {
-          lcp,
-          cls,
-          fcp,
-          ttfb,
-          totalBytes,
-          resourceCount: resources.length,
-          domContentLoaded: nav?.domContentLoadedEventEnd ?? 0,
-          loadComplete: nav?.loadEventEnd ?? 0,
-          viewportWidth: window.innerWidth,
-          viewportHeight: window.innerHeight,
-          userAgent: navigator.userAgent,
-        };
-      }),
+          return {
+            lcp,
+            cls,
+            fcp,
+            ttfb,
+            totalBytes,
+            resourceCount: resources.length,
+            domContentLoaded: nav?.domContentLoadedEventEnd ?? 0,
+            loadComplete: nav?.loadEventEnd ?? 0,
+            viewportWidth: window.innerWidth,
+            viewportHeight: window.innerHeight,
+            userAgent: navigator.userAgent,
+          };
+        }),
         new Promise<null>((resolve) =>
           setTimeout(() => {
-            logger.warn({ scanId: this.context.scanId }, 'Mobile metrics evaluate timed out after 15s');
+            logger.warn({ scanId: this.context.scanId }, 'Mobile metrics evaluate timed out after 10s');
             resolve(null);
-          }, 15_000),
+          }, 10_000),
         ),
       ]);
 
