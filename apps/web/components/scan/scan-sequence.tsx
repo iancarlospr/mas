@@ -302,10 +302,9 @@ export function ScanSequence({
             <button
               onClick={onComplete}
               className="flex-shrink-0 font-data text-data-sm text-gs-terminal hover:text-gs-bright
-                         border border-gs-terminal/40 hover:border-gs-terminal px-3 py-1
-                         transition-colors whitespace-nowrap"
+                         px-3 py-1 transition-colors whitespace-nowrap"
             >
-              [EXIT]
+              [EXIT MOVIE]
             </button>
           </div>
         </div>
