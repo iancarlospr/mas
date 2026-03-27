@@ -222,8 +222,8 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     name: 'News Sentiment Scanner',
     phase: 'external',
     minimumTier: 'full',
-    timeout: 60_000,
-    retries: 5,
+    timeout: 120_000,
+    retries: 1,
     category: 'brand_presence',
   },
   {
