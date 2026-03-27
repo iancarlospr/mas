@@ -204,7 +204,7 @@ export function ScanInput({
           <>
             <Script
               src="https://challenges.cloudflare.com/turnstile/v0/api.js"
-              strategy="afterInteractive"
+              strategy="lazyOnload"
               onLoad={renderTurnstile}
             />
             <div

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
 import { ChloeSprite } from '@/components/chloe/chloe-sprite';
 import { MobileChloeLaser } from '@/components/chloe/mobile-chloe-laser';
@@ -11,16 +12,20 @@ import { useAuth } from '@/lib/auth-context';
 import { useWindowManager } from '@/lib/window-manager';
 import { useScanOrchestrator } from '@/lib/scan-orchestrator';
 import { analytics } from '@/lib/analytics';
-import FeaturesWindow from '@/components/windows/features-window';
-import ProductsWindow from '@/components/windows/products-window';
-import CustomersWindow from '@/components/windows/customers-window';
-import AboutWindow from '@/components/windows/about-window';
-import HistoryWindow from '@/components/windows/history-window';
-import ProfileWindow from '@/components/windows/profile-window';
-import AuthWindow from '@/components/windows/auth-window';
-import ChatWindow from '@/components/windows/chat-window';
-import { DesktopReminderForm } from '@/components/mobile/desktop-reminder-form';
 import { createClient } from '@/lib/supabase/client';
+
+/* ── Lazy-loaded window components (below fold / overlay-only) ── */
+const FeaturesWindow = dynamic(() => import('@/components/windows/features-window'));
+const ProductsWindow = dynamic(() => import('@/components/windows/products-window'));
+const CustomersWindow = dynamic(() => import('@/components/windows/customers-window'));
+const AboutWindow = dynamic(() => import('@/components/windows/about-window'));
+const HistoryWindow = dynamic(() => import('@/components/windows/history-window'));
+const ProfileWindow = dynamic(() => import('@/components/windows/profile-window'), { ssr: false });
+const AuthWindow = dynamic(() => import('@/components/windows/auth-window'), { ssr: false });
+const ChatWindow = dynamic(() => import('@/components/windows/chat-window'), { ssr: false });
+const DesktopReminderForm = dynamic(
+  () => import('@/components/mobile/desktop-reminder-form').then((m) => ({ default: m.DesktopReminderForm })),
+);
 
 interface MobilePaidScan {
   id: string;
