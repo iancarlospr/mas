@@ -210,6 +210,7 @@ export function ScanInput({
             <div
               className="mt-gs-3 flex justify-center"
               style={{
+                minHeight: '65px',
                 opacity: 0.5,
                 transform: 'scale(0.85)',
                 transformOrigin: 'center',
@@ -355,6 +356,7 @@ export function ScanInput({
           <div
             className="flex justify-center"
             style={{
+              minHeight: '65px',
               opacity: 0.5,
               transform: 'scale(0.85)',
               transformOrigin: 'center',
