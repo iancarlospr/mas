@@ -26,9 +26,9 @@ const MODULE_WEIGHTS: Record<string, number> = {
 const TOTAL_WEIGHT = Object.values(MODULE_WEIGHTS).reduce((a, b) => a + b, 0);
 const DEFAULT_WEIGHT = 2;
 
-// Time-based floor: advances linearly so the bar always moves during long modules
-const EXPECTED_SCAN_SECONDS = 720; // 12min — conservative so floor doesn't cap early on slow scans
-const TIME_FLOOR_CAP = 95;         // floor caps here; only the complete event sends 100
+// Time-based floor: exponential ease-out so bar moves fast early, slows gradually, never stops
+const TIME_FLOOR_TAU = 300;  // time constant (~5min) — controls deceleration rate
+const TIME_FLOOR_CAP = 95;   // asymptotic cap; never actually reached, only complete event sends 100
 
 export async function GET(
   request: NextRequest,
@@ -151,7 +151,7 @@ export async function GET(
             let timeFloor = 0;
             if (scanStartTime !== null) {
               const elapsed = (Date.now() - scanStartTime) / 1000;
-              timeFloor = Math.min(TIME_FLOOR_CAP, (elapsed / EXPECTED_SCAN_SECONDS) * 100);
+              timeFloor = TIME_FLOOR_CAP * (1 - Math.exp(-elapsed / TIME_FLOOR_TAU));
             }
 
             const progress = Math.min(99, Math.round(Math.max(weightedPct, timeFloor)));
@@ -179,7 +179,7 @@ export async function GET(
             let timeFloor = 0;
             if (scanStartTime !== null) {
               const elapsed = (Date.now() - scanStartTime) / 1000;
-              timeFloor = Math.min(TIME_FLOOR_CAP, (elapsed / EXPECTED_SCAN_SECONDS) * 100);
+              timeFloor = TIME_FLOOR_CAP * (1 - Math.exp(-elapsed / TIME_FLOOR_TAU));
             }
 
             const weightedPct = (weightedSum / TOTAL_WEIGHT) * 100;
