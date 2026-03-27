@@ -231,10 +231,8 @@ export default function BetaTrackerWindow() {
 
     async function load() {
       try {
-        const res = await fetch('/api/admin/beta?token=' + encodeURIComponent(
-          // Read ADMIN_TOKEN from cookie if available, fallback to prompt
-          document.cookie.match(/(?:^|;\s*)__admin_token=([^;]+)/)?.[1] ?? ''
-        ));
+        // Cookie is httpOnly — browser sends it automatically, no client-side read needed
+        const res = await fetch('/api/admin/beta');
         if (!res.ok) {
           if (res.status === 401) {
             setError('Access denied — admin token required');

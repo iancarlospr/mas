@@ -61,11 +61,11 @@ export async function middleware(request: NextRequest) {
         sameSite: 'lax',
         maxAge: 60 * 60 * 24 * 30, // 30 days
       });
-      // Capture admin token into client-readable cookie (Mission Control access)
+      // Capture admin token into httpOnly cookie (Mission Control access)
       const adminParam = request.nextUrl.searchParams.get('admin');
       if (adminParam) {
         response.cookies.set('__admin_token', adminParam, {
-          httpOnly: false,
+          httpOnly: true, // not accessible to client JS — prevents XSS theft
           secure: true,
           sameSite: 'lax',
           maxAge: 60 * 60 * 24 * 30, // 30 days

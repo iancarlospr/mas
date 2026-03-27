@@ -4,9 +4,9 @@ import { createServiceClient } from '@/lib/supabase/server';
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN ?? process.env.ENGINE_HMAC_SECRET;
 
 export async function GET(request: NextRequest) {
-  // Simple token auth — not meant for public access
-  const token = request.headers.get('x-admin-token')
-    ?? request.nextUrl.searchParams.get('token');
+  // Admin token auth — httpOnly cookie (set by middleware) or header
+  const token = request.cookies.get('__admin_token')?.value
+    ?? request.headers.get('x-admin-token');
   if (!ADMIN_TOKEN || token !== ADMIN_TOKEN) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
