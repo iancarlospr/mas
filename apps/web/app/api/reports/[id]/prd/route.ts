@@ -870,7 +870,7 @@ function markdownToHtml(md: string): string {
 
   const fmt = (text: string): string =>
     text
-      .replace(/`([^`]+)`/g, '<code>$1</code>')
+      .replace(/`([^`]+)`/g, (_, inner: string) => `<code>${escapeHtml(inner)}</code>`)
       .replace(/\*\*([^*]+)\*\*/g, (_, inner: string) => {
         // Field label detection: **Context:** **Implementation:** etc
         if (/^[A-Z][a-z]+(\s[a-z]+)?:$/.test(inner)) {

@@ -112,13 +112,6 @@ THE DOCUMENT must follow this structure:
 - [ ] [Next item]
 ...
 
-## Financial Impact Analysis
-[If M44 ROI data is available, compile a section covering:]
-- Cost optimization areas with current vs. optimized spend
-- Annual savings opportunity by category
-- ROI projection for recommended changes
-[If M44 data is not available, omit this section entirely.]
-
 ## Tool Rationalization
 [If M45 Cost Cutter data is available, compile a section covering:]
 - Redundant tools and recommended consolidations
@@ -293,9 +286,6 @@ const execute = async (ctx: ModuleContext): Promise<ModuleResult> => {
   const m41Data = (m41Result?.data ?? {}) as Record<string, unknown>;
   const m42Data = m42Result.data as Record<string, unknown>;
 
-  const m44Result = ctx.previousResults.get('M44' as ModuleId);
-  const m44Data = (m44Result?.status === 'success' ? m44Result.data : null) as Record<string, unknown> | null;
-
   const m45Result = ctx.previousResults.get('M45' as ModuleId);
   const m45Data = (m45Result?.status === 'success' ? m45Result.data : null) as Record<string, unknown> | null;
 
@@ -371,7 +361,7 @@ ${executiveBrief}
 
 ## Cross-Module Themes (from M42)
 <website_data>
-${JSON.stringify(keyFindings, null, 2)}
+${JSON.stringify(keyFindings)}
 </website_data>
 
 ## Category Assessments (from M42)
@@ -381,7 +371,7 @@ ${categoryLines.join('\n')}
 
 ## Tech Stack Detected
 <website_data>
-${JSON.stringify(techStack, null, 2)}
+${JSON.stringify(techStack)}
 </website_data>
 
 ## All Findings by Priority (from M41 module analyses)
@@ -395,21 +385,12 @@ ${formatPriorityFindings(findings.p2, 'P2 — This Month')}
 
 ${formatPriorityFindings(findings.p3, 'P3 — Backlog')}
 </website_data>
-${m44Data ? `
-## Financial Impact Analysis (from M44 — ROI Simulator)
-<website_data>
-${m44Data['costAreas'] ? `### Cost Optimization Areas\n${JSON.stringify(m44Data['costAreas'], null, 2)}` : ''}
-${m44Data['totalAnnualSavings'] ? `### Total Estimated Annual Savings: $${(m44Data['totalAnnualSavings'] as number).toLocaleString()}` : ''}
-${m44Data['impactCategories'] ? `### Impact by Category\n${JSON.stringify(m44Data['impactCategories'], null, 2)}` : ''}
-${m44Data['totalOpportunity'] ? `### Total Opportunity Value: $${(m44Data['totalOpportunity'] as number).toLocaleString()}` : ''}
-</website_data>
-` : ''}
 ${m45Data ? `
 ## Tool Rationalization (from M45 — Cost Cutter)
 <website_data>
-${m45Data['redundancies'] ? `### Redundant Tools\n${JSON.stringify(m45Data['redundancies'], null, 2)}` : ''}
-${m45Data['abandonedTools'] ? `### Abandoned / Underused Tools\n${JSON.stringify(m45Data['abandonedTools'], null, 2)}` : ''}
-${m45Data['alternatives'] ? `### Recommended Alternatives\n${JSON.stringify(m45Data['alternatives'], null, 2)}` : ''}
+${m45Data['redundancies'] ? `### Redundant Tools\n${JSON.stringify(m45Data['redundancies'])}` : ''}
+${m45Data['abandonedTools'] ? `### Abandoned / Underused Tools\n${JSON.stringify(m45Data['abandonedTools'])}` : ''}
+${m45Data['alternatives'] ? `### Recommended Alternatives\n${JSON.stringify(m45Data['alternatives'])}` : ''}
 ${m45Data['totalAnnualWaste'] ? `### Total Annual Waste from Tool Redundancy: $${(m45Data['totalAnnualWaste'] as number).toLocaleString()}` : ''}
 </website_data>
 ` : ''}
