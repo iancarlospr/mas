@@ -30,6 +30,7 @@ const logger = pino({ name: 'module-runner' });
 const CRUX_TIMEOUT = 20_000;
 const MOBILE_NAV_TIMEOUT = 25_000;
 const CWV_STABILIZATION_DELAY = 2_000;
+const MOBILE_PASS_TIMEOUT = 90_000;
 
 /**
  * Modules available on the free tier. Only MarTech & Infrastructure.
@@ -200,7 +201,17 @@ export class ModuleRunner {
             break;
           case 'browser':
             await this.runBrowserPhase();
-            if (this.tier !== 'full') await this.runMobilePass();
+            if (this.tier !== 'full') {
+              await Promise.race([
+                this.runMobilePass(),
+                new Promise<void>((resolve) =>
+                  setTimeout(() => {
+                    logger.warn({ scanId: this.context.scanId }, 'Mobile pass timed out after 90s — skipping');
+                    resolve();
+                  }, MOBILE_PASS_TIMEOUT),
+                ),
+              ]);
+            }
             break;
           case 'ghostscan':
             await this.runGhostScanPhase();
@@ -1387,8 +1398,9 @@ export class ModuleRunner {
       // Wait for CWV to stabilize after page load
       await mobilePage.waitForTimeout(CWV_STABILIZATION_DELAY);
 
-      // Collect mobile performance metrics via Performance API
-      const metrics = await mobilePage.evaluate(() => {
+      // Collect mobile performance metrics via Performance API (15s timeout to prevent hangs)
+      const metrics = await Promise.race([
+        mobilePage.evaluate(() => {
         const perf = performance;
         const nav = perf.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
         const resources = perf.getEntriesByType('resource') as PerformanceResourceTiming[];
@@ -1447,13 +1459,22 @@ export class ModuleRunner {
           viewportHeight: window.innerHeight,
           userAgent: navigator.userAgent,
         };
-      });
+      }),
+        new Promise<null>((resolve) =>
+          setTimeout(() => {
+            logger.warn({ scanId: this.context.scanId }, 'Mobile metrics evaluate timed out after 15s');
+            resolve(null);
+          }, 15_000),
+        ),
+      ]);
 
-      this.context.mobileMetrics = metrics;
-      logger.info(
-        { scanId: this.context.scanId, lcp: metrics.lcp, cls: metrics.cls, totalBytes: metrics.totalBytes },
-        'Mobile pass metrics collected',
-      );
+      if (metrics) {
+        this.context.mobileMetrics = metrics;
+        logger.info(
+          { scanId: this.context.scanId, lcp: metrics.lcp, cls: metrics.cls, totalBytes: metrics.totalBytes },
+          'Mobile pass metrics collected',
+        );
+      }
     } catch (error) {
       logger.debug(
         { scanId: this.context.scanId, error: (error as Error).message },
