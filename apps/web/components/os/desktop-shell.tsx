@@ -183,6 +183,7 @@ export function DesktopShell({ children }: { children: ReactNode }) {
 
   return (
     <div
+      data-desktop-shell
       className="fixed inset-0 flex flex-col bg-gs-void overflow-hidden select-none"
       role="application"
       aria-label="AlphaScan Desktop"

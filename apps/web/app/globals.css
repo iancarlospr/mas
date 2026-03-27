@@ -109,6 +109,10 @@
       overflow: auto;
       -webkit-overflow-scrolling: touch;
     }
+    /* Hide desktop shell on mobile — prevents flash before React hydration */
+    [data-desktop-shell] {
+      display: none !important;
+    }
   }
 
   /* System font for OS chrome */

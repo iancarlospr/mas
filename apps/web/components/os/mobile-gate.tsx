@@ -189,7 +189,9 @@ function AnimatedChloe({ size, state, className }: { size: 32 | 64; state: 'idle
 const MOBILE_PASSTHROUGH = ['/login', '/register', '/auth/', '/scan/', '/chat/', '/history', '/verify'];
 
 export function MobileGate({ children }: { children: React.ReactNode }) {
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState(
+    () => typeof window !== 'undefined' && window.innerWidth < 1024
+  );
   const [heroVisible, setHeroVisible] = useState(true);
   const heroRef = useRef<HTMLDivElement>(null);
   const pricingRef = useRef<HTMLDivElement>(null);

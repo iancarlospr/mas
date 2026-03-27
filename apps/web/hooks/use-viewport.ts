@@ -11,7 +11,9 @@ type ViewportClass = 'mobile' | 'desktop';
  * Default 'desktop' for SSR — scan page loading state masks the hydration swap.
  */
 export function useViewport(): ViewportClass {
-  const [viewport, setViewport] = useState<ViewportClass>('desktop');
+  const [viewport, setViewport] = useState<ViewportClass>(
+    () => typeof window !== 'undefined' ? (window.innerWidth >= 1024 ? 'desktop' : 'mobile') : 'desktop',
+  );
 
   useEffect(() => {
     const mql = window.matchMedia('(min-width: 1024px)');

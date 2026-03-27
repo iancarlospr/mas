@@ -82,6 +82,9 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd()) }}
         />
+        <script dangerouslySetInnerHTML={{ __html:
+          `if(window.innerWidth<1024)document.documentElement.dataset.device="mobile"`
+        }} />
         <PostHogProvider>
           <DesktopRoot>
             {children}
