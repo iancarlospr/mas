@@ -53,9 +53,11 @@ function rasterizeCloserBg(container: HTMLElement): Promise<void> {
       const ctx = c.getContext('2d');
       if (!ctx) { resolve(); return; }
 
-      // Try native canvas filter (Chrome, Firefox, Safari 17.2+)
+      // Try native canvas filter (Chrome, Firefox, Safari 17.2+).
+      // On iOS, ctx.filter property "sticks" but silently doesn't apply to
+      // drawImage — always use pixel fallback on iOS.
       ctx.filter = 'blur(30px) saturate(0.4) brightness(0.2)';
-      const nativeFilter = ctx.filter !== 'none' && ctx.filter !== '';
+      const nativeFilter = !isIOSDevice() && ctx.filter !== 'none' && ctx.filter !== '';
 
       if (nativeFilter) {
         ctx.drawImage(img, 0, 0, c.width, c.height);
