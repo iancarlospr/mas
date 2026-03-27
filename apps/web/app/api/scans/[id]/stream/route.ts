@@ -26,9 +26,12 @@ const MODULE_WEIGHTS: Record<string, number> = {
 const TOTAL_WEIGHT = Object.values(MODULE_WEIGHTS).reduce((a, b) => a + b, 0);
 const DEFAULT_WEIGHT = 2;
 
-// Time-based floor: exponential ease-out so bar moves fast early, slows gradually, never stops
-const TIME_FLOOR_TAU = 300;  // time constant (~5min) — controls deceleration rate
-const TIME_FLOOR_CAP = 95;   // asymptotic cap; never actually reached, only complete event sends 100
+// Creep between module completions: exponential curve added to weighted progress
+const CREEP_TAU = 180;   // 3min time constant — controls how fast creep builds
+const CREEP_CAP = 30;    // max 30% creep between completions
+
+// Hard rule: bar must advance at least 1% every 60 seconds no matter what
+const MIN_ADVANCE_INTERVAL_MS = 60_000;
 
 export async function GET(
   request: NextRequest,
@@ -85,9 +88,10 @@ export async function GET(
       // Adaptive polling: 2s during active scan, 5s near completion
       let pollInterval = 2000;
 
-      // Smooth progress state
-      let scanStartTime: number | null = null;
+      // Progress state
       let lastSentProgress = 0;
+      let lastProgressTime: number | null = null;   // when progress last changed
+      let lastCompletionTime: number | null = null;  // when last module completed (for creep reset)
       let completedModuleIds: string[] = [];
 
       const poll = async () => {
@@ -125,11 +129,6 @@ export async function GET(
             send({ type: 'status', scanId: id, status: scan.status });
           }
 
-          // Start clock from first module completion
-          if (scanStartTime === null && currentCount > 0) {
-            scanStartTime = Date.now();
-          }
-
           // --- Module-based weighted progress ---
           let weightedSum = 0;
           if (currentCount > lastModuleCount) {
@@ -147,14 +146,8 @@ export async function GET(
             );
             const weightedPct = (weightedSum / TOTAL_WEIGHT) * 100;
 
-            // Time-based floor for this tick
-            let timeFloor = 0;
-            if (scanStartTime !== null) {
-              const elapsed = (Date.now() - scanStartTime) / 1000;
-              timeFloor = TIME_FLOOR_CAP * (1 - Math.exp(-elapsed / TIME_FLOOR_TAU));
-            }
-
-            const progress = Math.min(99, Math.round(Math.max(weightedPct, timeFloor)));
+            // Guaranteed +1% on every poll with new modules — completions are always visible
+            const progress = Math.min(99, Math.max(lastSentProgress + 1, Math.round(weightedPct)));
 
             // Send module events for new completions
             const newModules = currentModules.slice(lastModuleCount);
@@ -169,26 +162,33 @@ export async function GET(
             }
             lastModuleCount = currentModules.length;
             lastSentProgress = progress;
+            lastProgressTime = Date.now();
+            lastCompletionTime = Date.now();
           } else {
-            // No new modules — recalculate weighted sum from cache
+            // No new modules — creep between completions keeps bar moving
             weightedSum = completedModuleIds.reduce(
               (sum, mid) => sum + (MODULE_WEIGHTS[mid] ?? DEFAULT_WEIGHT), 0
             );
+            const weightedPct = (weightedSum / TOTAL_WEIGHT) * 100;
 
-            // Time-based floor keeps the bar moving during long modules (M21, synthesis)
-            let timeFloor = 0;
-            if (scanStartTime !== null) {
-              const elapsed = (Date.now() - scanStartTime) / 1000;
-              timeFloor = TIME_FLOOR_CAP * (1 - Math.exp(-elapsed / TIME_FLOOR_TAU));
+            // Exponential creep: added to weighted, resets on each completion
+            let creep = 0;
+            if (lastCompletionTime !== null) {
+              const sinceLast = (Date.now() - lastCompletionTime) / 1000;
+              creep = CREEP_CAP * (1 - Math.exp(-sinceLast / CREEP_TAU));
             }
 
-            const weightedPct = (weightedSum / TOTAL_WEIGHT) * 100;
-            const smoothProgress = Math.min(99, Math.round(Math.max(weightedPct, timeFloor)));
+            let smoothProgress = Math.min(99, Math.round(weightedPct + creep));
 
-            // Send progress tick if it advanced (even without new module completions)
+            // Hard rule: at least 1% every 60 seconds — bar must NEVER look frozen
+            if (lastProgressTime !== null && (Date.now() - lastProgressTime) >= MIN_ADVANCE_INTERVAL_MS) {
+              smoothProgress = Math.min(99, Math.max(smoothProgress, lastSentProgress + 1));
+            }
+
             if (smoothProgress > lastSentProgress) {
               send({ type: 'status', scanId: id, progress: smoothProgress });
               lastSentProgress = smoothProgress;
+              lastProgressTime = Date.now();
             }
           }
 
