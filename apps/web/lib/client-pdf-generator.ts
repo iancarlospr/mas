@@ -26,24 +26,65 @@ const GRAIN_SELECTORS = '.bar-grain, .bar-grain-light, .wins-grain, .results-gra
  * Pre-rasterize the closer slide's background image with its CSS filters
  * (blur 30px, saturate 0.4, brightness 0.2) baked in. html2canvas can't
  * render CSS filter on img elements, so we draw the filtered result onto
- * a canvas and replace the img. Uses canvas 2D context's filter property.
+ * a canvas and replace the img.
+ *
+ * On iOS/mobile: large data URI images may report complete=true before the
+ * bitmap is decoded → drawImage draws nothing. We use img.decode() to
+ * guarantee readiness. If ctx.filter is unsupported (older iOS Safari), a
+ * pixel-manipulation + scale-down blur fallback kicks in.
  */
 function rasterizeCloserBg(container: HTMLElement): Promise<void> {
   const img = container.querySelector<HTMLImageElement>('.closer-bg');
   if (!img) return Promise.resolve();
 
   return new Promise((resolve) => {
-    const apply = () => {
+    const apply = async () => {
+      // On iOS, data URIs can report complete=true before bitmap is decoded.
+      // img.decode() guarantees the bitmap is ready for canvas drawing.
+      if (isIOSDevice()) {
+        try { await img.decode(); } catch { /* proceed anyway */ }
+      }
+
       const c = document.createElement('canvas');
       // Render at slightly larger size to account for scale(1.15) + blur bleed
       const scale = 1.15;
       c.width = Math.round(BD_W * scale);
       c.height = Math.round(BD_H * scale);
       const ctx = c.getContext('2d');
-      if (ctx) {
-        ctx.filter = 'blur(30px) saturate(0.4) brightness(0.2)';
+      if (!ctx) { resolve(); return; }
+
+      // Try native canvas filter (Chrome, Firefox, Safari 17.2+)
+      ctx.filter = 'blur(30px) saturate(0.4) brightness(0.2)';
+      const nativeFilter = ctx.filter !== 'none' && ctx.filter !== '';
+
+      if (nativeFilter) {
         ctx.drawImage(img, 0, 0, c.width, c.height);
+      } else {
+        // Fallback for browsers without ctx.filter (older iOS Safari):
+        // 1. Draw raw image
+        // 2. Apply saturate(0.4) + brightness(0.2) via pixel manipulation
+        // 3. Approximate heavy blur via scale-down trick
+        ctx.filter = 'none';
+        ctx.drawImage(img, 0, 0, c.width, c.height);
+        const id = ctx.getImageData(0, 0, c.width, c.height);
+        const d = id.data;
+        for (let p = 0; p < d.length; p += 4) {
+          const r = d[p]!, g = d[p + 1]!, b = d[p + 2]!;
+          const gray = 0.299 * r + 0.587 * g + 0.114 * b;
+          d[p]     = (gray + 0.4 * (r - gray)) * 0.2;
+          d[p + 1] = (gray + 0.4 * (g - gray)) * 0.2;
+          d[p + 2] = (gray + 0.4 * (b - gray)) * 0.2;
+        }
+        ctx.putImageData(id, 0, 0);
+        // 3-pass scale-down blur (approximates heavy Gaussian blur)
+        const sw = Math.max(1, c.width >> 3);
+        const sh = Math.max(1, c.height >> 3);
+        for (let i = 0; i < 3; i++) {
+          ctx.drawImage(c, 0, 0, c.width, c.height, 0, 0, sw, sh);
+          ctx.drawImage(c, 0, 0, sw, sh, 0, 0, c.width, c.height);
+        }
       }
+
       // Replace img with the pre-filtered canvas
       Object.assign(c.style, {
         position: 'absolute',
@@ -60,9 +101,9 @@ function rasterizeCloserBg(container: HTMLElement): Promise<void> {
 
     if (img.complete && img.naturalWidth > 0) apply();
     else {
-      img.onload = apply;
-      // Fallback if image never loads
-      setTimeout(resolve, 3000);
+      img.onload = () => apply();
+      // Increased from 3s → 6s for mobile (large data URIs decode slower)
+      setTimeout(resolve, 6000);
     }
   });
 }
