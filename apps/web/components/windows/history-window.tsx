@@ -229,7 +229,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                 <div className="flex items-center" style={{ padding: '10px 10px 12px 16px', gap: 8 }}>
                   <span
                     className="min-w-0 font-data font-bold truncate"
-                    style={{ fontSize: 15, color: 'var(--gs-light)', flex: '1 1 0%', minWidth: 0 }}
+                    style={{ fontSize: 15, color: 'var(--gs-light)', flex: '0 1 auto' }}
                   >
                     {domain}
                   </span>
@@ -261,6 +261,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
                       <svg className="w-3.5 h-3.5 inline-block text-gs-warning animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round"><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>
                     )}
                   </span>
+                  <span className="flex-1" />
                   <span className="font-data" style={{ flexShrink: 0, fontSize: 12, color: 'oklch(0.50 0.04 340)' }}>
                     {new Date(scan.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                   </span>
