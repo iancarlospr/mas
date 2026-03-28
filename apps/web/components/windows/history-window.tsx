@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/auth-context';
 import { useWindowManager } from '@/lib/window-manager';
@@ -134,35 +134,35 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
     load();
   }, [user?.id]);
 
-  // When activeScanId transitions non-null → null, a scan just finished.
-  // Re-fetch that single row to update status + score in place.
-  const prevActiveScanIdRef = useRef<string | null>(null);
-  useEffect(() => {
-    const prevId = prevActiveScanIdRef.current;
-    prevActiveScanIdRef.current = orchestrator.activeScanId;
+  // Poll for in-progress scans until they reach terminal status.
+  // Same pattern as scan-progress.tsx polling fallback (lines 167-188).
+  const TERMINAL = useMemo(() => new Set(['complete', 'failed', 'cancelled']), []);
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const activeKey = scans.filter((s) => !TERMINAL.has(s.status)).map((s) => s.id).join(',');
 
-    if (prevId && !orchestrator.activeScanId) {
+  useEffect(() => {
+    if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
+    if (!activeKey) return; // no active scans — nothing to poll
+
+    const activeIds = activeKey.split(',');
+
+    pollRef.current = setInterval(async () => {
       const supabase = createClient();
-      supabase
+      const { data } = await supabase
         .from('scans')
         .select('id, url, marketing_iq, status, tier, created_at')
-        .eq('id', prevId)
-        .single()
-        .then(({ data }) => {
-          if (data) {
-            setScans((prev) => {
-              const idx = prev.findIndex((s) => s.id === data.id);
-              if (idx >= 0) {
-                const next = [...prev];
-                next[idx] = data;
-                return next;
-              }
-              return [data, ...prev];
-            });
-          }
+        .in('id', activeIds);
+
+      if (data) {
+        setScans((prev) => {
+          const updated = new Map(data.map((d) => [d.id, d]));
+          return prev.map((s) => updated.get(s.id) ?? s);
         });
-    }
-  }, [orchestrator.activeScanId]);
+      }
+    }, 5000);
+
+    return () => { if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; } };
+  }, [activeKey, TERMINAL]);
 
   if (authLoading || dataLoading) {
     return (

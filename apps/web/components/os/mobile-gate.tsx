@@ -506,7 +506,7 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
                 </p>
               </div>
               <div className="mobile-my-scans">
-                <HistoryWindow onChatOpen={openChatOverlay} />
+                <HistoryWindow key={historyKey} onChatOpen={openChatOverlay} />
               </div>
             </section>
           </>
