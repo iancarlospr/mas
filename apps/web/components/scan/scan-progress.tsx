@@ -33,6 +33,8 @@ interface ScanProgressProps {
   domain: string;
   /** Callback when scan completes and sequence finishes */
   onComplete: () => void;
+  /** Callback when user manually exits the movie (scan keeps running) */
+  onExit?: () => void;
   /** Whether this scan was served from cache */
   isCached?: boolean;
   /** Whether this is the user's first scan */
@@ -97,6 +99,7 @@ export function ScanProgress({
   scanId,
   domain,
   onComplete,
+  onExit,
   isCached = false,
   isFirstScan = true,
   userName,
@@ -224,6 +227,7 @@ export function ScanProgress({
         isCached={isCached}
         isFirstScan={isFirstScan}
         onComplete={handleSequenceComplete}
+        onExit={onExit}
         userName={userName}
       />
     );
@@ -242,6 +246,7 @@ export function ScanProgress({
       finalScoreLabel={scoreLabel}
       moduleCount={completedModules.length}
       onComplete={handleSequenceComplete}
+      onExit={onExit}
       userName={userName}
     />
   );

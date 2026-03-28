@@ -60,6 +60,8 @@ interface ScanSequenceProps {
   moduleCount?: number;
   /** Callback when sequence finishes and desktop should boot */
   onComplete: () => void;
+  /** Callback when user manually exits the movie (scan keeps running) */
+  onExit?: () => void;
   /** User's display name (for Matrix intro text) */
   userName?: string;
   /** Pause the sequence (freezes all phase timers) — used for auth gate */
@@ -112,6 +114,7 @@ export function ScanSequence({
   finalScoreLabel,
   moduleCount,
   onComplete,
+  onExit,
   userName = 'operative',
   paused = false,
 }: ScanSequenceProps) {
@@ -300,7 +303,7 @@ export function ScanSequence({
               <ProgressBar value={progress} variant="terminal" />
             </div>
             <button
-              onClick={onComplete}
+              onClick={onExit ?? onComplete}
               className="flex-shrink-0 font-data text-data-sm text-gs-terminal hover:text-gs-bright
                          px-3 py-1 transition-colors whitespace-nowrap"
             >

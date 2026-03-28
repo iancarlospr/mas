@@ -367,6 +367,16 @@ export function ScanOrchestratorProvider({ children }: { children: ReactNode }) 
           domain={activeScan.domain}
           isCached={activeScan.isCached}
           onComplete={() => handleScanComplete(activeScan.scanId, activeScan.domain)}
+          onExit={() => {
+            setActiveScan(null);
+            const mobileHandler = mobileCompleteRef.current;
+            if (mobileHandler) {
+              mobileCompleteRef.current = null;
+              mobileHandler('', '');
+            } else {
+              wm.openWindow('history');
+            }
+          }}
         />
       )}
       {visualSequence && (
