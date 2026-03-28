@@ -171,20 +171,39 @@ export default async function Image() {
           }}
         />
 
-        {/* ASCII brand logo — pink glowing, centered, big */}
+        {/* Brand logo — large pink text, Satori-safe (no Unicode box chars) */}
         <div
           style={{
-            fontSize: '18px',
-            fontFamily: 'monospace',
-            color: '#FFB2EF',
-            letterSpacing: '0.02em',
-            lineHeight: 1.15,
-            whiteSpace: 'pre',
-            textAlign: 'center',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
             position: 'relative',
           }}
         >
-          {` █████╗ ██╗     ██████╗ ██╗  ██╗ █████╗     ███████╗ ██████╗ █████╗ ███╗   ██╗\n██╔══██╗██║     ██╔══██╗██║  ██║██╔══██╗    ██╔════╝██╔════╝██╔══██╗████╗  ██║\n███████║██║     ██████╔╝███████║███████║    ███████╗██║     ███████║██╔██╗ ██║\n██╔══██║██║     ██╔═══╝ ██╔══██║██╔══██║    ╚════██║██║     ██╔══██║██║╚██╗██║\n██║  ██║███████╗██║     ██║  ██║██║  ██║    ███████║╚██████╗██║  ██║██║ ╚████║\n╚═╝  ╚═╝╚══════╝╚═╝     ╚═╝  ╚═╝╚═╝  ╚═╝    ╚══════╝ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═══╝`}
+          <div
+            style={{
+              fontSize: '96px',
+              fontFamily: 'monospace',
+              fontWeight: 700,
+              color: '#FFB2EF',
+              letterSpacing: '-0.02em',
+              lineHeight: 1,
+              textAlign: 'center',
+            }}
+          >
+            ALPHA SCAN
+          </div>
+          <div
+            style={{
+              fontSize: '16px',
+              color: '#5A4C5F',
+              letterSpacing: '0.3em',
+              textTransform: 'uppercase',
+              marginTop: '16px',
+            }}
+          >
+            Forensic Marketing Intelligence
+          </div>
         </div>
 
         {/* Glowing divider */}
