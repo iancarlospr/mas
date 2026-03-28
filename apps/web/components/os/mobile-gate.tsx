@@ -26,6 +26,9 @@ const ChatWindow = dynamic(() => import('@/components/windows/chat-window'), { s
 const DesktopReminderForm = dynamic(
   () => import('@/components/mobile/desktop-reminder-form').then((m) => ({ default: m.DesktopReminderForm })),
 );
+const MobileBlogSection = dynamic(
+  () => import('@/components/mobile/mobile-blog-section').then((m) => ({ default: m.MobileBlogSection })),
+);
 
 interface MobilePaidScan {
   id: string;
@@ -191,7 +194,7 @@ function AnimatedChloe({ size, state, className }: { size: 32 | 64; state: 'idle
 /* ── Main component ──────────────────────────────────────────── */
 
 /* Routes that should render their own page content on mobile instead of the landing page */
-const MOBILE_PASSTHROUGH = ['/login', '/register', '/auth/', '/scan/', '/chat/', '/history', '/verify'];
+const MOBILE_PASSTHROUGH = ['/login', '/register', '/auth/', '/scan/', '/chat/', '/history', '/verify', '/blog'];
 
 export function MobileGate({ children }: { children: React.ReactNode }) {
   const [isMobile, setIsMobile] = useState(
@@ -610,7 +613,14 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
           <SectionDivider />
         </div>
 
-        {/* ═══════ SECTION 7: ABOUT (doubles as footer) ═══════ */}
+        {/* ═══════ BLOG: UNDER THE STACK ═══════ */}
+        <section className="py-gs-2">
+          <MobileBlogSection />
+        </section>
+
+        <SectionDivider />
+
+        {/* ═══════ ABOUT (doubles as footer) ═══════ */}
         <section className="py-gs-2 mobile-about-footer relative z-[1]">
           <AboutWindow />
         </section>
