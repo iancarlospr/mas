@@ -23,6 +23,7 @@ const HistoryWindow = dynamic(() => import('@/components/windows/history-window'
 const ProfileWindow = dynamic(() => import('@/components/windows/profile-window'), { ssr: false });
 const AuthWindow = dynamic(() => import('@/components/windows/auth-window'), { ssr: false });
 const ChatWindow = dynamic(() => import('@/components/windows/chat-window'), { ssr: false });
+const BlogWindow = dynamic(() => import('@/components/windows/blog-window'));
 const DesktopReminderForm = dynamic(
   () => import('@/components/mobile/desktop-reminder-form').then((m) => ({ default: m.DesktopReminderForm })),
 );
@@ -194,7 +195,7 @@ function AnimatedChloe({ size, state, className }: { size: 32 | 64; state: 'idle
 /* ── Main component ──────────────────────────────────────────── */
 
 /* Routes that should render their own page content on mobile instead of the landing page */
-const MOBILE_PASSTHROUGH = ['/login', '/register', '/auth/', '/scan/', '/chat/', '/history', '/verify', '/blog'];
+const MOBILE_PASSTHROUGH = ['/login', '/register', '/auth/', '/scan/', '/chat/', '/history', '/verify'];
 
 export function MobileGate({ children }: { children: React.ReactNode }) {
   const [isMobile, setIsMobile] = useState(
@@ -212,7 +213,7 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
   const [historyKey, setHistoryKey] = useState(0);
   const prevScanIdRef = useRef<string | null>(null);
   // Overlay state for auth + profile + chat
-  const [mobileOverlay, setMobileOverlay] = useState<'login' | 'register' | 'profile' | 'chat' | null>(null);
+  const [mobileOverlay, setMobileOverlay] = useState<'login' | 'register' | 'profile' | 'chat' | 'blog' | null>(null);
   const [chatContext, setChatContext] = useState<{ scanId: string; domain: string } | null>(null);
   // Paid scan detection for conditional layout
   const [paidScans, setPaidScans] = useState<MobilePaidScan[]>([]);
@@ -615,7 +616,10 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
 
         {/* ═══════ BLOG: UNDER THE STACK ═══════ */}
         <section className="py-gs-2 relative z-[1]">
-          <MobileBlogSection />
+          <MobileBlogSection
+            onPostOpen={() => setMobileOverlay('blog')}
+            onViewAll={() => setMobileOverlay('blog')}
+          />
         </section>
 
         <SectionDivider />
@@ -752,6 +756,24 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
               onAuthRequired={() => openAuthOverlay('login')}
               onPurchaseCredits={handlePurchaseCredits}
             />
+          </div>
+        </div>
+      )}
+
+      {/* Blog overlay — reuses desktop BlogWindow with identical styling */}
+      {mobileOverlay === 'blog' && (
+        <div className="fixed inset-0 z-50 bg-gs-void flex flex-col overflow-hidden">
+          <div className="flex-shrink-0 h-[44px] flex items-center gap-gs-3 px-gs-4 bg-gs-deep/95 backdrop-blur-md border-b border-gs-mid/15">
+            <button
+              onClick={() => setMobileOverlay(null)}
+              className="font-data text-data-sm text-gs-base"
+            >
+              &larr; Back
+            </button>
+            <span className="font-system text-os-sm font-bold text-gs-light">UnderTheStack</span>
+          </div>
+          <div className="flex-1 overflow-auto">
+            <BlogWindow />
           </div>
         </div>
       )}

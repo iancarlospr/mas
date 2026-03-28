@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 
 interface PostMeta {
   slug: string;
@@ -15,7 +14,12 @@ function formatDateCompact(dateStr: string): string {
   return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 }
 
-export function MobileBlogSection() {
+interface MobileBlogSectionProps {
+  onPostOpen: (slug: string) => void;
+  onViewAll: () => void;
+}
+
+export function MobileBlogSection({ onPostOpen, onViewAll }: MobileBlogSectionProps) {
   const [posts, setPosts] = useState<PostMeta[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -78,10 +82,10 @@ export function MobileBlogSection() {
         <>
           <div>
             {posts.map((post) => (
-              <Link
+              <button
                 key={post.slug}
-                href={`/blog/${post.slug}`}
-                className="block py-4"
+                onClick={() => onPostOpen(post.slug)}
+                className="w-full text-left block py-4"
                 style={{ borderBottom: '1px solid oklch(0.35 0.05 340 / 0.1)' }}
               >
                 <time
@@ -102,20 +106,20 @@ export function MobileBlogSection() {
                 >
                   {post.excerpt}
                 </span>
-              </Link>
+              </button>
             ))}
           </div>
 
           {/* View all link */}
           <div className="pt-gs-4 text-center">
-            <Link
-              href="/blog"
+            <button
+              onClick={onViewAll}
               className="font-data text-data-xs inline-flex items-center gap-1"
               style={{ color: 'var(--gs-base)' }}
             >
               View all posts
               <span className="text-[11px]">→</span>
-            </Link>
+            </button>
           </div>
         </>
       )}
