@@ -51,11 +51,21 @@ export const metadata: Metadata = {
     description:
       'Serve an unclockable audit in minutes. Extract the ground truth from any marketing stack.',
     url: 'https://marketingalphascan.com',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Alpha Scan — Forensic Marketing Intelligence',
+        type: 'image/png',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Alpha Scan',
     description: 'Your MarTech stack is a landfill. Let Chloé run the forensics.',
+    images: ['/og-image.png'],
   },
   robots: { index: true, follow: true },
 };
