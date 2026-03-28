@@ -215,6 +215,7 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
   // Overlay state for auth + profile + chat
   const [mobileOverlay, setMobileOverlay] = useState<'login' | 'register' | 'profile' | 'chat' | 'blog' | null>(null);
   const [chatContext, setChatContext] = useState<{ scanId: string; domain: string } | null>(null);
+  const [blogSlug, setBlogSlug] = useState<string | null>(null);
   // Paid scan detection for conditional layout
   const [paidScans, setPaidScans] = useState<MobilePaidScan[]>([]);
   const [paidScansLoaded, setPaidScansLoaded] = useState(false);
@@ -617,8 +618,7 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
         {/* ═══════ BLOG: UNDER THE STACK ═══════ */}
         <section className="py-gs-2 relative z-[1]">
           <MobileBlogSection
-            onPostOpen={() => setMobileOverlay('blog')}
-            onViewAll={() => setMobileOverlay('blog')}
+            onPostOpen={(slug) => { setBlogSlug(slug); setMobileOverlay('blog'); }}
           />
         </section>
 
@@ -760,12 +760,12 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
         </div>
       )}
 
-      {/* Blog overlay — reuses desktop BlogWindow with identical styling */}
-      {mobileOverlay === 'blog' && (
+      {/* Blog overlay — opens directly to post content */}
+      {mobileOverlay === 'blog' && blogSlug && (
         <div className="fixed inset-0 z-50 bg-gs-void flex flex-col overflow-hidden">
           <div className="flex-shrink-0 h-[44px] flex items-center gap-gs-3 px-gs-4 bg-gs-deep/95 backdrop-blur-md border-b border-gs-mid/15">
             <button
-              onClick={() => setMobileOverlay(null)}
+              onClick={() => { setMobileOverlay(null); setBlogSlug(null); }}
               className="font-data text-data-sm text-gs-base"
             >
               &larr; Back
@@ -773,7 +773,7 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
             <span className="font-system text-os-sm font-bold text-gs-light">UnderTheStack</span>
           </div>
           <div className="flex-1 overflow-auto">
-            <BlogWindow />
+            <BlogWindow key={blogSlug} initialSlug={blogSlug} />
           </div>
         </div>
       )}

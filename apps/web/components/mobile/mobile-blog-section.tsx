@@ -16,10 +16,9 @@ function formatDateCompact(dateStr: string): string {
 
 interface MobileBlogSectionProps {
   onPostOpen: (slug: string) => void;
-  onViewAll: () => void;
 }
 
-export function MobileBlogSection({ onPostOpen, onViewAll }: MobileBlogSectionProps) {
+export function MobileBlogSection({ onPostOpen }: MobileBlogSectionProps) {
   const [posts, setPosts] = useState<PostMeta[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -108,18 +107,6 @@ export function MobileBlogSection({ onPostOpen, onViewAll }: MobileBlogSectionPr
                 </span>
               </button>
             ))}
-          </div>
-
-          {/* View all link */}
-          <div className="pt-gs-4 text-center">
-            <button
-              onClick={onViewAll}
-              className="font-data text-data-xs inline-flex items-center gap-1"
-              style={{ color: 'var(--gs-base)' }}
-            >
-              View all posts
-              <span className="text-[11px]">→</span>
-            </button>
           </div>
         </>
       )}

@@ -90,24 +90,36 @@ const listItem = {
 //  Main Component
 // ═══════════════════════════════════════════════════════════════
 
-export default function BlogWindow() {
+export default function BlogWindow({ initialSlug }: { initialSlug?: string } = {}) {
   const [posts, setPosts] = useState<PostMeta[]>([]);
   const [activePost, setActivePost] = useState<PostFull | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadingPost, setLoadingPost] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [view, setView] = useState<'list' | 'detail'>('list');
+  const [view, setView] = useState<'list' | 'detail'>(initialSlug ? 'detail' : 'list');
   const containerRef = useRef<HTMLDivElement>(null);
   const prefersReduced = useReducedMotion();
 
-  // Fetch post list on mount
+  // Fetch post list on mount (skip if initialSlug provided — mobile direct-open)
   useEffect(() => {
+    if (initialSlug) return;
     fetch('/api/blog')
       .then((r) => r.json())
       .then((data: PostMeta[]) => setPosts(data))
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, []);
+  }, [initialSlug]);
+
+  // Auto-open post when initialSlug is provided (mobile overlay)
+  useEffect(() => {
+    if (!initialSlug) return;
+    setLoadingPost(true);
+    fetch(`/api/blog/${initialSlug}`)
+      .then((r) => { if (r.ok) return r.json(); throw new Error(); })
+      .then((post: PostFull) => { setActivePost(post); setView('detail'); setProgress(0); })
+      .catch(() => {})
+      .finally(() => { setLoadingPost(false); setLoading(false); });
+  }, [initialSlug]);
 
   // Open a post
   const openPost = useCallback(async (slug: string) => {
