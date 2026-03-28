@@ -38,7 +38,7 @@ const WINDOW_CONFIGS: Record<string, WindowConfig> = {
   'chat-launcher': { title: 'GhostChat\u2122',                       icon: '~', width: 420, height: 380 },
   'scan-input':    { title: 'Scan.exe',                        icon: '~', width: 600, height: 380, variant: 'dialog' },
   'features':      { title: 'Why AlphaScan?',                  icon: '~', width: 540, height: 400 },
-  'blog':          { title: 'UnderTheStack',                   icon: '~', width: 560, height: 520 },
+  'blog':          { title: 'Blog',                              icon: '~', width: 560, height: 520 },
   'games':         { title: 'Ghost Sweeper',                   icon: '~', width: 320, height: 420, minWidth: 320, minHeight: 420 },
   'trash':         { title: 'Log Out',                         icon: '~', width: 340, height: 240 },
   'auth':          { title: 'auth.exe',                       icon: '~', width: 440, height: 480, variant: 'dialog' },

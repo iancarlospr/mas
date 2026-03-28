@@ -4,7 +4,7 @@ import { getAllPosts } from '@/lib/mdx';
 
 export const metadata: Metadata = {
   title: 'Blog',
-  description: 'Marketing technology teardowns, insights, and analysis from the Alpha Scan team.',
+  description: 'Building in public. One feature at a time. The journey behind Alpha Scan.',
 };
 
 export default function BlogPage() {
@@ -14,10 +14,10 @@ export default function BlogPage() {
     <section className="py-gs-16">
       <div className="mx-auto max-w-4xl px-gs-4">
         <h1 className="font-system text-[clamp(24px,4vw,44px)] font-bold text-gs-ink mb-gs-2">
-          UnderTheStack
+          Blog
         </h1>
         <p className="font-data text-data-lg text-gs-muted mb-gs-8">
-          Marketing technology teardowns, insights, and analysis.
+          Building in public. One feature at a time.
         </p>
 
         {posts.length === 0 ? (

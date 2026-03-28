@@ -11,7 +11,7 @@ const WINDOW_NAMES: Record<string, string> = {
   'chat-launcher': 'GhostChat™',
   'scan-input': 'Scan.exe',
   'features': 'Why AlphaScan?',
-  'blog': 'UnderTheStack',
+  'blog': 'Blog',
   'games': 'Ghost Sweeper',
   'trash': 'Log Out',
   'auth': 'auth.exe (Login)',

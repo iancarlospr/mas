@@ -43,10 +43,10 @@ export function MobileBlogSection({ onPostOpen }: MobileBlogSectionProps) {
             color: 'var(--gs-base)',
           }}
         >
-          UnderTheStack
+          Blog
         </h2>
         <p className="font-data text-data-xs text-gs-muted">
-          Marketing technology teardowns.
+          Building in public. One feature at a time.
         </p>
       </div>
 

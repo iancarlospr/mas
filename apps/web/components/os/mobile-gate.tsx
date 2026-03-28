@@ -615,7 +615,7 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
           <SectionDivider />
         </div>
 
-        {/* ═══════ BLOG: UNDER THE STACK ═══════ */}
+        {/* ═══════ BLOG ═══════ */}
         <section className="py-gs-2 relative z-[1]">
           <MobileBlogSection
             onPostOpen={(slug) => { setBlogSlug(slug); setMobileOverlay('blog'); }}
@@ -770,7 +770,7 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
             >
               &larr; Back
             </button>
-            <span className="font-system text-os-sm font-bold text-gs-light">UnderTheStack</span>
+            <span className="font-system text-os-sm font-bold text-gs-light">Blog</span>
           </div>
           <div className="flex-1 overflow-auto">
             <BlogWindow key={blogSlug} initialSlug={blogSlug} />

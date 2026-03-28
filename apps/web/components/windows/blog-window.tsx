@@ -5,7 +5,7 @@ import ReactMarkdown from 'react-markdown';
 import { motion, useInView, useReducedMotion } from 'framer-motion';
 
 /* ═══════════════════════════════════════════════════════════════
-   UnderTheStack — Hacker Zine Blog Window
+   Blog Window
 
    Two views:
    1. Post list — clean TOC with staggered entrance
@@ -281,10 +281,10 @@ export default function BlogWindow({ initialSlug }: { initialSlug?: string } = {
               color: 'var(--gs-base)',
             }}
           >
-            UnderTheStack
+            Blog
           </h1>
           <p className="font-data text-[13px] mt-2" style={{ color: 'var(--gs-mid)' }}>
-            Marketing technology teardowns.
+            Building in public. One feature at a time.
           </p>
         </motion.div>
       </div>
