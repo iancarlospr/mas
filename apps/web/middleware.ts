@@ -39,7 +39,6 @@ export async function middleware(request: NextRequest) {
     || pathname === '/sitemap.xml'
     || pathname === '/manifest.webmanifest'
     || pathname.startsWith('/icon-')
-    || pathname === '/apple-icon'
     || pathname === '/icon.svg'
     || pathname.endsWith('/opengraph-image')
     || pathname.includes('/opengraph-image');
@@ -102,7 +101,7 @@ export async function middleware(request: NextRequest) {
         <meta name="twitter:description" content="Your MarTech stack is a landfill. Let Chloé run the forensics.">
         <meta name="twitter:image" content="${ogImageUrl}">
         <meta name="theme-color" content="#080808">
-        <link rel="apple-touch-icon" href="/apple-icon" sizes="180x180">
+        <link rel="apple-touch-icon" href="/apple-icon.png" sizes="180x180">
         <link rel="manifest" href="/manifest.webmanifest">
         <style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0a0a0a;color:#fff;font-family:system-ui}
         .c{text-align:center;max-width:400px;padding:2rem}h1{font-size:1.5rem;margin-bottom:.5rem}p{color:#888;font-size:.9rem}</style></head>

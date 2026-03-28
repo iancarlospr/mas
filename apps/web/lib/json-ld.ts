@@ -12,7 +12,7 @@ export function organizationJsonLd() {
     name: 'Alpha Scan',
     legalName: 'Marketing Alpha Scan',
     url: 'https://marketingalphascan.com',
-    logo: 'https://marketingalphascan.com/apple-icon',
+    logo: 'https://marketingalphascan.com/apple-icon.png',
     description:
       'Forensic marketing intelligence platform. Reverse-engineer any marketing stack in minutes.',
   };
