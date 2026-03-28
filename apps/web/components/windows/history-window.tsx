@@ -134,6 +134,36 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
     load();
   }, [user?.id]);
 
+  // When activeScanId transitions non-null → null, a scan just finished.
+  // Re-fetch that single row to update status + score in place.
+  const prevActiveScanIdRef = useRef<string | null>(null);
+  useEffect(() => {
+    const prevId = prevActiveScanIdRef.current;
+    prevActiveScanIdRef.current = orchestrator.activeScanId;
+
+    if (prevId && !orchestrator.activeScanId) {
+      const supabase = createClient();
+      supabase
+        .from('scans')
+        .select('id, url, marketing_iq, status, tier, created_at')
+        .eq('id', prevId)
+        .single()
+        .then(({ data }) => {
+          if (data) {
+            setScans((prev) => {
+              const idx = prev.findIndex((s) => s.id === data.id);
+              if (idx >= 0) {
+                const next = [...prev];
+                next[idx] = data;
+                return next;
+              }
+              return [data, ...prev];
+            });
+          }
+        });
+    }
+  }, [orchestrator.activeScanId]);
+
   if (authLoading || dataLoading) {
     return (
       <div className="p-gs-6 flex items-center justify-center h-full">

@@ -205,7 +205,7 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
   const { user, isAuthenticated, loading: authLoading } = useAuth();
   const wm = useWindowManager();
   const orchestrator = useScanOrchestrator();
-  // Key to force HistoryWindow remount after scan completes (re-fetches data)
+  // Counter bumped when a scan completes — triggers paid scans refetch
   const [historyKey, setHistoryKey] = useState(0);
   const prevScanIdRef = useRef<string | null>(null);
   // Overlay state for auth + profile + chat
@@ -233,7 +233,7 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
     return () => observer.disconnect();
   }, [isMobile]);
 
-  // Force HistoryWindow remount when a scan completes (activeScanId goes from non-null to null)
+  // Bump counter when a scan completes so paid scans list refetches
   useEffect(() => {
     if (prevScanIdRef.current && !orchestrator.activeScanId) {
       setHistoryKey((k) => k + 1);
@@ -506,7 +506,7 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
                 </p>
               </div>
               <div className="mobile-my-scans">
-                <HistoryWindow key={historyKey} onChatOpen={openChatOverlay} />
+                <HistoryWindow onChatOpen={openChatOverlay} />
               </div>
             </section>
           </>
