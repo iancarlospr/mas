@@ -165,40 +165,42 @@ export default function BlogWindow({ initialSlug }: { initialSlug?: string } = {
   if (view === 'detail' && activePost) {
     return (
       <div ref={containerRef}>
-        {/* Sticky top bar with back + progress — sticks inside .window-content */}
-        <div
-          className="sticky top-0 z-10"
-          style={{ background: 'oklch(0.08 0.005 340 / 0.92)', backdropFilter: 'blur(8px)' }}
-        >
-          <div className="flex items-center justify-between px-5 py-2.5">
-            <button
-              onClick={goBack}
-              className="font-data text-[13px] group flex items-center gap-1.5 transition-colors"
-              style={{ color: 'var(--gs-base)' }}
-            >
-              <span className="inline-block transition-transform group-hover:-translate-x-0.5">←</span>
-              <span className="relative">
-                back
-                <span
-                  className="absolute left-0 -bottom-px h-px w-0 group-hover:w-full transition-all duration-200"
-                  style={{ background: 'var(--gs-base)' }}
-                />
-              </span>
-            </button>
+        {/* Sticky top bar with back + progress — hidden when opened via initialSlug (mobile overlay has its own back) */}
+        {!initialSlug && (
+          <div
+            className="sticky top-0 z-10"
+            style={{ background: 'oklch(0.08 0.005 340 / 0.92)', backdropFilter: 'blur(8px)' }}
+          >
+            <div className="flex items-center justify-between px-5 py-2.5">
+              <button
+                onClick={goBack}
+                className="font-data text-[13px] group flex items-center gap-1.5 transition-colors"
+                style={{ color: 'var(--gs-base)' }}
+              >
+                <span className="inline-block transition-transform group-hover:-translate-x-0.5">←</span>
+                <span className="relative">
+                  back
+                  <span
+                    className="absolute left-0 -bottom-px h-px w-0 group-hover:w-full transition-all duration-200"
+                    style={{ background: 'var(--gs-base)' }}
+                  />
+                </span>
+              </button>
+            </div>
+            {/* Progress bar */}
+            <div className="h-[2px] w-full" style={{ background: 'oklch(0.15 0.02 340)' }}>
+              <div
+                className="h-full transition-[width] duration-100 ease-linear"
+                style={{
+                  width: `${progress}%`,
+                  background: 'var(--gs-base)',
+                  boxShadow: progress > 0 ? '0 0 6px var(--gs-base)' : 'none',
+                }}
+              />
+            </div>
+            <div className="h-px" style={{ background: 'oklch(0.35 0.05 340 / 0.1)' }} />
           </div>
-          {/* Progress bar */}
-          <div className="h-[2px] w-full" style={{ background: 'oklch(0.15 0.02 340)' }}>
-            <div
-              className="h-full transition-[width] duration-100 ease-linear"
-              style={{
-                width: `${progress}%`,
-                background: 'var(--gs-base)',
-                boxShadow: progress > 0 ? '0 0 6px var(--gs-base)' : 'none',
-              }}
-            />
-          </div>
-          <div className="h-px" style={{ background: 'oklch(0.35 0.05 340 / 0.1)' }} />
-        </div>
+        )}
 
         {/* Post content — flows naturally, .window-content scrolls */}
         <div className="px-6 py-6">
