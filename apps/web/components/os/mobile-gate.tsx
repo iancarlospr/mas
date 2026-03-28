@@ -614,7 +614,7 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* ═══════ BLOG: UNDER THE STACK ═══════ */}
-        <section className="py-gs-2">
+        <section className="py-gs-2 relative z-[1]">
           <MobileBlogSection />
         </section>
 
