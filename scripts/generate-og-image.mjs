@@ -205,43 +205,38 @@ async function generate() {
     baseBuf[idx + 2] = Math.round(baseBuf[idx + 2] + (239 - baseBuf[idx + 2]) * lineAlpha);
   }
 
-  const baseImg = sharp(baseBuf, { raw: { width: W, height: H, channels: 4 } }).png();
-
-  // 4. Create rotated ghost — render directly onto base buffer before sharp
-  // Use a smaller ghost so it fits, then render pixel-by-pixel with rotation
-  const ghostScale = 20; // 32*20 = 640px wide, 42*20 = 840px tall — BIG
-  const ghostAlpha = 0.12;
-  // Ghost center — right-of-center, crashing in from bottom-right
-  const gcx = W * 0.68;
-  const gcy = H * 0.50;
-  const angle = -35 * Math.PI / 180;
-  const cosA = Math.cos(angle);
-  const sinA = Math.sin(angle);
-  // Ghost pixel dimensions
-  const gpw = 32 * ghostScale;
-  const gph = 42 * ghostScale;
-
-  for (let py = 0; py < H; py++) {
-    for (let px = 0; px < W; px++) {
-      // Inverse-rotate to find source pixel in ghost space
-      const dx = px - gcx;
-      const dy = py - gcy;
-      const sx = dx * cosA + dy * sinA + gpw / 2;
-      const sy = -dx * sinA + dy * cosA + gph / 2;
-      if (sx < 0 || sx >= gpw || sy < 0 || sy >= gph) continue;
-      const gx = Math.floor(sx / ghostScale);
-      const gy = Math.floor(sy / ghostScale);
-      if (gx < 0 || gx >= 32 || gy < 0 || gy >= 42) continue;
-      const cell = ghostGrid[gy]?.[gx];
-      if (!cell) continue;
-      const color = COLORS[cell];
-      if (!color) continue;
-      const idx = (py * W + px) * 4;
-      baseBuf[idx]     = Math.round(baseBuf[idx]     + (color[0] - baseBuf[idx])     * ghostAlpha);
-      baseBuf[idx + 1] = Math.round(baseBuf[idx + 1] + (color[1] - baseBuf[idx + 1]) * ghostAlpha);
-      baseBuf[idx + 2] = Math.round(baseBuf[idx + 2] + (color[2] - baseBuf[idx + 2]) * ghostAlpha);
+  // 4. Render rotated ghosts directly onto base buffer
+  function renderRotatedGhost(cx, cy, scale, angle, alpha) {
+    const cosA = Math.cos(angle);
+    const sinA = Math.sin(angle);
+    const gpw = 32 * scale;
+    const gph = 42 * scale;
+    for (let py = 0; py < H; py++) {
+      for (let px = 0; px < W; px++) {
+        const dx = px - cx;
+        const dy = py - cy;
+        const sx = dx * cosA + dy * sinA + gpw / 2;
+        const sy = -dx * sinA + dy * cosA + gph / 2;
+        if (sx < 0 || sx >= gpw || sy < 0 || sy >= gph) continue;
+        const gx = Math.floor(sx / scale);
+        const gy = Math.floor(sy / scale);
+        if (gx < 0 || gx >= 32 || gy < 0 || gy >= 42) continue;
+        const cell = ghostGrid[gy]?.[gx];
+        if (!cell) continue;
+        const color = COLORS[cell];
+        if (!color) continue;
+        const idx = (py * W + px) * 4;
+        baseBuf[idx]     = Math.round(baseBuf[idx]     + (color[0] - baseBuf[idx])     * alpha);
+        baseBuf[idx + 1] = Math.round(baseBuf[idx + 1] + (color[1] - baseBuf[idx + 1]) * alpha);
+        baseBuf[idx + 2] = Math.round(baseBuf[idx + 2] + (color[2] - baseBuf[idx + 2]) * alpha);
+      }
     }
   }
+
+  // Ghost 1 — main, right side, -35deg, brighter
+  renderRotatedGhost(W * 0.68, H * 0.50, 20, -35 * Math.PI / 180, 0.12);
+  // Ghost 2 — echo, left side, +20deg, fainter
+  renderRotatedGhost(W * 0.18, H * 0.35, 14, 20 * Math.PI / 180, 0.06);
 
   const baseImg2 = sharp(baseBuf, { raw: { width: W, height: H, channels: 4 } }).png();
 
