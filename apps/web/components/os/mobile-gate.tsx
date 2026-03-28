@@ -604,7 +604,7 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
               zIndex: 0,
               transform: 'rotate(-35deg) scale(2.5)',
               transformOrigin: 'center center',
-              opacity: 0.9,
+              opacity: 0.25,
             }}
           >
             <ChloeSprite state="smug" size={128} />
