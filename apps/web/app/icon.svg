@@ -11,18 +11,7 @@
         <feMergeNode in="SourceGraphic"/>
       </feMerge>
     </filter>
-    <!-- Radial background glow -->
-    <radialGradient id="bg-glow" cx="50%" cy="45%" r="50%">
-      <stop offset="0%" stop-color="#1A161A"/>
-      <stop offset="100%" stop-color="#080808"/>
-    </radialGradient>
   </defs>
-
-  <!-- Background -->
-  <rect width="32" height="32" rx="6" fill="url(#bg-glow)"/>
-
-  <!-- Outer glow halo -->
-  <ellipse cx="16" cy="15" rx="10" ry="11" fill="#FFB2EF" opacity="0.08" filter="url(#glow)"/>
 
   <!-- Ghost body (near-white pink) -->
   <rect x="12" y="4" width="8" height="2" fill="#FFF0FA"/>
