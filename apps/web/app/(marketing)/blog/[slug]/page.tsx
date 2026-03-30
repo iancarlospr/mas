@@ -22,10 +22,27 @@ export async function generateMetadata({
     description: post.excerpt,
     openGraph: {
       type: 'article',
+      url: `https://marketingalphascan.com/blog/${slug}`,
+      siteName: 'Alpha Scan',
       title: post.title,
       description: post.excerpt,
       publishedTime: post.date,
       authors: [post.author ?? 'Alpha Scan Team'],
+      images: [
+        {
+          url: 'https://marketingalphascan.com/og-image.png',
+          width: 1200,
+          height: 630,
+          alt: `${post.title} | Alpha Scan`,
+          type: 'image/png',
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description: post.excerpt,
+      images: ['https://marketingalphascan.com/og-image.png'],
     },
   };
 }
