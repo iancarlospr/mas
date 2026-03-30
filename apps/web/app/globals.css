@@ -1,0 +1,757 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =================================================================
+   Chloé's Bedroom OS — Design System Foundation
+   Palette: Monochromatic Pink (OKLCH hue 340)
+   Anchored on #080808 (void) and #FFB2EF (base)
+   ================================================================= */
+
+@layer base {
+  :root {
+    /* -- Typography -------------------------------------------- */
+    --font-system: var(--font-geist-mono), 'SF Mono', 'Menlo', monospace;
+    --font-data: var(--font-geist-mono), 'SF Mono', 'Menlo', monospace;
+    --font-display: var(--font-display-face, 'Barlow Condensed'), 'Impact', sans-serif;
+    --font-personality: var(--font-personality-face, 'Permanent Marker'), cursive;
+
+    /* -- Core Palette -- Monochromatic Pink (OKLCH hue 340) ---- */
+    --gs-void:   #080808;                    /* Deepest dark — desktop bg, dark panels */
+    --gs-deep:   oklch(0.18 0.02 340);       /* Window chrome, taskbar, dark surfaces */
+    --gs-mid:    oklch(0.35 0.05 340);       /* Borders, separators, secondary text */
+    --gs-base:   #FFB2EF;                    /* THE pink — primary UI, icons, Chloé */
+    --gs-bright: oklch(0.88 0.13 340);       /* Active states, hover, glow */
+    --gs-light:  oklch(0.96 0.04 340);       /* Text on dark backgrounds, content areas */
+
+    /* -- Backward-Compatible Aliases ----------------------------
+       Old tokens map to new values so 500+ references keep working.
+       Migration happens incrementally as files are touched. */
+    --gs-paper:        var(--gs-light);
+    --gs-ink:          var(--gs-void);
+    --gs-red:          var(--gs-base);
+    --gs-red-dark:     oklch(0.68 0.16 340);
+    --gs-chrome:       var(--gs-deep);
+    --gs-chrome-dark:  var(--gs-mid);
+    --gs-chrome-light: oklch(0.26 0.03 340);
+    --gs-muted:        var(--gs-mid);
+    --gs-ghost:        var(--gs-base);
+
+    /* -- Functional Colors (unchanged — DATA, not decoration) -- */
+    --gs-terminal:  oklch(0.80 0.25 145);    /* CRT phosphor green — scan sequence ONLY */
+    --gs-critical:  oklch(0.55 0.22 25);     /* Critical findings */
+    --gs-warning:   oklch(0.78 0.15 75);     /* Warnings */
+
+    /* -- Spacing ----------------------------------------------- */
+    --gs-space-1: 4px;
+    --gs-space-2: 8px;
+    --gs-space-3: 12px;
+    --gs-space-4: 16px;
+    --gs-space-6: 24px;
+    --gs-space-8: 32px;
+
+    /* -- Component Heights ------------------------------------ */
+    --gs-titlebar-h: 32px;
+    --gs-menubar-h: 32px;
+    --gs-taskbar-h: 40px;
+    --gs-statusbar-h: 24px;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    font-family: var(--font-system);
+    color: var(--gs-light);
+    background-color: var(--gs-void);
+    min-height: 100vh;
+    overflow: hidden;
+  }
+
+  /* Selection — strong pink bg, white text for readability */
+  ::selection {
+    background: oklch(0.65 0.2 340 / 0.5);
+    color: #fff;
+  }
+
+  /* Text inputs — light bg, dark text, visible caret everywhere */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="url"],
+  input[type="search"],
+  input[type="tel"],
+  input[type="number"],
+  textarea {
+    color: var(--gs-void);
+    caret-color: currentColor;
+    user-select: text;
+    -webkit-user-select: text;
+  }
+
+  /* Focus rings — consistent pink glow */
+  :focus-visible {
+    outline: 2px solid var(--gs-base);
+    outline-offset: 2px;
+  }
+
+  /* Smooth transitions on interactive elements */
+  a, button, [role="button"], input, select, textarea {
+    transition: color 150ms ease, background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease, transform 100ms ease;
+  }
+
+  /* Mobile: allow body scroll for non-OS pages */
+  @media (max-width: 1023px) {
+    body {
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    /* Hide desktop shell on mobile — prevents flash before React hydration */
+    [data-desktop-shell] {
+      display: none !important;
+    }
+  }
+
+  /* System font for OS chrome */
+  .font-system {
+    font-family: var(--font-system);
+  }
+
+  /* Display font for headlines */
+  .font-display {
+    font-family: var(--font-display);
+    letter-spacing: -0.03em;
+  }
+
+  /* Personality font for Chloé moments */
+  .font-personality {
+    font-family: var(--font-personality);
+  }
+
+  /* Data font (same as system — Geist Mono everywhere) */
+  .font-data {
+    font-family: var(--font-data);
+  }
+}
+
+/* =================================================================
+   Modern UI Components — Frosted Glass + Pink Accents
+   Replaces ALL Win95 bevel primitives.
+   ================================================================= */
+
+@layer components {
+  /* -- Raised Surface (backward compat stub → modern) --------- */
+  .bevel-raised {
+    background: oklch(0.15 0.02 340 / 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--gs-mid);
+    border-radius: 8px;
+  }
+
+  /* -- Sunken Surface (backward compat stub → modern) --------- */
+  .bevel-sunken {
+    background: oklch(0.13 0.01 340 / 0.6);
+    border: 1px solid oklch(0.22 0.03 340);
+    border-radius: 8px;
+  }
+
+  /* -- Button ------------------------------------------------- */
+  .bevel-button {
+    background: oklch(0.18 0.02 340 / 0.8);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--gs-mid);
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-family: var(--font-system);
+    font-size: 13px;
+    color: var(--gs-light);
+    cursor: pointer;
+    user-select: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 32px;
+    transition: background 200ms, border-color 200ms, transform 100ms;
+  }
+  .bevel-button:hover {
+    background: oklch(0.22 0.03 340 / 0.9);
+    border-color: var(--gs-base);
+  }
+  .bevel-button:active,
+  .bevel-button[data-pressed="true"] {
+    transform: scale(0.97);
+    background: oklch(0.14 0.02 340 / 0.9);
+  }
+  .bevel-button:focus-visible {
+    outline: 2px solid var(--gs-base);
+    outline-offset: 2px;
+  }
+  .bevel-button:disabled {
+    color: var(--gs-mid);
+    cursor: default;
+    opacity: 0.5;
+  }
+
+  /* -- Primary Button (Solid Pink) ---------------------------- */
+  .bevel-button-primary {
+    background: var(--gs-base);
+    border: 1px solid var(--gs-bright);
+    border-radius: 8px;
+    color: var(--gs-void);
+    padding: 8px 18px;
+    font-family: var(--font-system);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    user-select: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 34px;
+    transition: background 200ms, transform 100ms, box-shadow 200ms;
+  }
+  .bevel-button-primary:hover {
+    background: var(--gs-bright);
+    box-shadow: 0 0 16px oklch(0.85 0.15 340 / 0.3);
+  }
+  .bevel-button-primary:active {
+    transform: scale(0.97);
+  }
+
+  /* -- Neon Outline Button (secondary CTA) -------------------- */
+  .neon-outline-btn {
+    box-shadow:
+      0 0 12px oklch(0.72 0.17 340 / 0.25),
+      inset 0 1px 0 oklch(0.72 0.17 340 / 0.1);
+    animation: neon-pulse 2s ease-in-out infinite;
+  }
+  .neon-outline-btn:active {
+    transform: scale(0.97);
+  }
+  @keyframes neon-pulse {
+    0%, 100% { box-shadow: 0 0 12px oklch(0.72 0.17 340 / 0.15), inset 0 1px 0 oklch(0.72 0.17 340 / 0.08); }
+    50% { box-shadow: 0 0 16px oklch(0.72 0.17 340 / 0.35), inset 0 1px 0 oklch(0.72 0.17 340 / 0.12); }
+  }
+
+  /* -- Window Chrome ------------------------------------------ */
+  .window {
+    background: oklch(0.14 0.02 340 / 0.75);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--gs-mid);
+    border-radius: 12px;
+    box-shadow:
+      0 4px 24px oklch(0.08 0.01 340 / 0.4),
+      0 1px 4px oklch(0.08 0.01 340 / 0.3);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .window[data-active="true"] {
+    border-color: var(--gs-base);
+    box-shadow:
+      0 0 0 1px oklch(0.82 0.15 340 / 0.15),
+      0 4px 24px oklch(0.08 0.01 340 / 0.5),
+      0 0 32px oklch(0.82 0.15 340 / 0.08);
+  }
+
+  .window-titlebar {
+    height: var(--gs-titlebar-h);
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 12px;
+    font-family: var(--font-system);
+    font-size: 12px;
+    font-weight: 500;
+    user-select: none;
+    flex-shrink: 0;
+    background: var(--gs-base);
+    color: var(--gs-void);
+    border-radius: 11px 11px 0 0;
+  }
+  .window-titlebar:not([data-active="true"]) {
+    background: var(--gs-mid);
+    color: var(--gs-deep);
+  }
+
+  .window-titlebar-text {
+    position: absolute;
+    left: 0;
+    right: 0;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 0 70px;
+    pointer-events: none;
+  }
+
+  .window-titlebar-buttons {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  /* macOS-style colored dots */
+  .window-titlebar-btn {
+    width: 12px;
+    height: 12px;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    font-size: 0;
+    line-height: 0;
+    transition: filter 150ms, transform 150ms;
+  }
+  .window-titlebar-btn:hover {
+    filter: brightness(1.2);
+    transform: scale(1.15);
+  }
+  .window-titlebar-btn:active {
+    transform: scale(0.9);
+  }
+  .window-titlebar-btn[data-action="close"] {
+    background: #FF5F57;
+  }
+  .window-titlebar-btn[data-action="minimize"] {
+    background: #FEBC2E;
+  }
+  .window-titlebar-btn[data-action="maximize"] {
+    background: #28C840;
+  }
+  .window-titlebar:not([data-active="true"]) .window-titlebar-btn {
+    background: var(--gs-deep);
+    opacity: 0.5;
+  }
+
+  .window-content {
+    flex: 1 1 auto;
+    min-height: 0;
+    background: oklch(0.13 0.01 340 / 0.5);
+    overflow-y: auto;
+    overflow-x: hidden;
+    color: var(--gs-light);
+    margin: 0 1px 1px 1px;
+    border-radius: 0 0 11px 11px;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+
+  .window-statusbar {
+    height: var(--gs-statusbar-h);
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    font-family: var(--font-system);
+    font-size: 11px;
+    color: var(--gs-mid);
+    border-top: 1px solid oklch(0.22 0.03 340);
+    gap: 8px;
+    flex-shrink: 0;
+    background: transparent;
+  }
+  .window-statusbar-section {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* -- Terminal Variant (scan sequence context ONLY) ----------- */
+  .window-terminal .window-content {
+    background: #0A0A0A;
+    color: var(--gs-terminal);
+    font-family: 'JetBrains Mono', var(--font-data);
+    font-size: 13px;
+    line-height: 1.4;
+    padding: 8px;
+  }
+
+  /* -- Ghost Variant ------------------------------------------ */
+  .window-ghost {
+    box-shadow:
+      0 0 24px oklch(0.82 0.15 340 / 0.12),
+      0 4px 24px oklch(0.08 0.01 340 / 0.4);
+  }
+  .window-ghost .window-titlebar[data-active="true"] {
+    color: var(--gs-base);
+  }
+
+  /* -- Module Sub-Panel --------------------------------------- */
+  .module-panel {
+    border: 1px solid var(--gs-mid);
+    border-radius: 8px;
+    background: oklch(0.14 0.02 340 / 0.6);
+    margin-bottom: 8px;
+    overflow: hidden;
+  }
+  .module-panel-header {
+    height: 28px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 10px;
+    background: oklch(0.15 0.02 340 / 0.8);
+    border-bottom: 1px solid oklch(0.22 0.03 340);
+    font-family: var(--font-system);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gs-light);
+  }
+  .module-panel-content {
+    padding: 12px;
+  }
+
+  /* -- Redaction Aesthetic (Free Tier Gate) -------------------- */
+  .redacted {
+    position: relative;
+    overflow: hidden;
+  }
+  .redacted::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    /* Dithered bars instead of solid black */
+    background:
+      repeating-linear-gradient(
+        0deg,
+        var(--gs-void) 0px,
+        var(--gs-void) 6px,
+        transparent 6px,
+        transparent 8px
+      ),
+      repeating-conic-gradient(
+        var(--gs-deep) 0% 25%,
+        transparent 0% 50%
+      ) 0 0 / 4px 4px;
+    opacity: 0.9;
+    pointer-events: none;
+  }
+  .redacted-stamp {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-12deg);
+    font-family: var(--font-system);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--gs-base);
+    border: 2px solid var(--gs-base);
+    border-radius: 4px;
+    padding: 4px 16px;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    z-index: 10;
+    pointer-events: none;
+    opacity: 0.9;
+  }
+
+  /* -- Traffic Light Badges ----------------------------------- */
+  .traffic-green { color: var(--gs-terminal); }
+  .traffic-amber { color: var(--gs-warning); }
+  .traffic-red   { color: var(--gs-critical); }
+  .traffic-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .traffic-dot-green { background: var(--gs-terminal); }
+  .traffic-dot-amber { background: var(--gs-warning); }
+  .traffic-dot-red   { background: var(--gs-critical); }
+}
+
+/* =================================================================
+   Atmospheric Effects
+   CRT effects scoped to scan-sequence context only.
+   Desktop gets subtle noise.
+   ================================================================= */
+
+@layer utilities {
+  /* -- CRT Scanlines -- scan sequence ONLY -------------------- */
+  .crt-scanlines {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    contain: strict;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.03) 2px,
+      rgba(0, 0, 0, 0.03) 4px
+    );
+    mix-blend-mode: multiply;
+  }
+
+  /* -- CRT Vignette -- scan sequence ONLY --------------------- */
+  .crt-vignette {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9998;
+    contain: strict;
+    background: radial-gradient(
+      ellipse at center,
+      transparent 60%,
+      rgba(0, 0, 0, 0.06) 100%
+    );
+  }
+
+  /* -- Noise Grain (desktop) ---------------------------------- */
+  .noise-grain {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9997;
+    contain: strict;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 256px 256px;
+  }
+
+  /* -- Terminal Text Glow (scan sequence ONLY) ----------------- */
+  .terminal-glow {
+    text-shadow: 0 0 4px var(--gs-terminal), 0 0 8px oklch(0.80 0.15 145 / 0.3);
+  }
+
+  /* -- Ghost Glow (pink, Chloé only) -------------------------- */
+  .ghost-glow {
+    filter: drop-shadow(0 0 8px var(--gs-base)) drop-shadow(0 0 16px oklch(0.82 0.15 340 / 0.2));
+  }
+
+  /* -- Accent Text -------------------------------------------- */
+  .text-accent {
+    color: var(--gs-base);
+  }
+
+  /* -- Skeleton Loading --------------------------------------- */
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      oklch(0.15 0.02 340) 0%,
+      oklch(0.20 0.03 340) 50%,
+      oklch(0.15 0.02 340) 100%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-slide 1.5s ease-in-out infinite;
+    border-radius: 4px;
+  }
+
+  /* -- Dither Edge (2px checkerboard) ------------------------- */
+  .dither-edge {
+    position: relative;
+  }
+  .dither-edge::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -4px;
+    height: 4px;
+    pointer-events: none;
+    background: repeating-conic-gradient(
+      var(--gs-deep) 0% 25%,
+      transparent 0% 50%
+    ) 0 0 / 2px 2px;
+    opacity: 0.6;
+  }
+
+  /* -- Dither Edge Light (for taskbar top) --------------------- */
+  .dither-edge-top {
+    position: relative;
+  }
+  .dither-edge-top::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -4px;
+    height: 4px;
+    pointer-events: none;
+    background: repeating-conic-gradient(
+      var(--gs-deep) 0% 25%,
+      transparent 0% 50%
+    ) 0 0 / 2px 2px;
+    opacity: 0.6;
+  }
+}
+
+@keyframes skeleton-slide {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* =================================================================
+   Custom Scrollbars — Thin, Rounded, Pink-Accented
+   ================================================================= */
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--gs-deep);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--gs-mid);
+  border-radius: 3px;
+  min-height: 24px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gs-base);
+}
+::-webkit-scrollbar-corner {
+  background: var(--gs-deep);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--gs-mid) var(--gs-deep);
+}
+
+
+/* =================================================================
+   Reduced Motion
+   ================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .crt-scanlines,
+  .crt-vignette,
+  .noise-grain {
+    display: none !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* =================================================================
+   Print Stylesheet
+   ================================================================= */
+
+@media print {
+  @page {
+    size: 14in 8.5in;
+    margin: 0;
+  }
+
+  /* Desktop OS print rules — scoped so they don't leak into standalone slides */
+  body.gs-desktop * {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  body.gs-desktop .gs-menubar,
+  body.gs-desktop .gs-taskbar,
+  body.gs-desktop .gs-desktop-icons,
+  body.gs-desktop .gs-chloe-screenmate,
+  body.gs-desktop .crt-scanlines,
+  body.gs-desktop .crt-vignette,
+  body.gs-desktop .noise-grain,
+  body.gs-desktop .window-titlebar-buttons,
+  body.gs-desktop .bevel-button,
+  body.gs-desktop .bevel-button-primary,
+  body.gs-desktop .redacted-stamp,
+  body.gs-desktop .redacted::after,
+  body.gs-desktop [data-interactive],
+  body.gs-desktop [data-no-print] {
+    display: none !important;
+  }
+
+  body.gs-desktop .window {
+    border: none !important;
+    box-shadow: none !important;
+    background: white !important;
+    border-radius: 0 !important;
+  }
+  body.gs-desktop .window-titlebar {
+    background: none !important;
+    color: black !important;
+    border-bottom: 1px solid #ccc;
+  }
+  body.gs-desktop .window-content {
+    border: none !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    border-radius: 0 !important;
+  }
+
+  body.gs-desktop .module-panel {
+    break-before: page;
+    break-inside: avoid;
+    border: 1px solid #ddd !important;
+    border-radius: 0 !important;
+  }
+  body.gs-desktop .module-panel:first-child {
+    break-before: auto;
+  }
+
+  body.gs-desktop {
+    font-size: 10pt;
+    color: #000 !important;
+    background: white !important;
+    overflow: visible !important;
+  }
+  body.gs-desktop h1 { font-size: 18pt; }
+  body.gs-desktop h2 { font-size: 14pt; }
+  body.gs-desktop h3 { font-size: 12pt; }
+
+  body.gs-desktop .print-watermark {
+    display: block !important;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+    font-size: 72pt;
+    color: rgba(0, 0, 0, 0.03);
+    white-space: nowrap;
+    z-index: 9999;
+    pointer-events: none;
+  }
+}
+
+/* =================================================================
+   High Contrast Mode
+   ================================================================= */
+
+@media (prefers-contrast: high) {
+  .window {
+    border-width: 2px;
+    border-color: var(--gs-light);
+  }
+  .bevel-button {
+    border-color: var(--gs-light);
+  }
+  .module-panel {
+    border-color: var(--gs-light);
+  }
+  .traffic-dot {
+    border: 1px solid var(--gs-light);
+  }
+}

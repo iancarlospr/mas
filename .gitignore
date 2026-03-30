@@ -1,0 +1,82 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+dist/
+.next/
+out/
+build/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# IDE
+.vscode/settings.json
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Turbo
+.turbo/
+
+# Test
+coverage/
+playwright-report/
+test-results/
+e2e/.auth/
+testing-modules/
+
+# Supabase
+.supabase/
+supabase/.temp/
+
+# Docker
+docker-compose.override.yml
+
+# Redis
+*.rdb
+
+# Misc
+*.tsbuildinfo
+*.log
+.vercel
+.env*.local
+
+# Playwright MCP debug logs/screenshots
+.playwright-mcp/
+
+# Claude Code
+.claude/
+CLAUDE.md
+
+# Infrastructure (secrets-free but reveals architecture)
+scripts/setup-droplet.sh
+scripts/droplet-init.sh
+docker-compose.prod.yml
+apps/engine/Caddyfile
+apps/engine/docker-compose.yml
+
+# Local docs (PII, prospect lists, invite codes)
+docs/
+
+# One-off scripts with potential secrets
+packages/video/_*.mjs
+
+# Generated PDFs
+*.pdf
+!apps/web/app/opengraph-image.png

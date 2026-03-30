@@ -1,0 +1,123 @@
+---
+title: "We Audited 500 Websites. Here's What's Broken on Yours Too."
+excerpt: "We ran our 45-module scan on 500 websites across every industry. The results are worse than you think."
+date: "2026-03-13"
+author: "AlphaScan Team"
+published: false
+---
+
+# We Audited 500 Websites. Here's What's Broken on Yours Too.
+
+We pointed AlphaScan at 500 real websites, ecommerce stores, SaaS platforms, marketing agencies, local businesses, media outlets, healthcare providers, and financial services companies, and ran the full 45-module GhostScan on every single one. No cherry-picking. No curating for dramatic effect. Just a cold, honest look at how the internet's marketing stacks are actually doing.
+
+Spoiler: not great.
+
+We're not talking about obscure edge cases. These are real businesses spending real money on ads, email, content, and SEO, and hemorrhaging value because the infrastructure underneath all of it is held together with duct tape and good intentions.
+
+## The Big Numbers
+
+Let's start with the headlines. These are aggregate findings across all 500 sites.
+
+**[DATA] 73% have no DMARC policy or have it set to "none."** That means anyone can spoof emails from their domain. Your customers are getting phished with your brand name and you don't even know it. Setting up DMARC takes about 15 minutes.
+
+**[DATA] 64% have consent mode misconfigured.** Either Google Consent Mode v2 isn't implemented at all, or the default states are wrong, or the consent banner doesn't actually communicate with Google Tag Manager. You think you're collecting compliant data. You're not.
+
+**[DATA] 58% are loading abandoned third-party scripts.** Dead analytics tools. Defunct chat widgets. Tracking pixels for ad platforms they stopped using two years ago. Every one of these adds latency, leaks data, and creates legal exposure. They're just sitting there, slowing your site down for literally no reason.
+
+**[DATA] 67% have at least one broken tracking pixel.** Your Meta Pixel is firing on page load but not on purchase. Your Google Ads tag is sending the wrong conversion value. Your TikTok pixel doesn't exist on mobile. You're paying for ads and then fumbling the measurement.
+
+**[DATA] 71% fail basic accessibility checks.** Missing alt text, insufficient color contrast, form inputs without labels, no skip navigation. This isn't just a compliance issue. It's lost revenue. Screen reader users, keyboard navigators, and people with low vision are bouncing because your site is unusable for them.
+
+**[DATA] 81% have no error monitoring tool.** No Sentry, no LogRocket, no Datadog, no nothing. When JavaScript breaks on your checkout page at 2am on a Saturday, you find out Monday morning from a customer complaint. If you're lucky.
+
+**The average MarketingIQ score across all 500 sites: [DATA] 38 out of 100.** That's not a typo. The median was [DATA] 35. The highest score in the entire dataset was [DATA] 82. Only [DATA] 11% scored above 60.
+
+## Category by Category
+
+Here's what stood out in each of the eight MarketingIQ categories.
+
+### Compliance & Security
+
+**[DATA] 42% of sites have no Content Security Policy header at all.** That's the header that prevents cross-site scripting attacks and unauthorized script injection. Without it, any compromised third-party script can exfiltrate your customer data. The fix takes one line of server config. We also found that [DATA] 38% are missing basic security headers like X-Frame-Options and X-Content-Type-Options, the kind of thing that takes five minutes to add but prevents your site from being embedded in phishing frames.
+
+### Analytics Integrity
+
+**[DATA] 36% are running duplicate Google Analytics tags.** Two GA4 measurement IDs firing on every page, double-counting sessions, inflating pageviews. If your bounce rate looks suspiciously low, this is probably why. You're making decisions off data that's mathematically wrong.
+
+### Performance & UX
+
+**The median Largest Contentful Paint across all 500 sites was [DATA] 4.2 seconds.** Google considers anything over 2.5 seconds "poor." That means more than half the sites we scanned are failing the primary Core Web Vital. On mobile, it's worse: [DATA] 5.1 seconds median. Your hero image is not that important.
+
+### SEO & Content
+
+**[DATA] 53% have broken or missing structured data.** They've got schema markup on the page but it's throwing validation errors: wrong types, missing required fields, or referencing URLs that 404. Google is ignoring your rich snippet attempts and you can't tell from Search Console alone. On the bright side, [DATA] 74% at least have basic meta descriptions, but [DATA] 29% of those are duplicated across multiple pages, which is almost worse than having none at all.
+
+### Paid Media Attribution
+
+**[DATA] 44% of ecommerce sites have mismatched conversion values between their ad platform and their analytics.** The number Google Ads reports and the number GA4 reports for the same purchase event are different. Sometimes wildly different. You literally cannot calculate true ROAS when your tools disagree on what a conversion is worth.
+
+### MarTech Efficiency
+
+**The average site loads [DATA] 14 third-party scripts.** The top quartile loads [DATA] 23+. We found sites running three different heatmap tools simultaneously. Two A/B testing platforms. Four different live chat widgets, all loading, only one actually active. This is what happens when every team installs their own tools and nobody audits.
+
+### Digital Presence
+
+**[DATA] 61% have no structured careers page or jobs schema.** If you're hiring, Google for Jobs can surface your listings for free. But only if you've got the right markup. Most companies are paying for job board listings while leaving free organic placement on the table.
+
+### Market Position
+
+**[DATA] 48% of sites show declining organic traffic trends over the past 12 months.** Almost half. Some of this is market shifts, sure. But when we cross-reference with the SEO and performance findings, it paints a clear picture: neglected stacks lose ground.
+
+## The Industries That Scored Worst
+
+### 1. Local Businesses: Average MarketingIQ: [DATA] 27
+
+This one hurts because these are the businesses that need marketing the most. Small restaurants, salons, dental offices, plumbers. Their sites are template-built, never updated, running Google Analytics from 2019, and almost universally missing consent management. [DATA] 89% had no DMARC record whatsoever. [DATA] 76% are still running Universal Analytics code that stopped collecting data in July 2023. It's just dead JavaScript sitting on every page load. The good news: the fixes here are almost all free and take less than an afternoon. The bad news: most of these businesses don't have anyone whose job it is to check.
+
+### 2. Healthcare: Average MarketingIQ: [DATA] 31
+
+You'd think an industry obsessed with compliance would have their digital house in order. They don't. The tracking is a mess: [DATA] 78% are sending patient-adjacent data through Google Analytics without proper consent flows. Cookie banners exist but don't actually block scripts. HIPAA applies to your website too, not just your EMR.
+
+### 3. Marketing Agencies: Average MarketingIQ: [DATA] 34
+
+The cobbler's children have no shoes. Agencies scored embarrassingly close to the overall average despite literally selling marketing expertise. [DATA] 62% had broken conversion tracking on their own sites. [DATA] 55% had performance scores below 50. We found agencies with "data-driven marketing" in their homepage H1 that were running GA4 with no events configured beyond the default page_view. If your agency's own website can't pass a basic audit, that's a pretty loud signal about what they're doing with yours.
+
+### 4. Media & Publishing: Average MarketingIQ: [DATA] 36
+
+Ad-tech overload. The average media site in our dataset loaded [DATA] 31 third-party scripts, more than double the overall average. Performance is crushed under the weight of programmatic ad stacks. CLS scores are atrocious because ads shift layout after load. These sites are trading user experience for CPM and wondering why subscribers churn.
+
+## The Industries That Scored Best
+
+### 1. SaaS: Average MarketingIQ: [DATA] 52
+
+SaaS companies have engineering teams that care about this stuff. Their analytics implementations are cleaner, their performance is better, and they're more likely to have proper consent management. They still have gaps: [DATA] 41% are missing server-side tracking and [DATA] 55% have attribution blind spots between marketing and product analytics, but the baseline is significantly higher.
+
+### 2. Finance: Average MarketingIQ: [DATA] 49
+
+Regulation helps. Financial services companies are forced to care about security headers, consent, and data handling. Their DMARC adoption rate was [DATA] 68%, nearly double the overall average. Where they fall short is performance and MarTech bloat: compliance teams approve tools but nobody removes them when contracts end.
+
+### 3. Ecommerce (DTC): Average MarketingIQ: [DATA] 46
+
+Direct-to-consumer brands live and die by their conversion tracking, so they tend to get the paid media category right. Shopify's ecosystem helps with baseline security and performance. The weak spots are analytics integrity (duplicate tags from app installs) and consent management ([DATA] 57% relying on Shopify's default cookie banner, which doesn't integrate with GTM consent mode).
+
+## The Pattern Nobody Talks About
+
+Here's the thing that surprised us most: the problems aren't random. They're layered. Sites with broken consent mode almost always have broken tracking pixels too, because if your consent framework isn't working, everything downstream from it is compromised. Sites with no error monitoring are the same ones loading abandoned scripts, because nobody is watching the console errors pile up.
+
+The average site in our dataset had [DATA] 6.4 distinct issues that cascaded into each other. Fix the consent layer and three other problems often resolve themselves. Ignore it and you're building on a foundation that makes every other marketing investment less effective.
+
+This is why isolated audits, just running PageSpeed Insights or just checking your GA4 setup, miss the picture. Your marketing stack is a system. When one part breaks, it degrades everything it touches.
+
+## Where Do You Land?
+
+These are averages. Yours might be better. Yours might be worse. There's only one way to find out.
+
+Every stat in this post came from the same scan you can run right now, for free, on your own website. Same 45 modules. Same MarketingIQ scoring. Takes about 10 minutes.
+
+The sites that scored well in our audit didn't get there by accident. They got there because someone actually looked. Most marketing teams have never run a full-stack audit. They're optimizing campaigns on top of broken foundations and wondering why the numbers don't add up.
+
+We built AlphaScan because we were tired of seeing smart marketers waste money on ads that feed into broken tracking, email campaigns sent from domains anyone can spoof, and websites that take five seconds to load on the phones their customers actually use. The data from these 500 scans just confirmed what we already suspected: almost everyone has something broken, and almost nobody knows.
+
+**Your DMARC might be fine. Your tracking might be perfect. Your consent mode might be flawless.** But if you haven't checked, you're just guessing. And guessing is expensive.
+
+Run your scan. See your score. Fix what's broken.

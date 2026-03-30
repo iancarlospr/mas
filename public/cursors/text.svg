@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="24" viewBox="0 0 16 24">
+  <!-- Win95-style I-beam text cursor -->
+  <g fill="#000000">
+    <rect x="4" y="0" width="8" height="2"/>
+    <rect x="7" y="2" width="2" height="20"/>
+    <rect x="4" y="22" width="8" height="2"/>
+  </g>
+</svg>

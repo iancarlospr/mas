@@ -1,0 +1,221 @@
+---
+title: "The Complete Marketing Stack Audit Checklist (2026)"
+excerpt: "70+ items across 8 categories. Everything you should be checking on your website, with explanations for each one."
+date: "2026-03-24"
+author: "AlphaScan Team"
+published: false
+---
+
+# The Complete Marketing Stack Audit Checklist (2026)
+
+**Everything you should be checking on your website, organized by category, explained in plain English, and ready to use today.**
+
+Here's the truth about marketing audits: most people don't do them. Not because they don't care, but because nobody ever gave them a clear list of *what to actually check.* So they wing it. They eyeball the homepage, click around on mobile, confirm the analytics script is "probably still there," and call it a day.
+
+That's not an audit. That's vibes.
+
+This is the real list. Seventy-one items across eight categories: security, analytics, performance, SEO, paid media, martech infrastructure, brand presence, and market intelligence. For each one, we'll tell you what to check and why it matters. No jargon without explanation. If something is on this list, it's because it directly affects whether your marketing actually works.
+
+You can go through this manually. Print it out, open your site in one tab and DevTools in another, and start checking boxes. Budget a few hours. Bring snacks.
+
+Or: [run a free AlphaScan](/) and check all of them in about 10 minutes. Your call.
+
+---
+
+## Security & Compliance
+
+Security isn't just an IT problem. If your email gets spoofed, your site gets flagged, or your cookie banner is decorative, it's your marketing that takes the hit.
+
+- [ ] **SPF record configured with `-all`**: SPF tells email servers which IPs can send on behalf of your domain. Without the `-all` hard fail, anyone can send emails pretending to be you, tanking your domain reputation and landing your real marketing emails in spam.
+
+- [ ] **DMARC policy set to `quarantine` or `reject`**: DMARC tells receiving servers what to do when email authentication fails. A policy of `p=none` monitors but doesn't protect. Google and Yahoo require DMARC for bulk senders. If you're sending marketing emails without it, your deliverability is already suffering.
+
+- [ ] **DKIM signing with a 2048-bit key**: DKIM cryptographically proves your emails weren't tampered with in transit. Older 1024-bit keys are considered weak. If your DKIM setup is more than a couple years old, check the key length in your DNS TXT record.
+
+- [ ] **TLS 1.3 with a valid certificate (90+ days to expiry)**: TLS encrypts the connection between your visitor's browser and your server. An expired or soon-to-expire cert means visitors see a scary warning instead of your site. The 90-day buffer gives you room if auto-renewal silently fails.
+
+- [ ] **HSTS enabled with preload readiness**: HSTS forces browsers to always use HTTPS, even if someone types `http://`. Without it, the first request can be intercepted. Preload readiness means you're eligible for browser preload lists, which enforce HTTPS before the first visit.
+
+- [ ] **Content Security Policy with nonce-based `script-src`**: CSP tells browsers which scripts are allowed to run on your pages. Without it, a cross-site scripting vulnerability lets attackers inject anything: form stealers, redirects, crypto miners. Nonce-based policies are stronger than domain whitelists.
+
+- [ ] **Privacy policy page accessible**: Not just "exists somewhere," but accessible from every page via footer link. Every privacy regulation requires one. If yours is a dead link or hasn't been updated since 2017, that's a compliance gap a regulator or plaintiff's attorney will notice.
+
+- [ ] **Terms of service accessible**: Your ToS define the legal relationship with your users. Courts have ruled that terms buried behind multiple clicks may not be enforceable. Make them easy to find.
+
+- [ ] **Cookie consent banner functional (not just decorative)**: Does clicking "Reject" actually stop non-essential cookies? [We wrote a whole article about this.](/blog/your-cookie-banner-is-illegal) Test it: click Reject, then check your cookies. If you see `_ga` or `_fbp`, your banner is theater.
+
+- [ ] **No pre-consent tracking**: Open DevTools, reload without touching the banner, and watch what fires. If analytics and ad pixels load before consent, that's a GDPR violation, regardless of whether the banner exists. This is the #1 thing regulators fine for.
+
+- [ ] **CCPA "Do Not Sell" link present (if US-facing)**: If you have California visitors (you do), you need a conspicuous "Do Not Sell or Share My Personal Information" link that triggers a real opt-out mechanism, not just a privacy page.
+
+- [ ] **`security.txt` at `/.well-known/security.txt`**: A simple file telling security researchers how to report vulnerabilities. It's an IETF standard (RFC 9116), takes five minutes to set up, and means the difference between a responsible disclosure and a public callout.
+
+- [ ] **No sensitive subdomains exposed**: Are `dev.yoursite.com`, `staging.yoursite.com`, or `admin.yoursite.com` publicly accessible? These often have weaker auth and outdated code. Attackers enumerate subdomains as step one.
+
+---
+
+## Analytics & Measurement
+
+Bad measurement is worse than no measurement. It gives you confidence in wrong numbers. These items make sure your data is real, complete, and useful.
+
+- [ ] **GA4 measurement ID present and firing**: Check that your tag fires, that the ID starts with `G-` (not a leftover `UA-` code), and that data flows into a property *you* control. We see sites where the agency used their own property ID, then the relationship ended.
+
+- [ ] **Consent Mode v2 connected to your CMP**: Consent Mode v2 lets Google tags adapt to consent status, but only if your CMP actually sends it signals. If they're disconnected, your tags default to full tracking regardless of the banner. Required for EU audience measurement since March 2024.
+
+- [ ] **`dataLayer` populated with meaningful data**: The dataLayer is how your site talks to Google Tag Manager. Check `window.dataLayer` in your console. If it's empty, your tag manager is flying blind and can't track page types, user segments, or anything contextual.
+
+- [ ] **Custom events configured**: If the only event you track is `page_view`, you know how many people visited your pricing page but not how many clicked "Get Started." Custom events (clicks, form submissions, scroll depth) measure behavior, not just traffic.
+
+- [ ] **Cross-domain tracking set up (if multi-domain)**: If your marketing site and checkout live on different domains, each one sees a separate visitor by default. Without cross-domain tracking, you can't connect the journey from landing page to conversion and your attribution is fragmented.
+
+- [ ] **Debug mode disabled in production**: GA4 debug mode and GTM preview mode process data differently and skew your reports. Leaving debug flags in production also signals sloppy deployment practices.
+
+- [ ] **Single tag management system**: One tag manager, not two. Not GTM *and* Tealium. Not GTM loading another GTM container. Every extra TMS adds weight, creates race conditions, and makes auditing impossible.
+
+- [ ] **Server-side tagging configured**: Ad blockers now block 30-40% of client-side analytics traffic. Server-side tagging moves collection to your own server, giving you more complete data and resilience against the ongoing privacy infrastructure changes.
+
+- [ ] **Error monitoring tool installed**: JavaScript errors crash features and break forms silently. Tools like Sentry or Datadog catch them in real time. Without one, you find out about broken checkout flows from support tickets.
+
+---
+
+## Performance & Experience
+
+Google uses Core Web Vitals as a ranking factor. Over 60% of traffic is mobile. Speed and usability directly affect whether visitors convert or bounce.
+
+- [ ] **Largest Contentful Paint (LCP) under 2.5 seconds**: LCP measures how fast the biggest visible element appears. Google considers under 2.5s "good." Every 100ms of delay costs measurable conversion rate. Usual culprits: unoptimized hero images, render-blocking scripts, slow servers.
+
+- [ ] **Cumulative Layout Shift (CLS) under 0.1**: CLS measures how much your page jumps while loading. That thing where you're about to tap a button and it shifts down? That's layout shift. Causes: images without dimensions, late-loading fonts, cookie banners that push content.
+
+- [ ] **Total page weight under 2.5MB**: Everything the browser downloads: HTML, CSS, JS, images, fonts, third-party scripts. If your page is 5MB+, you're asking mobile visitors to download a small app on every visit.
+
+- [ ] **No render-blocking scripts in the `<head>`**: Scripts without `async` or `defer` block rendering. Visitors stare at white while the browser fetches your chat widget and A/B testing tool. Move non-critical scripts to the body or add `defer`.
+
+- [ ] **Images in modern formats (WebP or AVIF)**: If you're still serving JPEG and PNG, your images are 25-50% larger than they need to be. WebP has universal support. AVIF is even better. Most CDNs auto-convert on the fly.
+
+- [ ] **Lazy loading on below-fold images**: Images not visible on initial load shouldn't download until the user scrolls there. Native `loading="lazy"` handles this. Without it, a page with 20 images loads all 20 immediately, even if only 3 are seen.
+
+- [ ] **`font-display: swap` on web fonts**: Without `swap`, browsers hide text until the custom font downloads. Visitors see a blank page even though content is there. With `swap`, text appears immediately in a fallback font and swaps when ready.
+
+- [ ] **Mobile viewport meta tag present**: `<meta name="viewport" content="width=device-width, initial-scale=1">` tells phones to render at actual screen width. Without it, your site loads zoomed out to 980px, tiny and unusable. We still find sites missing this.
+
+- [ ] **No horizontal scroll at 375px width**: 375px is an iPhone SE viewport. If content overflows, you have fixed-width elements or images without `max-width: 100%`. Horizontal scroll on mobile universally signals "not built for phones."
+
+- [ ] **Touch targets at least 44x44 pixels**: Both Apple and Google specify 44px minimum tap targets. Smaller buttons mean mobile users tap the wrong thing. Especially common in footers and nav dropdowns.
+
+- [ ] **Body text at least 14px on mobile**: If visitors pinch-to-zoom to read, your text is too small. 14px is the floor. 16px is better. We regularly see 11-12px body text on mobile because nobody checked the phone rendering.
+
+- [ ] **No accessibility overlay installed**: Those floating "accessibility widgets" are not WCAG compliance. Multiple lawsuits have established that overlays don't make sites accessible and may make them worse for screen readers. Real accessibility requires structural HTML fixes.
+
+- [ ] **Alt text on meaningful images**: Screen readers use alt text to describe images. Missing alt text is the #1 WCAG violation, the basis for many ADA lawsuits, and a missed opportunity for Google Image Search traffic.
+
+- [ ] **Keyboard navigation functional**: Every interactive element should work via Tab, Enter, and Escape. Many users depend on keyboard nav: people with motor disabilities, power users, screen reader users. If your dropdown only opens on hover, they can't use your site.
+
+---
+
+## SEO & Content
+
+Search is still the highest-intent traffic source. These items ensure your pages are discoverable, correctly indexed, and formatted for search engines and social sharing.
+
+- [ ] **Title tag between 50-60 characters**: The title tag is the blue link in search results. Too long and Google truncates it mid-word. Include your target keyword and stay within ~580px pixel width.
+
+- [ ] **Meta description between 150-160 characters**: Google doesn't rank on it, but it massively affects click-through rate. Skip it and Google auto-generates a usually-awkward snippet from your content.
+
+- [ ] **Canonical URL set correctly**: The canonical tells search engines which URL version is the "real" one. Without it, ranking authority splits across `yoursite.com/page`, `www.yoursite.com/page`, and `yoursite.com/page?utm_source=email`.
+
+- [ ] **Open Graph tags complete**: When someone shares your page on LinkedIn, Slack, or iMessage, the preview card comes from OG tags. Missing tags = broken preview = wasted distribution.
+
+- [ ] **Twitter Card tags configured**: Same concept for Twitter/X. A `summary_large_image` card with a proper image gets significantly more engagement than a bare link. Two minutes to add.
+
+- [ ] **JSON-LD structured data on key pages**: Structured data helps Google understand *what* your page is (product, article, FAQ, local business) and can earn rich results, like star ratings, price ranges, and FAQ dropdowns, that dramatically boost click-through.
+
+- [ ] **`robots.txt` with sitemap reference**: Should include a `Sitemap:` directive pointing to your XML sitemap. Check it isn't accidentally blocking important pages. This happens constantly after site migrations.
+
+- [ ] **XML sitemap valid and submitted**: Should list pages you want indexed with last-modified dates. No 404s, no noindexed pages. Submit in Google Search Console. A broken sitemap gives Google wrong directions.
+
+- [ ] **No accidental `noindex` on important pages**: A single `noindex` tag removes a page from Google entirely. Useful for staging. Catastrophic when left on your homepage after launch. Check your most important pages.
+
+- [ ] **HTML `lang` attribute set**: `<html lang="en">` tells browsers and screen readers your content language. Without it, screen readers mispronounce, translation tools don't activate, and search engines guess. One attribute, ten seconds.
+
+- [ ] **Hreflang tags for multi-language content**: If you serve content in multiple languages or target specific regions, hreflang tells search engines which version to show which audience. Without it, your localized pages compete against each other.
+
+---
+
+## Paid Media
+
+Spending money on ads? These items make sure you're measuring what matters and feeding accurate data back to the platforms.
+
+- [ ] **Meta Pixel firing conversion events**: Not just `PageView`, but actual conversion events like `Purchase`, `Lead`, or `AddToCart`. Without conversion signals, Meta's algorithm has nothing to optimize toward and you're paying for traffic, not outcomes.
+
+- [ ] **Google Ads with enhanced conversions enabled**: Enhanced conversions send hashed first-party data back to Google to match conversions when cookies are blocked. Without it, your conversion tracking gets increasingly incomplete and your ROAS numbers are wrong.
+
+- [ ] **Click ID cookies preserved through your funnel**: `gclid`, `fbclid`, `ttclid`, these click IDs need to survive from landing page through conversion. If redirects or client-side routing strips them, your ads look like they're not converting when they are.
+
+- [ ] **Conversion events beyond `PageView` configured**: Across all platforms: if you only track page views, algorithms optimize for clicks, not conversions. Track what actually matters: form submissions, purchases, sign-ups.
+
+- [ ] **Landing page tracking matches ad platform settings**: If Google Ads expects a "Submit Lead Form" event but your page fires "Contact Us" with different parameters, the conversion never registers. Audit both sides.
+
+- [ ] **UTM parameters preserved across the site**: UTMs are fragile. Internal redirects, trailing slash normalization, and client-side routing can all strip them. Click a link from your own email and check whether UTMs survive to the landing page.
+
+---
+
+## MarTech & Infrastructure
+
+Your marketing stack runs on plumbing. These items check whether the infrastructure is solid and whether your data actually flows end-to-end.
+
+- [ ] **CDN configured and active**: A CDN caches assets worldwide so visitors load from nearby servers. Without one, users in London or Sao Paulo get noticeably slower loads. Most hosts include CDN capability, but "included" doesn't mean "configured correctly."
+
+- [ ] **HTTP/2 or HTTP/3 enabled**: HTTP/2 downloads multiple files simultaneously over one connection. HTTP/3 adds better mobile network performance. Check your response headers for `h2` or `h3`. It's not always on by default.
+
+- [ ] **No abandoned third-party scripts**: Every unused script costs performance and creates a security surface. That old chat widget or heatmap tool from a former employee? Still loading, still setting cookies, still sending data to servers you don't control. [We wrote a whole article about this.](/blog/the-martech-tax)
+
+- [ ] **No redundant tool pairs**: Two analytics platforms. Two chat widgets. Two tag managers. Double the cost, double the page weight, and data that contradicts itself. Pick one and remove the other.
+
+- [ ] **Forms integrated with your CRM**: If form submissions don't automatically create contacts in your CRM, leads die in the gap. Test it yourself: submit a form and check where the data lands.
+
+- [ ] **Marketing automation connected and active**: Email sequences and nurture flows only work if they're connected to your site's events. If someone visits your pricing page three times and nobody gets notified, your automation is a car with no gas.
+
+---
+
+## Brand & Digital Presence
+
+Your website isn't your only touchpoint. These items cover the ecosystem customers encounter when researching your brand.
+
+- [ ] **Press page with recent content**: A press page whose most recent item is from 2023 actively communicates that nothing is happening. Feature case studies, partnerships, or roundups. The key word is *recent*.
+
+- [ ] **Careers page with an applicant tracking system**: Investors, partners, and enterprise buyers check your careers page. A "send resume to jobs@" email on a blank page doesn't inspire confidence. A proper ATS (Greenhouse, Lever, Ashby) signals maturity.
+
+- [ ] **Help center on a professional platform**: If support docs live in a random Google Doc, you're creating tickets for questions that could be self-served. A proper help center also ranks in Google, capturing search traffic.
+
+- [ ] **System status page**: A public status page tells customers whether your service is up and gives you a communication channel during incidents. Without one, every outage triggers a flood of support tickets. Enterprise buyers often require it.
+
+- [ ] **Google Business Profile complete and current**: Often the first thing people see when they Google your company. An incomplete profile (no photos, wrong address, no description) looks abandoned. If you have a physical location, this is your most important local SEO asset.
+
+- [ ] **Social media profiles linked from your website**: Link to *active* profiles only. A Twitter account that last posted in 2024 does more harm than good. And check the links. We see broken social links on 10%+ of the sites we scan.
+
+- [ ] **Google Reviews monitored and responded to**: Unanswered negative reviews sit there permanently, shaping perception for every future customer. Responding (even briefly and professionally) signals you're engaged. No reviews at all is also a gap worth closing.
+
+---
+
+## Market Intelligence
+
+These items zoom out from your website to your competitive position. Are you building durable advantages or just treading water?
+
+- [ ] **Traffic diversified across 3+ countries**: If 95% of your traffic comes from one country, you're concentrated. Algorithm changes, economic shifts, or competitive moves in that market can tank you overnight. Diversification is resilience.
+
+- [ ] **10+ keywords ranking in the top 10**: A proxy for organic search health. Fewer than 10 first-page keywords means your SEO foundation needs work. Check Google Search Console for current positions.
+
+- [ ] **Referring domain count growing quarter over quarter**: Referring domains (unique sites linking to yours) are the most reliable indicator of authority growth. A stagnant count means your content isn't earning links, which will eventually drag rankings down.
+
+- [ ] **Brand search volume tracked**: How many people Google your company name each month. It's the purest measure of brand awareness. If it's flat or declining, your marketing generates activity but not awareness. Track it monthly in Google Trends.
+
+- [ ] **Competitor landscape mapped**: Your organic competitors aren't always who you think. They're whoever ranks for the same keywords. Map their domain authority, content velocity, and backlink growth. Understanding the landscape shows you where the gaps are.
+
+---
+
+## The Easy Way
+
+This checklist has 71 items. Going through them manually, actually checking each one, not just skimming, takes a skilled marketer or developer 4 to 6 hours. And that's one site, one time. Certificates expire, scripts get added, somebody edits the robots.txt without telling anyone. An audit done once is a snapshot. An audit done regularly is a system.
+
+AlphaScan checks every item on this list, and dozens more, automatically. Drop in your URL, wait about 10 minutes, get a full report with scores, explanations, and specific recommendations. No DevTools required. No spreadsheet.
+
+[Try a free preview now](/), and let somebody else grade your homework for once.

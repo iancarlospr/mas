@@ -1,0 +1,89 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Module Data Contracts > M01 Data Shape > should match snapshot 1`] = `
+[
+  "caa",
+  "dkim",
+  "dmarc",
+  "dnssec",
+  "hsts",
+  "securityHeaders",
+  "spf",
+  "tls",
+]
+`;
+
+exports[`Module Data Contracts > M04 Data Shape > should match snapshot 1`] = `
+[
+  "adsTxt",
+  "alternateLinks",
+  "canonical",
+  "charset",
+  "favicon",
+  "hreflang",
+  "htmlLang",
+  "jsonLd",
+  "llmsTxt",
+  "manifest",
+  "metaDescription",
+  "metaTags",
+  "ogTags",
+  "openSearch",
+  "pagination",
+  "preconnectHints",
+  "robotsDirectives",
+  "robotsTxt",
+  "sitemap",
+  "title",
+  "twitterCards",
+  "viewport",
+]
+`;
+
+exports[`Module Data Contracts > M05 Data Shape > should match snapshot 1`] = `
+[
+  "analyticsRequestCount",
+  "consent",
+  "cookies",
+  "dataLayer",
+  "networkEventNames",
+  "networkMeasurementIds",
+  "pixelFires",
+  "serverSideTracking",
+  "tagManagerRequestCount",
+  "toolCount",
+  "toolNames",
+  "tools",
+]
+`;
+
+exports[`Module Data Contracts > M06 Data Shape > should match snapshot 1`] = `
+[
+  "adBytesByPlatform",
+  "adRequestCount",
+  "adScriptBytes",
+  "adScriptCount",
+  "attributionCookies",
+  "capiDetected",
+  "capiSource",
+  "clickIds",
+  "cookiesByPlatform",
+  "googleAdsCookieFallback",
+  "pixelCount",
+  "pixelNames",
+  "pixels",
+  "totalNetworkFires",
+  "utmParams",
+]
+`;
+
+exports[`Module Data Contracts > M24 Data Shape > should match snapshot 1`] = `
+[
+  "organicKeywords",
+  "organicTraffic",
+  "overview",
+  "paidKeywords",
+  "paidTraffic",
+  "totalTraffic",
+]
+`;

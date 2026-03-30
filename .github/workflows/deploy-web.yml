@@ -1,0 +1,40 @@
+name: Deploy Web
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/web/**'
+      - 'packages/types/**'
+
+jobs:
+  # Vercel handles the actual deployment via its GitHub integration.
+  # This job verifies the production deployment succeeded by polling /api/health.
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for Vercel deployment and verify health
+        run: |
+          # Wait for Vercel to pick up the commit (initial delay)
+          echo "Waiting 60s for Vercel to start building..."
+          sleep 60
+
+          # Poll /api/health on the production domain (bypasses staging gate)
+          PROD_URL="https://www.marketingalphascan.com"
+          MAX_ATTEMPTS=30
+          INTERVAL=10
+
+          for i in $(seq 1 $MAX_ATTEMPTS); do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$PROD_URL/api/health" --max-time 10 2>/dev/null || echo "000")
+            echo "Attempt $i/$MAX_ATTEMPTS: $PROD_URL/api/health → HTTP $STATUS"
+
+            if [ "$STATUS" = "200" ]; then
+              echo "✅ Deployment healthy at $PROD_URL"
+              exit 0
+            fi
+
+            sleep $INTERVAL
+          done
+
+          echo "❌ Deployment health check failed after $MAX_ATTEMPTS attempts"
+          exit 1
