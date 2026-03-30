@@ -30,7 +30,7 @@ export async function generateMetadata({
       authors: [post.author ?? 'Alpha Scan Team'],
       images: [
         {
-          url: 'https://marketingalphascan.com/og-image.png',
+          url: 'https://marketingalphascan.com/opengraph-image.png',
           width: 1200,
           height: 630,
           alt: `${post.title} | Alpha Scan`,
@@ -42,7 +42,7 @@ export async function generateMetadata({
       card: 'summary_large_image',
       title: post.title,
       description: post.excerpt,
-      images: ['https://marketingalphascan.com/og-image.png'],
+      images: ['https://marketingalphascan.com/opengraph-image.png'],
     },
   };
 }

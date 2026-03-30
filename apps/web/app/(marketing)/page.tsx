@@ -14,7 +14,7 @@ export const metadata: Metadata = {
       'Serve an unclockable audit in minutes. Extract the ground truth from any marketing stack.',
     images: [
       {
-        url: 'https://marketingalphascan.com/og-image.png',
+        url: 'https://marketingalphascan.com/opengraph-image.png',
         width: 1200,
         height: 630,
         alt: 'Alpha Scan — Forensic Marketing Intelligence',
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Alpha Scan',
     description: 'Your MarTech stack is a landfill. Let Chloé run the forensics.',
-    images: ['https://marketingalphascan.com/og-image.png'],
+    images: ['https://marketingalphascan.com/opengraph-image.png'],
   },
 };
 
