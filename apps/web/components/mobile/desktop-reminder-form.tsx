@@ -42,6 +42,13 @@ export function DesktopReminderForm() {
     if (window.turnstile && siteKey) {
       renderTurnstile();
     }
+    return () => {
+      if (window.turnstile && turnstileWidgetRef.current) {
+        window.turnstile.remove(turnstileWidgetRef.current);
+        turnstileWidgetRef.current = null;
+        turnstileTokenRef.current = null;
+      }
+    };
   }, [renderTurnstile, siteKey]);
 
   const handleSubmit = useCallback(
@@ -104,7 +111,7 @@ export function DesktopReminderForm() {
           onChange={(e) => setEmail(e.target.value)}
           required
           disabled={status === 'sending'}
-          className="w-full h-[38px] px-gs-3 font-data text-[13px] text-center
+          className="w-full h-[38px] px-gs-3 font-data text-[16px] text-center
                      border border-gs-mid/30 bg-gs-light/10 text-gs-light
                      placeholder:text-gs-mid/50 focus:border-gs-base/60
                      focus:outline-none transition-colors select-text"
@@ -118,7 +125,7 @@ export function DesktopReminderForm() {
         <button
           type="submit"
           disabled={status === 'sending'}
-          className="w-full h-[38px] font-data text-[13px] font-bold transition-colors
+          className="w-full h-[38px] font-data text-[16px] font-bold transition-colors
                      border border-transparent"
           style={{
             background: 'var(--gs-base)',
@@ -134,7 +141,7 @@ export function DesktopReminderForm() {
         <>
           <Script
             src="https://challenges.cloudflare.com/turnstile/v0/api.js"
-            strategy="lazyOnload"
+            strategy="afterInteractive"
             onLoad={renderTurnstile}
           />
           <div
@@ -143,6 +150,7 @@ export function DesktopReminderForm() {
               overflow: 'hidden',
               opacity: 0.6,
               filter: 'grayscale(0.3) brightness(0.8)',
+              minHeight: '65px',
             }}
           >
             <div ref={turnstileContainerRef} />
