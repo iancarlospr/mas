@@ -7,8 +7,6 @@ import { verifyShareToken } from '@/lib/report/share';
 import { getSharedReportPreview } from '@/lib/report/share-preview';
 import { ReportPaywall } from './paywall';
 
-export const metadata: Metadata = { title: 'Executive Report' };
-
 export async function generateMetadata({
   params,
   searchParams,
@@ -22,7 +20,9 @@ export async function generateMetadata({
   const preview = await getSharedReportPreview(scanId, shareToken);
 
   if (!preview || !shareToken) {
-    return { title: 'Executive Report' };
+    return {
+      title: 'Executive Report',
+    };
   }
 
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://marketingalphascan.com';
