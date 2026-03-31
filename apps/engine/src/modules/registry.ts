@@ -377,7 +377,7 @@ export const MODULE_REGISTRY: ModuleDefinition[] = [
     name: 'Module AI Synthesis',
     phase: 'synthesis',
     minimumTier: 'full',
-    timeout: 300_000,
+    timeout: 480_000,
     retries: 2,
     category: 'market_intelligence',
     dependsOn: [
