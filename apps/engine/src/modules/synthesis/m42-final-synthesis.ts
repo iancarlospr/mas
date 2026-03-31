@@ -82,23 +82,27 @@ METHODOLOGY:
       RIGHT: "Mature Stack, Broken Measurement — Half the Ad Budget Is Flying Blind"
       RIGHT: "Strong Security Foundation Undermined by Pre-Consent Tracking and Missing Attribution"
       RIGHT for good scans: "Well-Instrumented Stack With Minor Gaps in Competitive Intelligence"
-   B) verdict_headline (the Scott Galloway Roast): 8-20 words, no period. Scott Galloway roasting this company. FUNNY FIRST. Plain English a CEO understands — ZERO marketing jargon, ZERO acronyms, ZERO data points, ZERO technical terms. No "UTM", "ROAS", "conversion tracking", "consent mode", "attribution", "pixel", "SEO", "GTM", or any term a normal person wouldn't use at a dinner party. The humor comes from a devastating ANALOGY or OBSERVATION about the business, not from listing what's broken.
-      VOICE: You ARE Galloway. Find the single most ironic or absurd thing about this company's marketing and turn it into a one-liner that makes people laugh. Think of it as a tweet, not a report. Short. Blunt. Devastating.
+   B) verdict_headline (the Scott Galloway Roast): 8-25 words, no period. Scott Galloway roasting THIS SPECIFIC company. FUNNY FIRST. Plain English a CEO understands — ZERO marketing jargon, ZERO acronyms, ZERO data points, ZERO technical terms. No "UTM", "ROAS", "conversion tracking", "consent mode", "attribution", "pixel", "SEO", "GTM", or any term a normal person wouldn't use at a dinner party.
+      CRITICAL RULE: The roast MUST be about THIS company's specific business, industry, or product. Read the domain, the business description, what they actually sell. The comedy comes from the IRONY between what they do for a living and how they run their own marketing. A generic ad-budget joke that could apply to any company is a FAILURE.
+      VOICE: You ARE Galloway. Find the single most ironic or absurd thing about THIS SPECIFIC company and turn it into a one-liner. Think of it as a tweet, not a report. Short. Blunt. Devastating.
+      PROCESS: 1) What does this company DO? (radiology, plumbing, law firm, SaaS, restaurant) 2) What's broken in their marketing? 3) What's the funniest contradiction between those two things?
       PATTERNS:
-      - The devastating analogy ("Their ad budget is the most generous donation Alphabet never asked for")
-      - The ironic contradiction using the company's OWN business ("They sell fleet tracking but can't track their own customers")
-      - The deadpan observation ("Someone is paying for all this and nobody thought to ask if it's working")
-      - The absurd reframe ("This isn't a marketing strategy, it's a charitable contribution")
+      - The industry irony ("They can see through a human body but can't see where their ad dollars are going" — radiology company with no measurement)
+      - The product contradiction ("They sell home security systems and their website has fewer locks on it than a screen door" — security company with no HTTPS/headers)
+      - The expertise gap ("A law firm that can't read the fine print on their own Google contract — someone should sue" — law firm overspending on ads)
+      - The service paradox ("They fix other people's plumbing but their own marketing pipeline has been leaking for years" — plumber with broken funnel)
+      - The Galloway personal touch ("This company is doing to its ad budget what I did to my first marriage — spending everything, measuring nothing, and wondering why it's not working" — generic fallback ONLY if no industry angle exists)
       WRONG: "Missing Consent Mode and Server-Side Tag Infrastructure" (jargon, reads like a Jira ticket)
       WRONG: "Two Thousand Google Ads and No Way to Tell Which Ones Work" (data points, still too technical)
       WRONG: "Paying Google Twice Because Nobody Set Up Conversion Tracking" (jargon: "conversion tracking")
-      WRONG: "Their SEO Strategy Is Just Vibes and a Blog Post From 2019" (jargon: "SEO")
-      RIGHT: "Their ad budget is the most generous donation Alphabet never asked for" (devastating, zero jargon, anyone gets it)
-      RIGHT: "They sell monitoring equipment but nobody's monitoring if their own website works" (ironic, uses their business)
-      RIGHT: "Someone approved this budget — find that person and have a conversation" (blunt Galloway energy)
-      RIGHT: "This company spends more on ads than some countries spend on education and can't tell you if it's working" (absurd scale)
-      RIGHT for good scans: "Somebody over there actually knows what they're doing — that's rarer than you think"
-      RIGHT for good scans: "I looked for something to roast and came up empty — whoever runs this deserves a raise"
+      WRONG: "Their ad budget is the most generous donation Alphabet never asked for" (generic — could be ANY company, says nothing about the business)
+      WRONG: "Someone approved this budget — find that person and have a conversation" (generic — not about the company)
+      RIGHT: "They can look inside a human spine but can't figure out where their money's going — that's a new kind of blind spot" (radiology company, uses THEIR industry)
+      RIGHT: "A locksmith whose own front door is wide open — poetic, really" (security company with no security headers)
+      RIGHT: "They teach people how to manage money and can't manage their own ad spend — I love this industry" (financial advisor with wasted budget)
+      RIGHT: "They deliver packages to 40 countries but their own data got lost somewhere between the homepage and checkout" (logistics company with broken tracking)
+      RIGHT for good scans: "I came here to roast somebody and honestly I'm a little disappointed — whoever runs this actually knows what they're doing"
+      RIGHT for good scans: "This is annoyingly competent — I had a whole bit prepared and now I have nothing"
 3. For EACH category: write a 3-5 sentence assessment summarizing the state of that area. Identify the top 1-3 issues and any strengths worth acknowledging.
 4. SYNTHESIZE across categories to identify exactly 3 KEY FINDINGS — these must be CROSS-MODULE THEMES, not repetitions of individual module findings.
    Example: "Systemic tracking infrastructure gaps" spanning M05 (no consent mode) + M06 (missing enhanced conversions) + M12 (tracking before consent) is ONE finding that synthesizes a theme across modules.
@@ -133,7 +137,7 @@ EXAMPLE — Here is an abbreviated ideal output. Match this level of synthesis q
 
 {
   "synthesis_headline": "Mature Stack, Broken Measurement — Half the Ad Budget Is Flying Blind on Pre-Privacy Infrastructure",
-  "verdict_headline": "Their ad budget is the most generous donation Alphabet never asked for",
+  "verdict_headline": "They can see inside a human body but can't see where their ad dollars are going — that's a new kind of blind spot",
   "category_assessments": {
     "security_compliance": {
       "category_name": "Security & Compliance",

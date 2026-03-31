@@ -37,7 +37,7 @@ export function RoastSlide({ scan }: RoastSlideProps) {
 
   // Display text
   const displayText = headline
-    ?? (score != null && label ? `MarketingIQ: ${score} — ${label}` : null);
+    ?? 'This company is doing to its ad budget what I did to my first marriage — spending everything, measuring nothing, and wondering why it\'s not working';
 
   if (!displayText) return null;
 
