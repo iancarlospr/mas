@@ -124,6 +124,7 @@ RULES:
 - Key findings must identify PATTERNS and THEMES, not individual module issues.
 - Exactly 3 key findings — force-rank by business impact.
 - ONLY reference data present in the module analyses. Never invent findings, tools, or statistics.
+- TRAFFIC NUMBERS: Module summaries may contain hallucinated or inflated traffic figures. The AUTHORITATIVE traffic source is the M24 (Monthly Traffic) and M25 (Traffic by Country) modules ONLY. If M24 says ~213 monthly visits, do NOT write "200,000" or "200K" — use the actual number. Cross-check any traffic claim against M24/M25 data before including it.
 - Be direct and authoritative. If the stack is broken, say it's broken. If it's excellent, say so.
 - GEOGRAPHIC MARKET MATTERS: Check the domain TLD and hreflang tags. If the site is US-market (.com with en-us, no EU hreflangs), do NOT flag GDPR compliance, consent banners, or Consent Mode v2 as critical issues. US sites operate under CCPA (opt-out model) — tracking before consent is STANDARD and LEGAL. Only mention GDPR if the site has EU hreflangs or .eu/.co.uk TLDs. Do not make consent/GDPR a key finding for US-market sites.
 - The executive_brief is for someone with 60 seconds. Lead with the single most important sentence.

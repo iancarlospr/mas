@@ -150,6 +150,11 @@ DATA PROVENANCE:
 RULES:
 - ONLY reference data present in the input. Never invent findings, tools, or statistics.
 - Every finding MUST cite specific evidence from the extracted data.
+- NEVER cite traffic numbers, visitor counts, or statistics that are not in THIS module's extracted data.
+  The Business Context includes approximate scale for framing purposes only — do NOT repeat those
+  numbers as if they were findings from THIS module. If this module's data does not contain traffic
+  stats, do NOT mention traffic volume in your analysis. Quote the EXACT numbers from the data —
+  never round up, inflate, or restate approximate figures as precise ones.
 - List EVERY issue individually — do not summarize multiple issues into one finding.
 - For positive findings: acknowledge what's done well. No recommendation needed.
 - For negative findings: the embedded recommendation must include specific
@@ -366,9 +371,9 @@ function formatBusinessContext(profile: BusinessProfile): string {
 
   const s = profile.scale;
   if (s.totalTraffic != null) {
-    const parts = [`~${s.totalTraffic.toLocaleString()} monthly visits`];
-    if (s.organicTraffic != null) parts.push(`${s.organicTraffic.toLocaleString()} organic`);
-    if (s.paidTraffic != null) parts.push(`${s.paidTraffic.toLocaleString()} paid`);
+    const parts = [`~${Math.round(s.totalTraffic)} estimated monthly visits (DataForSEO ETV — do NOT inflate or round up this number)`];
+    if (s.organicTraffic != null) parts.push(`${Math.round(s.organicTraffic)} organic`);
+    if (s.paidTraffic != null) parts.push(`${Math.round(s.paidTraffic)} paid`);
     lines.push(`- Scale: ${parts.join(', ')}`);
   }
 
