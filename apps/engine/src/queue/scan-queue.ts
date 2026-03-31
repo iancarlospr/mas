@@ -67,8 +67,12 @@ export function getScanQueue(): Queue<ScanJobData, ScanJobResult> {
 export async function enqueueScanJob(data: ScanJobData): Promise<string> {
   const queue = getScanQueue();
 
+  const jobId = data.synthesisOnly
+    ? `${data.scanId}:synth:${Date.now()}`
+    : data.scanId;
+
   const job = await queue.add(`scan:${data.scanId}`, data, {
-    jobId: data.scanId,
+    jobId,
     priority: data.tier === 'paid' ? 1 : data.tier === 'full' ? 2 : 3,
   });
 
