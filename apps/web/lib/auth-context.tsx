@@ -28,6 +28,9 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+/** Emails excluded from PostHog session recording (owner/dev accounts) */
+const RECORDING_EXCLUDED_EMAILS = ['ianramirezbba@gmail.com'];
+
 /** Identify the user in PostHog with person properties */
 function identifyUser(u: User) {
   if (typeof window === 'undefined' || !posthog.__loaded) return;
@@ -42,6 +45,11 @@ function identifyUser(u: User) {
     first_seen_at: new Date().toISOString(),
     signup_method: u.app_metadata?.provider ?? 'email',
   });
+
+  // Disable session recording for owner/dev accounts
+  if (u.email && RECORDING_EXCLUDED_EMAILS.includes(u.email)) {
+    posthog.stopSessionRecording();
+  }
 }
 
 /** Attempt to redeem a beta invite code — checks cookie first, then user metadata */
