@@ -252,7 +252,10 @@ function countPressArticles($: CheerioAPI): number {
     // Broader patterns for custom CMS markup
     '[class*="release"]', '[class*="article"]',
     '[class*="newsroom"] li', '[class*="media"] li',
-    '.card', '.listing-item', '.content-item',
+    '.listing-item', '.content-item',
+    // CMS-specific card patterns (Q4 Web Systems, custom enterprise CMS)
+    '[class*="mm-card__content"]', '[class*="mm-card__title"]',
+    '[class*="press-card"]', '[class*="news-card"]',
   ];
   let maxCount = 0;
   for (const sel of selectors) {
@@ -260,15 +263,24 @@ function countPressArticles($: CheerioAPI): number {
     if (count > maxCount) maxCount = count;
   }
 
-  // Fallback: if no selector matched, count date-like patterns near headings
-  // as a proxy for article items (handles fully custom markup)
+  // Fallback: count elements that have both a date-like <time> tag and a heading
+  // inside them — these are almost certainly article/press items
   if (maxCount === 0) {
-    // Count <a> or <h3>/<h4> elements that are siblings/children of date-containing elements
+    const timeElements = $('time').length;
+    if (timeElements > 0) {
+      maxCount = timeElements;
+    }
+  }
+
+  // Final fallback: count distinct date strings in the body text as a proxy
+  if (maxCount === 0) {
     const datePattern = /\b(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:t(?:ember)?)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+\d{1,2},?\s+\d{4}\b/gi;
     const bodyText = $('body').text();
     const dateMatches = bodyText.match(datePattern);
     if (dateMatches) {
-      maxCount = dateMatches.length;
+      // Deduplicate — same date appearing in headline + body shouldn't double-count
+      const uniqueDates = new Set(dateMatches.map(d => d.toLowerCase()));
+      maxCount = uniqueDates.size;
     }
   }
 
