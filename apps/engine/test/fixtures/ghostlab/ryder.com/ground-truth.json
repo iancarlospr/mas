@@ -11,7 +11,7 @@
         "press_page_url_no_double": { "match": "falsy", "note": "URL must not contain doubled /en-us/en-us/ path" },
         "found_pages": { "match": "truthy", "note": "Should find at least 1 press page" },
         "rss_feed": { "match": "truthy", "note": "Ryder has an RSS feed at /en-us/api/rssfeed/showrssfeed" },
-        "article_count": { "value": 1, "match": "gte", "note": "HTML shows ~8 initial items; RSS is content marketing feed, not press. Real press on external newsroom.ryder.com." },
+        "article_count": { "value": 1418, "match": "exact", "note": "1,418 press releases from newsroom.ryder.com Q4 CMS API" },
         "most_recent_date": { "match": "truthy", "note": "Should find recent press dates" }
       },
       "expectedCheckpoints": [

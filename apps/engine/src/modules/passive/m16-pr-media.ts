@@ -531,7 +531,69 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
     }
   }
 
-  data.found_pages = foundPages.map((p) => p.path);
+  // Follow external newsroom subdomains (e.g., newsroom.ryder.com)
+  // Many enterprises host press releases on a dedicated subdomain
+  const domain = new URL(baseUrl).hostname.replace(/^www\./, '');
+  let externalNewsroomUrl: string | null = null;
+  const NEWSROOM_SUBDOMAIN_PATTERN = /^https?:\/\/(?:newsroom|press|news|media)\.[^/]+/i;
+  for (const link of mainPagePressLinks) {
+    if (typeof link === 'string' && NEWSROOM_SUBDOMAIN_PATTERN.test(link)) {
+      const linkHost = new URL(link).hostname.replace(/^www\./, '');
+      if (linkHost.endsWith(domain) && linkHost !== domain) {
+        externalNewsroomUrl = link;
+        break;
+      }
+    }
+  }
+
+  let externalArticleCount = 0;
+  if (externalNewsroomUrl) {
+    try {
+      // Fetch the external newsroom page
+      const extOrigin = new URL(externalNewsroomUrl).origin;
+      const extResult = await fetchWithRetry(extOrigin, { timeout: 15_000, retries: 1 });
+      if (extResult.ok && extResult.body.length > 500) {
+        foundPages.push({
+          path: '/',
+          found: true,
+          html: extResult.body,
+          status: extResult.status,
+          fullUrl: extOrigin,
+        });
+
+        // Detect Q4 Web Systems CMS — extract API key and query press release count
+        // Q4 is used by hundreds of public companies for investor/newsroom sites
+        const q4ApiKeyMatch = extResult.body.match(/Q4ApiKey\s*=\s*['"]([A-F0-9]{32})['"]/i);
+        if (q4ApiKeyMatch) {
+          try {
+            const q4Key = q4ApiKeyMatch[1];
+            const q4Url = `${extOrigin}/feed/PressRelease.svc/GetPressReleaseList?apiKey=${q4Key}&LanguageId=1&bodyType=0&pressReleaseDateFilter=3&categoryId=1cb807d2-208f-4bc3-9133-6a9ad45ac3b0&pageSize=1&pageNumber=0&tagList=&includeTags=true&year=-1&searchTerm=`;
+            const q4Result = await fetchWithRetry(q4Url, { timeout: 10_000, retries: 0 });
+            if (q4Result.ok) {
+              const q4Data = JSON.parse(q4Result.body) as Record<string, unknown>;
+              const items = q4Data['GetPressReleaseListResult'];
+              if (Array.isArray(items)) {
+                // pageSize=1 but we need total — request a large page to get full count
+                const q4FullUrl = q4Url.replace('pageSize=1', 'pageSize=10000');
+                const q4FullResult = await fetchWithRetry(q4FullUrl, { timeout: 15_000, retries: 0 });
+                if (q4FullResult.ok) {
+                  const fullData = JSON.parse(q4FullResult.body) as Record<string, unknown>;
+                  const fullItems = fullData['GetPressReleaseListResult'];
+                  if (Array.isArray(fullItems)) {
+                    externalArticleCount = fullItems.length;
+                  }
+                }
+              }
+            }
+          } catch { /* Q4 API query failed — fall through */ }
+        }
+      }
+    } catch { /* external newsroom unreachable */ }
+  }
+  data.external_newsroom = externalNewsroomUrl;
+  data.external_article_count = externalArticleCount > 0 ? externalArticleCount : null;
+
+  data.found_pages = foundPages.map((p) => p.fullUrl ?? p.path);
 
   // 3. Analyze found pages
   let bestPressPage: ProbeResult | null = null;
@@ -640,7 +702,8 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
   data.most_recent_date = mostRecentDate?.toISOString() ?? null;
   data.oldest_date = allDates.length > 0 ? allDates[allDates.length - 1]!.toISOString().slice(0, 10) : null;
   data.date_count = allDates.length;
-  data.article_count = totalArticleCount;
+  // Use external newsroom article count when available (most accurate)
+  data.article_count = externalArticleCount > 0 ? externalArticleCount : totalArticleCount;
   data.wire_services = [...wireServices];
   data.press_schema_types = pressSchemaTypes;
   data.main_page_press_links = mainPagePressLinks;

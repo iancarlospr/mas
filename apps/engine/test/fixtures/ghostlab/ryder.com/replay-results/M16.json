@@ -4,8 +4,11 @@
   "data": {
     "detected_language": "en",
     "rss_feed_main_page": "/en-us/api/rssfeed/showrssfeed",
+    "external_newsroom": "https://newsroom.ryder.com/news/news-details/2026/Ryder-Recognized-With-Two-Honorees-as-2026-Top-Women-to-Watch-in-Trucking/default.aspx",
+    "external_article_count": 1418,
     "found_pages": [
-      "/en-us/newsroom"
+      "https://www.ryder.com/en-us/newsroom",
+      "https://newsroom.ryder.com"
     ],
     "press_page_url": "https://www.ryder.com/en-us/newsroom",
     "press_page_type": "en-us/newsroom",
@@ -17,7 +20,7 @@
     "most_recent_date": "2026-04-02T13:00:11.000Z",
     "oldest_date": "2020-10-14",
     "date_count": 429,
-    "article_count": 8,
+    "article_count": 1418,
     "wire_services": [],
     "press_schema_types": [],
     "main_page_press_links": [
@@ -84,7 +87,7 @@
   "_replay": {
     "site": "ryder.com",
     "moduleId": "M16",
-    "elapsed": 138,
-    "replayedAt": "2026-04-03T21:14:17.697Z"
+    "elapsed": 160,
+    "replayedAt": "2026-04-03T21:26:39.461Z"
   }
 }

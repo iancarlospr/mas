@@ -4,8 +4,10 @@
   "data": {
     "detected_language": "en",
     "rss_feed_main_page": "https://www.senzary.com/feed/",
+    "external_newsroom": null,
+    "external_article_count": null,
     "found_pages": [
-      "/about/news"
+      "https://www.senzary.com/about/news"
     ],
     "press_page_url": "https://www.senzary.com/about/news",
     "press_page_type": "about/news",
@@ -82,7 +84,7 @@
   "_replay": {
     "site": "senzary.com",
     "moduleId": "M16",
-    "elapsed": 207,
-    "replayedAt": "2026-04-03T21:14:17.537Z"
+    "elapsed": 201,
+    "replayedAt": "2026-04-03T21:26:39.273Z"
   }
 }

@@ -140,6 +140,42 @@ function createProbeHandlers(probesFixture: HttpProbesFixture) {
     );
   }
 
+  // Load external newsroom fixtures if they exist
+  for (const siteName of ['senzary.com', 'ryder.com']) {
+    const extPath = resolve(FIXTURES_DIR, siteName, 'external-newsroom.json');
+    if (existsSync(extPath)) {
+      const extFixture = JSON.parse(readFileSync(extPath, 'utf-8')) as {
+        origin: string;
+        pages: Record<string, { status: number; headers: Record<string, string>; body: string; ok: boolean }>;
+      };
+      // Handler for the root origin (e.g., https://newsroom.ryder.com)
+      const rootPage = extFixture.pages['/'];
+      if (rootPage) {
+        handlers.push(
+          http.get(extFixture.origin, () => {
+            return new HttpResponse(rootPage.body, {
+              status: rootPage.status,
+              headers: stripEncodingHeaders(rootPage.headers),
+            });
+          }),
+        );
+      }
+      // Handlers for API endpoints — use wildcard URL matching
+      for (const [pagePath, pageData] of Object.entries(extFixture.pages)) {
+        if (pagePath === '/') continue;
+        const fullUrl = `${extFixture.origin}${pagePath}`;
+        handlers.push(
+          http.get(fullUrl + '*', () => {
+            return new HttpResponse(pageData.body, {
+              status: pageData.status,
+              headers: stripEncodingHeaders(pageData.headers),
+            });
+          }),
+        );
+      }
+    }
+  }
+
   // Catch-all for any URL not in fixtures — return 404
   handlers.push(
     http.get('*', ({ request }) => {
