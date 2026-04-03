@@ -9,7 +9,7 @@
         "detected_language": { "value": "en", "match": "exact", "note": "English site" },
         "press_page_url": { "value": "about/news", "match": "contains", "note": "Senzary has /about/news page with real news content" },
         "rss_feed": { "value": "feed", "match": "contains", "note": "WordPress RSS at /feed/" },
-        "article_count": { "value": 5, "match": "gte", "note": "RSS feed has ~10 items" },
+        "article_count": { "value": 6, "match": "exact", "note": "6 news articles visible on /about/news/ page" },
         "date_count": { "value": 1, "match": "gte", "note": "Should find dates in press content" },
         "media_logos": { "value": false, "match": "exact", "note": "No media logos section" }
       },

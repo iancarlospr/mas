@@ -595,21 +595,16 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
     rssFound = data.rss_feed_main_page as string;
   }
 
-  // Fetch and parse RSS feed for accurate article count + dates
-  // RSS feeds are structured data — far more reliable than HTML element counting
-  let rssArticleCount = 0;
+  // Fetch RSS feed for recency detection only (NOT article counting).
+  // RSS feeds are unreliable for counts — they mix content types (blogs,
+  // case studies, brochures) and have arbitrary item limits. Article count
+  // stays based on what's visible on the press page HTML.
   if (rssFound) {
     const rssFeed = await fetchRssFeedData(rssFound, baseUrl);
     if (rssFeed) {
-      rssArticleCount = rssFeed.itemCount;
-      // Use RSS item count if higher than HTML-based count
-      if (rssFeed.itemCount > totalArticleCount) {
-        totalArticleCount = rssFeed.itemCount;
-      }
-      // Merge RSS dates into allDates
+      // Only use RSS dates to improve recency detection
       for (const d of rssFeed.dates) {
         allDates.push(d);
-        // Update most recent date if RSS has newer
         if (!mostRecentDate || d > mostRecentDate) {
           mostRecentDate = d;
         }
@@ -646,7 +641,6 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
   data.oldest_date = allDates.length > 0 ? allDates[allDates.length - 1]!.toISOString().slice(0, 10) : null;
   data.date_count = allDates.length;
   data.article_count = totalArticleCount;
-  data.article_count_source = rssArticleCount > 0 ? 'rss' : 'html';
   data.wire_services = [...wireServices];
   data.press_schema_types = pressSchemaTypes;
   data.main_page_press_links = mainPagePressLinks;

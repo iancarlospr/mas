@@ -17,8 +17,7 @@
     "most_recent_date": "2026-03-20T23:06:16.000Z",
     "oldest_date": "2022-08-26",
     "date_count": 11,
-    "article_count": 10,
-    "article_count_source": "rss",
+    "article_count": 6,
     "wire_services": [],
     "press_schema_types": [],
     "main_page_press_links": [
@@ -83,7 +82,7 @@
   "_replay": {
     "site": "senzary.com",
     "moduleId": "M16",
-    "elapsed": 157,
-    "replayedAt": "2026-04-03T21:12:24.659Z"
+    "elapsed": 207,
+    "replayedAt": "2026-04-03T21:14:17.537Z"
   }
 }

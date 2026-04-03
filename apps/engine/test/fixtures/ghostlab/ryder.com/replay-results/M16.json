@@ -18,7 +18,6 @@
     "oldest_date": "2020-10-14",
     "date_count": 429,
     "article_count": 8,
-    "article_count_source": "rss",
     "wire_services": [],
     "press_schema_types": [],
     "main_page_press_links": [
@@ -85,7 +84,7 @@
   "_replay": {
     "site": "ryder.com",
     "moduleId": "M16",
-    "elapsed": 140,
-    "replayedAt": "2026-04-03T21:12:24.822Z"
+    "elapsed": 138,
+    "replayedAt": "2026-04-03T21:14:17.697Z"
   }
 }
