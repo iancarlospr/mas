@@ -1,0 +1,344 @@
+{
+  "moduleId": "M02",
+  "status": "success",
+  "data": {
+    "detectedTechnologies": [
+      {
+        "id": "ga4",
+        "name": "Google Analytics 4",
+        "category": "analytics",
+        "confidence": 1
+      },
+      {
+        "id": "wordpress",
+        "name": "WordPress",
+        "category": "cms",
+        "confidence": 1,
+        "version": "6.9.4"
+      },
+      {
+        "id": "jquery",
+        "name": "jQuery",
+        "category": "other",
+        "confidence": 0.95,
+        "version": "3.7.1"
+      },
+      {
+        "id": "gtm",
+        "name": "Google Tag Manager",
+        "category": "analytics",
+        "confidence": 0.9
+      },
+      {
+        "id": "php",
+        "name": "PHP",
+        "category": "language",
+        "confidence": 0.849
+      },
+      {
+        "id": "woocommerce",
+        "name": "WooCommerce",
+        "category": "cms",
+        "confidence": 0.65
+      },
+      {
+        "id": "elementor",
+        "name": "Elementor",
+        "category": "framework",
+        "confidence": 0.65
+      }
+    ],
+    "cms": {
+      "id": "wordpress",
+      "name": "WordPress",
+      "version": "6.9.4",
+      "confidence": 1
+    },
+    "cdn": {
+      "id": "sucuri",
+      "name": "Sucuri",
+      "confidence": 0.9,
+      "source": "headers"
+    },
+    "framework": {
+      "id": "elementor",
+      "name": "Elementor",
+      "confidence": 0.65
+    },
+    "hosting": null,
+    "language": {
+      "id": "php",
+      "name": "PHP",
+      "confidence": 0.849
+    },
+    "buildTool": null,
+    "server": {
+      "id": "sucuri",
+      "name": "Sucuri",
+      "version": "Cloudproxy",
+      "os": null
+    },
+    "poweredBy": null,
+    "compression": "gzip",
+    "httpVersion": "HTTP/3",
+    "trackingIds": [
+      {
+        "tool": "Google Tag Manager",
+        "id": "GTM-PNK7XRPG",
+        "type": "tag-manager"
+      },
+      {
+        "tool": "Google Tag Manager",
+        "id": "GTM-5RCS5ZZ",
+        "type": "tag-manager"
+      },
+      {
+        "tool": "Google Analytics 4",
+        "id": "G-LWMSQPT6YZ",
+        "type": "analytics"
+      }
+    ],
+    "thirdPartyDomains": [
+      {
+        "domain": "assets.mailerlite.com",
+        "type": "script",
+        "urls": [
+          "https://assets.mailerlite.com/js/universal.js"
+        ],
+        "service": null
+      },
+      {
+        "domain": "googletagmanager.com",
+        "type": "script",
+        "urls": [
+          "https://www.googletagmanager.com/gtag/js?id=G-LWMSQPT6YZ",
+          "https://www.googletagmanager.com/gtm.js?id=",
+          "//www.googletagmanager.com"
+        ],
+        "service": "Google Tag Manager"
+      },
+      {
+        "domain": "s.w.org",
+        "type": "script",
+        "urls": [
+          "https://s.w.org/images/core/emoji/17.0.2/72x72/",
+          "https://s.w.org/images/core/emoji/17.0.2/svg/"
+        ],
+        "service": null
+      },
+      {
+        "domain": "stats.wp.com",
+        "type": "script",
+        "urls": [
+          "https://stats.wp.com/s-202614.js",
+          "https://stats.wp.com/e-202614.js",
+          "//stats.wp.com"
+        ],
+        "service": null
+      }
+    ],
+    "cache": {
+      "cacheStatus": "dynamic",
+      "age": null,
+      "cacheControl": null,
+      "edgeLocation": null,
+      "etag": false,
+      "lastModified": false,
+      "vary": "Accept-Encoding,User-Agent"
+    },
+    "cssClassFingerprints": [
+      {
+        "className": "class=\"attachment-2048x2048 size-2048x2048 wp-image-1",
+        "tech": "WordPress",
+        "category": "cms"
+      },
+      {
+        "className": "class=\"home wp-singular page-template-default page page-id-9 page-parent wp-cust",
+        "tech": "WooCommerce",
+        "category": "ecommerce"
+      },
+      {
+        "className": "class=\"home wp-singular page-template-default page page-id-9 page-parent wp-cust",
+        "tech": "Elementor",
+        "category": "builder"
+      }
+    ],
+    "inlineConfigFrameworks": null
+  },
+  "signals": [
+    {
+      "type": "technology",
+      "name": "Google Analytics 4",
+      "confidence": 1,
+      "evidence": "Detected via fingerprint matching (category: analytics)",
+      "category": "analytics"
+    },
+    {
+      "type": "technology",
+      "name": "WordPress 6.9.4",
+      "confidence": 1,
+      "evidence": "Detected via fingerprint matching (category: cms)",
+      "category": "cms"
+    },
+    {
+      "type": "technology",
+      "name": "jQuery 3.7.1",
+      "confidence": 0.95,
+      "evidence": "Detected via fingerprint matching (category: other)",
+      "category": "other"
+    },
+    {
+      "type": "technology",
+      "name": "Google Tag Manager",
+      "confidence": 0.9,
+      "evidence": "Detected via fingerprint matching (category: analytics)",
+      "category": "analytics"
+    },
+    {
+      "type": "technology",
+      "name": "PHP",
+      "confidence": 0.849,
+      "evidence": "Detected via fingerprint matching (category: language)",
+      "category": "language"
+    },
+    {
+      "type": "technology",
+      "name": "WooCommerce",
+      "confidence": 0.65,
+      "evidence": "Detected via fingerprint matching (category: cms)",
+      "category": "cms"
+    },
+    {
+      "type": "technology",
+      "name": "Elementor",
+      "confidence": 0.65,
+      "evidence": "Detected via fingerprint matching (category: framework)",
+      "category": "framework"
+    },
+    {
+      "type": "server",
+      "name": "Sucuri/Cloudproxy",
+      "confidence": 0.95,
+      "evidence": "Detected from Server HTTP header",
+      "category": "server"
+    },
+    {
+      "type": "compression",
+      "name": "gzip",
+      "confidence": 1,
+      "evidence": "Detected from content-encoding HTTP header",
+      "category": "infrastructure"
+    },
+    {
+      "type": "protocol",
+      "name": "HTTP/3",
+      "confidence": 0.9,
+      "evidence": "Detected from HTTP response headers (alt-svc / protocol hints)",
+      "category": "infrastructure"
+    },
+    {
+      "type": "cdn",
+      "name": "Sucuri",
+      "confidence": 0.9,
+      "evidence": "Detected from response headers (x-cache, via, x-amz-cf-id, cf-ray, etc.)",
+      "category": "infrastructure"
+    },
+    {
+      "type": "tracking",
+      "name": "Google Tag Manager: GTM-PNK7XRPG",
+      "confidence": 0.95,
+      "evidence": "tag-manager ID extracted from HTML/inline scripts",
+      "category": "marketing"
+    },
+    {
+      "type": "tracking",
+      "name": "Google Tag Manager: GTM-5RCS5ZZ",
+      "confidence": 0.95,
+      "evidence": "tag-manager ID extracted from HTML/inline scripts",
+      "category": "marketing"
+    },
+    {
+      "type": "tracking",
+      "name": "Google Analytics 4: G-LWMSQPT6YZ",
+      "confidence": 0.95,
+      "evidence": "analytics ID extracted from HTML/inline scripts",
+      "category": "marketing"
+    }
+  ],
+  "score": null,
+  "checkpoints": [
+    {
+      "id": "m02-cms-identified",
+      "name": "CMS identified",
+      "weight": 0.3,
+      "health": "warning",
+      "evidence": "Multiple CMS signals: WordPress, WooCommerce",
+      "recommendation": "Verify which CMS is actually in use; conflicting signals may indicate migration artifacts."
+    },
+    {
+      "id": "m02-cms-version-currency",
+      "name": "CMS version currency",
+      "weight": 0.5,
+      "health": "good",
+      "evidence": "WordPress version 6.9.4 detected. Version currency check requires a version database."
+    },
+    {
+      "id": "m02-cdn-detected",
+      "name": "CDN detected",
+      "weight": 0.6,
+      "health": "good",
+      "evidence": "CDN / edge hosting detected: Sucuri (via response headers)"
+    },
+    {
+      "id": "m02-https-enforced",
+      "name": "HTTPS enforced",
+      "weight": 0.8,
+      "health": "excellent",
+      "evidence": "HTTPS active with HSTS header: max-age=31536000; includeSubdomains; preload"
+    },
+    {
+      "id": "m02-http-version",
+      "name": "HTTP/2 or HTTP/3",
+      "weight": 0.5,
+      "health": "excellent",
+      "evidence": "HTTP/3 (QUIC) detected via alt-svc header."
+    },
+    {
+      "id": "m02-compression",
+      "name": "Compression",
+      "weight": 0.6,
+      "health": "good",
+      "evidence": "Gzip compression detected on the initial HTML response.",
+      "recommendation": "Consider enabling Brotli compression for ~15-20% smaller payloads compared to gzip."
+    },
+    {
+      "id": "m02-server-header-exposure",
+      "name": "Server header exposure",
+      "weight": 0.4,
+      "health": "warning",
+      "evidence": "Server header exposes software and version: Sucuri/Cloudproxy",
+      "recommendation": "Remove the version number from the Server header to reduce information leakage."
+    },
+    {
+      "id": "m02-framework-detected",
+      "name": "Framework detected",
+      "weight": 0,
+      "health": "info",
+      "evidence": "Frameworks: Elementor"
+    },
+    {
+      "id": "m02-hosting-identified",
+      "name": "Hosting identified",
+      "weight": 0,
+      "health": "info",
+      "evidence": "Hosting provider not identified from fingerprints."
+    }
+  ],
+  "duration": 90,
+  "_replay": {
+    "site": "senzary.com",
+    "moduleId": "M02",
+    "elapsed": 90,
+    "replayedAt": "2026-04-03T20:40:59.050Z"
+  }
+}

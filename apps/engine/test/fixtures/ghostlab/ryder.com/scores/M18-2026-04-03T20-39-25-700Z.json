@@ -1,0 +1,45 @@
+{
+  "module": "M18",
+  "site": "ryder.com",
+  "dataAccuracy": {
+    "score": 67,
+    "matched": 2,
+    "total": 3,
+    "details": [
+      "  data.ir_page_url: expected truthy, got null (Ryder is NYSE-listed (R), has IR portal)"
+    ]
+  },
+  "checkpointAccuracy": {
+    "score": 50,
+    "matched": 1,
+    "total": 2,
+    "details": [
+      "  checkpoint m18-ir-portal: expected good, got info (Has IR portal with filings)"
+    ]
+  },
+  "falsePositiveRate": {
+    "score": 100,
+    "matched": 1,
+    "total": 1,
+    "details": []
+  },
+  "regressionGuard": {
+    "score": 100,
+    "matched": 1,
+    "total": 1,
+    "details": []
+  },
+  "completeness": {
+    "score": 100,
+    "matched": 2,
+    "total": 2,
+    "details": [
+      "  EXTRA checkpoint: m18-financial-data (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: m18-esg-report (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: m18-governance (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: m18-ir-comms (not in ground truth — add if expected)"
+    ]
+  },
+  "overall": 78,
+  "scoredAt": "2026-04-03T20:39:25.700Z"
+}

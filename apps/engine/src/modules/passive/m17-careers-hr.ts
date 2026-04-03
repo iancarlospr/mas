@@ -312,8 +312,11 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
       /\b(join our team|we.re hiring|open positions|current openings|apply now|view jobs)\b/i.test(pageText) ||
       /\/careers\/?$|\/jobs\/?$/i.test(page.path);
 
-    // Use the first /careers or /jobs page as primary
-    if (!bestCareersPage && (page.path === '/careers' || page.path === '/jobs')) {
+    // Prefer the most "root" careers page — shorter paths are more likely the hub
+    // e.g., /en-us/careers over /en-us/careers/freight-agent
+    const isRootCareersPath = /\/(?:careers|jobs)\/?$/i.test(page.path);
+    if (isRootCareersPath && (!bestCareersPage || !(/\/(?:careers|jobs)\/?$/i.test(bestCareersPage.path)))) {
+      // This page ends with /careers or /jobs — it's the hub, prefer it
       bestCareersPage = page;
     } else if (!bestCareersPage && hasHiringIndicators) {
       bestCareersPage = page;

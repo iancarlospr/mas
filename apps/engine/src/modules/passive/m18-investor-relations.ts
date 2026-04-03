@@ -479,7 +479,7 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
   // Use pre-rendered sitemap pages from runner, with content validation
   // Pages under /solutions/, /products/, /services/ are product pages, not IR pages
   // (e.g. /solutions/esg-monitoring is an IoT product, not an investor ESG report)
-  const PRODUCT_PATH_PREFIXES = ['/solutions/', '/products/', '/services/', '/features/', '/platform/', '/shop/'];
+  const PRODUCT_PATH_PREFIXES = ['/solutions/', '/products/', '/product/', '/services/', '/features/', '/platform/', '/shop/'];
   const IR_TITLE_KEYWORDS = /\b(?:investor|shareholder|stock|financial|annual\s+report|sec\s+filing|governance|earnings|ir\b)/i;
 
   const foundPages: ProbeResult[] = [];

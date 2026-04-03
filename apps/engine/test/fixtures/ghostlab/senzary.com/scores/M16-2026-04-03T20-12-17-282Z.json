@@ -1,0 +1,44 @@
+{
+  "module": "M16",
+  "site": "senzary.com",
+  "dataAccuracy": {
+    "score": 25,
+    "matched": 1,
+    "total": 4,
+    "details": [
+      "  data.press_page_url: expected falsy, got \"https://www.senzary.com/about/news\" (Senzary has no real press/news page — /press/ was a Pressure Sensor product page)",
+      "  data.press_page_type: expected falsy, got \"about/news\" (No press page exists)",
+      "  data.article_count: expected lte 0, got 6 (Should be 0 or very low — no real press content)"
+    ]
+  },
+  "checkpointAccuracy": {
+    "score": 40,
+    "matched": 2,
+    "total": 5,
+    "details": [
+      "  checkpoint m16-press-page: expected info, got warning (No press page → info, not good/excellent)",
+      "  checkpoint m16-rss-feed: expected info, got good (No RSS feed)",
+      "  checkpoint m16-press-recency: expected info, got critical (No dateable content)"
+    ]
+  },
+  "falsePositiveRate": {
+    "score": 100,
+    "matched": 2,
+    "total": 2,
+    "details": []
+  },
+  "regressionGuard": {
+    "score": 100,
+    "matched": 3,
+    "total": 3,
+    "details": []
+  },
+  "completeness": {
+    "score": 100,
+    "matched": 5,
+    "total": 5,
+    "details": []
+  },
+  "overall": 63,
+  "scoredAt": "2026-04-03T20:12:17.281Z"
+}

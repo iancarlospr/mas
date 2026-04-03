@@ -1,0 +1,210 @@
+{
+  "site": "ryder.com",
+  "scanId": "0d1d9a90",
+  "verifiedAt": "2026-03-20",
+  "notes": "QA session #2 by Ian + Claude. Fortune 500 fleet management. Optimizely CMS on Azure App Service behind Cloudflare. 10 code fixes, 17 DB fixes. MIQ 56→59.",
+  "modules": {
+    "M16": {
+      "expectedData": {
+        "detected_language": { "value": "en", "match": "exact", "note": "English site" },
+        "press_page_url": { "value": "newsroom", "match": "contains", "note": "Ryder has /en-us/newsroom" },
+        "press_page_url_no_double": { "match": "falsy", "note": "URL must not contain doubled /en-us/en-us/ path" },
+        "found_pages": { "match": "truthy", "note": "Should find at least 1 press page" },
+        "rss_feed": { "match": "truthy", "note": "Ryder has an RSS feed at /en-us/api/rssfeed/showrssfeed" },
+        "article_count": { "value": 1, "match": "gte", "note": "Should find articles via date-pattern fallback or selector" },
+        "most_recent_date": { "match": "truthy", "note": "Should find recent press dates" }
+      },
+      "expectedCheckpoints": [
+        { "id": "m16-press-page", "expectedHealth": "excellent", "note": "Ryder has active newsroom with recent content (2026-03-24)" },
+        { "id": "m16-media-contact", "expectedHealth": "info", "note": "No press contact detected" },
+        { "id": "m16-rss-feed", "expectedHealth": "good", "note": "RSS feed exists" },
+        { "id": "m16-media-logos", "expectedHealth": "info", "note": "No media logos section" },
+        { "id": "m16-press-recency", "expectedHealth": "excellent", "note": "Content within 3 months" }
+      ],
+      "negativeAssertions": [
+        {
+          "path": "press_page_url",
+          "mustNotContain": "/en-us/en-us/",
+          "note": "URL must not have doubled locale prefix from baseUrl + sitemapPath concatenation"
+        }
+      ],
+      "fixedBugs": [
+        {
+          "description": "press_page_url had doubled /en-us/en-us/ path — baseUrl already contained /en-us and sitemapPages path also started with /en-us/newsroom",
+          "assertion": "press_page_url must not contain /en-us/en-us/",
+          "path": "press_page_url",
+          "mustNotContain": "/en-us/en-us/"
+        },
+        {
+          "description": "article_count was 0 due to custom CSS classes — generic selectors (article, .post, .entry) did not match Ryder's press release markup",
+          "assertion": "Press article counting should be robust to custom markup"
+        }
+      ]
+    },
+    "M02": {
+      "expectedData": {
+        "detectedTechnologies": { "match": "truthy", "note": "Should detect multiple technologies" },
+        "cms.name": { "value": "Optimizely", "match": "contains", "note": "Optimizely CMS" },
+        "cdn.name": { "value": "Cloudflare", "match": "exact", "note": "Cloudflare CDN" },
+        "hosting.name": { "value": "Azure App Service", "match": "exact", "note": "Azure hosting" },
+        "compression": { "value": "gzip", "match": "exact", "note": "gzip compression" }
+      },
+      "expectedCheckpoints": [
+        { "id": "m02-cms-identified", "expectedHealth": "good", "note": "Optimizely CMS detected without version" },
+        { "id": "m02-cdn-detected", "expectedHealth": "excellent", "note": "Cloudflare enterprise CDN" },
+        { "id": "m02-https-enforced", "expectedHealth": "excellent", "note": "HTTPS + HSTS" },
+        { "id": "m02-compression", "expectedHealth": "good", "note": "gzip, not brotli — captured headers show gzip" },
+        { "id": "m02-cms-version-currency", "expectedHealth": "info", "note": "No version detected for Optimizely" },
+        { "id": "m02-http-version", "expectedHealth": "good", "note": "HTTP/2 detected from Cloudflare headers" },
+        { "id": "m02-server-header-exposure", "expectedHealth": "excellent", "note": "Server header hidden behind Cloudflare" },
+        { "id": "m02-framework-detected", "expectedHealth": "info", "note": "Framework info" },
+        { "id": "m02-hosting-identified", "expectedHealth": "info", "note": "Azure App Service detected" }
+      ],
+      "negativeAssertions": [
+        {
+          "path": "cms",
+          "mustNotEqual": null,
+          "note": "CMS must be detected — Optimizely fingerprint was added"
+        }
+      ],
+      "fixedBugs": [
+        {
+          "description": "CMS was null — Optimizely/Episerver was not in fingerprints.json. Added fingerprint with HTML meta, header, and cookie rules.",
+          "assertion": "Optimizely CMS should be detected",
+          "path": "cms",
+          "mustNotEqual": null
+        },
+        {
+          "description": "Cookie-based fingerprint matching (CookieRule interface) existed in fingerprints.json but M02 had no matching logic wired up",
+          "assertion": "Cookie fingerprints should be matched against Set-Cookie headers"
+        }
+      ]
+    },
+    "M04": {
+      "expectedData": {
+        "title": { "match": "truthy", "note": "Page title should exist" },
+        "metaDescription": { "match": "truthy", "note": "Meta description should exist" },
+        "htmlLang": { "match": "truthy", "note": "HTML lang attribute should be present" },
+        "jsonLd": { "match": "truthy", "note": "Should have JSON-LD schema" },
+        "ogTags": { "match": "truthy", "note": "Should have Open Graph tags" }
+      },
+      "expectedCheckpoints": [
+        { "id": "M04-TITLE", "expectedHealth": "good", "note": "Title exists but may be outside 30-60 char sweet spot" },
+        { "id": "M04-META-DESC", "expectedHealth": "good", "note": "Meta description exists" },
+        { "id": "M04-VIEWPORT", "expectedHealth": "excellent", "note": "Proper viewport meta" }
+      ],
+      "negativeAssertions": [],
+      "fixedBugs": []
+    },
+    "M17": {
+      "expectedData": {
+        "careers_page_url": { "value": "/en-us/careers", "match": "contains", "note": "Should prefer the main careers hub, not a sub-page like freight-agent" },
+        "found_pages": { "match": "truthy", "note": "Should find multiple careers pages" },
+        "ats_provider": { "value": "iCIMS", "match": "exact", "note": "iCIMS detected via warehouse-ryder.icims.com" },
+        "external_careers_links": { "match": "truthy", "note": "Should find jobs.ryder.com" },
+        "benefits_mentioned": { "value": true, "match": "exact", "note": "Benefits mentioned on careers pages" },
+        "dei_mentioned": { "value": true, "match": "exact", "note": "DEI content on careers pages" }
+      },
+      "expectedCheckpoints": [
+        { "id": "m17-careers-page", "expectedHealth": "excellent", "note": "Active careers with positions + ATS" },
+        { "id": "m17-ats-provider", "expectedHealth": "good", "note": "iCIMS is not in the professional-tier list" },
+        { "id": "m17-open-positions", "expectedHealth": "info", "note": "Informational checkpoint" },
+        { "id": "m17-team-culture", "expectedHealth": "good", "note": "Team page detected" },
+        { "id": "m17-hiring-velocity", "expectedHealth": "info", "note": "No dateable postings found" }
+      ],
+      "negativeAssertions": [
+        {
+          "path": "careers_page_url",
+          "mustNotContain": "freight-agent",
+          "note": "Should prefer /en-us/careers hub over /en-us/careers/freight-agent sub-page"
+        }
+      ],
+      "fixedBugs": [
+        {
+          "description": "Sitemap only provided niche sub-pages, missed main /en-us/careers hub. No fallback HTTP probing exists in M17 unlike M16/M19.",
+          "assertion": "M17 should have fallback probing for careers pages like M16 and M19 do"
+        },
+        {
+          "description": "Best careers page selection used first-found, which was a sub-page (freight-agent) instead of the root careers hub (/en-us/careers).",
+          "assertion": "careers_page_url should prefer the shortest/root careers path",
+          "path": "careers_page_url",
+          "mustNotContain": "freight-agent"
+        }
+      ]
+    },
+    "M18": {
+      "expectedData": {
+        "external_ir_domain": { "value": "investors.ryder.com", "match": "contains", "note": "Should detect external IR subdomain from main page links" },
+        "ticker_symbol": { "value": "R", "match": "exact", "note": "NYSE: R — detected from main page HTML" },
+        "stock_exchange": { "value": "NYSE", "match": "contains", "note": "Must be NYSE, not NSE" }
+      },
+      "expectedCheckpoints": [
+        { "id": "m18-ir-portal", "expectedHealth": "info", "note": "IR portal is on external subdomain (investors.ryder.com) which offline replay can't fetch — info is correct for replay" },
+        { "id": "m18-ticker-symbol", "expectedHealth": "info", "note": "Ticker info checkpoint" },
+        { "id": "m18-financial-data", "expectedHealth": "info", "note": "No SEC filings detectable from main page alone" },
+        { "id": "m18-esg-report", "expectedHealth": "info", "note": "No ESG report on main page" },
+        { "id": "m18-governance", "expectedHealth": "info", "note": "No governance on main page" },
+        { "id": "m18-ir-comms", "expectedHealth": "info", "note": "No IR comms on main page" }
+      ],
+      "negativeAssertions": [
+        {
+          "path": "stock_exchange",
+          "mustNotEqual": "NSE",
+          "note": "NSE was extracted from 'SolutionsEngineered' body text — must be NYSE"
+        }
+      ],
+      "fixedBugs": [
+        {
+          "description": "Stock exchange was 'NSE' extracted from 'SolutionsEngineered' body text via substring match. The ticker regex must extract exchange from the same match as the ticker symbol.",
+          "assertion": "stock_exchange must be NYSE, not NSE",
+          "path": "stock_exchange",
+          "mustNotEqual": "NSE"
+        }
+      ]
+    },
+    "M19": {
+      "expectedData": {
+        "support_page_url": { "match": "truthy", "note": "Ryder has support/contact pages" },
+        "support_channels": { "match": "truthy", "note": "Should detect support channels" }
+      },
+      "expectedCheckpoints": [
+        { "id": "m19-help-center", "expectedHealth": "warning", "note": "Basic FAQ/help content only from captured sitemap page" },
+        { "id": "m19-support-channels", "expectedHealth": "warning", "note": "Only 1 channel detected from captured page" },
+        { "id": "m19-status-page", "expectedHealth": "info", "note": "No status page detected" },
+        { "id": "m19-business-hours", "expectedHealth": "info", "note": "No business hours detected" },
+        { "id": "m19-community-forum", "expectedHealth": "info", "note": "No community forum" },
+        { "id": "m19-developer-docs", "expectedHealth": "info", "note": "No developer docs" },
+        { "id": "m19-training-academy", "expectedHealth": "info", "note": "No training academy" }
+      ],
+      "negativeAssertions": [],
+      "fixedBugs": [
+        {
+          "description": "Contact form UUID pattern not matched — custom form ID format was not recognized by the form detection logic",
+          "assertion": "Form detection should handle various ID/name patterns"
+        },
+        {
+          "description": "Social media detection only found Twitter — missed LinkedIn and other platforms in footer links",
+          "assertion": "Social detection should check multiple platforms beyond Twitter"
+        }
+      ]
+    },
+    "M01": {
+      "expectedData": {
+        "spf": { "match": "truthy", "note": "SPF record exists" },
+        "dmarc": { "match": "truthy", "note": "DMARC record exists" },
+        "dkim": { "match": "truthy", "note": "DKIM should be found" },
+        "tls": { "match": "truthy", "note": "TLS info captured" },
+        "hsts": { "match": "truthy", "note": "HSTS enabled" },
+        "csp": { "match": "truthy", "note": "CSP header present" }
+      },
+      "expectedCheckpoints": [
+        { "id": "m01-spf", "expectedHealth": "excellent" },
+        { "id": "m01-dmarc", "expectedHealth": "excellent" },
+        { "id": "m01-tls", "expectedHealth": "excellent" },
+        { "id": "m01-hsts", "expectedHealth": "excellent" }
+      ],
+      "negativeAssertions": [],
+      "fixedBugs": []
+    }
+  }
+}

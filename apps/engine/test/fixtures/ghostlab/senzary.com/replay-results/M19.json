@@ -1,0 +1,142 @@
+{
+  "moduleId": "M19",
+  "status": "success",
+  "data": {
+    "detected_language": "en",
+    "found_pages": [
+      "/verticals/contact-us",
+      "/product/sub-ongoing-basic-support-service",
+      "/product/dra-lorawan-iot-contact-sensor",
+      "/product/mil-magnetic-contact-switch-sensor",
+      "/product/ser-advanced-support"
+    ],
+    "support_page_url": "https://www.senzary.com/verticals/contact-us",
+    "help_center_provider": null,
+    "help_center_evidence": null,
+    "help_page_quality": "none",
+    "status_page": {
+      "provider": null,
+      "url": null,
+      "evidence": "No status page detected"
+    },
+    "community_forum": {
+      "provider": null,
+      "url": null,
+      "evidence": "No community forum detected"
+    },
+    "business_hours": true,
+    "support_channels": {
+      "count": 1,
+      "channels": [
+        "contact_form"
+      ]
+    },
+    "developer_docs": {
+      "found": false,
+      "url": null,
+      "evidence": "No developer documentation detected"
+    },
+    "training_academy": {
+      "found": false,
+      "url": null,
+      "type": null,
+      "evidence": "No training or academy detected"
+    },
+    "support_tiers": {
+      "found": true,
+      "tiers": [
+        "basic"
+      ],
+      "evidence": "Support tiers detected: basic"
+    },
+    "support_emails": [
+      "info@senzary.com"
+    ],
+    "chatbot": {
+      "found": false,
+      "evidence": "No chatbot detected"
+    },
+    "sla": {
+      "found": false,
+      "evidence": "No SLA information detected"
+    },
+    "support_subdomains": []
+  },
+  "signals": [
+    {
+      "type": "support_channels",
+      "name": "Support Channels",
+      "confidence": 0.8,
+      "evidence": "1 support channel(s): contact_form",
+      "category": "brand_presence"
+    },
+    {
+      "type": "business_hours",
+      "name": "Business Hours Published",
+      "confidence": 0.7,
+      "evidence": "Business/support hours detected on page",
+      "category": "brand_presence"
+    }
+  ],
+  "score": null,
+  "checkpoints": [
+    {
+      "id": "m19-help-center",
+      "name": "Help center",
+      "weight": 0.5,
+      "health": "critical",
+      "evidence": "No support documentation found",
+      "recommendation": "Create a help center or knowledge base for customers (Zendesk, Intercom, or similar)"
+    },
+    {
+      "id": "m19-support-channels",
+      "name": "Support channels",
+      "weight": 0.5,
+      "health": "warning",
+      "evidence": "Only 1 support channel: contact_form",
+      "recommendation": "Add additional support channels (email, phone, live chat) for better customer experience"
+    },
+    {
+      "id": "m19-status-page",
+      "name": "System status page",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No system status page detected"
+    },
+    {
+      "id": "m19-business-hours",
+      "name": "Business hours",
+      "weight": 0.3,
+      "health": "excellent",
+      "evidence": "Business/support hours published on page"
+    },
+    {
+      "id": "m19-community-forum",
+      "name": "Community forum",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No community forum or discussion channel detected"
+    },
+    {
+      "id": "m19-developer-docs",
+      "name": "Developer docs",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No developer or API documentation detected"
+    },
+    {
+      "id": "m19-training-academy",
+      "name": "Training/academy",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No training portal or academy detected"
+    }
+  ],
+  "duration": 0,
+  "_replay": {
+    "site": "senzary.com",
+    "moduleId": "M19",
+    "elapsed": 258,
+    "replayedAt": "2026-04-03T20:38:51.863Z"
+  }
+}

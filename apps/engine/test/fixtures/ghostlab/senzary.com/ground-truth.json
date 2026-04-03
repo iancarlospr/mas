@@ -1,0 +1,218 @@
+{
+  "site": "senzary.com",
+  "scanId": "846efd58",
+  "verifiedAt": "2026-03-20",
+  "notes": "QA session by Ian + Claude. WordPress + Sucuri WAF. Small IoT/sensor company. 16 code fixes, 21+ DB fixes total across all modules.",
+  "modules": {
+    "M16": {
+      "expectedData": {
+        "detected_language": { "value": "en", "match": "exact", "note": "English site" },
+        "press_page_url": { "value": "about/news", "match": "contains", "note": "Senzary has /about/news page with real news content" },
+        "rss_feed": { "value": "feed", "match": "contains", "note": "WordPress RSS at /feed/" },
+        "article_count": { "value": 1, "match": "gte", "note": "Should find articles on the news page" },
+        "date_count": { "value": 1, "match": "gte", "note": "Should find dates in press content" },
+        "media_logos": { "value": false, "match": "exact", "note": "No media logos section" }
+      },
+      "expectedCheckpoints": [
+        { "id": "m16-press-page", "expectedHealth": "warning", "note": "Press page exists but content is stale (>1yr old as of 2026-04)" },
+        { "id": "m16-media-contact", "expectedHealth": "info", "note": "No press contacts" },
+        { "id": "m16-rss-feed", "expectedHealth": "good", "note": "WordPress RSS feed exists at /feed/" },
+        { "id": "m16-media-logos", "expectedHealth": "info", "note": "No media logos" },
+        { "id": "m16-press-recency", "expectedHealth": "critical", "note": "Content is >1yr old (last: 2024-09-18)" }
+      ],
+      "negativeAssertions": [
+        {
+          "path": "press_page_url",
+          "mustNotContain": "pressure",
+          "note": "The /press/ page is a Pressure Sensor product page, NOT a press/newsroom page"
+        },
+        {
+          "path": "press_page_url",
+          "mustNotContain": "sensor",
+          "note": "Product pages about sensors are NOT press pages"
+        }
+      ],
+      "fixedBugs": [
+        {
+          "description": "M16 matched /press/ path but it was a Pressure Sensor product page (senzary.com/press/). Word boundary matching needed.",
+          "assertion": "press_page_url must not point to a product page about pressure sensors",
+          "path": "press_page_url",
+          "mustNotContain": "pressure"
+        },
+        {
+          "description": "Press page content validation was missing — any page with 'press' in the URL was accepted without checking if it actually contains press releases.",
+          "assertion": "press page must be validated for press release content"
+        },
+        {
+          "description": "Probe paths did not include /news/ which is a common newsroom path.",
+          "assertion": "probe paths include /news/"
+        }
+      ]
+    },
+    "M02": {
+      "expectedData": {
+        "detectedTechnologies": { "match": "truthy", "note": "Should detect at least WordPress" },
+        "cms.name": { "value": "WordPress", "match": "exact", "note": "WordPress CMS" },
+        "cdn.name": { "value": "Sucuri", "match": "exact", "note": "Sucuri CDN/WAF" },
+        "server.name": { "match": "truthy", "note": "Should detect web server" },
+        "compression": { "value": "gzip", "match": "exact", "note": "gzip compression" }
+      },
+      "expectedCheckpoints": [
+        { "id": "m02-cms-identified", "expectedHealth": "warning", "note": "WordPress detected but multiple CMS-like technologies found" },
+        { "id": "m02-cdn-detected", "expectedHealth": "good", "note": "Sucuri CDN detected" },
+        { "id": "m02-https-enforced", "expectedHealth": "excellent", "note": "HTTPS + HSTS" },
+        { "id": "m02-compression", "expectedHealth": "good", "note": "gzip compression" },
+        { "id": "m02-cms-version-currency", "expectedHealth": "good", "note": "Version detected" },
+        { "id": "m02-http-version", "expectedHealth": "excellent", "note": "HTTP/2+ detected from CDN headers" },
+        { "id": "m02-server-header-exposure", "expectedHealth": "warning", "note": "Server header exposed with version" },
+        { "id": "m02-framework-detected", "expectedHealth": "info", "note": "Framework info" },
+        { "id": "m02-hosting-identified", "expectedHealth": "info", "note": "Hosting info" }
+      ],
+      "negativeAssertions": [
+        {
+          "path": "cms.version",
+          "mustNotEqual": "3.7.1",
+          "note": "3.7.1 is jQuery version, NOT WordPress version"
+        }
+      ],
+      "fixedBugs": [
+        {
+          "description": "WP version detection was reading jQuery version string (3.7.1) instead of the generator meta tag (WordPress 6.9.4)",
+          "assertion": "CMS version must not be jQuery version",
+          "path": "cms.version",
+          "mustNotEqual": "3.7.1"
+        },
+        {
+          "description": "Sucuri was not recognized as CDN",
+          "assertion": "Sucuri should be detected as CDN/WAF"
+        },
+        {
+          "description": "Framework checkpoint ordering was wrong — CMS should come first",
+          "assertion": "CMS is primary technology"
+        }
+      ]
+    },
+    "M04": {
+      "expectedData": {
+        "title": { "match": "truthy", "note": "Page title should exist" },
+        "metaDescription": { "match": "truthy", "note": "Meta description should exist" },
+        "htmlLang": { "match": "truthy", "note": "HTML lang attribute should be present" },
+        "jsonLd": { "match": "truthy", "note": "Should have some JSON-LD schema" },
+        "ogTags": { "match": "truthy", "note": "Should have Open Graph tags" }
+      },
+      "expectedCheckpoints": [
+        { "id": "M04-TITLE", "expectedHealth": "good", "note": "Title exists but may be outside 30-60 char sweet spot" },
+        { "id": "M04-META-DESC", "expectedHealth": "warning", "note": "Meta description exists but outside optimal length range" },
+        { "id": "M04-VIEWPORT", "expectedHealth": "excellent", "note": "Proper viewport meta" }
+      ],
+      "negativeAssertions": [],
+      "fixedBugs": []
+    },
+    "M17": {
+      "expectedData": {
+        "careers_page_url": { "match": "falsy", "note": "Small company, no careers page expected" }
+      },
+      "expectedCheckpoints": [
+        { "id": "m17-careers-page", "expectedHealth": "info", "note": "No careers page" }
+      ],
+      "negativeAssertions": [],
+      "fixedBugs": [
+        {
+          "description": "detectEmployerBranding ran on main page and matched product terms like 'benefits' and 'remote' which appeared in product descriptions, not HR content",
+          "assertion": "Employer branding detection must only run on actual careers pages"
+        }
+      ]
+    },
+    "M18": {
+      "expectedData": {
+        "ir_page_url": { "match": "falsy", "note": "Private company, no IR portal — /product/net-wireless-ir-blaster is an infrared product" }
+      },
+      "expectedCheckpoints": [
+        { "id": "m18-ir-portal", "expectedHealth": "info", "note": "No IR portal for private company" },
+        { "id": "m18-financial-data", "expectedHealth": "info", "note": "No financial data" },
+        { "id": "m18-ticker-symbol", "expectedHealth": "info", "note": "No ticker" },
+        { "id": "m18-esg-report", "expectedHealth": "info", "note": "No ESG report" },
+        { "id": "m18-governance", "expectedHealth": "info", "note": "No governance" },
+        { "id": "m18-ir-comms", "expectedHealth": "info", "note": "No IR comms" }
+      ],
+      "negativeAssertions": [
+        {
+          "path": "ir_page_url",
+          "mustNotContain": "esg-monitoring",
+          "note": "ESG product page at /solutions/esg-monitoring was falsely identified as IR portal"
+        },
+        {
+          "path": "ir_page_url",
+          "mustNotContain": "ir-blaster",
+          "note": "IR Blaster is an infrared product, not investor relations"
+        },
+        {
+          "path": "ir_page_url",
+          "mustNotContain": "/product/",
+          "note": "Product pages should never be identified as IR pages"
+        }
+      ],
+      "fixedBugs": [
+        {
+          "description": "ESG monitoring product page misidentified as IR portal because 'governance' keyword matched ESG content",
+          "assertion": "Product pages under /solutions/ should not be identified as IR pages",
+          "path": "ir_page_url",
+          "mustNotContain": "esg-monitoring"
+        },
+        {
+          "description": "/product/net-wireless-ir-blaster matched 'ir' keyword — infrared product misidentified as investor relations",
+          "assertion": "Product pages under /product/ should not be identified as IR pages",
+          "path": "ir_page_url",
+          "mustNotContain": "/product/"
+        }
+      ]
+    },
+    "M19": {
+      "expectedData": {
+        "support_page_url": { "match": "truthy", "note": "Should detect some support/contact page" }
+      },
+      "expectedCheckpoints": [
+        { "id": "m19-support-channels", "expectedHealth": "warning", "note": "Limited support channels" }
+      ],
+      "negativeAssertions": [
+        {
+          "path": "community_forum",
+          "mustNotContain": "calendly",
+          "note": "Calendly scheduling link was falsely identified as community forum"
+        }
+      ],
+      "fixedBugs": [
+        {
+          "description": "Calendly demo scheduling link was misidentified as community forum",
+          "assertion": "Scheduling platforms (Calendly, etc.) must not be detected as community forums",
+          "path": "community_forum",
+          "mustNotContain": "calendly"
+        },
+        {
+          "description": "assessHelpPageQuality counted generic navigation links as help content — inflated quality scores",
+          "assertion": "Help page quality requires help-specific headings (h2/h3 with help/guide/how-to keywords)"
+        }
+      ]
+    },
+    "M01": {
+      "expectedData": {
+        "spf": { "match": "truthy", "note": "SPF record should exist" },
+        "dmarc": { "match": "truthy", "note": "DMARC record should exist" },
+        "tls": { "match": "truthy", "note": "TLS info should be captured" },
+        "hsts": { "match": "truthy", "note": "HSTS header should be present" }
+      },
+      "expectedCheckpoints": [
+        { "id": "m01-spf", "expectedHealth": "excellent" },
+        { "id": "m01-tls", "expectedHealth": "excellent" },
+        { "id": "m01-hsts", "expectedHealth": "good" }
+      ],
+      "negativeAssertions": [],
+      "fixedBugs": [
+        {
+          "description": "CSP with only upgrade-insecure-requests was rated excellent — should be good (lacks script-src/default-src directives)",
+          "assertion": "CSP checkpoint must not be excellent without meaningful resource directives"
+        }
+      ]
+    }
+  }
+}

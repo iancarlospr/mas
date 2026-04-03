@@ -1,0 +1,62 @@
+{
+  "module": "M04",
+  "site": "ryder.com",
+  "dataAccuracy": {
+    "score": 67,
+    "matched": 2,
+    "total": 3,
+    "details": [
+      "  data.copyrightYear: expected gte 2025, got undefined (Copyright year should be 2025+ (the latest year in '1996 - 2025' range))"
+    ]
+  },
+  "checkpointAccuracy": {
+    "score": 0,
+    "matched": 0,
+    "total": 3,
+    "details": [
+      "  checkpoint M04-TITLE: expected excellent, got good",
+      "  checkpoint M04-ROBOTS: expected excellent, got critical",
+      "  checkpoint M04-SITEMAP: expected excellent, got critical (Ryder has extensive sitemaps)"
+    ]
+  },
+  "falsePositiveRate": {
+    "score": 100,
+    "matched": 1,
+    "total": 1,
+    "details": []
+  },
+  "regressionGuard": {
+    "score": 100,
+    "matched": 1,
+    "total": 1,
+    "details": []
+  },
+  "completeness": {
+    "score": 100,
+    "matched": 3,
+    "total": 3,
+    "details": [
+      "  EXTRA checkpoint: M04-META-DESC (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: M04-CANONICAL (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: M04-OG-TAGS (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: M04-OG-IMAGE (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: M04-TWITTER (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: M04-SCHEMA (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: M04-FAVICON (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: M04-LANG (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: M04-HREFLANG (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: M04-PRECONNECT (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: M04-LLMS-TXT (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: M04-MANIFEST (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: M04-ROBOTS-DIRECTIVES (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: M04-VIEWPORT (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: M04-CHARSET (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: M04-ADS-TXT (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: m04-structured-data (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: m04-rich-snippets (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: M04-VIEWPORT-A11Y (not in ground truth — add if expected)"
+    ]
+  },
+  "overall": 65,
+  "scoredAt": "2026-04-03T20:42:38.217Z"
+}

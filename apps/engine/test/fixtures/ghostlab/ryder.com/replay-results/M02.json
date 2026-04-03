@@ -1,0 +1,469 @@
+{
+  "moduleId": "M02",
+  "status": "success",
+  "data": {
+    "detectedTechnologies": [
+      {
+        "id": "cloudflare",
+        "name": "Cloudflare",
+        "category": "cdn",
+        "confidence": 1
+      },
+      {
+        "id": "optimizely-cms",
+        "name": "Optimizely CMS",
+        "category": "cms",
+        "confidence": 0.997
+      },
+      {
+        "id": "autopilot",
+        "name": "Autopilot / Ortto",
+        "category": "marketing_automation",
+        "confidence": 0.997
+      },
+      {
+        "id": "adobe-launch",
+        "name": "Adobe Experience Platform (Launch)",
+        "category": "analytics",
+        "confidence": 0.997
+      },
+      {
+        "id": "siteimprove",
+        "name": "Siteimprove",
+        "category": "analytics",
+        "confidence": 0.995
+      },
+      {
+        "id": "react",
+        "name": "React",
+        "category": "framework",
+        "confidence": 0.95
+      },
+      {
+        "id": "jquery",
+        "name": "jQuery",
+        "category": "other",
+        "confidence": 0.95
+      },
+      {
+        "id": "azure-app-service",
+        "name": "Azure App Service",
+        "category": "hosting",
+        "confidence": 0.95
+      },
+      {
+        "id": "gtm",
+        "name": "Google Tag Manager",
+        "category": "analytics",
+        "confidence": 0.9
+      }
+    ],
+    "cms": {
+      "id": "optimizely-cms",
+      "name": "Optimizely CMS",
+      "version": null,
+      "confidence": 0.997
+    },
+    "cdn": {
+      "id": "cloudflare",
+      "name": "Cloudflare",
+      "confidence": 1
+    },
+    "framework": {
+      "id": "react",
+      "name": "React",
+      "confidence": 0.95
+    },
+    "hosting": {
+      "id": "azure-app-service",
+      "name": "Azure App Service",
+      "confidence": 0.95
+    },
+    "language": null,
+    "buildTool": null,
+    "server": null,
+    "poweredBy": null,
+    "compression": "gzip",
+    "httpVersion": "HTTP/2",
+    "trackingIds": [
+      {
+        "tool": "Google Tag Manager",
+        "id": "GTM-5ZK5QJX",
+        "type": "tag-manager"
+      },
+      {
+        "tool": "Optimizely",
+        "id": "21362120414",
+        "type": "other"
+      }
+    ],
+    "thirdPartyDomains": [
+      {
+        "domain": "apps.leveragepoint.com",
+        "type": "script",
+        "urls": [
+          "https://apps.leveragepoint.com/public-vp/fc7e7ff8-d168-49d0-a281-6d1ae755eaba/calculator-pdf-export"
+        ],
+        "service": null
+      },
+      {
+        "domain": "assets.adobedtm.com",
+        "type": "script",
+        "urls": [
+          "\nhttps://assets.adobedtm.com/40d35a6a553f/b44c31f3d21b/launch-6df02ecd7e49.min.js\n"
+        ],
+        "service": null
+      },
+      {
+        "domain": "bpi.briteverify.com",
+        "type": "script",
+        "urls": [
+          "https://bpi.briteverify.com/api/public/v1/fullverify"
+        ],
+        "service": null
+      },
+      {
+        "domain": "cdn.bc0a.com",
+        "type": "script",
+        "urls": [
+          "//cdn.bc0a.com/autopilot/f00000000107419/autopilot_sdk.js"
+        ],
+        "service": null
+      },
+      {
+        "domain": "cdn.optimizely.com",
+        "type": "script",
+        "urls": [
+          "https://cdn.optimizely.com/js/21362120414.js",
+          "//cdn.optimizely.com"
+        ],
+        "service": "Optimizely"
+      },
+      {
+        "domain": "code.jquery.com",
+        "type": "prefetch",
+        "urls": [
+          "//code.jquery.com"
+        ],
+        "service": null
+      },
+      {
+        "domain": "d10lpsik1i8c69.cloudfront.net",
+        "type": "prefetch",
+        "urls": [
+          "//d10lpsik1i8c69.cloudfront.net"
+        ],
+        "service": null
+      },
+      {
+        "domain": "developer.mozilla.org",
+        "type": "script",
+        "urls": [
+          "https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String/replace"
+        ],
+        "service": null
+      },
+      {
+        "domain": "f.vimeocdn.com",
+        "type": "prefetch",
+        "urls": [
+          "//f.vimeocdn.com"
+        ],
+        "service": null
+      },
+      {
+        "domain": "go.microsoft.com",
+        "type": "script",
+        "urls": [
+          "https://go.microsoft.com/fwlink/?linkid=2128109\\nHost:"
+        ],
+        "service": null
+      },
+      {
+        "domain": "google-analytics.com",
+        "type": "prefetch",
+        "urls": [
+          "//www.google-analytics.com"
+        ],
+        "service": "Google Analytics"
+      },
+      {
+        "domain": "google.com",
+        "type": "prefetch",
+        "urls": [
+          "//www.google.com"
+        ],
+        "service": null
+      },
+      {
+        "domain": "googletagmanager.com",
+        "type": "script",
+        "urls": [
+          "https://www.googletagmanager.com/gtm.js?id=",
+          "//www.googletagmanager.com"
+        ],
+        "service": "Google Tag Manager"
+      },
+      {
+        "domain": "gstatic.com",
+        "type": "prefetch",
+        "urls": [
+          "//www.gstatic.com"
+        ],
+        "service": "Google Static Assets"
+      },
+      {
+        "domain": "hat.thepointyspritesclub.com",
+        "type": "script",
+        "urls": [
+          "https://hat.thepointyspritesclub.com/i/31b61819c3ed6a8ca5bc0e93494fa986.js"
+        ],
+        "service": null
+      },
+      {
+        "domain": "js.monitor.azure.com",
+        "type": "script",
+        "urls": [
+          "https://js.monitor.azure.com/scripts/b/ai.2.gbl.min.js",
+          "//js.monitor.azure.com"
+        ],
+        "service": null
+      },
+      {
+        "domain": "msdn.microsoft.com",
+        "type": "script",
+        "urls": [
+          "https://msdn.microsoft.com/en-us/library/ewy2t5e0.aspx"
+        ],
+        "service": null
+      },
+      {
+        "domain": "player.vimeo.com",
+        "type": "script",
+        "urls": [
+          "https://player.vimeo.com/video/839017758"
+        ],
+        "service": null
+      },
+      {
+        "domain": "s.go-mpulse.net",
+        "type": "script",
+        "urls": [
+          "https://s.go-mpulse.net/boomerang/"
+        ],
+        "service": null
+      },
+      {
+        "domain": "s2.go-mpulse.net",
+        "type": "script",
+        "urls": [
+          "https://s2.go-mpulse.net/boomerang/"
+        ],
+        "service": null
+      },
+      {
+        "domain": "siteimproveanalytics.com",
+        "type": "script",
+        "urls": [
+          "https://siteimproveanalytics.com/js/siteanalyze_6290449.js",
+          "//siteimproveanalytics.com"
+        ],
+        "service": null
+      },
+      {
+        "domain": "t2.dealer-leads.ca",
+        "type": "script",
+        "urls": [
+          "https://t2.dealer-leads.ca/main.js"
+        ],
+        "service": null
+      },
+      {
+        "domain": "view.genially.com",
+        "type": "script",
+        "urls": [
+          "https://view.genially.com/68656c5dafc9d551f1d827c8"
+        ],
+        "service": null
+      }
+    ],
+    "cache": {
+      "cacheStatus": "dynamic",
+      "age": null,
+      "cacheControl": "max-age=0, no-cache, no-store",
+      "edgeLocation": "ATL",
+      "etag": false,
+      "lastModified": false,
+      "vary": "Accept-Encoding"
+    },
+    "cssClassFingerprints": null,
+    "inlineConfigFrameworks": null
+  },
+  "signals": [
+    {
+      "type": "technology",
+      "name": "Cloudflare",
+      "confidence": 1,
+      "evidence": "Detected via fingerprint matching (category: cdn)",
+      "category": "cdn"
+    },
+    {
+      "type": "technology",
+      "name": "Optimizely CMS",
+      "confidence": 0.997,
+      "evidence": "Detected via fingerprint matching (category: cms)",
+      "category": "cms"
+    },
+    {
+      "type": "technology",
+      "name": "Autopilot / Ortto",
+      "confidence": 0.997,
+      "evidence": "Detected via fingerprint matching (category: marketing_automation)",
+      "category": "marketing_automation"
+    },
+    {
+      "type": "technology",
+      "name": "Adobe Experience Platform (Launch)",
+      "confidence": 0.997,
+      "evidence": "Detected via fingerprint matching (category: analytics)",
+      "category": "analytics"
+    },
+    {
+      "type": "technology",
+      "name": "Siteimprove",
+      "confidence": 0.995,
+      "evidence": "Detected via fingerprint matching (category: analytics)",
+      "category": "analytics"
+    },
+    {
+      "type": "technology",
+      "name": "React",
+      "confidence": 0.95,
+      "evidence": "Detected via fingerprint matching (category: framework)",
+      "category": "framework"
+    },
+    {
+      "type": "technology",
+      "name": "jQuery",
+      "confidence": 0.95,
+      "evidence": "Detected via fingerprint matching (category: other)",
+      "category": "other"
+    },
+    {
+      "type": "technology",
+      "name": "Azure App Service",
+      "confidence": 0.95,
+      "evidence": "Detected via fingerprint matching (category: hosting)",
+      "category": "hosting"
+    },
+    {
+      "type": "technology",
+      "name": "Google Tag Manager",
+      "confidence": 0.9,
+      "evidence": "Detected via fingerprint matching (category: analytics)",
+      "category": "analytics"
+    },
+    {
+      "type": "compression",
+      "name": "gzip",
+      "confidence": 1,
+      "evidence": "Detected from content-encoding HTTP header",
+      "category": "infrastructure"
+    },
+    {
+      "type": "protocol",
+      "name": "HTTP/2",
+      "confidence": 0.9,
+      "evidence": "Detected from HTTP response headers (alt-svc / protocol hints)",
+      "category": "infrastructure"
+    },
+    {
+      "type": "tracking",
+      "name": "Google Tag Manager: GTM-5ZK5QJX",
+      "confidence": 0.95,
+      "evidence": "tag-manager ID extracted from HTML/inline scripts",
+      "category": "marketing"
+    },
+    {
+      "type": "tracking",
+      "name": "Optimizely: 21362120414",
+      "confidence": 0.95,
+      "evidence": "other ID extracted from HTML/inline scripts",
+      "category": "marketing"
+    }
+  ],
+  "score": null,
+  "checkpoints": [
+    {
+      "id": "m02-cms-identified",
+      "name": "CMS identified",
+      "weight": 0.3,
+      "health": "good",
+      "evidence": "Optimizely CMS detected (confidence 0.997)"
+    },
+    {
+      "id": "m02-cms-version-currency",
+      "name": "CMS version currency",
+      "weight": 0,
+      "health": "info",
+      "evidence": "Optimizely CMS detected but version could not be determined."
+    },
+    {
+      "id": "m02-cdn-detected",
+      "name": "CDN detected",
+      "weight": 0.6,
+      "health": "excellent",
+      "evidence": "Enterprise CDN detected: Cloudflare (via fingerprint)"
+    },
+    {
+      "id": "m02-https-enforced",
+      "name": "HTTPS enforced",
+      "weight": 0.8,
+      "health": "excellent",
+      "evidence": "HTTPS active with HSTS header: max-age=86400 ; includeSubDomains ; preload"
+    },
+    {
+      "id": "m02-http-version",
+      "name": "HTTP/2 or HTTP/3",
+      "weight": 0.5,
+      "health": "good",
+      "evidence": "HTTP/2 detected."
+    },
+    {
+      "id": "m02-compression",
+      "name": "Compression",
+      "weight": 0.6,
+      "health": "good",
+      "evidence": "Gzip compression detected on the initial HTML response.",
+      "recommendation": "Consider enabling Brotli compression for ~15-20% smaller payloads compared to gzip."
+    },
+    {
+      "id": "m02-server-header-exposure",
+      "name": "Server header exposure",
+      "weight": 0.4,
+      "health": "excellent",
+      "evidence": "Server header is hidden or absent."
+    },
+    {
+      "id": "m02-framework-detected",
+      "name": "Framework detected",
+      "weight": 0,
+      "health": "info",
+      "evidence": "Frameworks: React"
+    },
+    {
+      "id": "m02-hosting-identified",
+      "name": "Hosting identified",
+      "weight": 0,
+      "health": "info",
+      "evidence": "Hosting: Azure App Service"
+    }
+  ],
+  "duration": 71,
+  "_replay": {
+    "site": "ryder.com",
+    "moduleId": "M02",
+    "elapsed": 71,
+    "replayedAt": "2026-04-03T20:40:59.152Z"
+  }
+}

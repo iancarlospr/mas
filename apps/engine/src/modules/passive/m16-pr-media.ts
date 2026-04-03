@@ -20,6 +20,8 @@ interface ProbeResult {
   found: boolean;
   html?: string;
   status?: number;
+  /** Full URL when sourced from sitemapPages (avoids baseUrl + path double-prefix). */
+  fullUrl?: string;
 }
 
 /**
@@ -247,12 +249,29 @@ function countPressArticles($: CheerioAPI): number {
     'article', '.press-release', '.news-item', '.post', '.blog-post',
     '.news-entry', '.article-card', '.press-item', '.entry',
     '[class*="press"] li', '[class*="news"] li',
+    // Broader patterns for custom CMS markup
+    '[class*="release"]', '[class*="article"]',
+    '[class*="newsroom"] li', '[class*="media"] li',
+    '.card', '.listing-item', '.content-item',
   ];
   let maxCount = 0;
   for (const sel of selectors) {
     const count = $(sel).length;
     if (count > maxCount) maxCount = count;
   }
+
+  // Fallback: if no selector matched, count date-like patterns near headings
+  // as a proxy for article items (handles fully custom markup)
+  if (maxCount === 0) {
+    // Count <a> or <h3>/<h4> elements that are siblings/children of date-containing elements
+    const datePattern = /\b(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:t(?:ember)?)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+\d{1,2},?\s+\d{4}\b/gi;
+    const bodyText = $('body').text();
+    const dateMatches = bodyText.match(datePattern);
+    if (dateMatches) {
+      maxCount = dateMatches.length;
+    }
+  }
+
   return maxCount;
 }
 
@@ -403,7 +422,7 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
 
   // Try sitemap pages first
   for (const page of ctx.sitemapPages?.press ?? []) {
-    const result: ProbeResult = { path: page.path, found: true, html: page.html, status: 200 };
+    const result: ProbeResult = { path: page.path, found: true, html: page.html, status: 200, fullUrl: page.url };
     if (validatePressPage(result)) {
       foundPages.push(result);
     }
@@ -509,11 +528,13 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
   }).sort((a, b) => b.getTime() - a.getTime());
 
   // Store data
-  // Use fully-qualified URL for external subdomain pages
+  // Use fullUrl from sitemapPages when available (avoids baseUrl + path double-prefix)
+  // Fall back to baseUrl + path for HTTP-probed pages, or https:// for external subdomains
   const pressPageUrl = bestPressPage
-    ? (bestPressPage.path.includes('.') && !bestPressPage.path.startsWith('/'))
-      ? `https://${bestPressPage.path}`
-      : `${baseUrl}${bestPressPage.path}`
+    ? bestPressPage.fullUrl
+      ?? ((bestPressPage.path.includes('.') && !bestPressPage.path.startsWith('/'))
+        ? `https://${bestPressPage.path}`
+        : `${baseUrl}${bestPressPage.path}`)
     : null;
   data.press_page_url = pressPageUrl;
   data.press_page_type = bestPressPage?.path.replace('/', '') ?? null;

@@ -1,0 +1,593 @@
+{
+  "moduleId": "M04",
+  "status": "success",
+  "data": {
+    "title": {
+      "content": "Home - SENZARY LLC",
+      "length": 18
+    },
+    "metaDescription": {
+      "content": "Revolutionize your industrial operations with Senzary's cutting-edge telemetry and IoT solutions. From smart manufacturing to predictive maintenance, we optimize efficiency, reduce costs, and drive innovation across industries.",
+      "length": 227
+    },
+    "canonical": "https://www.senzary.com/",
+    "ogTags": {
+      "og:locale": "en_US",
+      "og:type": "website",
+      "og:title": "Home",
+      "og:description": "Revolutionize your industrial operations with Senzary's cutting-edge telemetry and IoT solutions. From smart manufacturing to predictive maintenance, we optimize efficiency, reduce costs, and drive innovation across industries.",
+      "og:url": "https://www.senzary.com/",
+      "og:site_name": "SENZARY LLC",
+      "og:image": "https://www.senzary.com/wp-content/uploads/2024/10/iac-1.png"
+    },
+    "twitterCards": {
+      "twitter:card": "summary_large_image"
+    },
+    "jsonLd": {
+      "raw": [
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "WebPage",
+              "@id": "https://www.senzary.com/",
+              "url": "https://www.senzary.com/",
+              "name": "Home - SENZARY LLC",
+              "isPartOf": {
+                "@id": "https://www.senzary.com/#website"
+              },
+              "about": {
+                "@id": "https://www.senzary.com/#organization"
+              },
+              "primaryImageOfPage": {
+                "@id": "https://www.senzary.com/#primaryimage"
+              },
+              "image": {
+                "@id": "https://www.senzary.com/#primaryimage"
+              },
+              "thumbnailUrl": "https://www.senzary.com/wp-content/uploads/2024/10/iac-1.png",
+              "datePublished": "2024-10-22T11:16:22+00:00",
+              "dateModified": "2026-02-08T14:43:11+00:00",
+              "description": "Revolutionize your industrial operations with Senzary's cutting-edge telemetry and IoT solutions. From smart manufacturing to predictive maintenance, we optimize efficiency, reduce costs, and drive innovation across industries.",
+              "breadcrumb": {
+                "@id": "https://www.senzary.com/#breadcrumb"
+              },
+              "inLanguage": "en-US",
+              "potentialAction": [
+                {
+                  "@type": "ReadAction",
+                  "target": [
+                    "https://www.senzary.com/"
+                  ]
+                }
+              ]
+            },
+            {
+              "@type": "ImageObject",
+              "inLanguage": "en-US",
+              "@id": "https://www.senzary.com/#primaryimage",
+              "url": "https://www.senzary.com/wp-content/uploads/2024/10/iac-1.png",
+              "contentUrl": "https://www.senzary.com/wp-content/uploads/2024/10/iac-1.png",
+              "width": 300,
+              "height": 150
+            },
+            {
+              "@type": "BreadcrumbList",
+              "@id": "https://www.senzary.com/#breadcrumb",
+              "itemListElement": [
+                {
+                  "@type": "ListItem",
+                  "position": 1,
+                  "name": "Home"
+                }
+              ]
+            },
+            {
+              "@type": "WebSite",
+              "@id": "https://www.senzary.com/#website",
+              "url": "https://www.senzary.com/",
+              "name": "SENZARY LLC",
+              "description": "IOT enteprise operating system - critical solutions for downtime and safety",
+              "publisher": {
+                "@id": "https://www.senzary.com/#organization"
+              },
+              "potentialAction": [
+                {
+                  "@type": "SearchAction",
+                  "target": {
+                    "@type": "EntryPoint",
+                    "urlTemplate": "https://www.senzary.com/?s={search_term_string}"
+                  },
+                  "query-input": {
+                    "@type": "PropertyValueSpecification",
+                    "valueRequired": true,
+                    "valueName": "search_term_string"
+                  }
+                }
+              ],
+              "inLanguage": "en-US"
+            },
+            {
+              "@type": "Organization",
+              "@id": "https://www.senzary.com/#organization",
+              "name": "Senzary.com",
+              "url": "https://www.senzary.com/",
+              "logo": {
+                "@type": "ImageObject",
+                "inLanguage": "en-US",
+                "@id": "https://www.senzary.com/#/schema/logo/image/",
+                "url": "https://senzary.com/wp-content/uploads/2024/11/eric-schummer-QR-code.jpg",
+                "contentUrl": "https://senzary.com/wp-content/uploads/2024/11/eric-schummer-QR-code.jpg",
+                "width": 347,
+                "height": 334,
+                "caption": "Senzary.com"
+              },
+              "image": {
+                "@id": "https://www.senzary.com/#/schema/logo/image/"
+              },
+              "email": "sales@senzary.com",
+              "telephone": "1 833 senzary",
+              "foundingDate": "2020-08-01",
+              "numberOfEmployees": {
+                "@type": "QuantitativeValue",
+                "minValue": "11",
+                "maxValue": "50"
+              }
+            }
+          ]
+        }
+      ],
+      "types": [
+        "WebPage",
+        "ImageObject",
+        "BreadcrumbList",
+        "WebSite",
+        "Organization"
+      ],
+      "organizationName": "Senzary.com",
+      "organizationLogo": "https://senzary.com/wp-content/uploads/2024/11/eric-schummer-QR-code.jpg",
+      "socialProfiles": [],
+      "contactPoints": [
+        {
+          "type": "general",
+          "email": "sales@senzary.com"
+        }
+      ],
+      "websiteName": "SENZARY LLC",
+      "hasSearchAction": true
+    },
+    "robotsTxt": {
+      "present": true,
+      "blocked": false,
+      "content": "User-agent: *\nDisallow: /wp-content/uploads/wc-logs/\nDisallow: /wp-content/uploads/woocommerce_transient_files/\nDisallow: /wp-content/uploads/woocommerce_uploads/\nDisallow: /*?add-to-cart=\nDisallow: /*?*add-to-cart=\nDisallow: /wp-admin/\nAllow: /wp-admin/admin-ajax.php\n\n# START YOAST BLOCK\n# ---------------------------\nUser-agent: *\nDisallow:\n\nSitemap: https://www.senzary.com/sitemap_index.xml\n# ---------------------------\n# END YOAST BLOCK",
+      "sitemapUrls": [
+        "https://www.senzary.com/sitemap_index.xml"
+      ],
+      "disallowedPaths": [
+        "/wp-content/uploads/wc-logs/",
+        "/wp-content/uploads/woocommerce_transient_files/",
+        "/wp-content/uploads/woocommerce_uploads/",
+        "/*?add-to-cart=",
+        "/*?*add-to-cart=",
+        "/wp-admin/"
+      ],
+      "userAgentCount": 1
+    },
+    "sitemap": {
+      "present": true,
+      "urlCount": 10,
+      "urls": [
+        "https://www.senzary.com/post-sitemap.xml",
+        "https://www.senzary.com/page-sitemap.xml",
+        "https://www.senzary.com/case-studies-sitemap.xml",
+        "https://www.senzary.com/product-sitemap.xml",
+        "https://www.senzary.com/landing-sitemap.xml",
+        "https://www.senzary.com/category-sitemap.xml",
+        "https://www.senzary.com/post_tag-sitemap.xml",
+        "https://www.senzary.com/product_cat-sitemap.xml",
+        "https://www.senzary.com/product_tag-sitemap.xml",
+        "https://www.senzary.com/author-sitemap.xml"
+      ],
+      "source": "index"
+    },
+    "llmsTxt": {
+      "present": false
+    },
+    "manifest": {
+      "present": false
+    },
+    "favicon": {
+      "present": true,
+      "formats": [
+        {
+          "rel": "icon",
+          "href": "https://www.senzary.com/wp-content/uploads/2024/11/cropped-senzary-favicon-logo-150x150-1-32x32.png",
+          "sizes": "32x32"
+        },
+        {
+          "rel": "icon",
+          "href": "https://www.senzary.com/wp-content/uploads/2024/11/cropped-senzary-favicon-logo-150x150-1-192x192.png",
+          "sizes": "192x192"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "https://www.senzary.com/wp-content/uploads/2024/11/cropped-senzary-favicon-logo-150x150-1-180x180.png"
+        }
+      ]
+    },
+    "htmlLang": "en-US",
+    "hreflang": [],
+    "preconnectHints": [
+      "//stats.wp.com",
+      "//www.googletagmanager.com"
+    ],
+    "metaTags": {
+      "viewport": "width=device-width, initial-scale=1",
+      "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+      "description": "Revolutionize your industrial operations with Senzary's cutting-edge telemetry and IoT solutions. From smart manufacturing to predictive maintenance, we optimize efficiency, reduce costs, and drive innovation across industries.",
+      "og:locale": "en_US",
+      "og:type": "website",
+      "og:title": "Home",
+      "og:description": "Revolutionize your industrial operations with Senzary's cutting-edge telemetry and IoT solutions. From smart manufacturing to predictive maintenance, we optimize efficiency, reduce costs, and drive innovation across industries.",
+      "og:url": "https://www.senzary.com/",
+      "og:site_name": "SENZARY LLC",
+      "article:modified_time": "2026-02-08T14:43:11+00:00",
+      "og:image": "https://www.senzary.com/wp-content/uploads/2024/10/iac-1.png",
+      "twitter:card": "summary_large_image",
+      "google-site-verification": "ka9T3L2lLbpOQ4KhZXAN1ZrbQLO6bf97STgsK7n_6mA",
+      "generator": "Elementor 4.0.1; features: e_font_icon_svg, additional_custom_breakpoints; settings: css_print_method-external, google_font-enabled, font_display-swap",
+      "msapplication-TileImage": "https://www.senzary.com/wp-content/uploads/2024/11/cropped-senzary-favicon-logo-150x150-1-270x270.png"
+    },
+    "robotsDirectives": {
+      "metaRobots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+      "xRobotsTag": null,
+      "noindex": false,
+      "nofollow": false
+    },
+    "viewport": {
+      "content": "width=device-width, initial-scale=1",
+      "hasWidth": true,
+      "hasInitialScale": true
+    },
+    "charset": {
+      "charset": "UTF-8",
+      "source": "meta"
+    },
+    "adsTxt": {
+      "present": false,
+      "blocked": false
+    },
+    "alternateLinks": [
+      {
+        "type": "rss",
+        "href": "https://www.senzary.com/feed/",
+        "title": "SENZARY LLC » Feed"
+      },
+      {
+        "type": "rss",
+        "href": "https://www.senzary.com/comments/feed/",
+        "title": "SENZARY LLC » Comments Feed"
+      }
+    ],
+    "pagination": {
+      "next": null,
+      "prev": null
+    },
+    "openSearch": {
+      "present": false
+    },
+    "isAMP": false,
+    "structuredData": {
+      "microdata": [],
+      "rdfa": [],
+      "richSnippetEligibility": [
+        {
+          "feature": "Breadcrumb",
+          "eligible": true,
+          "format": "json-ld",
+          "missingRequired": []
+        }
+      ],
+      "validationErrors": [],
+      "totalItems": 5
+    },
+    "robotsTxtAnalysis": {
+      "groupedPaths": {
+        "admin": [
+          "/wp-admin/"
+        ],
+        "staging": [],
+        "internal": [],
+        "sensitive": [],
+        "other": [
+          "/wp-content/uploads/wc-logs/",
+          "/wp-content/uploads/woocommerce_transient_files/",
+          "/wp-content/uploads/woocommerce_uploads/",
+          "/*?add-to-cart=",
+          "/*?*add-to-cart="
+        ]
+      },
+      "crawlDelay": null,
+      "securityFlags": [
+        "Exposed admin paths in robots.txt"
+      ]
+    },
+    "sitemapFreshness": {
+      "newestLastmod": "2026-03-29T05:00:08.000Z",
+      "oldestLastmod": "2024-12-17T17:58:05.000Z",
+      "staleCount": 2,
+      "totalWithLastmod": 10,
+      "freshnessDistribution": {
+        "last30d": 8,
+        "last90d": 8,
+        "last365d": 8
+      }
+    },
+    "viewportConfig": {
+      "content": "width=device-width, initial-scale=1",
+      "hasWidth": true,
+      "hasInitialScale": true,
+      "attributes": {
+        "width": "device-width",
+        "initial-scale": "1"
+      },
+      "blocksZoom": false,
+      "isOptimal": true
+    }
+  },
+  "signals": [
+    {
+      "type": "seo",
+      "name": "title-tag",
+      "confidence": 0.95,
+      "evidence": "Title: \"Home - SENZARY LLC\" (18 chars)",
+      "category": "seo_content"
+    },
+    {
+      "type": "seo",
+      "name": "meta-description",
+      "confidence": 0.95,
+      "evidence": "Meta description present (227 chars)",
+      "category": "seo_content"
+    },
+    {
+      "type": "seo",
+      "name": "canonical-url",
+      "confidence": 0.95,
+      "evidence": "Canonical: https://www.senzary.com/",
+      "category": "seo_content"
+    },
+    {
+      "type": "social",
+      "name": "open-graph",
+      "confidence": 0.95,
+      "evidence": "7 OG tags: og:locale, og:type, og:title, og:description, og:url, og:site_name, og:image",
+      "category": "seo_content"
+    },
+    {
+      "type": "social",
+      "name": "twitter-card",
+      "confidence": 0.95,
+      "evidence": "Twitter Card: summary_large_image",
+      "category": "seo_content"
+    },
+    {
+      "type": "structured-data",
+      "name": "json-ld",
+      "confidence": 0.95,
+      "evidence": "1 JSON-LD block(s): WebPage, ImageObject, BreadcrumbList, WebSite, Organization",
+      "category": "seo_content"
+    },
+    {
+      "type": "crawlability",
+      "name": "robots-txt",
+      "confidence": 0.95,
+      "evidence": "robots.txt present with 1 sitemap ref(s), 6 disallow rule(s)",
+      "category": "seo_content"
+    },
+    {
+      "type": "crawlability",
+      "name": "sitemap-xml",
+      "confidence": 0.95,
+      "evidence": "sitemap.xml present with 10 URLs",
+      "category": "seo_content"
+    },
+    {
+      "type": "branding",
+      "name": "favicon",
+      "confidence": 0.9,
+      "evidence": "Favicon formats: icon 32x32, icon 192x192, apple-touch-icon",
+      "category": "brand_presence"
+    },
+    {
+      "type": "i18n",
+      "name": "html-lang",
+      "confidence": 0.95,
+      "evidence": "HTML lang=\"en-US\"",
+      "category": "seo_content"
+    },
+    {
+      "type": "performance",
+      "name": "resource-hints",
+      "confidence": 0.85,
+      "evidence": "2 resource hint(s)",
+      "category": "performance_experience"
+    },
+    {
+      "type": "feed",
+      "name": "alternate-links",
+      "confidence": 0.95,
+      "evidence": "2 alternate link(s): rss, rss",
+      "category": "brand_presence"
+    }
+  ],
+  "score": null,
+  "checkpoints": [
+    {
+      "id": "M04-TITLE",
+      "name": "Title Tag",
+      "weight": 0.7,
+      "health": "good",
+      "evidence": "Title present (18 chars): \"Home - SENZARY LLC\"",
+      "recommendation": "Consider adjusting title length to the ideal 30-60 character range."
+    },
+    {
+      "id": "M04-META-DESC",
+      "name": "Meta Description",
+      "weight": 0.6,
+      "health": "warning",
+      "evidence": "Meta description length suboptimal (227 chars)",
+      "recommendation": "Adjust meta description to 120-160 characters for optimal search result snippets."
+    },
+    {
+      "id": "M04-CANONICAL",
+      "name": "Canonical URL",
+      "weight": 0.7,
+      "health": "excellent",
+      "evidence": "Self-referencing canonical URL: https://www.senzary.com/"
+    },
+    {
+      "id": "M04-OG-TAGS",
+      "name": "Open Graph Tags",
+      "weight": 0.6,
+      "health": "excellent",
+      "evidence": "All 6 core OG tags present: og:title, og:description, og:image, og:url, og:type, og:site_name"
+    },
+    {
+      "id": "M04-OG-IMAGE",
+      "name": "OG Image",
+      "weight": 0.5,
+      "health": "good",
+      "evidence": "OG image present: https://www.senzary.com/wp-content/uploads/2024/10/iac-1.png",
+      "recommendation": "Add og:image:width and og:image:height tags for faster social previews."
+    },
+    {
+      "id": "M04-TWITTER",
+      "name": "Twitter Card",
+      "weight": 0.4,
+      "health": "good",
+      "evidence": "Twitter Card type \"summary_large_image\" present",
+      "recommendation": "Add all Twitter Card fields (twitter:title, twitter:description, twitter:image, twitter:site)."
+    },
+    {
+      "id": "M04-SCHEMA",
+      "name": "Schema.org / JSON-LD",
+      "weight": 0.8,
+      "health": "excellent",
+      "evidence": "Rich structured data: WebPage, ImageObject, BreadcrumbList, WebSite, Organization (1 blocks) — org: Senzary.com, SearchAction"
+    },
+    {
+      "id": "M04-ROBOTS",
+      "name": "robots.txt",
+      "weight": 0.5,
+      "health": "excellent",
+      "evidence": "robots.txt present with 1 sitemap reference(s), 6 disallow rule(s), 1 user-agent block(s)"
+    },
+    {
+      "id": "M04-SITEMAP",
+      "name": "Sitemap.xml",
+      "weight": 0.6,
+      "health": "excellent",
+      "evidence": "Sitemap present (sitemap index) with 10 URL(s)"
+    },
+    {
+      "id": "M04-FAVICON",
+      "name": "Favicon",
+      "weight": 0.3,
+      "health": "excellent",
+      "evidence": "Multiple favicon formats including apple-touch-icon: icon 32x32, icon 192x192, apple-touch-icon"
+    },
+    {
+      "id": "M04-LANG",
+      "name": "Language (html lang)",
+      "weight": 0.4,
+      "health": "excellent",
+      "evidence": "Specific language attribute: lang=\"en-US\""
+    },
+    {
+      "id": "M04-HREFLANG",
+      "name": "Hreflang Tags",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No hreflang tags found (informational -- may be a single-language site)"
+    },
+    {
+      "id": "M04-PRECONNECT",
+      "name": "Preconnect Hints",
+      "weight": 0.3,
+      "health": "good",
+      "evidence": "2 resource hint(s) found: //stats.wp.com, //www.googletagmanager.com",
+      "recommendation": "Consider adding preconnect hints for additional critical third-party origins."
+    },
+    {
+      "id": "M04-LLMS-TXT",
+      "name": "llms.txt",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No llms.txt found (informational -- optional emerging standard for LLM guidance)"
+    },
+    {
+      "id": "M04-MANIFEST",
+      "name": "manifest.json (PWA)",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No manifest.json found (informational -- required only for PWA installability)"
+    },
+    {
+      "id": "M04-ROBOTS-DIRECTIVES",
+      "name": "Robots Directives",
+      "weight": 0.6,
+      "health": "excellent",
+      "evidence": "Robots directives present: index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+    },
+    {
+      "id": "M04-VIEWPORT",
+      "name": "Viewport Meta",
+      "weight": 0.6,
+      "health": "excellent",
+      "evidence": "Viewport configured: width=device-width, initial-scale=1"
+    },
+    {
+      "id": "M04-CHARSET",
+      "name": "Character Encoding",
+      "weight": 0.3,
+      "health": "excellent",
+      "evidence": "UTF-8 charset declared via meta: UTF-8"
+    },
+    {
+      "id": "M04-ADS-TXT",
+      "name": "ads.txt",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No ads.txt found (informational — required only for sites running programmatic advertising)"
+    },
+    {
+      "id": "m04-structured-data",
+      "name": "Structured Data Coverage",
+      "weight": 0.5,
+      "health": "excellent",
+      "evidence": "5 structured data item(s) across JSON-LD (types: WebPage, ImageObject, BreadcrumbList, WebSite, Organization)"
+    },
+    {
+      "id": "m04-rich-snippets",
+      "name": "Rich Snippet Eligibility",
+      "weight": 0.4,
+      "health": "excellent",
+      "evidence": "Eligible for 1 rich result feature(s): Breadcrumb"
+    },
+    {
+      "id": "M04-VIEWPORT-A11Y",
+      "name": "Viewport Accessibility",
+      "weight": 0.4,
+      "health": "excellent",
+      "evidence": "Viewport allows user zoom (content: \"width=device-width, initial-scale=1\")"
+    }
+  ],
+  "duration": 139,
+  "_replay": {
+    "site": "senzary.com",
+    "moduleId": "M04",
+    "elapsed": 140,
+    "replayedAt": "2026-04-03T20:44:05.106Z"
+  }
+}

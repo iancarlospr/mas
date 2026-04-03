@@ -1,0 +1,46 @@
+{
+  "module": "M18",
+  "site": "senzary.com",
+  "dataAccuracy": {
+    "score": 0,
+    "matched": 0,
+    "total": 1,
+    "details": [
+      "  data.ir_page_url: expected falsy, got \"https://www.senzary.com/product/net-wireless-ir-blaster\" (Private company, no IR portal expected)"
+    ]
+  },
+  "checkpointAccuracy": {
+    "score": 0,
+    "matched": 0,
+    "total": 1,
+    "details": [
+      "  checkpoint m18-ir-portal: expected info, got good (No IR portal)"
+    ]
+  },
+  "falsePositiveRate": {
+    "score": 100,
+    "matched": 1,
+    "total": 1,
+    "details": []
+  },
+  "regressionGuard": {
+    "score": 100,
+    "matched": 2,
+    "total": 2,
+    "details": []
+  },
+  "completeness": {
+    "score": 100,
+    "matched": 1,
+    "total": 1,
+    "details": [
+      "  EXTRA checkpoint: m18-financial-data (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: m18-ticker-symbol (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: m18-esg-report (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: m18-governance (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: m18-ir-comms (not in ground truth — add if expected)"
+    ]
+  },
+  "overall": 45,
+  "scoredAt": "2026-04-03T20:39:25.698Z"
+}

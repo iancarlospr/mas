@@ -1,0 +1,105 @@
+{
+  "moduleId": "M17",
+  "status": "success",
+  "data": {
+    "detected_language": "en",
+    "found_pages": [
+      "/en-us/careers/freight-agent",
+      "/en-us/careers/recruiting-events",
+      "/en-us/careers/jobs-by-location",
+      "/en-us/careers"
+    ],
+    "careers_page_url": "https://www.ryder.com/en-us/careers",
+    "ats_provider": "iCIMS",
+    "ats_evidence": "iCIMS detected via URL: https://warehouse-ryder.icims.com/",
+    "open_positions_count": 2,
+    "has_team_page": true,
+    "has_culture_page": false,
+    "most_recent_posting": null,
+    "external_careers_links": [
+      "https://jobs.ryder.com/",
+      "https://jobs.ryder.com/jobs/"
+    ],
+    "benefits_mentioned": true,
+    "remote_work_mentioned": false,
+    "dei_mentioned": true,
+    "review_site_links": [
+      "https://www.linkedin.com/company/ryder-system-inc/"
+    ]
+  },
+  "signals": [
+    {
+      "type": "careers_page",
+      "name": "Careers Page",
+      "confidence": 0.95,
+      "evidence": "Careers page found at https://www.ryder.com/en-us/careers",
+      "category": "brand_presence"
+    },
+    {
+      "type": "ats_provider",
+      "name": "iCIMS",
+      "confidence": 0.9,
+      "evidence": "iCIMS detected via URL: https://warehouse-ryder.icims.com/",
+      "category": "brand_presence"
+    },
+    {
+      "type": "open_positions",
+      "name": "Open Positions",
+      "confidence": 0.7,
+      "evidence": "Approximately 2 open position(s) detected",
+      "category": "brand_presence"
+    },
+    {
+      "type": "team_page",
+      "name": "Team Page",
+      "confidence": 0.85,
+      "evidence": "Team page or section detected",
+      "category": "brand_presence"
+    }
+  ],
+  "score": null,
+  "checkpoints": [
+    {
+      "id": "m17-careers-page",
+      "name": "Careers page",
+      "weight": 0.4,
+      "health": "excellent",
+      "evidence": "Dedicated careers page with 2 open position(s) at /en-us/careers"
+    },
+    {
+      "id": "m17-ats-provider",
+      "name": "ATS provider",
+      "weight": 0.3,
+      "health": "good",
+      "evidence": "ATS detected: iCIMS"
+    },
+    {
+      "id": "m17-open-positions",
+      "name": "Open positions",
+      "weight": 0,
+      "health": "info",
+      "evidence": "2 open position(s) detected"
+    },
+    {
+      "id": "m17-team-culture",
+      "name": "Team/culture page",
+      "weight": 0.3,
+      "health": "good",
+      "evidence": "Team page detected"
+    },
+    {
+      "id": "m17-hiring-velocity",
+      "name": "Hiring velocity",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No dateable job postings found"
+    }
+  ],
+  "duration": 0,
+  "_replay": {
+    "site": "ryder.com",
+    "moduleId": "M17",
+    "elapsed": 247,
+    "replayedAt": "2026-04-03T20:38:38.953Z"
+  }
+}

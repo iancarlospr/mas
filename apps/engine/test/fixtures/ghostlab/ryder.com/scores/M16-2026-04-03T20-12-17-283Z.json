@@ -1,0 +1,42 @@
+{
+  "module": "M16",
+  "site": "ryder.com",
+  "dataAccuracy": {
+    "score": 100,
+    "matched": 3,
+    "total": 3,
+    "details": []
+  },
+  "checkpointAccuracy": {
+    "score": 33,
+    "matched": 1,
+    "total": 3,
+    "details": [
+      "  checkpoint m16-press-page: expected good, got excellent (Ryder has a press/newsroom page)",
+      "  checkpoint m16-rss-feed: expected info, got good (No RSS feed detected)"
+    ]
+  },
+  "falsePositiveRate": {
+    "score": 100,
+    "matched": 0,
+    "total": 0,
+    "details": []
+  },
+  "regressionGuard": {
+    "score": 100,
+    "matched": 2,
+    "total": 2,
+    "details": []
+  },
+  "completeness": {
+    "score": 100,
+    "matched": 3,
+    "total": 3,
+    "details": [
+      "  EXTRA checkpoint: m16-media-contact (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: m16-press-recency (not in ground truth — add if expected)"
+    ]
+  },
+  "overall": 83,
+  "scoredAt": "2026-04-03T20:12:17.283Z"
+}

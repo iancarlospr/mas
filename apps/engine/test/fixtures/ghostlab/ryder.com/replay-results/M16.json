@@ -1,0 +1,90 @@
+{
+  "moduleId": "M16",
+  "status": "success",
+  "data": {
+    "detected_language": "en",
+    "rss_feed_main_page": "/en-us/api/rssfeed/showrssfeed",
+    "found_pages": [
+      "/en-us/newsroom"
+    ],
+    "press_page_url": "https://www.ryder.com/en-us/newsroom",
+    "press_page_type": "en-us/newsroom",
+    "press_contact_email": null,
+    "press_contact_phone": null,
+    "media_kit_url": null,
+    "rss_feed": "/en-us/api/rssfeed/showrssfeed",
+    "media_logos": false,
+    "most_recent_date": "2026-03-24T00:00:00.000Z",
+    "oldest_date": "2026-02-11",
+    "date_count": 4,
+    "article_count": 7,
+    "wire_services": [],
+    "press_schema_types": [],
+    "main_page_press_links": [
+      "/en-us/newsroom",
+      "https://newsroom.ryder.com/news/news-details/2026/Ryder-Recognized-With-Two-Honorees-as-2026-Top-Women-to-Watch-in-Trucking/default.aspx",
+      "https://newsroom.ryder.com/news/news-details/2026/Ryder-to-Release-First-Quarter-2026-Earnings-on-April-23-2026/default.aspx"
+    ]
+  },
+  "signals": [
+    {
+      "type": "press_page",
+      "name": "Press/Newsroom Page",
+      "confidence": 0.95,
+      "evidence": "Press page found at https://www.ryder.com/en-us/newsroom",
+      "category": "seo_content"
+    },
+    {
+      "type": "rss_feed",
+      "name": "RSS Feed",
+      "confidence": 0.9,
+      "evidence": "RSS feed discovered: /en-us/api/rssfeed/showrssfeed",
+      "category": "seo_content"
+    }
+  ],
+  "score": null,
+  "checkpoints": [
+    {
+      "id": "m16-press-page",
+      "name": "Press/newsroom page",
+      "weight": 0.5,
+      "health": "excellent",
+      "evidence": "Dedicated press page with recent releases (last: 2026-03-24)"
+    },
+    {
+      "id": "m16-media-contact",
+      "name": "Media contact",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No dedicated press contact information found"
+    },
+    {
+      "id": "m16-rss-feed",
+      "name": "RSS feed",
+      "weight": 0.3,
+      "health": "good",
+      "evidence": "RSS feed auto-discovered: /en-us/api/rssfeed/showrssfeed"
+    },
+    {
+      "id": "m16-media-logos",
+      "name": "\"As seen in\" logos",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No media mention logos detected"
+    },
+    {
+      "id": "m16-press-recency",
+      "name": "Press release recency",
+      "weight": 0.4,
+      "health": "excellent",
+      "evidence": "Most recent press content within 3 months (2026-03-24)"
+    }
+  ],
+  "duration": 0,
+  "_replay": {
+    "site": "ryder.com",
+    "moduleId": "M16",
+    "elapsed": 75,
+    "replayedAt": "2026-04-03T20:32:08.067Z"
+  }
+}

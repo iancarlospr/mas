@@ -1,0 +1,48 @@
+{
+  "module": "M02",
+  "site": "senzary.com",
+  "dataAccuracy": {
+    "score": 0,
+    "matched": 0,
+    "total": 3,
+    "details": [
+      "  data.technologies: expected truthy, got undefined (Should detect at least WordPress)",
+      "  data.infra.server: expected truthy, got undefined (Should detect web server)",
+      "  data.infra.cdn: expected truthy, got undefined (Should detect Sucuri as CDN/WAF)"
+    ]
+  },
+  "checkpointAccuracy": {
+    "score": 75,
+    "matched": 3,
+    "total": 4,
+    "details": [
+      "  checkpoint m02-cms-identified: expected good, got warning (WordPress detected)"
+    ]
+  },
+  "falsePositiveRate": {
+    "score": 100,
+    "matched": 1,
+    "total": 1,
+    "details": []
+  },
+  "regressionGuard": {
+    "score": 100,
+    "matched": 3,
+    "total": 3,
+    "details": []
+  },
+  "completeness": {
+    "score": 100,
+    "matched": 4,
+    "total": 4,
+    "details": [
+      "  EXTRA checkpoint: m02-cms-version-currency (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: m02-http-version (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: m02-server-header-exposure (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: m02-framework-detected (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: m02-hosting-identified (not in ground truth — add if expected)"
+    ]
+  },
+  "overall": 64,
+  "scoredAt": "2026-04-03T20:40:59.541Z"
+}

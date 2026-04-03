@@ -1,0 +1,88 @@
+{
+  "records": {
+    "A": [
+      "217.114.94.2"
+    ],
+    "AAAA": [],
+    "MX": [
+      {
+        "exchange": "ryder-com.mail.protection.outlook.com",
+        "priority": 10
+      }
+    ],
+    "NS": [
+      "edns1.ultradns.net",
+      "edns1.ultradns.biz",
+      "edns1.ultradns.com",
+      "edns1.ultradns.org"
+    ],
+    "TXT": [
+      [
+        "reachdesk-verification=rr1uzWG7wafx8rCB7WZrVHQH3ty1HdC2tQXD7UAVcm2HVv9SIZLRUBvDvfm5ADgS"
+      ],
+      [
+        "google-site-verification=TbJCElkAc0jLwkmlPZCw1w9rpRanID1eqoOYiIYZH0g"
+      ],
+      [
+        "DirectFedAuthUrl=ryder.okta.com"
+      ],
+      [
+        "smartsheet-site-validation=oRq2ya0u7kjqS_BHcyLh444DWL6sz6CN"
+      ],
+      [
+        "v=spf1 include:_spf-ssg-a.microsoft.com ip4:168.218.5.3 ip4:206.113.15.122 ip4:168.218.50.253 ip4:54.240.43.16 ip4:18.214.158.23 ip4:207.166.95.11 ip4:207.166.92.11 ip4:168.218.15.251 ~all"
+      ],
+      [
+        "docusign=061936be-13bd-4464-a4a6-630cf5449fcc"
+      ],
+      [
+        "docker-verification=d86605a4-9764-4960-959a-3ad5bc783415"
+      ],
+      [
+        "docusign=75ff45a9-a13a-4fcf-85f5-d2c1f1c8eb39"
+      ],
+      [
+        "DirectFedAuthUrl=ryder.oktapreview.com"
+      ],
+      [
+        "cisco-ci-domain-verification=780d337c8bdda4ddf55bfd77858761589ed97b1dc13bfd704307e77acc32eb2c"
+      ],
+      [
+        "atlassian-domain-verification=Bu3b0mcyzvV9SpGlyXUkixtqPnCuThi76z/1D7xG6Y3qwBJEGW1B5D9vM+IwasfG"
+      ],
+      [
+        "mongodb-site-verification=475WcKW1JVbbHZndU8a1LKLitBiq1hzq"
+      ],
+      [
+        "pardot_334891_*=86a819d049d5ff70df4c7fc6fa3e2d85312ff44f337f760ce63a4ea7aeb48d17"
+      ],
+      [
+        "MS=ms81734066"
+      ],
+      [
+        "apple-domain-verification=CbCcmsZJ6yf7MTvk"
+      ],
+      [
+        "google-gws-recovery-domain-verification=53072652"
+      ],
+      [
+        "twilio-domain-verification=0015202e9d56fd656bf6b05df1d036bc"
+      ]
+    ],
+    "CNAME": [],
+    "SOA": {
+      "nsname": "edns1.ultradns.com",
+      "hostmaster": "premiumdns.support.neustar",
+      "serial": 2019082737,
+      "refresh": 28800,
+      "retry": 7200,
+      "expire": 1209600,
+      "minttl": 3600
+    },
+    "CAA": []
+  },
+  "dkim": {},
+  "dmarc": "v=DMARC1; p=quarantine; rua=mailto:4b019477f7d5365@rep.dmarcanalyzer.com;ruf=mailto:4b019477f7d5365@for.dmarcanalyzer.com; pct=100; fo=1;",
+  "spf": "v=spf1 include:_spf-ssg-a.microsoft.com ip4:168.218.5.3 ip4:206.113.15.122 ip4:168.218.50.253 ip4:54.240.43.16 ip4:18.214.158.23 ip4:207.166.95.11 ip4:207.166.92.11 ip4:168.218.15.251 ~all",
+  "capturedAt": "2026-04-03T20:10:34.209Z"
+}

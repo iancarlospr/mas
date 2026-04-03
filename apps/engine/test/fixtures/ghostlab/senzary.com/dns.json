@@ -1,0 +1,76 @@
+{
+  "records": {
+    "A": [
+      "192.124.249.189"
+    ],
+    "AAAA": [],
+    "MX": [
+      {
+        "exchange": "senzary-com.mail.protection.outlook.com",
+        "priority": 100
+      },
+      {
+        "exchange": "mx00.1and1.com",
+        "priority": 10
+      },
+      {
+        "exchange": "mx01.1and1.com",
+        "priority": 20
+      }
+    ],
+    "NS": [
+      "hera.ns.cloudflare.com",
+      "cash.ns.cloudflare.com"
+    ],
+    "TXT": [
+      [
+        "google-site-verification=6F0uRraJHOBwnc9V3B76uJHycSErwjE3csmvN1uDuek"
+      ],
+      [
+        "atlassian-domain-verification=UNZwEje8terFzEHA24KNjrc1c8bFkG2ncBObpC4de5nC8GPpu3YKrPEXOdicfX5K"
+      ],
+      [
+        "google-site-verification=6WJgJeCo1ujlQrndvERfEPbTuKcpSN2E7tX2o8QdVrc"
+      ],
+      [
+        "amazon-business-verification=b5cc56c7f1e6696a3b21d28e67240051c7204ae5aa4877acbe7f9d1b10f04147"
+      ],
+      [
+        "v=spf1 include:_spf.google.com include:spf.protection.outlook.com include:sender.zohobooks.com include:transmail.net include:_spf.atlassian.net include:_spf.perfora.net include:_spf.customer-server.com -all"
+      ],
+      [
+        "google-site-verification=2xQJ96ocdjvYrkJeydfRpLtXiOGEpSLSlPoah2xVahc"
+      ],
+      [
+        "atlassian-domain-verification=VVA/F1ZloeYkKwjK4hUoKEh5zU6yHaaaZG2ZsskXQK8klamvaiGWNstDcjFDiIWX"
+      ],
+      [
+        "MS=ms31974946"
+      ],
+      [
+        "zoho-verification=zb43656951.zmverify.zoho.com"
+      ],
+      [
+        "00Dao00001T7Ybt=1TBao0000000FNF"
+      ],
+      [
+        "google-site-verification=58vb769PhVI_tAYSFM7tNiTVK-ncmxVekz401elh0C8"
+      ]
+    ],
+    "CNAME": [],
+    "SOA": {
+      "nsname": "cash.ns.cloudflare.com",
+      "hostmaster": "dns.cloudflare.com",
+      "serial": 2400334021,
+      "refresh": 10000,
+      "retry": 2400,
+      "expire": 604800,
+      "minttl": 1800
+    },
+    "CAA": []
+  },
+  "dkim": {},
+  "dmarc": "v=DMARC1; p=none; rua=mailto:amazeus.net@gmail.com; ruf=mailto:amazeus.net@gmail.com",
+  "spf": "v=spf1 include:_spf.google.com include:spf.protection.outlook.com include:sender.zohobooks.com include:transmail.net include:_spf.atlassian.net include:_spf.perfora.net include:_spf.customer-server.com -all",
+  "capturedAt": "2026-04-03T20:09:41.465Z"
+}

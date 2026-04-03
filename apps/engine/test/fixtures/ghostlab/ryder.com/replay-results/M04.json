@@ -1,0 +1,475 @@
+{
+  "moduleId": "M04",
+  "status": "success",
+  "data": {
+    "title": {
+      "content": "Ryder | Logistics, Truck Leasing, Truck Rental, Used Truck Sales",
+      "length": 64
+    },
+    "metaDescription": {
+      "content": "Ryder is the leader in fleet management solutions, as well as supply chain management and logistics for businesses of all sizes. Contact us today for a customized plan.",
+      "length": 168
+    },
+    "canonical": "https://www.ryder.com/en-us",
+    "ogTags": {
+      "og:title": "Ryder | Logistics, Truck Leasing, Truck Rental, Used Truck Sales",
+      "og:local": "en",
+      "og:type": "website",
+      "og:url": "https://www.ryder.com/en-us",
+      "og:description": "Ryder is the leader in fleet management solutions, as well as supply chain management and logistics for businesses of all sizes. Contact us today for a customized plan.",
+      "og:site_name": "Ryder Website"
+    },
+    "twitterCards": {
+      "twitter:card": "summary",
+      "twitter:title": "Ryder | Logistics, Truck Leasing, Truck Rental, Used Truck Sales",
+      "twitter:description": "Ryder is the leader in fleet management solutions, as well as supply chain management and logistics for businesses of all sizes. Contact us today for a customized plan.",
+      "twitter:domain": "www.ryder.com"
+    },
+    "jsonLd": {
+      "raw": [
+        {
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          "url": "https://www.ryder.com/en-us"
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://www.ryder.com/en-us/search?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          },
+          "url": "https://www.ryder.com/en-us"
+        }
+      ],
+      "types": [
+        "Organization",
+        "WebSite"
+      ],
+      "organizationName": null,
+      "organizationLogo": null,
+      "socialProfiles": [],
+      "contactPoints": [],
+      "websiteName": null,
+      "hasSearchAction": true
+    },
+    "robotsTxt": {
+      "present": true,
+      "blocked": false,
+      "content": "User-agent: *\nDisallow: /episerver/\nDisallow: /utils/\n\n\n#Site en-US \nSitemap: https://www.ryder.com/en-us/sitemap.xml\n\n#UVS Sitemap en-US\nSitemap: https://www.ryder.com/api/uvs/sitemap?indexName=uvs_inventory&language=en-US\n\n#UVS Sitemap en-CA\nSitemap: https://www.ryder.com/api/uvs/sitemap?indexName=uvs_inventory&language=en-CA\n\n#UVS Sitemap fr-CA\nSitemap: https://www.ryder.com/api/uvs/sitemap?indexName=uvs_inventory_fr&language=fr-CA\n\n#UVS Sitemap es-MX\nSitemap: https://www.ryder.com/api/uvs/sitemap?indexName=uvs_inventory_sp&language=es-MX\n\n#Locations Sitemap\nSitemap: https://www.ryder.com/api/locations/sitemap",
+      "sitemapUrls": [
+        "https://www.ryder.com/en-us/sitemap.xml",
+        "https://www.ryder.com/api/uvs/sitemap?indexName=uvs_inventory&language=en-US",
+        "https://www.ryder.com/api/uvs/sitemap?indexName=uvs_inventory&language=en-CA",
+        "https://www.ryder.com/api/uvs/sitemap?indexName=uvs_inventory_fr&language=fr-CA",
+        "https://www.ryder.com/api/uvs/sitemap?indexName=uvs_inventory_sp&language=es-MX",
+        "https://www.ryder.com/api/locations/sitemap"
+      ],
+      "disallowedPaths": [
+        "/episerver/",
+        "/utils/"
+      ],
+      "userAgentCount": 1
+    },
+    "sitemap": {
+      "present": false,
+      "source": null
+    },
+    "llmsTxt": {
+      "present": false
+    },
+    "manifest": {
+      "present": false
+    },
+    "favicon": {
+      "present": true,
+      "formats": [
+        {
+          "rel": "icon",
+          "href": "/assets/images/favicon.png",
+          "type": "image/x-icon"
+        }
+      ]
+    },
+    "htmlLang": "en-US",
+    "hreflang": [
+      {
+        "lang": "en-us",
+        "href": "https://www.ryder.com/en-us"
+      },
+      {
+        "lang": "en-ca",
+        "href": "https://www.ryder.com/en-ca"
+      },
+      {
+        "lang": "fr-ca",
+        "href": "https://www.ryder.com/fr-ca"
+      },
+      {
+        "lang": "es-mx",
+        "href": "https://www.ryder.com/es-mx"
+      },
+      {
+        "lang": "x-default",
+        "href": "https://www.ryder.com/en-us"
+      }
+    ],
+    "preconnectHints": [
+      "//cdn.optimizely.com",
+      "//code.jquery.com",
+      "//www.google.com",
+      "//www.googletagmanager.com",
+      "//www.google-analytics.com",
+      "//www.gstatic.com",
+      "//js.monitor.azure.com",
+      "//d10lpsik1i8c69.cloudfront.net",
+      "//siteimproveanalytics.com",
+      "//f.vimeocdn.com"
+    ],
+    "metaTags": {
+      "viewport": "width=device-width, initial-scale=1",
+      "X-UA-Compatible": "IE=Edge",
+      "robots": "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1",
+      "format-detection": "telephone=no",
+      "google-site-verification": "MIvAVn3nU0_Lqea5mWOV-PGcS4NxstCwzXIqAyRPtiY",
+      "msvalidate.01": "0F459E7931CBA2465594365203678A34",
+      "description": "Ryder is the leader in fleet management solutions, as well as supply chain management and logistics for businesses of all sizes. Contact us today for a customized plan.",
+      "og:title": "Ryder | Logistics, Truck Leasing, Truck Rental, Used Truck Sales",
+      "og:local": "en",
+      "og:type": "website",
+      "og:url": "https://www.ryder.com/en-us",
+      "og:description": "Ryder is the leader in fleet management solutions, as well as supply chain management and logistics for businesses of all sizes. Contact us today for a customized plan.",
+      "og:site_name": "Ryder Website",
+      "fb:admins": "CHANGE FB:ADMINS",
+      "twitter:card": "summary",
+      "twitter:title": "Ryder | Logistics, Truck Leasing, Truck Rental, Used Truck Sales",
+      "twitter:description": "Ryder is the leader in fleet management solutions, as well as supply chain management and logistics for businesses of all sizes. Contact us today for a customized plan.",
+      "twitter:domain": "www.ryder.com"
+    },
+    "robotsDirectives": {
+      "metaRobots": "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1",
+      "xRobotsTag": null,
+      "noindex": false,
+      "nofollow": false
+    },
+    "viewport": {
+      "content": "width=device-width, initial-scale=1",
+      "hasWidth": true,
+      "hasInitialScale": true
+    },
+    "charset": {
+      "charset": "utf-8",
+      "source": "meta"
+    },
+    "adsTxt": {
+      "present": false,
+      "blocked": false
+    },
+    "alternateLinks": [
+      {
+        "type": "rss",
+        "href": "/en-us/api/rssfeed/showrssfeed",
+        "title": "RSS"
+      }
+    ],
+    "pagination": {
+      "next": null,
+      "prev": null
+    },
+    "openSearch": {
+      "present": false
+    },
+    "isAMP": false,
+    "structuredData": {
+      "microdata": [],
+      "rdfa": [],
+      "richSnippetEligibility": [],
+      "validationErrors": [],
+      "totalItems": 2
+    },
+    "robotsTxtAnalysis": {
+      "groupedPaths": {
+        "admin": [],
+        "staging": [],
+        "internal": [],
+        "sensitive": [],
+        "other": [
+          "/episerver/",
+          "/utils/"
+        ]
+      },
+      "crawlDelay": null,
+      "securityFlags": []
+    },
+    "viewportConfig": {
+      "content": "width=device-width, initial-scale=1",
+      "hasWidth": true,
+      "hasInitialScale": true,
+      "attributes": {
+        "width": "device-width",
+        "initial-scale": "1"
+      },
+      "blocksZoom": false,
+      "isOptimal": true
+    }
+  },
+  "signals": [
+    {
+      "type": "seo",
+      "name": "title-tag",
+      "confidence": 0.95,
+      "evidence": "Title: \"Ryder | Logistics, Truck Leasing, Truck Rental, Used Truck Sales\" (64 chars)",
+      "category": "seo_content"
+    },
+    {
+      "type": "seo",
+      "name": "meta-description",
+      "confidence": 0.95,
+      "evidence": "Meta description present (168 chars)",
+      "category": "seo_content"
+    },
+    {
+      "type": "seo",
+      "name": "canonical-url",
+      "confidence": 0.95,
+      "evidence": "Canonical: https://www.ryder.com/en-us",
+      "category": "seo_content"
+    },
+    {
+      "type": "social",
+      "name": "open-graph",
+      "confidence": 0.95,
+      "evidence": "6 OG tags: og:title, og:local, og:type, og:url, og:description, og:site_name",
+      "category": "seo_content"
+    },
+    {
+      "type": "social",
+      "name": "twitter-card",
+      "confidence": 0.95,
+      "evidence": "Twitter Card: summary",
+      "category": "seo_content"
+    },
+    {
+      "type": "structured-data",
+      "name": "json-ld",
+      "confidence": 0.95,
+      "evidence": "2 JSON-LD block(s): Organization, WebSite",
+      "category": "seo_content"
+    },
+    {
+      "type": "crawlability",
+      "name": "robots-txt",
+      "confidence": 0.95,
+      "evidence": "robots.txt present with 6 sitemap ref(s), 2 disallow rule(s)",
+      "category": "seo_content"
+    },
+    {
+      "type": "branding",
+      "name": "favicon",
+      "confidence": 0.9,
+      "evidence": "Favicon formats: icon",
+      "category": "brand_presence"
+    },
+    {
+      "type": "i18n",
+      "name": "html-lang",
+      "confidence": 0.95,
+      "evidence": "HTML lang=\"en-US\"",
+      "category": "seo_content"
+    },
+    {
+      "type": "i18n",
+      "name": "hreflang",
+      "confidence": 0.95,
+      "evidence": "5 hreflang entries: en-us, en-ca, fr-ca, es-mx, x-default",
+      "category": "seo_content"
+    },
+    {
+      "type": "performance",
+      "name": "resource-hints",
+      "confidence": 0.85,
+      "evidence": "10 resource hint(s)",
+      "category": "performance_experience"
+    },
+    {
+      "type": "feed",
+      "name": "alternate-links",
+      "confidence": 0.95,
+      "evidence": "1 alternate link(s): rss",
+      "category": "brand_presence"
+    }
+  ],
+  "score": null,
+  "checkpoints": [
+    {
+      "id": "M04-TITLE",
+      "name": "Title Tag",
+      "weight": 0.7,
+      "health": "good",
+      "evidence": "Title present (64 chars): \"Ryder | Logistics, Truck Leasing, Truck Rental, Used Truck Sales\"",
+      "recommendation": "Consider adjusting title length to the ideal 30-60 character range."
+    },
+    {
+      "id": "M04-META-DESC",
+      "name": "Meta Description",
+      "weight": 0.6,
+      "health": "good",
+      "evidence": "Meta description present (168 chars)",
+      "recommendation": "Fine-tune meta description to the ideal 120-160 character range."
+    },
+    {
+      "id": "M04-CANONICAL",
+      "name": "Canonical URL",
+      "weight": 0.7,
+      "health": "excellent",
+      "evidence": "Self-referencing canonical URL: https://www.ryder.com/en-us"
+    },
+    {
+      "id": "M04-OG-TAGS",
+      "name": "Open Graph Tags",
+      "weight": 0.6,
+      "health": "good",
+      "evidence": "5/6 core OG tags present. Missing: og:image",
+      "recommendation": "Add missing OG tags: og:image"
+    },
+    {
+      "id": "M04-OG-IMAGE",
+      "name": "OG Image",
+      "weight": 0.5,
+      "health": "critical",
+      "evidence": "No og:image tag found",
+      "recommendation": "Add an og:image tag with a high-quality image (1200x630 recommended) for social sharing."
+    },
+    {
+      "id": "M04-TWITTER",
+      "name": "Twitter Card",
+      "weight": 0.4,
+      "health": "good",
+      "evidence": "Twitter Card type \"summary\" present",
+      "recommendation": "Add all Twitter Card fields (twitter:title, twitter:description, twitter:image, twitter:site)."
+    },
+    {
+      "id": "M04-SCHEMA",
+      "name": "Schema.org / JSON-LD",
+      "weight": 0.8,
+      "health": "good",
+      "evidence": "Structured data: Organization, WebSite (2 blocks) — SearchAction",
+      "recommendation": "Consider adding additional Schema types (WebSite, content-specific) for richer search results."
+    },
+    {
+      "id": "M04-ROBOTS",
+      "name": "robots.txt",
+      "weight": 0.5,
+      "health": "excellent",
+      "evidence": "robots.txt present with 6 sitemap reference(s), 2 disallow rule(s), 1 user-agent block(s)"
+    },
+    {
+      "id": "M04-SITEMAP",
+      "name": "Sitemap.xml",
+      "weight": 0.6,
+      "health": "critical",
+      "evidence": "No sitemap found (checked /sitemap.xml, /sitemap_index.xml, /sitemap-index.xml, and robots.txt references)",
+      "recommendation": "Create an XML sitemap to help search engines discover and index all pages."
+    },
+    {
+      "id": "M04-FAVICON",
+      "name": "Favicon",
+      "weight": 0.3,
+      "health": "warning",
+      "evidence": "Single favicon found: icon",
+      "recommendation": "Add multiple favicon sizes and an apple-touch-icon for cross-device support."
+    },
+    {
+      "id": "M04-LANG",
+      "name": "Language (html lang)",
+      "weight": 0.4,
+      "health": "excellent",
+      "evidence": "Specific language attribute: lang=\"en-US\""
+    },
+    {
+      "id": "M04-HREFLANG",
+      "name": "Hreflang Tags",
+      "weight": 0.4,
+      "health": "excellent",
+      "evidence": "Hreflang tags with x-default and 4 locale(s): en-us, en-ca, fr-ca, es-mx, x-default"
+    },
+    {
+      "id": "M04-PRECONNECT",
+      "name": "Preconnect Hints",
+      "weight": 0.3,
+      "health": "excellent",
+      "evidence": "10 resource hints found: //cdn.optimizely.com, //code.jquery.com, //www.google.com, //www.googletagmanager.com, //www.google-analytics.com..."
+    },
+    {
+      "id": "M04-LLMS-TXT",
+      "name": "llms.txt",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No llms.txt found (informational -- optional emerging standard for LLM guidance)"
+    },
+    {
+      "id": "M04-MANIFEST",
+      "name": "manifest.json (PWA)",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No manifest.json found (informational -- required only for PWA installability)"
+    },
+    {
+      "id": "M04-ROBOTS-DIRECTIVES",
+      "name": "Robots Directives",
+      "weight": 0.6,
+      "health": "excellent",
+      "evidence": "Robots directives present: index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"
+    },
+    {
+      "id": "M04-VIEWPORT",
+      "name": "Viewport Meta",
+      "weight": 0.6,
+      "health": "excellent",
+      "evidence": "Viewport configured: width=device-width, initial-scale=1"
+    },
+    {
+      "id": "M04-CHARSET",
+      "name": "Character Encoding",
+      "weight": 0.3,
+      "health": "excellent",
+      "evidence": "UTF-8 charset declared via meta: utf-8"
+    },
+    {
+      "id": "M04-ADS-TXT",
+      "name": "ads.txt",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No ads.txt found (informational — required only for sites running programmatic advertising)"
+    },
+    {
+      "id": "m04-structured-data",
+      "name": "Structured Data Coverage",
+      "weight": 0.5,
+      "health": "excellent",
+      "evidence": "2 structured data item(s) across JSON-LD (types: Organization, WebSite)"
+    },
+    {
+      "id": "m04-rich-snippets",
+      "name": "Rich Snippet Eligibility",
+      "weight": 0,
+      "health": "info",
+      "evidence": "Structured data present but no Google rich result types detected (Organization, WebSite are informational only)"
+    },
+    {
+      "id": "M04-VIEWPORT-A11Y",
+      "name": "Viewport Accessibility",
+      "weight": 0.4,
+      "health": "excellent",
+      "evidence": "Viewport allows user zoom (content: \"width=device-width, initial-scale=1\")"
+    }
+  ],
+  "duration": 156,
+  "_replay": {
+    "site": "ryder.com",
+    "moduleId": "M04",
+    "elapsed": 156,
+    "replayedAt": "2026-04-03T20:44:05.289Z"
+  }
+}
