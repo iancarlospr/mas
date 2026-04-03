@@ -35,7 +35,7 @@ const MODULE_EXECUTORS: Record<string, () => Promise<{ execute: (ctx: ModuleCont
   M19: () => import('../../src/modules/passive/m19-support-success.js'),
 };
 
-const KNOWN_SITES = ['senzary.com', 'ryder.com'];
+const KNOWN_SITES = ['senzary.com', 'ryder.com', 'investpr.org'];
 
 // ── Args ──────────────────────────────────────────────────────────────────────
 
@@ -121,24 +121,44 @@ function createProbeHandlers(probesFixture: HttpProbesFixture) {
   const handlers = [];
   const { baseUrl, probes } = probesFixture;
 
+  // Build a lookup map for probe responses, keyed by full URL (with query params)
+  const probeLookup = new Map<string, typeof probes[string]>();
   for (const [path, data] of Object.entries(probes)) {
     const url = `${baseUrl}${path}`;
-    handlers.push(
-      http.get(url, () => {
+    probeLookup.set(url, data);
+  }
+
+  // Single handler that matches all requests to the base URL domain
+  // and looks up the full URL (including query params) in the probe map
+  const baseHost = new URL(baseUrl).hostname;
+  handlers.push(
+    http.get(`https://${baseHost}/*`, ({ request }) => {
+      const fullUrl = request.url;
+      // Try exact match first (includes query params)
+      let data = probeLookup.get(fullUrl);
+      // Try without trailing slash
+      if (!data) data = probeLookup.get(fullUrl.replace(/\/$/, ''));
+      // Try with trailing slash
+      if (!data) data = probeLookup.get(fullUrl + '/');
+      // Try path-only match (strip query params)
+      if (!data) {
+        const urlObj = new URL(fullUrl);
+        data = probeLookup.get(`${urlObj.origin}${urlObj.pathname}`);
+        if (!data) data = probeLookup.get(`${urlObj.origin}${urlObj.pathname.replace(/\/$/, '')}`);
+      }
+
+      if (data) {
         const cleanHeaders = stripEncodingHeaders(data.headers);
-        if (!data.ok) {
-          return new HttpResponse(data.body || 'Not Found', {
-            status: data.status || 404,
-            headers: cleanHeaders,
-          });
-        }
-        return new HttpResponse(data.body, {
-          status: data.status,
+        return new HttpResponse(data.body || '', {
+          status: data.status || 200,
           headers: cleanHeaders,
         });
-      }),
-    );
-  }
+      }
+      // Not in fixtures — return 404
+      console.log(`  [MSW] No fixture for: ${fullUrl}`);
+      return new HttpResponse('Not Found', { status: 404 });
+    }),
+  );
 
   // Load external newsroom fixtures if they exist
   for (const siteName of ['senzary.com', 'ryder.com']) {

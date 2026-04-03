@@ -328,24 +328,11 @@ function countPressArticles($: CheerioAPI): number {
     if (count > maxCount) maxCount = count;
   }
 
-  // Fallback: count elements that have both a date-like <time> tag and a heading
-  // inside them — these are almost certainly article/press items
+  // Fallback: count <time> elements (more reliable than date string matching)
   if (maxCount === 0) {
     const timeElements = $('time').length;
     if (timeElements > 0) {
       maxCount = timeElements;
-    }
-  }
-
-  // Final fallback: count distinct date strings in the body text as a proxy
-  if (maxCount === 0) {
-    const datePattern = /\b(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:t(?:ember)?)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+\d{1,2},?\s+\d{4}\b/gi;
-    const bodyText = $('body').text();
-    const dateMatches = bodyText.match(datePattern);
-    if (dateMatches) {
-      // Deduplicate — same date appearing in headline + body shouldn't double-count
-      const uniqueDates = new Set(dateMatches.map(d => d.toLowerCase()));
-      maxCount = uniqueDates.size;
     }
   }
 
@@ -674,37 +661,71 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
     }
   }
 
-  // WordPress REST API: use pagination detection to crawl all pages
-  // Only for WordPress sites when press page exists and shows pagination
-  const isWordPress = ctx.html?.includes('wp-content') || ctx.html?.includes('wp-includes');
-  if (isWordPress && bestPressPage?.html && externalArticleCount === 0) {
-    // Check if the press page has pagination (page/2, page/3, etc.)
-    const paginationMatch = bestPressPage.html.match(/\/page\/(\d+)/g);
-    if (paginationMatch) {
-      const maxPage = Math.max(...paginationMatch.map(p => parseInt(p.replace(/\/page\//, ''), 10)));
-      if (maxPage >= 2) {
-        // Crawl remaining pages to get full article count
-        const pressUrl = bestPressPage.fullUrl ?? `${baseUrl}${bestPressPage.path}`;
-        let paginatedTotal = totalArticleCount; // start with page 1 count
-        for (let p = 2; p <= Math.min(maxPage + 1, 50); p++) { // cap at 50 pages
-          try {
-            const pageUrl = `${pressUrl.replace(/\/$/, '')}/page/${p}/`;
-            const pageResult = await fetchWithRetry(pageUrl, { timeout: 8_000, retries: 0 });
-            if (pageResult.ok && pageResult.body.length > 500) {
-              const $page = parseHtml(pageResult.body);
-              const pageArticles = countPressArticles($page);
-              if (pageArticles === 0) break; // no more articles
-              paginatedTotal += pageArticles;
-            } else {
-              break; // page doesn't exist
-            }
-          } catch {
-            break;
+  // Pagination crawling: detect and follow paginated press pages
+  // Handles both WordPress (/page/N/) and query-param (?pg=N, ?page=N, ?paged=N) styles
+  if (bestPressPage?.html && externalArticleCount === 0) {
+    const pressUrl = bestPressPage.fullUrl ?? `${baseUrl}${bestPressPage.path}`;
+
+    // Detect pagination style from links in the press page HTML
+    const wpPagination = bestPressPage.html.match(/\/page\/(\d+)/g);
+    const qsPagination = bestPressPage.html.match(/[?&](?:pg|page|paged)=(\d+)/g);
+
+    let maxPage = 0;
+    let paginationStyle: 'path' | 'query' | null = null;
+    let queryParam = 'pg';
+
+    if (qsPagination) {
+      // Query-param pagination (?pg=2, ?page=2, ?paged=2)
+      const paramMatch = bestPressPage.html.match(/[?&](pg|page|paged)=(\d+)/);
+      if (paramMatch) queryParam = paramMatch[1]!;
+      maxPage = Math.max(...qsPagination.map(p => parseInt(p.replace(/.*=/, ''), 10)));
+      paginationStyle = 'query';
+    } else if (wpPagination) {
+      // WordPress-style path pagination (/page/2/)
+      maxPage = Math.max(...wpPagination.map(p => parseInt(p.replace(/\/page\//, ''), 10)));
+      paginationStyle = 'path';
+    }
+
+    if (paginationStyle && maxPage >= 2) {
+      // Collect unique article URLs across all pages using a Set
+      const pressPath = new URL(pressUrl).pathname.replace(/\/$/, '');
+      // Match article slugs: must be at least 8 chars to avoid false positives like /news/page, /news/home
+      const articleSlugPattern = new RegExp(
+        `href="[^"]*${pressPath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}/([a-z0-9][-a-z0-9]{7,})/?(?:[?#"][^"]*)?"`,
+        'gi',
+      );
+
+      // Extract unique slugs from page 1
+      const allSlugs = new Set<string>();
+      let match: RegExpExecArray | null;
+      while ((match = articleSlugPattern.exec(bestPressPage.html)) !== null) {
+        allSlugs.add(match[1]!);
+      }
+
+      // Crawl remaining pages
+      for (let p = 2; p <= Math.min(maxPage + 2, 50); p++) {
+        try {
+          const pageUrl = paginationStyle === 'query'
+            ? `${pressUrl.replace(/\/$/, '')}/?${queryParam}=${p}`
+            : `${pressUrl.replace(/\/$/, '')}/page/${p}/`;
+          const pageResult = await fetchWithRetry(pageUrl, { timeout: 8_000, retries: 0 });
+          if (!pageResult.ok || pageResult.body.length < 500) break;
+
+          const pageSlugs = new Set<string>();
+          const pagePattern = new RegExp(articleSlugPattern.source, 'gi');
+          while ((match = pagePattern.exec(pageResult.body)) !== null) {
+            pageSlugs.add(match[1]!);
           }
+          if (pageSlugs.size === 0) break;
+          for (const s of pageSlugs) allSlugs.add(s);
+        } catch {
+          break;
         }
-        if (paginatedTotal > totalArticleCount) {
-          totalArticleCount = paginatedTotal;
-        }
+      }
+
+      // Pagination slug count is the most accurate — use it when available
+      if (allSlugs.size > 0) {
+        totalArticleCount = allSlugs.size;
       }
     }
   }

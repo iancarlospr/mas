@@ -1,0 +1,42 @@
+{
+  "module": "M16",
+  "site": "investpr.org",
+  "dataAccuracy": {
+    "score": 60,
+    "matched": 3,
+    "total": 5,
+    "details": [
+      "  data.rss_feed: expected contains \"feed\", got null (WordPress RSS at /feed/)",
+      "  data.media_logos: expected exact false, got true"
+    ]
+  },
+  "checkpointAccuracy": {
+    "score": 60,
+    "matched": 3,
+    "total": 5,
+    "details": [
+      "  checkpoint m16-rss-feed: expected good, got info (WordPress RSS exists)",
+      "  checkpoint m16-media-logos: expected info, got excellent"
+    ]
+  },
+  "falsePositiveRate": {
+    "score": 100,
+    "matched": 0,
+    "total": 0,
+    "details": []
+  },
+  "regressionGuard": {
+    "score": 100,
+    "matched": 0,
+    "total": 0,
+    "details": []
+  },
+  "completeness": {
+    "score": 100,
+    "matched": 5,
+    "total": 5,
+    "details": []
+  },
+  "overall": 78,
+  "scoredAt": "2026-04-03T21:52:23.751Z"
+}
