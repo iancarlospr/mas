@@ -35,7 +35,7 @@ const MODULE_EXECUTORS: Record<string, () => Promise<{ execute: (ctx: ModuleCont
   M19: () => import('../../src/modules/passive/m19-support-success.js'),
 };
 
-const KNOWN_SITES = ['senzary.com', 'ryder.com', 'investpr.org', 'mmm-pr.com'];
+const KNOWN_SITES = ['senzary.com', 'ryder.com', 'investpr.org', 'mmm-pr.com', 'foundationforpuertorico.org'];
 
 // ── Args ──────────────────────────────────────────────────────────────────────
 

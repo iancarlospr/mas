@@ -1,0 +1,100 @@
+{
+  "moduleId": "M16",
+  "status": "success",
+  "data": {
+    "detected_language": "es",
+    "rss_feed_main_page": "https://foundationforpuertorico.org/es/feed/",
+    "external_newsroom": null,
+    "external_article_count": null,
+    "found_pages": [
+      "https://foundationforpuertorico.org/es/media/"
+    ],
+    "press_page_url": "https://foundationforpuertorico.org/es/media/",
+    "press_page_type": "es/media/",
+    "press_contact_email": "digital@foundationpr.org",
+    "press_contact_phone": null,
+    "media_kit_url": null,
+    "rss_feed": "https://foundationforpuertorico.org/es/feed/",
+    "media_logos": false,
+    "most_recent_date": "2020-04-29T00:00:00.000Z",
+    "oldest_date": "2020-04-29",
+    "date_count": 1,
+    "article_count": 104,
+    "wire_services": [],
+    "press_schema_types": [],
+    "main_page_press_links": [
+      "https://foundationforpuertorico.org/es/latest-blog/",
+      "https://foundationforpuertorico.org/es/media/"
+    ]
+  },
+  "signals": [
+    {
+      "type": "press_page",
+      "name": "Press/Newsroom Page",
+      "confidence": 0.95,
+      "evidence": "Press page found at https://foundationforpuertorico.org/es/media/",
+      "category": "seo_content"
+    },
+    {
+      "type": "press_contact",
+      "name": "Press Contact",
+      "confidence": 0.9,
+      "evidence": "Press email: digital@foundationpr.org",
+      "category": "seo_content"
+    },
+    {
+      "type": "rss_feed",
+      "name": "RSS Feed",
+      "confidence": 0.9,
+      "evidence": "RSS feed discovered: https://foundationforpuertorico.org/es/feed/",
+      "category": "seo_content"
+    }
+  ],
+  "score": null,
+  "checkpoints": [
+    {
+      "id": "m16-press-page",
+      "name": "Press/newsroom page",
+      "weight": 0.5,
+      "health": "warning",
+      "evidence": "Press page found but content is stale (>1yr, last: 2020-04-29)",
+      "recommendation": "Update press page with current releases or archive outdated content"
+    },
+    {
+      "id": "m16-media-contact",
+      "name": "Media contact",
+      "weight": 0.4,
+      "health": "good",
+      "evidence": "Press email available: digital@foundationpr.org"
+    },
+    {
+      "id": "m16-rss-feed",
+      "name": "RSS feed",
+      "weight": 0.3,
+      "health": "good",
+      "evidence": "RSS feed auto-discovered: https://foundationforpuertorico.org/es/feed/"
+    },
+    {
+      "id": "m16-media-logos",
+      "name": "\"As seen in\" logos",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No media mention logos detected"
+    },
+    {
+      "id": "m16-press-recency",
+      "name": "Press release recency",
+      "weight": 0.4,
+      "health": "critical",
+      "evidence": "Press content is over 1 year old (2020-04-29)",
+      "recommendation": "Update press page with current news and releases"
+    }
+  ],
+  "duration": 0,
+  "_replay": {
+    "site": "foundationforpuertorico.org",
+    "moduleId": "M16",
+    "elapsed": 166,
+    "replayedAt": "2026-04-03T22:51:31.699Z"
+  }
+}
