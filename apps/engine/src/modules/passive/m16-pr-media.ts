@@ -124,7 +124,7 @@ function detectRssFeed($: CheerioAPI): string | null {
 async function fetchRssFeedData(
   feedUrl: string,
   baseUrl: string,
-): Promise<{ itemCount: number; dates: Date[] } | null> {
+): Promise<{ itemCount: number; totalFeedItems: number; dates: Date[] } | null> {
   try {
     // Resolve relative URLs — use origin (not baseUrl) to avoid doubling locale prefixes
     const origin = new URL(baseUrl).origin;
@@ -136,27 +136,47 @@ async function fetchRssFeedData(
     const $ = cheerio.load(result.body, { xml: true });
 
     // RSS 2.0: <item>, Atom: <entry>
-    const items = $('item');
-    const entries = $('entry');
-    const totalItems = Math.max(items.length, entries.length);
+    const allItems = $('item').toArray().concat($('entry').toArray());
+    if (allItems.length === 0) return null;
 
-    if (totalItems === 0) return null;
+    // Filter to press/newsroom items only — exclude blog posts, case studies,
+    // product pages. RSS feeds often contain ALL site content, not just press.
+    const PRESS_URL_KEYWORDS = /\b(?:news|newsroom|press|media|release|announcement)\b/i;
+    const BLOG_URL_KEYWORDS = /(?:\/blog|\/insights?|\/case-stud|\/white-?paper|\/webinar|\/podcast|\/tutorial|\/guide|\/brochure|\/video|\/infographic|\/ebook)/i;
 
-    // Extract dates from <pubDate> (RSS) or <published>/<updated> (Atom)
+    let pressCount = 0;
+    let totalCount = allItems.length;
     const dates: Date[] = [];
-    const dateSelectors = ['pubDate', 'published', 'updated', 'dc\\:date'];
-    for (const sel of dateSelectors) {
-      $(sel).each((_, el) => {
-        const text = $(el).text().trim();
-        if (text) {
-          const d = new Date(text);
-          if (!isNaN(d.getTime())) dates.push(d);
-        }
-      });
-      if (dates.length > 0) break; // use first selector that yields dates
+
+    for (const item of allItems) {
+      const $item = $(item);
+      // Check item URL (link, xml:base, guid) for press vs blog content
+      const itemUrl = $item.attr('xml:base') ?? $item.find('link').text() ?? $item.find('guid').text() ?? '';
+
+      const isPress = PRESS_URL_KEYWORDS.test(itemUrl);
+      const isBlog = BLOG_URL_KEYWORDS.test(itemUrl);
+
+      // Count as press if: explicitly press-related, OR not identifiable as blog
+      // (for feeds that are purely press, URLs may not contain press keywords)
+      if (isPress || (!isBlog && !itemUrl.includes('/blog'))) {
+        pressCount++;
+      }
+
+      // Extract dates from all items (press recency benefits from full date range)
+      const dateText = $item.find('pubDate').text()
+        || $item.find('published').text()
+        || $item.find('updated').text();
+      if (dateText) {
+        const d = new Date(dateText.trim());
+        if (!isNaN(d.getTime())) dates.push(d);
+      }
     }
 
-    return { itemCount: totalItems, dates };
+    return {
+      itemCount: pressCount > 0 ? pressCount : totalCount,
+      totalFeedItems: totalCount,
+      dates,
+    };
   } catch {
     return null;
   }
