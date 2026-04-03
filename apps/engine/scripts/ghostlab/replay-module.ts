@@ -35,7 +35,7 @@ const MODULE_EXECUTORS: Record<string, () => Promise<{ execute: (ctx: ModuleCont
   M19: () => import('../../src/modules/passive/m19-support-success.js'),
 };
 
-const KNOWN_SITES = ['senzary.com', 'ryder.com', 'investpr.org'];
+const KNOWN_SITES = ['senzary.com', 'ryder.com', 'investpr.org', 'mmm-pr.com'];
 
 // ── Args ──────────────────────────────────────────────────────────────────────
 
@@ -134,7 +134,6 @@ function createProbeHandlers(probesFixture: HttpProbesFixture) {
   handlers.push(
     http.get(`https://${baseHost}/*`, ({ request }) => {
       const fullUrl = request.url;
-      // Try exact match first (includes query params)
       let data = probeLookup.get(fullUrl);
       // Try without trailing slash
       if (!data) data = probeLookup.get(fullUrl.replace(/\/$/, ''));

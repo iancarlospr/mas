@@ -2,44 +2,33 @@
   "moduleId": "M16",
   "status": "success",
   "data": {
-    "detected_language": "en",
-    "media_logos_main_page": true,
+    "detected_language": "es",
     "external_newsroom": null,
     "external_article_count": null,
     "found_pages": [
-      "https://www.investpr.org/news/"
+      "https://www.mmm-pr.com/sobre-mmm/enterate"
     ],
-    "press_page_url": "https://www.investpr.org/news/",
-    "press_page_type": "news/",
+    "press_page_url": "https://www.mmm-pr.com/sobre-mmm/enterate",
+    "press_page_type": "sobre-mmm/enterate",
     "press_contact_email": null,
     "press_contact_phone": null,
     "media_kit_url": null,
     "rss_feed": null,
-    "media_logos": true,
-    "most_recent_date": "2026-03-16T04:00:00.000Z",
-    "oldest_date": "2024-10-14",
-    "date_count": 11,
-    "article_count": 66,
+    "media_logos": false,
+    "most_recent_date": null,
+    "oldest_date": null,
+    "date_count": 0,
+    "article_count": 28,
     "wire_services": [],
     "press_schema_types": [],
-    "main_page_press_links": [
-      "https://www.investpr.org/news",
-      "https://www.investpr.org/news/"
-    ]
+    "main_page_press_links": []
   },
   "signals": [
     {
       "type": "press_page",
       "name": "Press/Newsroom Page",
       "confidence": 0.95,
-      "evidence": "Press page found at https://www.investpr.org/news/",
-      "category": "seo_content"
-    },
-    {
-      "type": "media_logos",
-      "name": "Media Mention Logos",
-      "confidence": 0.7,
-      "evidence": "Media mention / \"As seen in\" logos detected",
+      "evidence": "Press page found at https://www.mmm-pr.com/sobre-mmm/enterate",
       "category": "seo_content"
     }
   ],
@@ -49,8 +38,8 @@
       "id": "m16-press-page",
       "name": "Press/newsroom page",
       "weight": 0.5,
-      "health": "excellent",
-      "evidence": "Dedicated press page with recent releases (last: 2026-03-16)"
+      "health": "good",
+      "evidence": "Press page found at https://www.mmm-pr.com/sobre-mmm/enterate"
     },
     {
       "id": "m16-media-contact",
@@ -69,23 +58,23 @@
     {
       "id": "m16-media-logos",
       "name": "\"As seen in\" logos",
-      "weight": 0.3,
-      "health": "excellent",
-      "evidence": "Media mention logos or \"As seen in\" section detected"
+      "weight": 0,
+      "health": "info",
+      "evidence": "No media mention logos detected"
     },
     {
       "id": "m16-press-recency",
       "name": "Press release recency",
-      "weight": 0.4,
-      "health": "excellent",
-      "evidence": "Most recent press content within 3 months (2026-03-16)"
+      "weight": 0,
+      "health": "info",
+      "evidence": "No dateable press content found"
     }
   ],
   "duration": 0,
   "_replay": {
-    "site": "investpr.org",
+    "site": "mmm-pr.com",
     "moduleId": "M16",
-    "elapsed": 126,
-    "replayedAt": "2026-04-03T22:19:13.842Z"
+    "elapsed": 102,
+    "replayedAt": "2026-04-03T22:19:14.677Z"
   }
 }

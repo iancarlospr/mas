@@ -1,0 +1,16 @@
+{
+  "records": {
+    "A": [],
+    "AAAA": [],
+    "MX": [],
+    "NS": [],
+    "TXT": [],
+    "CNAME": [],
+    "SOA": null,
+    "CAA": []
+  },
+  "dkim": {},
+  "dmarc": null,
+  "spf": null,
+  "capturedAt": "2026-04-03"
+}

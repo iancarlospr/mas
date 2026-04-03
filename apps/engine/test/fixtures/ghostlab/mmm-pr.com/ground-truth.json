@@ -1,0 +1,23 @@
+{
+  "site": "mmm-pr.com",
+  "verifiedAt": "2026-04-03",
+  "notes": "MMM Healthcare - Puerto Rico Medicare insurance. Spanish-language site. Press center at /sobre-mmm/enterate (redirected from /centro-prensa). 28 news articles across 10 pages (3 per page). Articles at /noticias/detalle?id=N. Media contacts: Glorimar Molina, Jonathan Bonet.",
+  "modules": {
+    "M16": {
+      "expectedData": {
+        "detected_language": { "value": "es", "match": "exact", "note": "Spanish site" },
+        "press_page_url": { "value": "enterate", "match": "contains", "note": "Press center at /sobre-mmm/enterate" },
+        "article_count": { "value": 28, "match": "exact", "note": "28 articles across 10 pages, 3 per page, ?page=N&per-page=3 pagination" }
+      },
+      "expectedCheckpoints": [
+        { "id": "m16-press-page", "expectedHealth": "excellent", "note": "Active press page with recent articles" },
+        { "id": "m16-media-contact", "expectedHealth": "excellent", "note": "Has press contacts with email and phone" },
+        { "id": "m16-rss-feed", "expectedHealth": "info", "note": "No RSS on press page" },
+        { "id": "m16-media-logos", "expectedHealth": "info", "note": "No media logos" },
+        { "id": "m16-press-recency", "expectedHealth": "excellent", "note": "Recent articles" }
+      ],
+      "negativeAssertions": [],
+      "fixedBugs": []
+    }
+  }
+}

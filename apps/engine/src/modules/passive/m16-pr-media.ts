@@ -687,45 +687,78 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
     }
 
     if (paginationStyle && maxPage >= 2) {
-      // Collect unique article URLs across all pages using a Set
       const pressPath = new URL(pressUrl).pathname.replace(/\/$/, '');
-      // Match article slugs: must be at least 8 chars to avoid false positives like /news/page, /news/home
-      const articleSlugPattern = new RegExp(
-        `href="[^"]*${pressPath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}/([a-z0-9][-a-z0-9]{7,})/?(?:[?#"][^"]*)?"`,
-        'gi',
-      );
+      const pressOrigin = new URL(pressUrl).origin;
 
-      // Extract unique slugs from page 1
-      const allSlugs = new Set<string>();
-      let match: RegExpExecArray | null;
-      while ((match = articleSlugPattern.exec(bestPressPage.html)) !== null) {
-        allSlugs.add(match[1]!);
+      // Count unique article links across all paginated pages.
+      // Handles: /press-path/slug, /noticias/detalle?id=N, and "read more" links
+      function extractArticleUrls(pageHtml: string): Set<string> {
+        const urls = new Set<string>();
+        let m: RegExpExecArray | null;
+
+        // Pattern 1: slug-based articles under press path
+        const slugPattern = new RegExp(
+          `href="[^"]*${pressPath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}/([a-z0-9][-a-z0-9]{7,})/?[^"]*"`, 'gi',
+        );
+        while ((m = slugPattern.exec(pageHtml)) !== null) urls.add(m[1]!);
+
+        // Pattern 2: id-based article detail pages (?id=N)
+        const idPattern = /href="[^"]*(?:detalle|detail|noticia|article)\?id=(\d+)[^"]*"/gi;
+        while ((m = idPattern.exec(pageHtml)) !== null) urls.add(`id-${m[1]}`);
+
+        // Pattern 3: "read more" / "leer más" links
+        const readMorePattern = /href="([^"]+)"[^>]*>\s*(?:(?:LEER|Leer|leer)\s+(?:MÁS|más)|(?:READ|Read|read)\s+(?:MORE|more))/gi;
+        while ((m = readMorePattern.exec(pageHtml)) !== null) {
+          const href = m[1]!;
+          // If the URL contains an id= param, normalize to id-N to dedup with pattern 2
+          const idMatch = href.match(/[?&]id=(\d+)/);
+          if (idMatch) {
+            urls.add(`id-${idMatch[1]}`);
+          } else {
+            try {
+              const u = href.startsWith('http') ? new URL(href) : new URL(href, pressOrigin);
+              urls.add(u.pathname + u.search);
+            } catch { urls.add(href); }
+          }
+        }
+        return urls;
       }
 
-      // Crawl remaining pages
-      for (let p = 2; p <= Math.min(maxPage + 2, 50); p++) {
+      // Page 1
+      let allArticles: Set<string>;
+      try {
+        allArticles = extractArticleUrls(bestPressPage.html);
+      } catch {
+        allArticles = new Set();
+      }
+
+      // Detect per-page param (e.g., per-page=3). HTML may encode & as &amp;
+      const perPageMatch = bestPressPage.html.match(/(?:[?&]|&amp;)(per-page|per_page|pagesize)=(\d+)/i);
+      const perPageParam = perPageMatch ? `&${perPageMatch[1]}=${perPageMatch[2]}` : '';
+
+      // Crawl remaining pages — keep going until no new articles found
+      // (maxPage from page 1 may only show the next page link, not all pages)
+      for (let p = 2; p <= 50; p++) {
         try {
+          // Construct pagination URL: preserve trailing slash if original had one, omit if not
+          const cleanPressUrl = pressUrl.replace(/\/$/, '');
+          const sep = pressUrl.endsWith('/') ? '/?' : '?';
           const pageUrl = paginationStyle === 'query'
-            ? `${pressUrl.replace(/\/$/, '')}/?${queryParam}=${p}`
-            : `${pressUrl.replace(/\/$/, '')}/page/${p}/`;
+            ? `${cleanPressUrl}${sep}${queryParam}=${p}${perPageParam}`
+            : `${cleanPressUrl}/page/${p}/`;
           const pageResult = await fetchWithRetry(pageUrl, { timeout: 8_000, retries: 0 });
           if (!pageResult.ok || pageResult.body.length < 500) break;
 
-          const pageSlugs = new Set<string>();
-          const pagePattern = new RegExp(articleSlugPattern.source, 'gi');
-          while ((match = pagePattern.exec(pageResult.body)) !== null) {
-            pageSlugs.add(match[1]!);
-          }
-          if (pageSlugs.size === 0) break;
-          for (const s of pageSlugs) allSlugs.add(s);
+          const prevSize = allArticles.size;
+          for (const a of extractArticleUrls(pageResult.body)) allArticles.add(a);
+          if (allArticles.size === prevSize) break;
         } catch {
           break;
         }
       }
 
-      // Pagination slug count is the most accurate — use it when available
-      if (allSlugs.size > 0) {
-        totalArticleCount = allSlugs.size;
+      if (allArticles.size > 0) {
+        totalArticleCount = allArticles.size;
       }
     }
   }
