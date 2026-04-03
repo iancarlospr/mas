@@ -1,0 +1,40 @@
+{
+  "module": "M16",
+  "site": "mmm-pr.com",
+  "dataAccuracy": {
+    "score": 100,
+    "matched": 3,
+    "total": 3,
+    "details": []
+  },
+  "checkpointAccuracy": {
+    "score": 40,
+    "matched": 2,
+    "total": 5,
+    "details": [
+      "  checkpoint m16-press-page: expected excellent, got good (Active press page with recent articles)",
+      "  checkpoint m16-media-contact: expected excellent, got info (Has press contacts with email and phone)",
+      "  checkpoint m16-press-recency: expected excellent, got info (Recent articles)"
+    ]
+  },
+  "falsePositiveRate": {
+    "score": 100,
+    "matched": 0,
+    "total": 0,
+    "details": []
+  },
+  "regressionGuard": {
+    "score": 100,
+    "matched": 0,
+    "total": 0,
+    "details": []
+  },
+  "completeness": {
+    "score": 100,
+    "matched": 5,
+    "total": 5,
+    "details": []
+  },
+  "overall": 85,
+  "scoredAt": "2026-04-03T23:35:10.414Z"
+}

@@ -1,0 +1,131 @@
+{
+  "site": "senzary.com",
+  "capturedAt": "2026-04-03T23:28:05.400Z",
+  "capturedBy": "capture-ground-truth.ts (browser-verified)",
+  "baseUrl": "https://www.senzary.com/",
+  "modules": {
+    "M01": {
+      "spf": true,
+      "spfRecord": "v=spf1 include:_spf.google.com include:spf.protection.outlook.com include:sender.zohobooks.com include:transmail.net include:_spf.atlassian.net include:_spf.perfora.net include:_spf.customer-server.com -all",
+      "dmarc": true,
+      "dmarcPolicy": "none",
+      "hasMx": true,
+      "mxCount": 3,
+      "hasHsts": true,
+      "hasCsp": true,
+      "hasXfo": true,
+      "hasXcto": true,
+      "hasReferrerPolicy": false,
+      "hasPermissionsPolicy": false,
+      "serverHeader": "Sucuri/Cloudproxy"
+    },
+    "M02": {
+      "isWordPress": true,
+      "hasGeneratorMeta": true,
+      "generator": "Site Kit by Google 1.175.0",
+      "serverHeader": "Sucuri/Cloudproxy",
+      "hasCfRay": false,
+      "cdn": "Sucuri",
+      "compression": "gzip"
+    },
+    "M04": {
+      "title": "Home - SENZARY LLC",
+      "metaDescription": "Revolutionize your industrial operations with Senzary's cutting-edge telemetry and IoT solutions. From smart manufacturing to predictive maintenance, we optimize efficiency, reduce costs, and drive innovation across industries.",
+      "canonical": "https://www.senzary.com/",
+      "htmlLang": "en-US",
+      "viewport": "width=device-width, initial-scale=1",
+      "charset": "UTF-8",
+      "ogTagCount": 7,
+      "hasOgImage": true,
+      "jsonLdCount": 1,
+      "hasRobotsTxt": true,
+      "hasSitemap": false
+    },
+    "M16": {
+      "pressLinksFound": 4,
+      "pressLinks": [
+        {
+          "href": "https://www.senzary.com/about/news/",
+          "text": "News"
+        },
+        {
+          "href": "https://www.senzary.com/about/news/",
+          "text": "News"
+        },
+        {
+          "href": "https://www.senzary.com/about/news/",
+          "text": "News"
+        },
+        {
+          "href": "https://www.senzary.com/about/news/",
+          "text": "News"
+        }
+      ],
+      "pressPageUrl": "https://www.senzary.com/about/news/",
+      "visibleArticleCount": 19,
+      "countStrategies": [
+        {
+          "name": "article",
+          "count": 6
+        },
+        {
+          "name": "articleLinks",
+          "count": 19
+        },
+        {
+          "name": "dates",
+          "count": 5
+        }
+      ],
+      "pagination": {
+        "hasLoadMore": false,
+        "hasPagination": false,
+        "maxPage": 0,
+        "pageLinksCount": 0,
+        "wpPagesCount": 0
+      },
+      "externalNewsroom": null,
+      "rssFeed": "https://www.senzary.com/feed/",
+      "mediaContactEmail": null,
+      "hasMediaLogos": false,
+      "isWordPress": true,
+      "wpPressCategoryId": 93,
+      "wpPressCategorySlug": "news",
+      "wpPressCategoryCount": 1,
+      "wpVerifiedCount": 1
+    },
+    "M17": {
+      "careersLinksFound": 4,
+      "careersLinks": [
+        {
+          "href": "https://www.senzary.com/solutions/facilities-job-site-management/",
+          "text": "Facilities & Job Site Management"
+        },
+        {
+          "href": "https://www.senzary.com/solutions/facilities-job-site-management/",
+          "text": "Facilities & Job Site Management"
+        },
+        {
+          "href": "https://www.senzary.com/solutions/facilities-job-site-management/",
+          "text": "Facilities & Job Site Management"
+        },
+        {
+          "href": "https://www.senzary.com/solutions/facilities-job-site-management/",
+          "text": "Facilities & Job Site Management"
+        }
+      ],
+      "hasCareersPage": true
+    },
+    "M18": {
+      "irLinksFound": 0,
+      "hasIrPage": false,
+      "ticker": null
+    },
+    "M19": {
+      "supportLinksFound": 4,
+      "hasSupportPage": true,
+      "hasPhone": false,
+      "emails": []
+    }
+  }
+}

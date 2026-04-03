@@ -1,0 +1,205 @@
+{
+  "moduleId": "M02",
+  "status": "success",
+  "data": {
+    "detectedTechnologies": [
+      {
+        "id": "cloudflare",
+        "name": "Cloudflare",
+        "category": "cdn",
+        "confidence": 1
+      },
+      {
+        "id": "ga4",
+        "name": "Google Analytics 4",
+        "category": "analytics",
+        "confidence": 1
+      }
+    ],
+    "cms": null,
+    "cdn": {
+      "id": "cloudflare",
+      "name": "Cloudflare",
+      "confidence": 1
+    },
+    "framework": null,
+    "hosting": {
+      "id": "cloudflare",
+      "name": "Cloudflare",
+      "confidence": 0.85,
+      "source": "headers"
+    },
+    "language": null,
+    "buildTool": null,
+    "server": {
+      "id": "cloudflare",
+      "name": "cloudflare",
+      "version": null,
+      "os": null
+    },
+    "poweredBy": null,
+    "compression": "gzip",
+    "httpVersion": "HTTP/2",
+    "trackingIds": [
+      {
+        "tool": "Google Analytics 4",
+        "id": "G-LSGK7XRHJF",
+        "type": "analytics"
+      }
+    ],
+    "thirdPartyDomains": [
+      {
+        "domain": "figma.com",
+        "type": "script",
+        "urls": [
+          "https://www.figma.com"
+        ],
+        "service": null
+      },
+      {
+        "domain": "googletagmanager.com",
+        "type": "script",
+        "urls": [
+          "https://www.googletagmanager.com/gtag/js?id=G-LSGK7XRHJF"
+        ],
+        "service": "Google Tag Manager"
+      }
+    ],
+    "cache": {
+      "cacheStatus": "hit",
+      "age": null,
+      "cacheControl": "public, max-age=10",
+      "edgeLocation": "SJU",
+      "etag": true,
+      "lastModified": true,
+      "vary": null
+    },
+    "cssClassFingerprints": null,
+    "inlineConfigFrameworks": null
+  },
+  "signals": [
+    {
+      "type": "technology",
+      "name": "Cloudflare",
+      "confidence": 1,
+      "evidence": "Detected via fingerprint matching (category: cdn)",
+      "category": "cdn"
+    },
+    {
+      "type": "technology",
+      "name": "Google Analytics 4",
+      "confidence": 1,
+      "evidence": "Detected via fingerprint matching (category: analytics)",
+      "category": "analytics"
+    },
+    {
+      "type": "server",
+      "name": "cloudflare",
+      "confidence": 0.95,
+      "evidence": "Detected from Server HTTP header",
+      "category": "server"
+    },
+    {
+      "type": "compression",
+      "name": "gzip",
+      "confidence": 1,
+      "evidence": "Detected from content-encoding HTTP header",
+      "category": "infrastructure"
+    },
+    {
+      "type": "protocol",
+      "name": "HTTP/2",
+      "confidence": 0.9,
+      "evidence": "Detected from HTTP response headers (alt-svc / protocol hints)",
+      "category": "infrastructure"
+    },
+    {
+      "type": "hosting",
+      "name": "Cloudflare",
+      "confidence": 0.85,
+      "evidence": "Inferred from server header and CDN-specific response headers",
+      "category": "infrastructure"
+    },
+    {
+      "type": "tracking",
+      "name": "Google Analytics 4: G-LSGK7XRHJF",
+      "confidence": 0.95,
+      "evidence": "analytics ID extracted from HTML/inline scripts",
+      "category": "marketing"
+    }
+  ],
+  "score": null,
+  "checkpoints": [
+    {
+      "id": "m02-cms-identified",
+      "name": "CMS identified",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No CMS detected; site may use a custom or headless solution."
+    },
+    {
+      "id": "m02-cms-version-currency",
+      "name": "CMS version currency",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No CMS version information available."
+    },
+    {
+      "id": "m02-cdn-detected",
+      "name": "CDN detected",
+      "weight": 0.6,
+      "health": "excellent",
+      "evidence": "Enterprise CDN detected: Cloudflare (via fingerprint)"
+    },
+    {
+      "id": "m02-https-enforced",
+      "name": "HTTPS enforced",
+      "weight": 0.8,
+      "health": "excellent",
+      "evidence": "HTTPS active with HSTS header: max-age=2628000"
+    },
+    {
+      "id": "m02-http-version",
+      "name": "HTTP/2 or HTTP/3",
+      "weight": 0.5,
+      "health": "good",
+      "evidence": "HTTP/2 detected."
+    },
+    {
+      "id": "m02-compression",
+      "name": "Compression",
+      "weight": 0.6,
+      "health": "good",
+      "evidence": "Gzip compression detected on the initial HTML response.",
+      "recommendation": "Consider enabling Brotli compression for ~15-20% smaller payloads compared to gzip."
+    },
+    {
+      "id": "m02-server-header-exposure",
+      "name": "Server header exposure",
+      "weight": 0.4,
+      "health": "good",
+      "evidence": "Server header present without version: cloudflare"
+    },
+    {
+      "id": "m02-framework-detected",
+      "name": "Framework detected",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No frontend framework detected."
+    },
+    {
+      "id": "m02-hosting-identified",
+      "name": "Hosting identified",
+      "weight": 0,
+      "health": "info",
+      "evidence": "Hosting: Cloudflare (detected from response headers)"
+    }
+  ],
+  "duration": 22,
+  "_replay": {
+    "site": "brainhi.com",
+    "moduleId": "M02",
+    "elapsed": 22,
+    "replayedAt": "2026-04-03T23:34:58.970Z"
+  }
+}

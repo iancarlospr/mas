@@ -1,0 +1,354 @@
+{
+  "moduleId": "M04",
+  "status": "success",
+  "data": {
+    "title": {
+      "content": "BrainHi",
+      "length": 7
+    },
+    "metaDescription": {
+      "content": "BrainHi es la plataforma líder de inteligencia artificial en Puerto Rico para el sector salud, diseñada para ayudar a clínicas y oficinas médicas a recuperar llamadas perdidas, coordinar citas y mejorar la experiencia del paciente.\nNuestra tecnología trabaja 24/7, reduce la carga administrativa, aumenta la eficiencia y garantiza que ningún paciente quede sin atender —todo con cumplimiento HIPAA y SOC-2, y un enfoque en atención humana y responsable.",
+      "length": 453
+    },
+    "canonical": null,
+    "ogTags": {
+      "og:title": "BrainHi",
+      "og:description": "BrainHi es la plataforma líder de inteligencia artificial en Puerto Rico para el sector salud, diseñada para ayudar a clínicas y oficinas médicas a recuperar llamadas perdidas, coordinar citas y mejorar la experiencia del paciente.\nNuestra tecnología trabaja 24/7, reduce la carga administrativa, aumenta la eficiencia y garantiza que ningún paciente quede sin atender —todo con cumplimiento HIPAA y SOC-2, y un enfoque en atención humana y responsable.",
+      "og:type": "website",
+      "og:url": "https://brainhi.com/",
+      "og:site_name": "BrainHi"
+    },
+    "twitterCards": {
+      "twitter:card": "summary_large_image",
+      "twitter:url": "https://brainhi.com/",
+      "twitter:title": "BrainHi",
+      "twitter:description": "BrainHi es la plataforma líder de inteligencia artificial en Puerto Rico para el sector salud, diseñada para ayudar a clínicas y oficinas médicas a recuperar llamadas perdidas, coordinar citas y mejorar la experiencia del paciente.\nNuestra tecnología trabaja 24/7, reduce la carga administrativa, aumenta la eficiencia y garantiza que ningún paciente quede sin atender —todo con cumplimiento HIPAA y SOC-2, y un enfoque en atención humana y responsable."
+    },
+    "jsonLd": {
+      "raw": [],
+      "types": [],
+      "organizationName": null,
+      "organizationLogo": null,
+      "socialProfiles": [],
+      "contactPoints": [],
+      "websiteName": null,
+      "hasSearchAction": false
+    },
+    "robotsTxt": {
+      "present": false,
+      "blocked": false,
+      "sitemapUrls": [],
+      "disallowedPaths": [],
+      "userAgentCount": 0
+    },
+    "sitemap": {
+      "present": false,
+      "source": null
+    },
+    "llmsTxt": {
+      "present": false
+    },
+    "manifest": {
+      "present": false
+    },
+    "favicon": {
+      "present": true,
+      "formats": [
+        {
+          "rel": "icon",
+          "href": "/_assets/v11/2c08f9b1fa12dd06545761847c920d0434a9f6c6.png"
+        }
+      ]
+    },
+    "htmlLang": "en",
+    "hreflang": [],
+    "preconnectHints": [
+      "/_runtimes/sites-runtime.3d8ed699d1738407521952282d02a53e7f2815ba3208db7062959ace465d6fc2.js",
+      "/_components/v2/725b3daf9fedf7c9d886eae8ac595a230f54359e.js",
+      "/_json/cbc57ae5-3b42-4dbd-895a-c9046836403b/_index.json"
+    ],
+    "metaTags": {
+      "viewport": "width=device-width, initial-scale=1",
+      "color-scheme": "light dark",
+      "description": "BrainHi es la plataforma líder de inteligencia artificial en Puerto Rico para el sector salud, diseñada para ayudar a clínicas y oficinas médicas a recuperar llamadas perdidas, coordinar citas y mejorar la experiencia del paciente.\nNuestra tecnología trabaja 24/7, reduce la carga administrativa, aumenta la eficiencia y garantiza que ningún paciente quede sin atender —todo con cumplimiento HIPAA y SOC-2, y un enfoque en atención humana y responsable.",
+      "title": "BrainHi",
+      "robots": "index,follow",
+      "twitter:card": "summary_large_image",
+      "twitter:url": "https://brainhi.com/",
+      "twitter:title": "BrainHi",
+      "twitter:description": "BrainHi es la plataforma líder de inteligencia artificial en Puerto Rico para el sector salud, diseñada para ayudar a clínicas y oficinas médicas a recuperar llamadas perdidas, coordinar citas y mejorar la experiencia del paciente.\nNuestra tecnología trabaja 24/7, reduce la carga administrativa, aumenta la eficiencia y garantiza que ningún paciente quede sin atender —todo con cumplimiento HIPAA y SOC-2, y un enfoque en atención humana y responsable.",
+      "og:title": "BrainHi",
+      "og:description": "BrainHi es la plataforma líder de inteligencia artificial en Puerto Rico para el sector salud, diseñada para ayudar a clínicas y oficinas médicas a recuperar llamadas perdidas, coordinar citas y mejorar la experiencia del paciente.\nNuestra tecnología trabaja 24/7, reduce la carga administrativa, aumenta la eficiencia y garantiza que ningún paciente quede sin atender —todo con cumplimiento HIPAA y SOC-2, y un enfoque en atención humana y responsable.",
+      "og:type": "website",
+      "og:url": "https://brainhi.com/",
+      "og:site_name": "BrainHi"
+    },
+    "robotsDirectives": {
+      "metaRobots": "index,follow",
+      "xRobotsTag": null,
+      "noindex": false,
+      "nofollow": false
+    },
+    "viewport": {
+      "content": "width=device-width, initial-scale=1",
+      "hasWidth": true,
+      "hasInitialScale": true
+    },
+    "charset": {
+      "charset": "utf-8",
+      "source": "meta"
+    },
+    "adsTxt": {
+      "present": false,
+      "blocked": false
+    },
+    "alternateLinks": [],
+    "pagination": {
+      "next": null,
+      "prev": null
+    },
+    "openSearch": {
+      "present": false
+    },
+    "isAMP": false,
+    "structuredData": {
+      "microdata": [],
+      "rdfa": [],
+      "richSnippetEligibility": [],
+      "validationErrors": [],
+      "totalItems": 0
+    },
+    "robotsTxtAnalysis": {},
+    "viewportConfig": {
+      "content": "width=device-width, initial-scale=1",
+      "hasWidth": true,
+      "hasInitialScale": true,
+      "attributes": {
+        "width": "device-width",
+        "initial-scale": "1"
+      },
+      "blocksZoom": false,
+      "isOptimal": true
+    }
+  },
+  "signals": [
+    {
+      "type": "seo",
+      "name": "title-tag",
+      "confidence": 0.95,
+      "evidence": "Title: \"BrainHi\" (7 chars)",
+      "category": "seo_content"
+    },
+    {
+      "type": "seo",
+      "name": "meta-description",
+      "confidence": 0.95,
+      "evidence": "Meta description present (453 chars)",
+      "category": "seo_content"
+    },
+    {
+      "type": "social",
+      "name": "open-graph",
+      "confidence": 0.95,
+      "evidence": "5 OG tags: og:title, og:description, og:type, og:url, og:site_name",
+      "category": "seo_content"
+    },
+    {
+      "type": "social",
+      "name": "twitter-card",
+      "confidence": 0.95,
+      "evidence": "Twitter Card: summary_large_image",
+      "category": "seo_content"
+    },
+    {
+      "type": "branding",
+      "name": "favicon",
+      "confidence": 0.9,
+      "evidence": "Favicon formats: icon",
+      "category": "brand_presence"
+    },
+    {
+      "type": "i18n",
+      "name": "html-lang",
+      "confidence": 0.95,
+      "evidence": "HTML lang=\"en\"",
+      "category": "seo_content"
+    },
+    {
+      "type": "performance",
+      "name": "resource-hints",
+      "confidence": 0.85,
+      "evidence": "3 resource hint(s)",
+      "category": "performance_experience"
+    }
+  ],
+  "score": null,
+  "checkpoints": [
+    {
+      "id": "M04-TITLE",
+      "name": "Title Tag",
+      "weight": 0.7,
+      "health": "warning",
+      "evidence": "Title very short (7 chars): \"BrainHi\"",
+      "recommendation": "Expand the title tag to 30-60 characters for better SEO impact."
+    },
+    {
+      "id": "M04-META-DESC",
+      "name": "Meta Description",
+      "weight": 0.6,
+      "health": "warning",
+      "evidence": "Meta description length suboptimal (453 chars)",
+      "recommendation": "Adjust meta description to 120-160 characters for optimal search result snippets."
+    },
+    {
+      "id": "M04-CANONICAL",
+      "name": "Canonical URL",
+      "weight": 0.7,
+      "health": "critical",
+      "evidence": "No canonical URL found",
+      "recommendation": "Add a <link rel=\"canonical\"> tag to prevent duplicate content issues."
+    },
+    {
+      "id": "M04-OG-TAGS",
+      "name": "Open Graph Tags",
+      "weight": 0.6,
+      "health": "good",
+      "evidence": "5/6 core OG tags present. Missing: og:image",
+      "recommendation": "Add missing OG tags: og:image"
+    },
+    {
+      "id": "M04-OG-IMAGE",
+      "name": "OG Image",
+      "weight": 0.5,
+      "health": "critical",
+      "evidence": "No og:image tag found",
+      "recommendation": "Add an og:image tag with a high-quality image (1200x630 recommended) for social sharing."
+    },
+    {
+      "id": "M04-TWITTER",
+      "name": "Twitter Card",
+      "weight": 0.4,
+      "health": "good",
+      "evidence": "Twitter Card type \"summary_large_image\" present",
+      "recommendation": "Add all Twitter Card fields (twitter:title, twitter:description, twitter:image, twitter:site)."
+    },
+    {
+      "id": "M04-SCHEMA",
+      "name": "Schema.org / JSON-LD",
+      "weight": 0.8,
+      "health": "critical",
+      "evidence": "No structured data (JSON-LD) found",
+      "recommendation": "Add Schema.org JSON-LD structured data (Organization, WebSite, and content-specific types) for enhanced search results."
+    },
+    {
+      "id": "M04-ROBOTS",
+      "name": "robots.txt",
+      "weight": 0.5,
+      "health": "critical",
+      "evidence": "No robots.txt found",
+      "recommendation": "Create a robots.txt file to guide search engine crawlers and reference your sitemap."
+    },
+    {
+      "id": "M04-SITEMAP",
+      "name": "Sitemap.xml",
+      "weight": 0.6,
+      "health": "critical",
+      "evidence": "No sitemap found (checked /sitemap.xml, /sitemap_index.xml, /sitemap-index.xml, and robots.txt references)",
+      "recommendation": "Create an XML sitemap to help search engines discover and index all pages."
+    },
+    {
+      "id": "M04-FAVICON",
+      "name": "Favicon",
+      "weight": 0.3,
+      "health": "warning",
+      "evidence": "Single favicon found: icon",
+      "recommendation": "Add multiple favicon sizes and an apple-touch-icon for cross-device support."
+    },
+    {
+      "id": "M04-LANG",
+      "name": "Language (html lang)",
+      "weight": 0.4,
+      "health": "good",
+      "evidence": "Language attribute present: lang=\"en\"",
+      "recommendation": "Consider using a more specific locale (e.g., \"en-US\" instead of \"en\")."
+    },
+    {
+      "id": "M04-HREFLANG",
+      "name": "Hreflang Tags",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No hreflang tags found (informational -- may be a single-language site)"
+    },
+    {
+      "id": "M04-PRECONNECT",
+      "name": "Preconnect Hints",
+      "weight": 0.3,
+      "health": "excellent",
+      "evidence": "3 resource hints found: /_runtimes/sites-runtime.3d8ed699d1738407521952282d02a53e7f2815ba3208db7062959ace465d6fc2.js, /_components/v2/725b3daf9fedf7c9d886eae8ac595a230f54359e.js, /_json/cbc57ae5-3b42-4dbd-895a-c9046836403b/_index.json"
+    },
+    {
+      "id": "M04-LLMS-TXT",
+      "name": "llms.txt",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No llms.txt found (informational -- optional emerging standard for LLM guidance)"
+    },
+    {
+      "id": "M04-MANIFEST",
+      "name": "manifest.json (PWA)",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No manifest.json found (informational -- required only for PWA installability)"
+    },
+    {
+      "id": "M04-ROBOTS-DIRECTIVES",
+      "name": "Robots Directives",
+      "weight": 0.6,
+      "health": "excellent",
+      "evidence": "Robots directives present: index,follow"
+    },
+    {
+      "id": "M04-VIEWPORT",
+      "name": "Viewport Meta",
+      "weight": 0.6,
+      "health": "excellent",
+      "evidence": "Viewport configured: width=device-width, initial-scale=1"
+    },
+    {
+      "id": "M04-CHARSET",
+      "name": "Character Encoding",
+      "weight": 0.3,
+      "health": "excellent",
+      "evidence": "UTF-8 charset declared via meta: utf-8"
+    },
+    {
+      "id": "M04-ADS-TXT",
+      "name": "ads.txt",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No ads.txt found (informational — required only for sites running programmatic advertising)"
+    },
+    {
+      "id": "m04-structured-data",
+      "name": "Structured Data Coverage",
+      "weight": 0.5,
+      "health": "warning",
+      "evidence": "No structured data found (JSON-LD, Microdata, or RDFa)",
+      "recommendation": "Add JSON-LD structured data (Organization, WebSite, BreadcrumbList at minimum) to improve search engine understanding."
+    },
+    {
+      "id": "M04-VIEWPORT-A11Y",
+      "name": "Viewport Accessibility",
+      "weight": 0.4,
+      "health": "excellent",
+      "evidence": "Viewport allows user zoom (content: \"width=device-width, initial-scale=1\")"
+    }
+  ],
+  "duration": 104,
+  "_replay": {
+    "site": "brainhi.com",
+    "moduleId": "M04",
+    "elapsed": 104,
+    "replayedAt": "2026-04-03T23:35:02.596Z"
+  }
+}

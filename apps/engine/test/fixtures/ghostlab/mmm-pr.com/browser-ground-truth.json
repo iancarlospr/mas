@@ -1,0 +1,117 @@
+{
+  "site": "mmm-pr.com",
+  "capturedAt": "2026-04-03T23:28:51.922Z",
+  "capturedBy": "capture-ground-truth.ts (browser-verified)",
+  "baseUrl": "https://www.mmm-pr.com/",
+  "modules": {
+    "M01": {
+      "spf": true,
+      "spfRecord": "v=spf1 include:spf-00235501.pphosted.com include:spf-001bee02.pphosted.com include:spf.protection.outlook.com -all",
+      "dmarc": true,
+      "dmarcPolicy": "reject",
+      "hasMx": false,
+      "hasHsts": true,
+      "hasCsp": false,
+      "hasXfo": true,
+      "hasXcto": false,
+      "hasReferrerPolicy": false,
+      "hasPermissionsPolicy": false,
+      "serverHeader": "Apache"
+    },
+    "M02": {
+      "isWordPress": false,
+      "hasGeneratorMeta": false,
+      "generator": null,
+      "serverHeader": "Apache",
+      "hasCfRay": false,
+      "cdn": null,
+      "compression": "gzip"
+    },
+    "M04": {
+      "title": "Medicare & Mucho Más",
+      "metaDescription": "MMM, PMC Medicare Choice y FIRST+PLUS, productos ofrecidos por MMM Healthcare, LLC, son planes con un contrato Medicare.",
+      "canonical": null,
+      "htmlLang": "es-ES",
+      "viewport": "width=device-width, initial-scale=1",
+      "charset": "UTF-8",
+      "ogTagCount": 5,
+      "hasOgImage": false,
+      "jsonLdCount": 0,
+      "hasRobotsTxt": true,
+      "hasSitemap": false
+    },
+    "M16": {
+      "pressLinksFound": 1,
+      "pressLinks": [
+        {
+          "href": "/sobre-mmm/enterate",
+          "text": "ENTÉRATE"
+        }
+      ],
+      "pressPageUrl": "https://www.mmm-pr.com/sobre-mmm/enterate",
+      "visibleArticleCount": 45,
+      "countStrategies": [
+        {
+          "name": "article",
+          "count": 3
+        },
+        {
+          "name": "articleLinks",
+          "count": 45
+        },
+        {
+          "name": "dates",
+          "count": 0
+        }
+      ],
+      "pagination": {
+        "hasLoadMore": true,
+        "hasPagination": false,
+        "maxPage": 0,
+        "pageLinksCount": 0,
+        "wpPagesCount": 0
+      },
+      "externalNewsroom": null,
+      "rssFeed": null,
+      "mediaContactEmail": null,
+      "hasMediaLogos": false
+    },
+    "M17": {
+      "careersLinksFound": 5,
+      "careersLinks": [
+        {
+          "href": "/unete",
+          "text": "SOLICITA ORIENTACIÓN"
+        },
+        {
+          "href": "/sobre-mmm/empleos",
+          "text": "EMPLEOS"
+        },
+        {
+          "href": "/unete",
+          "text": "ÚNETE"
+        },
+        {
+          "href": "https://mmm-pr.com/unete?utm_source=banner&utm_medium=5estrellas&utm_campaign=AEP26",
+          "text": ""
+        },
+        {
+          "href": "https://mmm-pr.com/unete?utm_source=banner&utm_medium=espejuelos&utm_campaign=AEP26",
+          "text": ""
+        }
+      ],
+      "hasCareersPage": true
+    },
+    "M18": {
+      "irLinksFound": 0,
+      "hasIrPage": false,
+      "ticker": null
+    },
+    "M19": {
+      "supportLinksFound": 1,
+      "hasSupportPage": true,
+      "hasPhone": true,
+      "emails": []
+    }
+  }
+}

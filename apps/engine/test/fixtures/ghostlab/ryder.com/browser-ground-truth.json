@@ -1,0 +1,137 @@
+{
+  "site": "ryder.com",
+  "capturedAt": "2026-04-03T23:28:18.966Z",
+  "capturedBy": "capture-ground-truth.ts (browser-verified)",
+  "baseUrl": "https://www.ryder.com/en-us",
+  "modules": {
+    "M01": {
+      "spf": true,
+      "spfRecord": "v=spf1 include:_spf-ssg-a.microsoft.com ip4:168.218.5.3 ip4:206.113.15.122 ip4:168.218.50.253 ip4:54.240.43.16 ip4:18.214.158.23 ip4:207.166.95.11 ip4:207.166.92.11 ip4:168.218.15.251 ~all",
+      "dmarc": true,
+      "dmarcPolicy": "quarantine",
+      "hasMx": true,
+      "mxCount": 1,
+      "hasHsts": true,
+      "hasCsp": false,
+      "hasXfo": false,
+      "hasXcto": false,
+      "hasReferrerPolicy": true,
+      "hasPermissionsPolicy": false,
+      "serverHeader": null
+    },
+    "M02": {
+      "isWordPress": false,
+      "hasGeneratorMeta": false,
+      "generator": null,
+      "serverHeader": null,
+      "hasCfRay": true,
+      "cdn": "Cloudflare",
+      "compression": "gzip"
+    },
+    "M04": {
+      "title": "Ryder | Logistics, Truck Leasing, Truck Rental, Used Truck Sales",
+      "metaDescription": "Ryder is the leader in fleet management solutions, as well as supply chain management and logistics for businesses of all sizes. Contact us today for a customized plan.",
+      "canonical": "https://www.ryder.com/en-us",
+      "htmlLang": "en-US",
+      "viewport": "width=device-width, initial-scale=1",
+      "charset": "utf-8",
+      "ogTagCount": 7,
+      "hasOgImage": true,
+      "jsonLdCount": 3,
+      "hasRobotsTxt": true,
+      "hasSitemap": false
+    },
+    "M16": {
+      "pressLinksFound": 6,
+      "pressLinks": [
+        {
+          "href": "/en-us/newsroom",
+          "text": "Newsroom"
+        },
+        {
+          "href": "https://newsroom.ryder.com/news/news-details/2026/Ryder-Recognized-With-Two-Honorees-as-2026-Top-Women-to-Watch-in-Trucking/default.aspx",
+          "text": "Ryder Recognized With Two Honorees as 2026 \"Top Women to Watch in Trucking\"Women"
+        },
+        {
+          "href": "https://newsroom.ryder.com/news/news-details/2026/Ryder-Recognized-With-Two-Honorees-as-2026-Top-Women-to-Watch-in-Trucking/default.aspx",
+          "text": "Learn more"
+        },
+        {
+          "href": "https://newsroom.ryder.com/news/news-details/2026/Ryder-to-Release-First-Quarter-2026-Earnings-on-April-23-2026/default.aspx",
+          "text": "Ryder to Release First Quarter 2026 Earnings on April 23, 2026Ryder System, Inc."
+        },
+        {
+          "href": "https://newsroom.ryder.com/news/news-details/2026/Ryder-to-Release-First-Quarter-2026-Earnings-on-April-23-2026/default.aspx",
+          "text": "Learn more"
+        }
+      ],
+      "pressPageUrl": "https://www.ryder.com/en-us/newsroom",
+      "visibleArticleCount": 101,
+      "countStrategies": [
+        {
+          "name": "article",
+          "count": 0
+        },
+        {
+          "name": "articleLinks",
+          "count": 101
+        },
+        {
+          "name": "dates",
+          "count": 8
+        }
+      ],
+      "pagination": {
+        "hasLoadMore": true,
+        "hasPagination": false,
+        "maxPage": 0,
+        "pageLinksCount": 0,
+        "wpPagesCount": 0
+      },
+      "externalNewsroom": "https://newsroom.ryder.com/news/news-details/2026/Ryder-Recognized-With-Two-Honorees-as-2026-Top-Women-to-Watch-in-Trucking/default.aspx",
+      "rssFeed": "/en-us/api/rssfeed/showrssfeed",
+      "mediaContactEmail": null,
+      "hasMediaLogos": false
+    },
+    "M17": {
+      "careersLinksFound": 5,
+      "careersLinks": [
+        {
+          "href": "/en-us/careers",
+          "text": "Careers"
+        },
+        {
+          "href": "https://newsroom.ryder.com/news/news-details/2026/Ryder-Recognized-With-Two-Honorees-as-2026-Top-Women-to-Watch-in-Trucking/default.aspx",
+          "text": "Ryder Recognized With Two Honorees as 2026 \"Top Women to Wat"
+        },
+        {
+          "href": "/en-us/careers",
+          "text": "Ryder Careers"
+        },
+        {
+          "href": "https://ryder-drivers.jobs/",
+          "text": "here"
+        },
+        {
+          "href": "/en-us/careers",
+          "text": "Ryder Careers"
+        }
+      ],
+      "hasCareersPage": true
+    },
+    "M18": {
+      "irLinksFound": 2,
+      "hasIrPage": true,
+      "ticker": {
+        "exchange": "NYSE",
+        "symbol": "R"
+      }
+    },
+    "M19": {
+      "supportLinksFound": 5,
+      "hasSupportPage": true,
+      "hasPhone": true,
+      "emails": []
+    }
+  }
+}

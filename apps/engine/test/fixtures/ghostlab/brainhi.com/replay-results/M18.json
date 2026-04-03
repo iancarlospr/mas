@@ -13,8 +13,8 @@
       "found": false,
       "evidence": "No annual report detected"
     },
-    "ticker_symbol": "R",
-    "stock_exchange": "NYSE",
+    "ticker_symbol": null,
+    "stock_exchange": null,
     "esg_report": {
       "found": false,
       "evidence": "No ESG/sustainability report detected"
@@ -29,7 +29,7 @@
       "evidence": "No earnings call information detected"
     },
     "ir_contact_email": null,
-    "external_ir_domain": "https://investors.ryder.com/ir-home/",
+    "external_ir_domain": null,
     "proxy_statement": {
       "found": false,
       "evidence": "No proxy statement detected"
@@ -58,15 +58,7 @@
       "evidence": "No upcoming investor events detected"
     }
   },
-  "signals": [
-    {
-      "type": "ticker_symbol",
-      "name": "Ticker: R",
-      "confidence": 0.85,
-      "evidence": "Stock ticker R on NYSE detected",
-      "category": "brand_presence"
-    }
-  ],
+  "signals": [],
   "score": null,
   "checkpoints": [
     {
@@ -88,7 +80,7 @@
       "name": "Ticker symbol",
       "weight": 0,
       "health": "info",
-      "evidence": "Stock ticker: R (NYSE)"
+      "evidence": "No stock ticker detected (may be a private company)"
     },
     {
       "id": "m18-esg-report",
@@ -114,9 +106,9 @@
   ],
   "duration": 0,
   "_replay": {
-    "site": "ryder.com",
+    "site": "brainhi.com",
     "moduleId": "M18",
-    "elapsed": 126,
-    "replayedAt": "2026-04-03T23:35:18.472Z"
+    "elapsed": 8,
+    "replayedAt": "2026-04-03T23:35:17.266Z"
   }
 }

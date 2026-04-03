@@ -220,7 +220,7 @@ async function verifyM16(page: Page, browser: Browser, domain: string, baseUrl: 
     const pressPage = await ctx.newPage();
 
     try {
-      await pressPage.goto(pressPageUrl, { waitUntil: 'networkidle', timeout: 20000 });
+      await pressPage.goto(pressPageUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
       await pressPage.waitForTimeout(2000); // let JS render
 
       // Count visible articles
@@ -522,10 +522,10 @@ async function captureGroundTruth(domain: string, browser: Browser): Promise<voi
 
     // Try www first, fall back to bare domain
     try {
-      await mainPage.goto(baseUrl, { waitUntil: 'networkidle', timeout: 20000 });
+      await mainPage.goto(baseUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
     } catch {
       baseUrl = `https://${domain}`;
-      await mainPage.goto(baseUrl, { waitUntil: 'networkidle', timeout: 20000 });
+      await mainPage.goto(baseUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
     }
 
     // Wait for JS rendering
@@ -593,7 +593,11 @@ async function main() {
 
   try {
     for (const site of sites) {
-      await captureGroundTruth(site, browser);
+      try {
+        await captureGroundTruth(site, browser);
+      } catch (err) {
+        console.error(`\n  ✗ FAILED for ${site}: ${(err as Error).message}`);
+      }
     }
     console.log('\n✓ All ground truth captured');
   } finally {

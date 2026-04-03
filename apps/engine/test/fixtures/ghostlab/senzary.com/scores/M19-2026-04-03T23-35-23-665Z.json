@@ -1,0 +1,43 @@
+{
+  "module": "M19",
+  "site": "senzary.com",
+  "dataAccuracy": {
+    "score": 100,
+    "matched": 1,
+    "total": 1,
+    "details": []
+  },
+  "checkpointAccuracy": {
+    "score": 100,
+    "matched": 1,
+    "total": 1,
+    "details": []
+  },
+  "falsePositiveRate": {
+    "score": 100,
+    "matched": 1,
+    "total": 1,
+    "details": []
+  },
+  "regressionGuard": {
+    "score": 100,
+    "matched": 2,
+    "total": 2,
+    "details": []
+  },
+  "completeness": {
+    "score": 100,
+    "matched": 1,
+    "total": 1,
+    "details": [
+      "  EXTRA checkpoint: m19-help-center (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: m19-status-page (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: m19-business-hours (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: m19-community-forum (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: m19-developer-docs (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: m19-training-academy (not in ground truth — add if expected)"
+    ]
+  },
+  "overall": 100,
+  "scoredAt": "2026-04-03T23:35:23.663Z"
+}

@@ -1,0 +1,112 @@
+{
+  "site": "investpr.org",
+  "capturedAt": "2026-04-03T23:28:32.315Z",
+  "capturedBy": "capture-ground-truth.ts (browser-verified)",
+  "baseUrl": "https://www.investpr.org/",
+  "modules": {
+    "M01": {
+      "spf": true,
+      "spfRecord": "v=spf1 ip4:172.96.170.178 include:spf.protection.outlook.com include:spf.mandrillapp.com include:50272966.spf10.hubspotemail.net a:dispatch-us.ppe-hosted.com -all",
+      "dmarc": true,
+      "dmarcPolicy": "none",
+      "hasMx": true,
+      "mxCount": 2,
+      "hasHsts": true,
+      "hasCsp": false,
+      "hasXfo": true,
+      "hasXcto": true,
+      "hasReferrerPolicy": true,
+      "hasPermissionsPolicy": false,
+      "serverHeader": "cloudflare"
+    },
+    "M02": {
+      "isWordPress": true,
+      "hasGeneratorMeta": true,
+      "generator": "WordPress Download Manager 6.8.9",
+      "serverHeader": "cloudflare",
+      "hasCfRay": true,
+      "cdn": "Cloudflare",
+      "compression": "br"
+    },
+    "M04": {
+      "title": "InvestPR | Accelerating Economic Growth in Puerto Rico - InvestPR",
+      "metaDescription": "Invest Puerto Rico’s goal is to facilitate and enhance the efforts of private, public, and nonprofit organizations and drive economic development in Puerto Rico.",
+      "canonical": "https://www.investpr.org/",
+      "htmlLang": "en-US",
+      "viewport": "width=device-width, initial-scale=1.0",
+      "charset": "UTF-8",
+      "ogTagCount": 10,
+      "hasOgImage": true,
+      "jsonLdCount": 1,
+      "hasRobotsTxt": true,
+      "hasSitemap": false
+    },
+    "M16": {
+      "pressLinksFound": 2,
+      "pressLinks": [
+        {
+          "href": "https://www.investpr.org/news",
+          "text": "In the News"
+        },
+        {
+          "href": "https://www.investpr.org/news/",
+          "text": "In the News"
+        }
+      ],
+      "pressPageUrl": "https://www.investpr.org/news",
+      "visibleArticleCount": 33,
+      "countStrategies": [
+        {
+          "name": "article",
+          "count": 0
+        },
+        {
+          "name": "articleLinks",
+          "count": 33
+        },
+        {
+          "name": "dates",
+          "count": 11
+        }
+      ],
+      "pagination": {
+        "hasLoadMore": false,
+        "hasPagination": true,
+        "maxPage": 6,
+        "pageLinksCount": 7,
+        "wpPagesCount": 0
+      },
+      "paginatedArticleCount": 64,
+      "externalNewsroom": null,
+      "rssFeed": null,
+      "mediaContactEmail": null,
+      "hasMediaLogos": true,
+      "isWordPress": true
+    },
+    "M17": {
+      "careersLinksFound": 2,
+      "careersLinks": [
+        {
+          "href": "https://www.investpr.org/about-investpr/careers/",
+          "text": "Careers"
+        },
+        {
+          "href": "https://www.investpr.org/about-investpr/careers/",
+          "text": "Careers"
+        }
+      ],
+      "hasCareersPage": true
+    },
+    "M18": {
+      "irLinksFound": 0,
+      "hasIrPage": false,
+      "ticker": null
+    },
+    "M19": {
+      "supportLinksFound": 5,
+      "hasSupportPage": true,
+      "hasPhone": true,
+      "emails": []
+    }
+  }
+}

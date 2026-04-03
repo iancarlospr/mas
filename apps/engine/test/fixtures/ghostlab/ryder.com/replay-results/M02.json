@@ -459,11 +459,11 @@
       "evidence": "Hosting: Azure App Service"
     }
   ],
-  "duration": 71,
+  "duration": 115,
   "_replay": {
     "site": "ryder.com",
     "moduleId": "M02",
-    "elapsed": 71,
-    "replayedAt": "2026-04-03T20:40:59.152Z"
+    "elapsed": 115,
+    "replayedAt": "2026-04-03T23:35:00.186Z"
   }
 }

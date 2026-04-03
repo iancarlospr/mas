@@ -3,14 +3,8 @@
   "status": "success",
   "data": {
     "detected_language": "en",
-    "found_pages": [
-      "/verticals/contact-us",
-      "/product/sub-ongoing-basic-support-service",
-      "/product/dra-lorawan-iot-contact-sensor",
-      "/product/mil-magnetic-contact-switch-sensor",
-      "/product/ser-advanced-support"
-    ],
-    "support_page_url": "https://www.senzary.com/verticals/contact-us",
+    "found_pages": [],
+    "support_page_url": null,
     "help_center_provider": null,
     "help_center_evidence": null,
     "help_page_quality": "none",
@@ -24,12 +18,10 @@
       "url": null,
       "evidence": "No community forum detected"
     },
-    "business_hours": true,
+    "business_hours": false,
     "support_channels": {
-      "count": 1,
-      "channels": [
-        "contact_form"
-      ]
+      "count": 0,
+      "channels": []
     },
     "developer_docs": {
       "found": false,
@@ -43,15 +35,11 @@
       "evidence": "No training or academy detected"
     },
     "support_tiers": {
-      "found": true,
-      "tiers": [
-        "basic"
-      ],
-      "evidence": "Support tiers detected: basic"
+      "found": false,
+      "tiers": [],
+      "evidence": "No support tier structure detected"
     },
-    "support_emails": [
-      "info@senzary.com"
-    ],
+    "support_emails": [],
     "chatbot": {
       "found": false,
       "evidence": "No chatbot detected"
@@ -62,22 +50,7 @@
     },
     "support_subdomains": []
   },
-  "signals": [
-    {
-      "type": "support_channels",
-      "name": "Support Channels",
-      "confidence": 0.8,
-      "evidence": "1 support channel(s): contact_form",
-      "category": "brand_presence"
-    },
-    {
-      "type": "business_hours",
-      "name": "Business Hours Published",
-      "confidence": 0.7,
-      "evidence": "Business/support hours detected on page",
-      "category": "brand_presence"
-    }
-  ],
+  "signals": [],
   "score": null,
   "checkpoints": [
     {
@@ -92,9 +65,9 @@
       "id": "m19-support-channels",
       "name": "Support channels",
       "weight": 0.5,
-      "health": "warning",
-      "evidence": "Only 1 support channel: contact_form",
-      "recommendation": "Add additional support channels (email, phone, live chat) for better customer experience"
+      "health": "critical",
+      "evidence": "No support contact information found",
+      "recommendation": "Add visible support contact options (email, phone, or live chat) to the website"
     },
     {
       "id": "m19-status-page",
@@ -106,9 +79,9 @@
     {
       "id": "m19-business-hours",
       "name": "Business hours",
-      "weight": 0.3,
-      "health": "excellent",
-      "evidence": "Business/support hours published on page"
+      "weight": 0,
+      "health": "info",
+      "evidence": "No business hours detected"
     },
     {
       "id": "m19-community-forum",
@@ -134,9 +107,9 @@
   ],
   "duration": 0,
   "_replay": {
-    "site": "senzary.com",
+    "site": "brainhi.com",
     "moduleId": "M19",
-    "elapsed": 239,
-    "replayedAt": "2026-04-03T23:35:23.305Z"
+    "elapsed": 38,
+    "replayedAt": "2026-04-03T23:35:20.686Z"
   }
 }

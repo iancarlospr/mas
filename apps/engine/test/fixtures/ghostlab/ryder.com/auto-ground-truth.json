@@ -1,0 +1,192 @@
+{
+  "site": "ryder.com",
+  "verifiedAt": "2026-04-03T23:28:18.966Z",
+  "generatedBy": "generate-ground-truth-json.ts (from browser-ground-truth.json)",
+  "notes": "Auto-generated from browser-verified facts captured on 2026-04-03T23:28:18.966Z",
+  "modules": {
+    "M01": {
+      "expectedData": {
+        "spf": {
+          "match": "truthy",
+          "note": "SPF record exists"
+        },
+        "dmarc": {
+          "match": "truthy",
+          "note": "DMARC record exists"
+        },
+        "hsts": {
+          "match": "truthy",
+          "note": "HSTS header present"
+        }
+      },
+      "expectedCheckpoints": [
+        {
+          "id": "m01-spf",
+          "expectedHealth": "excellent",
+          "note": "SPF present"
+        },
+        {
+          "id": "m01-dmarc",
+          "expectedHealth": "good",
+          "note": "DMARC p=quarantine"
+        },
+        {
+          "id": "m01-tls",
+          "expectedHealth": "excellent",
+          "note": "HTTPS site"
+        }
+      ],
+      "negativeAssertions": [],
+      "fixedBugs": []
+    },
+    "M02": {
+      "expectedData": {
+        "detectedTechnologies": {
+          "match": "truthy",
+          "note": "Should detect technologies"
+        },
+        "cdn.name": {
+          "value": "Cloudflare",
+          "match": "contains",
+          "note": "CDN detected from headers"
+        },
+        "compression": {
+          "value": "gzip",
+          "match": "exact",
+          "note": "Compression from headers"
+        }
+      },
+      "expectedCheckpoints": [
+        {
+          "id": "m02-https-enforced",
+          "expectedHealth": "excellent",
+          "note": "HTTPS site"
+        }
+      ],
+      "negativeAssertions": [],
+      "fixedBugs": []
+    },
+    "M04": {
+      "expectedData": {
+        "title": {
+          "match": "truthy",
+          "note": "Page title exists"
+        },
+        "metaDescription": {
+          "match": "truthy",
+          "note": "Meta description exists"
+        },
+        "htmlLang": {
+          "match": "truthy",
+          "note": "Lang: en-US"
+        },
+        "jsonLd": {
+          "match": "truthy",
+          "note": "3 JSON-LD blocks"
+        }
+      },
+      "expectedCheckpoints": [
+        {
+          "id": "M04-VIEWPORT",
+          "expectedHealth": "excellent",
+          "note": "Viewport meta present"
+        },
+        {
+          "id": "M04-ROBOTS",
+          "expectedHealth": "excellent",
+          "note": "robots.txt exists"
+        }
+      ],
+      "negativeAssertions": [],
+      "fixedBugs": []
+    },
+    "M16": {
+      "expectedData": {
+        "press_page_url": {
+          "match": "truthy",
+          "note": "Press page at https://www.ryder.com/en-us/newsroom"
+        },
+        "article_count": {
+          "value": 101,
+          "match": "gte",
+          "note": "101 articles (visible on page)"
+        }
+      },
+      "expectedCheckpoints": [
+        {
+          "id": "m16-press-page",
+          "expectedHealth": "excellent",
+          "note": "Press page found"
+        },
+        {
+          "id": "m16-media-contact",
+          "expectedHealth": "info",
+          "note": "No media contact"
+        },
+        {
+          "id": "m16-rss-feed",
+          "expectedHealth": "good",
+          "note": "RSS feed detected"
+        },
+        {
+          "id": "m16-media-logos",
+          "expectedHealth": "info",
+          "note": "No media logos"
+        }
+      ],
+      "negativeAssertions": [],
+      "fixedBugs": []
+    },
+    "M17": {
+      "expectedData": {
+        "careers_page_url": {
+          "match": "truthy",
+          "note": "Careers page found"
+        }
+      },
+      "expectedCheckpoints": [
+        {
+          "id": "m17-careers-page",
+          "expectedHealth": "good",
+          "note": "Careers page exists"
+        }
+      ],
+      "negativeAssertions": [],
+      "fixedBugs": []
+    },
+    "M18": {
+      "expectedData": {
+        "ticker_symbol": {
+          "value": "R",
+          "match": "exact",
+          "note": "NYSE: R"
+        },
+        "stock_exchange": {
+          "value": "NYSE",
+          "match": "contains",
+          "note": "NYSE"
+        }
+      },
+      "expectedCheckpoints": [
+        {
+          "id": "m18-ir-portal",
+          "expectedHealth": "good",
+          "note": "IR page found"
+        }
+      ],
+      "negativeAssertions": [],
+      "fixedBugs": []
+    },
+    "M19": {
+      "expectedData": {
+        "support_page_url": {
+          "match": "truthy",
+          "note": "Support/contact page found"
+        }
+      },
+      "expectedCheckpoints": [],
+      "negativeAssertions": [],
+      "fixedBugs": []
+    }
+  }
+}

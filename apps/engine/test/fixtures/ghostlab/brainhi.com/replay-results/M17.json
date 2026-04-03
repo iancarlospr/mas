@@ -3,10 +3,7 @@
   "status": "success",
   "data": {
     "detected_language": "en",
-    "found_pages": [
-      "/senzary-to-join-iiot-leaders-in-paris-next-month-for-the-annual-lorawan-world-expo",
-      "/senzary-joins-kerlink-in-paris-to-present-their-iotlogiq-platform-to-global-partners"
-    ],
+    "found_pages": [],
     "careers_page_url": null,
     "ats_provider": null,
     "ats_evidence": null,
@@ -15,8 +12,8 @@
     "has_culture_page": false,
     "most_recent_posting": null,
     "external_careers_links": [],
-    "benefits_mentioned": true,
-    "remote_work_mentioned": true,
+    "benefits_mentioned": false,
+    "remote_work_mentioned": false,
     "dei_mentioned": false,
     "review_site_links": []
   },
@@ -61,9 +58,9 @@
   ],
   "duration": 0,
   "_replay": {
-    "site": "senzary.com",
+    "site": "brainhi.com",
     "moduleId": "M17",
-    "elapsed": 98,
-    "replayedAt": "2026-04-03T23:35:16.193Z"
+    "elapsed": 7,
+    "replayedAt": "2026-04-03T23:35:13.664Z"
   }
 }
