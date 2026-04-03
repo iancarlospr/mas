@@ -674,6 +674,41 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
     }
   }
 
+  // WordPress REST API: use pagination detection to crawl all pages
+  // Only for WordPress sites when press page exists and shows pagination
+  const isWordPress = ctx.html?.includes('wp-content') || ctx.html?.includes('wp-includes');
+  if (isWordPress && bestPressPage?.html && externalArticleCount === 0) {
+    // Check if the press page has pagination (page/2, page/3, etc.)
+    const paginationMatch = bestPressPage.html.match(/\/page\/(\d+)/g);
+    if (paginationMatch) {
+      const maxPage = Math.max(...paginationMatch.map(p => parseInt(p.replace(/\/page\//, ''), 10)));
+      if (maxPage >= 2) {
+        // Crawl remaining pages to get full article count
+        const pressUrl = bestPressPage.fullUrl ?? `${baseUrl}${bestPressPage.path}`;
+        let paginatedTotal = totalArticleCount; // start with page 1 count
+        for (let p = 2; p <= Math.min(maxPage + 1, 50); p++) { // cap at 50 pages
+          try {
+            const pageUrl = `${pressUrl.replace(/\/$/, '')}/page/${p}/`;
+            const pageResult = await fetchWithRetry(pageUrl, { timeout: 8_000, retries: 0 });
+            if (pageResult.ok && pageResult.body.length > 500) {
+              const $page = parseHtml(pageResult.body);
+              const pageArticles = countPressArticles($page);
+              if (pageArticles === 0) break; // no more articles
+              paginatedTotal += pageArticles;
+            } else {
+              break; // page doesn't exist
+            }
+          } catch {
+            break;
+          }
+        }
+        if (paginatedTotal > totalArticleCount) {
+          totalArticleCount = paginatedTotal;
+        }
+      }
+    }
+  }
+
   // Dedupe dates
   const datesSeen = new Set<string>();
   allDates = allDates.filter(d => {
