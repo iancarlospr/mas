@@ -38,6 +38,8 @@ interface ProbeResult {
   found: boolean;
   html?: string;
   status?: number;
+  /** Full URL when sourced from sitemapPages (avoids baseUrl + path double-prefix). */
+  fullUrl?: string;
 }
 
 /**
@@ -281,7 +283,7 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
   for (const page of ctx.sitemapPages?.careers ?? []) {
     const isExcluded = EXCLUDED_PATH_PREFIXES.some((prefix) => page.path.startsWith(prefix));
     if (!isExcluded) {
-      foundPages.push({ path: page.path, found: true, html: page.html, status: 200 });
+      foundPages.push({ path: page.path, found: true, html: page.html, status: 200, fullUrl: page.url });
     }
   }
 
@@ -413,11 +415,13 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
   }
 
   // Store data
-  // Use fully-qualified URL for external/subdomain career pages
+  // Use fullUrl from sitemapPages when available (avoids baseUrl + path double-prefix)
+  // Fall back to baseUrl + path for HTTP-probed pages, or https:// for external subdomains
   const careersPageUrl = bestCareersPage
-    ? (bestCareersPage.path.includes('.') && !bestCareersPage.path.startsWith('/'))
-      ? `https://${bestCareersPage.path}`   // subdomain probe path like "careers.samsung.com/"
-      : `${baseUrl}${bestCareersPage.path}` // standard path probe
+    ? bestCareersPage.fullUrl
+      ?? ((bestCareersPage.path.includes('.') && !bestCareersPage.path.startsWith('/'))
+        ? `https://${bestCareersPage.path}`   // subdomain probe path like "careers.samsung.com/"
+        : `${baseUrl}${bestCareersPage.path}`) // standard path probe
     : null;
   data.careers_page_url = careersPageUrl;
   data.ats_provider = atsDetected?.name ?? null;
@@ -440,7 +444,7 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
         type: 'careers_page',
         name: 'Careers Page',
         confidence: 0.95,
-        evidence: `Careers page found at ${baseUrl}${bestCareersPage.path}`,
+        evidence: `Careers page found at ${careersPageUrl}`,
         category: 'brand_presence',
       }),
     );

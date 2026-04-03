@@ -16,6 +16,8 @@ interface ProbeResult {
   found: boolean;
   html?: string;
   status?: number;
+  /** Full URL when sourced from sitemapPages (avoids baseUrl + path double-prefix). */
+  fullUrl?: string;
 }
 
 /**
@@ -492,7 +494,7 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
       const h1 = $p('h1').first().text().toLowerCase();
       if (!IR_TITLE_KEYWORDS.test(`${title} ${h1}`)) continue;
     }
-    foundPages.push({ path: page.path, found: true, html: page.html, status: 200 });
+    foundPages.push({ path: page.path, found: true, html: page.html, status: 200, fullUrl: page.url });
   }
 
   data.found_pages = foundPages.map((p) => p.path);
@@ -616,11 +618,13 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
   }
 
   // Store data
-  // Use fully-qualified URL for external IR or subdomain pages
+  // Use fullUrl from sitemapPages when available (avoids baseUrl + path double-prefix)
+  // Fall back to baseUrl + path for HTTP-probed pages, or https:// for external subdomains
   const irPageUrl = bestIrPage
-    ? (bestIrPage.path.includes('.') && !bestIrPage.path.startsWith('/'))
-      ? `https://${bestIrPage.path}`   // subdomain probe path like "investors.etsy.com/"
-      : `${baseUrl}${bestIrPage.path}` // standard path probe
+    ? bestIrPage.fullUrl
+      ?? ((bestIrPage.path.includes('.') && !bestIrPage.path.startsWith('/'))
+        ? `https://${bestIrPage.path}`   // subdomain probe path like "investors.etsy.com/"
+        : `${baseUrl}${bestIrPage.path}`) // standard path probe
     : null;
   data.ir_page_url = irPageUrl;
   data.sec_filings = secFilings;

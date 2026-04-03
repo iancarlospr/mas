@@ -57,6 +57,8 @@ interface ProbeResult {
   found: boolean;
   html?: string;
   status?: number;
+  /** Full URL when sourced from sitemapPages (avoids baseUrl + path double-prefix). */
+  fullUrl?: string;
 }
 
 /**
@@ -563,7 +565,7 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
   const foundPages: ProbeResult[] = [];
 
   for (const page of ctx.sitemapPages?.support ?? []) {
-    foundPages.push({ path: page.path, found: true, html: page.html, status: 200 });
+    foundPages.push({ path: page.path, found: true, html: page.html, status: 200, fullUrl: page.url });
   }
 
   // 2b. Fallback: if no support pages from sitemap, probe common paths directly
@@ -709,7 +711,10 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
   }
 
   // Store data
-  data.support_page_url = bestSupportPage ? `${baseUrl}${bestSupportPage.path}` : null;
+  // Use fullUrl from sitemapPages when available (avoids baseUrl + path double-prefix)
+  data.support_page_url = bestSupportPage
+    ? bestSupportPage.fullUrl ?? `${baseUrl}${bestSupportPage.path}`
+    : null;
   data.help_center_provider = helpCenterProvider?.name ?? null;
   data.help_center_evidence = helpCenterProvider?.evidence ?? null;
   data.help_page_quality = helpPageQuality;
