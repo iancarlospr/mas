@@ -9,11 +9,15 @@
       "currentScores": { "senzary.com": 100, "ryder.com": 100 },
       "resolvedIssues": [
         "BUG FIXED: press_page_url doubled /en-us/en-us/ path — sitemapPages carry fullUrl",
-        "BUG FIXED: article_count=0 for custom CMS markup — date-pattern fallback (ryder: 0→7)",
+        "BUG FIXED: article_count=0 for custom CMS markup — date-pattern fallback (ryder: 0→7 from .card selector)",
         "URL doubling fix applied to M17, M18, M19"
       ],
-      "knownIssues": [],
-      "nextAction": "Complete"
+      "knownIssues": [
+        "SCOPE LIMITATION: M16 is PR/Media — does not detect /insights/blogs or content marketing pages (by design, adding 'blog' would flood with false positives on every WordPress site)",
+        "article_count is a heuristic — counts CSS elements matching .card etc., not actual press releases. Ryder newsroom has more content loaded dynamically/paginated that passive HTML can't see",
+        "The mm-card CMS pattern is not in the selector list — .card catches it incidentally but fragile"
+      ],
+      "nextAction": "Complete — known limitations documented, no code changes needed"
     },
     "M17": {
       "status": "complete",
