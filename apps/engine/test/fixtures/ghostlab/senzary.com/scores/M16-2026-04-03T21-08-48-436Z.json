@@ -1,0 +1,39 @@
+{
+  "module": "M16",
+  "site": "senzary.com",
+  "dataAccuracy": {
+    "score": 100,
+    "matched": 6,
+    "total": 6,
+    "details": []
+  },
+  "checkpointAccuracy": {
+    "score": 60,
+    "matched": 3,
+    "total": 5,
+    "details": [
+      "  checkpoint m16-press-page: expected warning, got excellent (Press page exists but content is stale (>1yr old as of 2026-04))",
+      "  checkpoint m16-press-recency: expected critical, got excellent (Content is >1yr old (last: 2024-09-18))"
+    ]
+  },
+  "falsePositiveRate": {
+    "score": 100,
+    "matched": 2,
+    "total": 2,
+    "details": []
+  },
+  "regressionGuard": {
+    "score": 100,
+    "matched": 3,
+    "total": 3,
+    "details": []
+  },
+  "completeness": {
+    "score": 100,
+    "matched": 5,
+    "total": 5,
+    "details": []
+  },
+  "overall": 90,
+  "scoredAt": "2026-04-03T21:08:48.435Z"
+}

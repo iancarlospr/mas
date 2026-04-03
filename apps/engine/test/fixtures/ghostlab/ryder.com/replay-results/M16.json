@@ -14,10 +14,11 @@
     "media_kit_url": null,
     "rss_feed": "/en-us/api/rssfeed/showrssfeed",
     "media_logos": false,
-    "most_recent_date": "2026-03-24T00:00:00.000Z",
-    "oldest_date": "2026-02-11",
-    "date_count": 4,
-    "article_count": 8,
+    "most_recent_date": "2026-04-02T13:00:11.000Z",
+    "oldest_date": "2020-10-14",
+    "date_count": 429,
+    "article_count": 571,
+    "article_count_source": "rss",
     "wire_services": [],
     "press_schema_types": [],
     "main_page_press_links": [
@@ -49,7 +50,7 @@
       "name": "Press/newsroom page",
       "weight": 0.5,
       "health": "excellent",
-      "evidence": "Dedicated press page with recent releases (last: 2026-03-24)"
+      "evidence": "Dedicated press page with recent releases (last: 2026-04-02)"
     },
     {
       "id": "m16-media-contact",
@@ -77,14 +78,14 @@
       "name": "Press release recency",
       "weight": 0.4,
       "health": "excellent",
-      "evidence": "Most recent press content within 3 months (2026-03-24)"
+      "evidence": "Most recent press content within 3 months (2026-04-02)"
     }
   ],
   "duration": 0,
   "_replay": {
     "site": "ryder.com",
     "moduleId": "M16",
-    "elapsed": 124,
-    "replayedAt": "2026-04-03T20:59:22.382Z"
+    "elapsed": 135,
+    "replayedAt": "2026-04-03T21:08:17.153Z"
   }
 }

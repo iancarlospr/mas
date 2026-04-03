@@ -9,16 +9,16 @@
         "detected_language": { "value": "en", "match": "exact", "note": "English site" },
         "press_page_url": { "value": "about/news", "match": "contains", "note": "Senzary has /about/news page with real news content" },
         "rss_feed": { "value": "feed", "match": "contains", "note": "WordPress RSS at /feed/" },
-        "article_count": { "value": 1, "match": "gte", "note": "Should find articles on the news page" },
+        "article_count": { "value": 5, "match": "gte", "note": "RSS feed has ~10 items" },
         "date_count": { "value": 1, "match": "gte", "note": "Should find dates in press content" },
         "media_logos": { "value": false, "match": "exact", "note": "No media logos section" }
       },
       "expectedCheckpoints": [
-        { "id": "m16-press-page", "expectedHealth": "warning", "note": "Press page exists but content is stale (>1yr old as of 2026-04)" },
+        { "id": "m16-press-page", "expectedHealth": "excellent", "note": "Press page with recent content — RSS feed has items from March 2026" },
         { "id": "m16-media-contact", "expectedHealth": "info", "note": "No press contacts" },
         { "id": "m16-rss-feed", "expectedHealth": "good", "note": "WordPress RSS feed exists at /feed/" },
         { "id": "m16-media-logos", "expectedHealth": "info", "note": "No media logos" },
-        { "id": "m16-press-recency", "expectedHealth": "critical", "note": "Content is >1yr old (last: 2024-09-18)" }
+        { "id": "m16-press-recency", "expectedHealth": "excellent", "note": "RSS feed has content from March 2026 (within 3 months)" }
       ],
       "negativeAssertions": [
         {

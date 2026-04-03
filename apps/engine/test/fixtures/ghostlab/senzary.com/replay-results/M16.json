@@ -14,10 +14,11 @@
     "media_kit_url": null,
     "rss_feed": "https://www.senzary.com/feed/",
     "media_logos": false,
-    "most_recent_date": "2024-09-18T04:00:00.000Z",
+    "most_recent_date": "2026-03-20T23:06:16.000Z",
     "oldest_date": "2022-08-26",
-    "date_count": 5,
-    "article_count": 6,
+    "date_count": 11,
+    "article_count": 10,
+    "article_count_source": "rss",
     "wire_services": [],
     "press_schema_types": [],
     "main_page_press_links": [
@@ -46,9 +47,8 @@
       "id": "m16-press-page",
       "name": "Press/newsroom page",
       "weight": 0.5,
-      "health": "warning",
-      "evidence": "Press page found but content is stale (>1yr, last: 2024-09-18)",
-      "recommendation": "Update press page with current releases or archive outdated content"
+      "health": "excellent",
+      "evidence": "Dedicated press page with recent releases (last: 2026-03-20)"
     },
     {
       "id": "m16-media-contact",
@@ -75,16 +75,15 @@
       "id": "m16-press-recency",
       "name": "Press release recency",
       "weight": 0.4,
-      "health": "critical",
-      "evidence": "Press content is over 1 year old (2024-09-18)",
-      "recommendation": "Update press page with current news and releases"
+      "health": "excellent",
+      "evidence": "Most recent press content within 3 months (2026-03-20)"
     }
   ],
   "duration": 0,
   "_replay": {
     "site": "senzary.com",
     "moduleId": "M16",
-    "elapsed": 120,
-    "replayedAt": "2026-04-03T20:59:30.551Z"
+    "elapsed": 143,
+    "replayedAt": "2026-04-03T21:08:16.996Z"
   }
 }

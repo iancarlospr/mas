@@ -118,6 +118,51 @@ function detectRssFeed($: CheerioAPI): string | null {
 }
 
 /**
+ * Fetch and parse an RSS/Atom feed to count items and extract dates.
+ * Returns null if the feed cannot be fetched or parsed.
+ */
+async function fetchRssFeedData(
+  feedUrl: string,
+  baseUrl: string,
+): Promise<{ itemCount: number; dates: Date[] } | null> {
+  try {
+    // Resolve relative URLs — use origin (not baseUrl) to avoid doubling locale prefixes
+    const origin = new URL(baseUrl).origin;
+    const fullUrl = feedUrl.startsWith('http') ? feedUrl : `${origin}${feedUrl.startsWith('/') ? '' : '/'}${feedUrl}`;
+    const result = await fetchWithRetry(fullUrl, { timeout: 10_000, retries: 1 });
+    if (!result.ok || !result.body) return null;
+
+    // Parse as XML using cheerio (handles both RSS and Atom)
+    const $ = cheerio.load(result.body, { xml: true });
+
+    // RSS 2.0: <item>, Atom: <entry>
+    const items = $('item');
+    const entries = $('entry');
+    const totalItems = Math.max(items.length, entries.length);
+
+    if (totalItems === 0) return null;
+
+    // Extract dates from <pubDate> (RSS) or <published>/<updated> (Atom)
+    const dates: Date[] = [];
+    const dateSelectors = ['pubDate', 'published', 'updated', 'dc\\:date'];
+    for (const sel of dateSelectors) {
+      $(sel).each((_, el) => {
+        const text = $(el).text().trim();
+        if (text) {
+          const d = new Date(text);
+          if (!isNaN(d.getTime())) dates.push(d);
+        }
+      });
+      if (dates.length > 0) break; // use first selector that yields dates
+    }
+
+    return { itemCount: totalItems, dates };
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Detect media contact information (email, phone, media kit link).
  */
 function detectMediaContact($: CheerioAPI): {
@@ -530,6 +575,28 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
     rssFound = data.rss_feed_main_page as string;
   }
 
+  // Fetch and parse RSS feed for accurate article count + dates
+  // RSS feeds are structured data — far more reliable than HTML element counting
+  let rssArticleCount = 0;
+  if (rssFound) {
+    const rssFeed = await fetchRssFeedData(rssFound, baseUrl);
+    if (rssFeed) {
+      rssArticleCount = rssFeed.itemCount;
+      // Use RSS item count if higher than HTML-based count
+      if (rssFeed.itemCount > totalArticleCount) {
+        totalArticleCount = rssFeed.itemCount;
+      }
+      // Merge RSS dates into allDates
+      for (const d of rssFeed.dates) {
+        allDates.push(d);
+        // Update most recent date if RSS has newer
+        if (!mostRecentDate || d > mostRecentDate) {
+          mostRecentDate = d;
+        }
+      }
+    }
+  }
+
   // Dedupe dates
   const datesSeen = new Set<string>();
   allDates = allDates.filter(d => {
@@ -559,6 +626,7 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
   data.oldest_date = allDates.length > 0 ? allDates[allDates.length - 1]!.toISOString().slice(0, 10) : null;
   data.date_count = allDates.length;
   data.article_count = totalArticleCount;
+  data.article_count_source = rssArticleCount > 0 ? 'rss' : 'html';
   data.wire_services = [...wireServices];
   data.press_schema_types = pressSchemaTypes;
   data.main_page_press_links = mainPagePressLinks;
