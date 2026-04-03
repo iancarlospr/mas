@@ -600,11 +600,11 @@
       "evidence": "Viewport allows user zoom (content: \"width=device-width, initial-scale=1\")"
     }
   ],
-  "duration": 181,
+  "duration": 108,
   "_replay": {
     "site": "senzary.com",
     "moduleId": "M04",
-    "elapsed": 182,
-    "replayedAt": "2026-04-03T23:35:05.180Z"
+    "elapsed": 109,
+    "replayedAt": "2026-04-03T23:40:11.393Z"
   }
 }

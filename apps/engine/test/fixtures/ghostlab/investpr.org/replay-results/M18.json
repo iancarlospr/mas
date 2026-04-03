@@ -1,0 +1,114 @@
+{
+  "moduleId": "M18",
+  "status": "success",
+  "data": {
+    "detected_language": "en",
+    "found_pages": [],
+    "ir_page_url": null,
+    "sec_filings": {
+      "found": false,
+      "evidence": "No SEC filings detected"
+    },
+    "annual_report": {
+      "found": false,
+      "evidence": "No annual report detected"
+    },
+    "ticker_symbol": null,
+    "stock_exchange": null,
+    "esg_report": {
+      "found": false,
+      "evidence": "No ESG/sustainability report detected"
+    },
+    "ir_portal_depth": "none",
+    "governance": {
+      "found": false,
+      "evidence": "No governance content detected"
+    },
+    "earnings_calls": {
+      "found": false,
+      "evidence": "No earnings call information detected"
+    },
+    "ir_contact_email": null,
+    "external_ir_domain": null,
+    "proxy_statement": {
+      "found": false,
+      "evidence": "No proxy statement detected"
+    },
+    "investor_presentations": {
+      "found": false,
+      "urls": [],
+      "evidence": "No investor presentations detected"
+    },
+    "dividend_info": {
+      "found": false,
+      "evidence": "No dividend information detected"
+    },
+    "email_alert_signup": false,
+    "board_members": {
+      "count": 0,
+      "names": []
+    },
+    "transfer_agent": null,
+    "stock_identifiers": {
+      "cusip": null,
+      "isin": null
+    },
+    "upcoming_events": {
+      "found": false,
+      "evidence": "No upcoming investor events detected"
+    }
+  },
+  "signals": [],
+  "score": null,
+  "checkpoints": [
+    {
+      "id": "m18-ir-portal",
+      "name": "IR portal",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No investor relations page found (may be a private company)"
+    },
+    {
+      "id": "m18-financial-data",
+      "name": "Financial data",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No SEC filings or annual reports detected"
+    },
+    {
+      "id": "m18-ticker-symbol",
+      "name": "Ticker symbol",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No stock ticker detected (may be a private company)"
+    },
+    {
+      "id": "m18-esg-report",
+      "name": "ESG report",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No ESG or sustainability report detected"
+    },
+    {
+      "id": "m18-governance",
+      "name": "Governance",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No corporate governance content detected"
+    },
+    {
+      "id": "m18-ir-comms",
+      "name": "IR communications",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No earnings calls, presentations, or investor events detected"
+    }
+  ],
+  "duration": 0,
+  "_replay": {
+    "site": "investpr.org",
+    "moduleId": "M18",
+    "elapsed": 37,
+    "replayedAt": "2026-04-03T23:40:29.659Z"
+  }
+}

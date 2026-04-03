@@ -126,13 +126,16 @@ function main() {
         continue;
       }
 
-      // Check if this module has ground truth for this site
-      const gtPath = existsSync(resolve(FIXTURES_DIR, site, 'ground-truth.json'))
-        ? resolve(FIXTURES_DIR, site, 'ground-truth.json')
-        : resolve(FIXTURES_DIR, site, 'auto-ground-truth.json');
-
-      const gt = JSON.parse(readFileSync(gtPath, 'utf-8'));
-      if (!gt.modules?.[module]) {
+      // Check if this module has ground truth — check both manual and auto files
+      let hasModuleGT = false;
+      for (const gtFile of ['ground-truth.json', 'auto-ground-truth.json']) {
+        const p = resolve(FIXTURES_DIR, site, gtFile);
+        if (existsSync(p)) {
+          const gt = JSON.parse(readFileSync(p, 'utf-8'));
+          if (gt.modules?.[module]) { hasModuleGT = true; break; }
+        }
+      }
+      if (!hasModuleGT) {
         skipped.push(`${module}@${site} (no ground truth for module)`);
         continue;
       }

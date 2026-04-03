@@ -1,0 +1,59 @@
+{
+  "module": "M04",
+  "site": "foundationforpuertorico.org",
+  "dataAccuracy": {
+    "score": 100,
+    "matched": 4,
+    "total": 4,
+    "details": []
+  },
+  "checkpointAccuracy": {
+    "score": 50,
+    "matched": 1,
+    "total": 2,
+    "details": [
+      "  checkpoint M04-ROBOTS: expected excellent, got critical (robots.txt exists)"
+    ]
+  },
+  "falsePositiveRate": {
+    "score": 100,
+    "matched": 0,
+    "total": 0,
+    "details": []
+  },
+  "regressionGuard": {
+    "score": 100,
+    "matched": 0,
+    "total": 0,
+    "details": []
+  },
+  "completeness": {
+    "score": 100,
+    "matched": 2,
+    "total": 2,
+    "details": [
+      "  EXTRA checkpoint: M04-TITLE (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: M04-META-DESC (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: M04-CANONICAL (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: M04-OG-TAGS (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: M04-OG-IMAGE (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: M04-TWITTER (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: M04-SCHEMA (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: M04-SITEMAP (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: M04-FAVICON (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: M04-LANG (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: M04-HREFLANG (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: M04-PRECONNECT (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: M04-LLMS-TXT (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: M04-MANIFEST (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: M04-ROBOTS-DIRECTIVES (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: M04-CHARSET (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: M04-ADS-TXT (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: m04-structured-data (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: m04-rich-snippets (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: M04-VIEWPORT-A11Y (not in ground truth — add if expected)"
+    ]
+  },
+  "overall": 88,
+  "scoredAt": "2026-04-03T23:40:06.952Z"
+}

@@ -1,0 +1,343 @@
+{
+  "moduleId": "M02",
+  "status": "success",
+  "data": {
+    "detectedTechnologies": [
+      {
+        "id": "recaptcha",
+        "name": "reCAPTCHA",
+        "category": "security",
+        "confidence": 1
+      },
+      {
+        "id": "apache",
+        "name": "Apache",
+        "category": "server",
+        "confidence": 0.95
+      },
+      {
+        "id": "php",
+        "name": "PHP",
+        "category": "language",
+        "confidence": 0.95,
+        "version": "5.6.40"
+      },
+      {
+        "id": "jquery",
+        "name": "jQuery",
+        "category": "other",
+        "confidence": 0.95
+      },
+      {
+        "id": "gtm",
+        "name": "Google Tag Manager",
+        "category": "analytics",
+        "confidence": 0.9
+      },
+      {
+        "id": "bootstrap",
+        "name": "Bootstrap",
+        "category": "other",
+        "confidence": 0.9
+      },
+      {
+        "id": "ga4",
+        "name": "Google Analytics 4",
+        "category": "analytics",
+        "confidence": 0.7
+      }
+    ],
+    "cms": null,
+    "cdn": null,
+    "framework": null,
+    "hosting": null,
+    "language": {
+      "id": "php",
+      "name": "PHP",
+      "confidence": 0.95
+    },
+    "buildTool": null,
+    "server": {
+      "id": "apache",
+      "name": "Apache",
+      "confidence": 0.95
+    },
+    "poweredBy": "PHP/5.6.40",
+    "compression": "gzip",
+    "httpVersion": null,
+    "trackingIds": [
+      {
+        "tool": "Google Tag Manager",
+        "id": "GTM-K82TWFG",
+        "type": "tag-manager"
+      },
+      {
+        "tool": "Google Tag Manager",
+        "id": "GTM-NZSP2PM",
+        "type": "tag-manager"
+      },
+      {
+        "tool": "Google Analytics (UA)",
+        "id": "UA-87490409-1",
+        "type": "analytics"
+      },
+      {
+        "tool": "Google Analytics (UA)",
+        "id": "UA-138413823-1",
+        "type": "analytics"
+      },
+      {
+        "tool": "Facebook Pixel",
+        "id": "105018743501893",
+        "type": "advertising"
+      }
+    ],
+    "thirdPartyDomains": [
+      {
+        "domain": "cdn.jsdelivr.net",
+        "type": "script",
+        "urls": [
+          "//cdn.jsdelivr.net/npm/sweetalert2@11"
+        ],
+        "service": "jsDelivr CDN"
+      },
+      {
+        "domain": "connect.facebook.net",
+        "type": "script",
+        "urls": [
+          "https://connect.facebook.net/en_US/fbevents.js",
+          "https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v3.0&appId=1007320686006397&autoLogAppEvents=1"
+        ],
+        "service": "Facebook SDK"
+      },
+      {
+        "domain": "fonts.googleapis.com",
+        "type": "stylesheet",
+        "urls": [
+          "https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,500,500i,700,700i&amp;subset=latin-ext"
+        ],
+        "service": "Google Fonts"
+      },
+      {
+        "domain": "google.com",
+        "type": "script",
+        "urls": [
+          "https://www.google.com/recaptcha/api.js"
+        ],
+        "service": null
+      },
+      {
+        "domain": "googletagmanager.com",
+        "type": "script",
+        "urls": [
+          "https://www.googletagmanager.com/gtag/js?id=UA-87490409-1",
+          "https://www.googletagmanager.com/gtag/js?id=UA-138413823-1",
+          "https://www.googletagmanager.com/gtm.js?id="
+        ],
+        "service": "Google Tag Manager"
+      },
+      {
+        "domain": "s7.addthis.com",
+        "type": "script",
+        "urls": [
+          "//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-55ddce968e20ce39"
+        ],
+        "service": null
+      }
+    ],
+    "cache": {
+      "cacheStatus": null,
+      "age": null,
+      "cacheControl": "no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+      "edgeLocation": null,
+      "etag": false,
+      "lastModified": false,
+      "vary": "Accept-Encoding"
+    },
+    "cssClassFingerprints": null,
+    "inlineConfigFrameworks": null
+  },
+  "signals": [
+    {
+      "type": "technology",
+      "name": "reCAPTCHA",
+      "confidence": 1,
+      "evidence": "Detected via fingerprint matching (category: security)",
+      "category": "security"
+    },
+    {
+      "type": "technology",
+      "name": "Apache",
+      "confidence": 0.95,
+      "evidence": "Detected via fingerprint matching (category: server)",
+      "category": "server"
+    },
+    {
+      "type": "technology",
+      "name": "PHP 5.6.40",
+      "confidence": 0.95,
+      "evidence": "Detected via fingerprint matching (category: language)",
+      "category": "language"
+    },
+    {
+      "type": "technology",
+      "name": "jQuery",
+      "confidence": 0.95,
+      "evidence": "Detected via fingerprint matching (category: other)",
+      "category": "other"
+    },
+    {
+      "type": "technology",
+      "name": "Google Tag Manager",
+      "confidence": 0.9,
+      "evidence": "Detected via fingerprint matching (category: analytics)",
+      "category": "analytics"
+    },
+    {
+      "type": "technology",
+      "name": "Bootstrap",
+      "confidence": 0.9,
+      "evidence": "Detected via fingerprint matching (category: other)",
+      "category": "other"
+    },
+    {
+      "type": "technology",
+      "name": "Google Analytics 4",
+      "confidence": 0.7,
+      "evidence": "Detected via fingerprint matching (category: analytics)",
+      "category": "analytics"
+    },
+    {
+      "type": "server",
+      "name": "Apache",
+      "confidence": 0.95,
+      "evidence": "Detected from Server HTTP header",
+      "category": "server"
+    },
+    {
+      "type": "compression",
+      "name": "gzip",
+      "confidence": 1,
+      "evidence": "Detected from content-encoding HTTP header",
+      "category": "infrastructure"
+    },
+    {
+      "type": "powered-by",
+      "name": "PHP/5.6.40",
+      "confidence": 0.95,
+      "evidence": "Detected from X-Powered-By HTTP header",
+      "category": "infrastructure"
+    },
+    {
+      "type": "tracking",
+      "name": "Google Tag Manager: GTM-K82TWFG",
+      "confidence": 0.95,
+      "evidence": "tag-manager ID extracted from HTML/inline scripts",
+      "category": "marketing"
+    },
+    {
+      "type": "tracking",
+      "name": "Google Tag Manager: GTM-NZSP2PM",
+      "confidence": 0.95,
+      "evidence": "tag-manager ID extracted from HTML/inline scripts",
+      "category": "marketing"
+    },
+    {
+      "type": "tracking",
+      "name": "Google Analytics (UA): UA-87490409-1",
+      "confidence": 0.95,
+      "evidence": "analytics ID extracted from HTML/inline scripts",
+      "category": "marketing"
+    },
+    {
+      "type": "tracking",
+      "name": "Google Analytics (UA): UA-138413823-1",
+      "confidence": 0.95,
+      "evidence": "analytics ID extracted from HTML/inline scripts",
+      "category": "marketing"
+    },
+    {
+      "type": "tracking",
+      "name": "Facebook Pixel: 105018743501893",
+      "confidence": 0.95,
+      "evidence": "advertising ID extracted from HTML/inline scripts",
+      "category": "marketing"
+    }
+  ],
+  "score": null,
+  "checkpoints": [
+    {
+      "id": "m02-cms-identified",
+      "name": "CMS identified",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No CMS detected; site may use a custom or headless solution."
+    },
+    {
+      "id": "m02-cms-version-currency",
+      "name": "CMS version currency",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No CMS version information available."
+    },
+    {
+      "id": "m02-cdn-detected",
+      "name": "CDN detected",
+      "weight": 0.6,
+      "health": "critical",
+      "evidence": "No CDN detected. Assets are likely served from origin.",
+      "recommendation": "Consider using a CDN (e.g. Cloudflare, CloudFront, Fastly) to improve global load times and resilience."
+    },
+    {
+      "id": "m02-https-enforced",
+      "name": "HTTPS enforced",
+      "weight": 0.8,
+      "health": "excellent",
+      "evidence": "HTTPS active with HSTS header: max-age=31536000; includeSubDomains; preload"
+    },
+    {
+      "id": "m02-http-version",
+      "name": "HTTP/2 or HTTP/3",
+      "weight": 0.5,
+      "health": "warning",
+      "evidence": "Could not confirm HTTP/2 or HTTP/3 from response headers. Likely HTTP/1.1.",
+      "recommendation": "Enable HTTP/2 (or HTTP/3) on your web server or CDN for improved multiplexing and performance."
+    },
+    {
+      "id": "m02-compression",
+      "name": "Compression",
+      "weight": 0.6,
+      "health": "good",
+      "evidence": "Gzip compression detected on the initial HTML response.",
+      "recommendation": "Consider enabling Brotli compression for ~15-20% smaller payloads compared to gzip."
+    },
+    {
+      "id": "m02-server-header-exposure",
+      "name": "Server header exposure",
+      "weight": 0.4,
+      "health": "good",
+      "evidence": "Server header present without version: Apache"
+    },
+    {
+      "id": "m02-framework-detected",
+      "name": "Framework detected",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No frontend framework detected."
+    },
+    {
+      "id": "m02-hosting-identified",
+      "name": "Hosting identified",
+      "weight": 0,
+      "health": "info",
+      "evidence": "Hosting provider not identified from fingerprints."
+    }
+  ],
+  "duration": 49,
+  "_replay": {
+    "site": "mmm-pr.com",
+    "moduleId": "M02",
+    "elapsed": 49,
+    "replayedAt": "2026-04-03T23:40:01.765Z"
+  }
+}

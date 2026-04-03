@@ -2,29 +2,32 @@
   "moduleId": "M16",
   "status": "success",
   "data": {
-    "detected_language": "es",
-    "rss_feed_main_page": "https://foundationforpuertorico.org/es/feed/",
+    "detected_language": "en",
+    "rss_feed_main_page": "https://foundationforpuertorico.org/en/feed/",
+    "media_logos_main_page": true,
     "external_newsroom": null,
     "external_article_count": null,
     "found_pages": [
-      "https://foundationforpuertorico.org/es/media/"
+      "https://www.foundationforpuertorico.org/media",
+      "https://www.foundationforpuertorico.org/media-center",
+      "https://www.foundationforpuertorico.org/category/media"
     ],
-    "press_page_url": "https://foundationforpuertorico.org/es/media/",
-    "press_page_type": "es/media/",
+    "press_page_url": "https://www.foundationforpuertorico.org/media",
+    "press_page_type": "media",
     "press_contact_email": "digital@foundationpr.org",
     "press_contact_phone": null,
     "media_kit_url": null,
-    "rss_feed": "https://foundationforpuertorico.org/es/feed/",
-    "media_logos": false,
-    "most_recent_date": "2020-04-29T00:00:00.000Z",
-    "oldest_date": "2020-04-29",
-    "date_count": 1,
-    "article_count": 60,
+    "rss_feed": "https://foundationforpuertorico.org/en/feed/",
+    "media_logos": true,
+    "most_recent_date": null,
+    "oldest_date": null,
+    "date_count": 0,
+    "article_count": 10,
     "wire_services": [],
     "press_schema_types": [],
     "main_page_press_links": [
-      "https://foundationforpuertorico.org/es/latest-blog/",
-      "https://foundationforpuertorico.org/es/media/"
+      "https://foundationforpuertorico.org/en/latest-blog/",
+      "https://foundationforpuertorico.org/en/media/"
     ]
   },
   "signals": [
@@ -32,7 +35,7 @@
       "type": "press_page",
       "name": "Press/Newsroom Page",
       "confidence": 0.95,
-      "evidence": "Press page found at https://foundationforpuertorico.org/es/media/",
+      "evidence": "Press page found at https://www.foundationforpuertorico.org/media",
       "category": "seo_content"
     },
     {
@@ -46,7 +49,14 @@
       "type": "rss_feed",
       "name": "RSS Feed",
       "confidence": 0.9,
-      "evidence": "RSS feed discovered: https://foundationforpuertorico.org/es/feed/",
+      "evidence": "RSS feed discovered: https://foundationforpuertorico.org/en/feed/",
+      "category": "seo_content"
+    },
+    {
+      "type": "media_logos",
+      "name": "Media Mention Logos",
+      "confidence": 0.7,
+      "evidence": "Media mention / \"As seen in\" logos detected",
       "category": "seo_content"
     }
   ],
@@ -56,9 +66,8 @@
       "id": "m16-press-page",
       "name": "Press/newsroom page",
       "weight": 0.5,
-      "health": "warning",
-      "evidence": "Press page found but content is stale (>1yr, last: 2020-04-29)",
-      "recommendation": "Update press page with current releases or archive outdated content"
+      "health": "good",
+      "evidence": "Press page found at https://www.foundationforpuertorico.org/media"
     },
     {
       "id": "m16-media-contact",
@@ -72,29 +81,28 @@
       "name": "RSS feed",
       "weight": 0.3,
       "health": "good",
-      "evidence": "RSS feed auto-discovered: https://foundationforpuertorico.org/es/feed/"
+      "evidence": "RSS feed auto-discovered: https://foundationforpuertorico.org/en/feed/"
     },
     {
       "id": "m16-media-logos",
       "name": "\"As seen in\" logos",
-      "weight": 0,
-      "health": "info",
-      "evidence": "No media mention logos detected"
+      "weight": 0.3,
+      "health": "excellent",
+      "evidence": "Media mention logos or \"As seen in\" section detected"
     },
     {
       "id": "m16-press-recency",
       "name": "Press release recency",
-      "weight": 0.4,
-      "health": "critical",
-      "evidence": "Press content is over 1 year old (2020-04-29)",
-      "recommendation": "Update press page with current news and releases"
+      "weight": 0,
+      "health": "info",
+      "evidence": "No dateable press content found"
     }
   ],
   "duration": 0,
   "_replay": {
     "site": "foundationforpuertorico.org",
     "moduleId": "M16",
-    "elapsed": 171,
-    "replayedAt": "2026-04-03T23:35:07.600Z"
+    "elapsed": 260,
+    "replayedAt": "2026-04-03T23:40:13.852Z"
   }
 }

@@ -1,16 +1,79 @@
 {
   "records": {
-    "A": [],
+    "A": [
+      "141.193.213.11",
+      "141.193.213.10"
+    ],
     "AAAA": [],
-    "MX": [],
-    "NS": [],
-    "TXT": [],
+    "MX": [
+      {
+        "exchange": "mx2-us1.ppe-hosted.com",
+        "priority": 2
+      },
+      {
+        "exchange": "mx1-us1.ppe-hosted.com",
+        "priority": 1
+      }
+    ],
+    "NS": [
+      "ns53.domaincontrol.com",
+      "ns54.domaincontrol.com"
+    ],
+    "TXT": [
+      [
+        "google-site-verification=qcUrcHJK7j-XEBOX5mBoKasRxYTAt_Qc6cjy5ZbhtUo"
+      ],
+      [
+        "v=spf1 ip4:172.96.170.178 include:spf.protection.outlook.com include:spf.mandrillapp.com include:50272966.spf10.hubspotemail.net a:dispatch-us.ppe-hosted.com -all"
+      ],
+      [
+        "mandrill_verify.b_BKLHx7NMBL6yJdQtWBTA"
+      ],
+      [
+        "google-site-verification=leNdSZln-HnD-ToHVQ8Z2y1utsySxKT2mONuF2qZKxE"
+      ],
+      [
+        "A5C6BE56B1"
+      ],
+      [
+        "MS=ms95758109"
+      ],
+      [
+        "apple-domain-verification=HZRT7rTxBtVhkmor"
+      ],
+      [
+        "linkedin-site-verification=a3672fbb-86a6-429b-b70b-19d6bd6be8c1"
+      ],
+      [
+        "google-site-verification=nfyha7yUtsqqUaNP2MVykGOmq6xO6n8z7iC6-uIGVi8"
+      ],
+      [
+        "google-site-verification=N24DK9xXIqlBBi9rgxYMmNuy2k06NMCvNqwB_Hy__cQ"
+      ],
+      [
+        "hj-ownership=5CMjDqb243c4"
+      ],
+      [
+        "50272966.spf10.hubspotemail.net"
+      ],
+      [
+        "ppe-ad91d5109c90ce64fd0b435b21d274a06d492c85"
+      ]
+    ],
     "CNAME": [],
-    "SOA": null,
+    "SOA": {
+      "nsname": "ns53.domaincontrol.com",
+      "hostmaster": "dns.jomax.net",
+      "serial": 2026031000,
+      "refresh": 28800,
+      "retry": 7200,
+      "expire": 604800,
+      "minttl": 600
+    },
     "CAA": []
   },
   "dkim": {},
-  "dmarc": null,
-  "spf": null,
-  "capturedAt": "2026-04-03"
+  "dmarc": "v=DMARC1; p=none",
+  "spf": "v=spf1 ip4:172.96.170.178 include:spf.protection.outlook.com include:spf.mandrillapp.com include:50272966.spf10.hubspotemail.net a:dispatch-us.ppe-hosted.com -all",
+  "capturedAt": "2026-04-03T23:36:42.460Z"
 }

@@ -1,0 +1,46 @@
+{
+  "module": "M19",
+  "site": "mmm-pr.com",
+  "dataAccuracy": {
+    "score": 0,
+    "matched": 0,
+    "total": 1,
+    "details": [
+      "  data.support_page_url: expected truthy, got null (Support/contact page found)"
+    ]
+  },
+  "checkpointAccuracy": {
+    "score": 100,
+    "matched": 0,
+    "total": 0,
+    "details": []
+  },
+  "falsePositiveRate": {
+    "score": 100,
+    "matched": 0,
+    "total": 0,
+    "details": []
+  },
+  "regressionGuard": {
+    "score": 100,
+    "matched": 0,
+    "total": 0,
+    "details": []
+  },
+  "completeness": {
+    "score": 100,
+    "matched": 0,
+    "total": 0,
+    "details": [
+      "  EXTRA checkpoint: m19-help-center (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: m19-support-channels (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: m19-status-page (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: m19-business-hours (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: m19-community-forum (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: m19-developer-docs (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: m19-training-academy (not in ground truth — add if expected)"
+    ]
+  },
+  "overall": 70,
+  "scoredAt": "2026-04-03T23:40:38.368Z"
+}

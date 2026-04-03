@@ -1,0 +1,45 @@
+{
+  "module": "M17",
+  "site": "investpr.org",
+  "dataAccuracy": {
+    "score": 0,
+    "matched": 0,
+    "total": 1,
+    "details": [
+      "  data.careers_page_url: expected truthy, got null (Careers page found)"
+    ]
+  },
+  "checkpointAccuracy": {
+    "score": 0,
+    "matched": 0,
+    "total": 1,
+    "details": [
+      "  checkpoint m17-careers-page: expected good, got info (Careers page exists)"
+    ]
+  },
+  "falsePositiveRate": {
+    "score": 100,
+    "matched": 0,
+    "total": 0,
+    "details": []
+  },
+  "regressionGuard": {
+    "score": 100,
+    "matched": 0,
+    "total": 0,
+    "details": []
+  },
+  "completeness": {
+    "score": 100,
+    "matched": 1,
+    "total": 1,
+    "details": [
+      "  EXTRA checkpoint: m17-ats-provider (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: m17-open-positions (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: m17-team-culture (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: m17-hiring-velocity (not in ground truth — add if expected)"
+    ]
+  },
+  "overall": 45,
+  "scoredAt": "2026-04-03T23:40:22.798Z"
+}

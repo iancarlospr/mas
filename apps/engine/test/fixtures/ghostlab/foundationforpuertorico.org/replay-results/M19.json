@@ -1,0 +1,161 @@
+{
+  "moduleId": "M19",
+  "status": "success",
+  "data": {
+    "detected_language": "en",
+    "found_pages": [
+      "/best-practices-for-contact-tracing-and-how-to-best-implement-them-in-puerto-rico",
+      "/case-for-support",
+      "/contact-us",
+      "/contact-us-wcrp",
+      "/contact-us-wcrp-1"
+    ],
+    "support_page_url": "https://www.foundationforpuertorico.org/best-practices-for-contact-tracing-and-how-to-best-implement-them-in-puerto-rico",
+    "help_center_provider": null,
+    "help_center_evidence": null,
+    "help_page_quality": "single_faq",
+    "status_page": {
+      "provider": null,
+      "url": null,
+      "evidence": "No status page detected"
+    },
+    "community_forum": {
+      "provider": null,
+      "url": "https://foundationforpuertorico.org/en/community-innovation-hub/",
+      "evidence": "Community link found: https://foundationforpuertorico.org/en/community-innovation-hub/"
+    },
+    "business_hours": true,
+    "support_channels": {
+      "count": 4,
+      "channels": [
+        "phone",
+        "live_chat",
+        "community",
+        "social_media"
+      ]
+    },
+    "developer_docs": {
+      "found": false,
+      "url": null,
+      "evidence": "No developer documentation detected"
+    },
+    "training_academy": {
+      "found": true,
+      "url": "https://foundationforpuertorico.org/en/academia-de-lideres/",
+      "type": "academy",
+      "evidence": "Academy: \"Leadership Academy\""
+    },
+    "support_tiers": {
+      "found": false,
+      "tiers": [],
+      "evidence": "No support tier structure detected"
+    },
+    "support_emails": [],
+    "chatbot": {
+      "found": true,
+      "evidence": "AI chatbot or virtual assistant detected"
+    },
+    "sla": {
+      "found": false,
+      "evidence": "No SLA information detected"
+    },
+    "support_subdomains": []
+  },
+  "signals": [
+    {
+      "type": "community_forum",
+      "name": "Community Forum",
+      "confidence": 0.8,
+      "evidence": "Community link found: https://foundationforpuertorico.org/en/community-innovation-hub/",
+      "category": "brand_presence"
+    },
+    {
+      "type": "support_channels",
+      "name": "Support Channels",
+      "confidence": 0.8,
+      "evidence": "4 support channel(s): phone, live_chat, community, social_media",
+      "category": "brand_presence"
+    },
+    {
+      "type": "business_hours",
+      "name": "Business Hours Published",
+      "confidence": 0.7,
+      "evidence": "Business/support hours detected on page",
+      "category": "brand_presence"
+    },
+    {
+      "type": "training_academy",
+      "name": "Academy",
+      "confidence": 0.85,
+      "evidence": "Academy: \"Leadership Academy\"",
+      "category": "brand_presence"
+    },
+    {
+      "type": "chatbot",
+      "name": "AI Chatbot",
+      "confidence": 0.75,
+      "evidence": "AI chatbot or virtual assistant detected",
+      "category": "brand_presence"
+    }
+  ],
+  "score": null,
+  "checkpoints": [
+    {
+      "id": "m19-help-center",
+      "name": "Help center",
+      "weight": 0.5,
+      "health": "warning",
+      "evidence": "Only a basic FAQ page detected",
+      "recommendation": "Build a comprehensive help center with categorized articles and search"
+    },
+    {
+      "id": "m19-support-channels",
+      "name": "Support channels",
+      "weight": 0.5,
+      "health": "excellent",
+      "evidence": "4 support channels: phone, live_chat, community, social_media"
+    },
+    {
+      "id": "m19-status-page",
+      "name": "System status page",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No system status page detected"
+    },
+    {
+      "id": "m19-business-hours",
+      "name": "Business hours",
+      "weight": 0.3,
+      "health": "excellent",
+      "evidence": "Business/support hours published on page"
+    },
+    {
+      "id": "m19-community-forum",
+      "name": "Community forum",
+      "weight": 0.3,
+      "health": "good",
+      "evidence": "Community link found: https://foundationforpuertorico.org/en/community-innovation-hub/"
+    },
+    {
+      "id": "m19-developer-docs",
+      "name": "Developer docs",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No developer or API documentation detected"
+    },
+    {
+      "id": "m19-training-academy",
+      "name": "Training/academy",
+      "weight": 0.2,
+      "health": "excellent",
+      "evidence": "Academy: \"Leadership Academy\""
+    }
+  ],
+  "duration": 0,
+  "_replay": {
+    "site": "foundationforpuertorico.org",
+    "moduleId": "M19",
+    "elapsed": 364,
+    "replayedAt": "2026-04-03T23:40:35.659Z"
+  }
+}

@@ -1,0 +1,442 @@
+{
+  "moduleId": "M04",
+  "status": "success",
+  "data": {
+    "title": {
+      "content": "Medicare & Mucho Más",
+      "length": 20
+    },
+    "metaDescription": {
+      "content": "MMM, PMC Medicare Choice y FIRST+PLUS, productos ofrecidos por MMM Healthcare, LLC, son planes con un contrato Medicare.",
+      "length": 120
+    },
+    "canonical": null,
+    "ogTags": {
+      "og:type": "website",
+      "og:title": "Medicare & Mucho Más",
+      "og:description": "MMM, PMC Medicare Choice y FIRST+PLUS, productos ofrecidos por MMM Healthcare, LLC, son planes con un contrato Medicare.",
+      "og:url": "https://www.mmm-pr.com/index",
+      "og:site_name": "Medicare & Mucho Más"
+    },
+    "twitterCards": {
+      "twitter:card": "summary",
+      "twitter:description": "MMM, PMC Medicare Choice y FIRST+PLUS, productos ofrecidos por MMM Healthcare, LLC, son planes con un contrato Medicare.",
+      "twitter:title": "Medicare & Mucho Más"
+    },
+    "jsonLd": {
+      "raw": [],
+      "types": [],
+      "organizationName": null,
+      "organizationLogo": null,
+      "socialProfiles": [],
+      "contactPoints": [],
+      "websiteName": null,
+      "hasSearchAction": false
+    },
+    "robotsTxt": {
+      "present": true,
+      "blocked": false,
+      "content": "User-agent: *\nDisallow:",
+      "sitemapUrls": [],
+      "disallowedPaths": [],
+      "userAgentCount": 1
+    },
+    "sitemap": {
+      "present": false,
+      "source": null
+    },
+    "llmsTxt": {
+      "present": true,
+      "content": ""
+    },
+    "manifest": {
+      "present": false
+    },
+    "favicon": {
+      "present": true,
+      "formats": [
+        {
+          "rel": "apple-touch-icon",
+          "href": "/favicons/apple-icon-57x57.png",
+          "sizes": "57x57"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/favicons/apple-icon-60x60.png",
+          "sizes": "60x60"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/favicons/apple-icon-72x72.png",
+          "sizes": "72x72"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/favicons/apple-icon-76x76.png",
+          "sizes": "76x76"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/favicons/apple-icon-114x114.png",
+          "sizes": "114x114"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/favicons/apple-icon-120x120.png",
+          "sizes": "120x120"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/favicons/apple-icon-144x144.png",
+          "sizes": "144x144"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/favicons/apple-icon-152x152.png",
+          "sizes": "152x152"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/favicons/apple-icon-180x180.png",
+          "sizes": "180x180"
+        },
+        {
+          "rel": "icon",
+          "href": "/favicons/android-icon-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        },
+        {
+          "rel": "icon",
+          "href": "/favicons/favicon-32x32.png",
+          "sizes": "32x32",
+          "type": "image/png"
+        },
+        {
+          "rel": "icon",
+          "href": "/favicons/favicon-96x96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        },
+        {
+          "rel": "icon",
+          "href": "/favicons/favicon-16x16.png",
+          "sizes": "16x16",
+          "type": "image/png"
+        }
+      ]
+    },
+    "htmlLang": "es-ES",
+    "hreflang": [],
+    "preconnectHints": [],
+    "metaTags": {
+      "viewport": "width=device-width, initial-scale=1",
+      "csrf-param": "_csrf-frontend",
+      "csrf-token": "H_Pw6S2PlD-ehCnkUJDJ3PESa-B9uHcrn44VvOU-mh9YqoiQGOnea6bVZskjqarux0VZ0QvREXTT31r0o3z_cA==",
+      "msapplication-TileColor": "#ffffff",
+      "msapplication-TileImage": "/favicons/ms-icon-144x144.png",
+      "theme-color": "#ffffff",
+      "description": "MMM, PMC Medicare Choice y FIRST+PLUS, productos ofrecidos por MMM Healthcare, LLC, son planes con un contrato Medicare.",
+      "keywords": "MMM, PMC, First Plus, Advantage, Planes, Medicare Mucho Más, Medicare, Plan Médico, Cuidadores, Proveedores",
+      "og:type": "website",
+      "og:title": "Medicare & Mucho Más",
+      "og:description": "MMM, PMC Medicare Choice y FIRST+PLUS, productos ofrecidos por MMM Healthcare, LLC, son planes con un contrato Medicare.",
+      "og:url": "https://www.mmm-pr.com/index",
+      "og:site_name": "Medicare & Mucho Más",
+      "twitter:card": "summary",
+      "twitter:description": "MMM, PMC Medicare Choice y FIRST+PLUS, productos ofrecidos por MMM Healthcare, LLC, son planes con un contrato Medicare.",
+      "twitter:title": "Medicare & Mucho Más",
+      "google-site-verification": "ZO5FmFKHgnpjLgfCi5sYJsyeO9WNLr1faDi7giLIPwM"
+    },
+    "robotsDirectives": {
+      "metaRobots": null,
+      "xRobotsTag": null,
+      "noindex": false,
+      "nofollow": false
+    },
+    "viewport": {
+      "content": "width=device-width, initial-scale=1",
+      "hasWidth": true,
+      "hasInitialScale": true
+    },
+    "charset": {
+      "charset": "UTF-8",
+      "source": "meta"
+    },
+    "adsTxt": {
+      "present": true,
+      "blocked": false,
+      "lineCount": 0,
+      "body": ""
+    },
+    "alternateLinks": [],
+    "pagination": {
+      "next": null,
+      "prev": null
+    },
+    "openSearch": {
+      "present": false
+    },
+    "isAMP": false,
+    "structuredData": {
+      "microdata": [],
+      "rdfa": [],
+      "richSnippetEligibility": [],
+      "validationErrors": [],
+      "totalItems": 0
+    },
+    "robotsTxtAnalysis": {
+      "groupedPaths": {
+        "admin": [],
+        "staging": [],
+        "internal": [],
+        "sensitive": [],
+        "other": []
+      },
+      "crawlDelay": null,
+      "securityFlags": []
+    },
+    "viewportConfig": {
+      "content": "width=device-width, initial-scale=1",
+      "hasWidth": true,
+      "hasInitialScale": true,
+      "attributes": {
+        "width": "device-width",
+        "initial-scale": "1"
+      },
+      "blocksZoom": false,
+      "isOptimal": true
+    }
+  },
+  "signals": [
+    {
+      "type": "seo",
+      "name": "title-tag",
+      "confidence": 0.95,
+      "evidence": "Title: \"Medicare & Mucho Más\" (20 chars)",
+      "category": "seo_content"
+    },
+    {
+      "type": "seo",
+      "name": "meta-description",
+      "confidence": 0.95,
+      "evidence": "Meta description present (120 chars)",
+      "category": "seo_content"
+    },
+    {
+      "type": "social",
+      "name": "open-graph",
+      "confidence": 0.95,
+      "evidence": "5 OG tags: og:type, og:title, og:description, og:url, og:site_name",
+      "category": "seo_content"
+    },
+    {
+      "type": "social",
+      "name": "twitter-card",
+      "confidence": 0.95,
+      "evidence": "Twitter Card: summary",
+      "category": "seo_content"
+    },
+    {
+      "type": "crawlability",
+      "name": "robots-txt",
+      "confidence": 0.95,
+      "evidence": "robots.txt present with 0 sitemap ref(s), 0 disallow rule(s)",
+      "category": "seo_content"
+    },
+    {
+      "type": "branding",
+      "name": "favicon",
+      "confidence": 0.9,
+      "evidence": "Favicon formats: apple-touch-icon 57x57, apple-touch-icon 60x60, apple-touch-icon 72x72, apple-touch-icon 76x76, apple-touch-icon 114x114, apple-touch-icon 120x120, apple-touch-icon 144x144, apple-touch-icon 152x152, apple-touch-icon 180x180, icon 192x192, icon 32x32, icon 96x96, icon 16x16",
+      "category": "brand_presence"
+    },
+    {
+      "type": "i18n",
+      "name": "html-lang",
+      "confidence": 0.95,
+      "evidence": "HTML lang=\"es-ES\"",
+      "category": "seo_content"
+    },
+    {
+      "type": "ai-readiness",
+      "name": "llms-txt",
+      "confidence": 0.9,
+      "evidence": "llms.txt present",
+      "category": "brand_presence"
+    },
+    {
+      "type": "advertising",
+      "name": "ads-txt",
+      "confidence": 0.95,
+      "evidence": "ads.txt present with 0 seller record(s)",
+      "category": "marketing"
+    }
+  ],
+  "score": null,
+  "checkpoints": [
+    {
+      "id": "M04-TITLE",
+      "name": "Title Tag",
+      "weight": 0.7,
+      "health": "good",
+      "evidence": "Title present (20 chars): \"Medicare & Mucho Más\"",
+      "recommendation": "Consider adjusting title length to the ideal 30-60 character range."
+    },
+    {
+      "id": "M04-META-DESC",
+      "name": "Meta Description",
+      "weight": 0.6,
+      "health": "excellent",
+      "evidence": "Meta description present (120 chars)"
+    },
+    {
+      "id": "M04-CANONICAL",
+      "name": "Canonical URL",
+      "weight": 0.7,
+      "health": "critical",
+      "evidence": "No canonical URL found",
+      "recommendation": "Add a <link rel=\"canonical\"> tag to prevent duplicate content issues."
+    },
+    {
+      "id": "M04-OG-TAGS",
+      "name": "Open Graph Tags",
+      "weight": 0.6,
+      "health": "good",
+      "evidence": "5/6 core OG tags present. Missing: og:image",
+      "recommendation": "Add missing OG tags: og:image"
+    },
+    {
+      "id": "M04-OG-IMAGE",
+      "name": "OG Image",
+      "weight": 0.5,
+      "health": "critical",
+      "evidence": "No og:image tag found",
+      "recommendation": "Add an og:image tag with a high-quality image (1200x630 recommended) for social sharing."
+    },
+    {
+      "id": "M04-TWITTER",
+      "name": "Twitter Card",
+      "weight": 0.4,
+      "health": "good",
+      "evidence": "Twitter Card type \"summary\" present",
+      "recommendation": "Add all Twitter Card fields (twitter:title, twitter:description, twitter:image, twitter:site)."
+    },
+    {
+      "id": "M04-SCHEMA",
+      "name": "Schema.org / JSON-LD",
+      "weight": 0.8,
+      "health": "critical",
+      "evidence": "No structured data (JSON-LD) found",
+      "recommendation": "Add Schema.org JSON-LD structured data (Organization, WebSite, and content-specific types) for enhanced search results."
+    },
+    {
+      "id": "M04-ROBOTS",
+      "name": "robots.txt",
+      "weight": 0.5,
+      "health": "good",
+      "evidence": "robots.txt present (0 disallow rules, no sitemap reference)",
+      "recommendation": "Add a Sitemap directive to your robots.txt."
+    },
+    {
+      "id": "M04-SITEMAP",
+      "name": "Sitemap.xml",
+      "weight": 0.6,
+      "health": "critical",
+      "evidence": "No sitemap found (checked /sitemap.xml, /sitemap_index.xml, /sitemap-index.xml, and robots.txt references)",
+      "recommendation": "Create an XML sitemap to help search engines discover and index all pages."
+    },
+    {
+      "id": "M04-FAVICON",
+      "name": "Favicon",
+      "weight": 0.3,
+      "health": "excellent",
+      "evidence": "Multiple favicon formats including apple-touch-icon: apple-touch-icon 57x57, apple-touch-icon 60x60, apple-touch-icon 72x72, apple-touch-icon 76x76, apple-touch-icon 114x114, apple-touch-icon 120x120, apple-touch-icon 144x144, apple-touch-icon 152x152, apple-touch-icon 180x180, icon 192x192, icon 32x32, icon 96x96, icon 16x16"
+    },
+    {
+      "id": "M04-LANG",
+      "name": "Language (html lang)",
+      "weight": 0.4,
+      "health": "excellent",
+      "evidence": "Specific language attribute: lang=\"es-ES\""
+    },
+    {
+      "id": "M04-HREFLANG",
+      "name": "Hreflang Tags",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No hreflang tags found (informational -- may be a single-language site)"
+    },
+    {
+      "id": "M04-PRECONNECT",
+      "name": "Preconnect Hints",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No preconnect/prefetch hints found (informational -- site may not need them)"
+    },
+    {
+      "id": "M04-LLMS-TXT",
+      "name": "llms.txt",
+      "weight": 0.2,
+      "health": "good",
+      "evidence": "llms.txt present"
+    },
+    {
+      "id": "M04-MANIFEST",
+      "name": "manifest.json (PWA)",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No manifest.json found (informational -- required only for PWA installability)"
+    },
+    {
+      "id": "M04-ROBOTS-DIRECTIVES",
+      "name": "Robots Directives",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No explicit robots directives (defaults to index, follow)"
+    },
+    {
+      "id": "M04-VIEWPORT",
+      "name": "Viewport Meta",
+      "weight": 0.6,
+      "health": "excellent",
+      "evidence": "Viewport configured: width=device-width, initial-scale=1"
+    },
+    {
+      "id": "M04-CHARSET",
+      "name": "Character Encoding",
+      "weight": 0.3,
+      "health": "excellent",
+      "evidence": "UTF-8 charset declared via meta: UTF-8"
+    },
+    {
+      "id": "M04-ADS-TXT",
+      "name": "ads.txt",
+      "weight": 0.2,
+      "health": "excellent",
+      "evidence": "ads.txt present with 0 seller record(s)"
+    },
+    {
+      "id": "m04-structured-data",
+      "name": "Structured Data Coverage",
+      "weight": 0.5,
+      "health": "warning",
+      "evidence": "No structured data found (JSON-LD, Microdata, or RDFa)",
+      "recommendation": "Add JSON-LD structured data (Organization, WebSite, BreadcrumbList at minimum) to improve search engine understanding."
+    },
+    {
+      "id": "M04-VIEWPORT-A11Y",
+      "name": "Viewport Accessibility",
+      "weight": 0.4,
+      "health": "excellent",
+      "evidence": "Viewport allows user zoom (content: \"width=device-width, initial-scale=1\")"
+    }
+  ],
+  "duration": 69,
+  "_replay": {
+    "site": "mmm-pr.com",
+    "moduleId": "M04",
+    "elapsed": 70,
+    "replayedAt": "2026-04-03T23:40:08.975Z"
+  }
+}

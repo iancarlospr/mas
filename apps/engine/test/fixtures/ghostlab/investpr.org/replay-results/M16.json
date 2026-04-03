@@ -7,10 +7,10 @@
     "external_newsroom": null,
     "external_article_count": null,
     "found_pages": [
-      "https://www.investpr.org/news/"
+      "https://www.investpr.org/news"
     ],
-    "press_page_url": "https://www.investpr.org/news/",
-    "press_page_type": "news/",
+    "press_page_url": "https://www.investpr.org/news",
+    "press_page_type": "news",
     "press_contact_email": null,
     "press_contact_phone": null,
     "media_kit_url": null,
@@ -19,7 +19,7 @@
     "most_recent_date": "2026-03-16T04:00:00.000Z",
     "oldest_date": "2024-10-14",
     "date_count": 11,
-    "article_count": 66,
+    "article_count": 12,
     "wire_services": [],
     "press_schema_types": [],
     "main_page_press_links": [
@@ -32,7 +32,7 @@
       "type": "press_page",
       "name": "Press/Newsroom Page",
       "confidence": 0.95,
-      "evidence": "Press page found at https://www.investpr.org/news/",
+      "evidence": "Press page found at https://www.investpr.org/news",
       "category": "seo_content"
     },
     {
@@ -85,7 +85,7 @@
   "_replay": {
     "site": "investpr.org",
     "moduleId": "M16",
-    "elapsed": 180,
-    "replayedAt": "2026-04-03T23:35:08.883Z"
+    "elapsed": 140,
+    "replayedAt": "2026-04-03T23:40:15.068Z"
   }
 }

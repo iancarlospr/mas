@@ -78,11 +78,7 @@ function parseArgs(): { domain: string; scanId: string }[] {
   }
 
   const scanId = scanArg ?? KNOWN_SITES[domainArg] ?? '';
-  if (!scanId) {
-    console.error(`No scan-id provided and no known scan for ${domainArg}`);
-    process.exit(1);
-  }
-
+  // scan-id is optional — Supabase results capture will be skipped if empty
   return [{ domain: domainArg, scanId }];
 }
 

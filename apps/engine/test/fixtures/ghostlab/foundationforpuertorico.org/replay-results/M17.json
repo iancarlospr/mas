@@ -1,0 +1,82 @@
+{
+  "moduleId": "M17",
+  "status": "success",
+  "data": {
+    "detected_language": "en",
+    "found_pages": [
+      "/careers",
+      "/foundation-fellows-turning-talent-into-transformation",
+      "/foundation-for-puerto-rico-enables-the-reopening-of-the-camuy-river-cave-park",
+      "/foundation-for-puerto-rico-joins-the-annual-convention-of-the-association-of-builders-to-discuss-the-state-of-housing",
+      "/foundation-for-puerto-rico-joins-the-emprende-en-grande-event-hosted-by-the-municipality-of-rio-grande"
+    ],
+    "careers_page_url": "https://www.foundationforpuertorico.org/careers",
+    "ats_provider": null,
+    "ats_evidence": null,
+    "open_positions_count": 0,
+    "has_team_page": false,
+    "has_culture_page": false,
+    "most_recent_posting": null,
+    "external_careers_links": [],
+    "benefits_mentioned": true,
+    "remote_work_mentioned": true,
+    "dei_mentioned": false,
+    "review_site_links": [
+      "https://www.linkedin.com/company/foundationforpr"
+    ]
+  },
+  "signals": [
+    {
+      "type": "careers_page",
+      "name": "Careers Page",
+      "confidence": 0.95,
+      "evidence": "Careers page found at https://www.foundationforpuertorico.org/careers",
+      "category": "brand_presence"
+    }
+  ],
+  "score": null,
+  "checkpoints": [
+    {
+      "id": "m17-careers-page",
+      "name": "Careers page",
+      "weight": 0.4,
+      "health": "good",
+      "evidence": "Careers page found at /careers"
+    },
+    {
+      "id": "m17-ats-provider",
+      "name": "ATS provider",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No ATS provider detected"
+    },
+    {
+      "id": "m17-open-positions",
+      "name": "Open positions",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No open positions detected"
+    },
+    {
+      "id": "m17-team-culture",
+      "name": "Team/culture page",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No team or culture page detected"
+    },
+    {
+      "id": "m17-hiring-velocity",
+      "name": "Hiring velocity",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No dateable job postings found"
+    }
+  ],
+  "duration": 0,
+  "_replay": {
+    "site": "foundationforpuertorico.org",
+    "moduleId": "M17",
+    "elapsed": 425,
+    "replayedAt": "2026-04-03T23:40:21.306Z"
+  }
+}

@@ -1,0 +1,132 @@
+{
+  "moduleId": "M19",
+  "status": "success",
+  "data": {
+    "detected_language": "es",
+    "found_pages": [],
+    "support_page_url": null,
+    "help_center_provider": null,
+    "help_center_evidence": null,
+    "help_page_quality": "none",
+    "status_page": {
+      "provider": null,
+      "url": null,
+      "evidence": "No status page detected"
+    },
+    "community_forum": {
+      "provider": null,
+      "url": null,
+      "evidence": "No community forum detected"
+    },
+    "business_hours": false,
+    "support_channels": {
+      "count": 1,
+      "channels": [
+        "phone"
+      ]
+    },
+    "developer_docs": {
+      "found": true,
+      "url": "../docs/Notice-Of-Availability.pdf",
+      "evidence": "Developer docs: \"CONOCE MÁS\" (../docs/Notice-Of-Availability.pdf)"
+    },
+    "training_academy": {
+      "found": false,
+      "url": null,
+      "type": null,
+      "evidence": "No training or academy detected"
+    },
+    "support_tiers": {
+      "found": false,
+      "tiers": [],
+      "evidence": "No support tier structure detected"
+    },
+    "support_emails": [],
+    "chatbot": {
+      "found": false,
+      "evidence": "No chatbot detected"
+    },
+    "sla": {
+      "found": false,
+      "evidence": "No SLA information detected"
+    },
+    "support_subdomains": []
+  },
+  "signals": [
+    {
+      "type": "support_channels",
+      "name": "Support Channels",
+      "confidence": 0.8,
+      "evidence": "1 support channel(s): phone",
+      "category": "brand_presence"
+    },
+    {
+      "type": "developer_docs",
+      "name": "Developer Documentation",
+      "confidence": 0.85,
+      "evidence": "Developer docs: \"CONOCE MÁS\" (../docs/Notice-Of-Availability.pdf)",
+      "category": "brand_presence"
+    }
+  ],
+  "score": null,
+  "checkpoints": [
+    {
+      "id": "m19-help-center",
+      "name": "Help center",
+      "weight": 0.5,
+      "health": "critical",
+      "evidence": "No support documentation found",
+      "recommendation": "Create a help center or knowledge base for customers (Zendesk, Intercom, or similar)"
+    },
+    {
+      "id": "m19-support-channels",
+      "name": "Support channels",
+      "weight": 0.5,
+      "health": "warning",
+      "evidence": "Only 1 support channel: phone",
+      "recommendation": "Add additional support channels (email, phone, live chat) for better customer experience"
+    },
+    {
+      "id": "m19-status-page",
+      "name": "System status page",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No system status page detected"
+    },
+    {
+      "id": "m19-business-hours",
+      "name": "Business hours",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No business hours detected"
+    },
+    {
+      "id": "m19-community-forum",
+      "name": "Community forum",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No community forum or discussion channel detected"
+    },
+    {
+      "id": "m19-developer-docs",
+      "name": "Developer docs",
+      "weight": 0.2,
+      "health": "excellent",
+      "evidence": "Developer docs: \"CONOCE MÁS\" (../docs/Notice-Of-Availability.pdf)"
+    },
+    {
+      "id": "m19-training-academy",
+      "name": "Training/academy",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No training portal or academy detected"
+    }
+  ],
+  "duration": 0,
+  "_replay": {
+    "site": "mmm-pr.com",
+    "moduleId": "M19",
+    "elapsed": 77,
+    "replayedAt": "2026-04-03T23:40:38.015Z"
+  }
+}

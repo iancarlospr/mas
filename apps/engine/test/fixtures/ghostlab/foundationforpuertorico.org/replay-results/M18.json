@@ -1,0 +1,133 @@
+{
+  "moduleId": "M18",
+  "status": "success",
+  "data": {
+    "detected_language": "en",
+    "found_pages": [
+      "/annual-report",
+      "/business-financial"
+    ],
+    "ir_page_url": "https://www.foundationforpuertorico.org/annual-report",
+    "sec_filings": {
+      "found": true,
+      "evidence": "SEC filing link found: \"Annual Reports\""
+    },
+    "annual_report": {
+      "found": true,
+      "evidence": "Annual report link: \"EN\""
+    },
+    "ticker_symbol": null,
+    "stock_exchange": null,
+    "esg_report": {
+      "found": false,
+      "evidence": "No ESG/sustainability report detected"
+    },
+    "ir_portal_depth": "basic",
+    "governance": {
+      "found": false,
+      "evidence": "No governance content detected"
+    },
+    "earnings_calls": {
+      "found": false,
+      "evidence": "No earnings call information detected"
+    },
+    "ir_contact_email": null,
+    "external_ir_domain": null,
+    "proxy_statement": {
+      "found": false,
+      "evidence": "No proxy statement detected"
+    },
+    "investor_presentations": {
+      "found": false,
+      "urls": [],
+      "evidence": "No investor presentations detected"
+    },
+    "dividend_info": {
+      "found": false,
+      "evidence": "No dividend information detected"
+    },
+    "email_alert_signup": true,
+    "board_members": {
+      "count": 0,
+      "names": []
+    },
+    "transfer_agent": null,
+    "stock_identifiers": {
+      "cusip": null,
+      "isin": null
+    },
+    "upcoming_events": {
+      "found": false,
+      "evidence": "No upcoming investor events detected"
+    }
+  },
+  "signals": [
+    {
+      "type": "ir_portal",
+      "name": "Investor Relations Portal",
+      "confidence": 0.95,
+      "evidence": "IR portal found at https://www.foundationforpuertorico.org/annual-report",
+      "category": "brand_presence"
+    },
+    {
+      "type": "sec_filings",
+      "name": "SEC Filings",
+      "confidence": 0.9,
+      "evidence": "SEC filing link found: \"Annual Reports\"",
+      "category": "brand_presence"
+    }
+  ],
+  "score": null,
+  "checkpoints": [
+    {
+      "id": "m18-ir-portal",
+      "name": "IR portal",
+      "weight": 0.4,
+      "health": "warning",
+      "evidence": "IR page found at https://www.foundationforpuertorico.org/annual-report with basic info only",
+      "recommendation": "Add SEC filings, financial data, and earnings information to the IR portal"
+    },
+    {
+      "id": "m18-financial-data",
+      "name": "Financial data",
+      "weight": 0.3,
+      "health": "excellent",
+      "evidence": "SEC filing link found: \"Annual Reports\""
+    },
+    {
+      "id": "m18-ticker-symbol",
+      "name": "Ticker symbol",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No stock ticker detected (may be a private company)"
+    },
+    {
+      "id": "m18-esg-report",
+      "name": "ESG report",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No ESG or sustainability report detected"
+    },
+    {
+      "id": "m18-governance",
+      "name": "Governance",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No corporate governance content detected"
+    },
+    {
+      "id": "m18-ir-comms",
+      "name": "IR communications",
+      "weight": 0.2,
+      "health": "good",
+      "evidence": "IR communications detected: email alerts"
+    }
+  ],
+  "duration": 0,
+  "_replay": {
+    "site": "foundationforpuertorico.org",
+    "moduleId": "M18",
+    "elapsed": 226,
+    "replayedAt": "2026-04-03T23:40:28.542Z"
+  }
+}

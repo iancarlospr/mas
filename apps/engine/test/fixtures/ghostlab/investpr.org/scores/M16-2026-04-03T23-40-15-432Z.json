@@ -1,0 +1,38 @@
+{
+  "module": "M16",
+  "site": "investpr.org",
+  "dataAccuracy": {
+    "score": 75,
+    "matched": 3,
+    "total": 4,
+    "details": [
+      "  data.article_count: expected exact 65, got 12 (65 unique article slugs across 6 pages of ?pg= pagination)"
+    ]
+  },
+  "checkpointAccuracy": {
+    "score": 100,
+    "matched": 5,
+    "total": 5,
+    "details": []
+  },
+  "falsePositiveRate": {
+    "score": 100,
+    "matched": 0,
+    "total": 0,
+    "details": []
+  },
+  "regressionGuard": {
+    "score": 100,
+    "matched": 0,
+    "total": 0,
+    "details": []
+  },
+  "completeness": {
+    "score": 100,
+    "matched": 5,
+    "total": 5,
+    "details": []
+  },
+  "overall": 93,
+  "scoredAt": "2026-04-03T23:40:15.430Z"
+}

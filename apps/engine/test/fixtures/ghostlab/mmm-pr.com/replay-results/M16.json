@@ -5,11 +5,9 @@
     "detected_language": "es",
     "external_newsroom": null,
     "external_article_count": null,
-    "found_pages": [
-      "https://www.mmm-pr.com/sobre-mmm/enterate"
-    ],
-    "press_page_url": "https://www.mmm-pr.com/sobre-mmm/enterate",
-    "press_page_type": "sobre-mmm/enterate",
+    "found_pages": [],
+    "press_page_url": null,
+    "press_page_type": null,
     "press_contact_email": null,
     "press_contact_phone": null,
     "media_kit_url": null,
@@ -18,28 +16,20 @@
     "most_recent_date": null,
     "oldest_date": null,
     "date_count": 0,
-    "article_count": 28,
+    "article_count": 0,
     "wire_services": [],
     "press_schema_types": [],
     "main_page_press_links": []
   },
-  "signals": [
-    {
-      "type": "press_page",
-      "name": "Press/Newsroom Page",
-      "confidence": 0.95,
-      "evidence": "Press page found at https://www.mmm-pr.com/sobre-mmm/enterate",
-      "category": "seo_content"
-    }
-  ],
+  "signals": [],
   "score": null,
   "checkpoints": [
     {
       "id": "m16-press-page",
       "name": "Press/newsroom page",
-      "weight": 0.5,
-      "health": "good",
-      "evidence": "Press page found at https://www.mmm-pr.com/sobre-mmm/enterate"
+      "weight": 0,
+      "health": "info",
+      "evidence": "No dedicated press or newsroom page found"
     },
     {
       "id": "m16-media-contact",
@@ -74,7 +64,7 @@
   "_replay": {
     "site": "mmm-pr.com",
     "moduleId": "M16",
-    "elapsed": 99,
-    "replayedAt": "2026-04-03T23:35:10.062Z"
+    "elapsed": 55,
+    "replayedAt": "2026-04-03T23:40:16.192Z"
   }
 }

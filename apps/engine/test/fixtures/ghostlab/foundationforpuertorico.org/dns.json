@@ -1,16 +1,29 @@
 {
   "records": {
-    "A": [],
+    "A": [
+      "160.153.0.161"
+    ],
     "AAAA": [],
     "MX": [],
-    "NS": [],
+    "NS": [
+      "ns11.domaincontrol.com",
+      "ns12.domaincontrol.com"
+    ],
     "TXT": [],
     "CNAME": [],
-    "SOA": null,
+    "SOA": {
+      "nsname": "ns11.domaincontrol.com",
+      "hostmaster": "dns.jomax.net",
+      "serial": 2024021000,
+      "refresh": 28800,
+      "retry": 7200,
+      "expire": 604800,
+      "minttl": 600
+    },
     "CAA": []
   },
   "dkim": {},
   "dmarc": null,
   "spf": null,
-  "capturedAt": "2026-04-03"
+  "capturedAt": "2026-04-03T23:37:12.985Z"
 }

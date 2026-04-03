@@ -195,11 +195,11 @@
       "evidence": "Hosting: Cloudflare (detected from response headers)"
     }
   ],
-  "duration": 22,
+  "duration": 23,
   "_replay": {
     "site": "brainhi.com",
     "moduleId": "M02",
-    "elapsed": 22,
-    "replayedAt": "2026-04-03T23:34:58.970Z"
+    "elapsed": 23,
+    "replayedAt": "2026-04-03T23:39:58.125Z"
   }
 }

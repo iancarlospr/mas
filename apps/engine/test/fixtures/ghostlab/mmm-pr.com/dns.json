@@ -1,16 +1,68 @@
 {
   "records": {
-    "A": [],
+    "A": [
+      "63.128.78.150"
+    ],
     "AAAA": [],
     "MX": [],
-    "NS": [],
-    "TXT": [],
+    "NS": [
+      "a20-67.akam.net",
+      "a1-41.akam.net",
+      "a3-65.akam.net",
+      "a13-67.akam.net",
+      "a22-65.akam.net",
+      "a4-64.akam.net"
+    ],
+    "TXT": [
+      [
+        "facebook-domain-verification=63kt8tzfgafjqtoffdqf0oxsthrp8k"
+      ],
+      [
+        "globalsign-domain-verification=E4187E5D0F154CD6F453AC64B6A2B400"
+      ],
+      [
+        "globalsign-domain-verification=CA6B852B624FF81317A038B1FCDC5405"
+      ],
+      [
+        "4c2g8lc0fkbfjdpcmicvvjfhpm"
+      ],
+      [
+        "_cu8pvg9knh3w0yc17gqhmyzcv52ctjo"
+      ],
+      [
+        "apple-domain-verification=VkLJmy5JfPeQjQcv"
+      ],
+      [
+        "v=spf1 include:spf-00235501.pphosted.com include:spf-001bee02.pphosted.com include:spf.protection.outlook.com -all"
+      ]
+    ],
     "CNAME": [],
-    "SOA": null,
-    "CAA": []
+    "SOA": {
+      "nsname": "vaash-wdc04-dns-22.internal.das",
+      "hostmaster": "hostmaster.domain53hosting.com",
+      "serial": 56,
+      "refresh": 86400,
+      "retry": 7200,
+      "expire": 3600000,
+      "minttl": 900
+    },
+    "CAA": [
+      {
+        "critical": 0,
+        "issue": "sectigo.com"
+      },
+      {
+        "critical": 0,
+        "issue": "entrust.net"
+      },
+      {
+        "critical": 0,
+        "issue": "digicert.com"
+      }
+    ]
   },
   "dkim": {},
-  "dmarc": null,
-  "spf": null,
-  "capturedAt": "2026-04-03"
+  "dmarc": "v=DMARC1;p=reject;fo=1;rua=mailto:dmarc_rua@emaildefense.proofpoint.com;ruf=mailto:dmarc_ruf@emaildefense.proofpoint.com",
+  "spf": "v=spf1 include:spf-00235501.pphosted.com include:spf-001bee02.pphosted.com include:spf.protection.outlook.com -all",
+  "capturedAt": "2026-04-03T23:37:06.340Z"
 }

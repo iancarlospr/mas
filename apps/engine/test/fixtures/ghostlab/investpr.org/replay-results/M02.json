@@ -1,0 +1,372 @@
+{
+  "moduleId": "M02",
+  "status": "success",
+  "data": {
+    "detectedTechnologies": [
+      {
+        "id": "wordpress",
+        "name": "WordPress",
+        "category": "cms",
+        "confidence": 1,
+        "version": "6.8.9"
+      },
+      {
+        "id": "cloudflare",
+        "name": "Cloudflare",
+        "category": "cdn",
+        "confidence": 1
+      },
+      {
+        "id": "recaptcha",
+        "name": "reCAPTCHA",
+        "category": "security",
+        "confidence": 1,
+        "version": "2.1.0"
+      },
+      {
+        "id": "jquery",
+        "name": "jQuery",
+        "category": "other",
+        "confidence": 0.95,
+        "version": "3.7.1"
+      },
+      {
+        "id": "gtm",
+        "name": "Google Tag Manager",
+        "category": "analytics",
+        "confidence": 0.9
+      },
+      {
+        "id": "php",
+        "name": "PHP",
+        "category": "language",
+        "confidence": 0.85
+      }
+    ],
+    "cms": {
+      "id": "wordpress",
+      "name": "WordPress",
+      "version": "6.8.9",
+      "confidence": 1
+    },
+    "cdn": {
+      "id": "cloudflare",
+      "name": "Cloudflare",
+      "confidence": 1
+    },
+    "framework": null,
+    "hosting": {
+      "id": "wp-engine",
+      "name": "WP Engine",
+      "confidence": 0.85,
+      "source": "headers"
+    },
+    "language": {
+      "id": "php",
+      "name": "PHP",
+      "confidence": 0.85
+    },
+    "buildTool": null,
+    "server": {
+      "id": "cloudflare",
+      "name": "cloudflare",
+      "version": null,
+      "os": null
+    },
+    "poweredBy": "WP Engine",
+    "compression": "brotli",
+    "httpVersion": "HTTP/3",
+    "trackingIds": [
+      {
+        "tool": "Google Tag Manager",
+        "id": "GTM-5WBLRC2",
+        "type": "tag-manager"
+      }
+    ],
+    "thirdPartyDomains": [
+      {
+        "domain": "google.com",
+        "type": "script",
+        "urls": [
+          "https://www.google.com/recaptcha/api.js?render=6Ld53u0pAAAAAFYK-Cmmlwo6hbTTsjN52_3kvPsO&ver=2.1.0",
+          "https://www.google.com",
+          "//www.google.com"
+        ],
+        "service": null
+      },
+      {
+        "domain": "googletagmanager.com",
+        "type": "prefetch",
+        "urls": [
+          "https://www.googletagmanager.com"
+        ],
+        "service": "Google Tag Manager"
+      },
+      {
+        "domain": "gutenaforms.com",
+        "type": "script",
+        "urls": [
+          "https://gutenaforms.com/pricing/"
+        ],
+        "service": null
+      },
+      {
+        "domain": "investprorg.mpeasylink.com",
+        "type": "script",
+        "urls": [
+          "//investprorg.mpeasylink.com/mpel/mpel.js",
+          "https://investprorg.mpeasylink.com"
+        ],
+        "service": null
+      },
+      {
+        "domain": "js.hs-analytics.net",
+        "type": "prefetch",
+        "urls": [
+          "https://js.hs-analytics.net"
+        ],
+        "service": "HubSpot Analytics"
+      },
+      {
+        "domain": "js.hs-banner.com",
+        "type": "prefetch",
+        "urls": [
+          "https://js.hs-banner.com"
+        ],
+        "service": "HubSpot Cookie Banner"
+      },
+      {
+        "domain": "js.hs-scripts.com",
+        "type": "prefetch",
+        "urls": [
+          "//js.hs-scripts.com"
+        ],
+        "service": "HubSpot"
+      },
+      {
+        "domain": "js.hsadspixel.net",
+        "type": "prefetch",
+        "urls": [
+          "https://js.hsadspixel.net"
+        ],
+        "service": null
+      },
+      {
+        "domain": "js.hscollectedforms.net",
+        "type": "prefetch",
+        "urls": [
+          "https://js.hscollectedforms.net"
+        ],
+        "service": null
+      },
+      {
+        "domain": "js.hubspot.com",
+        "type": "prefetch",
+        "urls": [
+          "https://js.hubspot.com"
+        ],
+        "service": null
+      },
+      {
+        "domain": "static.hotjar.com",
+        "type": "prefetch",
+        "urls": [
+          "https://static.hotjar.com"
+        ],
+        "service": "Hotjar"
+      },
+      {
+        "domain": "use.fontawesome.com",
+        "type": "prefetch",
+        "urls": [
+          "//use.fontawesome.com"
+        ],
+        "service": null
+      },
+      {
+        "domain": "youtube.com",
+        "type": "iframe",
+        "urls": [
+          "https://www.youtube.com/embed/mOgeb5ioGW0?color=white&autoplay=1"
+        ],
+        "service": null
+      }
+    ],
+    "cache": {
+      "cacheStatus": "hit",
+      "age": null,
+      "cacheControl": "max-age=600, must-revalidate",
+      "edgeLocation": "SJU",
+      "etag": false,
+      "lastModified": false,
+      "vary": "Accept-Encoding, Accept-Encoding, Accept-Encoding, Accept-Encoding,Cookie"
+    },
+    "cssClassFingerprints": [
+      {
+        "className": "class=\"wp-block-g",
+        "tech": "WordPress",
+        "category": "cms"
+      }
+    ],
+    "inlineConfigFrameworks": null
+  },
+  "signals": [
+    {
+      "type": "technology",
+      "name": "WordPress 6.8.9",
+      "confidence": 1,
+      "evidence": "Detected via fingerprint matching (category: cms)",
+      "category": "cms"
+    },
+    {
+      "type": "technology",
+      "name": "Cloudflare",
+      "confidence": 1,
+      "evidence": "Detected via fingerprint matching (category: cdn)",
+      "category": "cdn"
+    },
+    {
+      "type": "technology",
+      "name": "reCAPTCHA 2.1.0",
+      "confidence": 1,
+      "evidence": "Detected via fingerprint matching (category: security)",
+      "category": "security"
+    },
+    {
+      "type": "technology",
+      "name": "jQuery 3.7.1",
+      "confidence": 0.95,
+      "evidence": "Detected via fingerprint matching (category: other)",
+      "category": "other"
+    },
+    {
+      "type": "technology",
+      "name": "Google Tag Manager",
+      "confidence": 0.9,
+      "evidence": "Detected via fingerprint matching (category: analytics)",
+      "category": "analytics"
+    },
+    {
+      "type": "technology",
+      "name": "PHP",
+      "confidence": 0.85,
+      "evidence": "Detected via fingerprint matching (category: language)",
+      "category": "language"
+    },
+    {
+      "type": "server",
+      "name": "cloudflare",
+      "confidence": 0.95,
+      "evidence": "Detected from Server HTTP header",
+      "category": "server"
+    },
+    {
+      "type": "compression",
+      "name": "brotli",
+      "confidence": 1,
+      "evidence": "Detected from content-encoding HTTP header",
+      "category": "infrastructure"
+    },
+    {
+      "type": "protocol",
+      "name": "HTTP/3",
+      "confidence": 0.9,
+      "evidence": "Detected from HTTP response headers (alt-svc / protocol hints)",
+      "category": "infrastructure"
+    },
+    {
+      "type": "powered-by",
+      "name": "WP Engine",
+      "confidence": 0.95,
+      "evidence": "Detected from X-Powered-By HTTP header",
+      "category": "infrastructure"
+    },
+    {
+      "type": "hosting",
+      "name": "WP Engine",
+      "confidence": 0.85,
+      "evidence": "Inferred from server header and CDN-specific response headers",
+      "category": "infrastructure"
+    },
+    {
+      "type": "tracking",
+      "name": "Google Tag Manager: GTM-5WBLRC2",
+      "confidence": 0.95,
+      "evidence": "tag-manager ID extracted from HTML/inline scripts",
+      "category": "marketing"
+    }
+  ],
+  "score": null,
+  "checkpoints": [
+    {
+      "id": "m02-cms-identified",
+      "name": "CMS identified",
+      "weight": 0.3,
+      "health": "excellent",
+      "evidence": "WordPress 6.8.9 detected (confidence 1)"
+    },
+    {
+      "id": "m02-cms-version-currency",
+      "name": "CMS version currency",
+      "weight": 0.5,
+      "health": "good",
+      "evidence": "WordPress version 6.8.9 detected. Version currency check requires a version database."
+    },
+    {
+      "id": "m02-cdn-detected",
+      "name": "CDN detected",
+      "weight": 0.6,
+      "health": "excellent",
+      "evidence": "Enterprise CDN detected: Cloudflare (via fingerprint)"
+    },
+    {
+      "id": "m02-https-enforced",
+      "name": "HTTPS enforced",
+      "weight": 0.8,
+      "health": "excellent",
+      "evidence": "HTTPS active with HSTS header: max-age=63072000"
+    },
+    {
+      "id": "m02-http-version",
+      "name": "HTTP/2 or HTTP/3",
+      "weight": 0.5,
+      "health": "excellent",
+      "evidence": "HTTP/3 (QUIC) detected via alt-svc header."
+    },
+    {
+      "id": "m02-compression",
+      "name": "Compression",
+      "weight": 0.6,
+      "health": "excellent",
+      "evidence": "Brotli compression detected on the initial HTML response."
+    },
+    {
+      "id": "m02-server-header-exposure",
+      "name": "Server header exposure",
+      "weight": 0.4,
+      "health": "good",
+      "evidence": "Server header present without version: cloudflare"
+    },
+    {
+      "id": "m02-framework-detected",
+      "name": "Framework detected",
+      "weight": 0,
+      "health": "info",
+      "evidence": "No frontend framework detected."
+    },
+    {
+      "id": "m02-hosting-identified",
+      "name": "Hosting identified",
+      "weight": 0,
+      "health": "info",
+      "evidence": "Hosting: WP Engine (detected from response headers)"
+    }
+  ],
+  "duration": 92,
+  "_replay": {
+    "site": "investpr.org",
+    "moduleId": "M02",
+    "elapsed": 92,
+    "replayedAt": "2026-04-03T23:40:00.645Z"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "module": "M16",
+  "site": "foundationforpuertorico.org",
+  "dataAccuracy": {
+    "score": 50,
+    "matched": 2,
+    "total": 4,
+    "details": [
+      "  data.detected_language: expected exact \"es\", got \"en\" (Spanish site)",
+      "  data.article_count: expected exact 60, got 10 (60 media mentions in WP category 'media' (id=31). KNOWN GAP: M16 currently reports ~104 from HTML selector count. Needs WP category query to get accurate count.)"
+    ]
+  },
+  "checkpointAccuracy": {
+    "score": 40,
+    "matched": 2,
+    "total": 5,
+    "details": [
+      "  checkpoint m16-press-page: expected warning, got good (Media page found but content appears stale)",
+      "  checkpoint m16-media-logos: expected info, got excellent (No as-seen-in logos)",
+      "  checkpoint m16-press-recency: expected critical, got info (Content appears stale from HTML dates)"
+    ]
+  },
+  "falsePositiveRate": {
+    "score": 100,
+    "matched": 0,
+    "total": 0,
+    "details": []
+  },
+  "regressionGuard": {
+    "score": 100,
+    "matched": 0,
+    "total": 0,
+    "details": []
+  },
+  "completeness": {
+    "score": 100,
+    "matched": 5,
+    "total": 5,
+    "details": []
+  },
+  "overall": 70,
+  "scoredAt": "2026-04-03T23:40:14.223Z"
+}
