@@ -1,0 +1,77 @@
+{
+  "records": {
+    "A": [
+      "204.69.207.1"
+    ],
+    "AAAA": [],
+    "MX": [
+      {
+        "exchange": "alt2.aspmx.l.google.com",
+        "priority": 5
+      },
+      {
+        "exchange": "aspmx2.googlemail.com",
+        "priority": 10
+      },
+      {
+        "exchange": "aspmx.l.google.com",
+        "priority": 1
+      },
+      {
+        "exchange": "alt1.aspmx.l.google.com",
+        "priority": 5
+      },
+      {
+        "exchange": "aspmx3.googlemail.com",
+        "priority": 10
+      }
+    ],
+    "NS": [
+      "ns-411.awsdns-51.com",
+      "ns-1017.awsdns-63.net",
+      "ns-1385.awsdns-45.org",
+      "ns-1750.awsdns-26.co.uk"
+    ],
+    "TXT": [
+      [
+        "v=spf1 include:_spf.google.com ~all"
+      ],
+      [
+        "google-site-verification=DME49oyNg4q49Rpslfnkzm37ONnGYFE0B_KqZrH4qUM"
+      ],
+      [
+        "apple-domain-verification=iPfZwSwyfImAS4mx"
+      ],
+      [
+        "google-site-verification=bCzEBnHjTXL_FbVtRyFArcgKCMbK0mnabMEQfvN5KO0"
+      ],
+      [
+        "facebook-domain-verification=qhu793ymtrzy5ee4ryli7wnxfrqxte"
+      ],
+      [
+        "google-site-verification=iqsi-bBT7cfrTqsp9VbrgRgEFBMEDhyegZwZ7sJUDew"
+      ],
+      [
+        "atlassian-domain-verification=Xcx9GDYdvXlWk2oK2NGOactXi2YM21veL1TEzSF6nLlM6fCbCOn3Y5YhhXYAchmd"
+      ],
+      [
+        "stripe-verification=42bf1ced57ec54fb912dddbb5f06ddb60213f9bc4685b3fb426ada075008d57a"
+      ]
+    ],
+    "CNAME": [],
+    "SOA": {
+      "nsname": "ns-1750.awsdns-26.co.uk",
+      "hostmaster": "awsdns-hostmaster.amazon.com",
+      "serial": 1,
+      "refresh": 7200,
+      "retry": 900,
+      "expire": 1209600,
+      "minttl": 86400
+    },
+    "CAA": []
+  },
+  "dkim": {},
+  "dmarc": "v=DMARC1; p=none",
+  "spf": "v=spf1 include:_spf.google.com ~all",
+  "capturedAt": "2026-04-03T23:19:10.660Z"
+}

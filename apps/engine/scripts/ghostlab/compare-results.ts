@@ -369,17 +369,28 @@ function compareModule(moduleId: string, site: string): GhostlabScore | null {
     return null;
   }
 
-  // Load ground truth
-  const gtPath = resolve(FIXTURES_DIR, site, 'ground-truth.json');
+  // Load ground truth — try manual first, fall back to auto-generated
+  let gtPath = resolve(FIXTURES_DIR, site, 'ground-truth.json');
   if (!existsSync(gtPath)) {
-    console.error(`No ground truth found: ${gtPath}`);
+    gtPath = resolve(FIXTURES_DIR, site, 'auto-ground-truth.json');
+  }
+  if (!existsSync(gtPath)) {
+    console.error(`No ground truth found for ${site}. Run capture-ground-truth.ts + generate-ground-truth-json.ts first.`);
     return null;
   }
 
   const replayResult = JSON.parse(readFileSync(replayPath, 'utf-8'));
   const groundTruth: GroundTruth = JSON.parse(readFileSync(gtPath, 'utf-8'));
 
-  const moduleGT = groundTruth.modules[moduleId];
+  // Check manual ground truth first for this module, fall back to auto
+  let moduleGT = groundTruth.modules[moduleId];
+  if (!moduleGT) {
+    const autoGtPath = resolve(FIXTURES_DIR, site, 'auto-ground-truth.json');
+    if (existsSync(autoGtPath)) {
+      const autoGt: GroundTruth = JSON.parse(readFileSync(autoGtPath, 'utf-8'));
+      moduleGT = autoGt.modules[moduleId];
+    }
+  }
   if (!moduleGT) {
     console.error(`No ground truth for ${moduleId} in ${site}`);
     return null;

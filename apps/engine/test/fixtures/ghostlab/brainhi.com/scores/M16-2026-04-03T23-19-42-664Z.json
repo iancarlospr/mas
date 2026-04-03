@@ -1,0 +1,43 @@
+{
+  "module": "M16",
+  "site": "brainhi.com",
+  "dataAccuracy": {
+    "score": 0,
+    "matched": 0,
+    "total": 2,
+    "details": [
+      "  data.press_page_url: expected truthy, got null (Press page at https://www.brainhi.com/news)",
+      "  data.article_count: expected gte 5, got 0 (5 articles (visible on page))"
+    ]
+  },
+  "checkpointAccuracy": {
+    "score": 75,
+    "matched": 3,
+    "total": 4,
+    "details": [
+      "  checkpoint m16-press-page: expected excellent, got info (Press page found)"
+    ]
+  },
+  "falsePositiveRate": {
+    "score": 100,
+    "matched": 0,
+    "total": 0,
+    "details": []
+  },
+  "regressionGuard": {
+    "score": 100,
+    "matched": 0,
+    "total": 0,
+    "details": []
+  },
+  "completeness": {
+    "score": 100,
+    "matched": 4,
+    "total": 4,
+    "details": [
+      "  EXTRA checkpoint: m16-press-recency (not in ground truth — add if expected)"
+    ]
+  },
+  "overall": 64,
+  "scoredAt": "2026-04-03T23:19:42.663Z"
+}
