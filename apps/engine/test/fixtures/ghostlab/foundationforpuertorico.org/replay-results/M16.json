@@ -19,7 +19,7 @@
     "most_recent_date": "2020-04-29T00:00:00.000Z",
     "oldest_date": "2020-04-29",
     "date_count": 1,
-    "article_count": 104,
+    "article_count": 60,
     "wire_services": [],
     "press_schema_types": [],
     "main_page_press_links": [
@@ -94,7 +94,7 @@
   "_replay": {
     "site": "foundationforpuertorico.org",
     "moduleId": "M16",
-    "elapsed": 166,
-    "replayedAt": "2026-04-03T22:51:31.699Z"
+    "elapsed": 161,
+    "replayedAt": "2026-04-03T22:58:33.985Z"
   }
 }

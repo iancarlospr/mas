@@ -313,14 +313,13 @@ function countPressArticles($: CheerioAPI): number {
   const selectors = [
     'article', '.press-release', '.news-item', '.post', '.blog-post',
     '.news-entry', '.article-card', '.press-item', '.entry',
-    '[class*="press"] li', '[class*="news"] li',
-    // Broader patterns for custom CMS markup
-    '[class*="release"]', '[class*="article"]',
-    '[class*="newsroom"] li', '[class*="media"] li',
     '.listing-item', '.content-item',
     // CMS-specific card patterns (Q4 Web Systems, custom enterprise CMS)
     '[class*="mm-card__content"]', '[class*="mm-card__title"]',
-    '[class*="press-card"]', '[class*="news-card"]',
+    '.press-card', '.news-card',
+    // Specific press/news list containers (use class-word matching, not substring)
+    '.press-releases li', '.press-list li', '.news-list li',
+    '.newsroom-list li', '.media-list li', '.media-mentions li',
   ];
   let maxCount = 0;
   for (const sel of selectors) {
@@ -761,6 +760,39 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
         totalArticleCount = allArticles.size;
       }
     }
+  }
+
+  // WordPress category-filtered article count: query the WP REST API to find
+  // a press/media/news category and get the exact post count for that category.
+  // This is more accurate than HTML selectors for sites with JS-loaded content.
+  const isWordPress = ctx.html?.includes('wp-content') || ctx.html?.includes('wp-includes');
+  if (isWordPress && bestPressPage && totalArticleCount < 10 && externalArticleCount === 0) {
+    try {
+      const origin = new URL(baseUrl).origin;
+      // Query WP categories API
+      const catsResult = await fetchWithRetry(`${origin}/wp-json/wp/v2/categories?per_page=50`, { timeout: 8_000, retries: 0 });
+      if (catsResult.ok) {
+        const categories = JSON.parse(catsResult.body) as Array<{ id: number; slug: string; count: number; name: string }>;
+        // Find press/media/news category by slug or name
+        const pressCategory = categories.find(c =>
+          /^(media|press|news|newsroom|prensa|noticias|medios|comunicados)$/.test(c.slug) ||
+          /^(media|press|news|newsroom|prensa|noticias|medios|comunicados)/i.test(c.name),
+        );
+        if (pressCategory && pressCategory.count > totalArticleCount) {
+          // Verify via X-WP-Total header
+          const wpResult = await fetchWithRetry(
+            `${origin}/wp-json/wp/v2/posts?per_page=1&categories=${pressCategory.id}`,
+            { timeout: 8_000, retries: 0 },
+          );
+          if (wpResult.ok) {
+            const wpTotal = parseInt(wpResult.headers['x-wp-total'] ?? '0', 10);
+            if (wpTotal > 0) {
+              totalArticleCount = wpTotal;
+            }
+          }
+        }
+      }
+    } catch { /* WP API not available */ }
   }
 
   // Dedupe dates
