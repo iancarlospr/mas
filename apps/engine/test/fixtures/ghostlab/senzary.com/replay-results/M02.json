@@ -334,11 +334,11 @@
       "evidence": "Hosting provider not identified from fingerprints."
     }
   ],
-  "duration": 86,
+  "duration": 85,
   "_replay": {
     "site": "senzary.com",
     "moduleId": "M02",
-    "elapsed": 86,
-    "replayedAt": "2026-04-03T23:40:04.139Z"
+    "elapsed": 85,
+    "replayedAt": "2026-04-03T23:47:09.400Z"
   }
 }

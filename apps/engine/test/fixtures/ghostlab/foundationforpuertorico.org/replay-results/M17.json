@@ -4,11 +4,11 @@
   "data": {
     "detected_language": "en",
     "found_pages": [
-      "/careers",
-      "/foundation-fellows-turning-talent-into-transformation",
-      "/foundation-for-puerto-rico-enables-the-reopening-of-the-camuy-river-cave-park",
-      "/foundation-for-puerto-rico-joins-the-annual-convention-of-the-association-of-builders-to-discuss-the-state-of-housing",
-      "/foundation-for-puerto-rico-joins-the-emprende-en-grande-event-hosted-by-the-municipality-of-rio-grande"
+      "https://www.foundationforpuertorico.org/careers",
+      "https://www.foundationforpuertorico.org/foundation-fellows-turning-talent-into-transformation",
+      "https://www.foundationforpuertorico.org/foundation-for-puerto-rico-enables-the-reopening-of-the-camuy-river-cave-park",
+      "https://www.foundationforpuertorico.org/foundation-for-puerto-rico-joins-the-annual-convention-of-the-association-of-builders-to-discuss-the-state-of-housing",
+      "https://www.foundationforpuertorico.org/foundation-for-puerto-rico-joins-the-emprende-en-grande-event-hosted-by-the-municipality-of-rio-grande"
     ],
     "careers_page_url": "https://www.foundationforpuertorico.org/careers",
     "ats_provider": null,
@@ -76,7 +76,7 @@
   "_replay": {
     "site": "foundationforpuertorico.org",
     "moduleId": "M17",
-    "elapsed": 425,
-    "replayedAt": "2026-04-03T23:40:21.306Z"
+    "elapsed": 437,
+    "replayedAt": "2026-04-03T23:47:26.856Z"
   }
 }

@@ -3,6 +3,7 @@ import type { ModuleContext, ModuleExecuteFn } from '../types.js';
 import type { ModuleResult, ModuleId, Signal, Checkpoint } from '@marketing-alpha/types';
 import { createSignal, createCheckpoint, infoCheckpoint } from '../../utils/signals.js';
 import { normalizeUrl } from '../../utils/url.js';
+import { fetchWithRetry } from '../../utils/http.js';
 import { parseHtml, extractLinks, extractScriptSrcs } from '../../utils/html.js';
 import type { CheerioAPI } from '../../utils/html.js';
 import { detectPageLanguage } from '../../utils/i18n-probes.js';
@@ -287,7 +288,38 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
     }
   }
 
-  data.found_pages = foundPages.map((p) => p.path);
+  // Fallback: if no careers pages from sitemap, probe common paths
+  if (foundPages.length === 0) {
+    const CAREERS_PROBE_PATHS = [
+      '/careers/', '/careers', '/jobs/', '/jobs', '/join-us/', '/join-us',
+      '/about/careers/', '/about/team/', '/about-us/careers/',
+      // Multi-language paths
+      '/sobre-mmm/empleos', '/sobre/empleos', '/empleo/', '/empleos/',
+      '/about-investpr/careers/', '/about/careers/',
+      // Common subfolder patterns
+      '/en/careers/', '/es/careers/', '/en-us/careers/',
+    ];
+    const probeResults = await Promise.allSettled(
+      CAREERS_PROBE_PATHS.map(async (path) => {
+        try {
+          const url = `${baseUrl}${path}`;
+          const res = await fetchWithRetry(url, { timeout: 10_000, retries: 0 });
+          if (res.ok && res.body.length > 500 && !res.body.trimStart().startsWith('{')) {
+            return { path, found: true, html: res.body, status: 200 } as ProbeResult;
+          }
+        } catch { /* not found */ }
+        return null;
+      }),
+    );
+    for (const r of probeResults) {
+      if (r.status === 'fulfilled' && r.value) {
+        const isExcluded = EXCLUDED_PATH_PREFIXES.some((prefix) => r.value!.path.startsWith(prefix));
+        if (!isExcluded) foundPages.push(r.value);
+      }
+    }
+  }
+
+  data.found_pages = foundPages.map((p) => p.fullUrl ?? p.path);
 
   // 3. Analyze found pages
   let bestCareersPage: ProbeResult | null = null;

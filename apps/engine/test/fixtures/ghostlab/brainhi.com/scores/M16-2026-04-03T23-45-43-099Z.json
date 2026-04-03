@@ -1,0 +1,38 @@
+{
+  "module": "M16",
+  "site": "brainhi.com",
+  "dataAccuracy": {
+    "score": 100,
+    "matched": 1,
+    "total": 1,
+    "details": []
+  },
+  "checkpointAccuracy": {
+    "score": 100,
+    "matched": 4,
+    "total": 4,
+    "details": []
+  },
+  "falsePositiveRate": {
+    "score": 100,
+    "matched": 0,
+    "total": 0,
+    "details": []
+  },
+  "regressionGuard": {
+    "score": 100,
+    "matched": 0,
+    "total": 0,
+    "details": []
+  },
+  "completeness": {
+    "score": 100,
+    "matched": 4,
+    "total": 4,
+    "details": [
+      "  EXTRA checkpoint: m16-press-recency (not in ground truth — add if expected)"
+    ]
+  },
+  "overall": 100,
+  "scoredAt": "2026-04-03T23:45:43.098Z"
+}

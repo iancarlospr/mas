@@ -3,45 +3,63 @@
   "status": "success",
   "data": {
     "detected_language": "en",
-    "found_pages": [],
-    "careers_page_url": null,
+    "found_pages": [
+      "/about-investpr/careers/"
+    ],
+    "careers_page_url": "https://www.investpr.org/about-investpr/careers/",
     "ats_provider": null,
     "ats_evidence": null,
-    "open_positions_count": 0,
+    "open_positions_count": 3,
     "has_team_page": false,
     "has_culture_page": false,
     "most_recent_posting": null,
     "external_careers_links": [],
-    "benefits_mentioned": false,
+    "benefits_mentioned": true,
     "remote_work_mentioned": false,
     "dei_mentioned": false,
     "review_site_links": [
       "https://www.linkedin.com/company/investpr/"
     ]
   },
-  "signals": [],
+  "signals": [
+    {
+      "type": "careers_page",
+      "name": "Careers Page",
+      "confidence": 0.95,
+      "evidence": "Careers page found at https://www.investpr.org/about-investpr/careers/",
+      "category": "brand_presence"
+    },
+    {
+      "type": "open_positions",
+      "name": "Open Positions",
+      "confidence": 0.7,
+      "evidence": "Approximately 3 open position(s) detected",
+      "category": "brand_presence"
+    }
+  ],
   "score": null,
   "checkpoints": [
     {
       "id": "m17-careers-page",
       "name": "Careers page",
-      "weight": 0,
-      "health": "info",
-      "evidence": "No dedicated careers page found"
+      "weight": 0.4,
+      "health": "excellent",
+      "evidence": "Dedicated careers page with 3 open position(s) at /about-investpr/careers/"
     },
     {
       "id": "m17-ats-provider",
       "name": "ATS provider",
-      "weight": 0,
-      "health": "info",
-      "evidence": "No ATS provider detected"
+      "weight": 0.3,
+      "health": "warning",
+      "evidence": "Job listings appear to be manually managed (no ATS detected)",
+      "recommendation": "Consider using a professional ATS for better candidate management"
     },
     {
       "id": "m17-open-positions",
       "name": "Open positions",
       "weight": 0,
       "health": "info",
-      "evidence": "No open positions detected"
+      "evidence": "3 open position(s) detected"
     },
     {
       "id": "m17-team-culture",
@@ -62,7 +80,7 @@
   "_replay": {
     "site": "investpr.org",
     "moduleId": "M17",
-    "elapsed": 34,
-    "replayedAt": "2026-04-03T23:40:22.445Z"
+    "elapsed": 112,
+    "replayedAt": "2026-04-03T23:47:28.126Z"
   }
 }

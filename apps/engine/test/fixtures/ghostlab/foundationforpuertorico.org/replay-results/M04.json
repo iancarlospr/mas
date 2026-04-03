@@ -559,11 +559,11 @@
       "evidence": "Viewport allows user zoom (content: \"width=device-width, initial-scale=1\")"
     }
   ],
-  "duration": 159,
+  "duration": 160,
   "_replay": {
     "site": "foundationforpuertorico.org",
     "moduleId": "M04",
-    "elapsed": 159,
-    "replayedAt": "2026-04-03T23:40:06.563Z"
+    "elapsed": 160,
+    "replayedAt": "2026-04-03T23:47:11.886Z"
   }
 }

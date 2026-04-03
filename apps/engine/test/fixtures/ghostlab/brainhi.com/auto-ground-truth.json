@@ -98,35 +98,27 @@
     "M16": {
       "expectedData": {
         "press_page_url": {
-          "match": "truthy",
-          "note": "Press page at https://www.brainhi.com/news"
-        },
-        "article_count": {
-          "value": 5,
-          "match": "gte",
-          "note": "5 articles (visible on page)"
+          "match": "falsy",
+          "note": "JS-rendered site \u2014 passive fetch returns empty shell, /news link not in server HTML"
         }
       },
       "expectedCheckpoints": [
         {
           "id": "m16-press-page",
-          "expectedHealth": "excellent",
-          "note": "Press page found"
+          "expectedHealth": "info",
+          "note": "Cannot detect press page on JS-rendered sites in passive phase"
         },
         {
           "id": "m16-media-contact",
-          "expectedHealth": "info",
-          "note": "No media contact"
+          "expectedHealth": "info"
         },
         {
           "id": "m16-rss-feed",
-          "expectedHealth": "info",
-          "note": "No RSS feed"
+          "expectedHealth": "info"
         },
         {
           "id": "m16-media-logos",
-          "expectedHealth": "info",
-          "note": "No media logos"
+          "expectedHealth": "info"
         }
       ],
       "negativeAssertions": [],

@@ -3,11 +3,13 @@
   "status": "success",
   "data": {
     "detected_language": "es",
-    "found_pages": [],
-    "careers_page_url": null,
-    "ats_provider": null,
-    "ats_evidence": null,
-    "open_positions_count": 0,
+    "found_pages": [
+      "/sobre-mmm/empleos"
+    ],
+    "careers_page_url": "https://www.mmm-pr.com/sobre-mmm/empleos",
+    "ats_provider": "Workday",
+    "ats_evidence": "Workday reference found in page HTML",
+    "open_positions_count": 1,
     "has_team_page": false,
     "has_culture_page": false,
     "most_recent_posting": null,
@@ -19,29 +21,51 @@
       "https://www.linkedin.com/company/10190155/"
     ]
   },
-  "signals": [],
+  "signals": [
+    {
+      "type": "careers_page",
+      "name": "Careers Page",
+      "confidence": 0.95,
+      "evidence": "Careers page found at https://www.mmm-pr.com/sobre-mmm/empleos",
+      "category": "brand_presence"
+    },
+    {
+      "type": "ats_provider",
+      "name": "Workday",
+      "confidence": 0.9,
+      "evidence": "Workday reference found in page HTML",
+      "category": "brand_presence"
+    },
+    {
+      "type": "open_positions",
+      "name": "Open Positions",
+      "confidence": 0.7,
+      "evidence": "Approximately 1 open position(s) detected",
+      "category": "brand_presence"
+    }
+  ],
   "score": null,
   "checkpoints": [
     {
       "id": "m17-careers-page",
       "name": "Careers page",
-      "weight": 0,
-      "health": "info",
-      "evidence": "No dedicated careers page found"
+      "weight": 0.4,
+      "health": "excellent",
+      "evidence": "Dedicated careers page with 1 open position(s) at /sobre-mmm/empleos"
     },
     {
       "id": "m17-ats-provider",
       "name": "ATS provider",
-      "weight": 0,
-      "health": "info",
-      "evidence": "No ATS provider detected"
+      "weight": 0.3,
+      "health": "excellent",
+      "evidence": "Professional ATS detected: Workday"
     },
     {
       "id": "m17-open-positions",
       "name": "Open positions",
       "weight": 0,
       "health": "info",
-      "evidence": "No open positions detected"
+      "evidence": "1 open position(s) detected"
     },
     {
       "id": "m17-team-culture",
@@ -62,7 +86,7 @@
   "_replay": {
     "site": "mmm-pr.com",
     "moduleId": "M17",
-    "elapsed": 23,
-    "replayedAt": "2026-04-03T23:40:23.524Z"
+    "elapsed": 76,
+    "replayedAt": "2026-04-03T23:47:29.265Z"
   }
 }

@@ -420,11 +420,11 @@
       "evidence": "Hosting: Cloudflare (detected from response headers)"
     }
   ],
-  "duration": 129,
+  "duration": 124,
   "_replay": {
     "site": "foundationforpuertorico.org",
     "moduleId": "M02",
-    "elapsed": 130,
-    "replayedAt": "2026-04-03T23:39:59.459Z"
+    "elapsed": 124,
+    "replayedAt": "2026-04-03T23:47:04.657Z"
   }
 }

@@ -1,0 +1,44 @@
+{
+  "module": "M18",
+  "site": "foundationforpuertorico.org",
+  "dataAccuracy": {
+    "score": 100,
+    "matched": 0,
+    "total": 0,
+    "details": []
+  },
+  "checkpointAccuracy": {
+    "score": 0,
+    "matched": 0,
+    "total": 1,
+    "details": [
+      "  checkpoint m18-ir-portal: expected info, got warning (No IR page)"
+    ]
+  },
+  "falsePositiveRate": {
+    "score": 100,
+    "matched": 0,
+    "total": 0,
+    "details": []
+  },
+  "regressionGuard": {
+    "score": 100,
+    "matched": 0,
+    "total": 0,
+    "details": []
+  },
+  "completeness": {
+    "score": 100,
+    "matched": 1,
+    "total": 1,
+    "details": [
+      "  EXTRA checkpoint: m18-financial-data (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: m18-ticker-symbol (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: m18-esg-report (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: m18-governance (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: m18-ir-comms (not in ground truth — add if expected)"
+    ]
+  },
+  "overall": 75,
+  "scoredAt": "2026-04-03T23:47:34.621Z"
+}

@@ -586,11 +586,11 @@
       "evidence": "Viewport allows user zoom (content: \"width=device-width, initial-scale=1.0\")"
     }
   ],
-  "duration": 125,
+  "duration": 123,
   "_replay": {
     "site": "investpr.org",
     "moduleId": "M04",
-    "elapsed": 125,
-    "replayedAt": "2026-04-03T23:40:07.816Z"
+    "elapsed": 124,
+    "replayedAt": "2026-04-03T23:47:13.112Z"
   }
 }

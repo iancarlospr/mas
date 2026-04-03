@@ -1,0 +1,47 @@
+{
+  "module": "M02",
+  "site": "investpr.org",
+  "dataAccuracy": {
+    "score": 75,
+    "matched": 3,
+    "total": 4,
+    "details": [
+      "  data.compression: expected exact \"br\", got \"brotli\" (Compression from headers)"
+    ]
+  },
+  "checkpointAccuracy": {
+    "score": 100,
+    "matched": 1,
+    "total": 1,
+    "details": []
+  },
+  "falsePositiveRate": {
+    "score": 100,
+    "matched": 0,
+    "total": 0,
+    "details": []
+  },
+  "regressionGuard": {
+    "score": 100,
+    "matched": 0,
+    "total": 0,
+    "details": []
+  },
+  "completeness": {
+    "score": 100,
+    "matched": 1,
+    "total": 1,
+    "details": [
+      "  EXTRA checkpoint: m02-cms-identified (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: m02-cms-version-currency (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: m02-cdn-detected (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: m02-http-version (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: m02-compression (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: m02-server-header-exposure (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: m02-framework-detected (not in ground truth — add if expected)",
+      "  EXTRA checkpoint: m02-hosting-identified (not in ground truth — add if expected)"
+    ]
+  },
+  "overall": 93,
+  "scoredAt": "2026-04-03T23:45:29.838Z"
+}

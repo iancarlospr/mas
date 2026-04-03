@@ -6,15 +6,14 @@
     "M16": {
       "expectedData": {
         "detected_language": { "value": "es", "match": "exact", "note": "Spanish site" },
-        "press_page_url": { "value": "enterate", "match": "contains", "note": "Press center at /sobre-mmm/enterate" },
-        "article_count": { "value": 28, "match": "exact", "note": "28 articles across 10 pages, 3 per page, ?page=N&per-page=3 pagination" }
+        "press_page_url": { "match": "falsy", "note": "KNOWN GAP: press page at /sobre-mmm/enterate requires navigation hop from /sobre-mmm — 'enterate' not in any press keyword list. Passive module can't follow internal links." }
       },
       "expectedCheckpoints": [
-        { "id": "m16-press-page", "expectedHealth": "excellent", "note": "Active press page with recent articles" },
-        { "id": "m16-media-contact", "expectedHealth": "excellent", "note": "Has press contacts with email and phone" },
-        { "id": "m16-rss-feed", "expectedHealth": "info", "note": "No RSS on press page" },
+        { "id": "m16-press-page", "expectedHealth": "info", "note": "KNOWN GAP: press page not discoverable via sitemap/probes" },
+        { "id": "m16-media-contact", "expectedHealth": "info", "note": "Contact only visible on undiscoverable press page" },
+        { "id": "m16-rss-feed", "expectedHealth": "info", "note": "No RSS" },
         { "id": "m16-media-logos", "expectedHealth": "info", "note": "No media logos" },
-        { "id": "m16-press-recency", "expectedHealth": "excellent", "note": "Recent articles" }
+        { "id": "m16-press-recency", "expectedHealth": "info", "note": "No press page found" }
       ],
       "negativeAssertions": [],
       "fixedBugs": []

@@ -1,0 +1,36 @@
+{
+  "module": "M19",
+  "site": "ryder.com",
+  "dataAccuracy": {
+    "score": 100,
+    "matched": 2,
+    "total": 2,
+    "details": []
+  },
+  "checkpointAccuracy": {
+    "score": 100,
+    "matched": 7,
+    "total": 7,
+    "details": []
+  },
+  "falsePositiveRate": {
+    "score": 100,
+    "matched": 0,
+    "total": 0,
+    "details": []
+  },
+  "regressionGuard": {
+    "score": 100,
+    "matched": 2,
+    "total": 2,
+    "details": []
+  },
+  "completeness": {
+    "score": 100,
+    "matched": 7,
+    "total": 7,
+    "details": []
+  },
+  "overall": 100,
+  "scoredAt": "2026-04-03T23:46:12.106Z"
+}

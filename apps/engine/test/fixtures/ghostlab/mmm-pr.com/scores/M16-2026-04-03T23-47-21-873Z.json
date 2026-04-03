@@ -1,0 +1,36 @@
+{
+  "module": "M16",
+  "site": "mmm-pr.com",
+  "dataAccuracy": {
+    "score": 100,
+    "matched": 2,
+    "total": 2,
+    "details": []
+  },
+  "checkpointAccuracy": {
+    "score": 100,
+    "matched": 5,
+    "total": 5,
+    "details": []
+  },
+  "falsePositiveRate": {
+    "score": 100,
+    "matched": 0,
+    "total": 0,
+    "details": []
+  },
+  "regressionGuard": {
+    "score": 100,
+    "matched": 0,
+    "total": 0,
+    "details": []
+  },
+  "completeness": {
+    "score": 100,
+    "matched": 5,
+    "total": 5,
+    "details": []
+  },
+  "overall": 100,
+  "scoredAt": "2026-04-03T23:47:21.872Z"
+}

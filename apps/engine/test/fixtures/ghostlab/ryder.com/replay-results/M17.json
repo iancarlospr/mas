@@ -4,10 +4,10 @@
   "data": {
     "detected_language": "en",
     "found_pages": [
-      "/en-us/careers/freight-agent",
-      "/en-us/careers/recruiting-events",
-      "/en-us/careers/jobs-by-location",
-      "/en-us/careers"
+      "https://www.ryder.com/en-us/careers/freight-agent",
+      "https://www.ryder.com/en-us/careers/recruiting-events",
+      "https://www.ryder.com/en-us/careers/jobs-by-location",
+      "https://www.ryder.com/en-us/careers"
     ],
     "careers_page_url": "https://www.ryder.com/en-us/careers",
     "ats_provider": "iCIMS",
@@ -99,7 +99,7 @@
   "_replay": {
     "site": "ryder.com",
     "moduleId": "M17",
-    "elapsed": 280,
-    "replayedAt": "2026-04-03T23:40:24.884Z"
+    "elapsed": 260,
+    "replayedAt": "2026-04-03T23:47:30.599Z"
   }
 }
