@@ -107,30 +107,27 @@
     "M16": {
       "expectedData": {
         "press_page_url": {
-          "match": "falsy",
-          "note": "No press page found"
+          "match": "truthy",
+          "note": "/newsroom/ found via probe fallback"
         }
       },
       "expectedCheckpoints": [
         {
           "id": "m16-press-page",
-          "expectedHealth": "info",
-          "note": "No press page"
+          "expectedHealth": "excellent",
+          "note": "Newsroom found"
         },
         {
           "id": "m16-media-contact",
-          "expectedHealth": "info",
-          "note": "No media contact"
+          "expectedHealth": "good"
         },
         {
           "id": "m16-rss-feed",
-          "expectedHealth": "info",
-          "note": "No RSS feed"
+          "expectedHealth": "good"
         },
         {
           "id": "m16-media-logos",
-          "expectedHealth": "info",
-          "note": "No media logos"
+          "expectedHealth": "excellent"
         }
       ],
       "negativeAssertions": [],

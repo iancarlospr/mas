@@ -126,42 +126,54 @@ function createProbeHandlers(probesFixture: HttpProbesFixture) {
   const { baseUrl, probes } = probesFixture;
 
   // Build a lookup map for probe responses, keyed by full URL (with query params)
+  // Add both www and non-www variants since sites redirect between them
   const probeLookup = new Map<string, typeof probes[string]>();
+  const baseOrigin = new URL(baseUrl).origin;
+  const baseDomain = new URL(baseUrl).hostname.replace(/^www\./, '');
+  const wwwOrigin = `https://www.${baseDomain}`;
+  const bareOrigin = `https://${baseDomain}`;
+
   for (const [path, data] of Object.entries(probes)) {
-    const url = `${baseUrl}${path}`;
-    probeLookup.set(url, data);
+    probeLookup.set(`${wwwOrigin}${path}`, data);
+    probeLookup.set(`${bareOrigin}${path}`, data);
   }
 
-  // Single handler that matches all requests to the base URL domain
-  // and looks up the full URL (including query params) in the probe map
-  const baseHost = new URL(baseUrl).hostname;
+  // Handler matches both www and non-www variants
   handlers.push(
-    http.get(`https://${baseHost}/*`, ({ request }) => {
-      const fullUrl = request.url;
-      let data = probeLookup.get(fullUrl);
-      // Try without trailing slash
-      if (!data) data = probeLookup.get(fullUrl.replace(/\/$/, ''));
-      // Try with trailing slash
-      if (!data) data = probeLookup.get(fullUrl + '/');
-      // Try path-only match (strip query params)
-      if (!data) {
-        const urlObj = new URL(fullUrl);
-        data = probeLookup.get(`${urlObj.origin}${urlObj.pathname}`);
-        if (!data) data = probeLookup.get(`${urlObj.origin}${urlObj.pathname.replace(/\/$/, '')}`);
-      }
-
-      if (data) {
-        const cleanHeaders = stripEncodingHeaders(data.headers);
-        return new HttpResponse(data.body || '', {
-          status: data.status || 200,
-          headers: cleanHeaders,
-        });
-      }
-      // Not in fixtures — return 404
-      console.log(`  [MSW] No fixture for: ${fullUrl}`);
-      return new HttpResponse('Not Found', { status: 404 });
+    http.get(`https://www.${baseDomain}/*`, ({ request }) => {
+      return lookupAndRespond(request.url);
     }),
   );
+  handlers.push(
+    http.get(`https://${baseDomain}/*`, ({ request }) => {
+      return lookupAndRespond(request.url);
+    }),
+  );
+
+  function lookupAndRespond(fullUrl: string): Response | undefined {
+    let data = probeLookup.get(fullUrl);
+    if (!data) data = probeLookup.get(fullUrl.replace(/\/$/, ''));
+    if (!data) data = probeLookup.get(fullUrl + '/');
+    // Try path-only match (strip query params) on both origins
+    if (!data) {
+      const urlObj = new URL(fullUrl);
+      for (const origin of [wwwOrigin, bareOrigin]) {
+        data = probeLookup.get(`${origin}${urlObj.pathname}`);
+        if (!data) data = probeLookup.get(`${origin}${urlObj.pathname.replace(/\/$/, '')}`);
+        if (!data) data = probeLookup.get(`${origin}${urlObj.pathname}${urlObj.search}`);
+        if (data) break;
+      }
+    }
+
+    if (data) {
+      return new HttpResponse(data.body || '', {
+        status: data.status || 200,
+        headers: stripEncodingHeaders(data.headers),
+      });
+    }
+    console.log(`  [MSW] No fixture for: ${fullUrl}`);
+    return new HttpResponse('Not Found', { status: 404 });
+  }
 
   // Load external newsroom fixtures if they exist
   for (const siteName of ['senzary.com', 'ryder.com']) {

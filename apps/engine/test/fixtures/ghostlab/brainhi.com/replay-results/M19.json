@@ -3,8 +3,14 @@
   "status": "success",
   "data": {
     "detected_language": "en",
-    "found_pages": [],
-    "support_page_url": null,
+    "found_pages": [
+      "/help/",
+      "/support/",
+      "/contact/",
+      "/faq/",
+      "/knowledge-base/"
+    ],
+    "support_page_url": "https://brainhi.com/help/",
     "help_center_provider": null,
     "help_center_evidence": null,
     "help_page_quality": "none",
@@ -109,7 +115,7 @@
   "_replay": {
     "site": "brainhi.com",
     "moduleId": "M19",
-    "elapsed": 39,
-    "replayedAt": "2026-04-03T23:47:39.878Z"
+    "elapsed": 89,
+    "replayedAt": "2026-04-04T00:21:28.584Z"
   }
 }

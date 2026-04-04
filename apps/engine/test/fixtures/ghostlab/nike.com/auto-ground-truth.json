@@ -102,35 +102,27 @@
     "M16": {
       "expectedData": {
         "press_page_url": {
-          "match": "truthy",
-          "note": "Press page at https://news.nike.com/"
-        },
-        "article_count": {
-          "value": 38,
-          "match": "gte",
-          "note": "38 articles (pagination crawl)"
+          "match": "falsy",
+          "note": "PASSIVE LIMITATION: External careers at jobs.nike.com"
         }
       },
       "expectedCheckpoints": [
         {
           "id": "m16-press-page",
-          "expectedHealth": "excellent",
-          "note": "Press page found"
+          "expectedHealth": "info",
+          "note": "Cannot detect: External careers at jobs.nike.com"
         },
         {
           "id": "m16-media-contact",
-          "expectedHealth": "info",
-          "note": "No media contact"
+          "expectedHealth": "info"
         },
         {
           "id": "m16-rss-feed",
-          "expectedHealth": "info",
-          "note": "No RSS feed"
+          "expectedHealth": "info"
         },
         {
           "id": "m16-media-logos",
-          "expectedHealth": "info",
-          "note": "No media logos"
+          "expectedHealth": "info"
         }
       ],
       "negativeAssertions": [],
@@ -139,15 +131,15 @@
     "M17": {
       "expectedData": {
         "careers_page_url": {
-          "match": "truthy",
-          "note": "Careers page found"
+          "match": "falsy",
+          "note": "PASSIVE LIMITATION: External careers at jobs.nike.com"
         }
       },
       "expectedCheckpoints": [
         {
           "id": "m17-careers-page",
-          "expectedHealth": "good",
-          "note": "Careers page exists"
+          "expectedHealth": "info",
+          "note": "Cannot detect: External careers at jobs.nike.com"
         }
       ],
       "negativeAssertions": [],

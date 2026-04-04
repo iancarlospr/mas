@@ -35,18 +35,22 @@
       "hasSearchAction": false
     },
     "robotsTxt": {
-      "present": false,
+      "present": true,
       "blocked": false,
+      "content": "",
       "sitemapUrls": [],
       "disallowedPaths": [],
       "userAgentCount": 0
     },
     "sitemap": {
-      "present": false,
-      "source": null
+      "present": true,
+      "urlCount": 0,
+      "urls": [],
+      "source": "standard"
     },
     "llmsTxt": {
-      "present": false
+      "present": true,
+      "content": "\n\n<!doctype html>\n<!-- Created in Figma Make -->\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\" />\n    <noscript>\n      <style>\n        #container {\n          display: none;\n        }\n      </style>\n    </noscript>\n\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <meta name=\"color-scheme\" content=\"light dark\" />\n    <link rel=\"preload\" href=\"/_runtimes/sites-runtime.3d8ed699d1738407521952282d02a53e7f2815ba3208db7062959ace465d6fc2.js\" as=\"script\" crossorigin />\n    <link rel=\"preload\" href=\"/_components/v2/725b3daf9fedf7c9d886eae8ac595a230f54359e.js\" as=\"script\" crossorigin />\n    <link rel=\"preload\" href=\"/_json/cbc57ae5-3b42-4dbd-895a-c9046836403b/_index.json\" as=\"fetch\" />\n        <script async src=\"https://www.googletagmanager.com/gtag/js?id=G-LSGK7XRHJF\"></script>\n    <script>\n      window.dataLayer = window.dataLayer || [];\n      function gtag(){dataLayer.push(arguments);}\n      gtag('js', new Date());\n      gtag('config', 'G-LSGK7XRHJF');\n      gtag('consent', 'default', {\n        'ad_storage': 'denied',\n        'analytics_storage': 'denied'\n      });\n    </script>\n    <style id=\"reset-css\"> @layer figreset,figoverridable,reset,theme,base,figutils,components,utilities;@layer figoverridable{:root{font-synthesis:none}}@layer figutils{:root{--banner-height:48px;--banner-height-v2:40px;--full-height-with-banner:calc(100dvh - var(--banner-height))}@media (max-width:600px){.banner-v2-container{left:0 !important;right:0 !important;margin:0 auto !important}}.wrapper-with-banner .min-h-screen{min-height:var(--full-height-with-banner)}.wrapper-with-banner .h-screen{height:var(--full-height-with-banner)}}</style><style id=\"font-faces-ly87hh\"> @font-face{font-family:\"Montserrat:Regular\";font-style:normal;src:url(\"/_woff/v2/Montserrat_wght__1/Montserrat_wght__1-english.woff2\");font-display:block;unicode-range:U+0000-00A0,U+00A2-00A9,U+00AC-00AE,U+00B0-00B7,U+00B9-00BA,U+00BC-00BE,U+00D7,U+00F7,U+2000-206F,U+2074,U+20AC,U+2122,U+2190-21BB,U+2212,U+2215,U+F8FF,U+FEFF,U+FFFD}@font-face{font-family:\"Montserrat:Regular\";font-style:normal;src:url(\"/_woff/v2/Montserrat_wght__1/Montserrat_wght__1-rest-latin.woff2\");font-display:block;unicode-range:U+00A1,U+00AA-00AB,U+00AF,U+00B8,U+00BB,U+00BF-00D6,U+00D8-00F6,U+00F8-00FF,U+0131,U+0152-0153,U+02B0-02FF}@font-face{font-family:\"Montserrat:Regular\";font-style:normal;src:url(\"/_woff/v2/Montserrat_wght__1/Montserrat_wght__1-latin-extended-a.woff2\");font-display:block;unicode-range:U+0100-0130,U+0132-0151,U+0154-017F}@font-face{font-family:\"Montserrat:Regular\";font-style:normal;src:url(\"/_woff/v2/Montserrat_wght__1/Montserrat_wght__1-latin-extended-b.woff2\");font-display:block;unicode-range:U+0180-024F}@font-face{font-family:\"Montserrat:Regular\";font-style:normal;src:url(\"/_woff/v2/Montserrat_wght__1/Montserrat_wght__1-latin-extended-additional.woff2\");font-display:block;unicode-range:U+1E00-1EFF}@font-face{font-family:\"Montserrat:Regular\";font-style:normal;src:url(\"/_woff/v2/Montserrat_wght__1/Montserrat_wght__1-rest.woff2\");font-display:block;unicode-range:U+0250-02AF,U+0300-1DFF,U+1F00-1FFF,U+2070-2073,U+2075-20AB,U+20AD-2121,U+2123-218F,U+21BC-2211,U+2213-2214,U+2216-F8FE,U+F900-FEFE,U+FF00-FFFC,U+FFFE-FFFF}@font-face{font-family:\"Montserrat\";font-style:SemiBold;src:url(\"/_woff/v2/Montserrat_wght__1/Montserrat_wght__1-english.woff2\");font-display:block;unicode-range:U+0000-00A0,U+00A2-00A9,U+00AC-00AE,U+00B0-00B7,U+00B9-00BA,U+00BC-00BE,U+00D7,U+00F7,U+2000-206F,U+2074,U+20AC,U+2122,U+2190-21BB,U+2212,U+2215,U+F8FF,U+FEFF,U+FFFD}@font-face{font-family:\"Montserrat\";font-style:SemiBold;src:url(\"/_woff/v2/Montserrat_wght__1/Montserrat_wght__1-rest-latin.woff2\");font-display:block;unicode-range:U+00A1,U+00AA-00AB,U+00AF,U+00B8,U+00BB,U+00BF-00D6,U+00D8-00F6,U+00F8-00FF,U+0131,U+0152-0153,U+02B0-02FF}@font-face{font-family:\"Montserrat\";font-style:SemiBold;src:url(\"/_woff/v2/Montserrat_wght__1/Montserrat_wght__1-latin-extended-a.woff2\");font-display:block;unicode-range:U+0100-0130,U+0132-0151,U+0154-017F}@font-face{font-family:\"Montserrat\";font-style:SemiBold;src:url(\"/_woff/v2/Montserrat_wght__1/Montserrat_wght__1-latin-extended-b.woff2\");font-display:block;unicode-range:U+0180-024F}@font-face{font-family:\"Montserrat\";font-style:SemiBold;src:url(\"/_woff/v2/Montserrat_wght__1/Montserrat_wght__1-latin-extended-additional.woff2\");font-display:block;unicode-range:U+1E00-1EFF}@font-face{font-family:\"Montserrat\";font-style:SemiBold;src:url(\"/_woff/v2/Montserrat_wght__1/Montserrat_wght__1-rest.woff2\");font-display:block;unicode-range:U+0250-02AF,U+0300-1DFF,U+1F00-1FFF,U+2070-2073,U+2075-20AB,U+20AD-2121,U+2123-218F,U+21BC-2211,U+2213-2214,U+2216-F8FE,U+F900-FEFE,U+FF00-FFFC,U+FFFE-FFFF}@font-face{font-family:\"Montserrat:Medium\";font-style:normal;src:url(\"/_woff/v2/Montserrat_wght__1/Montserrat_wght__1-english.woff2\");font-display:block;unicode-range:U+0000-00A0,U+00A2-00A9,U+00AC-00AE,U+00B0-00B7,U+00B9-00BA,U+00BC-00BE,U+00D7,U+00F7,U+2000-206F,U+2"
     },
     "manifest": {
       "present": false
@@ -161,6 +165,20 @@
       "category": "seo_content"
     },
     {
+      "type": "crawlability",
+      "name": "robots-txt",
+      "confidence": 0.95,
+      "evidence": "robots.txt present with 0 sitemap ref(s), 0 disallow rule(s)",
+      "category": "seo_content"
+    },
+    {
+      "type": "crawlability",
+      "name": "sitemap-xml",
+      "confidence": 0.95,
+      "evidence": "sitemap.xml present with 0 URLs",
+      "category": "seo_content"
+    },
+    {
       "type": "branding",
       "name": "favicon",
       "confidence": 0.9,
@@ -180,6 +198,13 @@
       "confidence": 0.85,
       "evidence": "3 resource hint(s)",
       "category": "performance_experience"
+    },
+    {
+      "type": "ai-readiness",
+      "name": "llms-txt",
+      "confidence": 0.9,
+      "evidence": "llms.txt present",
+      "category": "brand_presence"
     }
   ],
   "score": null,
@@ -244,17 +269,16 @@
       "id": "M04-ROBOTS",
       "name": "robots.txt",
       "weight": 0.5,
-      "health": "critical",
-      "evidence": "No robots.txt found",
-      "recommendation": "Create a robots.txt file to guide search engine crawlers and reference your sitemap."
+      "health": "good",
+      "evidence": "robots.txt present (0 disallow rules, no sitemap reference)",
+      "recommendation": "Add a Sitemap directive to your robots.txt."
     },
     {
       "id": "M04-SITEMAP",
       "name": "Sitemap.xml",
       "weight": 0.6,
-      "health": "critical",
-      "evidence": "No sitemap found (checked /sitemap.xml, /sitemap_index.xml, /sitemap-index.xml, and robots.txt references)",
-      "recommendation": "Create an XML sitemap to help search engines discover and index all pages."
+      "health": "good",
+      "evidence": "Sitemap present but could not determine URL count"
     },
     {
       "id": "M04-FAVICON",
@@ -289,9 +313,9 @@
     {
       "id": "M04-LLMS-TXT",
       "name": "llms.txt",
-      "weight": 0,
-      "health": "info",
-      "evidence": "No llms.txt found (informational -- optional emerging standard for LLM guidance)"
+      "weight": 0.2,
+      "health": "excellent",
+      "evidence": "llms.txt present with directives (5000 chars)"
     },
     {
       "id": "M04-MANIFEST",
@@ -344,11 +368,11 @@
       "evidence": "Viewport allows user zoom (content: \"width=device-width, initial-scale=1\")"
     }
   ],
-  "duration": 81,
+  "duration": 103,
   "_replay": {
     "site": "brainhi.com",
     "moduleId": "M04",
-    "elapsed": 82,
-    "replayedAt": "2026-04-03T23:47:10.575Z"
+    "elapsed": 104,
+    "replayedAt": "2026-04-04T00:20:10.581Z"
   }
 }

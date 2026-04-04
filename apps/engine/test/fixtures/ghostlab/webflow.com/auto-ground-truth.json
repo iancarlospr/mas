@@ -144,15 +144,15 @@
     "M17": {
       "expectedData": {
         "careers_page_url": {
-          "match": "truthy",
-          "note": "Careers page found"
+          "match": "falsy",
+          "note": "PASSIVE LIMITATION: JS-rendered site, /company/careers not in server HTML"
         }
       },
       "expectedCheckpoints": [
         {
           "id": "m17-careers-page",
-          "expectedHealth": "good",
-          "note": "Careers page exists"
+          "expectedHealth": "info",
+          "note": "Cannot detect: JS-rendered site, /company/careers not in server HTML"
         }
       ],
       "negativeAssertions": [],

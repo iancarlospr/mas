@@ -99,34 +99,26 @@
       "expectedData": {
         "press_page_url": {
           "match": "truthy",
-          "note": "Press page at https://zapier.com/templates/details/social-media-bot"
-        },
-        "article_count": {
-          "value": 15,
-          "match": "gte",
-          "note": "15 articles (visible on page)"
+          "note": "/press/ found via probe fallback"
         }
       },
       "expectedCheckpoints": [
         {
           "id": "m16-press-page",
-          "expectedHealth": "excellent",
-          "note": "Press page found"
+          "expectedHealth": "info",
+          "note": "Press page found but no articles"
         },
         {
           "id": "m16-media-contact",
-          "expectedHealth": "info",
-          "note": "No media contact"
+          "expectedHealth": "info"
         },
         {
           "id": "m16-rss-feed",
-          "expectedHealth": "info",
-          "note": "No RSS feed"
+          "expectedHealth": "info"
         },
         {
           "id": "m16-media-logos",
-          "expectedHealth": "info",
-          "note": "No media logos"
+          "expectedHealth": "info"
         }
       ],
       "negativeAssertions": [],

@@ -3,12 +3,22 @@
   "status": "success",
   "data": {
     "detected_language": "en",
-    "found_pages": [],
-    "careers_page_url": null,
+    "found_pages": [
+      "/careers/",
+      "/careers",
+      "/jobs/",
+      "/jobs",
+      "/join-us/",
+      "/join-us",
+      "/about/careers/",
+      "/about/team/",
+      "/about/careers/"
+    ],
+    "careers_page_url": "https://brainhi.com/careers/",
     "ats_provider": null,
     "ats_evidence": null,
     "open_positions_count": 0,
-    "has_team_page": false,
+    "has_team_page": true,
     "has_culture_page": false,
     "most_recent_posting": null,
     "external_careers_links": [],
@@ -17,15 +27,31 @@
     "dei_mentioned": false,
     "review_site_links": []
   },
-  "signals": [],
+  "signals": [
+    {
+      "type": "careers_page",
+      "name": "Careers Page",
+      "confidence": 0.95,
+      "evidence": "Careers page found at https://brainhi.com/careers/",
+      "category": "brand_presence"
+    },
+    {
+      "type": "team_page",
+      "name": "Team Page",
+      "confidence": 0.85,
+      "evidence": "Team page or section detected",
+      "category": "brand_presence"
+    }
+  ],
   "score": null,
   "checkpoints": [
     {
       "id": "m17-careers-page",
       "name": "Careers page",
-      "weight": 0,
-      "health": "info",
-      "evidence": "No dedicated careers page found"
+      "weight": 0.4,
+      "health": "warning",
+      "evidence": "Careers page found at /careers/ but no active listings detected",
+      "recommendation": "Add open positions or a clear hiring message to the careers page"
     },
     {
       "id": "m17-ats-provider",
@@ -44,9 +70,9 @@
     {
       "id": "m17-team-culture",
       "name": "Team/culture page",
-      "weight": 0,
-      "health": "info",
-      "evidence": "No team or culture page detected"
+      "weight": 0.3,
+      "health": "good",
+      "evidence": "Team page detected"
     },
     {
       "id": "m17-hiring-velocity",
@@ -60,7 +86,7 @@
   "_replay": {
     "site": "brainhi.com",
     "moduleId": "M17",
-    "elapsed": 33,
-    "replayedAt": "2026-04-03T23:47:25.296Z"
+    "elapsed": 63,
+    "replayedAt": "2026-04-04T00:20:50.591Z"
   }
 }
