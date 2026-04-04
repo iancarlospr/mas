@@ -26,7 +26,7 @@ const FIXTURES_DIR = resolve(__dirname, '../../test/fixtures/ghostlab');
 // Module executor imports — passive phase only
 // Each module exports { execute } as named export
 const MODULE_EXECUTORS: Record<string, () => Promise<{ execute: (ctx: ModuleContext) => Promise<ModuleResult> }>> = {
-  M01: () => import('../../src/modules/passive/m01-dns-security.js'),
+  M01: () => import('../../src/modules/passive/m01-dns-security.js').then(m => ({ execute: m.default ?? m.execute })),
   M02: () => import('../../src/modules/passive/m02-cms-infrastructure.js'),
   M04: () => import('../../src/modules/passive/m04-page-metadata.js'),
   M16: () => import('../../src/modules/passive/m16-pr-media.js'),
