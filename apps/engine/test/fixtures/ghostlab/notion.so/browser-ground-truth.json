@@ -1,0 +1,71 @@
+{
+  "site": "notion.so",
+  "capturedAt": "2026-04-03T23:52:13.675Z",
+  "capturedBy": "capture-ground-truth.ts (browser-verified)",
+  "baseUrl": "https://www.notion.com/",
+  "modules": {
+    "M01": {
+      "spf": true,
+      "spfRecord": "v=spf1 ~all",
+      "dmarc": true,
+      "dmarcPolicy": "quarantine",
+      "hasMx": false,
+      "hasHsts": true,
+      "hasCsp": true,
+      "hasXfo": false,
+      "hasXcto": false,
+      "hasReferrerPolicy": true,
+      "hasPermissionsPolicy": false,
+      "serverHeader": "cloudflare"
+    },
+    "M02": {
+      "isWordPress": false,
+      "hasGeneratorMeta": false,
+      "generator": null,
+      "serverHeader": "cloudflare",
+      "hasCfRay": true,
+      "cdn": "Cloudflare",
+      "compression": "gzip"
+    },
+    "M04": {
+      "title": "The AI workspace that works for you. | Notion",
+      "metaDescription": "Build Custom Agents, search across all your apps, and automate busywork. The AI workspace where teams get more done, faster.",
+      "canonical": "https://www.notion.com/",
+      "htmlLang": "en-us",
+      "viewport": "width=device-width, initial-scale=1",
+      "charset": "utf-8",
+      "ogTagCount": 7,
+      "hasOgImage": true,
+      "jsonLdCount": 0,
+      "hasRobotsTxt": true,
+      "hasSitemap": false
+    },
+    "M16": {
+      "pressLinksFound": 0,
+      "pressLinks": [],
+      "pressPageUrl": null,
+      "visibleArticleCount": 0
+    },
+    "M17": {
+      "careersLinksFound": 1,
+      "careersLinks": [
+        {
+          "href": "/careers",
+          "text": "Careers"
+        }
+      ],
+      "hasCareersPage": true
+    },
+    "M18": {
+      "irLinksFound": 0,
+      "hasIrPage": false,
+      "ticker": null
+    },
+    "M19": {
+      "supportLinksFound": 4,
+      "hasSupportPage": true,
+      "hasPhone": false,
+      "emails": []
+    }
+  }
+}

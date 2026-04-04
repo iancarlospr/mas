@@ -1,0 +1,80 @@
+{
+  "site": "hubspot.com",
+  "capturedAt": "2026-04-03T23:51:18.560Z",
+  "capturedBy": "capture-ground-truth.ts (browser-verified)",
+  "baseUrl": "https://www.hubspot.com/?wfuid=f32f0abba0.1775260276&wfsid=1775260276-fd3e-8f2f-6e9160917f28",
+  "modules": {
+    "M01": {
+      "spf": true,
+      "spfRecord": "v=spf1 redirect=_hspf.hubspot.com",
+      "dmarc": true,
+      "dmarcPolicy": "reject",
+      "hasMx": true,
+      "mxCount": 1,
+      "hasHsts": true,
+      "hasCsp": true,
+      "hasXfo": true,
+      "hasXcto": true,
+      "hasReferrerPolicy": true,
+      "hasPermissionsPolicy": false,
+      "serverHeader": "cloudflare"
+    },
+    "M02": {
+      "isWordPress": false,
+      "hasGeneratorMeta": true,
+      "generator": "HubSpot",
+      "serverHeader": "cloudflare",
+      "hasCfRay": true,
+      "cdn": "Cloudflare",
+      "compression": "br"
+    },
+    "M04": {
+      "title": "HubSpot | Software & Tools for your Business - Homepage",
+      "metaDescription": "HubSpot's customer platform includes all the marketing, sales, customer service, and CRM software you need to grow your business.",
+      "canonical": "https://www.hubspot.com",
+      "htmlLang": "en",
+      "viewport": "width=device-width, initial-scale=1",
+      "charset": "utf-8",
+      "ogTagCount": 7,
+      "hasOgImage": true,
+      "jsonLdCount": 1,
+      "hasRobotsTxt": true,
+      "hasSitemap": true
+    },
+    "M16": {
+      "pressLinksFound": 0,
+      "pressLinks": [],
+      "pressPageUrl": null,
+      "visibleArticleCount": 0
+    },
+    "M17": {
+      "careersLinksFound": 3,
+      "careersLinks": [
+        {
+          "href": "https://www.hubspot.com/careers?hubs_content=www.hubspot.com%2F&hubs_content-cta=nav-utility-careers&wfoid=145c904782.1775260277",
+          "text": "Careers"
+        },
+        {
+          "href": "https://www.hubspot.com/careers?hubs_content=www.hubspot.com%2F&hubs_content-cta=nav-utility-careers&wfoid=145c904782.1775260277",
+          "text": "Careers"
+        },
+        {
+          "href": "https://www.hubspot.com/careers?hubs_content=www.hubspot.com%2F&hubs_content-cta=null&wfoid=145c904782.1775260277",
+          "text": "Careers"
+        }
+      ],
+      "hasCareersPage": true
+    },
+    "M18": {
+      "irLinksFound": 3,
+      "hasIrPage": true,
+      "ticker": null
+    },
+    "M19": {
+      "supportLinksFound": 5,
+      "hasSupportPage": true,
+      "hasPhone": false,
+      "emails": []
+    }
+  }
+}

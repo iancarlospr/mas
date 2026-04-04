@@ -1,0 +1,122 @@
+{
+  "site": "stripe.com",
+  "capturedAt": "2026-04-03T23:51:37.367Z",
+  "capturedBy": "capture-ground-truth.ts (browser-verified)",
+  "baseUrl": "https://stripe.com/",
+  "modules": {
+    "M01": {
+      "spf": true,
+      "spfRecord": "v=spf1 ip4:198.2.180.60/32 ip4:13.111.2.227/32 include:spf1.stripe.com include:greenhouse-outbound-mail.stripe.com include:_spf.qualtrics.com ~all",
+      "dmarc": true,
+      "dmarcPolicy": "reject",
+      "hasMx": true,
+      "mxCount": 5,
+      "hasHsts": true,
+      "hasCsp": true,
+      "hasXfo": true,
+      "hasXcto": true,
+      "hasReferrerPolicy": true,
+      "hasPermissionsPolicy": false,
+      "serverHeader": "nginx"
+    },
+    "M02": {
+      "isWordPress": false,
+      "hasGeneratorMeta": false,
+      "generator": null,
+      "serverHeader": "nginx",
+      "hasCfRay": false,
+      "cdn": null,
+      "compression": "gzip"
+    },
+    "M04": {
+      "title": "Stripe | Financial Infrastructure to Grow Your Revenue",
+      "metaDescription": "Stripe is a financial services platform that helps all types of businesses accept payments, build flexible billing models, and manage money movement.",
+      "canonical": "https://stripe.com/",
+      "htmlLang": "en-US",
+      "viewport": "width=device-width, initial-scale=1, viewport-fit=cover",
+      "charset": "utf-8",
+      "ogTagCount": 5,
+      "hasOgImage": true,
+      "jsonLdCount": 1,
+      "hasRobotsTxt": true,
+      "hasSitemap": false
+    },
+    "M16": {
+      "pressLinksFound": 16,
+      "pressLinks": [
+        {
+          "href": "/newsroom/news/stripe-openai-instant-checkout",
+          "text": ""
+        },
+        {
+          "href": "/newsroom/news/nvidia-collaboration-with-stripe",
+          "text": ""
+        },
+        {
+          "href": "/newsroom/news/stripe-ford-agreement",
+          "text": ""
+        },
+        {
+          "href": "/newsroom/news/google-and-stripe",
+          "text": ""
+        },
+        {
+          "href": "/newsroom/news/stripe-and-uber",
+          "text": ""
+        }
+      ],
+      "pressPageUrl": "https://www.stripe.com/newsroom/news/stripe-openai-instant-checkout",
+      "visibleArticleCount": 89,
+      "countStrategies": [
+        {
+          "name": "article",
+          "count": 1
+        },
+        {
+          "name": "articleLinks",
+          "count": 89
+        },
+        {
+          "name": "dates",
+          "count": 1
+        }
+      ],
+      "pagination": {
+        "hasLoadMore": false,
+        "hasPagination": false,
+        "maxPage": 0,
+        "pageLinksCount": 0,
+        "wpPagesCount": 0
+      },
+      "externalNewsroom": "https://press.stripe.com/",
+      "rssFeed": null,
+      "mediaContactEmail": null,
+      "hasMediaLogos": false
+    },
+    "M17": {
+      "careersLinksFound": 2,
+      "careersLinks": [
+        {
+          "href": "https://stripesessions.com/",
+          "text": "Join us at Sessions"
+        },
+        {
+          "href": "/jobs",
+          "text": "Jobs"
+        }
+      ],
+      "hasCareersPage": true
+    },
+    "M18": {
+      "irLinksFound": 0,
+      "hasIrPage": false,
+      "ticker": null
+    },
+    "M19": {
+      "supportLinksFound": 5,
+      "hasSupportPage": true,
+      "hasPhone": false,
+      "emails": []
+    }
+  }
+}

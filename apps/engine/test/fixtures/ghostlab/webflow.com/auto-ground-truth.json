@@ -1,8 +1,8 @@
 {
-  "site": "brainhi.com",
-  "verifiedAt": "2026-04-03T23:15:17.391Z",
+  "site": "webflow.com",
+  "verifiedAt": "2026-04-03T23:52:04.885Z",
   "generatedBy": "generate-ground-truth-json.ts (from browser-ground-truth.json)",
-  "notes": "Auto-generated from browser-verified facts captured on 2026-04-03T23:15:17.391Z",
+  "notes": "Auto-generated from browser-verified facts captured on 2026-04-03T23:52:04.885Z",
   "modules": {
     "M01": {
       "expectedData": {
@@ -17,6 +17,10 @@
         "hsts": {
           "match": "truthy",
           "note": "HSTS header present"
+        },
+        "csp": {
+          "match": "truthy",
+          "note": "CSP header present"
         }
       },
       "expectedCheckpoints": [
@@ -27,8 +31,8 @@
         },
         {
           "id": "m01-dmarc",
-          "expectedHealth": "warning",
-          "note": "DMARC p=none"
+          "expectedHealth": "excellent",
+          "note": "DMARC p=reject"
         },
         {
           "id": "m01-tls",
@@ -90,6 +94,11 @@
           "id": "M04-VIEWPORT",
           "expectedHealth": "excellent",
           "note": "Viewport meta present"
+        },
+        {
+          "id": "M04-ROBOTS",
+          "expectedHealth": "excellent",
+          "note": "robots.txt exists"
         }
       ],
       "negativeAssertions": [],
@@ -99,12 +108,12 @@
       "expectedData": {
         "press_page_url": {
           "match": "truthy",
-          "note": "Press page at https://www.brainhi.com/news"
+          "note": "Press page at https://webflow.com/company/media"
         },
         "article_count": {
-          "value": 5,
+          "value": 16,
           "match": "gte",
-          "note": "5 articles (visible on page)"
+          "note": "16 articles (visible on page)"
         }
       },
       "expectedCheckpoints": [
@@ -135,15 +144,15 @@
     "M17": {
       "expectedData": {
         "careers_page_url": {
-          "match": "falsy",
-          "note": "No careers page"
+          "match": "truthy",
+          "note": "Careers page found"
         }
       },
       "expectedCheckpoints": [
         {
           "id": "m17-careers-page",
-          "expectedHealth": "info",
-          "note": "No careers page"
+          "expectedHealth": "good",
+          "note": "Careers page exists"
         }
       ],
       "negativeAssertions": [],
@@ -162,7 +171,12 @@
       "fixedBugs": []
     },
     "M19": {
-      "expectedData": {},
+      "expectedData": {
+        "support_page_url": {
+          "match": "truthy",
+          "note": "Support/contact page found"
+        }
+      },
       "expectedCheckpoints": [],
       "negativeAssertions": [],
       "fixedBugs": []

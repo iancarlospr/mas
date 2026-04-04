@@ -35,7 +35,11 @@ const MODULE_EXECUTORS: Record<string, () => Promise<{ execute: (ctx: ModuleCont
   M19: () => import('../../src/modules/passive/m19-support-success.js'),
 };
 
-const KNOWN_SITES = ['senzary.com', 'ryder.com', 'investpr.org', 'mmm-pr.com', 'foundationforpuertorico.org'];
+// Auto-discover sites from fixtures directory
+import { readdirSync } from 'node:fs';
+const KNOWN_SITES = readdirSync(FIXTURES_DIR, { withFileTypes: true })
+  .filter(d => d.isDirectory() && existsSync(resolve(FIXTURES_DIR, d.name, 'context.json')))
+  .map(d => d.name);
 
 // ── Args ──────────────────────────────────────────────────────────────────────
 

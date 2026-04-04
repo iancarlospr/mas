@@ -1,0 +1,106 @@
+{
+  "site": "squarespace.com",
+  "capturedAt": "2026-04-03T23:51:56.758Z",
+  "capturedBy": "capture-ground-truth.ts (browser-verified)",
+  "baseUrl": "https://www.squarespace.com/",
+  "modules": {
+    "M01": {
+      "spf": true,
+      "spfRecord": "v=spf1 include:squarespace-mail.com include:mail.zendesk.com include:_spf.google.com include:sendgrid-spf.email.squarespace.com include:registrarmail.net ip4:8.41.221.0/24 ip4:8.36.86.0/24 ip4:34.174.163.32/27 ip4:162.216.148.0/27 ~all",
+      "dmarc": true,
+      "dmarcPolicy": "reject",
+      "hasMx": true,
+      "mxCount": 7,
+      "hasHsts": true,
+      "hasCsp": false,
+      "hasXfo": false,
+      "hasXcto": true,
+      "hasReferrerPolicy": false,
+      "hasPermissionsPolicy": false,
+      "serverHeader": "Squarespace"
+    },
+    "M02": {
+      "isWordPress": false,
+      "hasGeneratorMeta": false,
+      "generator": null,
+      "serverHeader": "Squarespace",
+      "hasCfRay": false,
+      "cdn": null,
+      "compression": "gzip"
+    },
+    "M04": {
+      "title": "Website Builder – Easily Create Your Own Website — Squarespace",
+      "metaDescription": "Create a website and grow your business with a free Squarespace trial. Start with customizable website templates, AI website builder tools, or a domain name.",
+      "canonical": "https://www.squarespace.com/",
+      "htmlLang": "en-US",
+      "viewport": "width=device-width, initial-scale=1",
+      "charset": "utf-8",
+      "ogTagCount": 7,
+      "hasOgImage": true,
+      "jsonLdCount": 5,
+      "hasRobotsTxt": true,
+      "hasSitemap": true
+    },
+    "M16": {
+      "pressLinksFound": 2,
+      "pressLinks": [
+        {
+          "href": "https://newsroom.squarespace.com/",
+          "text": "NewsroomNewsroom"
+        },
+        {
+          "href": "/press-coverage",
+          "text": "Press & MediaPress & Media"
+        }
+      ],
+      "pressPageUrl": "https://newsroom.squarespace.com/",
+      "visibleArticleCount": 18,
+      "countStrategies": [
+        {
+          "name": "article",
+          "count": 1
+        },
+        {
+          "name": "articleLinks",
+          "count": 18
+        },
+        {
+          "name": "dates",
+          "count": 1
+        }
+      ],
+      "pagination": {
+        "hasLoadMore": false,
+        "hasPagination": false,
+        "maxPage": 0,
+        "pageLinksCount": 0,
+        "wpPagesCount": 0
+      },
+      "externalNewsroom": null,
+      "rssFeed": "https://newsroom.squarespace.com/blog?format=rss",
+      "mediaContactEmail": null,
+      "hasMediaLogos": false
+    },
+    "M17": {
+      "careersLinksFound": 1,
+      "careersLinks": [
+        {
+          "href": "/about/careers",
+          "text": "CareersCareers"
+        }
+      ],
+      "hasCareersPage": true
+    },
+    "M18": {
+      "irLinksFound": 0,
+      "hasIrPage": false,
+      "ticker": null
+    },
+    "M19": {
+      "supportLinksFound": 5,
+      "hasSupportPage": true,
+      "hasPhone": false,
+      "emails": []
+    }
+  }
+}

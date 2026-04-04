@@ -1,0 +1,111 @@
+{
+  "site": "nike.com",
+  "capturedAt": "2026-04-03T23:50:51.285Z",
+  "capturedBy": "capture-ground-truth.ts (browser-verified)",
+  "baseUrl": "https://www.nike.com/pr/",
+  "modules": {
+    "M01": {
+      "spf": true,
+      "spfRecord": "v=spf1 include:%{ir}.%{v}.%{d}.spf.has.pphosted.com ~all",
+      "dmarc": true,
+      "dmarcPolicy": "reject",
+      "hasMx": true,
+      "mxCount": 2,
+      "hasHsts": true,
+      "hasCsp": true,
+      "hasXfo": true,
+      "hasXcto": false,
+      "hasReferrerPolicy": false,
+      "hasPermissionsPolicy": true,
+      "serverHeader": "unified-edge-router"
+    },
+    "M02": {
+      "isWordPress": false,
+      "hasGeneratorMeta": false,
+      "generator": null,
+      "serverHeader": "unified-edge-router",
+      "hasCfRay": false,
+      "cdn": null,
+      "compression": "gzip"
+    },
+    "M04": {
+      "title": "Sitio web oficial de Nike. Nike PR",
+      "metaDescription": "Nike ofrece productos innovadores, experiencias y servicios para inspirar a los atletas del mundo.",
+      "canonical": "https://www.nike.com/pr/",
+      "htmlLang": "es-PR",
+      "viewport": "width=device-width, initial-scale=1.0, maximum-scale=2.0",
+      "charset": "utf-8",
+      "ogTagCount": 7,
+      "hasOgImage": true,
+      "jsonLdCount": 1,
+      "hasRobotsTxt": true,
+      "hasSitemap": false
+    },
+    "M16": {
+      "pressLinksFound": 2,
+      "pressLinks": [
+        {
+          "href": "https://news.nike.com/",
+          "text": "Noticias"
+        },
+        {
+          "href": "https://news.nike.com/",
+          "text": "Noticias"
+        }
+      ],
+      "pressPageUrl": "https://news.nike.com/",
+      "visibleArticleCount": 15,
+      "countStrategies": [
+        {
+          "name": "article",
+          "count": 0
+        },
+        {
+          "name": "articleLinks",
+          "count": 15
+        },
+        {
+          "name": "dates",
+          "count": 10
+        }
+      ],
+      "pagination": {
+        "hasLoadMore": false,
+        "hasPagination": true,
+        "maxPage": 5,
+        "pageLinksCount": 10,
+        "wpPagesCount": 0
+      },
+      "paginatedArticleCount": 38,
+      "externalNewsroom": null,
+      "rssFeed": null,
+      "mediaContactEmail": null,
+      "hasMediaLogos": false
+    },
+    "M17": {
+      "careersLinksFound": 2,
+      "careersLinks": [
+        {
+          "href": "https://jobs.nike.com/",
+          "text": "Ofertas de empleo"
+        },
+        {
+          "href": "https://jobs.nike.com/",
+          "text": "Ofertas de empleo"
+        }
+      ],
+      "hasCareersPage": true
+    },
+    "M18": {
+      "irLinksFound": 1,
+      "hasIrPage": true,
+      "ticker": null
+    },
+    "M19": {
+      "supportLinksFound": 5,
+      "hasSupportPage": true,
+      "hasPhone": false,
+      "emails": []
+    }
+  }
+}

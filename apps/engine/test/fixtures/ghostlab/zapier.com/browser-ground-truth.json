@@ -1,0 +1,114 @@
+{
+  "site": "zapier.com",
+  "capturedAt": "2026-04-03T23:52:20.575Z",
+  "capturedBy": "capture-ground-truth.ts (browser-verified)",
+  "baseUrl": "https://zapier.com/",
+  "modules": {
+    "M01": {
+      "spf": true,
+      "spfRecord": "v=spf1 include:_spf.google.com include:mailgun.org include:7462085.spf03.hubspotemail.net include:mail.zendesk.com include:_spf.qualtrics.com -all",
+      "dmarc": true,
+      "dmarcPolicy": "reject",
+      "hasMx": true,
+      "mxCount": 7,
+      "hasHsts": true,
+      "hasCsp": true,
+      "hasXfo": false,
+      "hasXcto": false,
+      "hasReferrerPolicy": false,
+      "hasPermissionsPolicy": false,
+      "serverHeader": "Vercel"
+    },
+    "M02": {
+      "isWordPress": false,
+      "hasGeneratorMeta": false,
+      "generator": null,
+      "serverHeader": "Vercel",
+      "hasCfRay": false,
+      "cdn": "CloudFront",
+      "compression": null
+    },
+    "M04": {
+      "title": "Zapier: Automate AI Workflows, Agents, and Apps",
+      "metaDescription": "Build and scale AI workflows and agents across 8,000+ apps with Zapier—the most connected AI orchestration platform. Trusted by 3 million+ businesses. ",
+      "canonical": "https://zapier.com/",
+      "htmlLang": "en",
+      "viewport": "width=device-width, initial-scale=1.0",
+      "charset": "utf-8",
+      "ogTagCount": 3,
+      "hasOgImage": true,
+      "jsonLdCount": 0,
+      "hasRobotsTxt": true,
+      "hasSitemap": true
+    },
+    "M16": {
+      "pressLinksFound": 4,
+      "pressLinks": [
+        {
+          "href": "https://zapier.com/templates/details/social-media-bot",
+          "text": "Generate posts"
+        },
+        {
+          "href": "https://zapier.com/templates/details/social-media-bot",
+          "text": "Generate posts"
+        },
+        {
+          "href": "/apps/categories/social-marketing",
+          "text": "Social Media Marketing"
+        },
+        {
+          "href": "/press",
+          "text": "Press"
+        }
+      ],
+      "pressPageUrl": "https://zapier.com/templates/details/social-media-bot",
+      "visibleArticleCount": 15,
+      "countStrategies": [
+        {
+          "name": "article",
+          "count": 0
+        },
+        {
+          "name": "articleLinks",
+          "count": 15
+        },
+        {
+          "name": "dates",
+          "count": 0
+        }
+      ],
+      "pagination": {
+        "hasLoadMore": false,
+        "hasPagination": false,
+        "maxPage": 0,
+        "pageLinksCount": 0,
+        "wpPagesCount": 0
+      },
+      "externalNewsroom": null,
+      "rssFeed": null,
+      "mediaContactEmail": null,
+      "hasMediaLogos": false
+    },
+    "M17": {
+      "careersLinksFound": 1,
+      "careersLinks": [
+        {
+          "href": "/jobs",
+          "text": "Jobs"
+        }
+      ],
+      "hasCareersPage": true
+    },
+    "M18": {
+      "irLinksFound": 0,
+      "hasIrPage": false,
+      "ticker": null
+    },
+    "M19": {
+      "supportLinksFound": 5,
+      "hasSupportPage": true,
+      "hasPhone": false,
+      "emails": []
+    }
+  }
+}

@@ -20,7 +20,11 @@ import { fileURLToPath } from 'node:url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FIXTURES_DIR = resolve(__dirname, '../../test/fixtures/ghostlab');
 
-const KNOWN_SITES = ['senzary.com', 'ryder.com', 'investpr.org', 'mmm-pr.com', 'foundationforpuertorico.org', 'brainhi.com'];
+// Auto-discover sites from fixtures directory
+import { readdirSync } from 'node:fs';
+const KNOWN_SITES = readdirSync(FIXTURES_DIR, { withFileTypes: true })
+  .filter(d => d.isDirectory() && existsSync(resolve(FIXTURES_DIR, d.name, 'browser-ground-truth.json')))
+  .map(d => d.name);
 
 interface BrowserFacts {
   site: string;

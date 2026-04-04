@@ -80,3 +80,12 @@ packages/video/_*.mjs
 # Generated PDFs
 *.pdf
 !apps/web/app/opengraph-image.png
+# Ghostlab fixtures — generated locally, too large for git
+apps/engine/test/fixtures/ghostlab/*/context.json
+apps/engine/test/fixtures/ghostlab/*/http-probes.json
+apps/engine/test/fixtures/ghostlab/*/sitemap-pages.json
+apps/engine/test/fixtures/ghostlab/*/dns.json
+apps/engine/test/fixtures/ghostlab/*/external-newsroom.json
+apps/engine/test/fixtures/ghostlab/*/replay-results/
+apps/engine/test/fixtures/ghostlab/*/scores/
+apps/engine/test/fixtures/ghostlab/*/baseline-results/

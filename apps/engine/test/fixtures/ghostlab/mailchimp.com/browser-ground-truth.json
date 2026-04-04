@@ -1,0 +1,118 @@
+{
+  "site": "mailchimp.com",
+  "capturedAt": "2026-04-03T23:51:46.952Z",
+  "capturedBy": "capture-ground-truth.ts (browser-verified)",
+  "baseUrl": "https://mailchimp.com/",
+  "modules": {
+    "M01": {
+      "spf": true,
+      "spfRecord": "v=spf1 ip4:205.201.128.0/20 ip4:198.2.128.0/18 ip4:148.105.0.0/16 ip4:129.145.74.12 include:_spf.google.com include:mailsenders.netsuite.com include:_spf2.intuit.com ",
+      "dmarc": true,
+      "dmarcPolicy": "reject",
+      "hasMx": true,
+      "mxCount": 2,
+      "hasHsts": false,
+      "hasCsp": false,
+      "hasXfo": true,
+      "hasXcto": false,
+      "hasReferrerPolicy": false,
+      "hasPermissionsPolicy": false,
+      "serverHeader": "istio-envoy"
+    },
+    "M02": {
+      "isWordPress": false,
+      "hasGeneratorMeta": false,
+      "generator": null,
+      "serverHeader": "istio-envoy",
+      "hasCfRay": false,
+      "cdn": null,
+      "compression": "gzip"
+    },
+    "M04": {
+      "title": "Email & SMS Marketing Platform | Mailchimp",
+      "metaDescription": "Utilize real-time user behavior data and artificial intelligence to convert more customers. Easy to use, get started for free!",
+      "canonical": "https://mailchimp.com/",
+      "htmlLang": "en",
+      "viewport": "width=device-width, initial-scale=1",
+      "charset": "utf-8",
+      "ogTagCount": 7,
+      "hasOgImage": true,
+      "jsonLdCount": 1,
+      "hasRobotsTxt": true,
+      "hasSitemap": false
+    },
+    "M16": {
+      "pressLinksFound": 5,
+      "pressLinks": [
+        {
+          "href": "/solutions/social-media-marketing-tools/",
+          "text": "Social media marketing"
+        },
+        {
+          "href": "/resources/social-media/",
+          "text": "Social media"
+        },
+        {
+          "href": "/solutions/social-media-marketing-tools/",
+          "text": "Social media marketing"
+        },
+        {
+          "href": "/resources/social-media/",
+          "text": "Social media"
+        },
+        {
+          "href": "/newsroom/",
+          "text": "Newsroom"
+        }
+      ],
+      "pressPageUrl": "https://www.mailchimp.com/solutions/social-media-marketing-tools/",
+      "visibleArticleCount": 46,
+      "countStrategies": [
+        {
+          "name": "article",
+          "count": 0
+        },
+        {
+          "name": "articleLinks",
+          "count": 46
+        },
+        {
+          "name": "dates",
+          "count": 0
+        }
+      ],
+      "pagination": {
+        "hasLoadMore": false,
+        "hasPagination": false,
+        "maxPage": 0,
+        "pageLinksCount": 0,
+        "wpPagesCount": 0
+      },
+      "externalNewsroom": null,
+      "rssFeed": null,
+      "mediaContactEmail": null,
+      "hasMediaLogos": false
+    },
+    "M17": {
+      "careersLinksFound": 1,
+      "careersLinks": [
+        {
+          "href": "/jobs/",
+          "text": "Careers"
+        }
+      ],
+      "hasCareersPage": true
+    },
+    "M18": {
+      "irLinksFound": 0,
+      "hasIrPage": false,
+      "ticker": null
+    },
+    "M19": {
+      "supportLinksFound": 5,
+      "hasSupportPage": true,
+      "hasPhone": true,
+      "emails": []
+    }
+  }
+}
