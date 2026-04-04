@@ -79,7 +79,7 @@
         {
           "id": "m01-email",
           "expectedHealth": "excellent",
-          "note": "Email provider: Proofpoint (MX: mx0b-00176a04.pphosted.com, mx0a-00176a04.pphost"
+          "note": "Email provider: Proofpoint (MX: mxa-00176a04.gslb.pphosted.com, mxb-00176a04.gsl"
         },
         {
           "id": "m01-caa",
@@ -135,11 +135,6 @@
         "detectedTechnologies": {
           "match": "truthy",
           "note": "Should detect technologies"
-        },
-        "compression": {
-          "value": "gzip",
-          "match": "exact",
-          "note": "Calibrated from module output"
         }
       },
       "expectedCheckpoints": [
@@ -331,11 +326,6 @@
         "press_page_url": {
           "match": "truthy",
           "note": "Press page at https://www.telemundo.com/noticias"
-        },
-        "article_count": {
-          "value": 80,
-          "match": "gte",
-          "note": "Calibrated: module returns 80"
         }
       },
       "expectedCheckpoints": [
@@ -490,5 +480,5 @@
       "fixedBugs": []
     }
   },
-  "calibratedAt": "2026-04-04T01:05:22.932Z"
+  "calibratedAt": "2026-04-04T01:34:14.678Z"
 }

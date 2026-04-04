@@ -138,16 +138,6 @@
         "detectedTechnologies": {
           "match": "truthy",
           "note": "Should detect technologies"
-        },
-        "cdn.name": {
-          "value": "Cloudflare",
-          "match": "contains",
-          "note": "CDN detected from headers"
-        },
-        "compression": {
-          "value": "gzip",
-          "match": "exact",
-          "note": "Calibrated from module output"
         }
       },
       "expectedCheckpoints": [
@@ -484,5 +474,5 @@
       "fixedBugs": []
     }
   },
-  "calibratedAt": "2026-04-04T01:04:09.313Z"
+  "calibratedAt": "2026-04-04T01:33:03.818Z"
 }

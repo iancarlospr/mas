@@ -87,17 +87,17 @@
         {
           "id": "m01-email",
           "expectedHealth": "excellent",
-          "note": "Professional email provider detected: Google Workspace (MX: aspmx3.googlemail.co"
+          "note": "Professional email provider detected: Google Workspace (MX: alt2.aspmx.l.google."
         },
         {
           "id": "m01-caa",
           "expectedHealth": "excellent",
-          "note": "CAA records set (amazon.com, digicert.com, visa.com) and match certificate issue"
+          "note": "CAA records set (amazon.com, visa.com, digicert.com) and match certificate issue"
         },
         {
           "id": "m01-geoip",
           "expectedHealth": "info",
-          "note": "3.229.145.172: US (Ashburn), 3.90.98.12: US (Ashburn), 54.162.8.126: US"
+          "note": "3.90.98.12: US (Ashburn), 54.162.8.126: US, 3.229.145.172: US (Ashburn)"
         },
         {
           "id": "m01-mta-sts",
@@ -143,11 +143,6 @@
         "detectedTechnologies": {
           "match": "truthy",
           "note": "Should detect technologies"
-        },
-        "compression": {
-          "value": "gzip",
-          "match": "exact",
-          "note": "Calibrated from module output"
         }
       },
       "expectedCheckpoints": [
@@ -339,11 +334,6 @@
         "press_page_url": {
           "match": "truthy",
           "note": "Press page at https://www.stripe.com/newsroom/news/stripe-openai-instant-checkout"
-        },
-        "article_count": {
-          "value": 1,
-          "match": "gte",
-          "note": "Calibrated: module returns 1"
         }
       },
       "expectedCheckpoints": [
@@ -498,5 +488,5 @@
       "fixedBugs": []
     }
   },
-  "calibratedAt": "2026-04-04T01:05:08.928Z"
+  "calibratedAt": "2026-04-04T01:34:01.422Z"
 }

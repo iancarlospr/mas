@@ -99,12 +99,10 @@ function generateM02(facts: Record<string, unknown>): GroundTruthModule {
       gt.expectedData['cms.name'] = { value: 'WordPress', match: 'contains', note: `Generator: ${gen}` };
     }
   }
-  if (facts.cdn) {
-    gt.expectedData['cdn.name'] = { value: facts.cdn as string, match: 'contains', note: 'CDN detected from headers' };
-  }
-  if (facts.compression) {
-    gt.expectedData['compression'] = { value: facts.compression as string, match: 'exact', note: 'Compression from headers' };
-  }
+  // NOTE: CDN detection excluded from auto ground truth — depends on which
+  // edge server responds (Varnish vs CloudFront vs Cloudflare can vary).
+  // NOTE: compression excluded — M02 normalizes "br" to "brotli" which
+  // creates false mismatches with raw header values from browser capture.
 
   gt.expectedCheckpoints.push({ id: 'm02-https-enforced', expectedHealth: 'excellent', note: 'HTTPS site' });
 
@@ -150,10 +148,8 @@ function generateM16(facts: Record<string, unknown>): GroundTruthModule {
     const visibleCount = facts.visibleArticleCount as number | undefined;
     const articleCount = wpCount ?? paginatedCount ?? visibleCount ?? 0;
 
-    if (articleCount > 0) {
-      const source = wpCount ? 'WP API' : paginatedCount ? 'pagination crawl' : 'visible on page';
-      gt.expectedData['article_count'] = { value: articleCount, match: 'gte', note: `${articleCount} articles (${source})` };
-    }
+    // NOTE: article_count excluded from auto ground truth — browser counts are
+    // unreliable. Only manually verified ground truth should have article counts.
 
     // Press page health
     gt.expectedCheckpoints.push({ id: 'm16-press-page', expectedHealth: 'excellent', note: 'Press page found' });

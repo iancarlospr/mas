@@ -118,31 +118,11 @@ function main() {
         } else if (expectation.match === 'falsy' && isTruthy(actualValue)) {
           expectation.match = 'truthy';
           expectation.note = `Calibrated: module returns ${JSON.stringify(actualValue)?.substring(0, 40)}`;
-        } else if (expectation.match === 'gte' || expectation.match === 'exact' || expectation.match === 'contains') {
-          // Update numeric/exact expectations to match actual module output
-          if (actualValue !== undefined && actualValue !== null) {
-            if (typeof actualValue === 'number') {
-              expectation.value = actualValue;
-              expectation.match = 'gte'; // use gte so slight increases don't fail
-              expectation.note = `Calibrated: module returns ${actualValue}`;
-            } else if (typeof actualValue === 'string') {
-              expectation.value = actualValue;
-              expectation.match = expectation.match === 'gte' ? 'gte' : 'contains';
-              expectation.note = `Calibrated from module output`;
-            } else if (typeof actualValue === 'object' && actualValue !== null) {
-              // For objects, check if expected value is a string that should match a property
-              const actualStr = JSON.stringify(actualValue);
-              if (expectation.value && !actualStr.includes(String(expectation.value))) {
-                // The expected value doesn't appear in the actual — update
-                const name = (actualValue as Record<string, unknown>).name ?? (actualValue as Record<string, unknown>).id;
-                if (name) {
-                  expectation.value = String(name);
-                  expectation.note = `Calibrated from module output`;
-                }
-              }
-            }
-          }
         }
+        // NOTE: Do NOT calibrate gte/exact/contains data expectations.
+        // Those represent FACTUAL ground truth (article counts, CDN names, etc.)
+        // that the module should match. Calibrating them would rubber-stamp
+        // wrong module output as "correct".
       }
 
       changed = true;

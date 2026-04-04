@@ -87,7 +87,7 @@
         {
           "id": "m01-email",
           "expectedHealth": "excellent",
-          "note": "Email provider: IONOS (1&1) (MX: senzary-com.mail.protection.outlook.com, mx00.1"
+          "note": "Email provider: IONOS (1&1) (MX: mx00.1and1.com, mx01.1and1.com, senzary-com.mai"
         },
         {
           "id": "m01-caa",
@@ -138,16 +138,6 @@
         "detectedTechnologies": {
           "match": "truthy",
           "note": "Should detect technologies"
-        },
-        "cdn.name": {
-          "value": "Sucuri",
-          "match": "contains",
-          "note": "CDN detected from headers"
-        },
-        "compression": {
-          "value": "gzip",
-          "match": "exact",
-          "note": "Calibrated from module output"
         }
       },
       "expectedCheckpoints": [
@@ -339,11 +329,6 @@
         "press_page_url": {
           "match": "truthy",
           "note": "Press page at https://www.senzary.com/about/news/"
-        },
-        "article_count": {
-          "value": 6,
-          "match": "gte",
-          "note": "Calibrated: module returns 6"
         }
       },
       "expectedCheckpoints": [
@@ -498,5 +483,5 @@
       "fixedBugs": []
     }
   },
-  "calibratedAt": "2026-04-04T01:04:39.521Z"
+  "calibratedAt": "2026-04-04T01:33:31.925Z"
 }

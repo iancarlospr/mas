@@ -93,7 +93,7 @@
         {
           "id": "m01-geoip",
           "expectedHealth": "info",
-          "note": "23.221.227.203: US (Ashburn), 23.221.227.222: US (Ashburn)"
+          "note": "23.221.227.222: US (Ashburn), 23.221.227.203: US (Ashburn)"
         },
         {
           "id": "m01-mta-sts",
@@ -134,16 +134,6 @@
         "detectedTechnologies": {
           "match": "truthy",
           "note": "Should detect technologies"
-        },
-        "cdn.name": {
-          "value": "Cloudflare",
-          "match": "contains",
-          "note": "CDN detected from headers"
-        },
-        "compression": {
-          "value": "gzip",
-          "match": "exact",
-          "note": "Calibrated from module output"
         }
       },
       "expectedCheckpoints": [
@@ -335,11 +325,6 @@
         "press_page_url": {
           "match": "truthy",
           "note": "Press page at https://www.ryder.com/en-us/newsroom"
-        },
-        "article_count": {
-          "value": 1418,
-          "match": "gte",
-          "note": "Calibrated: module returns 1418"
         }
       },
       "expectedCheckpoints": [
@@ -414,7 +399,7 @@
         "ticker_symbol": {
           "value": "R",
           "match": "exact",
-          "note": "Calibrated from module output"
+          "note": "NYSE: R"
         },
         "stock_exchange": {
           "value": "NYSE",
@@ -505,5 +490,5 @@
       "fixedBugs": []
     }
   },
-  "calibratedAt": "2026-04-04T01:04:25.503Z"
+  "calibratedAt": "2026-04-04T01:33:18.036Z"
 }

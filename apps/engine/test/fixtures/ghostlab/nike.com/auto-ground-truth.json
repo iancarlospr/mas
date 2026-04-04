@@ -138,11 +138,6 @@
         "detectedTechnologies": {
           "match": "truthy",
           "note": "Should detect technologies"
-        },
-        "compression": {
-          "value": "gzip",
-          "match": "exact",
-          "note": "Calibrated from module output"
         }
       },
       "expectedCheckpoints": [
@@ -334,11 +329,6 @@
         "press_page_url": {
           "match": "falsy",
           "note": "Calibrated: module returns null"
-        },
-        "article_count": {
-          "value": 0,
-          "match": "gte",
-          "note": "Calibrated: module returns 0"
         }
       },
       "expectedCheckpoints": [
@@ -493,5 +483,5 @@
       "fixedBugs": []
     }
   },
-  "calibratedAt": "2026-04-04T01:04:02.807Z"
+  "calibratedAt": "2026-04-04T01:32:57.419Z"
 }

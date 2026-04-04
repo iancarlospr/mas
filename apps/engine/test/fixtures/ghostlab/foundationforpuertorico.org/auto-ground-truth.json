@@ -126,11 +126,6 @@
           "value": "WordPress",
           "match": "contains",
           "note": "Generator: WordPress 6.8.5"
-        },
-        "cdn.name": {
-          "value": "Cloudflare",
-          "match": "contains",
-          "note": "CDN detected from headers"
         }
       },
       "expectedCheckpoints": [
@@ -322,11 +317,6 @@
         "press_page_url": {
           "match": "truthy",
           "note": "Press page at https://foundationforpuertorico.org/en/latest-blog/"
-        },
-        "article_count": {
-          "value": 10,
-          "match": "gte",
-          "note": "Calibrated: module returns 10"
         }
       },
       "expectedCheckpoints": [
@@ -481,5 +471,5 @@
       "fixedBugs": []
     }
   },
-  "calibratedAt": "2026-04-04T01:03:16.370Z"
+  "calibratedAt": "2026-04-04T01:32:13.025Z"
 }

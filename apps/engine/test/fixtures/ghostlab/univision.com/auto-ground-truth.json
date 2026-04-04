@@ -79,7 +79,7 @@
         {
           "id": "m01-email",
           "expectedHealth": "excellent",
-          "note": "Professional email provider detected: Google Workspace (MX: alt3.aspmx.l.google."
+          "note": "Professional email provider detected: Google Workspace (MX: alt1.aspmx.l.google."
         },
         {
           "id": "m01-caa",
@@ -89,7 +89,7 @@
         {
           "id": "m01-geoip",
           "expectedHealth": "info",
-          "note": "151.101.1.91: US, 151.101.129.91: US, 151.101.65.91: US, 151.101.193.91: US"
+          "note": "151.101.129.91: US, 151.101.193.91: US, 151.101.65.91: US, 151.101.1.91: US"
         },
         {
           "id": "m01-mta-sts",
@@ -130,11 +130,6 @@
         "detectedTechnologies": {
           "match": "truthy",
           "note": "Should detect technologies"
-        },
-        "cdn.name": {
-          "value": "CloudFront",
-          "match": "contains",
-          "note": "Calibrated from module output"
         }
       },
       "expectedCheckpoints": [
@@ -326,11 +321,6 @@
         "press_page_url": {
           "match": "truthy",
           "note": "Press page at https://www.univision.com/noticias"
-        },
-        "article_count": {
-          "value": 0,
-          "match": "gte",
-          "note": "Calibrated: module returns 0"
         }
       },
       "expectedCheckpoints": [
@@ -485,5 +475,5 @@
       "fixedBugs": []
     }
   },
-  "calibratedAt": "2026-04-04T01:16:39.125Z"
+  "calibratedAt": "2026-04-04T01:34:23.539Z"
 }

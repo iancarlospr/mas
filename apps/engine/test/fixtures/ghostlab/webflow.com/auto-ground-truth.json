@@ -87,7 +87,7 @@
         {
           "id": "m01-email",
           "expectedHealth": "excellent",
-          "note": "Professional email provider detected: Google Workspace (MX: alt2.aspmx.l.google."
+          "note": "Professional email provider detected: Google Workspace (MX: aspmx2.googlemail.co"
         },
         {
           "id": "m01-caa",
@@ -97,7 +97,7 @@
         {
           "id": "m01-geoip",
           "expectedHealth": "info",
-          "note": "100.52.50.156: US, 54.91.115.249: US (Ashburn), 44.220.220.8: US (Ashburn), 34.2"
+          "note": "54.91.115.249: US (Ashburn), 54.227.218.56: US (Ashburn), 3.223.224.218: US (Ash"
         },
         {
           "id": "m01-mta-sts",
@@ -138,16 +138,6 @@
         "detectedTechnologies": {
           "match": "truthy",
           "note": "Should detect technologies"
-        },
-        "cdn.name": {
-          "value": "Cloudflare",
-          "match": "contains",
-          "note": "CDN detected from headers"
-        },
-        "compression": {
-          "value": "gzip",
-          "match": "exact",
-          "note": "Calibrated from module output"
         }
       },
       "expectedCheckpoints": [
@@ -339,11 +329,6 @@
         "press_page_url": {
           "match": "truthy",
           "note": "Press page at https://webflow.com/company/media"
-        },
-        "article_count": {
-          "value": 0,
-          "match": "gte",
-          "note": "Calibrated: module returns 0"
         }
       },
       "expectedCheckpoints": [
@@ -498,5 +483,5 @@
       "fixedBugs": []
     }
   },
-  "calibratedAt": "2026-04-04T01:05:41.204Z"
+  "calibratedAt": "2026-04-04T01:34:31.046Z"
 }

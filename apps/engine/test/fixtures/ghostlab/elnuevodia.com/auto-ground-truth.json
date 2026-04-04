@@ -93,7 +93,7 @@
         {
           "id": "m01-geoip",
           "expectedHealth": "info",
-          "note": "64.237.191.155: PR (Moca), 64.237.191.225: PR (Moca)"
+          "note": "64.237.191.155: PR (Moca), 64.237.191.187: PR (Moca)"
         },
         {
           "id": "m01-mta-sts",
@@ -103,7 +103,7 @@
         {
           "id": "m01-ipv6",
           "expectedHealth": "excellent",
-          "note": "AAAA records found: 2606:5f00:1000:40a::40ed:bfb8, 2606:5f00:1000:40a::40ed:bfc9"
+          "note": "AAAA records found: 2606:5f00:1000:40a::40ed:bf9b, 2606:5f00:1000:40a::40ed:bfbb"
         },
         {
           "id": "m01-www-consistency",
@@ -134,11 +134,6 @@
         "detectedTechnologies": {
           "match": "truthy",
           "note": "Should detect technologies"
-        },
-        "compression": {
-          "value": "gzip",
-          "match": "exact",
-          "note": "Calibrated from module output"
         }
       },
       "expectedCheckpoints": [
@@ -330,11 +325,6 @@
         "press_page_url": {
           "match": "falsy",
           "note": "Calibrated: module returns null"
-        },
-        "article_count": {
-          "value": 0,
-          "match": "gte",
-          "note": "Calibrated: module returns 0"
         }
       },
       "expectedCheckpoints": [
@@ -489,5 +479,5 @@
       "fixedBugs": []
     }
   },
-  "calibratedAt": "2026-04-04T01:03:06.019Z"
+  "calibratedAt": "2026-04-04T01:32:02.429Z"
 }

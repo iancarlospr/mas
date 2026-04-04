@@ -139,16 +139,6 @@
           "value": "WordPress",
           "match": "contains",
           "note": "Generator: WordPress Download Manager 6.8.9"
-        },
-        "cdn.name": {
-          "value": "Cloudflare",
-          "match": "contains",
-          "note": "CDN detected from headers"
-        },
-        "compression": {
-          "value": "brotli",
-          "match": "exact",
-          "note": "Calibrated from module output"
         }
       },
       "expectedCheckpoints": [
@@ -340,11 +330,6 @@
         "press_page_url": {
           "match": "truthy",
           "note": "Press page at https://www.investpr.org/news"
-        },
-        "article_count": {
-          "value": 12,
-          "match": "gte",
-          "note": "Calibrated: module returns 12"
         }
       },
       "expectedCheckpoints": [
@@ -499,5 +484,5 @@
       "fixedBugs": []
     }
   },
-  "calibratedAt": "2026-04-04T01:03:32.489Z"
+  "calibratedAt": "2026-04-04T01:32:28.691Z"
 }

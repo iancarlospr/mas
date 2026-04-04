@@ -576,11 +576,11 @@
       "evidence": "Viewport allows user zoom (content: \"width=device-width, initial-scale=1\")"
     }
   ],
-  "duration": 2215,
+  "duration": 2179,
   "_replay": {
     "site": "foundationforpuertorico.org",
     "moduleId": "M04",
-    "elapsed": 2216,
-    "replayedAt": "2026-04-04T01:17:52.700Z"
+    "elapsed": 2180,
+    "replayedAt": "2026-04-04T01:35:47.464Z"
   }
 }

@@ -84,7 +84,7 @@
         {
           "id": "m01-caa",
           "expectedHealth": "excellent",
-          "note": "CAA records set (letsencrypt.org, pki.goog, digicert.com, amazonaws.com) and mat"
+          "note": "CAA records set (pki.goog, digicert.com, letsencrypt.org, amazonaws.com) and mat"
         },
         {
           "id": "m01-geoip",
@@ -130,11 +130,6 @@
         "detectedTechnologies": {
           "match": "truthy",
           "note": "Should detect technologies"
-        },
-        "compression": {
-          "value": "gzip",
-          "match": "exact",
-          "note": "Calibrated from module output"
         }
       },
       "expectedCheckpoints": [
@@ -326,11 +321,6 @@
         "press_page_url": {
           "match": "truthy",
           "note": "Press page at https://www.mailchimp.com/solutions/social-media-marketing-tools/"
-        },
-        "article_count": {
-          "value": 1,
-          "match": "gte",
-          "note": "Calibrated: module returns 1"
         }
       },
       "expectedCheckpoints": [
@@ -485,5 +475,5 @@
       "fixedBugs": []
     }
   },
-  "calibratedAt": "2026-04-04T01:03:40.936Z"
+  "calibratedAt": "2026-04-04T01:32:36.776Z"
 }

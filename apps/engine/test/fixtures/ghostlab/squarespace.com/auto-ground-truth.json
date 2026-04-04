@@ -83,7 +83,7 @@
         {
           "id": "m01-email",
           "expectedHealth": "excellent",
-          "note": "Professional email provider detected: Google Workspace (MX: aspmx.l.google.com, "
+          "note": "Professional email provider detected: Google Workspace (MX: aspmx4.googlemail.co"
         },
         {
           "id": "m01-caa",
@@ -93,7 +93,7 @@
         {
           "id": "m01-geoip",
           "expectedHealth": "info",
-          "note": "198.49.23.180: US, 198.185.159.180: US, 198.185.159.181: US, 198.49.23.181: US"
+          "note": "198.49.23.181: US, 198.185.159.180: US, 198.49.23.180: US, 198.185.159.181: US"
         },
         {
           "id": "m01-mta-sts",
@@ -134,11 +134,6 @@
         "detectedTechnologies": {
           "match": "truthy",
           "note": "Should detect technologies"
-        },
-        "compression": {
-          "value": "gzip",
-          "match": "exact",
-          "note": "Calibrated from module output"
         }
       },
       "expectedCheckpoints": [
@@ -330,11 +325,6 @@
         "press_page_url": {
           "match": "truthy",
           "note": "Press page at https://newsroom.squarespace.com/"
-        },
-        "article_count": {
-          "value": 10,
-          "match": "gte",
-          "note": "Calibrated: module returns 10"
         }
       },
       "expectedCheckpoints": [
@@ -489,5 +479,5 @@
       "fixedBugs": []
     }
   },
-  "calibratedAt": "2026-04-04T01:05:01.294Z"
+  "calibratedAt": "2026-04-04T01:33:53.882Z"
 }

@@ -87,17 +87,17 @@
         {
           "id": "m01-email",
           "expectedHealth": "excellent",
-          "note": "Professional email provider detected: Google Workspace (MX: alt2.aspmx.l.google."
+          "note": "Professional email provider detected: Google Workspace (MX: noreply.qemailserver"
         },
         {
           "id": "m01-caa",
           "expectedHealth": "good",
-          "note": "CAA records set: certainly.com, digicert.com, amazon.com, globalsign.com, pki.go"
+          "note": "CAA records set: certainly.com, pki.goog, digicert.com, amazon.com, globalsign.c"
         },
         {
           "id": "m01-geoip",
           "expectedHealth": "info",
-          "note": "13.32.179.105: US, 13.32.179.54: US, 13.32.179.109: US, 13.32.179.36: US"
+          "note": "52.85.78.8: US, 52.85.78.3: US, 52.85.78.92: US, 52.85.78.53: US"
         },
         {
           "id": "m01-mta-sts",
@@ -138,11 +138,6 @@
         "detectedTechnologies": {
           "match": "truthy",
           "note": "Should detect technologies"
-        },
-        "cdn.name": {
-          "value": "CloudFront",
-          "match": "contains",
-          "note": "CDN detected from headers"
         }
       },
       "expectedCheckpoints": [
@@ -325,11 +320,6 @@
         "press_page_url": {
           "match": "truthy",
           "note": "Press page at https://zapier.com/templates/details/social-media-bot"
-        },
-        "article_count": {
-          "value": 0,
-          "match": "gte",
-          "note": "Calibrated: module returns 0"
         }
       },
       "expectedCheckpoints": [
@@ -484,5 +474,5 @@
       "fixedBugs": []
     }
   },
-  "calibratedAt": "2026-04-04T01:05:48.670Z"
+  "calibratedAt": "2026-04-04T01:34:37.993Z"
 }

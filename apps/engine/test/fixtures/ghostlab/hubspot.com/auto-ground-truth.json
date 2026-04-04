@@ -97,7 +97,7 @@
         {
           "id": "m01-geoip",
           "expectedHealth": "info",
-          "note": "104.18.39.114: , 172.64.148.142: US"
+          "note": "172.64.148.142: US, 104.18.39.114: "
         },
         {
           "id": "m01-mta-sts",
@@ -107,7 +107,7 @@
         {
           "id": "m01-ipv6",
           "expectedHealth": "excellent",
-          "note": "AAAA records found: 2a06:98c1:310a::ac40:948e, 2606:4700:440d::6812:2772"
+          "note": "AAAA records found: 2606:4700:440d::6812:2772, 2a06:98c1:310a::ac40:948e"
         },
         {
           "id": "m01-www-consistency",
@@ -138,16 +138,6 @@
         "detectedTechnologies": {
           "match": "truthy",
           "note": "Should detect technologies"
-        },
-        "cdn.name": {
-          "value": "Cloudflare",
-          "match": "contains",
-          "note": "CDN detected from headers"
-        },
-        "compression": {
-          "value": "brotli",
-          "match": "exact",
-          "note": "Calibrated from module output"
         }
       },
       "expectedCheckpoints": [
@@ -493,5 +483,5 @@
       "fixedBugs": []
     }
   },
-  "calibratedAt": "2026-04-04T01:03:25.591Z"
+  "calibratedAt": "2026-04-04T01:32:22.195Z"
 }

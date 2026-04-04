@@ -88,7 +88,7 @@
         {
           "id": "m01-caa",
           "expectedHealth": "excellent",
-          "note": "CAA records set (entrust.net, digicert.com, sectigo.com) and match certificate i"
+          "note": "CAA records set (sectigo.com, digicert.com, entrust.net) and match certificate i"
         },
         {
           "id": "m01-geoip",
@@ -134,11 +134,6 @@
         "detectedTechnologies": {
           "match": "truthy",
           "note": "Should detect technologies"
-        },
-        "compression": {
-          "value": "gzip",
-          "match": "exact",
-          "note": "Calibrated from module output"
         }
       },
       "expectedCheckpoints": [
@@ -321,11 +316,6 @@
         "press_page_url": {
           "match": "falsy",
           "note": "Calibrated: module returns null"
-        },
-        "article_count": {
-          "value": 0,
-          "match": "gte",
-          "note": "Calibrated: module returns 0"
         }
       },
       "expectedCheckpoints": [
@@ -480,5 +470,5 @@
       "fixedBugs": []
     }
   },
-  "calibratedAt": "2026-04-04T01:03:54.047Z"
+  "calibratedAt": "2026-04-04T01:32:49.283Z"
 }
