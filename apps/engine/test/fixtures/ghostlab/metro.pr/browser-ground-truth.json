@@ -1,48 +1,89 @@
 {
   "site": "metro.pr",
-  "capturedAt": "2026-04-04T00:39:03.516Z",
+  "capturedAt": "2026-04-04T02:56:52.309Z",
   "capturedBy": "capture-ground-truth.ts (browser-verified)",
   "baseUrl": "https://www.metro.pr/",
   "modules": {
     "M01": {
       "spf": true,
       "spfRecord": "v=spf1 include:_spf.google.com include:spfa.mailendo.com ~all",
+      "spfAllQualifier": "~all",
+      "spfIncludes": 2,
       "dmarc": true,
+      "dmarcRecord": "v=DMARC1;p=quarantine;rua=mailto:multimedia@metro.pr;ruf=mailto:carlos.figueroa@metro.pr;sp=none;fo=1;pct=100;ri=86400;adkim=r;aspf=r;",
       "dmarcPolicy": "quarantine",
+      "dmarcRua": true,
+      "dmarcRuf": true,
+      "dkim": true,
+      "dkimSelectors": [
+        "google"
+      ],
       "hasMx": true,
       "mxCount": 1,
+      "emailProvider": "Google Workspace",
+      "nsProvider": "ns1.regzone.info",
+      "hasCaa": false,
+      "hasIpv6": false,
       "hasHsts": false,
       "hasCsp": true,
+      "cspHasDefaultSrc": false,
+      "cspHasScriptSrc": false,
+      "cspReportOnly": false,
       "hasXfo": false,
+      "xfoValue": null,
       "hasXcto": false,
       "hasReferrerPolicy": false,
+      "referrerPolicy": null,
       "hasPermissionsPolicy": false,
       "serverHeader": "openresty"
     },
     "M02": {
       "isWordPress": false,
-      "hasGeneratorMeta": false,
+      "isShopify": false,
+      "isDrupal": false,
+      "isSquarespace": false,
+      "isWebflow": false,
+      "isWix": false,
+      "isHubSpotCMS": false,
       "generator": null,
+      "cmsName": null,
       "serverHeader": "openresty",
-      "hasCfRay": false,
       "cdn": null,
-      "compression": "gzip"
+      "compression": "gzip",
+      "httpVersion": "HTTP/2",
+      "poweredBy": null,
+      "hasGA4": true,
+      "ga4Id": "G-6VQM3SM002",
+      "hasGTM": true,
+      "gtmId": "GTM-5SGSDVTZ"
     },
     "M04": {
       "title": "Noticias, Deportes y Entretenimiento de Puerto Rico y el Mundo | Metro",
+      "titleLength": 70,
       "metaDescription": "Las últimas noticias y Entretenimiento en Metro, la red de medios más grande del mundo.",
+      "metaDescriptionLength": 87,
       "canonical": "https://www.metro.pr",
       "htmlLang": "es",
       "viewport": "width=device-width, initial-scale=1.0, user-scalable=yes, minimum-scale=0.5, maximum-scale=2.0",
       "charset": "UTF-8",
       "ogTagCount": 4,
+      "hasOgTitle": true,
+      "hasOgDescription": false,
       "hasOgImage": true,
-      "jsonLdCount": 1,
+      "hasOgUrl": false,
+      "hasOgType": false,
+      "hasOgSiteName": true,
+      "twitterCard": "summary_large_image",
+      "jsonLdCount": 0,
+      "jsonLdTypes": [],
+      "hreflangCount": 1,
+      "faviconCount": 1,
       "hasRobotsTxt": true,
-      "hasSitemap": false
+      "robotsHasSitemap": true,
+      "hasSitemap": true
     },
     "M16": {
-      "pressLinksFound": 50,
+      "pressLinksFound": 48,
       "pressLinks": [
         {
           "href": "/noticias",
@@ -61,8 +102,8 @@
           "text": "Mundo"
         },
         {
-          "href": "/noticias/2026/04/03/rescatan-a-tres-agentes-federales-y-dos-civiles-tras-volcadura-de-embarcaciones-frente-a-isla-de-cabras/",
-          "text": "Rescatan a tres agentes federales y dos civiles tras volcadura de embarcaciones "
+          "href": "/noticias/2026/04/04/tripulacion-de-artemis-ii-avanza-rumbo-a-la-luna-con-gran-espiritu/",
+          "text": ""
         }
       ],
       "pressPageUrl": "https://www.metro.pr/noticias",
@@ -97,18 +138,52 @@
     "M17": {
       "careersLinksFound": 0,
       "careersLinks": [],
-      "hasCareersPage": false
+      "hasCareersPage": false,
+      "externalCareersUrl": null,
+      "atsProviders": []
     },
     "M18": {
       "irLinksFound": 3,
+      "irLinks": [
+        {
+          "href": "/noticias/2026/04/03/estados-unidos-rescata-a-uno-de-los-tripulantes-de-avion-militar-derribado-en-iran/",
+          "text": "Estados Unidos rescata a uno de los tripulantes de avión mil"
+        },
+        {
+          "href": "/noticias/2026/04/03/estados-unidos-rescata-a-uno-de-los-tripulantes-de-avion-militar-derribado-en-iran/",
+          "text": "Estados Unidos rescata a uno de los tripulantes de avión mil"
+        },
+        {
+          "href": "/noticias/2026/04/03/estados-unidos-rescata-a-uno-de-los-tripulantes-de-avion-militar-derribado-en-iran/",
+          "text": "Estados Unidos rescata a uno de los tripulantes de avión mil"
+        }
+      ],
       "hasIrPage": true,
-      "ticker": null
+      "ticker": null,
+      "externalIrDomain": null
     },
     "M19": {
       "supportLinksFound": 2,
+      "supportLinks": [
+        {
+          "href": "/sabrosia/2026/04/02/mas-de-500-pequenos-empresarios-de-pesca-recibieron-ayuda-para-apoyar-la-seguridad-alimentaria/",
+          "text": "Más de 500 pequeños empresarios de pesca recibieron ayuda pa"
+        },
+        {
+          "href": "/sabrosia/2026/04/02/mas-de-500-pequenos-empresarios-de-pesca-recibieron-ayuda-para-apoyar-la-seguridad-alimentaria/",
+          "text": ""
+        }
+      ],
       "hasSupportPage": true,
+      "phones": [],
       "hasPhone": false,
-      "emails": []
+      "emails": [],
+      "hasEmail": false,
+      "hasChat": false,
+      "statusPageUrl": null,
+      "hasDeveloperDocs": false,
+      "supportSubdomains": [],
+      "channelCount": 1
     }
   }
 }

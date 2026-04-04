@@ -1,8 +1,8 @@
 {
   "site": "stripe.com",
-  "verifiedAt": "2026-04-03T23:51:37.367Z",
+  "verifiedAt": "2026-04-04T02:58:34.503Z",
   "generatedBy": "generate-ground-truth-json.ts (from browser-ground-truth.json)",
-  "notes": "Auto-generated from browser-verified facts captured on 2026-04-03T23:51:37.367Z",
+  "notes": "Auto-generated from browser-verified facts captured on 2026-04-04T02:58:34.503Z",
   "modules": {
     "M01": {
       "expectedData": {
@@ -12,32 +12,49 @@
         },
         "dmarc": {
           "match": "truthy",
-          "note": "DMARC record exists"
+          "note": "DMARC p=reject"
+        },
+        "dmarcPolicy": {
+          "match": "truthy",
+          "note": "DMARC policy: reject"
+        },
+        "dkim": {
+          "match": "truthy",
+          "note": "DKIM selectors: google, s1"
+        },
+        "emailProvider.provider": {
+          "value": "Google Workspace",
+          "match": "contains",
+          "note": "Email provider from MX"
         },
         "hsts": {
           "match": "truthy",
-          "note": "HSTS header present"
+          "note": "HSTS present"
         },
         "csp": {
           "match": "truthy",
-          "note": "CSP header present"
+          "note": "CSP present"
+        },
+        "ipv6": {
+          "match": "falsy",
+          "note": "No IPv6"
         }
       },
       "expectedCheckpoints": [
         {
           "id": "m01-spf",
           "expectedHealth": "good",
-          "note": "SPF present"
+          "note": "SPF present with ~all (soft-fail) and 3 DNS lookups: v=spf1 ip4:198.2.180.60/32 "
         },
         {
           "id": "m01-dmarc",
           "expectedHealth": "excellent",
-          "note": "DMARC p=reject"
+          "note": "DMARC policy is reject with rua+ruf reporting: v=DMARC1; p=reject; pct=100; fo=1"
         },
         {
           "id": "m01-dkim",
           "expectedHealth": "good",
-          "note": "DKIM found (selector: s1), key strength ~1024-bit"
+          "note": "DKIM found (selector: google), key strength ~1024-bit"
         },
         {
           "id": "m01-dnssec",
@@ -87,17 +104,17 @@
         {
           "id": "m01-email",
           "expectedHealth": "excellent",
-          "note": "Professional email provider detected: Google Workspace (MX: alt2.aspmx.l.google."
+          "note": "Professional email provider detected: Google Workspace (MX: alt1.aspmx.l.google."
         },
         {
           "id": "m01-caa",
           "expectedHealth": "excellent",
-          "note": "CAA records set (amazon.com, visa.com, digicert.com) and match certificate issue"
+          "note": "CAA records set (visa.com, amazon.com, digicert.com) and match certificate issue"
         },
         {
           "id": "m01-geoip",
           "expectedHealth": "info",
-          "note": "3.90.98.12: US (Ashburn), 54.162.8.126: US, 3.229.145.172: US (Ashburn)"
+          "note": "3.228.62.110: US (Ashburn), 52.86.4.21: US (Ashburn), 52.54.252.87: US (Ashburn)"
         },
         {
           "id": "m01-mta-sts",
@@ -199,19 +216,32 @@
       "expectedData": {
         "title": {
           "match": "truthy",
-          "note": "Page title exists"
+          "note": "Title: \"Stripe | Financial Infrastructure to Grow Your Rev\""
         },
         "metaDescription": {
           "match": "truthy",
-          "note": "Meta description exists"
+          "note": "Meta description present"
         },
         "htmlLang": {
-          "match": "truthy",
+          "value": "en-US",
+          "match": "contains",
           "note": "Lang: en-US"
         },
-        "jsonLd": {
+        "canonical": {
           "match": "truthy",
-          "note": "1 JSON-LD blocks"
+          "note": "Canonical URL set"
+        },
+        "ogTags": {
+          "match": "truthy",
+          "note": "5 OG tags"
+        },
+        "hreflang": {
+          "match": "truthy",
+          "note": "87 hreflang tags"
+        },
+        "robotsTxt": {
+          "match": "truthy",
+          "note": "robots.txt exists"
         }
       },
       "expectedCheckpoints": [
@@ -253,7 +283,7 @@
         {
           "id": "M04-ROBOTS",
           "expectedHealth": "excellent",
-          "note": "robots.txt exists"
+          "note": "robots.txt present with 1 sitemap reference(s), 17 disallow rule(s), 3 user-agen"
         },
         {
           "id": "M04-SITEMAP",
@@ -298,7 +328,7 @@
         {
           "id": "M04-VIEWPORT",
           "expectedHealth": "excellent",
-          "note": "Viewport meta present"
+          "note": "Viewport configured: width=device-width, initial-scale=1, viewport-fit=cover"
         },
         {
           "id": "M04-CHARSET",
@@ -377,7 +407,7 @@
         {
           "id": "m17-careers-page",
           "expectedHealth": "excellent",
-          "note": "Careers page exists"
+          "note": "Dedicated careers page with 93 open position(s) at /jobs"
         },
         {
           "id": "m17-ats-provider",
@@ -409,7 +439,7 @@
         {
           "id": "m18-ir-portal",
           "expectedHealth": "good",
-          "note": "No IR page"
+          "note": "IR page found at https://www.stripe.com/legal/financial-accounts-eea"
         },
         {
           "id": "m18-financial-data",
@@ -444,7 +474,11 @@
       "expectedData": {
         "support_page_url": {
           "match": "truthy",
-          "note": "Support/contact page found"
+          "note": "Support page found"
+        },
+        "developer_docs": {
+          "match": "truthy",
+          "note": "Developer docs found"
         }
       },
       "expectedCheckpoints": [
@@ -488,5 +522,5 @@
       "fixedBugs": []
     }
   },
-  "calibratedAt": "2026-04-04T01:34:01.422Z"
+  "calibratedAt": "2026-04-04T03:25:44.208Z"
 }

@@ -1,44 +1,89 @@
 {
   "site": "hubspot.com",
-  "capturedAt": "2026-04-03T23:51:18.560Z",
+  "capturedAt": "2026-04-04T02:56:18.436Z",
   "capturedBy": "capture-ground-truth.ts (browser-verified)",
-  "baseUrl": "https://www.hubspot.com/?wfuid=f32f0abba0.1775260276&wfsid=1775260276-fd3e-8f2f-6e9160917f28",
+  "baseUrl": "https://www.hubspot.com/?wfuid=f9fc066c6c.1775271376&wfsid=1775271376-593d-bd41-f808611bc85e",
   "modules": {
     "M01": {
       "spf": true,
       "spfRecord": "v=spf1 redirect=_hspf.hubspot.com",
+      "spfAllQualifier": null,
+      "spfIncludes": 0,
       "dmarc": true,
+      "dmarcRecord": "v=DMARC1;p=reject;pct=100;rua=mailto:bdlk5ayo@ag.dmarcian.com;ruf=mailto:bdlk5ayo@fr.dmarcian.com",
       "dmarcPolicy": "reject",
+      "dmarcRua": true,
+      "dmarcRuf": true,
+      "dkim": true,
+      "dkimSelectors": [
+        "google",
+        "s1"
+      ],
       "hasMx": true,
       "mxCount": 1,
+      "emailProvider": "Google Workspace",
+      "nsProvider": "Cloudflare",
+      "hasCaa": false,
+      "hasIpv6": true,
       "hasHsts": true,
+      "hstsMaxAge": 31536000,
+      "hstsIncludeSubDomains": true,
+      "hstsPreload": true,
       "hasCsp": true,
+      "cspHasDefaultSrc": false,
+      "cspHasScriptSrc": true,
+      "cspReportOnly": true,
       "hasXfo": true,
+      "xfoValue": "DENY",
       "hasXcto": true,
       "hasReferrerPolicy": true,
+      "referrerPolicy": "no-referrer-when-downgrade",
       "hasPermissionsPolicy": false,
       "serverHeader": "cloudflare"
     },
     "M02": {
       "isWordPress": false,
-      "hasGeneratorMeta": true,
+      "isShopify": false,
+      "isDrupal": false,
+      "isSquarespace": false,
+      "isWebflow": false,
+      "isWix": false,
+      "isHubSpotCMS": true,
       "generator": "HubSpot",
+      "cmsName": "HubSpot",
       "serverHeader": "cloudflare",
-      "hasCfRay": true,
       "cdn": "Cloudflare",
-      "compression": "br"
+      "compression": "br",
+      "httpVersion": "HTTP/2",
+      "poweredBy": null,
+      "hasGA4": true,
+      "ga4Id": "G-LXTM6CQ0XK",
+      "hasGTM": true,
+      "gtmId": "GTM-N5LT88"
     },
     "M04": {
       "title": "HubSpot | Software & Tools for your Business - Homepage",
+      "titleLength": 55,
       "metaDescription": "HubSpot's customer platform includes all the marketing, sales, customer service, and CRM software you need to grow your business.",
+      "metaDescriptionLength": 129,
       "canonical": "https://www.hubspot.com",
       "htmlLang": "en",
       "viewport": "width=device-width, initial-scale=1",
       "charset": "utf-8",
       "ogTagCount": 7,
+      "hasOgTitle": true,
+      "hasOgDescription": true,
       "hasOgImage": true,
-      "jsonLdCount": 1,
+      "hasOgUrl": true,
+      "hasOgType": false,
+      "hasOgSiteName": false,
+      "twitterCard": "summary_large_image",
+      "jsonLdCount": 0,
+      "jsonLdTypes": [],
+      "hreflangCount": 7,
+      "faviconCount": 1,
       "hasRobotsTxt": true,
+      "robotsHasSitemap": false,
       "hasSitemap": true
     },
     "M16": {
@@ -51,30 +96,92 @@
       "careersLinksFound": 3,
       "careersLinks": [
         {
-          "href": "https://www.hubspot.com/careers?hubs_content=www.hubspot.com%2F&hubs_content-cta=nav-utility-careers&wfoid=145c904782.1775260277",
+          "href": "https://www.hubspot.com/careers?hubs_content=www.hubspot.com%2F&hubs_content-cta=nav-utility-careers&wfoid=d5c9f5ffff.1775271377",
           "text": "Careers"
         },
         {
-          "href": "https://www.hubspot.com/careers?hubs_content=www.hubspot.com%2F&hubs_content-cta=nav-utility-careers&wfoid=145c904782.1775260277",
+          "href": "https://www.hubspot.com/careers?hubs_content=www.hubspot.com%2F&hubs_content-cta=nav-utility-careers&wfoid=d5c9f5ffff.1775271377",
           "text": "Careers"
         },
         {
-          "href": "https://www.hubspot.com/careers?hubs_content=www.hubspot.com%2F&hubs_content-cta=null&wfoid=145c904782.1775260277",
+          "href": "https://www.hubspot.com/careers?hubs_content=www.hubspot.com%2F&hubs_content-cta=careers&wfoid=d5c9f5ffff.1775271377",
           "text": "Careers"
         }
       ],
-      "hasCareersPage": true
+      "hasCareersPage": true,
+      "externalCareersUrl": null,
+      "atsProviders": []
     },
     "M18": {
       "irLinksFound": 3,
+      "irLinks": [
+        {
+          "href": "https://ir.hubspot.com/?hubs_content=www.hubspot.com%2F&hubs_content-cta=nav-utility-investors&wfoid=d5c9f5ffff.1775271377",
+          "text": "Investor Relations"
+        },
+        {
+          "href": "https://ir.hubspot.com/?hubs_content=www.hubspot.com%2F&hubs_content-cta=nav-utility-investors&wfoid=d5c9f5ffff.1775271377",
+          "text": "Investor Relations"
+        },
+        {
+          "href": "https://ir.hubspot.com/?_ga=2.262843276.12874469.1592422655-430007000.1592422655&hubs_content=www.hubspot.com%2F&hubs_content-cta=investor-relations&wfoid=d5c9f5ffff.1775271377",
+          "text": "Investor Relations"
+        }
+      ],
       "hasIrPage": true,
-      "ticker": null
+      "ticker": null,
+      "externalIrDomain": "https://ir.hubspot.com/?hubs_content=www.hubspot.com%2F&hubs_content-cta=nav-utility-investors&wfoid=d5c9f5ffff.1775271377"
     },
     "M19": {
-      "supportLinksFound": 5,
+      "supportLinksFound": 8,
+      "supportLinks": [
+        {
+          "href": "https://help.hubspot.com/?hubs_content=www.hubspot.com%2F&hubs_content-cta=nav-utility-support&wfoid=d5c9f5ffff.1775271377",
+          "text": "Customer Support"
+        },
+        {
+          "href": "https://offers.hubspot.com/contact-sales?hubs_signup-url=www.hubspot.com%2F&hubs_signup-cta=nav-utility-contactsales&hubs_content=www.hubspot.com%2F&hubs_content-cta=nav-utility-contactsales&wfoid=d5c9f5ffff.1775271377",
+          "text": "Contact Sales"
+        },
+        {
+          "href": "https://www.hubspot.com/company/contact?hubs_content=www.hubspot.com%2F&hubs_content-cta=nav-utility-contact&wfoid=d5c9f5ffff.1775271377",
+          "text": "Contact Us"
+        },
+        {
+          "href": "https://www.hubspot.com/use-case/scale-customer-service-support?hubs_content=www.hubspot.com%2F&hubs_content-cta=nav-solutions-support&wfoid=d5c9f5ffff.1775271377",
+          "text": "Scale support"
+        },
+        {
+          "href": "https://knowledge.hubspot.com/?hubs_content=www.hubspot.com%2F&hubs_content-cta=nav-resources-knowledge&wfoid=d5c9f5ffff.1775271377",
+          "text": "HubSpot Knowledge Base"
+        },
+        {
+          "href": "https://www.hubspot.com/use-case/scale-customer-service-support?hubs_content=www.hubspot.com%2F&hubs_content-cta=nav-solutions-support&wfoid=d5c9f5ffff.1775271377",
+          "text": "Scale support"
+        },
+        {
+          "href": "https://knowledge.hubspot.com/?hubs_content=www.hubspot.com%2F&hubs_content-cta=nav-resources-knowledge&wfoid=d5c9f5ffff.1775271377",
+          "text": "HubSpot Knowledge Base"
+        },
+        {
+          "href": "https://www.hubspot.com/company/contact?hubs_content=www.hubspot.com%2F&hubs_content-cta=nav-utility-contact&wfoid=d5c9f5ffff.1775271377",
+          "text": "Contact Us"
+        }
+      ],
       "hasSupportPage": true,
+      "phones": [],
       "hasPhone": false,
-      "emails": []
+      "emails": [],
+      "hasEmail": false,
+      "hasChat": true,
+      "statusPageUrl": null,
+      "hasDeveloperDocs": true,
+      "supportSubdomains": [
+        "https://help.hubspot.com/?hubs_content=www.hubspot.com%2F&hubs_content-cta=nav-utility-support&wfoid=d5c9f5ffff.1775271377",
+        "https://community.hubspot.com/?hubs_content=www.hubspot.com%2F&hubs_content-cta=nav-resources-community&wfoid=d5c9f5ffff.1775271377",
+        "https://knowledge.hubspot.com/?hubs_content=www.hubspot.com%2F&hubs_content-cta=nav-resources-knowledge&wfoid=d5c9f5ffff.1775271377"
+      ],
+      "channelCount": 2
     }
   }
 }

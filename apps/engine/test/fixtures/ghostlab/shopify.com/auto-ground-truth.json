@@ -1,8 +1,8 @@
 {
   "site": "shopify.com",
-  "verifiedAt": "2026-04-03T23:51:25.980Z",
+  "verifiedAt": "2026-04-04T02:58:18.482Z",
   "generatedBy": "generate-ground-truth-json.ts (from browser-ground-truth.json)",
-  "notes": "Auto-generated from browser-verified facts captured on 2026-04-03T23:51:25.980Z",
+  "notes": "Auto-generated from browser-verified facts captured on 2026-04-04T02:58:18.482Z",
   "modules": {
     "M01": {
       "expectedData": {
@@ -12,28 +12,49 @@
         },
         "dmarc": {
           "match": "truthy",
-          "note": "DMARC record exists"
+          "note": "DMARC p=reject"
+        },
+        "dmarcPolicy": {
+          "match": "truthy",
+          "note": "DMARC policy: reject"
+        },
+        "dkim": {
+          "match": "truthy",
+          "note": "DKIM selectors: google"
+        },
+        "emailProvider.provider": {
+          "value": "Google Workspace",
+          "match": "contains",
+          "note": "Email provider from MX"
         },
         "hsts": {
           "match": "truthy",
-          "note": "HSTS header present"
+          "note": "HSTS present"
+        },
+        "csp": {
+          "match": "falsy",
+          "note": "No CSP"
+        },
+        "ipv6": {
+          "match": "falsy",
+          "note": "No IPv6"
         }
       },
       "expectedCheckpoints": [
         {
           "id": "m01-spf",
           "expectedHealth": "good",
-          "note": "SPF present"
+          "note": "SPF present with ~all (soft-fail) and 3 DNS lookups: v=spf1 include:_spf.google."
         },
         {
           "id": "m01-dmarc",
           "expectedHealth": "excellent",
-          "note": "DMARC p=reject"
+          "note": "DMARC policy is reject with rua+ruf reporting: v=DMARC1; p=reject; pct=100; fo=1"
         },
         {
           "id": "m01-dkim",
           "expectedHealth": "good",
-          "note": "DKIM found (selector: mail), key strength ~1024-bit"
+          "note": "DKIM found (selector: google), key strength ~1024-bit"
         },
         {
           "id": "m01-dnssec",
@@ -93,7 +114,7 @@
         {
           "id": "m01-geoip",
           "expectedHealth": "info",
-          "note": "104.18.42.163: , 172.64.145.93: US"
+          "note": "172.64.145.93: US, 104.18.42.163: "
         },
         {
           "id": "m01-mta-sts",
@@ -134,6 +155,15 @@
         "detectedTechnologies": {
           "match": "truthy",
           "note": "Should detect technologies"
+        },
+        "cms.name": {
+          "value": "Shopify",
+          "match": "contains",
+          "note": "CMS: Shopify"
+        },
+        "trackingIds": {
+          "match": "falsy",
+          "note": "Calibrated: module returns []"
         }
       },
       "expectedCheckpoints": [
@@ -190,19 +220,36 @@
       "expectedData": {
         "title": {
           "match": "truthy",
-          "note": "Page title exists"
+          "note": "Title: \"Shopify: The All-in-One Commerce Platform for Busi\""
         },
         "metaDescription": {
           "match": "truthy",
-          "note": "Meta description exists"
+          "note": "Meta description present"
         },
         "htmlLang": {
-          "match": "truthy",
+          "value": "en",
+          "match": "contains",
           "note": "Lang: en"
         },
-        "jsonLd": {
+        "canonical": {
           "match": "truthy",
-          "note": "1 JSON-LD blocks"
+          "note": "Canonical URL set"
+        },
+        "ogTags": {
+          "match": "truthy",
+          "note": "6 OG tags"
+        },
+        "hreflang": {
+          "match": "truthy",
+          "note": "65 hreflang tags"
+        },
+        "robotsTxt": {
+          "match": "truthy",
+          "note": "robots.txt exists"
+        },
+        "sitemap": {
+          "match": "truthy",
+          "note": "sitemap.xml exists"
         }
       },
       "expectedCheckpoints": [
@@ -244,7 +291,7 @@
         {
           "id": "M04-ROBOTS",
           "expectedHealth": "warning",
-          "note": "robots.txt exists"
+          "note": "robots.txt present but blocks important paths: /, *.data$, */account, */auth/cal"
         },
         {
           "id": "M04-SITEMAP",
@@ -289,7 +336,7 @@
         {
           "id": "M04-VIEWPORT",
           "expectedHealth": "excellent",
-          "note": "Viewport meta present"
+          "note": "Viewport configured: width=device-width,initial-scale=1"
         },
         {
           "id": "M04-CHARSET",
@@ -368,7 +415,7 @@
         {
           "id": "m17-careers-page",
           "expectedHealth": "good",
-          "note": "Careers page exists"
+          "note": "Careers page found at /careers/"
         },
         {
           "id": "m17-ats-provider",
@@ -400,7 +447,7 @@
         {
           "id": "m18-ir-portal",
           "expectedHealth": "info",
-          "note": "No IR page"
+          "note": "No investor relations page found (may be a private company)"
         },
         {
           "id": "m18-financial-data",
@@ -435,7 +482,15 @@
       "expectedData": {
         "support_page_url": {
           "match": "truthy",
-          "note": "Support/contact page found"
+          "note": "Support page found"
+        },
+        "chatbot": {
+          "match": "truthy",
+          "note": "Live chat detected"
+        },
+        "developer_docs": {
+          "match": "truthy",
+          "note": "Developer docs found"
         }
       },
       "expectedCheckpoints": [
@@ -479,5 +534,5 @@
       "fixedBugs": []
     }
   },
-  "calibratedAt": "2026-04-04T01:33:46.203Z"
+  "calibratedAt": "2026-04-04T03:25:22.648Z"
 }

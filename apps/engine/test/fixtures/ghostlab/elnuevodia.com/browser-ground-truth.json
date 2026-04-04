@@ -1,44 +1,86 @@
 {
   "site": "elnuevodia.com",
-  "capturedAt": "2026-04-04T00:38:50.061Z",
+  "capturedAt": "2026-04-04T02:55:55.317Z",
   "capturedBy": "capture-ground-truth.ts (browser-verified)",
   "baseUrl": "https://www.elnuevodia.com/",
   "modules": {
     "M01": {
       "spf": true,
       "spfRecord": "v=spf1 ip4:196.32.153.0/24 include:spf.protection.outlook.com include:sendgrid.net include:mail.zendesk.com include:spf.mandrillapp.com -all",
+      "spfAllQualifier": "-all",
+      "spfIncludes": 4,
       "dmarc": true,
+      "dmarcRecord": "v=DMARC1; p=none; pct=100; rua=mailto:postmaster@gfrmedia.com; ruf=mailto:postmaster@gfrmedia.com; fo=1",
       "dmarcPolicy": "none",
+      "dmarcRua": true,
+      "dmarcRuf": true,
+      "dkim": true,
+      "dkimSelectors": [
+        "selector2",
+        "s1"
+      ],
       "hasMx": true,
       "mxCount": 1,
+      "emailProvider": "Microsoft 365",
+      "nsProvider": "ns1.elnuevodia.com",
+      "hasCaa": false,
+      "hasIpv6": false,
       "hasHsts": false,
       "hasCsp": true,
+      "cspHasDefaultSrc": false,
+      "cspHasScriptSrc": false,
+      "cspReportOnly": false,
       "hasXfo": false,
+      "xfoValue": null,
       "hasXcto": false,
       "hasReferrerPolicy": false,
+      "referrerPolicy": null,
       "hasPermissionsPolicy": false,
       "serverHeader": "openresty"
     },
     "M02": {
       "isWordPress": false,
-      "hasGeneratorMeta": false,
+      "isShopify": false,
+      "isDrupal": false,
+      "isSquarespace": false,
+      "isWebflow": false,
+      "isWix": false,
+      "isHubSpotCMS": false,
       "generator": null,
+      "cmsName": null,
       "serverHeader": "openresty",
-      "hasCfRay": false,
       "cdn": null,
-      "compression": "gzip"
+      "compression": "gzip",
+      "httpVersion": "HTTP/2",
+      "poweredBy": null,
+      "hasGA4": true,
+      "ga4Id": "G-CPB5W2WWRL",
+      "hasGTM": true,
+      "gtmId": "GTM-M36BFNH"
     },
     "M04": {
       "title": "Noticias de Puerto Rico hoy | Última hora, análisis y opinión en El Nuevo Día",
+      "titleLength": 77,
       "metaDescription": "Infórmate con las últimas noticias de Puerto Rico hoy. Política, seguridad, deportes, entretenimiento y más en El Nuevo Día, el periódico líder de la isla.",
+      "metaDescriptionLength": 155,
       "canonical": "https://www.elnuevodia.com",
       "htmlLang": "es",
       "viewport": "width=device-width, initial-scale=1",
       "charset": null,
       "ogTagCount": 7,
+      "hasOgTitle": true,
+      "hasOgDescription": true,
       "hasOgImage": true,
-      "jsonLdCount": 2,
+      "hasOgUrl": true,
+      "hasOgType": true,
+      "hasOgSiteName": true,
+      "twitterCard": "summary_large_image",
+      "jsonLdCount": 0,
+      "jsonLdTypes": [],
+      "hreflangCount": 0,
+      "faviconCount": 1,
       "hasRobotsTxt": true,
+      "robotsHasSitemap": true,
       "hasSitemap": false
     },
     "M16": {
@@ -66,7 +108,7 @@
         }
       ],
       "pressPageUrl": "https://www.elnuevodia.com/ultimas-noticias/",
-      "visibleArticleCount": 67,
+      "visibleArticleCount": 71,
       "countStrategies": [
         {
           "name": "article",
@@ -74,7 +116,7 @@
         },
         {
           "name": "articleLinks",
-          "count": 67
+          "count": 71
         },
         {
           "name": "dates",
@@ -96,18 +138,44 @@
     "M17": {
       "careersLinksFound": 0,
       "careersLinks": [],
-      "hasCareersPage": false
+      "hasCareersPage": false,
+      "externalCareersUrl": null,
+      "atsProviders": []
     },
     "M18": {
-      "irLinksFound": 3,
+      "irLinksFound": 1,
+      "irLinks": [
+        {
+          "href": "/noticias/estados-unidos/notas/un-avion-de-combate-estadounidense-se-estrella-en-ormuz-luego-de-que-iran-derribara-un-caza-f-15/",
+          "text": "Un avión de combate estadounidense se estrella en Ormuz lueg"
+        }
+      ],
       "hasIrPage": true,
-      "ticker": null
+      "ticker": null,
+      "externalIrDomain": null
     },
     "M19": {
       "supportLinksFound": 2,
+      "supportLinks": [
+        {
+          "href": "https://micuenta.elnuevodia.com/ayuda",
+          "text": "Servicio al cliente"
+        },
+        {
+          "href": "/preguntas-frecuentes",
+          "text": "FAQ"
+        }
+      ],
       "hasSupportPage": true,
+      "phones": [],
       "hasPhone": false,
-      "emails": []
+      "emails": [],
+      "hasEmail": false,
+      "hasChat": false,
+      "statusPageUrl": null,
+      "hasDeveloperDocs": false,
+      "supportSubdomains": [],
+      "channelCount": 1
     }
   }
 }

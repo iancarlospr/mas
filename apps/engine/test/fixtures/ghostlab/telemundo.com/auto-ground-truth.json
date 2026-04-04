@@ -1,8 +1,8 @@
 {
   "site": "telemundo.com",
-  "verifiedAt": "2026-04-04T00:38:37.756Z",
+  "verifiedAt": "2026-04-04T02:58:43.765Z",
   "generatedBy": "generate-ground-truth-json.ts (from browser-ground-truth.json)",
-  "notes": "Auto-generated from browser-verified facts captured on 2026-04-04T00:38:37.756Z",
+  "notes": "Auto-generated from browser-verified facts captured on 2026-04-04T02:58:43.765Z",
   "modules": {
     "M01": {
       "expectedData": {
@@ -12,19 +12,44 @@
         },
         "dmarc": {
           "match": "truthy",
-          "note": "DMARC record exists"
+          "note": "DMARC p=none"
+        },
+        "dmarcPolicy": {
+          "match": "truthy",
+          "note": "DMARC policy: none"
+        },
+        "dkim": {
+          "match": "falsy",
+          "note": "No DKIM found"
+        },
+        "emailProvider.provider": {
+          "value": "Proofpoint",
+          "match": "contains",
+          "note": "Email provider from MX"
+        },
+        "hsts": {
+          "match": "falsy",
+          "note": "No HSTS"
+        },
+        "csp": {
+          "match": "falsy",
+          "note": "No CSP"
+        },
+        "ipv6": {
+          "match": "falsy",
+          "note": "No IPv6"
         }
       },
       "expectedCheckpoints": [
         {
           "id": "m01-spf",
           "expectedHealth": "good",
-          "note": "SPF present"
+          "note": "SPF present with ~all (soft-fail) and 1 DNS lookups: v=spf1 include:%{ir}.%{v}.%"
         },
         {
           "id": "m01-dmarc",
           "expectedHealth": "warning",
-          "note": "DMARC p=none"
+          "note": "DMARC policy is none (monitoring only): v=DMARC1; p=none; fo=1; rua=mailto:dmarc"
         },
         {
           "id": "m01-dkim",
@@ -79,7 +104,7 @@
         {
           "id": "m01-email",
           "expectedHealth": "excellent",
-          "note": "Email provider: Proofpoint (MX: mxa-00176a04.gslb.pphosted.com, mxb-00176a04.gsl"
+          "note": "Email provider: Proofpoint (MX: mxa-00176a04.gslb.pphosted.com, mx0b-00176a04.pp"
         },
         {
           "id": "m01-caa",
@@ -191,19 +216,32 @@
       "expectedData": {
         "title": {
           "match": "truthy",
-          "note": "Page title exists"
+          "note": "Title: \"Telemundo | Noticias, Shows, Entretenimiento, Seri\""
         },
         "metaDescription": {
           "match": "truthy",
-          "note": "Meta description exists"
+          "note": "Meta description present"
         },
         "htmlLang": {
-          "match": "truthy",
+          "value": "es",
+          "match": "contains",
           "note": "Lang: es"
         },
-        "jsonLd": {
+        "canonical": {
           "match": "truthy",
-          "note": "3 JSON-LD blocks"
+          "note": "Canonical URL set"
+        },
+        "ogTags": {
+          "match": "truthy",
+          "note": "9 OG tags"
+        },
+        "robotsTxt": {
+          "match": "truthy",
+          "note": "robots.txt exists"
+        },
+        "sitemap": {
+          "match": "truthy",
+          "note": "sitemap.xml exists"
         }
       },
       "expectedCheckpoints": [
@@ -245,7 +283,7 @@
         {
           "id": "M04-ROBOTS",
           "expectedHealth": "warning",
-          "note": "robots.txt exists"
+          "note": "robots.txt present but blocks important paths: /, /, /, /, /, /, /, /, /, /, /, "
         },
         {
           "id": "M04-SITEMAP",
@@ -290,7 +328,7 @@
         {
           "id": "M04-VIEWPORT",
           "expectedHealth": "excellent",
-          "note": "Viewport meta present"
+          "note": "Viewport configured: width=device-width, initial-scale=1, user-scalable=yes"
         },
         {
           "id": "M04-CHARSET",
@@ -369,7 +407,7 @@
         {
           "id": "m17-careers-page",
           "expectedHealth": "info",
-          "note": "Careers page exists"
+          "note": "No dedicated careers page found"
         },
         {
           "id": "m17-ats-provider",
@@ -401,7 +439,7 @@
         {
           "id": "m18-ir-portal",
           "expectedHealth": "info",
-          "note": "IR page found"
+          "note": "No investor relations page found (may be a private company)"
         },
         {
           "id": "m18-financial-data",
@@ -436,7 +474,11 @@
       "expectedData": {
         "support_page_url": {
           "match": "truthy",
-          "note": "Support/contact page found"
+          "note": "Support page found"
+        },
+        "developer_docs": {
+          "match": "truthy",
+          "note": "Developer docs found"
         }
       },
       "expectedCheckpoints": [
@@ -480,5 +522,5 @@
       "fixedBugs": []
     }
   },
-  "calibratedAt": "2026-04-04T01:34:14.678Z"
+  "calibratedAt": "2026-04-04T03:26:01.789Z"
 }

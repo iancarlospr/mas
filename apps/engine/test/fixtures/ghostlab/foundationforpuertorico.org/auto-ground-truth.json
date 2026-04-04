@@ -1,11 +1,36 @@
 {
   "site": "foundationforpuertorico.org",
-  "verifiedAt": "2026-04-03T23:29:02.427Z",
+  "verifiedAt": "2026-04-04T02:56:05.647Z",
   "generatedBy": "generate-ground-truth-json.ts (from browser-ground-truth.json)",
-  "notes": "Auto-generated from browser-verified facts captured on 2026-04-03T23:29:02.427Z",
+  "notes": "Auto-generated from browser-verified facts captured on 2026-04-04T02:56:05.647Z",
   "modules": {
     "M01": {
-      "expectedData": {},
+      "expectedData": {
+        "spf": {
+          "match": "falsy",
+          "note": "No SPF"
+        },
+        "dmarc": {
+          "match": "falsy",
+          "note": "No DMARC"
+        },
+        "dkim": {
+          "match": "falsy",
+          "note": "No DKIM found"
+        },
+        "hsts": {
+          "match": "falsy",
+          "note": "No HSTS"
+        },
+        "csp": {
+          "match": "falsy",
+          "note": "No CSP"
+        },
+        "ipv6": {
+          "match": "falsy",
+          "note": "No IPv6"
+        }
+      },
       "expectedCheckpoints": [
         {
           "id": "m01-spf",
@@ -125,7 +150,11 @@
         "cms.name": {
           "value": "WordPress",
           "match": "contains",
-          "note": "Generator: WordPress 6.8.5"
+          "note": "CMS: WordPress"
+        },
+        "trackingIds": {
+          "match": "truthy",
+          "note": "GTM: GTM-MSZ27P4"
         }
       },
       "expectedCheckpoints": [
@@ -182,19 +211,36 @@
       "expectedData": {
         "title": {
           "match": "truthy",
-          "note": "Page title exists"
+          "note": "Title: \"Foundation for Puerto Rico | Transforming Puerto R\""
         },
         "metaDescription": {
           "match": "truthy",
-          "note": "Meta description exists"
+          "note": "Meta description present"
         },
         "htmlLang": {
-          "match": "truthy",
+          "value": "en-US",
+          "match": "contains",
           "note": "Lang: en-US"
         },
-        "jsonLd": {
+        "canonical": {
           "match": "truthy",
-          "note": "1 JSON-LD blocks"
+          "note": "Canonical URL set"
+        },
+        "ogTags": {
+          "match": "truthy",
+          "note": "10 OG tags"
+        },
+        "hreflang": {
+          "match": "truthy",
+          "note": "4 hreflang tags"
+        },
+        "robotsTxt": {
+          "match": "truthy",
+          "note": "robots.txt exists"
+        },
+        "sitemap": {
+          "match": "truthy",
+          "note": "sitemap.xml exists"
         }
       },
       "expectedCheckpoints": [
@@ -236,7 +282,7 @@
         {
           "id": "M04-ROBOTS",
           "expectedHealth": "critical",
-          "note": "robots.txt exists"
+          "note": "No robots.txt found"
         },
         {
           "id": "M04-SITEMAP",
@@ -281,7 +327,7 @@
         {
           "id": "M04-VIEWPORT",
           "expectedHealth": "excellent",
-          "note": "Viewport meta present"
+          "note": "Viewport configured: width=device-width, initial-scale=1"
         },
         {
           "id": "M04-CHARSET",
@@ -360,7 +406,7 @@
         {
           "id": "m17-careers-page",
           "expectedHealth": "good",
-          "note": "Careers page exists"
+          "note": "Careers page found at /careers"
         },
         {
           "id": "m17-ats-provider",
@@ -392,7 +438,7 @@
         {
           "id": "m18-ir-portal",
           "expectedHealth": "warning",
-          "note": "No IR page"
+          "note": "IR page found at https://www.foundationforpuertorico.org/annual-report with basi"
         },
         {
           "id": "m18-financial-data",
@@ -427,7 +473,11 @@
       "expectedData": {
         "support_page_url": {
           "match": "truthy",
-          "note": "Support/contact page found"
+          "note": "Support page found"
+        },
+        "support_channels": {
+          "match": "truthy",
+          "note": "Phone support detected"
         }
       },
       "expectedCheckpoints": [
@@ -471,5 +521,5 @@
       "fixedBugs": []
     }
   },
-  "calibratedAt": "2026-04-04T01:32:13.025Z"
+  "calibratedAt": "2026-04-04T03:23:30.186Z"
 }

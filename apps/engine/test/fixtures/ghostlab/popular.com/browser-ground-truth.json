@@ -1,44 +1,90 @@
 {
   "site": "popular.com",
-  "capturedAt": "2026-04-04T00:39:25.752Z",
+  "capturedAt": "2026-04-04T02:57:47.878Z",
   "capturedBy": "capture-ground-truth.ts (browser-verified)",
   "baseUrl": "https://www.popular.com/",
   "modules": {
     "M01": {
       "spf": true,
       "spfRecord": "v=spf1 include:%{d}.9d.spf-protect.agari.com exists:%{i}._i.%{d}._d.espf.agari.com -all",
+      "spfAllQualifier": "-all",
+      "spfIncludes": 1,
       "dmarc": true,
+      "dmarcRecord": "v=DMARC1; p=reject; fo=1; ri=3600; rua=mailto:banco-popular@rua.agari.com; ruf=mailto:banco-popular@ruf.agari.com,mailto:bancopopular-dmarc@datafeeds.phishlabs.com",
       "dmarcPolicy": "reject",
+      "dmarcRua": true,
+      "dmarcRuf": true,
+      "dkim": true,
+      "dkimSelectors": [
+        "selector1",
+        "selector2",
+        "s1"
+      ],
       "hasMx": true,
       "mxCount": 1,
+      "emailProvider": "Microsoft 365",
+      "nsProvider": "AWS Route53",
+      "hasCaa": false,
+      "hasIpv6": false,
       "hasHsts": true,
+      "hstsMaxAge": 31536000,
+      "hstsIncludeSubDomains": false,
+      "hstsPreload": false,
       "hasCsp": true,
+      "cspHasDefaultSrc": true,
+      "cspHasScriptSrc": false,
+      "cspReportOnly": false,
       "hasXfo": true,
+      "xfoValue": "SAMEORIGIN",
       "hasXcto": true,
       "hasReferrerPolicy": true,
+      "referrerPolicy": "strict-origin-when-cross-origin",
       "hasPermissionsPolicy": true,
       "serverHeader": "Sucuri/Cloudproxy"
     },
     "M02": {
       "isWordPress": false,
-      "hasGeneratorMeta": false,
+      "isShopify": false,
+      "isDrupal": false,
+      "isSquarespace": false,
+      "isWebflow": false,
+      "isWix": false,
+      "isHubSpotCMS": false,
       "generator": null,
+      "cmsName": null,
       "serverHeader": "Sucuri/Cloudproxy",
-      "hasCfRay": false,
       "cdn": "Sucuri",
-      "compression": "gzip"
+      "compression": "gzip",
+      "httpVersion": "HTTP/3",
+      "poweredBy": null,
+      "hasGA4": true,
+      "ga4Id": "G-WQNSS77ZYR",
+      "hasGTM": true,
+      "gtmId": "GTM-WVX4MV"
     },
     "M04": {
       "title": "Banco Popular - Servicios financieros en Puerto Rico",
+      "titleLength": 52,
       "metaDescription": "Popular te ofrece la red más extensa de sucursales y cajeros automáticos en Puerto Rico. Conoce nuestros productos y servicios para individuos y negocios.",
+      "metaDescriptionLength": 154,
       "canonical": "https://www.popular.com/",
       "htmlLang": "es",
       "viewport": "width=device-width, initial-scale=1, maximum-scale=2.0, user-scalable=yes",
       "charset": "utf-8",
       "ogTagCount": 2,
+      "hasOgTitle": false,
+      "hasOgDescription": true,
       "hasOgImage": true,
+      "hasOgUrl": false,
+      "hasOgType": false,
+      "hasOgSiteName": false,
+      "twitterCard": null,
       "jsonLdCount": 0,
+      "jsonLdTypes": [],
+      "hreflangCount": 0,
+      "faviconCount": 7,
       "hasRobotsTxt": true,
+      "robotsHasSitemap": true,
       "hasSitemap": true
     },
     "M16": {
@@ -93,18 +139,75 @@
           "text": "Empleos"
         }
       ],
-      "hasCareersPage": true
+      "hasCareersPage": true,
+      "externalCareersUrl": null,
+      "atsProviders": []
     },
     "M18": {
       "irLinksFound": 2,
+      "irLinks": [
+        {
+          "href": "redirects/investor.popular.com/es/",
+          "text": "Para Accionistas"
+        },
+        {
+          "href": "redirects/investor.popular.com/es/",
+          "text": "Para Accionistas"
+        }
+      ],
       "hasIrPage": true,
-      "ticker": null
+      "ticker": null,
+      "externalIrDomain": null
     },
     "M19": {
-      "supportLinksFound": 5,
+      "supportLinksFound": 8,
+      "supportLinks": [
+        {
+          "href": "https://resourcecenter.popular.com/ayuda",
+          "text": "FAQs"
+        },
+        {
+          "href": "javascript://",
+          "text": "Ayuda"
+        },
+        {
+          "href": "#",
+          "text": "Ayuda"
+        },
+        {
+          "href": "https://resourcecenter.popular.com/ayuda",
+          "text": "FAQs"
+        },
+        {
+          "href": "https://resourcecenter.popular.com/ayuda/servicios/sucursales-y-horarios/horario-y-direccion-de-sucursales-y-ath/",
+          "text": "Horario y dirección de sucursales y ATH"
+        },
+        {
+          "href": "https://resourcecenter.popular.com/ayuda/banca-por-movil/mi-banco-alertas/",
+          "text": "Mi Banco Móvil – Mensajes de texto"
+        },
+        {
+          "href": "https://resourcecenter.popular.com/ayuda/banca-por-internet/e-statements/",
+          "text": "Cómo buscar estados de cuenta"
+        },
+        {
+          "href": "https://resourcecenter.popular.com/ayuda/banca-por-internet/transferencias/",
+          "text": "Hacer transferencias"
+        }
+      ],
       "hasSupportPage": true,
+      "phones": [
+        "7877243650",
+        "7877539677"
+      ],
       "hasPhone": true,
-      "emails": []
+      "emails": [],
+      "hasEmail": false,
+      "hasChat": false,
+      "statusPageUrl": null,
+      "hasDeveloperDocs": false,
+      "supportSubdomains": [],
+      "channelCount": 2
     }
   }
 }

@@ -1,43 +1,84 @@
 {
   "site": "brainhi.com",
-  "capturedAt": "2026-04-03T23:15:17.391Z",
+  "capturedAt": "2026-04-04T02:55:43.680Z",
   "capturedBy": "capture-ground-truth.ts (browser-verified)",
   "baseUrl": "https://brainhi.com/",
   "modules": {
     "M01": {
       "spf": true,
       "spfRecord": "v=spf1 include:_spf.google.com ~all",
+      "spfAllQualifier": "~all",
+      "spfIncludes": 1,
       "dmarc": true,
+      "dmarcRecord": "v=DMARC1; p=none",
       "dmarcPolicy": "none",
+      "dmarcRua": false,
+      "dmarcRuf": false,
+      "dkim": true,
+      "dkimSelectors": [
+        "google",
+        "s1"
+      ],
       "hasMx": true,
       "mxCount": 5,
+      "emailProvider": "Google Workspace",
+      "nsProvider": "AWS Route53",
+      "hasCaa": false,
+      "hasIpv6": false,
       "hasHsts": true,
+      "hstsMaxAge": 2628000,
+      "hstsIncludeSubDomains": false,
+      "hstsPreload": false,
       "hasCsp": false,
       "hasXfo": false,
+      "xfoValue": null,
       "hasXcto": false,
       "hasReferrerPolicy": false,
+      "referrerPolicy": null,
       "hasPermissionsPolicy": false,
       "serverHeader": "cloudflare"
     },
     "M02": {
       "isWordPress": false,
-      "hasGeneratorMeta": false,
+      "isShopify": false,
+      "isDrupal": false,
+      "isSquarespace": false,
+      "isWebflow": false,
+      "isWix": false,
+      "isHubSpotCMS": false,
       "generator": null,
+      "cmsName": null,
       "serverHeader": "cloudflare",
-      "hasCfRay": true,
       "cdn": "Cloudflare",
-      "compression": "gzip"
+      "compression": "gzip",
+      "httpVersion": "HTTP/2",
+      "poweredBy": null,
+      "hasGA4": true,
+      "ga4Id": "G-LSGK7XRHJF",
+      "hasGTM": false,
+      "gtmId": null
     },
     "M04": {
       "title": "BrainHi",
+      "titleLength": 7,
       "metaDescription": "Transform healthcare with AI. Reduce no-shows by 38%, automate patient communication, and improve care outcomes.",
+      "metaDescriptionLength": 112,
       "canonical": "https://brainhi.com/",
       "htmlLang": "en",
       "viewport": "width=device-width, initial-scale=1",
       "charset": "utf-8",
       "ogTagCount": 6,
+      "hasOgTitle": true,
+      "hasOgDescription": true,
       "hasOgImage": true,
-      "jsonLdCount": 1,
+      "hasOgUrl": true,
+      "hasOgType": true,
+      "hasOgSiteName": true,
+      "twitterCard": "summary_large_image",
+      "jsonLdCount": 0,
+      "jsonLdTypes": [],
+      "hreflangCount": 0,
+      "faviconCount": 1,
       "hasRobotsTxt": false,
       "hasSitemap": false
     },
@@ -80,18 +121,30 @@
     "M17": {
       "careersLinksFound": 0,
       "careersLinks": [],
-      "hasCareersPage": false
+      "hasCareersPage": false,
+      "externalCareersUrl": null,
+      "atsProviders": []
     },
     "M18": {
       "irLinksFound": 0,
+      "irLinks": [],
       "hasIrPage": false,
-      "ticker": null
+      "ticker": null,
+      "externalIrDomain": null
     },
     "M19": {
       "supportLinksFound": 0,
+      "supportLinks": [],
       "hasSupportPage": false,
+      "phones": [],
       "hasPhone": false,
-      "emails": []
+      "emails": [],
+      "hasEmail": false,
+      "hasChat": false,
+      "statusPageUrl": null,
+      "hasDeveloperDocs": false,
+      "supportSubdomains": [],
+      "channelCount": 0
     }
   }
 }

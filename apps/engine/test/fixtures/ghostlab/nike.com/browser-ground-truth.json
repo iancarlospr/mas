@@ -1,44 +1,88 @@
 {
   "site": "nike.com",
-  "capturedAt": "2026-04-03T23:50:51.285Z",
+  "capturedAt": "2026-04-04T02:57:23.251Z",
   "capturedBy": "capture-ground-truth.ts (browser-verified)",
   "baseUrl": "https://www.nike.com/pr/",
   "modules": {
     "M01": {
       "spf": true,
       "spfRecord": "v=spf1 include:%{ir}.%{v}.%{d}.spf.has.pphosted.com ~all",
+      "spfAllQualifier": "~all",
+      "spfIncludes": 1,
       "dmarc": true,
+      "dmarcRecord": "v=DMARC1; p=reject; fo=1; rua=mailto:dmarc_rua@emaildefense.proofpoint.com; ruf=mailto:dmarc_ruf@emaildefense.proofpoint.com",
       "dmarcPolicy": "reject",
+      "dmarcRua": true,
+      "dmarcRuf": true,
+      "dkim": true,
+      "dkimSelectors": [
+        "s1"
+      ],
       "hasMx": true,
       "mxCount": 2,
+      "emailProvider": "Proofpoint",
+      "nsProvider": "ns-n3.nike.com",
+      "hasCaa": false,
+      "hasIpv6": false,
       "hasHsts": true,
+      "hstsMaxAge": 2628000,
+      "hstsIncludeSubDomains": true,
+      "hstsPreload": false,
       "hasCsp": true,
+      "cspHasDefaultSrc": false,
+      "cspHasScriptSrc": false,
+      "cspReportOnly": false,
       "hasXfo": true,
+      "xfoValue": "sameorigin",
       "hasXcto": false,
       "hasReferrerPolicy": false,
+      "referrerPolicy": null,
       "hasPermissionsPolicy": true,
       "serverHeader": "unified-edge-router"
     },
     "M02": {
       "isWordPress": false,
-      "hasGeneratorMeta": false,
+      "isShopify": false,
+      "isDrupal": false,
+      "isSquarespace": false,
+      "isWebflow": false,
+      "isWix": false,
+      "isHubSpotCMS": false,
       "generator": null,
+      "cmsName": null,
       "serverHeader": "unified-edge-router",
-      "hasCfRay": false,
       "cdn": null,
-      "compression": "gzip"
+      "compression": "gzip",
+      "httpVersion": "HTTP/2",
+      "poweredBy": "Next.js",
+      "hasGA4": true,
+      "ga4Id": "G-QTVTHYLBQS",
+      "hasGTM": true,
+      "gtmId": "GTM-NTF2X45"
     },
     "M04": {
       "title": "Sitio web oficial de Nike. Nike PR",
+      "titleLength": 34,
       "metaDescription": "Nike ofrece productos innovadores, experiencias y servicios para inspirar a los atletas del mundo.",
+      "metaDescriptionLength": 98,
       "canonical": "https://www.nike.com/pr/",
       "htmlLang": "es-PR",
       "viewport": "width=device-width, initial-scale=1.0, maximum-scale=2.0",
       "charset": "utf-8",
       "ogTagCount": 7,
+      "hasOgTitle": true,
+      "hasOgDescription": true,
       "hasOgImage": true,
-      "jsonLdCount": 1,
+      "hasOgUrl": true,
+      "hasOgType": true,
+      "hasOgSiteName": true,
+      "twitterCard": "summary_large_image",
+      "jsonLdCount": 0,
+      "jsonLdTypes": [],
+      "hreflangCount": 0,
+      "faviconCount": 7,
       "hasRobotsTxt": true,
+      "robotsHasSitemap": true,
       "hasSitemap": false
     },
     "M16": {
@@ -94,18 +138,68 @@
           "text": "Ofertas de empleo"
         }
       ],
-      "hasCareersPage": true
+      "hasCareersPage": true,
+      "externalCareersUrl": "https://jobs.nike.com/",
+      "atsProviders": []
     },
     "M18": {
       "irLinksFound": 1,
+      "irLinks": [
+        {
+          "href": "#skip-to-content",
+          "text": "Ir al contenido principal"
+        }
+      ],
       "hasIrPage": true,
-      "ticker": null
+      "ticker": null,
+      "externalIrDomain": "https://investors.nike.com/"
     },
     "M19": {
-      "supportLinksFound": 5,
+      "supportLinksFound": 8,
+      "supportLinks": [
+        {
+          "href": "https://www.nike.com/pr/help",
+          "text": "Ayuda"
+        },
+        {
+          "href": "https://www.nike.com/pr/help",
+          "text": "Ayuda"
+        },
+        {
+          "href": "https://www.nike.com/pr/help/a/nike-atencion-cliente",
+          "text": "Devoluciones"
+        },
+        {
+          "href": "https://www.nike.com/pr/help/#contact",
+          "text": "Comunícate con nosotros"
+        },
+        {
+          "href": "https://www.nike.com/pr/help",
+          "text": "Obtener Ayuda"
+        },
+        {
+          "href": "https://www.nike.com/pr/help/a/nike-atencion-cliente",
+          "text": "Devoluciones"
+        },
+        {
+          "href": "https://www.nike.com/pr/help/#contact",
+          "text": "Comunícate con nosotros"
+        },
+        {
+          "href": "https://www.nike.com/pr/help",
+          "text": "Obtener Ayuda"
+        }
+      ],
       "hasSupportPage": true,
+      "phones": [],
       "hasPhone": false,
-      "emails": []
+      "emails": [],
+      "hasEmail": false,
+      "hasChat": true,
+      "statusPageUrl": null,
+      "hasDeveloperDocs": false,
+      "supportSubdomains": [],
+      "channelCount": 2
     }
   }
 }

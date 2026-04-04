@@ -1,8 +1,8 @@
 {
   "site": "webflow.com",
-  "verifiedAt": "2026-04-03T23:52:04.885Z",
+  "verifiedAt": "2026-04-04T02:59:01.758Z",
   "generatedBy": "generate-ground-truth-json.ts (from browser-ground-truth.json)",
-  "notes": "Auto-generated from browser-verified facts captured on 2026-04-03T23:52:04.885Z",
+  "notes": "Auto-generated from browser-verified facts captured on 2026-04-04T02:59:01.758Z",
   "modules": {
     "M01": {
       "expectedData": {
@@ -12,27 +12,44 @@
         },
         "dmarc": {
           "match": "truthy",
-          "note": "DMARC record exists"
+          "note": "DMARC p=reject"
+        },
+        "dmarcPolicy": {
+          "match": "truthy",
+          "note": "DMARC policy: reject"
+        },
+        "dkim": {
+          "match": "truthy",
+          "note": "DKIM selectors: google, s1"
+        },
+        "emailProvider.provider": {
+          "value": "Google Workspace",
+          "match": "contains",
+          "note": "Email provider from MX"
         },
         "hsts": {
           "match": "truthy",
-          "note": "HSTS header present"
+          "note": "HSTS present"
         },
         "csp": {
           "match": "truthy",
-          "note": "CSP header present"
+          "note": "CSP present"
+        },
+        "ipv6": {
+          "match": "falsy",
+          "note": "No IPv6"
         }
       },
       "expectedCheckpoints": [
         {
           "id": "m01-spf",
           "expectedHealth": "warning",
-          "note": "SPF present"
+          "note": "SPF present with ?all (neutral) and 4 DNS lookups: v=spf1 include:_spf.google.co"
         },
         {
           "id": "m01-dmarc",
           "expectedHealth": "excellent",
-          "note": "DMARC p=reject"
+          "note": "DMARC policy is reject with rua reporting: v=DMARC1; p=reject; sp=none; rua=mail"
         },
         {
           "id": "m01-dkim",
@@ -87,7 +104,7 @@
         {
           "id": "m01-email",
           "expectedHealth": "excellent",
-          "note": "Professional email provider detected: Google Workspace (MX: aspmx2.googlemail.co"
+          "note": "Professional email provider detected: Google Workspace (MX: alt1.aspmx.l.google."
         },
         {
           "id": "m01-caa",
@@ -97,7 +114,7 @@
         {
           "id": "m01-geoip",
           "expectedHealth": "info",
-          "note": "54.91.115.249: US (Ashburn), 54.227.218.56: US (Ashburn), 3.223.224.218: US (Ash"
+          "note": "100.24.232.72: US (Ashburn), 54.156.214.177: US (Ashburn), 34.227.147.52: US (As"
         },
         {
           "id": "m01-mta-sts",
@@ -138,6 +155,15 @@
         "detectedTechnologies": {
           "match": "truthy",
           "note": "Should detect technologies"
+        },
+        "cms.name": {
+          "value": "Webflow",
+          "match": "contains",
+          "note": "CMS: Webflow"
+        },
+        "trackingIds": {
+          "match": "falsy",
+          "note": "Calibrated: module returns []"
         }
       },
       "expectedCheckpoints": [
@@ -194,19 +220,36 @@
       "expectedData": {
         "title": {
           "match": "truthy",
-          "note": "Page title exists"
+          "note": "Title: \"Webflow: Create a custom website | Visual website \""
         },
         "metaDescription": {
           "match": "truthy",
-          "note": "Meta description exists"
+          "note": "Meta description present"
         },
         "htmlLang": {
-          "match": "truthy",
+          "value": "en",
+          "match": "contains",
           "note": "Lang: en"
         },
-        "jsonLd": {
+        "canonical": {
           "match": "truthy",
-          "note": "1 JSON-LD blocks"
+          "note": "Canonical URL set"
+        },
+        "ogTags": {
+          "match": "truthy",
+          "note": "4 OG tags"
+        },
+        "hreflang": {
+          "match": "truthy",
+          "note": "4 hreflang tags"
+        },
+        "robotsTxt": {
+          "match": "truthy",
+          "note": "robots.txt exists"
+        },
+        "sitemap": {
+          "match": "truthy",
+          "note": "sitemap.xml exists"
         }
       },
       "expectedCheckpoints": [
@@ -248,7 +291,7 @@
         {
           "id": "M04-ROBOTS",
           "expectedHealth": "excellent",
-          "note": "robots.txt exists"
+          "note": "robots.txt present with 1 sitemap reference(s), 5 disallow rule(s), 1 user-agent"
         },
         {
           "id": "M04-SITEMAP",
@@ -293,7 +336,7 @@
         {
           "id": "M04-VIEWPORT",
           "expectedHealth": "excellent",
-          "note": "Viewport meta present"
+          "note": "Viewport configured: width=device-width, initial-scale=1"
         },
         {
           "id": "M04-CHARSET",
@@ -372,7 +415,7 @@
         {
           "id": "m17-careers-page",
           "expectedHealth": "info",
-          "note": "Careers page exists"
+          "note": "No dedicated careers page found"
         },
         {
           "id": "m17-ats-provider",
@@ -404,7 +447,7 @@
         {
           "id": "m18-ir-portal",
           "expectedHealth": "info",
-          "note": "No IR page"
+          "note": "No investor relations page found (may be a private company)"
         },
         {
           "id": "m18-financial-data",
@@ -439,7 +482,11 @@
       "expectedData": {
         "support_page_url": {
           "match": "truthy",
-          "note": "Support/contact page found"
+          "note": "Support page found"
+        },
+        "developer_docs": {
+          "match": "truthy",
+          "note": "Developer docs found"
         }
       },
       "expectedCheckpoints": [
@@ -483,5 +530,5 @@
       "fixedBugs": []
     }
   },
-  "calibratedAt": "2026-04-04T01:34:31.046Z"
+  "calibratedAt": "2026-04-04T03:26:21.381Z"
 }

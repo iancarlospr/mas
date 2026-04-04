@@ -1,44 +1,89 @@
 {
   "site": "zapier.com",
-  "capturedAt": "2026-04-03T23:52:20.575Z",
+  "capturedAt": "2026-04-04T02:59:12.587Z",
   "capturedBy": "capture-ground-truth.ts (browser-verified)",
   "baseUrl": "https://zapier.com/",
   "modules": {
     "M01": {
       "spf": true,
       "spfRecord": "v=spf1 include:_spf.google.com include:mailgun.org include:7462085.spf03.hubspotemail.net include:mail.zendesk.com include:_spf.qualtrics.com -all",
+      "spfAllQualifier": "-all",
+      "spfIncludes": 5,
       "dmarc": true,
+      "dmarcRecord": "v=DMARC1; p=reject; pct=100; rua=mailto:re+imuzho2gzgl@dmarc.postmarkapp.com,mailto:dmarc_agg@dmarc.everest.email; ruf=mailto:dmarc_fr@dmarc.everest.email; sp=reject; aspf=r; adkim=r;",
       "dmarcPolicy": "reject",
+      "dmarcRua": true,
+      "dmarcRuf": true,
+      "dkim": true,
+      "dkimSelectors": [
+        "google",
+        "s1"
+      ],
       "hasMx": true,
       "mxCount": 7,
+      "emailProvider": "Google Workspace",
+      "nsProvider": "AWS Route53",
+      "hasCaa": true,
+      "hasIpv6": false,
       "hasHsts": true,
+      "hstsMaxAge": 63072000,
+      "hstsIncludeSubDomains": true,
+      "hstsPreload": true,
       "hasCsp": true,
+      "cspHasDefaultSrc": false,
+      "cspHasScriptSrc": false,
+      "cspReportOnly": false,
       "hasXfo": false,
+      "xfoValue": null,
       "hasXcto": false,
       "hasReferrerPolicy": false,
+      "referrerPolicy": null,
       "hasPermissionsPolicy": false,
       "serverHeader": "Vercel"
     },
     "M02": {
       "isWordPress": false,
-      "hasGeneratorMeta": false,
+      "isShopify": false,
+      "isDrupal": false,
+      "isSquarespace": false,
+      "isWebflow": false,
+      "isWix": false,
+      "isHubSpotCMS": false,
       "generator": null,
+      "cmsName": null,
       "serverHeader": "Vercel",
-      "hasCfRay": false,
       "cdn": "CloudFront",
-      "compression": null
+      "compression": null,
+      "httpVersion": "HTTP/3",
+      "poweredBy": null,
+      "hasGA4": false,
+      "ga4Id": null,
+      "hasGTM": true,
+      "gtmId": "GTM-K7GFJTV"
     },
     "M04": {
       "title": "Zapier: Automate AI Workflows, Agents, and Apps",
+      "titleLength": 47,
       "metaDescription": "Build and scale AI workflows and agents across 8,000+ apps with Zapier—the most connected AI orchestration platform. Trusted by 3 million+ businesses. ",
+      "metaDescriptionLength": 151,
       "canonical": "https://zapier.com/",
       "htmlLang": "en",
       "viewport": "width=device-width, initial-scale=1.0",
       "charset": "utf-8",
       "ogTagCount": 3,
+      "hasOgTitle": true,
+      "hasOgDescription": true,
       "hasOgImage": true,
+      "hasOgUrl": false,
+      "hasOgType": false,
+      "hasOgSiteName": false,
+      "twitterCard": "summary_large_image",
       "jsonLdCount": 0,
+      "jsonLdTypes": [],
+      "hreflangCount": 6,
+      "faviconCount": 6,
       "hasRobotsTxt": true,
+      "robotsHasSitemap": true,
       "hasSitemap": true
     },
     "M16": {
@@ -97,18 +142,66 @@
           "text": "Jobs"
         }
       ],
-      "hasCareersPage": true
+      "hasCareersPage": true,
+      "externalCareersUrl": null,
+      "atsProviders": []
     },
     "M18": {
       "irLinksFound": 0,
+      "irLinks": [],
       "hasIrPage": false,
-      "ticker": null
+      "ticker": null,
+      "externalIrDomain": null
     },
     "M19": {
-      "supportLinksFound": 5,
+      "supportLinksFound": 8,
+      "supportLinks": [
+        {
+          "href": "/solutions/customer-support",
+          "text": "Customer SupportElevate customer satisfaction"
+        },
+        {
+          "href": "/customer-support-management",
+          "text": "Customer supportQuickly route tickets and responses"
+        },
+        {
+          "href": "https://help.zapier.com/hc/en-us",
+          "text": "Help CenterFind answers to your questions"
+        },
+        {
+          "href": "/app/get-help",
+          "text": "Zapier SupportGet help and find support options"
+        },
+        {
+          "href": "/partnerdirectory",
+          "text": "Hire a Zapier Solution PartnerFind a consultant to help you "
+        },
+        {
+          "href": "https://platform.zapier.com/",
+          "text": "Documentation"
+        },
+        {
+          "href": "/l/contact-sales?demo_source=cs_nav_header_/index",
+          "text": "Contact sales"
+        },
+        {
+          "href": "/solutions/customer-support",
+          "text": "Customer Support"
+        }
+      ],
       "hasSupportPage": true,
+      "phones": [],
       "hasPhone": false,
-      "emails": []
+      "emails": [],
+      "hasEmail": false,
+      "hasChat": true,
+      "statusPageUrl": null,
+      "hasDeveloperDocs": true,
+      "supportSubdomains": [
+        "https://help.zapier.com/hc/en-us",
+        "https://help.zapier.com/hc/en-us"
+      ],
+      "channelCount": 2
     }
   }
 }

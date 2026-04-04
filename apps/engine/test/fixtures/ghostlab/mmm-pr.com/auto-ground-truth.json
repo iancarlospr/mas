@@ -1,8 +1,8 @@
 {
   "site": "mmm-pr.com",
-  "verifiedAt": "2026-04-03T23:28:51.922Z",
+  "verifiedAt": "2026-04-04T02:57:12.591Z",
   "generatedBy": "generate-ground-truth-json.ts (from browser-ground-truth.json)",
-  "notes": "Auto-generated from browser-verified facts captured on 2026-04-03T23:28:51.922Z",
+  "notes": "Auto-generated from browser-verified facts captured on 2026-04-04T02:57:12.591Z",
   "modules": {
     "M01": {
       "expectedData": {
@@ -12,23 +12,39 @@
         },
         "dmarc": {
           "match": "truthy",
-          "note": "DMARC record exists"
+          "note": "DMARC p=reject"
+        },
+        "dmarcPolicy": {
+          "match": "truthy",
+          "note": "DMARC policy: reject"
+        },
+        "dkim": {
+          "match": "falsy",
+          "note": "No DKIM found"
         },
         "hsts": {
           "match": "truthy",
-          "note": "HSTS header present"
+          "note": "HSTS present"
+        },
+        "csp": {
+          "match": "falsy",
+          "note": "No CSP"
+        },
+        "ipv6": {
+          "match": "falsy",
+          "note": "No IPv6"
         }
       },
       "expectedCheckpoints": [
         {
           "id": "m01-spf",
           "expectedHealth": "excellent",
-          "note": "SPF present"
+          "note": "SPF present with -all and 3 DNS lookups (limit 10): v=spf1 include:spf-00235501."
         },
         {
           "id": "m01-dmarc",
           "expectedHealth": "excellent",
-          "note": "DMARC p=reject"
+          "note": "DMARC policy is reject with rua+ruf reporting: v=DMARC1;p=reject;fo=1;rua=mailto"
         },
         {
           "id": "m01-dkim",
@@ -88,7 +104,7 @@
         {
           "id": "m01-caa",
           "expectedHealth": "excellent",
-          "note": "CAA records set (sectigo.com, digicert.com, entrust.net) and match certificate i"
+          "note": "CAA records set (entrust.net, digicert.com, sectigo.com) and match certificate i"
         },
         {
           "id": "m01-geoip",
@@ -134,6 +150,10 @@
         "detectedTechnologies": {
           "match": "truthy",
           "note": "Should detect technologies"
+        },
+        "trackingIds": {
+          "match": "truthy",
+          "note": "GTM: GTM-NZSP2PM"
         }
       },
       "expectedCheckpoints": [
@@ -190,15 +210,28 @@
       "expectedData": {
         "title": {
           "match": "truthy",
-          "note": "Page title exists"
+          "note": "Title: \"Medicare & Mucho Más\""
         },
         "metaDescription": {
           "match": "truthy",
-          "note": "Meta description exists"
+          "note": "Meta description present"
         },
         "htmlLang": {
-          "match": "truthy",
+          "value": "es-ES",
+          "match": "contains",
           "note": "Lang: es-ES"
+        },
+        "canonical": {
+          "match": "falsy",
+          "note": "No canonical"
+        },
+        "ogTags": {
+          "match": "truthy",
+          "note": "5 OG tags"
+        },
+        "robotsTxt": {
+          "match": "truthy",
+          "note": "robots.txt exists"
         }
       },
       "expectedCheckpoints": [
@@ -240,7 +273,7 @@
         {
           "id": "M04-ROBOTS",
           "expectedHealth": "good",
-          "note": "robots.txt exists"
+          "note": "robots.txt present (0 disallow rules, no sitemap reference)"
         },
         {
           "id": "M04-SITEMAP",
@@ -285,7 +318,7 @@
         {
           "id": "M04-VIEWPORT",
           "expectedHealth": "excellent",
-          "note": "Viewport meta present"
+          "note": "Viewport configured: width=device-width, initial-scale=1"
         },
         {
           "id": "M04-CHARSET",
@@ -359,7 +392,7 @@
         {
           "id": "m17-careers-page",
           "expectedHealth": "excellent",
-          "note": "Careers page exists"
+          "note": "Dedicated careers page with 1 open position(s) at /sobre-mmm/empleos"
         },
         {
           "id": "m17-ats-provider",
@@ -391,7 +424,7 @@
         {
           "id": "m18-ir-portal",
           "expectedHealth": "info",
-          "note": "No IR page"
+          "note": "No investor relations page found (may be a private company)"
         },
         {
           "id": "m18-financial-data",
@@ -427,6 +460,14 @@
         "support_page_url": {
           "match": "falsy",
           "note": "Calibrated: module returns null"
+        },
+        "support_channels": {
+          "match": "truthy",
+          "note": "Phone support detected"
+        },
+        "developer_docs": {
+          "match": "truthy",
+          "note": "Developer docs found"
         }
       },
       "expectedCheckpoints": [
@@ -470,5 +511,5 @@
       "fixedBugs": []
     }
   },
-  "calibratedAt": "2026-04-04T01:32:49.283Z"
+  "calibratedAt": "2026-04-04T03:24:12.198Z"
 }

@@ -1,6 +1,6 @@
 {
   "site": "univision.com",
-  "capturedAt": "2026-04-04T00:38:24.034Z",
+  "capturedAt": "2026-04-04T02:58:53.760Z",
   "capturedBy": "capture-ground-truth.ts (browser-verified)",
   "baseUrl": "https://www.univision.com/",
   "modules": {
@@ -8,41 +8,78 @@
       "spf": false,
       "spfRecord": null,
       "dmarc": true,
+      "dmarcRecord": "v=DMARC1;p=quarantine;sp=none;pct=100;rua=mailto:dnsadmin@us.univision.com;ri=86400;aspf=r;adkim=r;fo=1;",
       "dmarcPolicy": "quarantine",
+      "dmarcRua": true,
+      "dmarcRuf": false,
+      "dkim": false,
+      "dkimSelectors": [],
       "hasMx": true,
       "mxCount": 4,
+      "emailProvider": "Google Workspace",
+      "nsProvider": "AWS Route53",
+      "hasCaa": false,
+      "hasIpv6": false,
       "hasHsts": true,
+      "hstsMaxAge": 31557600,
+      "hstsIncludeSubDomains": false,
+      "hstsPreload": false,
       "hasCsp": false,
       "hasXfo": false,
+      "xfoValue": null,
       "hasXcto": false,
       "hasReferrerPolicy": true,
+      "referrerPolicy": "origin-when-cross-origin",
       "hasPermissionsPolicy": false,
       "serverHeader": null
     },
     "M02": {
       "isWordPress": false,
-      "hasGeneratorMeta": false,
+      "isShopify": false,
+      "isDrupal": false,
+      "isSquarespace": false,
+      "isWebflow": false,
+      "isWix": false,
+      "isHubSpotCMS": false,
       "generator": null,
+      "cmsName": null,
       "serverHeader": null,
-      "hasCfRay": false,
       "cdn": "Varnish",
-      "compression": null
+      "compression": null,
+      "httpVersion": "HTTP/3",
+      "poweredBy": null,
+      "hasGA4": false,
+      "ga4Id": null,
+      "hasGTM": true,
+      "gtmId": "GTM-TDVV9BR"
     },
     "M04": {
       "title": "Univision | Shows, Noticias, Entretenimiento, Deportes y Novelas - Champions League y Liga MX en vivo | Univision",
+      "titleLength": 113,
       "metaDescription": "La mejor cobertura en Noticias, Deportes y Entretenimiento. Lo mejor de nuestra programación de TV. | Univision",
+      "metaDescriptionLength": 111,
       "canonical": "https://www.univision.com",
       "htmlLang": "es",
       "viewport": "width=device-width, initial-scale=1",
       "charset": "utf-8",
       "ogTagCount": 7,
+      "hasOgTitle": true,
+      "hasOgDescription": true,
       "hasOgImage": true,
-      "jsonLdCount": 1,
+      "hasOgUrl": true,
+      "hasOgType": true,
+      "hasOgSiteName": true,
+      "twitterCard": "summary_large_image",
+      "jsonLdCount": 0,
+      "jsonLdTypes": [],
+      "hreflangCount": 0,
+      "faviconCount": 1,
       "hasRobotsTxt": true,
-      "hasSitemap": false
+      "robotsHasSitemap": true,
+      "hasSitemap": true
     },
     "M16": {
-      "pressLinksFound": 118,
+      "pressLinksFound": 134,
       "pressLinks": [
         {
           "href": "/noticias",
@@ -66,7 +103,7 @@
         }
       ],
       "pressPageUrl": "https://www.univision.com/noticias",
-      "visibleArticleCount": 162,
+      "visibleArticleCount": 164,
       "countStrategies": [
         {
           "name": "article",
@@ -74,7 +111,7 @@
         },
         {
           "name": "articleLinks",
-          "count": 162
+          "count": 164
         },
         {
           "name": "dates",
@@ -94,37 +131,83 @@
       "hasMediaLogos": false
     },
     "M17": {
-      "careersLinksFound": 4,
+      "careersLinksFound": 1,
       "careersLinks": [
-        {
-          "href": "/shows/la-voz-de-la-manana/el-mercado-laboral-de-eeuu-suma-178-000-nuevos-empleos-y-baja-la-tasa-de-desempleo-al-4-3-video",
-          "text": ""
-        },
-        {
-          "href": "/shows/la-voz-de-la-manana/el-mercado-laboral-de-eeuu-suma-178-000-nuevos-empleos-y-baja-la-tasa-de-desempleo-al-4-3-video",
-          "text": "ÚLTIMA HORA"
-        },
-        {
-          "href": "/shows/la-voz-de-la-manana/el-mercado-laboral-de-eeuu-suma-178-000-nuevos-empleos-y-baja-la-tasa-de-desempleo-al-4-3-video",
-          "text": "El mercado laboral de EEUU suma 178,000 nuevos empleos y baj"
-        },
         {
           "href": "https://corporate.televisaunivision.com/careers",
           "text": "Jobs"
         }
       ],
-      "hasCareersPage": true
+      "hasCareersPage": true,
+      "externalCareersUrl": null,
+      "atsProviders": []
     },
     "M18": {
       "irLinksFound": 5,
+      "irLinks": [
+        {
+          "href": "/temas/iran",
+          "text": "Guerra en Irán"
+        },
+        {
+          "href": "/noticias/mundo/guerra-iran-hoy-viernes-3-de-abril-de-2026-noticias-conflicto-medio-oriente-estados-unidos",
+          "text": "Cae un segundo avión estadounidense en Irán: hay dos pilotos"
+        },
+        {
+          "href": "/temas/iran",
+          "text": "Guerra en Irán"
+        },
+        {
+          "href": "/noticias/estados-unidos/segundo-avion-de-eeuu-se-estrella-en-iran",
+          "text": "Segundo avión de EEUU se estrella en Irán"
+        },
+        {
+          "href": "/shows/noticiero-univision/lo-ultimo-sobre-la-guerra-con-iran-lo-que-se-sabe-del-derribo-de-otro-avion-militar-de-eeuu-y-las-actividades-de-trump-video",
+          "text": "Lo último sobre la guerra con Irán: Lo que se sabe del derri"
+        }
+      ],
       "hasIrPage": true,
-      "ticker": null
+      "ticker": null,
+      "externalIrDomain": null
     },
     "M19": {
-      "supportLinksFound": 4,
+      "supportLinksFound": 6,
+      "supportLinks": [
+        {
+          "href": "/noticias/el-nos-mantenia-fuertes-hijas-en-california-piden-ayuda-su-padre-fue-detenido-por-ice-y-su-madre-tiene-cancer-video",
+          "text": ""
+        },
+        {
+          "href": "/noticias/el-nos-mantenia-fuertes-hijas-en-california-piden-ayuda-su-padre-fue-detenido-por-ice-y-su-madre-tiene-cancer-video",
+          "text": "\"Él nos mantenía fuertes\": Hijas en California piden ayuda; "
+        },
+        {
+          "href": "/noticias/inmigracion/nuevo-examen-de-ciudadania-en-espanol-e-ingles-gratis",
+          "text": "Practica gratis las preguntas y respuestas en español e ingl"
+        },
+        {
+          "href": "/shows/despierta-america/majo-aguilar-reacciona-a-las-preguntas-sobre-la-boda-de-su-prima-angela-aguilar-video",
+          "text": ""
+        },
+        {
+          "href": "/shows/despierta-america/majo-aguilar-reacciona-a-las-preguntas-sobre-la-boda-de-su-prima-angela-aguilar-video",
+          "text": "Majo Aguilar reacciona a las preguntas sobre la boda de su p"
+        },
+        {
+          "href": "https://www.tudn.com/tudn-faqs",
+          "text": "FAQ"
+        }
+      ],
       "hasSupportPage": true,
+      "phones": [],
       "hasPhone": false,
-      "emails": []
+      "emails": [],
+      "hasEmail": false,
+      "hasChat": false,
+      "statusPageUrl": null,
+      "hasDeveloperDocs": false,
+      "supportSubdomains": [],
+      "channelCount": 1
     }
   }
 }

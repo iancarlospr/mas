@@ -482,11 +482,11 @@
       "evidence": "Viewport allows user zoom (content: \"width=device-width, initial-scale=1\")"
     }
   ],
-  "duration": 181,
+  "duration": 199,
   "_replay": {
     "site": "ryder.com",
     "moduleId": "M04",
-    "elapsed": 181,
-    "replayedAt": "2026-04-04T01:40:51.685Z"
+    "elapsed": 199,
+    "replayedAt": "2026-04-04T03:28:07.246Z"
   }
 }

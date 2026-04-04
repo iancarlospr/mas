@@ -1,45 +1,87 @@
 {
   "site": "senzary.com",
-  "capturedAt": "2026-04-03T23:28:05.400Z",
+  "capturedAt": "2026-04-04T02:58:11.608Z",
   "capturedBy": "capture-ground-truth.ts (browser-verified)",
   "baseUrl": "https://www.senzary.com/",
   "modules": {
     "M01": {
       "spf": true,
       "spfRecord": "v=spf1 include:_spf.google.com include:spf.protection.outlook.com include:sender.zohobooks.com include:transmail.net include:_spf.atlassian.net include:_spf.perfora.net include:_spf.customer-server.com -all",
+      "spfAllQualifier": "-all",
+      "spfIncludes": 7,
       "dmarc": true,
+      "dmarcRecord": "v=DMARC1; p=none; rua=mailto:amazeus.net@gmail.com; ruf=mailto:amazeus.net@gmail.com",
       "dmarcPolicy": "none",
+      "dmarcRua": true,
+      "dmarcRuf": true,
+      "dkim": false,
+      "dkimSelectors": [],
       "hasMx": true,
       "mxCount": 3,
+      "emailProvider": null,
+      "nsProvider": "Cloudflare",
+      "hasCaa": false,
+      "hasIpv6": false,
       "hasHsts": true,
+      "hstsMaxAge": 31536000,
+      "hstsIncludeSubDomains": false,
+      "hstsPreload": true,
       "hasCsp": true,
+      "cspHasDefaultSrc": false,
+      "cspHasScriptSrc": false,
+      "cspReportOnly": false,
       "hasXfo": true,
+      "xfoValue": "SAMEORIGIN",
       "hasXcto": true,
       "hasReferrerPolicy": false,
+      "referrerPolicy": null,
       "hasPermissionsPolicy": false,
       "serverHeader": "Sucuri/Cloudproxy"
     },
     "M02": {
       "isWordPress": true,
-      "hasGeneratorMeta": true,
+      "isShopify": false,
+      "isDrupal": false,
+      "isSquarespace": false,
+      "isWebflow": false,
+      "isWix": false,
+      "isHubSpotCMS": false,
       "generator": "Site Kit by Google 1.175.0",
+      "cmsName": "Site",
       "serverHeader": "Sucuri/Cloudproxy",
-      "hasCfRay": false,
       "cdn": "Sucuri",
-      "compression": "gzip"
+      "compression": "gzip",
+      "httpVersion": "HTTP/3",
+      "poweredBy": null,
+      "hasGA4": true,
+      "ga4Id": "G-LWMSQPT6YZ",
+      "hasGTM": true,
+      "gtmId": "GTM-5RCS5ZZ"
     },
     "M04": {
       "title": "Home - SENZARY LLC",
+      "titleLength": 18,
       "metaDescription": "Revolutionize your industrial operations with Senzary's cutting-edge telemetry and IoT solutions. From smart manufacturing to predictive maintenance, we optimize efficiency, reduce costs, and drive innovation across industries.",
+      "metaDescriptionLength": 227,
       "canonical": "https://www.senzary.com/",
       "htmlLang": "en-US",
       "viewport": "width=device-width, initial-scale=1",
       "charset": "UTF-8",
       "ogTagCount": 7,
+      "hasOgTitle": true,
+      "hasOgDescription": true,
       "hasOgImage": true,
-      "jsonLdCount": 1,
+      "hasOgUrl": true,
+      "hasOgType": true,
+      "hasOgSiteName": true,
+      "twitterCard": "summary_large_image",
+      "jsonLdCount": 0,
+      "jsonLdTypes": [],
+      "hreflangCount": 0,
+      "faviconCount": 3,
       "hasRobotsTxt": true,
-      "hasSitemap": false
+      "robotsHasSitemap": true,
+      "hasSitemap": true
     },
     "M16": {
       "pressLinksFound": 4,
@@ -114,18 +156,47 @@
           "text": "Facilities & Job Site Management"
         }
       ],
-      "hasCareersPage": true
+      "hasCareersPage": true,
+      "externalCareersUrl": null,
+      "atsProviders": []
     },
     "M18": {
       "irLinksFound": 0,
+      "irLinks": [],
       "hasIrPage": false,
-      "ticker": null
+      "ticker": null,
+      "externalIrDomain": null
     },
     "M19": {
       "supportLinksFound": 4,
+      "supportLinks": [
+        {
+          "href": "https://www.senzary.com/verticals/contact-us/",
+          "text": "Contact Us"
+        },
+        {
+          "href": "https://www.senzary.com/verticals/contact-us/",
+          "text": "Contact Us"
+        },
+        {
+          "href": "https://www.senzary.com/verticals/contact-us/",
+          "text": "Contact Us"
+        },
+        {
+          "href": "https://www.senzary.com/verticals/contact-us/",
+          "text": "Contact Us"
+        }
+      ],
       "hasSupportPage": true,
+      "phones": [],
       "hasPhone": false,
-      "emails": []
+      "emails": [],
+      "hasEmail": false,
+      "hasChat": false,
+      "statusPageUrl": null,
+      "hasDeveloperDocs": false,
+      "supportSubdomains": [],
+      "channelCount": 1
     }
   }
 }

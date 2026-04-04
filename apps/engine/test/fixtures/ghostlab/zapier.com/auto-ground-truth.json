@@ -1,8 +1,8 @@
 {
   "site": "zapier.com",
-  "verifiedAt": "2026-04-03T23:52:20.575Z",
+  "verifiedAt": "2026-04-04T02:59:12.587Z",
   "generatedBy": "generate-ground-truth-json.ts (from browser-ground-truth.json)",
-  "notes": "Auto-generated from browser-verified facts captured on 2026-04-03T23:52:20.575Z",
+  "notes": "Auto-generated from browser-verified facts captured on 2026-04-04T02:59:12.587Z",
   "modules": {
     "M01": {
       "expectedData": {
@@ -12,27 +12,44 @@
         },
         "dmarc": {
           "match": "truthy",
-          "note": "DMARC record exists"
+          "note": "DMARC p=reject"
+        },
+        "dmarcPolicy": {
+          "match": "truthy",
+          "note": "DMARC policy: reject"
+        },
+        "dkim": {
+          "match": "truthy",
+          "note": "DKIM selectors: google, s1"
+        },
+        "emailProvider.provider": {
+          "value": "Google Workspace",
+          "match": "contains",
+          "note": "Email provider from MX"
         },
         "hsts": {
           "match": "truthy",
-          "note": "HSTS header present"
+          "note": "HSTS present"
         },
         "csp": {
           "match": "truthy",
-          "note": "CSP header present"
+          "note": "CSP present"
+        },
+        "ipv6": {
+          "match": "falsy",
+          "note": "No IPv6"
         }
       },
       "expectedCheckpoints": [
         {
           "id": "m01-spf",
           "expectedHealth": "excellent",
-          "note": "SPF present"
+          "note": "SPF present with -all and 5 DNS lookups (limit 10): v=spf1 include:_spf.google.c"
         },
         {
           "id": "m01-dmarc",
           "expectedHealth": "excellent",
-          "note": "DMARC p=reject"
+          "note": "DMARC policy is reject with rua+ruf reporting: v=DMARC1; p=reject; pct=100; rua="
         },
         {
           "id": "m01-dkim",
@@ -87,17 +104,17 @@
         {
           "id": "m01-email",
           "expectedHealth": "excellent",
-          "note": "Professional email provider detected: Google Workspace (MX: noreply.qemailserver"
+          "note": "Professional email provider detected: Google Workspace (MX: ms74255568.msv1.inva"
         },
         {
           "id": "m01-caa",
           "expectedHealth": "good",
-          "note": "CAA records set: certainly.com, pki.goog, digicert.com, amazon.com, globalsign.c"
+          "note": "CAA records set: amazon.com, pki.goog, globalsign.com, digicert.com, certainly.c"
         },
         {
           "id": "m01-geoip",
           "expectedHealth": "info",
-          "note": "52.85.78.8: US, 52.85.78.3: US, 52.85.78.92: US, 52.85.78.53: US"
+          "note": "52.85.78.92: US, 52.85.78.53: US, 52.85.78.8: US, 52.85.78.3: US"
         },
         {
           "id": "m01-mta-sts",
@@ -138,6 +155,10 @@
         "detectedTechnologies": {
           "match": "truthy",
           "note": "Should detect technologies"
+        },
+        "trackingIds": {
+          "match": "truthy",
+          "note": "GTM: GTM-K7GFJTV"
         }
       },
       "expectedCheckpoints": [
@@ -194,15 +215,36 @@
       "expectedData": {
         "title": {
           "match": "truthy",
-          "note": "Page title exists"
+          "note": "Title: \"Zapier: Automate AI Workflows, Agents, and Apps\""
         },
         "metaDescription": {
           "match": "truthy",
-          "note": "Meta description exists"
+          "note": "Meta description present"
         },
         "htmlLang": {
-          "match": "truthy",
+          "value": "en",
+          "match": "contains",
           "note": "Lang: en"
+        },
+        "canonical": {
+          "match": "truthy",
+          "note": "Canonical URL set"
+        },
+        "ogTags": {
+          "match": "truthy",
+          "note": "3 OG tags"
+        },
+        "hreflang": {
+          "match": "truthy",
+          "note": "6 hreflang tags"
+        },
+        "robotsTxt": {
+          "match": "truthy",
+          "note": "robots.txt exists"
+        },
+        "sitemap": {
+          "match": "truthy",
+          "note": "sitemap.xml exists"
         }
       },
       "expectedCheckpoints": [
@@ -244,7 +286,7 @@
         {
           "id": "M04-ROBOTS",
           "expectedHealth": "excellent",
-          "note": "robots.txt exists"
+          "note": "robots.txt present with 10 sitemap reference(s), 33 disallow rule(s), 3 user-age"
         },
         {
           "id": "M04-SITEMAP",
@@ -289,7 +331,7 @@
         {
           "id": "M04-VIEWPORT",
           "expectedHealth": "excellent",
-          "note": "Viewport meta present"
+          "note": "Viewport configured: width=device-width, initial-scale=1.0"
         },
         {
           "id": "M04-CHARSET",
@@ -363,7 +405,7 @@
         {
           "id": "m17-careers-page",
           "expectedHealth": "excellent",
-          "note": "Careers page exists"
+          "note": "Dedicated careers page with 10 open position(s) at /jobs/"
         },
         {
           "id": "m17-ats-provider",
@@ -395,7 +437,7 @@
         {
           "id": "m18-ir-portal",
           "expectedHealth": "info",
-          "note": "No IR page"
+          "note": "No investor relations page found (may be a private company)"
         },
         {
           "id": "m18-financial-data",
@@ -430,7 +472,15 @@
       "expectedData": {
         "support_page_url": {
           "match": "truthy",
-          "note": "Support/contact page found"
+          "note": "Support page found"
+        },
+        "chatbot": {
+          "match": "truthy",
+          "note": "Live chat detected"
+        },
+        "developer_docs": {
+          "match": "truthy",
+          "note": "Developer docs found"
         }
       },
       "expectedCheckpoints": [
@@ -474,5 +524,5 @@
       "fixedBugs": []
     }
   },
-  "calibratedAt": "2026-04-04T01:34:37.993Z"
+  "calibratedAt": "2026-04-04T03:26:29.465Z"
 }

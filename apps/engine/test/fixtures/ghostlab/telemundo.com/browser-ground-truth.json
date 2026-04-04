@@ -1,48 +1,84 @@
 {
   "site": "telemundo.com",
-  "capturedAt": "2026-04-04T00:38:37.756Z",
+  "capturedAt": "2026-04-04T02:58:43.765Z",
   "capturedBy": "capture-ground-truth.ts (browser-verified)",
   "baseUrl": "https://www.telemundo.com/",
   "modules": {
     "M01": {
       "spf": true,
       "spfRecord": "v=spf1 include:%{ir}.%{v}.%{d}.spf.has.pphosted.com ~all",
+      "spfAllQualifier": "~all",
+      "spfIncludes": 1,
       "dmarc": true,
+      "dmarcRecord": "v=DMARC1; p=none; fo=1; rua=mailto:dmarc_rua@emaildefense.proofpoint.com; ruf=mailto:dmarc_ruf@emaildefense.proofpoint.com",
       "dmarcPolicy": "none",
+      "dmarcRua": true,
+      "dmarcRuf": true,
+      "dkim": false,
+      "dkimSelectors": [],
       "hasMx": true,
       "mxCount": 4,
+      "emailProvider": "Proofpoint",
+      "nsProvider": "a5-64.akam.net",
+      "hasCaa": false,
+      "hasIpv6": false,
       "hasHsts": false,
       "hasCsp": false,
       "hasXfo": false,
+      "xfoValue": null,
       "hasXcto": false,
       "hasReferrerPolicy": false,
+      "referrerPolicy": null,
       "hasPermissionsPolicy": false,
       "serverHeader": "nginx"
     },
     "M02": {
       "isWordPress": false,
-      "hasGeneratorMeta": false,
+      "isShopify": false,
+      "isDrupal": false,
+      "isSquarespace": false,
+      "isWebflow": false,
+      "isWix": false,
+      "isHubSpotCMS": false,
       "generator": null,
+      "cmsName": null,
       "serverHeader": "nginx",
-      "hasCfRay": false,
       "cdn": null,
-      "compression": "gzip"
+      "compression": "gzip",
+      "httpVersion": "HTTP/2",
+      "poweredBy": "Next.js",
+      "hasGA4": false,
+      "ga4Id": null,
+      "hasGTM": false,
+      "gtmId": null
     },
     "M04": {
       "title": "Telemundo | Noticias, Shows, Entretenimiento, Series y Novelas | Telemundo",
+      "titleLength": 74,
       "metaDescription": "La mejor cobertura de noticias en español, capítulos completos de nuestras series y shows, entretenimiento, estilo de vida, y los videos y fotos del momento.",
+      "metaDescriptionLength": 157,
       "canonical": "https://www.telemundo.com",
       "htmlLang": "es",
       "viewport": "width=device-width, initial-scale=1, user-scalable=yes",
       "charset": "utf-8",
       "ogTagCount": 9,
+      "hasOgTitle": true,
+      "hasOgDescription": true,
       "hasOgImage": true,
-      "jsonLdCount": 3,
+      "hasOgUrl": true,
+      "hasOgType": true,
+      "hasOgSiteName": true,
+      "twitterCard": "summary_large_image",
+      "jsonLdCount": 0,
+      "jsonLdTypes": [],
+      "hreflangCount": 0,
+      "faviconCount": 21,
       "hasRobotsTxt": true,
-      "hasSitemap": false
+      "robotsHasSitemap": true,
+      "hasSitemap": true
     },
     "M16": {
-      "pressLinksFound": 83,
+      "pressLinksFound": 82,
       "pressLinks": [
         {
           "href": "https://www.telemundo.com/noticias",
@@ -66,7 +102,7 @@
         }
       ],
       "pressPageUrl": "https://www.telemundo.com/noticias",
-      "visibleArticleCount": 125,
+      "visibleArticleCount": 129,
       "countStrategies": [
         {
           "name": "article",
@@ -74,7 +110,7 @@
         },
         {
           "name": "articleLinks",
-          "count": 125
+          "count": 129
         },
         {
           "name": "dates",
@@ -105,22 +141,88 @@
           "text": "EE.UU. suma 178,000 empleos en marzo pese a guerra con Irán"
         }
       ],
-      "hasCareersPage": true
+      "hasCareersPage": true,
+      "externalCareersUrl": null,
+      "atsProviders": []
     },
     "M18": {
       "irLinksFound": 5,
+      "irLinks": [
+        {
+          "href": "https://www.telemundo.com/shows/la-casa-de-los-famosos/video/luis-coronel-un-paso-de-ir-por-la-salvacion-en-la-casa-de-los-famosos-6-tmvo13163043",
+          "text": "01:29"
+        },
+        {
+          "href": "https://www.telemundo.com/shows/la-casa-de-los-famosos/video/luis-coronel-un-paso-de-ir-por-la-salvacion-en-la-casa-de-los-famosos-6-tmvo13163043",
+          "text": "Luis Coronel a un paso de ir por la salvación de La Casa"
+        },
+        {
+          "href": "https://www.telemundo.com/shows/la-casa-de-los-famosos/video/celinee-se-perfila-como-finalista-para-ir-por-el-robo-de-la-salvacion-de-la-casa-de-los-tmvo13163022",
+          "text": "04:37"
+        },
+        {
+          "href": "https://www.telemundo.com/shows/la-casa-de-los-famosos/video/celinee-se-perfila-como-finalista-para-ir-por-el-robo-de-la-salvacion-de-la-casa-de-los-tmvo13163022",
+          "text": "Celinee se perfila como finalista por la salvación"
+        },
+        {
+          "href": "https://www.telemundo.com/noticias/edicion-noticias-telemundo/economia/video/eeuu-suma-178000-empleos-en-marzo-pese-la-guerra-con-iran-y-el-alza-al-precio-de-la-tmvo13162967",
+          "text": "EE.UU. suma 178,000 empleos en marzo pese a guerra con Irán"
+        }
+      ],
       "hasIrPage": true,
-      "ticker": null
+      "ticker": null,
+      "externalIrDomain": null
     },
     "M19": {
-      "supportLinksFound": 5,
+      "supportLinksFound": 8,
+      "supportLinks": [
+        {
+          "href": "https://www.telemundo.com/ayuda",
+          "text": "Telemundo te Ayuda"
+        },
+        {
+          "href": "https://www.telemundo.com/ayuda",
+          "text": "Telemundo te Ayuda"
+        },
+        {
+          "href": "https://www.telemundo.com/support/uc#shipping-returns-policy",
+          "text": "Política de Devolución de Shop Telemundo"
+        },
+        {
+          "href": "https://www.telemundo.com/support/uc#customer-service",
+          "text": "Servicio al Cliente de Shop Telemundo"
+        },
+        {
+          "href": "https://www.telemundo.com/support/uc/#faqs",
+          "text": "Preguntas Frecuentes de Shop Telemundo"
+        },
+        {
+          "href": "https://www.telemundo.com/support/uc#terms-of-service",
+          "text": "Términos de Servicio de Shop Telemundo"
+        },
+        {
+          "href": "https://support.google.com/chrome/answer/95647?hl=en&p=cpn_cookies",
+          "text": "Google Chrome"
+        },
+        {
+          "href": "https://support.apple.com/en-gb/HT201265",
+          "text": "Apple Safari"
+        }
+      ],
       "hasSupportPage": true,
+      "phones": [],
       "hasPhone": false,
       "emails": [
         "?subject=&body=null",
         "?subject=&body=null",
         "?subject=Cristiano Ronaldo desafía a la lógica y llega a 500 goles después de los 30 años&body=https://www.telemundo.com/deportes/mas-deporte/video/cristiano-ronaldo-desafia-la-logica-y-llega-500-goles-despues-de-los-30-anos-tmvo13130433"
-      ]
+      ],
+      "hasEmail": true,
+      "hasChat": false,
+      "statusPageUrl": null,
+      "hasDeveloperDocs": true,
+      "supportSubdomains": [],
+      "channelCount": 2
     }
   }
 }

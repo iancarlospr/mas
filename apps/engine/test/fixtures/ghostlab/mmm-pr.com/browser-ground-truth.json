@@ -1,43 +1,81 @@
 {
   "site": "mmm-pr.com",
-  "capturedAt": "2026-04-03T23:28:51.922Z",
+  "capturedAt": "2026-04-04T02:57:12.591Z",
   "capturedBy": "capture-ground-truth.ts (browser-verified)",
   "baseUrl": "https://www.mmm-pr.com/",
   "modules": {
     "M01": {
       "spf": true,
       "spfRecord": "v=spf1 include:spf-00235501.pphosted.com include:spf-001bee02.pphosted.com include:spf.protection.outlook.com -all",
+      "spfAllQualifier": "-all",
+      "spfIncludes": 3,
       "dmarc": true,
+      "dmarcRecord": "v=DMARC1;p=reject;fo=1;rua=mailto:dmarc_rua@emaildefense.proofpoint.com;ruf=mailto:dmarc_ruf@emaildefense.proofpoint.com",
       "dmarcPolicy": "reject",
+      "dmarcRua": true,
+      "dmarcRuf": true,
+      "dkim": false,
+      "dkimSelectors": [],
       "hasMx": false,
+      "nsProvider": "a22-65.akam.net",
+      "hasCaa": true,
+      "hasIpv6": false,
       "hasHsts": true,
+      "hstsMaxAge": 31536000,
+      "hstsIncludeSubDomains": true,
+      "hstsPreload": true,
       "hasCsp": false,
       "hasXfo": true,
+      "xfoValue": "SAMEORIGIN",
       "hasXcto": false,
       "hasReferrerPolicy": false,
+      "referrerPolicy": null,
       "hasPermissionsPolicy": false,
       "serverHeader": "Apache"
     },
     "M02": {
       "isWordPress": false,
-      "hasGeneratorMeta": false,
+      "isShopify": false,
+      "isDrupal": false,
+      "isSquarespace": false,
+      "isWebflow": false,
+      "isWix": false,
+      "isHubSpotCMS": false,
       "generator": null,
+      "cmsName": null,
       "serverHeader": "Apache",
-      "hasCfRay": false,
       "cdn": null,
-      "compression": "gzip"
+      "compression": "gzip",
+      "httpVersion": "HTTP/2",
+      "poweredBy": "PHP/5.6.40",
+      "hasGA4": true,
+      "ga4Id": "G-7PHKCPBH3N",
+      "hasGTM": true,
+      "gtmId": "GTM-NZSP2PM"
     },
     "M04": {
       "title": "Medicare & Mucho Más",
+      "titleLength": 20,
       "metaDescription": "MMM, PMC Medicare Choice y FIRST+PLUS, productos ofrecidos por MMM Healthcare, LLC, son planes con un contrato Medicare.",
+      "metaDescriptionLength": 120,
       "canonical": null,
       "htmlLang": "es-ES",
       "viewport": "width=device-width, initial-scale=1",
       "charset": "UTF-8",
       "ogTagCount": 5,
+      "hasOgTitle": true,
+      "hasOgDescription": true,
       "hasOgImage": false,
+      "hasOgUrl": true,
+      "hasOgType": true,
+      "hasOgSiteName": true,
+      "twitterCard": "summary",
       "jsonLdCount": 0,
+      "jsonLdTypes": [],
+      "hreflangCount": 0,
+      "faviconCount": 13,
       "hasRobotsTxt": true,
+      "robotsHasSitemap": false,
       "hasSitemap": false
     },
     "M16": {
@@ -92,26 +130,75 @@
           "text": "ÚNETE"
         },
         {
-          "href": "https://mmm-pr.com/unete?utm_source=banner&utm_medium=5estrellas&utm_campaign=AEP26",
+          "href": "https://mmm-pr.com/unete?utm_source=banner&utm_medium=otc&utm_campaign=AEP26",
           "text": ""
         },
         {
-          "href": "https://mmm-pr.com/unete?utm_source=banner&utm_medium=espejuelos&utm_campaign=AEP26",
+          "href": "https://mmm-pr.com/unete?utm_source=banner&utm_medium=flexicard&utm_campaign=AEP26",
           "text": ""
         }
       ],
-      "hasCareersPage": true
+      "hasCareersPage": true,
+      "externalCareersUrl": null,
+      "atsProviders": []
     },
     "M18": {
       "irLinksFound": 0,
+      "irLinks": [],
       "hasIrPage": false,
-      "ticker": null
+      "ticker": null,
+      "externalIrDomain": null
     },
     "M19": {
-      "supportLinksFound": 1,
+      "supportLinksFound": 8,
+      "supportLinks": [
+        {
+          "href": "../docs/Notice-Of-Availability.pdf",
+          "text": "CONOCE MÁS"
+        },
+        {
+          "href": "/docs/EPISOURCE-security-incident-ESP.pdf",
+          "text": "Conozca sobre el incidente de seguridad de EPISOURCE."
+        },
+        {
+          "href": "/preguntas-frecuentes",
+          "text": "PREGUNTAS FRECUENTES"
+        },
+        {
+          "href": "../docs/Funcion-TTY.pdf",
+          "text": "FUNCIÓN TTY"
+        },
+        {
+          "href": "../docs/SMS-Texting-Terms-and-Conditions-2023.pdf",
+          "text": "Términos y Condiciones de mensajería de texto (SMS)"
+        },
+        {
+          "href": "../docs/MMM-Non-Discrimination-ESP.pdf",
+          "text": "Aviso de no dicriminación y disponibilidad de servicios de a"
+        },
+        {
+          "href": "../docs/MMM-Notificacion-Practivas-de-Privacidad-ESP.pdf",
+          "text": "Notificación de Privacidad"
+        },
+        {
+          "href": "../docs/Politica-Privacidad-Interoperabilidad.pdf",
+          "text": "Política de Privacidad de Interoperabilidad"
+        }
+      ],
       "hasSupportPage": true,
+      "phones": [
+        "1-866-333-5470",
+        "711",
+        "1-833-647-9555"
+      ],
       "hasPhone": true,
-      "emails": []
+      "emails": [],
+      "hasEmail": false,
+      "hasChat": false,
+      "statusPageUrl": null,
+      "hasDeveloperDocs": true,
+      "supportSubdomains": [],
+      "channelCount": 2
     }
   }
 }

@@ -1,8 +1,8 @@
 {
   "site": "nike.com",
-  "verifiedAt": "2026-04-03T23:50:51.285Z",
+  "verifiedAt": "2026-04-04T02:57:23.251Z",
   "generatedBy": "generate-ground-truth-json.ts (from browser-ground-truth.json)",
-  "notes": "Auto-generated from browser-verified facts captured on 2026-04-03T23:50:51.285Z",
+  "notes": "Auto-generated from browser-verified facts captured on 2026-04-04T02:57:23.251Z",
   "modules": {
     "M01": {
       "expectedData": {
@@ -12,32 +12,49 @@
         },
         "dmarc": {
           "match": "truthy",
-          "note": "DMARC record exists"
+          "note": "DMARC p=reject"
+        },
+        "dmarcPolicy": {
+          "match": "truthy",
+          "note": "DMARC policy: reject"
+        },
+        "dkim": {
+          "match": "truthy",
+          "note": "DKIM selectors: s1"
+        },
+        "emailProvider.provider": {
+          "value": "Proofpoint",
+          "match": "contains",
+          "note": "Email provider from MX"
         },
         "hsts": {
           "match": "truthy",
-          "note": "HSTS header present"
+          "note": "HSTS present"
         },
         "csp": {
           "match": "truthy",
-          "note": "CSP header present"
+          "note": "CSP present"
+        },
+        "ipv6": {
+          "match": "falsy",
+          "note": "No IPv6"
         }
       },
       "expectedCheckpoints": [
         {
           "id": "m01-spf",
           "expectedHealth": "good",
-          "note": "SPF present"
+          "note": "SPF present with ~all (soft-fail) and 1 DNS lookups: v=spf1 include:%{ir}.%{v}.%"
         },
         {
           "id": "m01-dmarc",
           "expectedHealth": "excellent",
-          "note": "DMARC p=reject"
+          "note": "DMARC policy is reject with rua+ruf reporting: v=DMARC1; p=reject; fo=1; rua=mai"
         },
         {
           "id": "m01-dkim",
           "expectedHealth": "good",
-          "note": "DKIM found (selector: s2), key strength ~1024-bit"
+          "note": "DKIM found (selector: s1), key strength ~1024-bit"
         },
         {
           "id": "m01-dnssec",
@@ -87,7 +104,7 @@
         {
           "id": "m01-email",
           "expectedHealth": "excellent",
-          "note": "Email provider: Proofpoint (MX: mxa-001b6002.gslb.pphosted.com, mxb-001b6002.gsl"
+          "note": "Email provider: Proofpoint (MX: mxb-001b6002.gslb.pphosted.com, mxa-001b6002.gsl"
         },
         {
           "id": "m01-caa",
@@ -138,6 +155,10 @@
         "detectedTechnologies": {
           "match": "truthy",
           "note": "Should detect technologies"
+        },
+        "trackingIds": {
+          "match": "falsy",
+          "note": "Calibrated: module returns []"
         }
       },
       "expectedCheckpoints": [
@@ -194,19 +215,28 @@
       "expectedData": {
         "title": {
           "match": "truthy",
-          "note": "Page title exists"
+          "note": "Title: \"Sitio web oficial de Nike. Nike PR\""
         },
         "metaDescription": {
           "match": "truthy",
-          "note": "Meta description exists"
+          "note": "Meta description present"
         },
         "htmlLang": {
-          "match": "truthy",
+          "value": "es-PR",
+          "match": "contains",
           "note": "Lang: es-PR"
         },
-        "jsonLd": {
+        "canonical": {
           "match": "truthy",
-          "note": "1 JSON-LD blocks"
+          "note": "Canonical URL set"
+        },
+        "ogTags": {
+          "match": "truthy",
+          "note": "7 OG tags"
+        },
+        "robotsTxt": {
+          "match": "truthy",
+          "note": "robots.txt exists"
         }
       },
       "expectedCheckpoints": [
@@ -248,7 +278,7 @@
         {
           "id": "M04-ROBOTS",
           "expectedHealth": "warning",
-          "note": "robots.txt exists"
+          "note": "robots.txt present but blocks important paths: */member/inbox, */member/settings"
         },
         {
           "id": "M04-SITEMAP",
@@ -293,7 +323,7 @@
         {
           "id": "M04-VIEWPORT",
           "expectedHealth": "excellent",
-          "note": "Viewport meta present"
+          "note": "Viewport configured: width=device-width, initial-scale=1.0, maximum-scale=2.0"
         },
         {
           "id": "M04-CHARSET",
@@ -366,13 +396,17 @@
         "careers_page_url": {
           "match": "falsy",
           "note": "Calibrated: module returns null"
+        },
+        "external_careers_links": {
+          "match": "truthy",
+          "note": "External: https://jobs.nike.com/"
         }
       },
       "expectedCheckpoints": [
         {
           "id": "m17-careers-page",
           "expectedHealth": "info",
-          "note": "Careers page exists"
+          "note": "No dedicated careers page found"
         },
         {
           "id": "m17-ats-provider",
@@ -399,12 +433,18 @@
       "fixedBugs": []
     },
     "M18": {
-      "expectedData": {},
+      "expectedData": {
+        "external_ir_domain": {
+          "value": "https://investors.nike.com",
+          "match": "contains",
+          "note": "External IR subdomain"
+        }
+      },
       "expectedCheckpoints": [
         {
           "id": "m18-ir-portal",
           "expectedHealth": "info",
-          "note": "IR page found"
+          "note": "No investor relations page found (may be a private company)"
         },
         {
           "id": "m18-financial-data",
@@ -439,7 +479,11 @@
       "expectedData": {
         "support_page_url": {
           "match": "truthy",
-          "note": "Support/contact page found"
+          "note": "Support page found"
+        },
+        "chatbot": {
+          "match": "truthy",
+          "note": "Live chat detected"
         }
       },
       "expectedCheckpoints": [
@@ -483,5 +527,5 @@
       "fixedBugs": []
     }
   },
-  "calibratedAt": "2026-04-04T01:32:57.419Z"
+  "calibratedAt": "2026-04-04T03:24:21.946Z"
 }

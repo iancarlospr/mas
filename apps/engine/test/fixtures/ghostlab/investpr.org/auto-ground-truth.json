@@ -1,8 +1,8 @@
 {
   "site": "investpr.org",
-  "verifiedAt": "2026-04-03T23:28:32.315Z",
+  "verifiedAt": "2026-04-04T02:56:26.324Z",
   "generatedBy": "generate-ground-truth-json.ts (from browser-ground-truth.json)",
-  "notes": "Auto-generated from browser-verified facts captured on 2026-04-03T23:28:32.315Z",
+  "notes": "Auto-generated from browser-verified facts captured on 2026-04-04T02:56:26.324Z",
   "modules": {
     "M01": {
       "expectedData": {
@@ -12,23 +12,39 @@
         },
         "dmarc": {
           "match": "truthy",
-          "note": "DMARC record exists"
+          "note": "DMARC p=none"
+        },
+        "dmarcPolicy": {
+          "match": "truthy",
+          "note": "DMARC policy: none"
+        },
+        "dkim": {
+          "match": "falsy",
+          "note": "No DKIM found"
         },
         "hsts": {
           "match": "truthy",
-          "note": "HSTS header present"
+          "note": "HSTS present"
+        },
+        "csp": {
+          "match": "falsy",
+          "note": "No CSP"
+        },
+        "ipv6": {
+          "match": "falsy",
+          "note": "No IPv6"
         }
       },
       "expectedCheckpoints": [
         {
           "id": "m01-spf",
           "expectedHealth": "excellent",
-          "note": "SPF present"
+          "note": "SPF present with -all and 4 DNS lookups (limit 10): v=spf1 ip4:172.96.170.178 in"
         },
         {
           "id": "m01-dmarc",
           "expectedHealth": "warning",
-          "note": "DMARC p=none"
+          "note": "DMARC policy is none (monitoring only): v=DMARC1; p=none"
         },
         {
           "id": "m01-dkim",
@@ -83,7 +99,7 @@
         {
           "id": "m01-email",
           "expectedHealth": "good",
-          "note": "Custom mail server (MX: mx2-us1.ppe-hosted.com, mx1-us1.ppe-hosted.com)"
+          "note": "Custom mail server (MX: mx1-us1.ppe-hosted.com, mx2-us1.ppe-hosted.com)"
         },
         {
           "id": "m01-caa",
@@ -93,7 +109,7 @@
         {
           "id": "m01-geoip",
           "expectedHealth": "info",
-          "note": "141.193.213.11: US, 141.193.213.10: US"
+          "note": "141.193.213.10: US, 141.193.213.11: US"
         },
         {
           "id": "m01-mta-sts",
@@ -138,7 +154,11 @@
         "cms.name": {
           "value": "WordPress",
           "match": "contains",
-          "note": "Generator: WordPress Download Manager 6.8.9"
+          "note": "CMS: WordPress"
+        },
+        "trackingIds": {
+          "match": "truthy",
+          "note": "GTM: GTM-5WBLRC2"
         }
       },
       "expectedCheckpoints": [
@@ -195,19 +215,32 @@
       "expectedData": {
         "title": {
           "match": "truthy",
-          "note": "Page title exists"
+          "note": "Title: \"InvestPR | Accelerating Economic Growth in Puerto \""
         },
         "metaDescription": {
           "match": "truthy",
-          "note": "Meta description exists"
+          "note": "Meta description present"
         },
         "htmlLang": {
-          "match": "truthy",
+          "value": "en-US",
+          "match": "contains",
           "note": "Lang: en-US"
         },
-        "jsonLd": {
+        "canonical": {
           "match": "truthy",
-          "note": "1 JSON-LD blocks"
+          "note": "Canonical URL set"
+        },
+        "ogTags": {
+          "match": "truthy",
+          "note": "10 OG tags"
+        },
+        "robotsTxt": {
+          "match": "truthy",
+          "note": "robots.txt exists"
+        },
+        "sitemap": {
+          "match": "truthy",
+          "note": "sitemap.xml exists"
         }
       },
       "expectedCheckpoints": [
@@ -249,7 +282,7 @@
         {
           "id": "M04-ROBOTS",
           "expectedHealth": "excellent",
-          "note": "robots.txt exists"
+          "note": "robots.txt present with 3 sitemap reference(s), 1 disallow rule(s), 1 user-agent"
         },
         {
           "id": "M04-SITEMAP",
@@ -294,7 +327,7 @@
         {
           "id": "M04-VIEWPORT",
           "expectedHealth": "excellent",
-          "note": "Viewport meta present"
+          "note": "Viewport configured: width=device-width, initial-scale=1.0"
         },
         {
           "id": "M04-CHARSET",
@@ -373,7 +406,7 @@
         {
           "id": "m17-careers-page",
           "expectedHealth": "excellent",
-          "note": "Careers page exists"
+          "note": "Dedicated careers page with 3 open position(s) at /about-investpr/careers/"
         },
         {
           "id": "m17-ats-provider",
@@ -405,7 +438,7 @@
         {
           "id": "m18-ir-portal",
           "expectedHealth": "info",
-          "note": "No IR page"
+          "note": "No investor relations page found (may be a private company)"
         },
         {
           "id": "m18-financial-data",
@@ -441,6 +474,10 @@
         "support_page_url": {
           "match": "falsy",
           "note": "Calibrated: module returns null"
+        },
+        "support_channels": {
+          "match": "truthy",
+          "note": "Phone support detected"
         }
       },
       "expectedCheckpoints": [
@@ -484,5 +521,5 @@
       "fixedBugs": []
     }
   },
-  "calibratedAt": "2026-04-04T01:32:28.691Z"
+  "calibratedAt": "2026-04-04T03:23:47.521Z"
 }

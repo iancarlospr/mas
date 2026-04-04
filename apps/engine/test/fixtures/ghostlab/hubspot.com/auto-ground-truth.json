@@ -1,8 +1,8 @@
 {
   "site": "hubspot.com",
-  "verifiedAt": "2026-04-03T23:51:18.560Z",
+  "verifiedAt": "2026-04-04T02:56:18.436Z",
   "generatedBy": "generate-ground-truth-json.ts (from browser-ground-truth.json)",
-  "notes": "Auto-generated from browser-verified facts captured on 2026-04-03T23:51:18.560Z",
+  "notes": "Auto-generated from browser-verified facts captured on 2026-04-04T02:56:18.436Z",
   "modules": {
     "M01": {
       "expectedData": {
@@ -12,27 +12,44 @@
         },
         "dmarc": {
           "match": "truthy",
-          "note": "DMARC record exists"
+          "note": "DMARC p=reject"
+        },
+        "dmarcPolicy": {
+          "match": "truthy",
+          "note": "DMARC policy: reject"
+        },
+        "dkim": {
+          "match": "truthy",
+          "note": "DKIM selectors: google, s1"
+        },
+        "emailProvider.provider": {
+          "value": "Google Workspace",
+          "match": "contains",
+          "note": "Email provider from MX"
         },
         "hsts": {
           "match": "truthy",
-          "note": "HSTS header present"
+          "note": "HSTS present"
         },
         "csp": {
           "match": "truthy",
-          "note": "CSP header present"
+          "note": "CSP present"
+        },
+        "ipv6": {
+          "match": "truthy",
+          "note": "IPv6 AAAA record"
         }
       },
       "expectedCheckpoints": [
         {
           "id": "m01-spf",
           "expectedHealth": "good",
-          "note": "SPF present"
+          "note": "SPF delegates policy via redirect=_hspf.hubspot.com (1 DNS lookup): v=spf1 redir"
         },
         {
           "id": "m01-dmarc",
           "expectedHealth": "excellent",
-          "note": "DMARC p=reject"
+          "note": "DMARC policy is reject with rua+ruf reporting: v=DMARC1;p=reject;pct=100;rua=mai"
         },
         {
           "id": "m01-dkim",
@@ -107,7 +124,7 @@
         {
           "id": "m01-ipv6",
           "expectedHealth": "excellent",
-          "note": "AAAA records found: 2606:4700:440d::6812:2772, 2a06:98c1:310a::ac40:948e"
+          "note": "AAAA records found: 2a06:98c1:310a::ac40:948e, 2606:4700:440d::6812:2772"
         },
         {
           "id": "m01-www-consistency",
@@ -138,6 +155,15 @@
         "detectedTechnologies": {
           "match": "truthy",
           "note": "Should detect technologies"
+        },
+        "cms.name": {
+          "value": "HubSpot",
+          "match": "contains",
+          "note": "CMS: HubSpot"
+        },
+        "trackingIds": {
+          "match": "truthy",
+          "note": "GTM: GTM-N5LT88"
         }
       },
       "expectedCheckpoints": [
@@ -194,19 +220,36 @@
       "expectedData": {
         "title": {
           "match": "truthy",
-          "note": "Page title exists"
+          "note": "Title: \"HubSpot | Software & Tools for your Business - Hom\""
         },
         "metaDescription": {
           "match": "truthy",
-          "note": "Meta description exists"
+          "note": "Meta description present"
         },
         "htmlLang": {
-          "match": "truthy",
+          "value": "en",
+          "match": "contains",
           "note": "Lang: en"
         },
-        "jsonLd": {
+        "canonical": {
           "match": "truthy",
-          "note": "1 JSON-LD blocks"
+          "note": "Canonical URL set"
+        },
+        "ogTags": {
+          "match": "truthy",
+          "note": "7 OG tags"
+        },
+        "hreflang": {
+          "match": "truthy",
+          "note": "7 hreflang tags"
+        },
+        "robotsTxt": {
+          "match": "truthy",
+          "note": "robots.txt exists"
+        },
+        "sitemap": {
+          "match": "truthy",
+          "note": "sitemap.xml exists"
         }
       },
       "expectedCheckpoints": [
@@ -248,7 +291,7 @@
         {
           "id": "M04-ROBOTS",
           "expectedHealth": "good",
-          "note": "robots.txt exists"
+          "note": "robots.txt present (356 disallow rules, no sitemap reference)"
         },
         {
           "id": "M04-SITEMAP",
@@ -293,7 +336,7 @@
         {
           "id": "M04-VIEWPORT",
           "expectedHealth": "excellent",
-          "note": "Viewport meta present"
+          "note": "Viewport configured: width=device-width, initial-scale=1"
         },
         {
           "id": "M04-CHARSET",
@@ -372,7 +415,7 @@
         {
           "id": "m17-careers-page",
           "expectedHealth": "excellent",
-          "note": "Careers page exists"
+          "note": "Dedicated careers page with 2 open position(s) at /careers/marketing/jobs"
         },
         {
           "id": "m17-ats-provider",
@@ -399,12 +442,18 @@
       "fixedBugs": []
     },
     "M18": {
-      "expectedData": {},
+      "expectedData": {
+        "external_ir_domain": {
+          "value": "https://ir.hubspot.com",
+          "match": "contains",
+          "note": "External IR subdomain"
+        }
+      },
       "expectedCheckpoints": [
         {
           "id": "m18-ir-portal",
           "expectedHealth": "warning",
-          "note": "IR page found"
+          "note": "IR page found at https://www.hubspot.com/startups/resources/19-unexpected-invest"
         },
         {
           "id": "m18-financial-data",
@@ -439,7 +488,15 @@
       "expectedData": {
         "support_page_url": {
           "match": "truthy",
-          "note": "Support/contact page found"
+          "note": "Support page found"
+        },
+        "chatbot": {
+          "match": "truthy",
+          "note": "Live chat detected"
+        },
+        "developer_docs": {
+          "match": "truthy",
+          "note": "Developer docs found"
         }
       },
       "expectedCheckpoints": [
@@ -483,5 +540,5 @@
       "fixedBugs": []
     }
   },
-  "calibratedAt": "2026-04-04T01:32:22.195Z"
+  "calibratedAt": "2026-04-04T03:23:40.066Z"
 }

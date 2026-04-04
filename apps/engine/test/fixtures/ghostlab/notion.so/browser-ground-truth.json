@@ -1,44 +1,85 @@
 {
   "site": "notion.so",
-  "capturedAt": "2026-04-03T23:52:13.675Z",
+  "capturedAt": "2026-04-04T03:08:08.333Z",
   "capturedBy": "capture-ground-truth.ts (browser-verified)",
   "baseUrl": "https://www.notion.com/",
   "modules": {
     "M01": {
       "spf": true,
       "spfRecord": "v=spf1 ~all",
+      "spfAllQualifier": "~all",
+      "spfIncludes": 0,
       "dmarc": true,
+      "dmarcRecord": "v=DMARC1; p=quarantine; pct=100; rua=mailto:re+1b3a27dd30bc@inbound.dmarcdigests.com;",
       "dmarcPolicy": "quarantine",
+      "dmarcRua": true,
+      "dmarcRuf": false,
+      "dkim": false,
+      "dkimSelectors": [],
       "hasMx": false,
+      "nsProvider": "Cloudflare",
+      "hasCaa": false,
+      "hasIpv6": true,
       "hasHsts": true,
+      "hstsMaxAge": 31536000,
+      "hstsIncludeSubDomains": true,
+      "hstsPreload": true,
       "hasCsp": true,
+      "cspHasDefaultSrc": false,
+      "cspHasScriptSrc": true,
+      "cspReportOnly": false,
       "hasXfo": false,
+      "xfoValue": null,
       "hasXcto": false,
       "hasReferrerPolicy": true,
+      "referrerPolicy": "strict-origin-when-cross-origin",
       "hasPermissionsPolicy": false,
       "serverHeader": "cloudflare"
     },
     "M02": {
       "isWordPress": false,
-      "hasGeneratorMeta": false,
+      "isShopify": false,
+      "isDrupal": false,
+      "isSquarespace": false,
+      "isWebflow": false,
+      "isWix": false,
+      "isHubSpotCMS": false,
       "generator": null,
+      "cmsName": null,
       "serverHeader": "cloudflare",
-      "hasCfRay": true,
       "cdn": "Cloudflare",
-      "compression": "gzip"
+      "compression": "gzip",
+      "httpVersion": "HTTP/3",
+      "poweredBy": "Next.js",
+      "hasGA4": true,
+      "ga4Id": "G-9ZJ8CB186L",
+      "hasGTM": true,
+      "gtmId": "GTM-MTWKTL4"
     },
     "M04": {
       "title": "The AI workspace that works for you. | Notion",
+      "titleLength": 45,
       "metaDescription": "Build Custom Agents, search across all your apps, and automate busywork. The AI workspace where teams get more done, faster.",
+      "metaDescriptionLength": 124,
       "canonical": "https://www.notion.com/",
       "htmlLang": "en-us",
       "viewport": "width=device-width, initial-scale=1",
       "charset": "utf-8",
       "ogTagCount": 7,
+      "hasOgTitle": true,
+      "hasOgDescription": true,
       "hasOgImage": true,
+      "hasOgUrl": true,
+      "hasOgType": true,
+      "hasOgSiteName": true,
+      "twitterCard": "summary_large_image",
       "jsonLdCount": 0,
+      "jsonLdTypes": [],
+      "hreflangCount": 16,
+      "faviconCount": 2,
       "hasRobotsTxt": true,
-      "hasSitemap": false
+      "robotsHasSitemap": true,
+      "hasSitemap": true
     },
     "M16": {
       "pressLinksFound": 0,
@@ -54,18 +95,59 @@
           "text": "Careers"
         }
       ],
-      "hasCareersPage": true
+      "hasCareersPage": true,
+      "externalCareersUrl": null,
+      "atsProviders": []
     },
     "M18": {
       "irLinksFound": 0,
+      "irLinks": [],
       "hasIrPage": false,
-      "ticker": null
+      "ticker": null,
+      "externalIrDomain": null
     },
     "M19": {
-      "supportLinksFound": 4,
+      "supportLinksFound": 7,
+      "supportLinks": [
+        {
+          "href": "/product/docs",
+          "text": "DocsSimple and powerful"
+        },
+        {
+          "href": "/help",
+          "text": "Help"
+        },
+        {
+          "href": "/contact-sales",
+          "text": "Request a demo"
+        },
+        {
+          "href": "/contact-sales",
+          "text": "Request a demo"
+        },
+        {
+          "href": "/product/ai/use-cases/resolve-support-tickets-in-slack",
+          "text": ""
+        },
+        {
+          "href": "/product/docs",
+          "text": ""
+        },
+        {
+          "href": "/help",
+          "text": "Help center"
+        }
+      ],
       "hasSupportPage": true,
+      "phones": [],
       "hasPhone": false,
-      "emails": []
+      "emails": [],
+      "hasEmail": false,
+      "hasChat": false,
+      "statusPageUrl": "https://www.notion-status.com",
+      "hasDeveloperDocs": true,
+      "supportSubdomains": [],
+      "channelCount": 1
     }
   }
 }

@@ -1,45 +1,84 @@
 {
   "site": "mailchimp.com",
-  "capturedAt": "2026-04-03T23:51:46.952Z",
+  "capturedAt": "2026-04-04T02:56:44.891Z",
   "capturedBy": "capture-ground-truth.ts (browser-verified)",
   "baseUrl": "https://mailchimp.com/",
   "modules": {
     "M01": {
       "spf": true,
       "spfRecord": "v=spf1 ip4:205.201.128.0/20 ip4:198.2.128.0/18 ip4:148.105.0.0/16 ip4:129.145.74.12 include:_spf.google.com include:mailsenders.netsuite.com include:_spf2.intuit.com ",
+      "spfAllQualifier": null,
+      "spfIncludes": 3,
       "dmarc": true,
+      "dmarcRecord": "v=DMARC1; p=reject; rua=mailto:19ezfriw@ag.dmarcian.com,mailto:dmarc_rua@emaildefense.proofpoint.com; ruf=mailto:19ezfriw@fr.dmarcian.com,mailto:dmarc_ruf@emaildefense.proofpoint.com;",
       "dmarcPolicy": "reject",
+      "dmarcRua": true,
+      "dmarcRuf": true,
+      "dkim": true,
+      "dkimSelectors": [
+        "google",
+        "k1"
+      ],
       "hasMx": true,
       "mxCount": 2,
+      "emailProvider": null,
+      "nsProvider": "a4-65.akam.net",
+      "hasCaa": true,
+      "hasIpv6": false,
       "hasHsts": false,
       "hasCsp": false,
       "hasXfo": true,
+      "xfoValue": "SAMEORIGIN",
       "hasXcto": false,
       "hasReferrerPolicy": false,
+      "referrerPolicy": null,
       "hasPermissionsPolicy": false,
       "serverHeader": "istio-envoy"
     },
     "M02": {
       "isWordPress": false,
-      "hasGeneratorMeta": false,
+      "isShopify": false,
+      "isDrupal": false,
+      "isSquarespace": false,
+      "isWebflow": false,
+      "isWix": false,
+      "isHubSpotCMS": false,
       "generator": null,
+      "cmsName": null,
       "serverHeader": "istio-envoy",
-      "hasCfRay": false,
       "cdn": null,
-      "compression": "gzip"
+      "compression": "gzip",
+      "httpVersion": "HTTP/2",
+      "poweredBy": null,
+      "hasGA4": true,
+      "ga4Id": "G-N5HD1RTH6E",
+      "hasGTM": true,
+      "gtmId": "GTM-5XRCGV8"
     },
     "M04": {
       "title": "Email & SMS Marketing Platform | Mailchimp",
+      "titleLength": 42,
       "metaDescription": "Utilize real-time user behavior data and artificial intelligence to convert more customers. Easy to use, get started for free!",
+      "metaDescriptionLength": 126,
       "canonical": "https://mailchimp.com/",
       "htmlLang": "en",
       "viewport": "width=device-width, initial-scale=1",
       "charset": "utf-8",
       "ogTagCount": 7,
+      "hasOgTitle": true,
+      "hasOgDescription": true,
       "hasOgImage": true,
-      "jsonLdCount": 1,
+      "hasOgUrl": true,
+      "hasOgType": true,
+      "hasOgSiteName": true,
+      "twitterCard": null,
+      "jsonLdCount": 0,
+      "jsonLdTypes": [],
+      "hreflangCount": 7,
+      "faviconCount": 9,
       "hasRobotsTxt": true,
-      "hasSitemap": false
+      "robotsHasSitemap": true,
+      "hasSitemap": true
     },
     "M16": {
       "pressLinksFound": 5,
@@ -101,18 +140,67 @@
           "text": "Careers"
         }
       ],
-      "hasCareersPage": true
+      "hasCareersPage": true,
+      "externalCareersUrl": null,
+      "atsProviders": []
     },
     "M18": {
       "irLinksFound": 0,
+      "irLinks": [],
       "hasIrPage": false,
-      "ticker": null
+      "ticker": null,
+      "externalIrDomain": null
     },
     "M19": {
-      "supportLinksFound": 5,
+      "supportLinksFound": 8,
+      "supportLinks": [
+        {
+          "href": "/help/",
+          "text": "Help Center"
+        },
+        {
+          "href": "https://mailchimp.com/developer/marketing/docs/fundamentals/",
+          "text": "Getting started"
+        },
+        {
+          "href": "https://mailchimp.com/developer/marketing/api/",
+          "text": "API docs"
+        },
+        {
+          "href": "/help/",
+          "text": "Help Center"
+        },
+        {
+          "href": "/help/",
+          "text": "Help Center"
+        },
+        {
+          "href": "https://mailchimp.com/developer/marketing/docs/fundamentals/",
+          "text": "Getting started"
+        },
+        {
+          "href": "https://mailchimp.com/developer/marketing/api/",
+          "text": "API docs"
+        },
+        {
+          "href": "/help/",
+          "text": "Help Center"
+        }
+      ],
       "hasSupportPage": true,
+      "phones": [
+        "+18559987689",
+        "+18559987689",
+        "+18555360585"
+      ],
       "hasPhone": true,
-      "emails": []
+      "emails": [],
+      "hasEmail": false,
+      "hasChat": false,
+      "statusPageUrl": "https://status.mailchimp.com/",
+      "hasDeveloperDocs": true,
+      "supportSubdomains": [],
+      "channelCount": 2
     }
   }
 }

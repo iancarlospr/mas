@@ -1,44 +1,83 @@
 {
   "site": "squarespace.com",
-  "capturedAt": "2026-04-03T23:51:56.758Z",
+  "capturedAt": "2026-04-04T02:58:26.028Z",
   "capturedBy": "capture-ground-truth.ts (browser-verified)",
   "baseUrl": "https://www.squarespace.com/",
   "modules": {
     "M01": {
       "spf": true,
       "spfRecord": "v=spf1 include:squarespace-mail.com include:mail.zendesk.com include:_spf.google.com include:sendgrid-spf.email.squarespace.com include:registrarmail.net ip4:8.41.221.0/24 ip4:8.36.86.0/24 ip4:34.174.163.32/27 ip4:162.216.148.0/27 ~all",
+      "spfAllQualifier": "~all",
+      "spfIncludes": 5,
       "dmarc": true,
+      "dmarcRecord": "v=DMARC1; p=reject; aspf=r; fo=1; pct=100; rua=mailto:squarespace@rua.agari.com; ruf=mailto:squarespace@ruf.agari.com",
       "dmarcPolicy": "reject",
+      "dmarcRua": true,
+      "dmarcRuf": true,
+      "dkim": false,
+      "dkimSelectors": [],
       "hasMx": true,
       "mxCount": 7,
+      "emailProvider": "Google Workspace",
+      "nsProvider": "ns03.squarespacedns.com",
+      "hasCaa": false,
+      "hasIpv6": false,
       "hasHsts": true,
+      "hstsMaxAge": 15552000,
+      "hstsIncludeSubDomains": false,
+      "hstsPreload": false,
       "hasCsp": false,
       "hasXfo": false,
+      "xfoValue": null,
       "hasXcto": true,
       "hasReferrerPolicy": false,
+      "referrerPolicy": null,
       "hasPermissionsPolicy": false,
       "serverHeader": "Squarespace"
     },
     "M02": {
       "isWordPress": false,
-      "hasGeneratorMeta": false,
+      "isShopify": false,
+      "isDrupal": false,
+      "isSquarespace": true,
+      "isWebflow": false,
+      "isWix": false,
+      "isHubSpotCMS": false,
       "generator": null,
+      "cmsName": "Squarespace",
       "serverHeader": "Squarespace",
-      "hasCfRay": false,
       "cdn": null,
-      "compression": "gzip"
+      "compression": null,
+      "httpVersion": "HTTP/2",
+      "poweredBy": null,
+      "hasGA4": true,
+      "ga4Id": "G-1L8CXRNJCG",
+      "hasGTM": true,
+      "gtmId": "GTM-BCCP"
     },
     "M04": {
       "title": "Website Builder – Easily Create Your Own Website — Squarespace",
+      "titleLength": 62,
       "metaDescription": "Create a website and grow your business with a free Squarespace trial. Start with customizable website templates, AI website builder tools, or a domain name.",
+      "metaDescriptionLength": 157,
       "canonical": "https://www.squarespace.com/",
       "htmlLang": "en-US",
       "viewport": "width=device-width, initial-scale=1",
       "charset": "utf-8",
       "ogTagCount": 7,
+      "hasOgTitle": true,
+      "hasOgDescription": false,
       "hasOgImage": true,
-      "jsonLdCount": 5,
+      "hasOgUrl": true,
+      "hasOgType": true,
+      "hasOgSiteName": true,
+      "twitterCard": "summary",
+      "jsonLdCount": 0,
+      "jsonLdTypes": [],
+      "hreflangCount": 0,
+      "faviconCount": 8,
       "hasRobotsTxt": true,
+      "robotsHasSitemap": true,
       "hasSitemap": true
     },
     "M16": {
@@ -89,18 +128,67 @@
           "text": "CareersCareers"
         }
       ],
-      "hasCareersPage": true
+      "hasCareersPage": true,
+      "externalCareersUrl": null,
+      "atsProviders": []
     },
     "M18": {
       "irLinksFound": 0,
+      "irLinks": [],
       "hasIrPage": false,
-      "ticker": null
+      "ticker": null,
+      "externalIrDomain": null
     },
     "M19": {
-      "supportLinksFound": 5,
+      "supportLinksFound": 8,
+      "supportLinks": [
+        {
+          "href": "/premium",
+          "text": "Squarespace PremiumOur most advanced features, lowest proces"
+        },
+        {
+          "href": "https://support.squarespace.com/",
+          "text": "Help Center→In-depth guides and videos about the platform, o"
+        },
+        {
+          "href": "/designer/home",
+          "text": "Hire an Expert→Let us do the work of finding you the perfect"
+        },
+        {
+          "href": "/premium",
+          "text": "Squarespace PremiumOur most advanced features, lowest proces"
+        },
+        {
+          "href": "https://support.squarespace.com/",
+          "text": "Help Center→In-depth guides and videos about the platform, o"
+        },
+        {
+          "href": "/designer/home",
+          "text": "Hire an Expert→Let us do the work of finding you the perfect"
+        },
+        {
+          "href": "/websites/create-a-portfolio",
+          "text": "Showcase your workBuild a portfolio website to highlight pro"
+        },
+        {
+          "href": "/websites/create-a-portfolio",
+          "text": "Showcase your workBuild a portfolio website to highlight pro"
+        }
+      ],
       "hasSupportPage": true,
+      "phones": [],
       "hasPhone": false,
-      "emails": []
+      "emails": [],
+      "hasEmail": false,
+      "hasChat": false,
+      "statusPageUrl": "https://status.squarespace.com/",
+      "hasDeveloperDocs": true,
+      "supportSubdomains": [
+        "https://support.squarespace.com/",
+        "https://support.squarespace.com/",
+        "https://support.squarespace.com"
+      ],
+      "channelCount": 1
     }
   }
 }

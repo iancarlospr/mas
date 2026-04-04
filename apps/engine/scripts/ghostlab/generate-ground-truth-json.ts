@@ -60,22 +60,28 @@ function generateM01(facts: Record<string, unknown>): GroundTruthModule {
     fixedBugs: [],
   };
 
-  if (facts.spf) {
-    gt.expectedData['spf'] = { match: 'truthy', note: 'SPF record exists' };
-    gt.expectedCheckpoints.push({ id: 'm01-spf', expectedHealth: 'excellent', note: 'SPF present' });
+  // SPF — M01 stores as data.spf (string or boolean)
+  gt.expectedData['spf'] = { match: facts.spf ? 'truthy' : 'falsy', note: facts.spf ? 'SPF record exists' : 'No SPF' };
+
+  // DMARC — M01 stores as data.dmarc (string) and data.dmarcPolicy (string)
+  gt.expectedData['dmarc'] = { match: facts.dmarc ? 'truthy' : 'falsy', note: facts.dmarc ? `DMARC p=${facts.dmarcPolicy}` : 'No DMARC' };
+  // DMARC policy — use truthy not exact because DNS is live and policies can change between capture and replay
+  if (facts.dmarcPolicy) gt.expectedData['dmarcPolicy'] = { match: 'truthy', note: `DMARC policy: ${facts.dmarcPolicy}` };
+
+  // DKIM — M01 stores as data.dkim (array of {selector, record})
+  gt.expectedData['dkim'] = { match: facts.dkim ? 'truthy' : 'falsy', note: facts.dkim ? `DKIM selectors: ${(facts.dkimSelectors as string[])?.join(', ')}` : 'No DKIM found' };
+
+  // Email — M01 stores as data.emailProvider (object with .provider field)
+  // Only assert when we detected a specific known provider (not null)
+  if (facts.emailProvider && facts.emailProvider !== 'Other') {
+    gt.expectedData['emailProvider.provider'] = { value: facts.emailProvider as string, match: 'contains', note: 'Email provider from MX' };
   }
-  if (facts.dmarc) {
-    gt.expectedData['dmarc'] = { match: 'truthy', note: 'DMARC record exists' };
-    const policy = facts.dmarcPolicy as string;
-    const health = policy === 'reject' ? 'excellent' : policy === 'quarantine' ? 'good' : 'warning';
-    gt.expectedCheckpoints.push({ id: 'm01-dmarc', expectedHealth: health, note: `DMARC p=${policy}` });
-  }
-  if (facts.hasHsts) {
-    gt.expectedData['hsts'] = { match: 'truthy', note: 'HSTS header present' };
-  }
-  if (facts.hasCsp) {
-    gt.expectedData['csp'] = { match: 'truthy', note: 'CSP header present' };
-  }
+
+  // Security headers
+  gt.expectedData['hsts'] = { match: facts.hasHsts ? 'truthy' : 'falsy', note: facts.hasHsts ? 'HSTS present' : 'No HSTS' };
+  gt.expectedData['csp'] = { match: facts.hasCsp ? 'truthy' : 'falsy', note: facts.hasCsp ? 'CSP present' : 'No CSP' };
+  gt.expectedData['ipv6'] = { match: facts.hasIpv6 ? 'truthy' : 'falsy', note: facts.hasIpv6 ? 'IPv6 AAAA record' : 'No IPv6' };
+
   gt.expectedCheckpoints.push({ id: 'm01-tls', expectedHealth: 'excellent', note: 'HTTPS site' });
 
   return gt;
@@ -93,16 +99,14 @@ function generateM02(facts: Record<string, unknown>): GroundTruthModule {
 
   gt.expectedData['detectedTechnologies'] = { match: 'truthy', note: 'Should detect technologies' };
 
-  if (facts.generator) {
-    const gen = facts.generator as string;
-    if (gen.toLowerCase().includes('wordpress')) {
-      gt.expectedData['cms.name'] = { value: 'WordPress', match: 'contains', note: `Generator: ${gen}` };
-    }
+  // CMS
+  if (facts.cmsName) {
+    gt.expectedData['cms.name'] = { value: facts.cmsName as string, match: 'contains', note: `CMS: ${facts.cmsName}` };
   }
-  // NOTE: CDN detection excluded from auto ground truth — depends on which
-  // edge server responds (Varnish vs CloudFront vs Cloudflare can vary).
-  // NOTE: compression excluded — M02 normalizes "br" to "brotli" which
-  // creates false mismatches with raw header values from browser capture.
+
+  // Tracking IDs
+  if (facts.hasGA4) gt.expectedData['trackingIds'] = { match: 'truthy', note: `GA4: ${facts.ga4Id}` };
+  if (facts.hasGTM) gt.expectedData['trackingIds'] = { match: 'truthy', note: `GTM: ${facts.gtmId}` };
 
   gt.expectedCheckpoints.push({ id: 'm02-https-enforced', expectedHealth: 'excellent', note: 'HTTPS site' });
 
@@ -119,12 +123,36 @@ function generateM04(facts: Record<string, unknown>): GroundTruthModule {
     fixedBugs: [],
   };
 
-  if (facts.title) gt.expectedData['title'] = { match: 'truthy', note: 'Page title exists' };
-  if (facts.metaDescription) gt.expectedData['metaDescription'] = { match: 'truthy', note: 'Meta description exists' };
-  if (facts.htmlLang) gt.expectedData['htmlLang'] = { match: 'truthy', note: `Lang: ${facts.htmlLang}` };
-  if (facts.viewport) gt.expectedCheckpoints.push({ id: 'M04-VIEWPORT', expectedHealth: 'excellent', note: 'Viewport meta present' });
-  if ((facts.jsonLdCount as number) > 0) gt.expectedData['jsonLd'] = { match: 'truthy', note: `${facts.jsonLdCount} JSON-LD blocks` };
-  if (facts.hasRobotsTxt) gt.expectedCheckpoints.push({ id: 'M04-ROBOTS', expectedHealth: 'excellent', note: 'robots.txt exists' });
+  // Title
+  gt.expectedData['title'] = { match: facts.title ? 'truthy' : 'falsy', note: facts.title ? `Title: "${(facts.title as string).substring(0, 50)}"` : 'No title' };
+
+  // Meta description
+  gt.expectedData['metaDescription'] = { match: facts.metaDescription ? 'truthy' : 'falsy', note: facts.metaDescription ? 'Meta description present' : 'No meta description' };
+
+  // Language
+  if (facts.htmlLang) gt.expectedData['htmlLang'] = { value: facts.htmlLang as string, match: 'contains', note: `Lang: ${facts.htmlLang}` };
+
+  // Canonical
+  gt.expectedData['canonical'] = { match: facts.canonical ? 'truthy' : 'falsy', note: facts.canonical ? 'Canonical URL set' : 'No canonical' };
+
+  // OG tags
+  const ogCount = facts.ogTagCount as number ?? 0;
+  if (ogCount > 0) gt.expectedData['ogTags'] = { match: 'truthy', note: `${ogCount} OG tags` };
+
+  // JSON-LD
+  if ((facts.jsonLdCount as number) > 0) {
+    gt.expectedData['jsonLd'] = { match: 'truthy', note: `Schema types: ${(facts.jsonLdTypes as string[])?.join(', ').substring(0, 60)}` };
+  }
+
+  // Hreflang
+  const hreflangCount = facts.hreflangCount as number ?? 0;
+  if (hreflangCount > 0) gt.expectedData['hreflang'] = { match: 'truthy', note: `${hreflangCount} hreflang tags` };
+
+  // robots.txt
+  if (facts.hasRobotsTxt) gt.expectedData['robotsTxt'] = { match: 'truthy', note: 'robots.txt exists' };
+
+  // Sitemap
+  if (facts.hasSitemap) gt.expectedData['sitemap'] = { match: 'truthy', note: 'sitemap.xml exists' };
 
   return gt;
 }
@@ -194,12 +222,15 @@ function generateM17(facts: Record<string, unknown>): GroundTruthModule {
     fixedBugs: [],
   };
 
-  if (facts.hasCareersPage) {
-    gt.expectedData['careers_page_url'] = { match: 'truthy', note: 'Careers page found' };
-    gt.expectedCheckpoints.push({ id: 'm17-careers-page', expectedHealth: 'good', note: 'Careers page exists' });
-  } else {
-    gt.expectedData['careers_page_url'] = { match: 'falsy', note: 'No careers page' };
-    gt.expectedCheckpoints.push({ id: 'm17-careers-page', expectedHealth: 'info', note: 'No careers page' });
+  gt.expectedData['careers_page_url'] = { match: facts.hasCareersPage ? 'truthy' : 'falsy', note: facts.hasCareersPage ? 'Careers page found' : 'No careers page' };
+
+  if (facts.externalCareersUrl) {
+    gt.expectedData['external_careers_links'] = { match: 'truthy', note: `External: ${facts.externalCareersUrl}` };
+  }
+
+  const atsProviders = facts.atsProviders as string[] ?? [];
+  if (atsProviders.length > 0) {
+    gt.expectedData['ats_provider'] = { value: atsProviders[0], match: 'contains', note: `ATS: ${atsProviders.join(', ')}` };
   }
 
   return gt;
@@ -215,10 +246,10 @@ function generateM18(facts: Record<string, unknown>): GroundTruthModule {
     fixedBugs: [],
   };
 
-  if (facts.hasIrPage) {
-    gt.expectedCheckpoints.push({ id: 'm18-ir-portal', expectedHealth: 'good', note: 'IR page found' });
-  } else {
-    gt.expectedCheckpoints.push({ id: 'm18-ir-portal', expectedHealth: 'info', note: 'No IR page' });
+  if (facts.externalIrDomain) {
+    // Strip query params — tracking params change between captures
+    const irDomain = (facts.externalIrDomain as string).split('?')[0]!.replace(/\/$/, '');
+    gt.expectedData['external_ir_domain'] = { value: irDomain, match: 'contains', note: 'External IR subdomain' };
   }
 
   const ticker = facts.ticker as { exchange: string; symbol: string } | null;
@@ -240,9 +271,11 @@ function generateM19(facts: Record<string, unknown>): GroundTruthModule {
     fixedBugs: [],
   };
 
-  if (facts.hasSupportPage) {
-    gt.expectedData['support_page_url'] = { match: 'truthy', note: 'Support/contact page found' };
-  }
+  gt.expectedData['support_page_url'] = { match: facts.hasSupportPage ? 'truthy' : 'falsy', note: facts.hasSupportPage ? 'Support page found' : 'No support page' };
+
+  if (facts.hasPhone) gt.expectedData['support_channels'] = { match: 'truthy', note: 'Phone support detected' };
+  if (facts.hasChat) gt.expectedData['chatbot'] = { match: 'truthy', note: 'Live chat detected' };
+  if (facts.hasDeveloperDocs) gt.expectedData['developer_docs'] = { match: 'truthy', note: 'Developer docs found' };
 
   return gt;
 }

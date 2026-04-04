@@ -1,8 +1,8 @@
 {
   "site": "senzary.com",
-  "verifiedAt": "2026-04-03T23:28:05.400Z",
+  "verifiedAt": "2026-04-04T02:58:11.608Z",
   "generatedBy": "generate-ground-truth-json.ts (from browser-ground-truth.json)",
-  "notes": "Auto-generated from browser-verified facts captured on 2026-04-03T23:28:05.400Z",
+  "notes": "Auto-generated from browser-verified facts captured on 2026-04-04T02:58:11.608Z",
   "modules": {
     "M01": {
       "expectedData": {
@@ -12,27 +12,39 @@
         },
         "dmarc": {
           "match": "truthy",
-          "note": "DMARC record exists"
+          "note": "DMARC p=none"
+        },
+        "dmarcPolicy": {
+          "match": "truthy",
+          "note": "DMARC policy: none"
+        },
+        "dkim": {
+          "match": "falsy",
+          "note": "No DKIM found"
         },
         "hsts": {
           "match": "truthy",
-          "note": "HSTS header present"
+          "note": "HSTS present"
         },
         "csp": {
           "match": "truthy",
-          "note": "CSP header present"
+          "note": "CSP present"
+        },
+        "ipv6": {
+          "match": "falsy",
+          "note": "No IPv6"
         }
       },
       "expectedCheckpoints": [
         {
           "id": "m01-spf",
           "expectedHealth": "excellent",
-          "note": "SPF present"
+          "note": "SPF present with -all and 7 DNS lookups (limit 10): v=spf1 include:_spf.google.c"
         },
         {
           "id": "m01-dmarc",
           "expectedHealth": "warning",
-          "note": "DMARC p=none"
+          "note": "DMARC policy is none (monitoring only): v=DMARC1; p=none; rua=mailto:amazeus.net"
         },
         {
           "id": "m01-dkim",
@@ -87,7 +99,7 @@
         {
           "id": "m01-email",
           "expectedHealth": "excellent",
-          "note": "Email provider: IONOS (1&1) (MX: mx00.1and1.com, mx01.1and1.com, senzary-com.mai"
+          "note": "Email provider: IONOS (1&1) (MX: mx01.1and1.com, senzary-com.mail.protection.out"
         },
         {
           "id": "m01-caa",
@@ -138,6 +150,15 @@
         "detectedTechnologies": {
           "match": "truthy",
           "note": "Should detect technologies"
+        },
+        "cms.name": {
+          "value": "Site",
+          "match": "contains",
+          "note": "CMS: Site"
+        },
+        "trackingIds": {
+          "match": "truthy",
+          "note": "GTM: GTM-5RCS5ZZ"
         }
       },
       "expectedCheckpoints": [
@@ -194,19 +215,32 @@
       "expectedData": {
         "title": {
           "match": "truthy",
-          "note": "Page title exists"
+          "note": "Title: \"Home - SENZARY LLC\""
         },
         "metaDescription": {
           "match": "truthy",
-          "note": "Meta description exists"
+          "note": "Meta description present"
         },
         "htmlLang": {
-          "match": "truthy",
+          "value": "en-US",
+          "match": "contains",
           "note": "Lang: en-US"
         },
-        "jsonLd": {
+        "canonical": {
           "match": "truthy",
-          "note": "1 JSON-LD blocks"
+          "note": "Canonical URL set"
+        },
+        "ogTags": {
+          "match": "truthy",
+          "note": "7 OG tags"
+        },
+        "robotsTxt": {
+          "match": "truthy",
+          "note": "robots.txt exists"
+        },
+        "sitemap": {
+          "match": "truthy",
+          "note": "sitemap.xml exists"
         }
       },
       "expectedCheckpoints": [
@@ -248,7 +282,7 @@
         {
           "id": "M04-ROBOTS",
           "expectedHealth": "excellent",
-          "note": "robots.txt exists"
+          "note": "robots.txt present with 1 sitemap reference(s), 6 disallow rule(s), 1 user-agent"
         },
         {
           "id": "M04-SITEMAP",
@@ -293,7 +327,7 @@
         {
           "id": "M04-VIEWPORT",
           "expectedHealth": "excellent",
-          "note": "Viewport meta present"
+          "note": "Viewport configured: width=device-width, initial-scale=1"
         },
         {
           "id": "M04-CHARSET",
@@ -372,7 +406,7 @@
         {
           "id": "m17-careers-page",
           "expectedHealth": "info",
-          "note": "Careers page exists"
+          "note": "No dedicated careers page found"
         },
         {
           "id": "m17-ats-provider",
@@ -404,7 +438,7 @@
         {
           "id": "m18-ir-portal",
           "expectedHealth": "info",
-          "note": "No IR page"
+          "note": "No investor relations page found (may be a private company)"
         },
         {
           "id": "m18-financial-data",
@@ -439,7 +473,7 @@
       "expectedData": {
         "support_page_url": {
           "match": "truthy",
-          "note": "Support/contact page found"
+          "note": "Support page found"
         }
       },
       "expectedCheckpoints": [
@@ -483,5 +517,5 @@
       "fixedBugs": []
     }
   },
-  "calibratedAt": "2026-04-04T01:33:31.925Z"
+  "calibratedAt": "2026-04-04T03:25:05.536Z"
 }

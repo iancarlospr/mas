@@ -1,8 +1,8 @@
 {
   "site": "popular.com",
-  "verifiedAt": "2026-04-04T00:39:25.752Z",
+  "verifiedAt": "2026-04-04T02:57:47.878Z",
   "generatedBy": "generate-ground-truth-json.ts (from browser-ground-truth.json)",
-  "notes": "Auto-generated from browser-verified facts captured on 2026-04-04T00:39:25.752Z",
+  "notes": "Auto-generated from browser-verified facts captured on 2026-04-04T02:57:47.878Z",
   "modules": {
     "M01": {
       "expectedData": {
@@ -12,27 +12,44 @@
         },
         "dmarc": {
           "match": "truthy",
-          "note": "DMARC record exists"
+          "note": "DMARC p=reject"
+        },
+        "dmarcPolicy": {
+          "match": "truthy",
+          "note": "DMARC policy: reject"
+        },
+        "dkim": {
+          "match": "truthy",
+          "note": "DKIM selectors: selector1, selector2, s1"
+        },
+        "emailProvider.provider": {
+          "value": "Microsoft 365",
+          "match": "contains",
+          "note": "Email provider from MX"
         },
         "hsts": {
           "match": "truthy",
-          "note": "HSTS header present"
+          "note": "HSTS present"
         },
         "csp": {
           "match": "truthy",
-          "note": "CSP header present"
+          "note": "CSP present"
+        },
+        "ipv6": {
+          "match": "falsy",
+          "note": "No IPv6"
         }
       },
       "expectedCheckpoints": [
         {
           "id": "m01-spf",
           "expectedHealth": "excellent",
-          "note": "SPF present"
+          "note": "SPF present with -all and 2 DNS lookups (limit 10): v=spf1 include:%{d}.9d.spf-p"
         },
         {
           "id": "m01-dmarc",
           "expectedHealth": "excellent",
-          "note": "DMARC p=reject"
+          "note": "DMARC policy is reject with rua+ruf reporting: v=DMARC1; p=reject; fo=1; ri=3600"
         },
         {
           "id": "m01-dkim",
@@ -138,6 +155,10 @@
         "detectedTechnologies": {
           "match": "truthy",
           "note": "Should detect technologies"
+        },
+        "trackingIds": {
+          "match": "truthy",
+          "note": "GTM: GTM-WVX4MV"
         }
       },
       "expectedCheckpoints": [
@@ -194,15 +215,32 @@
       "expectedData": {
         "title": {
           "match": "truthy",
-          "note": "Page title exists"
+          "note": "Title: \"Banco Popular - Servicios financieros en Puerto Ri\""
         },
         "metaDescription": {
           "match": "truthy",
-          "note": "Meta description exists"
+          "note": "Meta description present"
         },
         "htmlLang": {
-          "match": "truthy",
+          "value": "es",
+          "match": "contains",
           "note": "Lang: es"
+        },
+        "canonical": {
+          "match": "truthy",
+          "note": "Canonical URL set"
+        },
+        "ogTags": {
+          "match": "truthy",
+          "note": "2 OG tags"
+        },
+        "robotsTxt": {
+          "match": "truthy",
+          "note": "robots.txt exists"
+        },
+        "sitemap": {
+          "match": "truthy",
+          "note": "sitemap.xml exists"
         }
       },
       "expectedCheckpoints": [
@@ -244,7 +282,7 @@
         {
           "id": "M04-ROBOTS",
           "expectedHealth": "excellent",
-          "note": "robots.txt exists"
+          "note": "robots.txt present with 1 sitemap reference(s), 0 disallow rule(s), 3 user-agent"
         },
         {
           "id": "M04-SITEMAP",
@@ -289,7 +327,7 @@
         {
           "id": "M04-VIEWPORT",
           "expectedHealth": "excellent",
-          "note": "Viewport meta present"
+          "note": "Viewport configured: width=device-width, initial-scale=1, maximum-scale=2.0, use"
         },
         {
           "id": "M04-CHARSET",
@@ -363,7 +401,7 @@
         {
           "id": "m17-careers-page",
           "expectedHealth": "excellent",
-          "note": "Careers page exists"
+          "note": "Dedicated careers page with 1 open position(s) at /empleos/vida"
         },
         {
           "id": "m17-ats-provider",
@@ -395,7 +433,7 @@
         {
           "id": "m18-ir-portal",
           "expectedHealth": "excellent",
-          "note": "IR page found"
+          "note": "Dedicated IR portal with filings at https://www.popular.com/en/investor-relation"
         },
         {
           "id": "m18-financial-data",
@@ -430,7 +468,11 @@
       "expectedData": {
         "support_page_url": {
           "match": "truthy",
-          "note": "Support/contact page found"
+          "note": "Support page found"
+        },
+        "support_channels": {
+          "match": "truthy",
+          "note": "Phone support detected"
         }
       },
       "expectedCheckpoints": [
@@ -474,5 +516,5 @@
       "fixedBugs": []
     }
   },
-  "calibratedAt": "2026-04-04T01:33:10.324Z"
+  "calibratedAt": "2026-04-04T03:24:38.635Z"
 }

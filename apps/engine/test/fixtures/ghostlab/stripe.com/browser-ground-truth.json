@@ -1,44 +1,89 @@
 {
   "site": "stripe.com",
-  "capturedAt": "2026-04-03T23:51:37.367Z",
+  "capturedAt": "2026-04-04T02:58:34.503Z",
   "capturedBy": "capture-ground-truth.ts (browser-verified)",
   "baseUrl": "https://stripe.com/",
   "modules": {
     "M01": {
       "spf": true,
       "spfRecord": "v=spf1 ip4:198.2.180.60/32 ip4:13.111.2.227/32 include:spf1.stripe.com include:greenhouse-outbound-mail.stripe.com include:_spf.qualtrics.com ~all",
+      "spfAllQualifier": "~all",
+      "spfIncludes": 3,
       "dmarc": true,
+      "dmarcRecord": "v=DMARC1; p=reject; pct=100; fo=1; rua=mailto:dmarc-reports@stripe.com; ruf=mailto:dmarc-forensics@stripe.com;",
       "dmarcPolicy": "reject",
+      "dmarcRua": true,
+      "dmarcRuf": true,
+      "dkim": true,
+      "dkimSelectors": [
+        "google",
+        "s1"
+      ],
       "hasMx": true,
       "mxCount": 5,
+      "emailProvider": "Google Workspace",
+      "nsProvider": "AWS Route53",
+      "hasCaa": true,
+      "hasIpv6": false,
       "hasHsts": true,
+      "hstsMaxAge": 63072000,
+      "hstsIncludeSubDomains": true,
+      "hstsPreload": true,
       "hasCsp": true,
+      "cspHasDefaultSrc": true,
+      "cspHasScriptSrc": true,
+      "cspReportOnly": false,
       "hasXfo": true,
+      "xfoValue": "SAMEORIGIN",
       "hasXcto": true,
       "hasReferrerPolicy": true,
+      "referrerPolicy": "no-referrer-when-downgrade",
       "hasPermissionsPolicy": false,
       "serverHeader": "nginx"
     },
     "M02": {
       "isWordPress": false,
-      "hasGeneratorMeta": false,
+      "isShopify": false,
+      "isDrupal": false,
+      "isSquarespace": false,
+      "isWebflow": false,
+      "isWix": false,
+      "isHubSpotCMS": false,
       "generator": null,
+      "cmsName": null,
       "serverHeader": "nginx",
-      "hasCfRay": false,
       "cdn": null,
-      "compression": "gzip"
+      "compression": "gzip",
+      "httpVersion": "HTTP/2",
+      "poweredBy": null,
+      "hasGA4": false,
+      "ga4Id": null,
+      "hasGTM": false,
+      "gtmId": null
     },
     "M04": {
       "title": "Stripe | Financial Infrastructure to Grow Your Revenue",
+      "titleLength": 54,
       "metaDescription": "Stripe is a financial services platform that helps all types of businesses accept payments, build flexible billing models, and manage money movement.",
+      "metaDescriptionLength": 149,
       "canonical": "https://stripe.com/",
       "htmlLang": "en-US",
       "viewport": "width=device-width, initial-scale=1, viewport-fit=cover",
       "charset": "utf-8",
       "ogTagCount": 5,
+      "hasOgTitle": true,
+      "hasOgDescription": true,
       "hasOgImage": true,
-      "jsonLdCount": 1,
+      "hasOgUrl": true,
+      "hasOgType": true,
+      "hasOgSiteName": false,
+      "twitterCard": "summary_large_image",
+      "jsonLdCount": 0,
+      "jsonLdTypes": [],
+      "hreflangCount": 87,
+      "faviconCount": 4,
       "hasRobotsTxt": true,
+      "robotsHasSitemap": true,
       "hasSitemap": false
     },
     "M16": {
@@ -105,18 +150,67 @@
           "text": "Jobs"
         }
       ],
-      "hasCareersPage": true
+      "hasCareersPage": true,
+      "externalCareersUrl": null,
+      "atsProviders": []
     },
     "M18": {
       "irLinksFound": 0,
+      "irLinks": [],
       "hasIrPage": false,
-      "ticker": null
+      "ticker": null,
+      "externalIrDomain": null
     },
     "M19": {
-      "supportLinksFound": 5,
+      "supportLinksFound": 8,
+      "supportLinks": [
+        {
+          "href": "/contact/sales",
+          "text": "Contact sales"
+        },
+        {
+          "href": "/contact/sales",
+          "text": "Contact sales"
+        },
+        {
+          "href": "/contact/sales",
+          "text": "Contact sales"
+        },
+        {
+          "href": "/support-plans",
+          "text": "View plans"
+        },
+        {
+          "href": "/customers/decagon",
+          "text": "Decagon decreases support costs by 65% with Stripe-integrate"
+        },
+        {
+          "href": "/startups#application",
+          "text": "Stripe Startups program.Access financial benefits, a focused"
+        },
+        {
+          "href": "https://docs.stripe.com/development",
+          "text": "View developer docs"
+        },
+        {
+          "href": "https://docs.stripe.com/no-code",
+          "text": "Explore no-code"
+        }
+      ],
       "hasSupportPage": true,
+      "phones": [],
       "hasPhone": false,
-      "emails": []
+      "emails": [],
+      "hasEmail": false,
+      "hasChat": false,
+      "statusPageUrl": "https://status.stripe.com",
+      "hasDeveloperDocs": true,
+      "supportSubdomains": [
+        "https://docs.stripe.com/development",
+        "https://docs.stripe.com/no-code",
+        "https://docs.stripe.com/development"
+      ],
+      "channelCount": 1
     }
   }
 }

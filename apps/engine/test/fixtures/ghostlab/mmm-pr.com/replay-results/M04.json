@@ -432,11 +432,11 @@
       "evidence": "Viewport allows user zoom (content: \"width=device-width, initial-scale=1\")"
     }
   ],
-  "duration": 76,
+  "duration": 87,
   "_replay": {
     "site": "mmm-pr.com",
     "moduleId": "M04",
-    "elapsed": 77,
-    "replayedAt": "2026-04-04T01:40:46.661Z"
+    "elapsed": 87,
+    "replayedAt": "2026-04-04T03:28:00.911Z"
   }
 }

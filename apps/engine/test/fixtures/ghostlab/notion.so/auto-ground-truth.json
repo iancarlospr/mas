@@ -1,8 +1,8 @@
 {
   "site": "notion.so",
-  "verifiedAt": "2026-04-03T23:52:13.675Z",
+  "verifiedAt": "2026-04-04T03:08:08.333Z",
   "generatedBy": "generate-ground-truth-json.ts (from browser-ground-truth.json)",
-  "notes": "Auto-generated from browser-verified facts captured on 2026-04-03T23:52:13.675Z",
+  "notes": "Auto-generated from browser-verified facts captured on 2026-04-04T03:08:08.333Z",
   "modules": {
     "M01": {
       "expectedData": {
@@ -12,27 +12,39 @@
         },
         "dmarc": {
           "match": "truthy",
-          "note": "DMARC record exists"
+          "note": "DMARC p=quarantine"
+        },
+        "dmarcPolicy": {
+          "match": "truthy",
+          "note": "DMARC policy: quarantine"
+        },
+        "dkim": {
+          "match": "falsy",
+          "note": "No DKIM found"
         },
         "hsts": {
           "match": "truthy",
-          "note": "HSTS header present"
+          "note": "HSTS present"
         },
         "csp": {
           "match": "truthy",
-          "note": "CSP header present"
+          "note": "CSP present"
+        },
+        "ipv6": {
+          "match": "truthy",
+          "note": "IPv6 AAAA record"
         }
       },
       "expectedCheckpoints": [
         {
           "id": "m01-spf",
           "expectedHealth": "good",
-          "note": "SPF present"
+          "note": "SPF present with ~all (soft-fail) and 1 DNS lookups: v=spf1 include:mktomail.com"
         },
         {
           "id": "m01-dmarc",
           "expectedHealth": "good",
-          "note": "DMARC p=quarantine"
+          "note": "DMARC record found (p=reject): v=DMARC1; p=reject"
         },
         {
           "id": "m01-dkim",
@@ -87,7 +99,7 @@
         {
           "id": "m01-email",
           "expectedHealth": "excellent",
-          "note": "Email provider: GoDaddy (MX: mailstore1.secureserver.net, smtp.secureserver.net)"
+          "note": "Email provider: GoDaddy (MX: smtp.secureserver.net, mailstore1.secureserver.net)"
         },
         {
           "id": "m01-caa",
@@ -138,6 +150,10 @@
         "detectedTechnologies": {
           "match": "truthy",
           "note": "Should detect technologies"
+        },
+        "trackingIds": {
+          "match": "falsy",
+          "note": "Calibrated: module returns []"
         }
       },
       "expectedCheckpoints": [
@@ -194,15 +210,36 @@
       "expectedData": {
         "title": {
           "match": "truthy",
-          "note": "Page title exists"
+          "note": "Title: \"The AI workspace that works for you. | Notion\""
         },
         "metaDescription": {
           "match": "truthy",
-          "note": "Meta description exists"
+          "note": "Meta description present"
         },
         "htmlLang": {
-          "match": "truthy",
+          "value": "en-us",
+          "match": "contains",
           "note": "Lang: en-us"
+        },
+        "canonical": {
+          "match": "truthy",
+          "note": "Canonical URL set"
+        },
+        "ogTags": {
+          "match": "truthy",
+          "note": "7 OG tags"
+        },
+        "hreflang": {
+          "match": "truthy",
+          "note": "16 hreflang tags"
+        },
+        "robotsTxt": {
+          "match": "truthy",
+          "note": "robots.txt exists"
+        },
+        "sitemap": {
+          "match": "truthy",
+          "note": "sitemap.xml exists"
         }
       },
       "expectedCheckpoints": [
@@ -244,7 +281,7 @@
         {
           "id": "M04-ROBOTS",
           "expectedHealth": "critical",
-          "note": "robots.txt exists"
+          "note": "No robots.txt found"
         },
         {
           "id": "M04-SITEMAP",
@@ -289,7 +326,7 @@
         {
           "id": "M04-VIEWPORT",
           "expectedHealth": "excellent",
-          "note": "Viewport meta present"
+          "note": "Viewport configured: width=device-width, initial-scale=1"
         },
         {
           "id": "M04-CHARSET",
@@ -363,7 +400,7 @@
         {
           "id": "m17-careers-page",
           "expectedHealth": "info",
-          "note": "Careers page exists"
+          "note": "No dedicated careers page found"
         },
         {
           "id": "m17-ats-provider",
@@ -395,7 +432,7 @@
         {
           "id": "m18-ir-portal",
           "expectedHealth": "info",
-          "note": "No IR page"
+          "note": "No investor relations page found (may be a private company)"
         },
         {
           "id": "m18-financial-data",
@@ -431,6 +468,10 @@
         "support_page_url": {
           "match": "falsy",
           "note": "Calibrated: module returns null"
+        },
+        "developer_docs": {
+          "match": "truthy",
+          "note": "Developer docs found"
         }
       },
       "expectedCheckpoints": [
@@ -474,5 +515,5 @@
       "fixedBugs": []
     }
   },
-  "calibratedAt": "2026-04-04T01:33:03.818Z"
+  "calibratedAt": "2026-04-04T03:24:29.835Z"
 }

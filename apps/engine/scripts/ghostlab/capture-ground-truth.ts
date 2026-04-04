@@ -14,7 +14,7 @@
  */
 
 import { chromium, type Browser, type Page } from 'patchright';
-import { writeFileSync, mkdirSync, readFileSync, existsSync } from 'node:fs';
+import { writeFileSync, mkdirSync, readFileSync, existsSync, readdirSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Resolver } from 'node:dns/promises';
@@ -23,7 +23,10 @@ import { fetchWithRetry } from '../../src/utils/http.js';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FIXTURES_DIR = resolve(__dirname, '../../test/fixtures/ghostlab');
 
-const KNOWN_SITES = ['senzary.com', 'ryder.com', 'investpr.org', 'mmm-pr.com', 'foundationforpuertorico.org'];
+// Auto-discover sites from fixtures directory
+const KNOWN_SITES = readdirSync(FIXTURES_DIR, { withFileTypes: true })
+  .filter(d => d.isDirectory())
+  .map(d => d.name);
 
 // ── Args ──────────────────────────────────────────────────────────────────────
 
@@ -48,52 +51,125 @@ async function verifyM01(domain: string): Promise<Record<string, unknown>> {
 
   const facts: Record<string, unknown> = {};
 
-  // SPF
+  // SPF — full record + qualifier analysis
   try {
     const txt = await resolver.resolveTxt(domain);
     const spf = txt.flat().find(r => r.startsWith('v=spf1'));
-    facts.spf = spf ? true : false;
+    facts.spf = !!spf;
     facts.spfRecord = spf ?? null;
+    if (spf) {
+      facts.spfAllQualifier = spf.match(/[-~?+]all/)?.[0] ?? null;
+      facts.spfIncludes = (spf.match(/include:/g) || []).length;
+    }
   } catch { facts.spf = false; }
 
-  // DMARC
+  // DMARC — policy + reporting
   try {
     const dmarc = await resolver.resolveTxt(`_dmarc.${domain}`);
     const dmarcRecord = dmarc.flat().find(r => r.startsWith('v=DMARC1'));
     facts.dmarc = !!dmarcRecord;
+    facts.dmarcRecord = dmarcRecord ?? null;
     if (dmarcRecord) {
-      const policyMatch = dmarcRecord.match(/p=(\w+)/);
-      facts.dmarcPolicy = policyMatch?.[1] ?? null;
+      facts.dmarcPolicy = dmarcRecord.match(/;\s*p=(\w+)/)?.[1] ?? null;
+      facts.dmarcRua = !!dmarcRecord.match(/rua=/);
+      facts.dmarcRuf = !!dmarcRecord.match(/ruf=/);
     }
   } catch { facts.dmarc = false; }
+
+  // DKIM — probe common selectors
+  const dkimSelectors = ['google', 'selector1', 'selector2', 'default', 'dkim', 'k1', 's1'];
+  const dkimFound: string[] = [];
+  for (const sel of dkimSelectors) {
+    try {
+      const records = await resolver.resolveTxt(`${sel}._domainkey.${domain}`);
+      const full = records.flat().join('');
+      if (full.includes('v=DKIM1') || full.includes('p=')) {
+        dkimFound.push(sel);
+      }
+    } catch { /* expected */ }
+  }
+  facts.dkim = dkimFound.length > 0;
+  facts.dkimSelectors = dkimFound;
 
   // MX
   try {
     const mx = await resolver.resolveMx(domain);
     facts.hasMx = mx.length > 0;
     facts.mxCount = mx.length;
+    if (mx.length > 0) {
+      const topMx = mx.sort((a, b) => a.priority - b.priority)[0]!.exchange.toLowerCase();
+      facts.emailProvider = topMx.includes('google') ? 'Google Workspace'
+        : topMx.includes('outlook') || topMx.includes('microsoft') ? 'Microsoft 365'
+        : topMx.includes('zoho') ? 'Zoho'
+        : topMx.includes('protonmail') ? 'ProtonMail'
+        : topMx.includes('pphosted') || topMx.includes('proofpoint') ? 'Proofpoint'
+        : topMx.includes('mimecast') ? 'Mimecast'
+        : topMx.includes('barracuda') ? 'Barracuda'
+        : topMx.includes('postmarkapp') ? 'Postmark'
+        : topMx.includes('sendgrid') ? 'SendGrid'
+        : topMx.includes('mailgun') ? 'Mailgun'
+        : topMx.includes('amazonaws') || topMx.includes('aws') ? 'AWS SES'
+        : null; // null = let module decide, don't assert a specific value
+    }
   } catch { facts.hasMx = false; }
 
-  // Headers (via HTTP)
+  // NS
+  try {
+    const ns = await resolver.resolveNs(domain);
+    facts.nsProvider = ns[0]?.toLowerCase().includes('cloudflare') ? 'Cloudflare'
+      : ns[0]?.toLowerCase().includes('awsdns') ? 'AWS Route53'
+      : ns[0]?.toLowerCase().includes('google') ? 'Google Cloud DNS'
+      : ns[0]?.toLowerCase().includes('azure') ? 'Azure DNS'
+      : ns[0] ?? null;
+  } catch { facts.nsProvider = null; }
+
+  // CAA
+  try {
+    const caa = await resolver.resolveCaa(domain);
+    facts.hasCaa = caa.length > 0;
+  } catch { facts.hasCaa = false; }
+
+  // IPv6
+  try {
+    const aaaa = await resolver.resolve6(domain);
+    facts.hasIpv6 = aaaa.length > 0;
+  } catch { facts.hasIpv6 = false; }
+
+  // HTTP Security Headers — full extraction
+  let headers: Record<string, string> = {};
   try {
     const result = await fetchWithRetry(`https://www.${domain}`, { timeout: 10_000, retries: 1 });
-    const h = result.headers;
-    facts.hasHsts = !!h['strict-transport-security'];
-    facts.hasCsp = !!h['content-security-policy'];
-    facts.hasXfo = !!h['x-frame-options'];
-    facts.hasXcto = !!h['x-content-type-options'];
-    facts.hasReferrerPolicy = !!h['referrer-policy'];
-    facts.hasPermissionsPolicy = !!h['permissions-policy'];
-    facts.serverHeader = h['server'] ?? null;
+    headers = result.headers;
   } catch {
     try {
       const result = await fetchWithRetry(`https://${domain}`, { timeout: 10_000, retries: 1 });
-      const h = result.headers;
-      facts.hasHsts = !!h['strict-transport-security'];
-      facts.hasCsp = !!h['content-security-policy'];
-      facts.serverHeader = h['server'] ?? null;
+      headers = result.headers;
     } catch { /* skip */ }
   }
+
+  const hsts = headers['strict-transport-security'] ?? '';
+  facts.hasHsts = !!hsts;
+  if (hsts) {
+    facts.hstsMaxAge = parseInt(hsts.match(/max-age=(\d+)/)?.[1] ?? '0', 10);
+    facts.hstsIncludeSubDomains = hsts.includes('includeSubDomains');
+    facts.hstsPreload = hsts.includes('preload');
+  }
+
+  const csp = headers['content-security-policy'] ?? '';
+  facts.hasCsp = !!csp;
+  if (csp) {
+    facts.cspHasDefaultSrc = csp.includes('default-src');
+    facts.cspHasScriptSrc = csp.includes('script-src');
+    facts.cspReportOnly = !!headers['content-security-policy-report-only'];
+  }
+
+  facts.hasXfo = !!headers['x-frame-options'];
+  facts.xfoValue = headers['x-frame-options'] ?? null;
+  facts.hasXcto = !!(headers['x-content-type-options']);
+  facts.hasReferrerPolicy = !!headers['referrer-policy'];
+  facts.referrerPolicy = headers['referrer-policy'] ?? null;
+  facts.hasPermissionsPolicy = !!headers['permissions-policy'];
+  facts.serverHeader = headers['server'] ?? null;
 
   return facts;
 }
@@ -105,31 +181,50 @@ async function verifyM02(page: Page, url: string): Promise<Record<string, unknow
   const facts: Record<string, unknown> = {};
 
   const html = await page.content();
-  const headers = await page.evaluate(() => {
-    // Get response headers from performance API
-    const entries = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
-    return entries[0]?.serverTiming?.map(t => t.name) ?? [];
-  });
 
-  // CMS detection from HTML
+  // CMS detection from HTML patterns
   facts.isWordPress = html.includes('wp-content') || html.includes('wp-includes');
-  facts.hasGeneratorMeta = !!html.match(/<meta[^>]*name="generator"[^>]*content="([^"]+)"/i);
+  facts.isShopify = html.includes('cdn.shopify.com') || html.includes('shopify.com');
+  facts.isDrupal = html.includes('drupal.js') || html.includes('/sites/default/');
+  facts.isSquarespace = html.includes('squarespace.com') || html.includes('static.squarespace.com');
+  facts.isWebflow = html.includes('webflow.com') || html.includes('wf-cdn');
+  facts.isWix = html.includes('wix.com') || html.includes('parastorage.com');
+  facts.isHubSpotCMS = html.includes('hubspot.com/hub') || html.includes('hs-sites.com');
+
   const generatorMatch = html.match(/<meta[^>]*name="generator"[^>]*content="([^"]+)"/i);
   facts.generator = generatorMatch?.[1] ?? null;
+  facts.cmsName = facts.generator?.toString().split(' ')[0]
+    ?? (facts.isWordPress ? 'WordPress' : facts.isShopify ? 'Shopify'
+    : facts.isDrupal ? 'Drupal' : facts.isSquarespace ? 'Squarespace'
+    : facts.isWebflow ? 'Webflow' : facts.isWix ? 'Wix'
+    : facts.isHubSpotCMS ? 'HubSpot CMS' : null);
 
-  // CDN detection from response headers
+  // CDN + server detection from response headers
   const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 15000 }).catch(() => null);
   if (response) {
-    const respHeaders = await response.allHeaders();
-    facts.serverHeader = respHeaders['server'] ?? null;
-    facts.hasCfRay = !!respHeaders['cf-ray'];
-    facts.cdn = respHeaders['cf-ray'] ? 'Cloudflare'
-      : respHeaders['x-amz-cf-id'] ? 'CloudFront'
-      : respHeaders['x-sucuri-id'] ? 'Sucuri'
-      : respHeaders['via']?.includes('varnish') ? 'Varnish'
+    const h = await response.allHeaders();
+    facts.serverHeader = h['server'] ?? null;
+    facts.cdn = h['cf-ray'] ? 'Cloudflare'
+      : h['x-amz-cf-id'] ? 'CloudFront'
+      : h['x-sucuri-id'] ? 'Sucuri'
+      : h['x-fastly-request-id'] ? 'Fastly'
+      : h['x-vercel-id'] ? 'Vercel'
+      : h['x-netlify-request-id'] ? 'Netlify'
+      : h['via']?.includes('varnish') ? 'Varnish'
+      : h['via']?.includes('cloudfront') ? 'CloudFront'
       : null;
-    facts.compression = respHeaders['content-encoding'] ?? null;
+    facts.compression = h['content-encoding'] ?? null;
+    facts.httpVersion = response.request().url().startsWith('https') ? (h['alt-svc']?.includes('h3') ? 'HTTP/3' : 'HTTP/2') : null;
+    facts.poweredBy = h['x-powered-by'] ?? null;
   }
+
+  // Tracking IDs from HTML
+  const ga4Match = html.match(/G-[A-Z0-9]{6,}/);
+  const gtmMatch = html.match(/GTM-[A-Z0-9]+/);
+  facts.hasGA4 = !!ga4Match;
+  facts.ga4Id = ga4Match?.[0] ?? null;
+  facts.hasGTM = !!gtmMatch;
+  facts.gtmId = gtmMatch?.[0] ?? null;
 
   return facts;
 }
@@ -141,34 +236,75 @@ async function verifyM04(page: Page, domain: string): Promise<Record<string, unk
   const facts: Record<string, unknown> = {};
 
   facts.title = await page.title();
+  facts.titleLength = (facts.title as string)?.length ?? 0;
   facts.metaDescription = await page.$eval('meta[name="description"]', el => el.getAttribute('content')).catch(() => null);
+  facts.metaDescriptionLength = (facts.metaDescription as string)?.length ?? 0;
   facts.canonical = await page.$eval('link[rel="canonical"]', el => el.getAttribute('href')).catch(() => null);
   facts.htmlLang = await page.$eval('html', el => el.getAttribute('lang')).catch(() => null);
   facts.viewport = await page.$eval('meta[name="viewport"]', el => el.getAttribute('content')).catch(() => null);
   facts.charset = await page.$eval('meta[charset]', el => el.getAttribute('charset')).catch(() => null);
 
-  // OG tags
+  // OG tags — detailed
   const ogTags = await page.$$eval('meta[property^="og:"]', els =>
     els.map(el => ({ property: el.getAttribute('property'), content: el.getAttribute('content')?.substring(0, 100) }))
   ).catch(() => []);
   facts.ogTagCount = ogTags.length;
+  facts.hasOgTitle = ogTags.some(t => t.property === 'og:title');
+  facts.hasOgDescription = ogTags.some(t => t.property === 'og:description');
   facts.hasOgImage = ogTags.some(t => t.property === 'og:image');
+  facts.hasOgUrl = ogTags.some(t => t.property === 'og:url');
+  facts.hasOgType = ogTags.some(t => t.property === 'og:type');
+  facts.hasOgSiteName = ogTags.some(t => t.property === 'og:site_name');
 
-  // JSON-LD
-  const jsonLdCount = await page.$$eval('script[type="application/ld+json"]', els => els.length).catch(() => 0);
-  facts.jsonLdCount = jsonLdCount;
+  // Twitter card
+  const twitterCard = await page.$eval('meta[name="twitter:card"]', el => el.getAttribute('content')).catch(() => null);
+  facts.twitterCard = twitterCard;
+
+  // JSON-LD types
+  const jsonLdTypes = await page.$$eval('script[type="application/ld+json"]', els => {
+    const types: string[] = [];
+    els.forEach(el => {
+      try {
+        const data = JSON.parse(el.textContent ?? '');
+        const extract = (obj: any) => {
+          if (obj['@type']) types.push(String(obj['@type']));
+          if (Array.isArray(obj['@graph'])) obj['@graph'].forEach(extract);
+        };
+        if (Array.isArray(data)) data.forEach(extract); else extract(data);
+      } catch { /* skip */ }
+    });
+    return types;
+  }).catch(() => []);
+  facts.jsonLdCount = jsonLdTypes.length > 0 ? 1 : 0; // at least one block
+  facts.jsonLdTypes = jsonLdTypes;
+
+  // Hreflang
+  const hreflangCount = await page.$$eval('link[rel="alternate"][hreflang]', els => els.length).catch(() => 0);
+  facts.hreflangCount = hreflangCount;
+
+  // Favicon
+  const faviconCount = await page.$$eval('link[rel*="icon"]', els => els.length).catch(() => 0);
+  facts.faviconCount = faviconCount;
 
   // robots.txt
   try {
     const robots = await fetchWithRetry(`https://www.${domain}/robots.txt`, { timeout: 5000, retries: 0 });
     facts.hasRobotsTxt = robots.ok && !robots.body.trimStart().startsWith('<');
+    if (facts.hasRobotsTxt) {
+      facts.robotsHasSitemap = robots.body.toLowerCase().includes('sitemap:');
+    }
   } catch { facts.hasRobotsTxt = false; }
 
   // sitemap
   try {
     const sitemap = await fetchWithRetry(`https://www.${domain}/sitemap.xml`, { timeout: 5000, retries: 0 });
-    facts.hasSitemap = sitemap.ok && sitemap.body.includes('<urlset');
-  } catch { facts.hasSitemap = false; }
+    facts.hasSitemap = sitemap.ok && (sitemap.body.includes('<urlset') || sitemap.body.includes('<sitemapindex'));
+  } catch {
+    try {
+      const sitemap = await fetchWithRetry(`https://${domain}/sitemap.xml`, { timeout: 5000, retries: 0 });
+      facts.hasSitemap = sitemap.ok && (sitemap.body.includes('<urlset') || sitemap.body.includes('<sitemapindex'));
+    } catch { facts.hasSitemap = false; }
+  }
 
   return facts;
 }
@@ -420,7 +556,7 @@ async function verifyM17(page: Page, browser: Browser, domain: string): Promise<
         const href = el.getAttribute('href') ?? '';
         const text = el.textContent?.trim() ?? '';
         return (keywords.test(href) || keywords.test(text)) &&
-          !href.includes('facebook') && !href.includes('linkedin');
+          !href.includes('facebook') && !href.includes('linkedin') && !href.includes('instagram');
       })
       .map(el => ({ href: el.getAttribute('href') ?? '', text: el.textContent?.trim().substring(0, 60) ?? '' }))
       .slice(0, 5);
@@ -429,6 +565,28 @@ async function verifyM17(page: Page, browser: Browser, domain: string): Promise<
   facts.careersLinksFound = careersLinks.length;
   facts.careersLinks = careersLinks;
   facts.hasCareersPage = careersLinks.length > 0;
+
+  // Check for external careers subdomain
+  const externalCareers = careersLinks.find(l =>
+    /^https?:\/\/(careers|jobs)\./i.test(l.href) && l.href.includes(domain.replace(/^www\./, '')),
+  );
+  facts.externalCareersUrl = externalCareers?.href ?? null;
+
+  // Check for known ATS providers in page HTML
+  const atsPatterns = await page.evaluate(() => {
+    const html = document.documentElement.innerHTML;
+    const found: string[] = [];
+    if (/greenhouse\.io|boards\.greenhouse/i.test(html)) found.push('Greenhouse');
+    if (/lever\.co|jobs\.lever/i.test(html)) found.push('Lever');
+    if (/workday\.com|myworkdayjobs/i.test(html)) found.push('Workday');
+    if (/icims\.com/i.test(html)) found.push('iCIMS');
+    if (/smartrecruiters\.com/i.test(html)) found.push('SmartRecruiters');
+    if (/ashbyhq\.com/i.test(html)) found.push('Ashby');
+    if (/bamboohr\.com/i.test(html)) found.push('BambooHR');
+    if (/jobvite\.com/i.test(html)) found.push('Jobvite');
+    return found;
+  });
+  facts.atsProviders = atsPatterns;
 
   return facts;
 }
@@ -439,29 +597,38 @@ async function verifyM18(page: Page, domain: string): Promise<Record<string, unk
   console.log('  M18: Investor Relations...');
   const facts: Record<string, unknown> = {};
 
-  const irLinks = await page.$$eval('a[href]', (els) => {
-    const keywords = /\b(investor|shareholder|ir\b|inversionista|accionista)\b/i;
-    return els
+  const irData = await page.evaluate((domain) => {
+    const keywords = /\b(investor|shareholder|ir\b|inversionista|accionista|annual.report|sec.filing)\b/i;
+    const irLinks = Array.from(document.querySelectorAll('a[href]'))
       .filter(el => {
         const href = el.getAttribute('href') ?? '';
         const text = el.textContent?.trim() ?? '';
-        return keywords.test(href) || keywords.test(text);
+        return (keywords.test(href) || keywords.test(text)) &&
+          !href.includes('facebook') && !href.includes('linkedin');
       })
       .map(el => ({ href: el.getAttribute('href') ?? '', text: el.textContent?.trim().substring(0, 60) ?? '' }))
       .slice(0, 5);
-  });
 
-  facts.irLinksFound = irLinks.length;
-  facts.hasIrPage = irLinks.length > 0;
-
-  // Check for ticker symbol in page text
-  const ticker = await page.evaluate(() => {
+    // Ticker symbol
     const text = document.body.innerText;
-    const match = text.match(/\b(NYSE|NASDAQ|TSX|LSE)\s*:\s*([A-Z]{1,5})\b/);
-    return match ? { exchange: match[1], symbol: match[2] } : null;
-  });
-  facts.ticker = ticker;
+    const tickerMatch = text.match(/\b(NYSE|NASDAQ|TSX|LSE)\s*:\s*([A-Z]{1,5})\b/);
 
+    // External IR subdomain
+    const extIr = Array.from(document.querySelectorAll('a[href]')).find(a => {
+      const href = a.getAttribute('href') ?? '';
+      return /^https?:\/\/(ir|investors?)\./i.test(href) && href.includes(domain.replace(/^www\./, ''));
+    });
+
+    return {
+      irLinksFound: irLinks.length,
+      irLinks,
+      hasIrPage: irLinks.length > 0,
+      ticker: tickerMatch ? { exchange: tickerMatch[1], symbol: tickerMatch[2] } : null,
+      externalIrDomain: extIr?.getAttribute('href') ?? null,
+    };
+  }, domain);
+
+  Object.assign(facts, irData);
   return facts;
 }
 
@@ -471,31 +638,71 @@ async function verifyM19(page: Page, domain: string): Promise<Record<string, unk
   console.log('  M19: Support & Success...');
   const facts: Record<string, unknown> = {};
 
-  const supportLinks = await page.$$eval('a[href]', (els) => {
-    const keywords = /\b(support|help|faq|contact|soporte|ayuda|contacto|preguntas)\b/i;
-    return els
+  const supportData = await page.evaluate((domain) => {
+    const keywords = /\b(support|help|faq|contact|soporte|ayuda|contacto|preguntas|knowledge.base|docs|documentation)\b/i;
+    const supportLinks = Array.from(document.querySelectorAll('a[href]'))
       .filter(el => {
         const href = el.getAttribute('href') ?? '';
         const text = el.textContent?.trim() ?? '';
-        return keywords.test(href) || keywords.test(text);
+        return (keywords.test(href) || keywords.test(text)) &&
+          !href.includes('facebook') && !href.includes('linkedin');
       })
       .map(el => ({ href: el.getAttribute('href') ?? '', text: el.textContent?.trim().substring(0, 60) ?? '' }))
-      .slice(0, 5);
-  });
+      .slice(0, 8);
 
-  facts.supportLinksFound = supportLinks.length;
-  facts.hasSupportPage = supportLinks.length > 0;
+    // Phone
+    const phoneLinks = document.querySelectorAll('a[href^="tel:"]');
+    const phones = Array.from(phoneLinks).map(el => el.getAttribute('href')?.replace('tel:', '') ?? '').slice(0, 3);
 
-  // Check for phone number (tel: links)
-  const phoneLinks = await page.$$eval('a[href^="tel:"]', els => els.length);
-  facts.hasPhone = phoneLinks > 0;
+    // Email
+    const emailLinks = document.querySelectorAll('a[href^="mailto:"]');
+    const emails = Array.from(emailLinks).map(el => el.getAttribute('href')?.replace('mailto:', '') ?? '').slice(0, 3);
 
-  // Check for email
-  const emailLinks = await page.$$eval('a[href^="mailto:"]', els =>
-    els.map(el => el.getAttribute('href')?.replace('mailto:', '') ?? '').slice(0, 3)
-  );
-  facts.emails = emailLinks;
+    // Live chat
+    const hasChat = !!(
+      document.querySelector('[class*="chat"], [id*="chat"], [class*="intercom"], [class*="drift"], [class*="crisp"], [class*="zendesk"]') ||
+      document.querySelector('iframe[src*="intercom"], iframe[src*="drift"], iframe[src*="crisp"], iframe[src*="zendesk"], iframe[src*="hubspot"]')
+    );
 
+    // Status page
+    const statusLink = Array.from(document.querySelectorAll('a[href]')).find(a => {
+      const href = a.getAttribute('href') ?? '';
+      return /status\.|statuspage\.|instatus\.|betteruptime/i.test(href);
+    });
+
+    // Developer docs
+    const docsLink = Array.from(document.querySelectorAll('a[href]')).find(a => {
+      const href = a.getAttribute('href') ?? '';
+      const text = a.textContent ?? '';
+      return /\b(docs|documentation|api|developer)\b/i.test(href) || /\b(documentation|api reference|developer)\b/i.test(text);
+    });
+
+    // Support subdomains
+    const supportSubdomains = Array.from(document.querySelectorAll('a[href]'))
+      .filter(a => {
+        const href = a.getAttribute('href') ?? '';
+        return /^https?:\/\/(support|help|docs|kb|knowledge|community)\./i.test(href) && href.includes(domain.replace(/^www\./, ''));
+      })
+      .map(a => a.getAttribute('href')!)
+      .slice(0, 3);
+
+    return {
+      supportLinksFound: supportLinks.length,
+      supportLinks,
+      hasSupportPage: supportLinks.length > 0,
+      phones,
+      hasPhone: phones.length > 0,
+      emails,
+      hasEmail: emails.length > 0,
+      hasChat,
+      statusPageUrl: statusLink?.getAttribute('href') ?? null,
+      hasDeveloperDocs: !!docsLink,
+      supportSubdomains,
+      channelCount: (phones.length > 0 ? 1 : 0) + (emails.length > 0 ? 1 : 0) + (hasChat ? 1 : 0) + (supportLinks.length > 0 ? 1 : 0),
+    };
+  }, domain);
+
+  Object.assign(facts, supportData);
   return facts;
 }
 

@@ -1,44 +1,85 @@
 {
   "site": "shopify.com",
-  "capturedAt": "2026-04-03T23:51:25.980Z",
+  "capturedAt": "2026-04-04T02:58:18.482Z",
   "capturedBy": "capture-ground-truth.ts (browser-verified)",
   "baseUrl": "https://www.shopify.com/",
   "modules": {
     "M01": {
       "spf": true,
       "spfRecord": "v=spf1 include:_spf.google.com include:mail.zendesk.com include:sendgrid.net ~all",
+      "spfAllQualifier": "~all",
+      "spfIncludes": 3,
       "dmarc": true,
+      "dmarcRecord": "v=DMARC1; p=reject; pct=100; fo=1; rua=mailto:dmarc-aggregate@shopify.com;ruf=mailto:dmarc-reports@shopify.com",
       "dmarcPolicy": "reject",
+      "dmarcRua": true,
+      "dmarcRuf": true,
+      "dkim": true,
+      "dkimSelectors": [
+        "google"
+      ],
       "hasMx": true,
       "mxCount": 5,
+      "emailProvider": "Google Workspace",
+      "nsProvider": "gold.foundationdns.com",
+      "hasCaa": false,
+      "hasIpv6": false,
       "hasHsts": true,
+      "hstsMaxAge": 15552000,
+      "hstsIncludeSubDomains": true,
+      "hstsPreload": true,
       "hasCsp": false,
       "hasXfo": false,
+      "xfoValue": null,
       "hasXcto": true,
       "hasReferrerPolicy": false,
+      "referrerPolicy": null,
       "hasPermissionsPolicy": false,
       "serverHeader": "cloudflare"
     },
     "M02": {
       "isWordPress": false,
-      "hasGeneratorMeta": false,
+      "isShopify": true,
+      "isDrupal": false,
+      "isSquarespace": false,
+      "isWebflow": false,
+      "isWix": false,
+      "isHubSpotCMS": false,
       "generator": null,
+      "cmsName": "Shopify",
       "serverHeader": "cloudflare",
-      "hasCfRay": true,
       "cdn": "Cloudflare",
-      "compression": "br"
+      "compression": "br",
+      "httpVersion": "HTTP/3",
+      "poweredBy": null,
+      "hasGA4": true,
+      "ga4Id": "G-W6NECZNE63",
+      "hasGTM": true,
+      "gtmId": "GTM-TZ26LP8"
     },
     "M04": {
       "title": "Shopify: The All-in-One Commerce Platform for Businesses - Shopify",
+      "titleLength": 66,
       "metaDescription": "Try Shopify free and start a business or grow an existing one. Get more than ecommerce software with tools to manage every part of your business.",
+      "metaDescriptionLength": 145,
       "canonical": "https://www.shopify.com/",
       "htmlLang": "en",
       "viewport": "width=device-width,initial-scale=1",
       "charset": "utf-8",
       "ogTagCount": 6,
+      "hasOgTitle": true,
+      "hasOgDescription": true,
       "hasOgImage": true,
-      "jsonLdCount": 1,
+      "hasOgUrl": true,
+      "hasOgType": true,
+      "hasOgSiteName": true,
+      "twitterCard": null,
+      "jsonLdCount": 0,
+      "jsonLdTypes": [],
+      "hreflangCount": 65,
+      "faviconCount": 6,
       "hasRobotsTxt": true,
+      "robotsHasSitemap": true,
       "hasSitemap": true
     },
     "M16": {
@@ -85,18 +126,50 @@
           "text": "Careers"
         }
       ],
-      "hasCareersPage": true
+      "hasCareersPage": true,
+      "externalCareersUrl": null,
+      "atsProviders": []
     },
     "M18": {
       "irLinksFound": 0,
+      "irLinks": [],
       "hasIrPage": false,
-      "ticker": null
+      "ticker": null,
+      "externalIrDomain": null
     },
     "M19": {
-      "supportLinksFound": 2,
+      "supportLinksFound": 4,
+      "supportLinks": [
+        {
+          "href": "https://shopify.dev",
+          "text": "Shopify.devDev docs, CLI, and more"
+        },
+        {
+          "href": "/editions/winter2026#build-with-full-mcp-support",
+          "text": "Full dev MCP support"
+        },
+        {
+          "href": "https://shopify.dev/docs",
+          "text": "Developer Docs"
+        },
+        {
+          "href": "https://help.shopify.com/en",
+          "text": "Shopify Help Center"
+        }
+      ],
       "hasSupportPage": true,
+      "phones": [],
       "hasPhone": false,
-      "emails": []
+      "emails": [],
+      "hasEmail": false,
+      "hasChat": true,
+      "statusPageUrl": "https://shopifystatus.com",
+      "hasDeveloperDocs": true,
+      "supportSubdomains": [
+        "https://help.shopify.com/en",
+        "https://community.shopify.com/"
+      ],
+      "channelCount": 2
     }
   }
 }

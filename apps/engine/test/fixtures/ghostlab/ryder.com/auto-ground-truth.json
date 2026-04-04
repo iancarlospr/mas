@@ -1,8 +1,8 @@
 {
   "site": "ryder.com",
-  "verifiedAt": "2026-04-03T23:28:18.966Z",
+  "verifiedAt": "2026-04-04T02:57:57.251Z",
   "generatedBy": "generate-ground-truth-json.ts (from browser-ground-truth.json)",
-  "notes": "Auto-generated from browser-verified facts captured on 2026-04-03T23:28:18.966Z",
+  "notes": "Auto-generated from browser-verified facts captured on 2026-04-04T02:57:57.251Z",
   "modules": {
     "M01": {
       "expectedData": {
@@ -12,23 +12,44 @@
         },
         "dmarc": {
           "match": "truthy",
-          "note": "DMARC record exists"
+          "note": "DMARC p=quarantine"
+        },
+        "dmarcPolicy": {
+          "match": "truthy",
+          "note": "DMARC policy: quarantine"
+        },
+        "dkim": {
+          "match": "truthy",
+          "note": "DKIM selectors: selector1"
+        },
+        "emailProvider.provider": {
+          "value": "Microsoft 365",
+          "match": "contains",
+          "note": "Email provider from MX"
         },
         "hsts": {
           "match": "truthy",
-          "note": "HSTS header present"
+          "note": "HSTS present"
+        },
+        "csp": {
+          "match": "falsy",
+          "note": "No CSP"
+        },
+        "ipv6": {
+          "match": "falsy",
+          "note": "No IPv6"
         }
       },
       "expectedCheckpoints": [
         {
           "id": "m01-spf",
           "expectedHealth": "good",
-          "note": "SPF present"
+          "note": "SPF present with ~all (soft-fail) and 2 DNS lookups: v=spf1 include:_spf-ssg-a.m"
         },
         {
           "id": "m01-dmarc",
           "expectedHealth": "good",
-          "note": "DMARC p=quarantine"
+          "note": "DMARC policy is quarantine with rua reporting: v=DMARC1; p=quarantine; rua=mailt"
         },
         {
           "id": "m01-dkim",
@@ -134,6 +155,10 @@
         "detectedTechnologies": {
           "match": "truthy",
           "note": "Should detect technologies"
+        },
+        "trackingIds": {
+          "match": "truthy",
+          "note": "GTM: GTM-5ZK5QJX"
         }
       },
       "expectedCheckpoints": [
@@ -190,19 +215,32 @@
       "expectedData": {
         "title": {
           "match": "truthy",
-          "note": "Page title exists"
+          "note": "Title: \"Ryder | Logistics, Truck Leasing, Truck Rental, Us\""
         },
         "metaDescription": {
           "match": "truthy",
-          "note": "Meta description exists"
+          "note": "Meta description present"
         },
         "htmlLang": {
-          "match": "truthy",
+          "value": "en-US",
+          "match": "contains",
           "note": "Lang: en-US"
         },
-        "jsonLd": {
+        "canonical": {
           "match": "truthy",
-          "note": "3 JSON-LD blocks"
+          "note": "Canonical URL set"
+        },
+        "ogTags": {
+          "match": "truthy",
+          "note": "7 OG tags"
+        },
+        "hreflang": {
+          "match": "truthy",
+          "note": "5 hreflang tags"
+        },
+        "robotsTxt": {
+          "match": "truthy",
+          "note": "robots.txt exists"
         }
       },
       "expectedCheckpoints": [
@@ -244,7 +282,7 @@
         {
           "id": "M04-ROBOTS",
           "expectedHealth": "excellent",
-          "note": "robots.txt exists"
+          "note": "robots.txt present with 6 sitemap reference(s), 2 disallow rule(s), 1 user-agent"
         },
         {
           "id": "M04-SITEMAP",
@@ -289,7 +327,7 @@
         {
           "id": "M04-VIEWPORT",
           "expectedHealth": "excellent",
-          "note": "Viewport meta present"
+          "note": "Viewport configured: width=device-width, initial-scale=1"
         },
         {
           "id": "M04-CHARSET",
@@ -368,7 +406,7 @@
         {
           "id": "m17-careers-page",
           "expectedHealth": "excellent",
-          "note": "Careers page exists"
+          "note": "Dedicated careers page with 2 open position(s) at /en-us/careers"
         },
         {
           "id": "m17-ats-provider",
@@ -396,6 +434,11 @@
     },
     "M18": {
       "expectedData": {
+        "external_ir_domain": {
+          "value": "https://investors.ryder.com/ir-home",
+          "match": "contains",
+          "note": "External IR subdomain"
+        },
         "ticker_symbol": {
           "value": "R",
           "match": "exact",
@@ -411,7 +454,7 @@
         {
           "id": "m18-ir-portal",
           "expectedHealth": "info",
-          "note": "IR page found"
+          "note": "No investor relations page found (may be a private company)"
         },
         {
           "id": "m18-financial-data",
@@ -446,7 +489,11 @@
       "expectedData": {
         "support_page_url": {
           "match": "truthy",
-          "note": "Support/contact page found"
+          "note": "Support page found"
+        },
+        "support_channels": {
+          "match": "truthy",
+          "note": "Phone support detected"
         }
       },
       "expectedCheckpoints": [
@@ -490,5 +537,5 @@
       "fixedBugs": []
     }
   },
-  "calibratedAt": "2026-04-04T01:33:18.036Z"
+  "calibratedAt": "2026-04-04T03:24:48.309Z"
 }

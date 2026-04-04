@@ -1,41 +1,71 @@
 {
   "site": "foundationforpuertorico.org",
-  "capturedAt": "2026-04-03T23:29:02.427Z",
+  "capturedAt": "2026-04-04T02:56:05.647Z",
   "capturedBy": "capture-ground-truth.ts (browser-verified)",
   "baseUrl": "https://foundationforpuertorico.org/en/",
   "modules": {
     "M01": {
       "spf": false,
       "dmarc": false,
+      "dkim": false,
+      "dkimSelectors": [],
       "hasMx": false,
+      "nsProvider": "ns12.domaincontrol.com",
+      "hasCaa": false,
+      "hasIpv6": false,
       "hasHsts": false,
       "hasCsp": false,
       "hasXfo": false,
+      "xfoValue": null,
       "hasXcto": false,
       "hasReferrerPolicy": false,
+      "referrerPolicy": null,
       "hasPermissionsPolicy": false,
       "serverHeader": "cloudflare"
     },
     "M02": {
       "isWordPress": true,
-      "hasGeneratorMeta": true,
+      "isShopify": false,
+      "isDrupal": false,
+      "isSquarespace": false,
+      "isWebflow": false,
+      "isWix": false,
+      "isHubSpotCMS": false,
       "generator": "WordPress 6.8.5",
+      "cmsName": "WordPress",
       "serverHeader": "cloudflare",
-      "hasCfRay": true,
       "cdn": "Cloudflare",
-      "compression": null
+      "compression": null,
+      "httpVersion": "HTTP/3",
+      "poweredBy": null,
+      "hasGA4": true,
+      "ga4Id": "G-1MDECVGR56",
+      "hasGTM": true,
+      "gtmId": "GTM-MSZ27P4"
     },
     "M04": {
       "title": "Foundation for Puerto Rico | Transforming Puerto Rico’s economy to be thriving and sustainable.",
+      "titleLength": 95,
       "metaDescription": "Foundation for Puerto Rico is a 501(c)(3) nonprofit that seeks to unleash Puerto Rico’s potential in the global economy, so more people can live, visit, work, and invest in our beautiful island.",
+      "metaDescriptionLength": 194,
       "canonical": "https://foundationforpuertorico.org/en/",
       "htmlLang": "en-US",
       "viewport": "width=device-width, initial-scale=1",
       "charset": "UTF-8",
       "ogTagCount": 10,
+      "hasOgTitle": true,
+      "hasOgDescription": true,
       "hasOgImage": true,
-      "jsonLdCount": 1,
+      "hasOgUrl": true,
+      "hasOgType": true,
+      "hasOgSiteName": true,
+      "twitterCard": "summary_large_image",
+      "jsonLdCount": 0,
+      "jsonLdTypes": [],
+      "hreflangCount": 4,
+      "faviconCount": 3,
       "hasRobotsTxt": true,
+      "robotsHasSitemap": false,
       "hasSitemap": true
     },
     "M16": {
@@ -119,18 +149,70 @@
           "text": "Join us"
         }
       ],
-      "hasCareersPage": true
+      "hasCareersPage": true,
+      "externalCareersUrl": null,
+      "atsProviders": []
     },
     "M18": {
-      "irLinksFound": 0,
-      "hasIrPage": false,
-      "ticker": null
+      "irLinksFound": 1,
+      "irLinks": [
+        {
+          "href": "https://foundationforpuertorico.org/en/annual-report/",
+          "text": "Annual Reports"
+        }
+      ],
+      "hasIrPage": true,
+      "ticker": null,
+      "externalIrDomain": null
     },
     "M19": {
-      "supportLinksFound": 5,
+      "supportLinksFound": 8,
+      "supportLinks": [
+        {
+          "href": "https://foundationforpuertorico.org/en/wcrp-repository-2023/",
+          "text": "WCRP Support Resources"
+        },
+        {
+          "href": "https://foundationforpuertorico.org/en/small-business-support-program/",
+          "text": "Small Business Support Program"
+        },
+        {
+          "href": "https://foundationforpuertorico.org/en/wcrp-repository-2023/",
+          "text": "WCRP Support Resources"
+        },
+        {
+          "href": "https://foundationforpuertorico.org/en/small-business-support-program/",
+          "text": "Small Business Support Program"
+        },
+        {
+          "href": "https://foundationforpuertorico.org/en/wcrp-repository-2023/",
+          "text": "WCRP Support Resources"
+        },
+        {
+          "href": "https://foundationforpuertorico.org/en/small-business-support-program/",
+          "text": "Small Business Support Program"
+        },
+        {
+          "href": "https://foundationforpuertorico.org/en/wcrp-repository-2023/",
+          "text": "WCRP Support Resources"
+        },
+        {
+          "href": "https://foundationforpuertorico.org/en/small-business-support-program/",
+          "text": "Small Business Support Program"
+        }
+      ],
       "hasSupportPage": true,
+      "phones": [
+        "7877731100"
+      ],
       "hasPhone": true,
-      "emails": []
+      "emails": [],
+      "hasEmail": false,
+      "hasChat": false,
+      "statusPageUrl": null,
+      "hasDeveloperDocs": false,
+      "supportSubdomains": [],
+      "channelCount": 2
     }
   }
 }

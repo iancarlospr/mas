@@ -1,8 +1,8 @@
 {
   "site": "mailchimp.com",
-  "verifiedAt": "2026-04-03T23:51:46.952Z",
+  "verifiedAt": "2026-04-04T02:56:44.891Z",
   "generatedBy": "generate-ground-truth-json.ts (from browser-ground-truth.json)",
-  "notes": "Auto-generated from browser-verified facts captured on 2026-04-03T23:51:46.952Z",
+  "notes": "Auto-generated from browser-verified facts captured on 2026-04-04T02:56:44.891Z",
   "modules": {
     "M01": {
       "expectedData": {
@@ -12,24 +12,44 @@
         },
         "dmarc": {
           "match": "truthy",
-          "note": "DMARC record exists"
+          "note": "DMARC p=reject"
+        },
+        "dmarcPolicy": {
+          "match": "truthy",
+          "note": "DMARC policy: reject"
+        },
+        "dkim": {
+          "match": "truthy",
+          "note": "DKIM selectors: google, k1"
+        },
+        "hsts": {
+          "match": "falsy",
+          "note": "No HSTS"
+        },
+        "csp": {
+          "match": "falsy",
+          "note": "No CSP"
+        },
+        "ipv6": {
+          "match": "falsy",
+          "note": "No IPv6"
         }
       },
       "expectedCheckpoints": [
         {
           "id": "m01-spf",
           "expectedHealth": "good",
-          "note": "SPF present"
+          "note": "SPF present with ~all (soft-fail) and 4 DNS lookups: v=spf1 ip4:205.201.128.0/20"
         },
         {
           "id": "m01-dmarc",
           "expectedHealth": "excellent",
-          "note": "DMARC p=reject"
+          "note": "DMARC policy is reject with rua+ruf reporting: v=DMARC1; p=reject; rua=mailto:19"
         },
         {
           "id": "m01-dkim",
           "expectedHealth": "good",
-          "note": "DKIM found (selector: k1), key strength ~1024-bit"
+          "note": "DKIM found (selector: google), key strength ~1024-bit"
         },
         {
           "id": "m01-dnssec",
@@ -79,12 +99,12 @@
         {
           "id": "m01-email",
           "expectedHealth": "good",
-          "note": "Custom mail server (MX: mx1.intuit.iphmx.com, mx2.intuit.iphmx.com)"
+          "note": "Custom mail server (MX: mx2.intuit.iphmx.com, mx1.intuit.iphmx.com)"
         },
         {
           "id": "m01-caa",
           "expectedHealth": "excellent",
-          "note": "CAA records set (pki.goog, digicert.com, letsencrypt.org, amazonaws.com) and mat"
+          "note": "CAA records set (amazonaws.com, pki.goog, letsencrypt.org, digicert.com) and mat"
         },
         {
           "id": "m01-geoip",
@@ -130,6 +150,10 @@
         "detectedTechnologies": {
           "match": "truthy",
           "note": "Should detect technologies"
+        },
+        "trackingIds": {
+          "match": "truthy",
+          "note": "GTM: GTM-5XRCGV8"
         }
       },
       "expectedCheckpoints": [
@@ -186,19 +210,36 @@
       "expectedData": {
         "title": {
           "match": "truthy",
-          "note": "Page title exists"
+          "note": "Title: \"Email & SMS Marketing Platform | Mailchimp\""
         },
         "metaDescription": {
           "match": "truthy",
-          "note": "Meta description exists"
+          "note": "Meta description present"
         },
         "htmlLang": {
-          "match": "truthy",
+          "value": "en",
+          "match": "contains",
           "note": "Lang: en"
         },
-        "jsonLd": {
+        "canonical": {
           "match": "truthy",
-          "note": "1 JSON-LD blocks"
+          "note": "Canonical URL set"
+        },
+        "ogTags": {
+          "match": "truthy",
+          "note": "7 OG tags"
+        },
+        "hreflang": {
+          "match": "truthy",
+          "note": "7 hreflang tags"
+        },
+        "robotsTxt": {
+          "match": "truthy",
+          "note": "robots.txt exists"
+        },
+        "sitemap": {
+          "match": "truthy",
+          "note": "sitemap.xml exists"
         }
       },
       "expectedCheckpoints": [
@@ -240,7 +281,7 @@
         {
           "id": "M04-ROBOTS",
           "expectedHealth": "excellent",
-          "note": "robots.txt exists"
+          "note": "robots.txt present with 1 sitemap reference(s), 0 disallow rule(s), 1 user-agent"
         },
         {
           "id": "M04-SITEMAP",
@@ -285,7 +326,7 @@
         {
           "id": "M04-VIEWPORT",
           "expectedHealth": "excellent",
-          "note": "Viewport meta present"
+          "note": "Viewport configured: width=device-width, initial-scale=1"
         },
         {
           "id": "M04-CHARSET",
@@ -364,7 +405,7 @@
         {
           "id": "m17-careers-page",
           "expectedHealth": "excellent",
-          "note": "Careers page exists"
+          "note": "Dedicated careers page with 15 open position(s) at /careers/"
         },
         {
           "id": "m17-ats-provider",
@@ -396,7 +437,7 @@
         {
           "id": "m18-ir-portal",
           "expectedHealth": "good",
-          "note": "No IR page"
+          "note": "IR page found at https://www.mailchimp.com/resources/sms-for-banking-and-financi"
         },
         {
           "id": "m18-financial-data",
@@ -431,7 +472,15 @@
       "expectedData": {
         "support_page_url": {
           "match": "truthy",
-          "note": "Support/contact page found"
+          "note": "Support page found"
+        },
+        "support_channels": {
+          "match": "truthy",
+          "note": "Phone support detected"
+        },
+        "developer_docs": {
+          "match": "truthy",
+          "note": "Developer docs found"
         }
       },
       "expectedCheckpoints": [
@@ -475,5 +524,5 @@
       "fixedBugs": []
     }
   },
-  "calibratedAt": "2026-04-04T01:32:36.776Z"
+  "calibratedAt": "2026-04-04T03:23:57.508Z"
 }

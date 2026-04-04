@@ -1,44 +1,85 @@
 {
   "site": "ryder.com",
-  "capturedAt": "2026-04-03T23:28:18.966Z",
+  "capturedAt": "2026-04-04T02:57:57.251Z",
   "capturedBy": "capture-ground-truth.ts (browser-verified)",
   "baseUrl": "https://www.ryder.com/en-us",
   "modules": {
     "M01": {
       "spf": true,
       "spfRecord": "v=spf1 include:_spf-ssg-a.microsoft.com ip4:168.218.5.3 ip4:206.113.15.122 ip4:168.218.50.253 ip4:54.240.43.16 ip4:18.214.158.23 ip4:207.166.95.11 ip4:207.166.92.11 ip4:168.218.15.251 ~all",
+      "spfAllQualifier": "~all",
+      "spfIncludes": 1,
       "dmarc": true,
+      "dmarcRecord": "v=DMARC1; p=quarantine; rua=mailto:4b019477f7d5365@rep.dmarcanalyzer.com;ruf=mailto:4b019477f7d5365@for.dmarcanalyzer.com; pct=100; fo=1;",
       "dmarcPolicy": "quarantine",
+      "dmarcRua": true,
+      "dmarcRuf": true,
+      "dkim": true,
+      "dkimSelectors": [
+        "selector1"
+      ],
       "hasMx": true,
       "mxCount": 1,
+      "emailProvider": "Microsoft 365",
+      "nsProvider": "edns1.ultradns.com",
+      "hasCaa": false,
+      "hasIpv6": false,
       "hasHsts": true,
+      "hstsMaxAge": 86400,
+      "hstsIncludeSubDomains": true,
+      "hstsPreload": true,
       "hasCsp": false,
       "hasXfo": false,
+      "xfoValue": null,
       "hasXcto": false,
       "hasReferrerPolicy": true,
+      "referrerPolicy": "origin",
       "hasPermissionsPolicy": false,
       "serverHeader": null
     },
     "M02": {
       "isWordPress": false,
-      "hasGeneratorMeta": false,
+      "isShopify": false,
+      "isDrupal": false,
+      "isSquarespace": false,
+      "isWebflow": false,
+      "isWix": false,
+      "isHubSpotCMS": false,
       "generator": null,
+      "cmsName": null,
       "serverHeader": null,
-      "hasCfRay": true,
       "cdn": "Cloudflare",
-      "compression": "gzip"
+      "compression": "gzip",
+      "httpVersion": "HTTP/2",
+      "poweredBy": null,
+      "hasGA4": true,
+      "ga4Id": "G-5HZMQRB7HY",
+      "hasGTM": true,
+      "gtmId": "GTM-5ZK5QJX"
     },
     "M04": {
       "title": "Ryder | Logistics, Truck Leasing, Truck Rental, Used Truck Sales",
+      "titleLength": 64,
       "metaDescription": "Ryder is the leader in fleet management solutions, as well as supply chain management and logistics for businesses of all sizes. Contact us today for a customized plan.",
+      "metaDescriptionLength": 168,
       "canonical": "https://www.ryder.com/en-us",
       "htmlLang": "en-US",
       "viewport": "width=device-width, initial-scale=1",
       "charset": "utf-8",
       "ogTagCount": 7,
+      "hasOgTitle": true,
+      "hasOgDescription": true,
       "hasOgImage": true,
-      "jsonLdCount": 3,
+      "hasOgUrl": true,
+      "hasOgType": true,
+      "hasOgSiteName": true,
+      "twitterCard": "summary",
+      "jsonLdCount": 0,
+      "jsonLdTypes": [],
+      "hreflangCount": 5,
+      "faviconCount": 1,
       "hasRobotsTxt": true,
+      "robotsHasSitemap": true,
       "hasSitemap": false
     },
     "M16": {
@@ -117,21 +158,79 @@
           "text": "Ryder Careers"
         }
       ],
-      "hasCareersPage": true
+      "hasCareersPage": true,
+      "externalCareersUrl": null,
+      "atsProviders": []
     },
     "M18": {
       "irLinksFound": 2,
+      "irLinks": [
+        {
+          "href": "https://newsroom.ryder.com/news/news-details/2026/Ryder-to-Release-First-Quarter-2026-Earnings-on-April-23-2026/default.aspx",
+          "text": "Ryder to Release First Quarter 2026 Earnings on April 23, 20"
+        },
+        {
+          "href": "https://investors.ryder.com/ir-home/",
+          "text": "Investors"
+        }
+      ],
       "hasIrPage": true,
       "ticker": {
         "exchange": "NYSE",
         "symbol": "R"
-      }
+      },
+      "externalIrDomain": "https://investors.ryder.com/ir-home/"
     },
     "M19": {
-      "supportLinksFound": 5,
+      "supportLinksFound": 8,
+      "supportLinks": [
+        {
+          "href": "/en-us/e-commerce/e-commerce-fulfillment#contact-form",
+          "text": "Contact Sales"
+        },
+        {
+          "href": "/en-us/contact-us#contact-form",
+          "text": "Contact Info"
+        },
+        {
+          "href": "/en-us/e-commerce/e-commerce-fulfillment#contact-form",
+          "text": "Contact Sales"
+        },
+        {
+          "href": "#contact-form",
+          "text": "Contact a Ryder Expert"
+        },
+        {
+          "href": "/en-us/fleet-leasing/promotions?currentPromo=straight-truck-1200-a-month#contact-form",
+          "text": "Straight Truck $1,200/monthLease a straight truck starting a"
+        },
+        {
+          "href": "/en-us/fleet-leasing/promotions?currentPromo=straight-truck-1200-a-month#contact-form",
+          "text": "Get Offer"
+        },
+        {
+          "href": "/en-us/rent-trucks/promotions?currentPromo=up-to-500-off-reefers-rental#contact-form",
+          "text": "$500 Off Reefer RentalKeep your freight cool with up to $500"
+        },
+        {
+          "href": "/en-us/rent-trucks/promotions?currentPromo=up-to-500-off-reefers-rental#contact-form",
+          "text": "Get Offer"
+        }
+      ],
       "hasSupportPage": true,
+      "phones": [
+        "888-706-1243",
+        "888-706-1243",
+        "888-885-1958"
+      ],
       "hasPhone": true,
-      "emails": []
+      "emails": [],
+      "hasEmail": false,
+      "hasChat": false,
+      "statusPageUrl": null,
+      "hasDeveloperDocs": false,
+      "supportSubdomains": [],
+      "channelCount": 2
     }
   }
 }

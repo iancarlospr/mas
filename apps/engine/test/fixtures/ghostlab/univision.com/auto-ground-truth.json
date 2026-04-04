@@ -1,18 +1,43 @@
 {
   "site": "univision.com",
-  "verifiedAt": "2026-04-04T00:38:24.034Z",
+  "verifiedAt": "2026-04-04T02:58:53.760Z",
   "generatedBy": "generate-ground-truth-json.ts (from browser-ground-truth.json)",
-  "notes": "Auto-generated from browser-verified facts captured on 2026-04-04T00:38:24.034Z",
+  "notes": "Auto-generated from browser-verified facts captured on 2026-04-04T02:58:53.760Z",
   "modules": {
     "M01": {
       "expectedData": {
+        "spf": {
+          "match": "falsy",
+          "note": "No SPF"
+        },
         "dmarc": {
           "match": "truthy",
-          "note": "DMARC record exists"
+          "note": "DMARC p=quarantine"
+        },
+        "dmarcPolicy": {
+          "match": "truthy",
+          "note": "DMARC policy: quarantine"
+        },
+        "dkim": {
+          "match": "falsy",
+          "note": "No DKIM found"
+        },
+        "emailProvider.provider": {
+          "value": "Google Workspace",
+          "match": "contains",
+          "note": "Email provider from MX"
         },
         "hsts": {
           "match": "truthy",
-          "note": "HSTS header present"
+          "note": "HSTS present"
+        },
+        "csp": {
+          "match": "falsy",
+          "note": "No CSP"
+        },
+        "ipv6": {
+          "match": "falsy",
+          "note": "No IPv6"
         }
       },
       "expectedCheckpoints": [
@@ -24,7 +49,7 @@
         {
           "id": "m01-dmarc",
           "expectedHealth": "good",
-          "note": "DMARC p=quarantine"
+          "note": "DMARC policy is quarantine with rua reporting: v=DMARC1;p=quarantine;sp=none;pct"
         },
         {
           "id": "m01-dkim",
@@ -89,7 +114,7 @@
         {
           "id": "m01-geoip",
           "expectedHealth": "info",
-          "note": "151.101.129.91: US, 151.101.193.91: US, 151.101.65.91: US, 151.101.1.91: US"
+          "note": "151.101.65.91: US, 151.101.193.91: US, 151.101.1.91: US, 151.101.129.91: US"
         },
         {
           "id": "m01-mta-sts",
@@ -130,6 +155,10 @@
         "detectedTechnologies": {
           "match": "truthy",
           "note": "Should detect technologies"
+        },
+        "trackingIds": {
+          "match": "truthy",
+          "note": "GTM: GTM-TDVV9BR"
         }
       },
       "expectedCheckpoints": [
@@ -186,19 +215,32 @@
       "expectedData": {
         "title": {
           "match": "truthy",
-          "note": "Page title exists"
+          "note": "Title: \"Univision | Shows, Noticias, Entretenimiento, Depo\""
         },
         "metaDescription": {
           "match": "truthy",
-          "note": "Meta description exists"
+          "note": "Meta description present"
         },
         "htmlLang": {
-          "match": "truthy",
+          "value": "es",
+          "match": "contains",
           "note": "Lang: es"
         },
-        "jsonLd": {
+        "canonical": {
           "match": "truthy",
-          "note": "1 JSON-LD blocks"
+          "note": "Canonical URL set"
+        },
+        "ogTags": {
+          "match": "truthy",
+          "note": "7 OG tags"
+        },
+        "robotsTxt": {
+          "match": "truthy",
+          "note": "robots.txt exists"
+        },
+        "sitemap": {
+          "match": "truthy",
+          "note": "sitemap.xml exists"
         }
       },
       "expectedCheckpoints": [
@@ -240,7 +282,7 @@
         {
           "id": "M04-ROBOTS",
           "expectedHealth": "warning",
-          "note": "robots.txt exists"
+          "note": "robots.txt present but blocks important paths: /deportes/fantasy/template*, /not"
         },
         {
           "id": "M04-SITEMAP",
@@ -285,7 +327,7 @@
         {
           "id": "M04-VIEWPORT",
           "expectedHealth": "excellent",
-          "note": "Viewport meta present"
+          "note": "Viewport configured: width=device-width, initial-scale=1"
         },
         {
           "id": "M04-CHARSET",
@@ -364,7 +406,7 @@
         {
           "id": "m17-careers-page",
           "expectedHealth": "excellent",
-          "note": "Careers page exists"
+          "note": "Dedicated careers page with 8 open position(s) at /careers/"
         },
         {
           "id": "m17-ats-provider",
@@ -396,7 +438,7 @@
         {
           "id": "m18-ir-portal",
           "expectedHealth": "info",
-          "note": "IR page found"
+          "note": "No investor relations page found (may be a private company)"
         },
         {
           "id": "m18-financial-data",
@@ -431,7 +473,7 @@
       "expectedData": {
         "support_page_url": {
           "match": "truthy",
-          "note": "Support/contact page found"
+          "note": "Support page found"
         }
       },
       "expectedCheckpoints": [
@@ -475,5 +517,5 @@
       "fixedBugs": []
     }
   },
-  "calibratedAt": "2026-04-04T01:34:23.539Z"
+  "calibratedAt": "2026-04-04T03:26:12.418Z"
 }
