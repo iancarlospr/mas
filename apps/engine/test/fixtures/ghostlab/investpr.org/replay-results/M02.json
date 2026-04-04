@@ -362,11 +362,11 @@
       "evidence": "Hosting: WP Engine (detected from response headers)"
     }
   ],
-  "duration": 91,
+  "duration": 94,
   "_replay": {
     "site": "investpr.org",
     "moduleId": "M02",
-    "elapsed": 91,
-    "replayedAt": "2026-04-04T01:35:21.600Z"
+    "elapsed": 94,
+    "replayedAt": "2026-04-04T01:40:13.777Z"
   }
 }

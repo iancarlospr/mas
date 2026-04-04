@@ -293,6 +293,7 @@ const execute: ModuleExecuteFn = async (ctx: ModuleContext): Promise<ModuleResul
     const CAREERS_PROBE_PATHS = [
       '/careers/', '/careers', '/jobs/', '/jobs', '/join-us/', '/join-us',
       '/about/careers/', '/about/team/', '/about-us/careers/',
+      '/company/careers/', '/company/careers', '/company/jobs/',
       // Multi-language paths
       '/sobre-mmm/empleos', '/sobre/empleos', '/empleo/', '/empleos/',
       '/about-investpr/careers/', '/about/careers/',
