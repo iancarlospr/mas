@@ -1,0 +1,114 @@
+{
+  "site": "metro.pr",
+  "capturedAt": "2026-04-04T00:39:03.516Z",
+  "capturedBy": "capture-ground-truth.ts (browser-verified)",
+  "baseUrl": "https://www.metro.pr/",
+  "modules": {
+    "M01": {
+      "spf": true,
+      "spfRecord": "v=spf1 include:_spf.google.com include:spfa.mailendo.com ~all",
+      "dmarc": true,
+      "dmarcPolicy": "quarantine",
+      "hasMx": true,
+      "mxCount": 1,
+      "hasHsts": false,
+      "hasCsp": true,
+      "hasXfo": false,
+      "hasXcto": false,
+      "hasReferrerPolicy": false,
+      "hasPermissionsPolicy": false,
+      "serverHeader": "openresty"
+    },
+    "M02": {
+      "isWordPress": false,
+      "hasGeneratorMeta": false,
+      "generator": null,
+      "serverHeader": "openresty",
+      "hasCfRay": false,
+      "cdn": null,
+      "compression": "gzip"
+    },
+    "M04": {
+      "title": "Noticias, Deportes y Entretenimiento de Puerto Rico y el Mundo | Metro",
+      "metaDescription": "Las últimas noticias y Entretenimiento en Metro, la red de medios más grande del mundo.",
+      "canonical": "https://www.metro.pr",
+      "htmlLang": "es",
+      "viewport": "width=device-width, initial-scale=1.0, user-scalable=yes, minimum-scale=0.5, maximum-scale=2.0",
+      "charset": "UTF-8",
+      "ogTagCount": 4,
+      "hasOgImage": true,
+      "jsonLdCount": 1,
+      "hasRobotsTxt": true,
+      "hasSitemap": false
+    },
+    "M16": {
+      "pressLinksFound": 50,
+      "pressLinks": [
+        {
+          "href": "/noticias",
+          "text": "Noticias"
+        },
+        {
+          "href": "/noticias/locales",
+          "text": "Locales"
+        },
+        {
+          "href": "/noticias/economia",
+          "text": "Economía"
+        },
+        {
+          "href": "/noticias/mundo",
+          "text": "Mundo"
+        },
+        {
+          "href": "/noticias/2026/04/03/rescatan-a-tres-agentes-federales-y-dos-civiles-tras-volcadura-de-embarcaciones-frente-a-isla-de-cabras/",
+          "text": "Rescatan a tres agentes federales y dos civiles tras volcadura de embarcaciones "
+        }
+      ],
+      "pressPageUrl": "https://www.metro.pr/noticias",
+      "visibleArticleCount": 16,
+      "countStrategies": [
+        {
+          "name": "article",
+          "count": 5
+        },
+        {
+          "name": "articleLinks",
+          "count": 16
+        },
+        {
+          "name": "dates",
+          "count": 0
+        }
+      ],
+      "pagination": {
+        "hasLoadMore": true,
+        "hasPagination": true,
+        "maxPage": 14648,
+        "pageLinksCount": 0,
+        "wpPagesCount": 1
+      },
+      "paginatedArticleCount": 41,
+      "externalNewsroom": null,
+      "rssFeed": null,
+      "mediaContactEmail": null,
+      "hasMediaLogos": false
+    },
+    "M17": {
+      "careersLinksFound": 0,
+      "careersLinks": [],
+      "hasCareersPage": false
+    },
+    "M18": {
+      "irLinksFound": 3,
+      "hasIrPage": true,
+      "ticker": null
+    },
+    "M19": {
+      "supportLinksFound": 2,
+      "hasSupportPage": true,
+      "hasPhone": false,
+      "emails": []
+    }
+  }
+}

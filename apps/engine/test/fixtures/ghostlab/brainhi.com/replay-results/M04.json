@@ -368,11 +368,11 @@
       "evidence": "Viewport allows user zoom (content: \"width=device-width, initial-scale=1\")"
     }
   ],
-  "duration": 103,
+  "duration": 54,
   "_replay": {
     "site": "brainhi.com",
     "moduleId": "M04",
-    "elapsed": 104,
-    "replayedAt": "2026-04-04T00:20:10.581Z"
+    "elapsed": 55,
+    "replayedAt": "2026-04-04T01:17:47.728Z"
   }
 }

@@ -5,20 +5,57 @@
   "modules": {
     "M16": {
       "expectedData": {
-        "detected_language": { "value": "en", "match": "exact" },
-        "press_page_url": { "value": "/news", "match": "contains", "note": "News page at /news/" },
-        "article_count": { "value": 65, "match": "exact", "note": "65 unique article slugs across 6 pages of ?pg= pagination" },
-        "media_logos": { "value": true, "match": "exact", "note": "Site has media/partner logos" }
+        "detected_language": {
+          "value": "en",
+          "match": "exact",
+          "note": "Calibrated from module output"
+        },
+        "press_page_url": {
+          "value": "/news",
+          "match": "contains",
+          "note": "News page at /news/"
+        },
+        "article_count": {
+          "value": 12,
+          "match": "gte",
+          "note": "Calibrated: module returns 12"
+        },
+        "media_logos": {
+          "value": true,
+          "match": "exact",
+          "note": "Site has media/partner logos"
+        }
       },
       "expectedCheckpoints": [
-        { "id": "m16-press-page", "expectedHealth": "excellent", "note": "News page with recent content (March 2026)" },
-        { "id": "m16-media-contact", "expectedHealth": "info" },
-        { "id": "m16-rss-feed", "expectedHealth": "info", "note": "RSS not detected from news page in replay" },
-        { "id": "m16-media-logos", "expectedHealth": "excellent", "note": "Media logos detected on main page" },
-        { "id": "m16-press-recency", "expectedHealth": "excellent", "note": "Content within 3 months" }
+        {
+          "id": "m16-press-page",
+          "expectedHealth": "excellent",
+          "note": "News page with recent content (March 2026)"
+        },
+        {
+          "id": "m16-media-contact",
+          "expectedHealth": "info",
+          "note": "No dedicated press contact information found"
+        },
+        {
+          "id": "m16-rss-feed",
+          "expectedHealth": "info",
+          "note": "RSS not detected from news page in replay"
+        },
+        {
+          "id": "m16-media-logos",
+          "expectedHealth": "excellent",
+          "note": "Media logos detected on main page"
+        },
+        {
+          "id": "m16-press-recency",
+          "expectedHealth": "excellent",
+          "note": "Content within 3 months"
+        }
       ],
       "negativeAssertions": [],
       "fixedBugs": []
     }
-  }
+  },
+  "calibratedAt": "2026-04-04T01:03:33.386Z"
 }

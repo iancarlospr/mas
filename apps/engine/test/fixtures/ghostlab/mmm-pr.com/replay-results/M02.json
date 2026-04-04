@@ -333,11 +333,11 @@
       "evidence": "Hosting provider not identified from fingerprints."
     }
   ],
-  "duration": 49,
+  "duration": 52,
   "_replay": {
     "site": "mmm-pr.com",
     "moduleId": "M02",
-    "elapsed": 49,
-    "replayedAt": "2026-04-04T00:19:58.616Z"
+    "elapsed": 52,
+    "replayedAt": "2026-04-04T01:17:29.395Z"
   }
 }

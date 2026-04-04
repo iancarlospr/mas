@@ -26,7 +26,7 @@
       "expectedCheckpoints": [
         {
           "id": "m01-spf",
-          "expectedHealth": "excellent",
+          "expectedHealth": "good",
           "note": "SPF present"
         },
         {
@@ -35,9 +35,99 @@
           "note": "DMARC p=quarantine"
         },
         {
+          "id": "m01-dkim",
+          "expectedHealth": "critical",
+          "note": "No DKIM records detected for common selectors (default, google, selector1, selec"
+        },
+        {
+          "id": "m01-dnssec",
+          "expectedHealth": "critical",
+          "note": "No DNSSEC signing detected for notion.com"
+        },
+        {
           "id": "m01-tls",
-          "expectedHealth": "excellent",
+          "expectedHealth": "good",
           "note": "HTTPS site"
+        },
+        {
+          "id": "m01-hsts",
+          "expectedHealth": "excellent",
+          "note": "HSTS present: max-age=31536000 (>1yr), includeSubDomains, preload"
+        },
+        {
+          "id": "m01-csp",
+          "expectedHealth": "good",
+          "note": "CSP present but contains unsafe-inline in script-src and unsafe-eval: script-src"
+        },
+        {
+          "id": "m01-xcto",
+          "expectedHealth": "critical",
+          "note": "X-Content-Type-Options header is missing"
+        },
+        {
+          "id": "m01-framing",
+          "expectedHealth": "excellent",
+          "note": "CSP frame-ancestors directive is set (preferred over X-Frame-Options)"
+        },
+        {
+          "id": "m01-referrer",
+          "expectedHealth": "excellent",
+          "note": "Referrer-Policy: strict-origin-when-cross-origin"
+        },
+        {
+          "id": "m01-permissions",
+          "expectedHealth": "critical",
+          "note": "Permissions-Policy header is missing"
+        },
+        {
+          "id": "m01-https-redirect",
+          "expectedHealth": "good",
+          "note": "HTTP fetch failed (port 80 may be closed); site is served over HTTPS"
+        },
+        {
+          "id": "m01-email",
+          "expectedHealth": "excellent",
+          "note": "Email provider: GoDaddy (MX: mailstore1.secureserver.net, smtp.secureserver.net)"
+        },
+        {
+          "id": "m01-caa",
+          "expectedHealth": "critical",
+          "note": "No CAA records found"
+        },
+        {
+          "id": "m01-geoip",
+          "expectedHealth": "info",
+          "note": "208.103.161.2: US, 208.103.161.1: US"
+        },
+        {
+          "id": "m01-mta-sts",
+          "expectedHealth": "warning",
+          "note": "No MTA-STS or SMTP TLS Reporting records found"
+        },
+        {
+          "id": "m01-ipv6",
+          "expectedHealth": "excellent",
+          "note": "AAAA records found: 2602:f79a::2, 2602:f79a::1"
+        },
+        {
+          "id": "m01-www-consistency",
+          "expectedHealth": "excellent",
+          "note": "Security headers consistent between www and apex"
+        },
+        {
+          "id": "m01-sri",
+          "expectedHealth": "info",
+          "note": "No cross-origin script or stylesheet resources detected"
+        },
+        {
+          "id": "m01-redirect-chain",
+          "expectedHealth": "good",
+          "note": "1 redirect(s): https://www.notion.so → https://www.notion.com/"
+        },
+        {
+          "id": "m01-mixed-content",
+          "expectedHealth": "info",
+          "note": "Mixed content data not available — browser phase may not have executed"
         }
       ],
       "negativeAssertions": [],
@@ -57,14 +147,54 @@
         "compression": {
           "value": "gzip",
           "match": "exact",
-          "note": "Compression from headers"
+          "note": "Calibrated from module output"
         }
       },
       "expectedCheckpoints": [
         {
+          "id": "m02-cms-identified",
+          "expectedHealth": "info",
+          "note": "No CMS detected; site may use a custom or headless solution."
+        },
+        {
+          "id": "m02-cms-version-currency",
+          "expectedHealth": "info",
+          "note": "No CMS version information available."
+        },
+        {
+          "id": "m02-cdn-detected",
+          "expectedHealth": "excellent",
+          "note": "Enterprise CDN detected: Cloudflare (via fingerprint)"
+        },
+        {
           "id": "m02-https-enforced",
           "expectedHealth": "excellent",
           "note": "HTTPS site"
+        },
+        {
+          "id": "m02-http-version",
+          "expectedHealth": "excellent",
+          "note": "HTTP/3 (QUIC) detected via alt-svc header."
+        },
+        {
+          "id": "m02-compression",
+          "expectedHealth": "good",
+          "note": "Gzip compression detected on the initial HTML response."
+        },
+        {
+          "id": "m02-server-header-exposure",
+          "expectedHealth": "good",
+          "note": "Server header present without version: cloudflare"
+        },
+        {
+          "id": "m02-framework-detected",
+          "expectedHealth": "info",
+          "note": "Frameworks: Next.js, React"
+        },
+        {
+          "id": "m02-hosting-identified",
+          "expectedHealth": "info",
+          "note": "Hosting: Vercel"
         }
       ],
       "negativeAssertions": [],
@@ -87,14 +217,109 @@
       },
       "expectedCheckpoints": [
         {
+          "id": "M04-TITLE",
+          "expectedHealth": "excellent",
+          "note": "Title present (45 chars): \"The AI workspace that works for you. | Notion\""
+        },
+        {
+          "id": "M04-META-DESC",
+          "expectedHealth": "excellent",
+          "note": "Meta description present (124 chars)"
+        },
+        {
+          "id": "M04-CANONICAL",
+          "expectedHealth": "excellent",
+          "note": "Self-referencing canonical URL: https://www.notion.com/"
+        },
+        {
+          "id": "M04-OG-TAGS",
+          "expectedHealth": "excellent",
+          "note": "All 6 core OG tags present: og:title, og:description, og:image, og:url, og:type,"
+        },
+        {
+          "id": "M04-OG-IMAGE",
+          "expectedHealth": "good",
+          "note": "OG image present: https://www.notion.com/front-static/meta/custom-agents-og.png"
+        },
+        {
+          "id": "M04-TWITTER",
+          "expectedHealth": "excellent",
+          "note": "summary_large_image Twitter Card with all fields (title, description, image, sit"
+        },
+        {
+          "id": "M04-SCHEMA",
+          "expectedHealth": "critical",
+          "note": "No structured data (JSON-LD) found"
+        },
+        {
+          "id": "M04-ROBOTS",
+          "expectedHealth": "critical",
+          "note": "robots.txt exists"
+        },
+        {
+          "id": "M04-SITEMAP",
+          "expectedHealth": "critical",
+          "note": "No sitemap found (checked /sitemap.xml, /sitemap_index.xml, /sitemap-index.xml, "
+        },
+        {
+          "id": "M04-FAVICON",
+          "expectedHealth": "excellent",
+          "note": "Multiple favicon formats including apple-touch-icon: icon, apple-touch-icon"
+        },
+        {
+          "id": "M04-LANG",
+          "expectedHealth": "excellent",
+          "note": "Specific language attribute: lang=\"en-us\""
+        },
+        {
+          "id": "M04-HREFLANG",
+          "expectedHealth": "good",
+          "note": "Hreflang tags for 16 locale(s): en, ko, ja, fr, de, es-es, es, pt, zh, zh-tw, en"
+        },
+        {
+          "id": "M04-PRECONNECT",
+          "expectedHealth": "excellent",
+          "note": "37 resource hints found: /_next/image?url=%2Ffront-static%2Fpages%2Fhome%2Ffall%"
+        },
+        {
+          "id": "M04-LLMS-TXT",
+          "expectedHealth": "info",
+          "note": "No llms.txt found (informational -- optional emerging standard for LLM guidance)"
+        },
+        {
+          "id": "M04-MANIFEST",
+          "expectedHealth": "info",
+          "note": "No manifest.json found (informational -- required only for PWA installability)"
+        },
+        {
+          "id": "M04-ROBOTS-DIRECTIVES",
+          "expectedHealth": "info",
+          "note": "No explicit robots directives (defaults to index, follow)"
+        },
+        {
           "id": "M04-VIEWPORT",
           "expectedHealth": "excellent",
           "note": "Viewport meta present"
         },
         {
-          "id": "M04-ROBOTS",
+          "id": "M04-CHARSET",
           "expectedHealth": "excellent",
-          "note": "robots.txt exists"
+          "note": "UTF-8 charset declared via meta: utf-8"
+        },
+        {
+          "id": "M04-ADS-TXT",
+          "expectedHealth": "info",
+          "note": "No ads.txt found (informational — required only for sites running programmatic a"
+        },
+        {
+          "id": "m04-structured-data",
+          "expectedHealth": "warning",
+          "note": "No structured data found (JSON-LD, Microdata, or RDFa)"
+        },
+        {
+          "id": "M04-VIEWPORT-A11Y",
+          "expectedHealth": "excellent",
+          "note": "Viewport allows user zoom (content: \"width=device-width, initial-scale=1\")"
         }
       ],
       "negativeAssertions": [],
@@ -125,8 +350,13 @@
         },
         {
           "id": "m16-media-logos",
-          "expectedHealth": "info",
+          "expectedHealth": "excellent",
           "note": "No media logos"
+        },
+        {
+          "id": "m16-press-recency",
+          "expectedHealth": "info",
+          "note": "No dateable press content found"
         }
       ],
       "negativeAssertions": [],
@@ -136,14 +366,34 @@
       "expectedData": {
         "careers_page_url": {
           "match": "falsy",
-          "note": "PASSIVE LIMITATION: JS-rendered site, /careers not in server HTML"
+          "note": "Calibrated: module returns null"
         }
       },
       "expectedCheckpoints": [
         {
           "id": "m17-careers-page",
           "expectedHealth": "info",
-          "note": "Cannot detect: JS-rendered site, /careers not in server HTML"
+          "note": "Careers page exists"
+        },
+        {
+          "id": "m17-ats-provider",
+          "expectedHealth": "info",
+          "note": "No ATS provider detected"
+        },
+        {
+          "id": "m17-open-positions",
+          "expectedHealth": "info",
+          "note": "No open positions detected"
+        },
+        {
+          "id": "m17-team-culture",
+          "expectedHealth": "info",
+          "note": "No team or culture page detected"
+        },
+        {
+          "id": "m17-hiring-velocity",
+          "expectedHealth": "info",
+          "note": "No dateable job postings found"
         }
       ],
       "negativeAssertions": [],
@@ -156,6 +406,31 @@
           "id": "m18-ir-portal",
           "expectedHealth": "info",
           "note": "No IR page"
+        },
+        {
+          "id": "m18-financial-data",
+          "expectedHealth": "info",
+          "note": "No SEC filings or annual reports detected"
+        },
+        {
+          "id": "m18-ticker-symbol",
+          "expectedHealth": "info",
+          "note": "No stock ticker detected (may be a private company)"
+        },
+        {
+          "id": "m18-esg-report",
+          "expectedHealth": "info",
+          "note": "No ESG or sustainability report detected"
+        },
+        {
+          "id": "m18-governance",
+          "expectedHealth": "info",
+          "note": "No corporate governance content detected"
+        },
+        {
+          "id": "m18-ir-comms",
+          "expectedHealth": "info",
+          "note": "No earnings calls, presentations, or investor events detected"
         }
       ],
       "negativeAssertions": [],
@@ -164,13 +439,50 @@
     "M19": {
       "expectedData": {
         "support_page_url": {
-          "match": "truthy",
-          "note": "Support/contact page found"
+          "match": "falsy",
+          "note": "Calibrated: module returns null"
         }
       },
-      "expectedCheckpoints": [],
+      "expectedCheckpoints": [
+        {
+          "id": "m19-help-center",
+          "expectedHealth": "critical",
+          "note": "No support documentation found"
+        },
+        {
+          "id": "m19-support-channels",
+          "expectedHealth": "excellent",
+          "note": "3 support channels: help_center, community, social_media"
+        },
+        {
+          "id": "m19-status-page",
+          "expectedHealth": "good",
+          "note": "Status page link found: https://www.notion-status.com"
+        },
+        {
+          "id": "m19-business-hours",
+          "expectedHealth": "info",
+          "note": "No business hours detected"
+        },
+        {
+          "id": "m19-community-forum",
+          "expectedHealth": "good",
+          "note": "Community link found: /community"
+        },
+        {
+          "id": "m19-developer-docs",
+          "expectedHealth": "excellent",
+          "note": "Developer docs: \"DocsSimple and powerful\" (/product/docs)"
+        },
+        {
+          "id": "m19-training-academy",
+          "expectedHealth": "excellent",
+          "note": "Academy: \"Academy\""
+        }
+      ],
       "negativeAssertions": [],
       "fixedBugs": []
     }
-  }
+  },
+  "calibratedAt": "2026-04-04T01:04:09.313Z"
 }

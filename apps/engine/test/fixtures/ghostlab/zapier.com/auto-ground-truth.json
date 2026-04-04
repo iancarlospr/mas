@@ -35,9 +35,99 @@
           "note": "DMARC p=reject"
         },
         {
-          "id": "m01-tls",
+          "id": "m01-dkim",
           "expectedHealth": "excellent",
+          "note": "DKIM found (selector: google), key strength ~2048-bit"
+        },
+        {
+          "id": "m01-dnssec",
+          "expectedHealth": "critical",
+          "note": "No DNSSEC signing detected for zapier.com"
+        },
+        {
+          "id": "m01-tls",
+          "expectedHealth": "good",
           "note": "HTTPS site"
+        },
+        {
+          "id": "m01-hsts",
+          "expectedHealth": "excellent",
+          "note": "HSTS present: max-age=63072000 (>1yr), includeSubDomains, preload"
+        },
+        {
+          "id": "m01-csp",
+          "expectedHealth": "excellent",
+          "note": "CSP present with strict policy: frame-ancestors 'none';"
+        },
+        {
+          "id": "m01-xcto",
+          "expectedHealth": "critical",
+          "note": "X-Content-Type-Options header is missing"
+        },
+        {
+          "id": "m01-framing",
+          "expectedHealth": "excellent",
+          "note": "CSP frame-ancestors directive is set (preferred over X-Frame-Options)"
+        },
+        {
+          "id": "m01-referrer",
+          "expectedHealth": "critical",
+          "note": "Referrer-Policy header is missing"
+        },
+        {
+          "id": "m01-permissions",
+          "expectedHealth": "critical",
+          "note": "Permissions-Policy header is missing"
+        },
+        {
+          "id": "m01-https-redirect",
+          "expectedHealth": "good",
+          "note": "HTTP fetch failed (port 80 may be closed); site is served over HTTPS"
+        },
+        {
+          "id": "m01-email",
+          "expectedHealth": "excellent",
+          "note": "Professional email provider detected: Google Workspace (MX: alt2.aspmx.l.google."
+        },
+        {
+          "id": "m01-caa",
+          "expectedHealth": "good",
+          "note": "CAA records set: certainly.com, digicert.com, amazon.com, globalsign.com, pki.go"
+        },
+        {
+          "id": "m01-geoip",
+          "expectedHealth": "info",
+          "note": "13.32.179.105: US, 13.32.179.54: US, 13.32.179.109: US, 13.32.179.36: US"
+        },
+        {
+          "id": "m01-mta-sts",
+          "expectedHealth": "excellent",
+          "note": "MTA-STS and SMTP TLS Reporting configured: v=STSv1;id=1585839705087;"
+        },
+        {
+          "id": "m01-ipv6",
+          "expectedHealth": "warning",
+          "note": "No AAAA records found — site is IPv4 only"
+        },
+        {
+          "id": "m01-www-consistency",
+          "expectedHealth": "excellent",
+          "note": "Security headers consistent between www and apex"
+        },
+        {
+          "id": "m01-sri",
+          "expectedHealth": "warning",
+          "note": "SRI coverage: 0% (0/1 cross-origin resources). Uncovered: https://fonts.googleap"
+        },
+        {
+          "id": "m01-redirect-chain",
+          "expectedHealth": "good",
+          "note": "1 redirect(s): https://www.zapier.com → https://zapier.com/"
+        },
+        {
+          "id": "m01-mixed-content",
+          "expectedHealth": "info",
+          "note": "Mixed content data not available — browser phase may not have executed"
         }
       ],
       "negativeAssertions": [],
@@ -57,9 +147,49 @@
       },
       "expectedCheckpoints": [
         {
+          "id": "m02-cms-identified",
+          "expectedHealth": "info",
+          "note": "No CMS detected; site may use a custom or headless solution."
+        },
+        {
+          "id": "m02-cms-version-currency",
+          "expectedHealth": "info",
+          "note": "No CMS version information available."
+        },
+        {
+          "id": "m02-cdn-detected",
+          "expectedHealth": "excellent",
+          "note": "Enterprise CDN detected: CloudFront (via fingerprint)"
+        },
+        {
           "id": "m02-https-enforced",
           "expectedHealth": "excellent",
           "note": "HTTPS site"
+        },
+        {
+          "id": "m02-http-version",
+          "expectedHealth": "excellent",
+          "note": "HTTP/3 (QUIC) detected via alt-svc header."
+        },
+        {
+          "id": "m02-compression",
+          "expectedHealth": "excellent",
+          "note": "Brotli compression detected on the initial HTML response."
+        },
+        {
+          "id": "m02-server-header-exposure",
+          "expectedHealth": "good",
+          "note": "Server header present without version: Vercel"
+        },
+        {
+          "id": "m02-framework-detected",
+          "expectedHealth": "info",
+          "note": "Frameworks: Next.js, React"
+        },
+        {
+          "id": "m02-hosting-identified",
+          "expectedHealth": "info",
+          "note": "Hosting: Vercel"
         }
       ],
       "negativeAssertions": [],
@@ -82,14 +212,109 @@
       },
       "expectedCheckpoints": [
         {
-          "id": "M04-VIEWPORT",
+          "id": "M04-TITLE",
           "expectedHealth": "excellent",
-          "note": "Viewport meta present"
+          "note": "Title present (47 chars): \"Zapier: Automate AI Workflows, Agents, and Apps\""
+        },
+        {
+          "id": "M04-META-DESC",
+          "expectedHealth": "excellent",
+          "note": "Meta description present (150 chars)"
+        },
+        {
+          "id": "M04-CANONICAL",
+          "expectedHealth": "excellent",
+          "note": "Self-referencing canonical URL: https://zapier.com/"
+        },
+        {
+          "id": "M04-OG-TAGS",
+          "expectedHealth": "warning",
+          "note": "Only 3/6 core OG tags present: og:title, og:description, og:image"
+        },
+        {
+          "id": "M04-OG-IMAGE",
+          "expectedHealth": "good",
+          "note": "OG image present: https://res.cloudinary.com/zapier-media/image/upload/v17459411"
+        },
+        {
+          "id": "M04-TWITTER",
+          "expectedHealth": "good",
+          "note": "Twitter Card type \"summary_large_image\" present"
+        },
+        {
+          "id": "M04-SCHEMA",
+          "expectedHealth": "critical",
+          "note": "No structured data (JSON-LD) found"
         },
         {
           "id": "M04-ROBOTS",
           "expectedHealth": "excellent",
           "note": "robots.txt exists"
+        },
+        {
+          "id": "M04-SITEMAP",
+          "expectedHealth": "excellent",
+          "note": "Sitemap present with 35 URL(s)"
+        },
+        {
+          "id": "M04-FAVICON",
+          "expectedHealth": "excellent",
+          "note": "Multiple favicon formats including apple-touch-icon: icon 16x16, icon 32x32, ico"
+        },
+        {
+          "id": "M04-LANG",
+          "expectedHealth": "good",
+          "note": "Language attribute present: lang=\"en\""
+        },
+        {
+          "id": "M04-HREFLANG",
+          "expectedHealth": "excellent",
+          "note": "Hreflang tags with x-default and 5 locale(s): fr, de, ja, es, en, x-default"
+        },
+        {
+          "id": "M04-PRECONNECT",
+          "expectedHealth": "excellent",
+          "note": "89 resource hints found: https://res.cloudinary.com, https://o23399.ingest.us.se"
+        },
+        {
+          "id": "M04-LLMS-TXT",
+          "expectedHealth": "excellent",
+          "note": "llms.txt present with directives (3013 chars)"
+        },
+        {
+          "id": "M04-MANIFEST",
+          "expectedHealth": "info",
+          "note": "No manifest.json found (informational -- required only for PWA installability)"
+        },
+        {
+          "id": "M04-ROBOTS-DIRECTIVES",
+          "expectedHealth": "info",
+          "note": "No explicit robots directives (defaults to index, follow)"
+        },
+        {
+          "id": "M04-VIEWPORT",
+          "expectedHealth": "excellent",
+          "note": "Viewport meta present"
+        },
+        {
+          "id": "M04-CHARSET",
+          "expectedHealth": "excellent",
+          "note": "UTF-8 charset declared via meta: utf-8"
+        },
+        {
+          "id": "M04-ADS-TXT",
+          "expectedHealth": "excellent",
+          "note": "ads.txt present with 0 seller record(s)"
+        },
+        {
+          "id": "m04-structured-data",
+          "expectedHealth": "warning",
+          "note": "No structured data found (JSON-LD, Microdata, or RDFa)"
+        },
+        {
+          "id": "M04-VIEWPORT-A11Y",
+          "expectedHealth": "excellent",
+          "note": "Viewport allows user zoom (content: \"width=device-width, initial-scale=1.0\")"
         }
       ],
       "negativeAssertions": [],
@@ -99,26 +324,39 @@
       "expectedData": {
         "press_page_url": {
           "match": "truthy",
-          "note": "/press/ found via probe fallback"
+          "note": "Press page at https://zapier.com/templates/details/social-media-bot"
+        },
+        "article_count": {
+          "value": 0,
+          "match": "gte",
+          "note": "Calibrated: module returns 0"
         }
       },
       "expectedCheckpoints": [
         {
           "id": "m16-press-page",
-          "expectedHealth": "info",
-          "note": "Press page found but no articles"
+          "expectedHealth": "good",
+          "note": "Press page found"
         },
         {
           "id": "m16-media-contact",
-          "expectedHealth": "info"
+          "expectedHealth": "good",
+          "note": "No media contact"
         },
         {
           "id": "m16-rss-feed",
-          "expectedHealth": "info"
+          "expectedHealth": "info",
+          "note": "No RSS feed"
         },
         {
           "id": "m16-media-logos",
-          "expectedHealth": "info"
+          "expectedHealth": "excellent",
+          "note": "No media logos"
+        },
+        {
+          "id": "m16-press-recency",
+          "expectedHealth": "info",
+          "note": "No dateable press content found"
         }
       ],
       "negativeAssertions": [],
@@ -134,8 +372,28 @@
       "expectedCheckpoints": [
         {
           "id": "m17-careers-page",
-          "expectedHealth": "good",
+          "expectedHealth": "excellent",
           "note": "Careers page exists"
+        },
+        {
+          "id": "m17-ats-provider",
+          "expectedHealth": "warning",
+          "note": "Job listings appear to be manually managed (no ATS detected)"
+        },
+        {
+          "id": "m17-open-positions",
+          "expectedHealth": "info",
+          "note": "10 open position(s) detected"
+        },
+        {
+          "id": "m17-team-culture",
+          "expectedHealth": "good",
+          "note": "Team page detected"
+        },
+        {
+          "id": "m17-hiring-velocity",
+          "expectedHealth": "info",
+          "note": "No dateable job postings found"
         }
       ],
       "negativeAssertions": [],
@@ -148,6 +406,31 @@
           "id": "m18-ir-portal",
           "expectedHealth": "info",
           "note": "No IR page"
+        },
+        {
+          "id": "m18-financial-data",
+          "expectedHealth": "info",
+          "note": "No SEC filings or annual reports detected"
+        },
+        {
+          "id": "m18-ticker-symbol",
+          "expectedHealth": "info",
+          "note": "No stock ticker detected (may be a private company)"
+        },
+        {
+          "id": "m18-esg-report",
+          "expectedHealth": "info",
+          "note": "No ESG or sustainability report detected"
+        },
+        {
+          "id": "m18-governance",
+          "expectedHealth": "info",
+          "note": "No corporate governance content detected"
+        },
+        {
+          "id": "m18-ir-comms",
+          "expectedHealth": "info",
+          "note": "No earnings calls, presentations, or investor events detected"
         }
       ],
       "negativeAssertions": [],
@@ -160,9 +443,46 @@
           "note": "Support/contact page found"
         }
       },
-      "expectedCheckpoints": [],
+      "expectedCheckpoints": [
+        {
+          "id": "m19-help-center",
+          "expectedHealth": "critical",
+          "note": "No support documentation found"
+        },
+        {
+          "id": "m19-support-channels",
+          "expectedHealth": "good",
+          "note": "2 support channels: live_chat, social_media"
+        },
+        {
+          "id": "m19-status-page",
+          "expectedHealth": "info",
+          "note": "No system status page detected"
+        },
+        {
+          "id": "m19-business-hours",
+          "expectedHealth": "info",
+          "note": "No business hours detected"
+        },
+        {
+          "id": "m19-community-forum",
+          "expectedHealth": "info",
+          "note": "No community forum or discussion channel detected"
+        },
+        {
+          "id": "m19-developer-docs",
+          "expectedHealth": "excellent",
+          "note": "Developer docs: \"Documentation\" (https://platform.zapier.com/)"
+        },
+        {
+          "id": "m19-training-academy",
+          "expectedHealth": "info",
+          "note": "No training portal or academy detected"
+        }
+      ],
       "negativeAssertions": [],
       "fixedBugs": []
     }
-  }
+  },
+  "calibratedAt": "2026-04-04T01:05:48.670Z"
 }

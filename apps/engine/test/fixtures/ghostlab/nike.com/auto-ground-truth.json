@@ -26,7 +26,7 @@
       "expectedCheckpoints": [
         {
           "id": "m01-spf",
-          "expectedHealth": "excellent",
+          "expectedHealth": "good",
           "note": "SPF present"
         },
         {
@@ -35,9 +35,99 @@
           "note": "DMARC p=reject"
         },
         {
+          "id": "m01-dkim",
+          "expectedHealth": "good",
+          "note": "DKIM found (selector: s2), key strength ~1024-bit"
+        },
+        {
+          "id": "m01-dnssec",
+          "expectedHealth": "critical",
+          "note": "No DNSSEC signing detected for nike.com"
+        },
+        {
           "id": "m01-tls",
-          "expectedHealth": "excellent",
+          "expectedHealth": "good",
           "note": "HTTPS site"
+        },
+        {
+          "id": "m01-hsts",
+          "expectedHealth": "warning",
+          "note": "HSTS present but max-age is 2628000 (<6 months)"
+        },
+        {
+          "id": "m01-csp",
+          "expectedHealth": "excellent",
+          "note": "CSP present with strict policy: frame-ancestors 'self' *.nike.com *.nikecloud.co"
+        },
+        {
+          "id": "m01-xcto",
+          "expectedHealth": "critical",
+          "note": "X-Content-Type-Options header is missing"
+        },
+        {
+          "id": "m01-framing",
+          "expectedHealth": "excellent",
+          "note": "CSP frame-ancestors directive is set (preferred over X-Frame-Options)"
+        },
+        {
+          "id": "m01-referrer",
+          "expectedHealth": "critical",
+          "note": "Referrer-Policy header is missing"
+        },
+        {
+          "id": "m01-permissions",
+          "expectedHealth": "warning",
+          "note": "Permissions-Policy present but permissive (0 restrictive directives): ch-ua-mode"
+        },
+        {
+          "id": "m01-https-redirect",
+          "expectedHealth": "good",
+          "note": "HTTP fetch failed (port 80 may be closed); site is served over HTTPS"
+        },
+        {
+          "id": "m01-email",
+          "expectedHealth": "excellent",
+          "note": "Email provider: Proofpoint (MX: mxa-001b6002.gslb.pphosted.com, mxb-001b6002.gsl"
+        },
+        {
+          "id": "m01-caa",
+          "expectedHealth": "critical",
+          "note": "No CAA records found"
+        },
+        {
+          "id": "m01-geoip",
+          "expectedHealth": "info",
+          "note": "23.3.132.106: US"
+        },
+        {
+          "id": "m01-mta-sts",
+          "expectedHealth": "warning",
+          "note": "No MTA-STS or SMTP TLS Reporting records found"
+        },
+        {
+          "id": "m01-ipv6",
+          "expectedHealth": "warning",
+          "note": "No AAAA records found — site is IPv4 only"
+        },
+        {
+          "id": "m01-www-consistency",
+          "expectedHealth": "excellent",
+          "note": "Security headers consistent between www and apex"
+        },
+        {
+          "id": "m01-sri",
+          "expectedHealth": "info",
+          "note": "No cross-origin script or stylesheet resources detected"
+        },
+        {
+          "id": "m01-redirect-chain",
+          "expectedHealth": "good",
+          "note": "1 redirect(s): https://www.nike.com → https://www.nike.com/pr/"
+        },
+        {
+          "id": "m01-mixed-content",
+          "expectedHealth": "info",
+          "note": "Mixed content data not available — browser phase may not have executed"
         }
       ],
       "negativeAssertions": [],
@@ -52,14 +142,54 @@
         "compression": {
           "value": "gzip",
           "match": "exact",
-          "note": "Compression from headers"
+          "note": "Calibrated from module output"
         }
       },
       "expectedCheckpoints": [
         {
+          "id": "m02-cms-identified",
+          "expectedHealth": "info",
+          "note": "No CMS detected; site may use a custom or headless solution."
+        },
+        {
+          "id": "m02-cms-version-currency",
+          "expectedHealth": "info",
+          "note": "No CMS version information available."
+        },
+        {
+          "id": "m02-cdn-detected",
+          "expectedHealth": "excellent",
+          "note": "Enterprise CDN detected: Akamai (via third-party domains)"
+        },
+        {
           "id": "m02-https-enforced",
           "expectedHealth": "excellent",
           "note": "HTTPS site"
+        },
+        {
+          "id": "m02-http-version",
+          "expectedHealth": "good",
+          "note": "HTTP/2 detected."
+        },
+        {
+          "id": "m02-compression",
+          "expectedHealth": "good",
+          "note": "Gzip compression detected on the initial HTML response."
+        },
+        {
+          "id": "m02-server-header-exposure",
+          "expectedHealth": "good",
+          "note": "Server header present without version: unified-edge-router"
+        },
+        {
+          "id": "m02-framework-detected",
+          "expectedHealth": "info",
+          "note": "Frameworks: Next.js, React"
+        },
+        {
+          "id": "m02-hosting-identified",
+          "expectedHealth": "info",
+          "note": "Hosting provider not identified from fingerprints."
         }
       ],
       "negativeAssertions": [],
@@ -86,14 +216,114 @@
       },
       "expectedCheckpoints": [
         {
+          "id": "M04-TITLE",
+          "expectedHealth": "excellent",
+          "note": "Title present (34 chars): \"Sitio web oficial de Nike. Nike PR\""
+        },
+        {
+          "id": "M04-META-DESC",
+          "expectedHealth": "good",
+          "note": "Meta description present (98 chars)"
+        },
+        {
+          "id": "M04-CANONICAL",
+          "expectedHealth": "excellent",
+          "note": "Self-referencing canonical URL: https://www.nike.com/pr/"
+        },
+        {
+          "id": "M04-OG-TAGS",
+          "expectedHealth": "excellent",
+          "note": "All 6 core OG tags present: og:title, og:description, og:image, og:url, og:type,"
+        },
+        {
+          "id": "M04-OG-IMAGE",
+          "expectedHealth": "good",
+          "note": "OG image present: https://c.static-nike.com/a/images/w_1920,c_limit/mdbgldn6yg1g"
+        },
+        {
+          "id": "M04-TWITTER",
+          "expectedHealth": "excellent",
+          "note": "summary_large_image Twitter Card with all fields (title, description, image, sit"
+        },
+        {
+          "id": "M04-SCHEMA",
+          "expectedHealth": "warning",
+          "note": "Minimal structured data: WebPage (1 blocks)"
+        },
+        {
+          "id": "M04-ROBOTS",
+          "expectedHealth": "warning",
+          "note": "robots.txt exists"
+        },
+        {
+          "id": "M04-SITEMAP",
+          "expectedHealth": "critical",
+          "note": "No sitemap found (checked /sitemap.xml, /sitemap_index.xml, /sitemap-index.xml, "
+        },
+        {
+          "id": "M04-FAVICON",
+          "expectedHealth": "excellent",
+          "note": "Multiple favicon formats including apple-touch-icon: icon, icon 192x192, icon 12"
+        },
+        {
+          "id": "M04-LANG",
+          "expectedHealth": "excellent",
+          "note": "Specific language attribute: lang=\"es-PR\""
+        },
+        {
+          "id": "M04-HREFLANG",
+          "expectedHealth": "info",
+          "note": "No hreflang tags found (informational -- may be a single-language site)"
+        },
+        {
+          "id": "M04-PRECONNECT",
+          "expectedHealth": "excellent",
+          "note": "12 resource hints found: https://insights-collector.newrelic.com/, https://c.sta"
+        },
+        {
+          "id": "M04-LLMS-TXT",
+          "expectedHealth": "good",
+          "note": "llms.txt present"
+        },
+        {
+          "id": "M04-MANIFEST",
+          "expectedHealth": "info",
+          "note": "No manifest.json found (informational -- required only for PWA installability)"
+        },
+        {
+          "id": "M04-ROBOTS-DIRECTIVES",
+          "expectedHealth": "excellent",
+          "note": "Robots directives present: index, follow"
+        },
+        {
           "id": "M04-VIEWPORT",
           "expectedHealth": "excellent",
           "note": "Viewport meta present"
         },
         {
-          "id": "M04-ROBOTS",
+          "id": "M04-CHARSET",
           "expectedHealth": "excellent",
-          "note": "robots.txt exists"
+          "note": "UTF-8 charset declared via meta: utf-8"
+        },
+        {
+          "id": "M04-ADS-TXT",
+          "expectedHealth": "excellent",
+          "note": "ads.txt present with 0 seller record(s)"
+        },
+        {
+          "id": "m04-structured-data",
+          "expectedHealth": "excellent",
+          "note": "1 structured data item(s) across JSON-LD (types: WebPage)"
+        },
+        {
+          "id": "m04-rich-snippets",
+          "expectedHealth": "info",
+          "note": "Structured data present but no Google rich result types detected (Organization, "
+        },
+        {
+          "id": "M04-VIEWPORT-A11Y",
+          "expectedHealth": "excellent",
+          "note": "Viewport allows user zoom (content: \"width=device-width, initial-scale=1.0, maxi"
         }
       ],
       "negativeAssertions": [],
@@ -103,26 +333,39 @@
       "expectedData": {
         "press_page_url": {
           "match": "falsy",
-          "note": "PASSIVE LIMITATION: External careers at jobs.nike.com"
+          "note": "Calibrated: module returns null"
+        },
+        "article_count": {
+          "value": 0,
+          "match": "gte",
+          "note": "Calibrated: module returns 0"
         }
       },
       "expectedCheckpoints": [
         {
           "id": "m16-press-page",
           "expectedHealth": "info",
-          "note": "Cannot detect: External careers at jobs.nike.com"
+          "note": "Press page found"
         },
         {
           "id": "m16-media-contact",
-          "expectedHealth": "info"
+          "expectedHealth": "info",
+          "note": "No media contact"
         },
         {
           "id": "m16-rss-feed",
-          "expectedHealth": "info"
+          "expectedHealth": "info",
+          "note": "No RSS feed"
         },
         {
           "id": "m16-media-logos",
-          "expectedHealth": "info"
+          "expectedHealth": "info",
+          "note": "No media logos"
+        },
+        {
+          "id": "m16-press-recency",
+          "expectedHealth": "info",
+          "note": "No dateable press content found"
         }
       ],
       "negativeAssertions": [],
@@ -132,14 +375,34 @@
       "expectedData": {
         "careers_page_url": {
           "match": "falsy",
-          "note": "PASSIVE LIMITATION: External careers at jobs.nike.com"
+          "note": "Calibrated: module returns null"
         }
       },
       "expectedCheckpoints": [
         {
           "id": "m17-careers-page",
           "expectedHealth": "info",
-          "note": "Cannot detect: External careers at jobs.nike.com"
+          "note": "Careers page exists"
+        },
+        {
+          "id": "m17-ats-provider",
+          "expectedHealth": "info",
+          "note": "No ATS provider detected"
+        },
+        {
+          "id": "m17-open-positions",
+          "expectedHealth": "info",
+          "note": "No open positions detected"
+        },
+        {
+          "id": "m17-team-culture",
+          "expectedHealth": "info",
+          "note": "No team or culture page detected"
+        },
+        {
+          "id": "m17-hiring-velocity",
+          "expectedHealth": "info",
+          "note": "No dateable job postings found"
         }
       ],
       "negativeAssertions": [],
@@ -150,8 +413,33 @@
       "expectedCheckpoints": [
         {
           "id": "m18-ir-portal",
-          "expectedHealth": "good",
+          "expectedHealth": "info",
           "note": "IR page found"
+        },
+        {
+          "id": "m18-financial-data",
+          "expectedHealth": "info",
+          "note": "No SEC filings or annual reports detected"
+        },
+        {
+          "id": "m18-ticker-symbol",
+          "expectedHealth": "info",
+          "note": "No stock ticker detected (may be a private company)"
+        },
+        {
+          "id": "m18-esg-report",
+          "expectedHealth": "info",
+          "note": "No ESG or sustainability report detected"
+        },
+        {
+          "id": "m18-governance",
+          "expectedHealth": "info",
+          "note": "No corporate governance content detected"
+        },
+        {
+          "id": "m18-ir-comms",
+          "expectedHealth": "info",
+          "note": "No earnings calls, presentations, or investor events detected"
         }
       ],
       "negativeAssertions": [],
@@ -164,9 +452,46 @@
           "note": "Support/contact page found"
         }
       },
-      "expectedCheckpoints": [],
+      "expectedCheckpoints": [
+        {
+          "id": "m19-help-center",
+          "expectedHealth": "good",
+          "note": "Help/support page with structured content found"
+        },
+        {
+          "id": "m19-support-channels",
+          "expectedHealth": "good",
+          "note": "2 support channels: live_chat, help_center"
+        },
+        {
+          "id": "m19-status-page",
+          "expectedHealth": "good",
+          "note": "Status page link found: https://www.nike.com/orders/details/"
+        },
+        {
+          "id": "m19-business-hours",
+          "expectedHealth": "excellent",
+          "note": "Business/support hours published on page"
+        },
+        {
+          "id": "m19-community-forum",
+          "expectedHealth": "info",
+          "note": "No community forum or discussion channel detected"
+        },
+        {
+          "id": "m19-developer-docs",
+          "expectedHealth": "info",
+          "note": "No developer or API documentation detected"
+        },
+        {
+          "id": "m19-training-academy",
+          "expectedHealth": "excellent",
+          "note": "Training portal: \"Training\""
+        }
+      ],
       "negativeAssertions": [],
       "fixedBugs": []
     }
-  }
+  },
+  "calibratedAt": "2026-04-04T01:04:02.807Z"
 }

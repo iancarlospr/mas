@@ -1,0 +1,130 @@
+{
+  "site": "univision.com",
+  "capturedAt": "2026-04-04T00:38:24.034Z",
+  "capturedBy": "capture-ground-truth.ts (browser-verified)",
+  "baseUrl": "https://www.univision.com/",
+  "modules": {
+    "M01": {
+      "spf": false,
+      "spfRecord": null,
+      "dmarc": true,
+      "dmarcPolicy": "quarantine",
+      "hasMx": true,
+      "mxCount": 4,
+      "hasHsts": true,
+      "hasCsp": false,
+      "hasXfo": false,
+      "hasXcto": false,
+      "hasReferrerPolicy": true,
+      "hasPermissionsPolicy": false,
+      "serverHeader": null
+    },
+    "M02": {
+      "isWordPress": false,
+      "hasGeneratorMeta": false,
+      "generator": null,
+      "serverHeader": null,
+      "hasCfRay": false,
+      "cdn": "Varnish",
+      "compression": null
+    },
+    "M04": {
+      "title": "Univision | Shows, Noticias, Entretenimiento, Deportes y Novelas - Champions League y Liga MX en vivo | Univision",
+      "metaDescription": "La mejor cobertura en Noticias, Deportes y Entretenimiento. Lo mejor de nuestra programación de TV. | Univision",
+      "canonical": "https://www.univision.com",
+      "htmlLang": "es",
+      "viewport": "width=device-width, initial-scale=1",
+      "charset": "utf-8",
+      "ogTagCount": 7,
+      "hasOgImage": true,
+      "jsonLdCount": 1,
+      "hasRobotsTxt": true,
+      "hasSitemap": false
+    },
+    "M16": {
+      "pressLinksFound": 118,
+      "pressLinks": [
+        {
+          "href": "/noticias",
+          "text": "Noticias"
+        },
+        {
+          "href": "/noticias/inmigracion",
+          "text": "Inmigración"
+        },
+        {
+          "href": "/noticias",
+          "text": "Noticias"
+        },
+        {
+          "href": "/noticias",
+          "text": "Noticias"
+        },
+        {
+          "href": "/noticias/criminalidad",
+          "text": "Criminalidad"
+        }
+      ],
+      "pressPageUrl": "https://www.univision.com/noticias",
+      "visibleArticleCount": 162,
+      "countStrategies": [
+        {
+          "name": "article",
+          "count": 0
+        },
+        {
+          "name": "articleLinks",
+          "count": 162
+        },
+        {
+          "name": "dates",
+          "count": 0
+        }
+      ],
+      "pagination": {
+        "hasLoadMore": false,
+        "hasPagination": false,
+        "maxPage": 0,
+        "pageLinksCount": 0,
+        "wpPagesCount": 0
+      },
+      "externalNewsroom": null,
+      "rssFeed": null,
+      "mediaContactEmail": null,
+      "hasMediaLogos": false
+    },
+    "M17": {
+      "careersLinksFound": 4,
+      "careersLinks": [
+        {
+          "href": "/shows/la-voz-de-la-manana/el-mercado-laboral-de-eeuu-suma-178-000-nuevos-empleos-y-baja-la-tasa-de-desempleo-al-4-3-video",
+          "text": ""
+        },
+        {
+          "href": "/shows/la-voz-de-la-manana/el-mercado-laboral-de-eeuu-suma-178-000-nuevos-empleos-y-baja-la-tasa-de-desempleo-al-4-3-video",
+          "text": "ÚLTIMA HORA"
+        },
+        {
+          "href": "/shows/la-voz-de-la-manana/el-mercado-laboral-de-eeuu-suma-178-000-nuevos-empleos-y-baja-la-tasa-de-desempleo-al-4-3-video",
+          "text": "El mercado laboral de EEUU suma 178,000 nuevos empleos y baj"
+        },
+        {
+          "href": "https://corporate.televisaunivision.com/careers",
+          "text": "Jobs"
+        }
+      ],
+      "hasCareersPage": true
+    },
+    "M18": {
+      "irLinksFound": 5,
+      "hasIrPage": true,
+      "ticker": null
+    },
+    "M19": {
+      "supportLinksFound": 4,
+      "hasSupportPage": true,
+      "hasPhone": false,
+      "emails": []
+    }
+  }
+}

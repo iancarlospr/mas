@@ -1,8 +1,8 @@
 {
-  "site": "mmm-pr.com",
-  "verifiedAt": "2026-04-03T23:28:51.922Z",
+  "site": "metro.pr",
+  "verifiedAt": "2026-04-04T00:39:03.516Z",
   "generatedBy": "generate-ground-truth-json.ts (from browser-ground-truth.json)",
-  "notes": "Auto-generated from browser-verified facts captured on 2026-04-03T23:28:51.922Z",
+  "notes": "Auto-generated from browser-verified facts captured on 2026-04-04T00:39:03.516Z",
   "modules": {
     "M01": {
       "expectedData": {
@@ -14,31 +14,31 @@
           "match": "truthy",
           "note": "DMARC record exists"
         },
-        "hsts": {
+        "csp": {
           "match": "truthy",
-          "note": "HSTS header present"
+          "note": "CSP header present"
         }
       },
       "expectedCheckpoints": [
         {
           "id": "m01-spf",
-          "expectedHealth": "excellent",
+          "expectedHealth": "good",
           "note": "SPF present"
         },
         {
           "id": "m01-dmarc",
-          "expectedHealth": "excellent",
-          "note": "DMARC p=reject"
+          "expectedHealth": "good",
+          "note": "DMARC p=quarantine"
         },
         {
           "id": "m01-dkim",
-          "expectedHealth": "critical",
-          "note": "No DKIM records detected for common selectors (default, google, selector1, selec"
+          "expectedHealth": "excellent",
+          "note": "DKIM found (selector: google), key strength ~2048-bit"
         },
         {
           "id": "m01-dnssec",
           "expectedHealth": "critical",
-          "note": "No DNSSEC signing detected for mmm-pr.com"
+          "note": "No DNSSEC signing detected for metro.pr"
         },
         {
           "id": "m01-tls",
@@ -47,13 +47,13 @@
         },
         {
           "id": "m01-hsts",
-          "expectedHealth": "excellent",
-          "note": "HSTS present: max-age=31536000 (>1yr), includeSubDomains, preload"
+          "expectedHealth": "critical",
+          "note": "Strict-Transport-Security header is missing"
         },
         {
           "id": "m01-csp",
-          "expectedHealth": "critical",
-          "note": "Content-Security-Policy header is missing"
+          "expectedHealth": "warning",
+          "note": "CSP present but contains no resource-restricting directives (no default-src, scr"
         },
         {
           "id": "m01-xcto",
@@ -62,8 +62,8 @@
         },
         {
           "id": "m01-framing",
-          "expectedHealth": "good",
-          "note": "X-Frame-Options: SAMEORIGIN"
+          "expectedHealth": "critical",
+          "note": "Neither CSP frame-ancestors nor X-Frame-Options is set"
         },
         {
           "id": "m01-referrer",
@@ -82,18 +82,18 @@
         },
         {
           "id": "m01-email",
-          "expectedHealth": "critical",
-          "note": "No MX records found for mmm-pr.com -- domain cannot receive email"
+          "expectedHealth": "excellent",
+          "note": "Professional email provider detected: Google Workspace (MX: smtp.google.com)"
         },
         {
           "id": "m01-caa",
-          "expectedHealth": "excellent",
-          "note": "CAA records set (entrust.net, digicert.com, sectigo.com) and match certificate i"
+          "expectedHealth": "critical",
+          "note": "No CAA records found"
         },
         {
           "id": "m01-geoip",
           "expectedHealth": "info",
-          "note": "63.128.78.150: US (Ormond Beach)"
+          "note": "64.237.191.211: PR (Moca), 64.237.191.152: PR (Moca)"
         },
         {
           "id": "m01-mta-sts",
@@ -102,8 +102,8 @@
         },
         {
           "id": "m01-ipv6",
-          "expectedHealth": "warning",
-          "note": "No AAAA records found — site is IPv4 only"
+          "expectedHealth": "excellent",
+          "note": "AAAA records found: 2606:5f00:1000:40a::40ed:bf98, 2606:5f00:1000:40a::40ed:bfd3"
         },
         {
           "id": "m01-www-consistency",
@@ -113,7 +113,7 @@
         {
           "id": "m01-sri",
           "expectedHealth": "warning",
-          "note": "SRI coverage: 0% (0/7 cross-origin resources). Uncovered: https://www.googletagm"
+          "note": "SRI coverage: 0% (0/2 cross-origin resources). Uncovered: //get.s-onetag.com/877"
         },
         {
           "id": "m01-redirect-chain",
@@ -154,18 +154,18 @@
         },
         {
           "id": "m02-cdn-detected",
-          "expectedHealth": "critical",
-          "note": "No CDN detected. Assets are likely served from origin."
+          "expectedHealth": "excellent",
+          "note": "Enterprise CDN detected: Akamai (via third-party domains)"
         },
         {
           "id": "m02-https-enforced",
-          "expectedHealth": "excellent",
+          "expectedHealth": "good",
           "note": "HTTPS site"
         },
         {
           "id": "m02-http-version",
-          "expectedHealth": "warning",
-          "note": "Could not confirm HTTP/2 or HTTP/3 from response headers. Likely HTTP/1.1."
+          "expectedHealth": "good",
+          "note": "HTTP/2 detected."
         },
         {
           "id": "m02-compression",
@@ -175,7 +175,7 @@
         {
           "id": "m02-server-header-exposure",
           "expectedHealth": "good",
-          "note": "Server header present without version: Apache"
+          "note": "Server header present without version: openresty"
         },
         {
           "id": "m02-framework-detected",
@@ -203,74 +203,78 @@
         },
         "htmlLang": {
           "match": "truthy",
-          "note": "Lang: es-ES"
+          "note": "Lang: es"
+        },
+        "jsonLd": {
+          "match": "truthy",
+          "note": "1 JSON-LD blocks"
         }
       },
       "expectedCheckpoints": [
         {
           "id": "M04-TITLE",
           "expectedHealth": "good",
-          "note": "Title present (20 chars): \"Medicare & Mucho Más\""
+          "note": "Title present (70 chars): \"Noticias, Deportes y Entretenimiento de Puerto Rico y"
         },
         {
           "id": "M04-META-DESC",
-          "expectedHealth": "excellent",
-          "note": "Meta description present (120 chars)"
+          "expectedHealth": "good",
+          "note": "Meta description present (87 chars)"
         },
         {
           "id": "M04-CANONICAL",
-          "expectedHealth": "critical",
-          "note": "No canonical URL found"
+          "expectedHealth": "excellent",
+          "note": "Self-referencing canonical URL: https://www.metro.pr"
         },
         {
           "id": "M04-OG-TAGS",
-          "expectedHealth": "good",
-          "note": "5/6 core OG tags present. Missing: og:image"
+          "expectedHealth": "warning",
+          "note": "Only 3/6 core OG tags present: og:title, og:image, og:site_name"
         },
         {
           "id": "M04-OG-IMAGE",
-          "expectedHealth": "critical",
-          "note": "No og:image tag found"
+          "expectedHealth": "good",
+          "note": "OG image present: https://www.metro.pr/resizer/v2/https%3A%2F%2Fwww.metroworldne"
         },
         {
           "id": "M04-TWITTER",
           "expectedHealth": "good",
-          "note": "Twitter Card type \"summary\" present"
+          "note": "Twitter Card type \"summary_large_image\" present"
         },
         {
           "id": "M04-SCHEMA",
-          "expectedHealth": "critical",
-          "note": "No structured data (JSON-LD) found"
+          "expectedHealth": "warning",
+          "note": "Minimal structured data: Organization (1 blocks) — org: Metro Puerto Rico"
         },
         {
           "id": "M04-ROBOTS",
-          "expectedHealth": "good",
+          "expectedHealth": "warning",
           "note": "robots.txt exists"
         },
         {
           "id": "M04-SITEMAP",
-          "expectedHealth": "critical",
-          "note": "No sitemap found (checked /sitemap.xml, /sitemap_index.xml, /sitemap-index.xml, "
+          "expectedHealth": "excellent",
+          "note": "Sitemap present (sitemap index) with 2 URL(s)"
         },
         {
           "id": "M04-FAVICON",
-          "expectedHealth": "excellent",
-          "note": "Multiple favicon formats including apple-touch-icon: apple-touch-icon 57x57, app"
+          "expectedHealth": "warning",
+          "note": "Single favicon found: icon"
         },
         {
           "id": "M04-LANG",
-          "expectedHealth": "excellent",
-          "note": "Specific language attribute: lang=\"es-ES\""
+          "expectedHealth": "good",
+          "note": "Language attribute present: lang=\"es\""
         },
         {
           "id": "M04-HREFLANG",
-          "expectedHealth": "info",
-          "note": "No hreflang tags found (informational -- may be a single-language site)"
+          "expectedHealth": "warning",
+          "note": "Hreflang present but only 1 entry: es"
         },
         {
           "id": "M04-PRECONNECT",
-          "expectedHealth": "info",
-          "note": "No preconnect/prefetch hints found (informational -- site may not need them)"
+          "expectedHealth": "excellent",
+          "note": "9 resource hints found: https://fonts.gstatic.com, https://www.googletagmanager."
         },
         {
           "id": "M04-LLMS-TXT",
@@ -284,8 +288,8 @@
         },
         {
           "id": "M04-ROBOTS-DIRECTIVES",
-          "expectedHealth": "info",
-          "note": "No explicit robots directives (defaults to index, follow)"
+          "expectedHealth": "excellent",
+          "note": "Robots directives present: index, follow"
         },
         {
           "id": "M04-VIEWPORT",
@@ -300,17 +304,22 @@
         {
           "id": "M04-ADS-TXT",
           "expectedHealth": "excellent",
-          "note": "ads.txt present with 0 seller record(s)"
+          "note": "ads.txt present with 1057 seller record(s)"
         },
         {
           "id": "m04-structured-data",
-          "expectedHealth": "warning",
-          "note": "No structured data found (JSON-LD, Microdata, or RDFa)"
+          "expectedHealth": "excellent",
+          "note": "1 structured data item(s) across JSON-LD (types: Organization)"
+        },
+        {
+          "id": "m04-rich-snippets",
+          "expectedHealth": "info",
+          "note": "Structured data present but no Google rich result types detected (Organization, "
         },
         {
           "id": "M04-VIEWPORT-A11Y",
           "expectedHealth": "excellent",
-          "note": "Viewport allows user zoom (content: \"width=device-width, initial-scale=1\")"
+          "note": "Viewport allows user zoom (content: \"width=device-width, initial-scale=1.0, user"
         }
       ],
       "negativeAssertions": [],
@@ -341,7 +350,7 @@
         },
         {
           "id": "m16-rss-feed",
-          "expectedHealth": "info",
+          "expectedHealth": "good",
           "note": "No RSS feed"
         },
         {
@@ -361,25 +370,25 @@
     "M17": {
       "expectedData": {
         "careers_page_url": {
-          "match": "truthy",
-          "note": "Careers page found"
+          "match": "falsy",
+          "note": "No careers page"
         }
       },
       "expectedCheckpoints": [
         {
           "id": "m17-careers-page",
-          "expectedHealth": "excellent",
-          "note": "Careers page exists"
+          "expectedHealth": "info",
+          "note": "No careers page"
         },
         {
           "id": "m17-ats-provider",
-          "expectedHealth": "excellent",
-          "note": "Professional ATS detected: Workday"
+          "expectedHealth": "info",
+          "note": "No ATS provider detected"
         },
         {
           "id": "m17-open-positions",
           "expectedHealth": "info",
-          "note": "1 open position(s) detected"
+          "note": "No open positions detected"
         },
         {
           "id": "m17-team-culture",
@@ -401,7 +410,7 @@
         {
           "id": "m18-ir-portal",
           "expectedHealth": "info",
-          "note": "No IR page"
+          "note": "IR page found"
         },
         {
           "id": "m18-financial-data",
@@ -448,7 +457,7 @@
         {
           "id": "m19-support-channels",
           "expectedHealth": "warning",
-          "note": "Only 1 support channel: phone"
+          "note": "Only 1 support channel: social_media"
         },
         {
           "id": "m19-status-page",
@@ -467,8 +476,8 @@
         },
         {
           "id": "m19-developer-docs",
-          "expectedHealth": "excellent",
-          "note": "Developer docs: \"CONOCE MÁS\" (../docs/Notice-Of-Availability.pdf)"
+          "expectedHealth": "info",
+          "note": "No developer or API documentation detected"
         },
         {
           "id": "m19-training-academy",
@@ -480,5 +489,5 @@
       "fixedBugs": []
     }
   },
-  "calibratedAt": "2026-04-04T01:03:54.047Z"
+  "calibratedAt": "2026-04-04T01:03:47.421Z"
 }

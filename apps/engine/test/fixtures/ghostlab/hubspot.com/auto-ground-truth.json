@@ -26,7 +26,7 @@
       "expectedCheckpoints": [
         {
           "id": "m01-spf",
-          "expectedHealth": "excellent",
+          "expectedHealth": "good",
           "note": "SPF present"
         },
         {
@@ -35,9 +35,99 @@
           "note": "DMARC p=reject"
         },
         {
-          "id": "m01-tls",
+          "id": "m01-dkim",
           "expectedHealth": "excellent",
+          "note": "DKIM found (selector: s1), key strength ~2048-bit"
+        },
+        {
+          "id": "m01-dnssec",
+          "expectedHealth": "good",
+          "note": "DNSSEC signing detected (full chain validation not performed in passive scan)"
+        },
+        {
+          "id": "m01-tls",
+          "expectedHealth": "good",
           "note": "HTTPS site"
+        },
+        {
+          "id": "m01-hsts",
+          "expectedHealth": "excellent",
+          "note": "HSTS present: max-age=31536000 (>1yr), includeSubDomains, preload"
+        },
+        {
+          "id": "m01-csp",
+          "expectedHealth": "good",
+          "note": "CSP present but contains unsafe-inline in script-src and unsafe-eval: script-src"
+        },
+        {
+          "id": "m01-xcto",
+          "expectedHealth": "excellent",
+          "note": "X-Content-Type-Options: nosniff is set"
+        },
+        {
+          "id": "m01-framing",
+          "expectedHealth": "good",
+          "note": "X-Frame-Options: DENY"
+        },
+        {
+          "id": "m01-referrer",
+          "expectedHealth": "good",
+          "note": "Referrer-Policy: no-referrer-when-downgrade"
+        },
+        {
+          "id": "m01-permissions",
+          "expectedHealth": "critical",
+          "note": "Permissions-Policy header is missing"
+        },
+        {
+          "id": "m01-https-redirect",
+          "expectedHealth": "good",
+          "note": "HTTP fetch failed (port 80 may be closed); site is served over HTTPS"
+        },
+        {
+          "id": "m01-email",
+          "expectedHealth": "excellent",
+          "note": "Professional email provider detected: Google Workspace (MX: smtp.google.com)"
+        },
+        {
+          "id": "m01-caa",
+          "expectedHealth": "critical",
+          "note": "No CAA records found"
+        },
+        {
+          "id": "m01-geoip",
+          "expectedHealth": "info",
+          "note": "104.18.39.114: , 172.64.148.142: US"
+        },
+        {
+          "id": "m01-mta-sts",
+          "expectedHealth": "warning",
+          "note": "No MTA-STS or SMTP TLS Reporting records found"
+        },
+        {
+          "id": "m01-ipv6",
+          "expectedHealth": "excellent",
+          "note": "AAAA records found: 2a06:98c1:310a::ac40:948e, 2606:4700:440d::6812:2772"
+        },
+        {
+          "id": "m01-www-consistency",
+          "expectedHealth": "excellent",
+          "note": "Security headers consistent between www and apex"
+        },
+        {
+          "id": "m01-sri",
+          "expectedHealth": "warning",
+          "note": "SRI coverage: 0% (0/4 cross-origin resources). Uncovered: https://cdn.intellimiz"
+        },
+        {
+          "id": "m01-redirect-chain",
+          "expectedHealth": "excellent",
+          "note": "No redirects — direct resolution"
+        },
+        {
+          "id": "m01-mixed-content",
+          "expectedHealth": "info",
+          "note": "Mixed content data not available — browser phase may not have executed"
         }
       ],
       "negativeAssertions": [],
@@ -55,16 +145,56 @@
           "note": "CDN detected from headers"
         },
         "compression": {
-          "value": "br",
+          "value": "brotli",
           "match": "exact",
-          "note": "Compression from headers"
+          "note": "Calibrated from module output"
         }
       },
       "expectedCheckpoints": [
         {
+          "id": "m02-cms-identified",
+          "expectedHealth": "good",
+          "note": "HubSpot CMS detected (confidence 1)"
+        },
+        {
+          "id": "m02-cms-version-currency",
+          "expectedHealth": "info",
+          "note": "HubSpot CMS detected but version could not be determined."
+        },
+        {
+          "id": "m02-cdn-detected",
+          "expectedHealth": "excellent",
+          "note": "Enterprise CDN detected: Cloudflare (via fingerprint)"
+        },
+        {
           "id": "m02-https-enforced",
           "expectedHealth": "excellent",
           "note": "HTTPS site"
+        },
+        {
+          "id": "m02-http-version",
+          "expectedHealth": "good",
+          "note": "HTTP/2 detected."
+        },
+        {
+          "id": "m02-compression",
+          "expectedHealth": "excellent",
+          "note": "Brotli compression detected on the initial HTML response."
+        },
+        {
+          "id": "m02-server-header-exposure",
+          "expectedHealth": "good",
+          "note": "Server header present without version: cloudflare"
+        },
+        {
+          "id": "m02-framework-detected",
+          "expectedHealth": "info",
+          "note": "No frontend framework detected."
+        },
+        {
+          "id": "m02-hosting-identified",
+          "expectedHealth": "info",
+          "note": "Hosting: Cloudflare (detected from response headers)"
         }
       ],
       "negativeAssertions": [],
@@ -91,14 +221,114 @@
       },
       "expectedCheckpoints": [
         {
+          "id": "M04-TITLE",
+          "expectedHealth": "excellent",
+          "note": "Title present (55 chars): \"HubSpot | Software & Tools for your Business - Homepa"
+        },
+        {
+          "id": "M04-META-DESC",
+          "expectedHealth": "excellent",
+          "note": "Meta description present (129 chars)"
+        },
+        {
+          "id": "M04-CANONICAL",
+          "expectedHealth": "excellent",
+          "note": "Self-referencing canonical URL: https://www.hubspot.com"
+        },
+        {
+          "id": "M04-OG-TAGS",
+          "expectedHealth": "good",
+          "note": "4/6 core OG tags present. Missing: og:type, og:site_name"
+        },
+        {
+          "id": "M04-OG-IMAGE",
+          "expectedHealth": "excellent",
+          "note": "OG image present with dimensions (2160x1440): https://www.hubspot.com/hubfs/asse"
+        },
+        {
+          "id": "M04-TWITTER",
+          "expectedHealth": "good",
+          "note": "Twitter Card type \"summary_large_image\" present"
+        },
+        {
+          "id": "M04-SCHEMA",
+          "expectedHealth": "excellent",
+          "note": "Rich structured data: Organization, WebSite, WebPage, Product, SoftwareApplicati"
+        },
+        {
+          "id": "M04-ROBOTS",
+          "expectedHealth": "good",
+          "note": "robots.txt exists"
+        },
+        {
+          "id": "M04-SITEMAP",
+          "expectedHealth": "excellent",
+          "note": "Sitemap present with 500 URL(s)"
+        },
+        {
+          "id": "M04-FAVICON",
+          "expectedHealth": "warning",
+          "note": "Single favicon found: shortcut icon"
+        },
+        {
+          "id": "M04-LANG",
+          "expectedHealth": "good",
+          "note": "Language attribute present: lang=\"en\""
+        },
+        {
+          "id": "M04-HREFLANG",
+          "expectedHealth": "excellent",
+          "note": "Hreflang tags with x-default and 6 locale(s): x-default, en, es, fr-FR, de-DE, j"
+        },
+        {
+          "id": "M04-PRECONNECT",
+          "expectedHealth": "excellent",
+          "note": "15 resource hints found: https://js.hs-analytics.net, https://wtcfns.hubspot.com"
+        },
+        {
+          "id": "M04-LLMS-TXT",
+          "expectedHealth": "good",
+          "note": "llms.txt present"
+        },
+        {
+          "id": "M04-MANIFEST",
+          "expectedHealth": "info",
+          "note": "No manifest.json found (informational -- required only for PWA installability)"
+        },
+        {
+          "id": "M04-ROBOTS-DIRECTIVES",
+          "expectedHealth": "info",
+          "note": "No explicit robots directives (defaults to index, follow)"
+        },
+        {
           "id": "M04-VIEWPORT",
           "expectedHealth": "excellent",
           "note": "Viewport meta present"
         },
         {
-          "id": "M04-ROBOTS",
+          "id": "M04-CHARSET",
           "expectedHealth": "excellent",
-          "note": "robots.txt exists"
+          "note": "UTF-8 charset declared via meta: utf-8"
+        },
+        {
+          "id": "M04-ADS-TXT",
+          "expectedHealth": "excellent",
+          "note": "ads.txt present with 0 seller record(s)"
+        },
+        {
+          "id": "m04-structured-data",
+          "expectedHealth": "good",
+          "note": "5 structured data item(s) across JSON-LD (types: Organization, WebSite, WebPage,"
+        },
+        {
+          "id": "m04-rich-snippets",
+          "expectedHealth": "good",
+          "note": "Eligible for 1 rich result feature(s): Software App — 1 type(s) missing required"
+        },
+        {
+          "id": "M04-VIEWPORT-A11Y",
+          "expectedHealth": "excellent",
+          "note": "Viewport allows user zoom (content: \"width=device-width, initial-scale=1\")"
         }
       ],
       "negativeAssertions": [],
@@ -108,26 +338,34 @@
       "expectedData": {
         "press_page_url": {
           "match": "truthy",
-          "note": "/newsroom/ found via probe fallback"
+          "note": "Calibrated: module returns \"https://www.hubspot.com/newsroom/\""
         }
       },
       "expectedCheckpoints": [
         {
           "id": "m16-press-page",
           "expectedHealth": "excellent",
-          "note": "Newsroom found"
+          "note": "No press page"
         },
         {
           "id": "m16-media-contact",
-          "expectedHealth": "good"
+          "expectedHealth": "good",
+          "note": "No media contact"
         },
         {
           "id": "m16-rss-feed",
-          "expectedHealth": "good"
+          "expectedHealth": "good",
+          "note": "No RSS feed"
         },
         {
           "id": "m16-media-logos",
-          "expectedHealth": "excellent"
+          "expectedHealth": "excellent",
+          "note": "No media logos"
+        },
+        {
+          "id": "m16-press-recency",
+          "expectedHealth": "excellent",
+          "note": "Most recent press content within 3 months (2026-04-03)"
         }
       ],
       "negativeAssertions": [],
@@ -143,8 +381,28 @@
       "expectedCheckpoints": [
         {
           "id": "m17-careers-page",
-          "expectedHealth": "good",
+          "expectedHealth": "excellent",
           "note": "Careers page exists"
+        },
+        {
+          "id": "m17-ats-provider",
+          "expectedHealth": "warning",
+          "note": "Job listings appear to be manually managed (no ATS detected)"
+        },
+        {
+          "id": "m17-open-positions",
+          "expectedHealth": "info",
+          "note": "2 open position(s) detected"
+        },
+        {
+          "id": "m17-team-culture",
+          "expectedHealth": "good",
+          "note": "Team page detected"
+        },
+        {
+          "id": "m17-hiring-velocity",
+          "expectedHealth": "info",
+          "note": "Very old job postings (last: 2025-03-01)"
         }
       ],
       "negativeAssertions": [],
@@ -155,8 +413,33 @@
       "expectedCheckpoints": [
         {
           "id": "m18-ir-portal",
-          "expectedHealth": "good",
+          "expectedHealth": "warning",
           "note": "IR page found"
+        },
+        {
+          "id": "m18-financial-data",
+          "expectedHealth": "info",
+          "note": "No SEC filings or annual reports detected"
+        },
+        {
+          "id": "m18-ticker-symbol",
+          "expectedHealth": "info",
+          "note": "No stock ticker detected (may be a private company)"
+        },
+        {
+          "id": "m18-esg-report",
+          "expectedHealth": "info",
+          "note": "No ESG or sustainability report detected"
+        },
+        {
+          "id": "m18-governance",
+          "expectedHealth": "good",
+          "note": "Governance reference: board of directors"
+        },
+        {
+          "id": "m18-ir-comms",
+          "expectedHealth": "info",
+          "note": "No earnings calls, presentations, or investor events detected"
         }
       ],
       "negativeAssertions": [],
@@ -169,9 +452,46 @@
           "note": "Support/contact page found"
         }
       },
-      "expectedCheckpoints": [],
+      "expectedCheckpoints": [
+        {
+          "id": "m19-help-center",
+          "expectedHealth": "excellent",
+          "note": "Professional help center detected (HubSpot Knowledge Base)"
+        },
+        {
+          "id": "m19-support-channels",
+          "expectedHealth": "excellent",
+          "note": "4 support channels: live_chat, help_center, community, social_media"
+        },
+        {
+          "id": "m19-status-page",
+          "expectedHealth": "info",
+          "note": "No system status page detected"
+        },
+        {
+          "id": "m19-business-hours",
+          "expectedHealth": "info",
+          "note": "No business hours detected"
+        },
+        {
+          "id": "m19-community-forum",
+          "expectedHealth": "excellent",
+          "note": "Dedicated community subdomain: //community.hubspot.com"
+        },
+        {
+          "id": "m19-developer-docs",
+          "expectedHealth": "excellent",
+          "note": "Developer docs: \"YouBiz Business Spend Insights survey\" (https://cdn.you.co/docs"
+        },
+        {
+          "id": "m19-training-academy",
+          "expectedHealth": "excellent",
+          "note": "Academy: \"Learn now\""
+        }
+      ],
       "negativeAssertions": [],
       "fixedBugs": []
     }
-  }
+  },
+  "calibratedAt": "2026-04-04T01:03:25.591Z"
 }

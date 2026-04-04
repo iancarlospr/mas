@@ -22,7 +22,7 @@
       "expectedCheckpoints": [
         {
           "id": "m01-spf",
-          "expectedHealth": "excellent",
+          "expectedHealth": "good",
           "note": "SPF present"
         },
         {
@@ -31,9 +31,99 @@
           "note": "DMARC p=reject"
         },
         {
+          "id": "m01-dkim",
+          "expectedHealth": "good",
+          "note": "DKIM found (selector: mail), key strength ~1024-bit"
+        },
+        {
+          "id": "m01-dnssec",
+          "expectedHealth": "good",
+          "note": "DNSSEC signing detected (full chain validation not performed in passive scan)"
+        },
+        {
           "id": "m01-tls",
-          "expectedHealth": "excellent",
+          "expectedHealth": "good",
           "note": "HTTPS site"
+        },
+        {
+          "id": "m01-hsts",
+          "expectedHealth": "warning",
+          "note": "HSTS present but max-age is 15552000 (<6 months)"
+        },
+        {
+          "id": "m01-csp",
+          "expectedHealth": "critical",
+          "note": "Content-Security-Policy header is missing"
+        },
+        {
+          "id": "m01-xcto",
+          "expectedHealth": "excellent",
+          "note": "X-Content-Type-Options: nosniff is set"
+        },
+        {
+          "id": "m01-framing",
+          "expectedHealth": "critical",
+          "note": "Neither CSP frame-ancestors nor X-Frame-Options is set"
+        },
+        {
+          "id": "m01-referrer",
+          "expectedHealth": "critical",
+          "note": "Referrer-Policy header is missing"
+        },
+        {
+          "id": "m01-permissions",
+          "expectedHealth": "critical",
+          "note": "Permissions-Policy header is missing"
+        },
+        {
+          "id": "m01-https-redirect",
+          "expectedHealth": "good",
+          "note": "HTTP fetch failed (port 80 may be closed); site is served over HTTPS"
+        },
+        {
+          "id": "m01-email",
+          "expectedHealth": "excellent",
+          "note": "Professional email provider detected: Google Workspace (MX: alt3.aspmx.l.google."
+        },
+        {
+          "id": "m01-caa",
+          "expectedHealth": "critical",
+          "note": "No CAA records found"
+        },
+        {
+          "id": "m01-geoip",
+          "expectedHealth": "info",
+          "note": "104.18.42.163: , 172.64.145.93: US"
+        },
+        {
+          "id": "m01-mta-sts",
+          "expectedHealth": "warning",
+          "note": "No MTA-STS or SMTP TLS Reporting records found"
+        },
+        {
+          "id": "m01-ipv6",
+          "expectedHealth": "warning",
+          "note": "No AAAA records found — site is IPv4 only"
+        },
+        {
+          "id": "m01-www-consistency",
+          "expectedHealth": "excellent",
+          "note": "Security headers consistent between www and apex"
+        },
+        {
+          "id": "m01-sri",
+          "expectedHealth": "warning",
+          "note": "SRI coverage: 0% (0/1 cross-origin resources). Uncovered: https://cdn.shopify.co"
+        },
+        {
+          "id": "m01-redirect-chain",
+          "expectedHealth": "excellent",
+          "note": "No redirects — direct resolution"
+        },
+        {
+          "id": "m01-mixed-content",
+          "expectedHealth": "info",
+          "note": "Mixed content data not available — browser phase may not have executed"
         }
       ],
       "negativeAssertions": [],
@@ -51,16 +141,56 @@
           "note": "CDN detected from headers"
         },
         "compression": {
-          "value": "br",
+          "value": "brotli",
           "match": "exact",
-          "note": "Compression from headers"
+          "note": "Calibrated from module output"
         }
       },
       "expectedCheckpoints": [
         {
+          "id": "m02-cms-identified",
+          "expectedHealth": "good",
+          "note": "Shopify detected (confidence 0.95)"
+        },
+        {
+          "id": "m02-cms-version-currency",
+          "expectedHealth": "info",
+          "note": "Shopify detected but version could not be determined."
+        },
+        {
+          "id": "m02-cdn-detected",
+          "expectedHealth": "excellent",
+          "note": "Enterprise CDN detected: Cloudflare (via fingerprint)"
+        },
+        {
           "id": "m02-https-enforced",
           "expectedHealth": "excellent",
           "note": "HTTPS site"
+        },
+        {
+          "id": "m02-http-version",
+          "expectedHealth": "excellent",
+          "note": "HTTP/3 (QUIC) detected via alt-svc header."
+        },
+        {
+          "id": "m02-compression",
+          "expectedHealth": "excellent",
+          "note": "Brotli compression detected on the initial HTML response."
+        },
+        {
+          "id": "m02-server-header-exposure",
+          "expectedHealth": "good",
+          "note": "Server header present without version: cloudflare"
+        },
+        {
+          "id": "m02-framework-detected",
+          "expectedHealth": "info",
+          "note": "No frontend framework detected."
+        },
+        {
+          "id": "m02-hosting-identified",
+          "expectedHealth": "info",
+          "note": "Hosting: Cloudflare (detected from response headers)"
         }
       ],
       "negativeAssertions": [],
@@ -87,14 +217,114 @@
       },
       "expectedCheckpoints": [
         {
+          "id": "M04-TITLE",
+          "expectedHealth": "good",
+          "note": "Title present (66 chars): \"Shopify: The All-in-One Commerce Platform for Busines"
+        },
+        {
+          "id": "M04-META-DESC",
+          "expectedHealth": "excellent",
+          "note": "Meta description present (145 chars)"
+        },
+        {
+          "id": "M04-CANONICAL",
+          "expectedHealth": "excellent",
+          "note": "Self-referencing canonical URL: https://www.shopify.com/"
+        },
+        {
+          "id": "M04-OG-TAGS",
+          "expectedHealth": "excellent",
+          "note": "All 6 core OG tags present: og:title, og:description, og:image, og:url, og:type,"
+        },
+        {
+          "id": "M04-OG-IMAGE",
+          "expectedHealth": "good",
+          "note": "OG image present: https://cdn.shopify.com/b/shopify-brochure2-assets/d617483c5e5"
+        },
+        {
+          "id": "M04-TWITTER",
+          "expectedHealth": "critical",
+          "note": "No Twitter Card tags found"
+        },
+        {
+          "id": "M04-SCHEMA",
+          "expectedHealth": "warning",
+          "note": "Minimal structured data: Corporation (1 blocks)"
+        },
+        {
+          "id": "M04-ROBOTS",
+          "expectedHealth": "warning",
+          "note": "robots.txt exists"
+        },
+        {
+          "id": "M04-SITEMAP",
+          "expectedHealth": "excellent",
+          "note": "Sitemap present with 500 URL(s)"
+        },
+        {
+          "id": "M04-FAVICON",
+          "expectedHealth": "excellent",
+          "note": "Multiple favicon formats including apple-touch-icon: icon, apple-touch-icon, app"
+        },
+        {
+          "id": "M04-LANG",
+          "expectedHealth": "good",
+          "note": "Language attribute present: lang=\"en\""
+        },
+        {
+          "id": "M04-HREFLANG",
+          "expectedHealth": "excellent",
+          "note": "Hreflang tags with x-default and 64 locale(s): x-default, en-US, es-AR, en-AU, d"
+        },
+        {
+          "id": "M04-PRECONNECT",
+          "expectedHealth": "excellent",
+          "note": "8 resource hints found: https://cdn.shopify.com/b/shopify-brochure2-assets/5949c"
+        },
+        {
+          "id": "M04-LLMS-TXT",
+          "expectedHealth": "excellent",
+          "note": "llms.txt present with directives (861 chars)"
+        },
+        {
+          "id": "M04-MANIFEST",
+          "expectedHealth": "info",
+          "note": "No manifest.json found (informational -- required only for PWA installability)"
+        },
+        {
+          "id": "M04-ROBOTS-DIRECTIVES",
+          "expectedHealth": "info",
+          "note": "No explicit robots directives (defaults to index, follow)"
+        },
+        {
           "id": "M04-VIEWPORT",
           "expectedHealth": "excellent",
           "note": "Viewport meta present"
         },
         {
-          "id": "M04-ROBOTS",
+          "id": "M04-CHARSET",
           "expectedHealth": "excellent",
-          "note": "robots.txt exists"
+          "note": "UTF-8 charset declared via meta: utf-8"
+        },
+        {
+          "id": "M04-ADS-TXT",
+          "expectedHealth": "excellent",
+          "note": "ads.txt present with 0 seller record(s)"
+        },
+        {
+          "id": "m04-structured-data",
+          "expectedHealth": "excellent",
+          "note": "2 structured data item(s) across JSON-LD, Microdata (types: Corporation, SiteNav"
+        },
+        {
+          "id": "m04-rich-snippets",
+          "expectedHealth": "info",
+          "note": "Structured data present but no Google rich result types detected (Organization, "
+        },
+        {
+          "id": "M04-VIEWPORT-A11Y",
+          "expectedHealth": "excellent",
+          "note": "Viewport allows user zoom (content: \"width=device-width,initial-scale=1\")"
         }
       ],
       "negativeAssertions": [],
@@ -107,9 +337,9 @@
           "note": "Press page at https://www.shopify.com/news"
         },
         "article_count": {
-          "value": 9,
+          "value": 18,
           "match": "gte",
-          "note": "9 articles (visible on page)"
+          "note": "Calibrated: module returns 18"
         }
       },
       "expectedCheckpoints": [
@@ -132,6 +362,11 @@
           "id": "m16-media-logos",
           "expectedHealth": "info",
           "note": "No media logos"
+        },
+        {
+          "id": "m16-press-recency",
+          "expectedHealth": "excellent",
+          "note": "Most recent press content within 3 months (2026-04-02)"
         }
       ],
       "negativeAssertions": [],
@@ -149,6 +384,26 @@
           "id": "m17-careers-page",
           "expectedHealth": "good",
           "note": "Careers page exists"
+        },
+        {
+          "id": "m17-ats-provider",
+          "expectedHealth": "excellent",
+          "note": "Professional ATS detected: Ashby"
+        },
+        {
+          "id": "m17-open-positions",
+          "expectedHealth": "info",
+          "note": "No open positions detected"
+        },
+        {
+          "id": "m17-team-culture",
+          "expectedHealth": "info",
+          "note": "No team or culture page detected"
+        },
+        {
+          "id": "m17-hiring-velocity",
+          "expectedHealth": "info",
+          "note": "No dateable job postings found"
         }
       ],
       "negativeAssertions": [],
@@ -161,6 +416,31 @@
           "id": "m18-ir-portal",
           "expectedHealth": "info",
           "note": "No IR page"
+        },
+        {
+          "id": "m18-financial-data",
+          "expectedHealth": "info",
+          "note": "No SEC filings or annual reports detected"
+        },
+        {
+          "id": "m18-ticker-symbol",
+          "expectedHealth": "info",
+          "note": "No stock ticker detected (may be a private company)"
+        },
+        {
+          "id": "m18-esg-report",
+          "expectedHealth": "info",
+          "note": "No ESG or sustainability report detected"
+        },
+        {
+          "id": "m18-governance",
+          "expectedHealth": "info",
+          "note": "No corporate governance content detected"
+        },
+        {
+          "id": "m18-ir-comms",
+          "expectedHealth": "info",
+          "note": "No earnings calls, presentations, or investor events detected"
         }
       ],
       "negativeAssertions": [],
@@ -173,9 +453,46 @@
           "note": "Support/contact page found"
         }
       },
-      "expectedCheckpoints": [],
+      "expectedCheckpoints": [
+        {
+          "id": "m19-help-center",
+          "expectedHealth": "good",
+          "note": "Help/support page with structured content found"
+        },
+        {
+          "id": "m19-support-channels",
+          "expectedHealth": "excellent",
+          "note": "3 support channels: help_center, community, social_media"
+        },
+        {
+          "id": "m19-status-page",
+          "expectedHealth": "good",
+          "note": "Status page link found: https://shopifystatus.com"
+        },
+        {
+          "id": "m19-business-hours",
+          "expectedHealth": "excellent",
+          "note": "Business/support hours published on page"
+        },
+        {
+          "id": "m19-community-forum",
+          "expectedHealth": "excellent",
+          "note": "Dedicated community subdomain: https://community.shopify.com/"
+        },
+        {
+          "id": "m19-developer-docs",
+          "expectedHealth": "excellent",
+          "note": "Developer docs: \"Developer Docs\" (https://shopify.dev/docs)"
+        },
+        {
+          "id": "m19-training-academy",
+          "expectedHealth": "info",
+          "note": "No training portal or academy detected"
+        }
+      ],
       "negativeAssertions": [],
       "fixedBugs": []
     }
-  }
+  },
+  "calibratedAt": "2026-04-04T01:04:53.775Z"
 }

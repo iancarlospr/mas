@@ -31,9 +31,99 @@
           "note": "DMARC p=none"
         },
         {
+          "id": "m01-dkim",
+          "expectedHealth": "critical",
+          "note": "No DKIM records detected for common selectors (default, google, selector1, selec"
+        },
+        {
+          "id": "m01-dnssec",
+          "expectedHealth": "critical",
+          "note": "No DNSSEC signing detected for investpr.org"
+        },
+        {
           "id": "m01-tls",
-          "expectedHealth": "excellent",
+          "expectedHealth": "good",
           "note": "HTTPS site"
+        },
+        {
+          "id": "m01-hsts",
+          "expectedHealth": "good",
+          "note": "HSTS present: max-age=63072000"
+        },
+        {
+          "id": "m01-csp",
+          "expectedHealth": "critical",
+          "note": "Content-Security-Policy header is missing"
+        },
+        {
+          "id": "m01-xcto",
+          "expectedHealth": "excellent",
+          "note": "X-Content-Type-Options: nosniff is set"
+        },
+        {
+          "id": "m01-framing",
+          "expectedHealth": "good",
+          "note": "X-Frame-Options: SAMEORIGIN"
+        },
+        {
+          "id": "m01-referrer",
+          "expectedHealth": "good",
+          "note": "Referrer-Policy: strict-origin"
+        },
+        {
+          "id": "m01-permissions",
+          "expectedHealth": "critical",
+          "note": "Permissions-Policy header is missing"
+        },
+        {
+          "id": "m01-https-redirect",
+          "expectedHealth": "good",
+          "note": "HTTP fetch failed (port 80 may be closed); site is served over HTTPS"
+        },
+        {
+          "id": "m01-email",
+          "expectedHealth": "good",
+          "note": "Custom mail server (MX: mx2-us1.ppe-hosted.com, mx1-us1.ppe-hosted.com)"
+        },
+        {
+          "id": "m01-caa",
+          "expectedHealth": "critical",
+          "note": "No CAA records found"
+        },
+        {
+          "id": "m01-geoip",
+          "expectedHealth": "info",
+          "note": "141.193.213.11: US, 141.193.213.10: US"
+        },
+        {
+          "id": "m01-mta-sts",
+          "expectedHealth": "warning",
+          "note": "No MTA-STS or SMTP TLS Reporting records found"
+        },
+        {
+          "id": "m01-ipv6",
+          "expectedHealth": "warning",
+          "note": "No AAAA records found — site is IPv4 only"
+        },
+        {
+          "id": "m01-www-consistency",
+          "expectedHealth": "excellent",
+          "note": "Security headers consistent between www and apex"
+        },
+        {
+          "id": "m01-sri",
+          "expectedHealth": "warning",
+          "note": "SRI coverage: 0% (0/2 cross-origin resources). Uncovered: //investprorg.mpeasyli"
+        },
+        {
+          "id": "m01-redirect-chain",
+          "expectedHealth": "excellent",
+          "note": "No redirects — direct resolution"
+        },
+        {
+          "id": "m01-mixed-content",
+          "expectedHealth": "info",
+          "note": "Mixed content data not available — browser phase may not have executed"
         }
       ],
       "negativeAssertions": [],
@@ -56,16 +146,56 @@
           "note": "CDN detected from headers"
         },
         "compression": {
-          "value": "br",
+          "value": "brotli",
           "match": "exact",
-          "note": "Compression from headers"
+          "note": "Calibrated from module output"
         }
       },
       "expectedCheckpoints": [
         {
+          "id": "m02-cms-identified",
+          "expectedHealth": "excellent",
+          "note": "WordPress 6.8.9 detected (confidence 1)"
+        },
+        {
+          "id": "m02-cms-version-currency",
+          "expectedHealth": "good",
+          "note": "WordPress version 6.8.9 detected. Version currency check requires a version data"
+        },
+        {
+          "id": "m02-cdn-detected",
+          "expectedHealth": "excellent",
+          "note": "Enterprise CDN detected: Cloudflare (via fingerprint)"
+        },
+        {
           "id": "m02-https-enforced",
           "expectedHealth": "excellent",
           "note": "HTTPS site"
+        },
+        {
+          "id": "m02-http-version",
+          "expectedHealth": "excellent",
+          "note": "HTTP/3 (QUIC) detected via alt-svc header."
+        },
+        {
+          "id": "m02-compression",
+          "expectedHealth": "excellent",
+          "note": "Brotli compression detected on the initial HTML response."
+        },
+        {
+          "id": "m02-server-header-exposure",
+          "expectedHealth": "good",
+          "note": "Server header present without version: cloudflare"
+        },
+        {
+          "id": "m02-framework-detected",
+          "expectedHealth": "info",
+          "note": "No frontend framework detected."
+        },
+        {
+          "id": "m02-hosting-identified",
+          "expectedHealth": "info",
+          "note": "Hosting: WP Engine (detected from response headers)"
         }
       ],
       "negativeAssertions": [],
@@ -92,14 +222,114 @@
       },
       "expectedCheckpoints": [
         {
-          "id": "M04-VIEWPORT",
+          "id": "M04-TITLE",
+          "expectedHealth": "good",
+          "note": "Title present (65 chars): \"InvestPR | Accelerating Economic Growth in Puerto Ric"
+        },
+        {
+          "id": "M04-META-DESC",
+          "expectedHealth": "good",
+          "note": "Meta description present (161 chars)"
+        },
+        {
+          "id": "M04-CANONICAL",
           "expectedHealth": "excellent",
-          "note": "Viewport meta present"
+          "note": "Self-referencing canonical URL: https://www.investpr.org/"
+        },
+        {
+          "id": "M04-OG-TAGS",
+          "expectedHealth": "excellent",
+          "note": "All 6 core OG tags present: og:title, og:description, og:image, og:url, og:type,"
+        },
+        {
+          "id": "M04-OG-IMAGE",
+          "expectedHealth": "excellent",
+          "note": "OG image present with dimensions (1920x1080): https://www.investpr.org/wp-conten"
+        },
+        {
+          "id": "M04-TWITTER",
+          "expectedHealth": "good",
+          "note": "Twitter Card type \"summary_large_image\" present"
+        },
+        {
+          "id": "M04-SCHEMA",
+          "expectedHealth": "excellent",
+          "note": "Rich structured data: WebPage, ImageObject, BreadcrumbList, WebSite, Organizatio"
         },
         {
           "id": "M04-ROBOTS",
           "expectedHealth": "excellent",
           "note": "robots.txt exists"
+        },
+        {
+          "id": "M04-SITEMAP",
+          "expectedHealth": "excellent",
+          "note": "Sitemap present (sitemap index) with 8 URL(s)"
+        },
+        {
+          "id": "M04-FAVICON",
+          "expectedHealth": "warning",
+          "note": "Single favicon found: icon"
+        },
+        {
+          "id": "M04-LANG",
+          "expectedHealth": "excellent",
+          "note": "Specific language attribute: lang=\"en-US\""
+        },
+        {
+          "id": "M04-HREFLANG",
+          "expectedHealth": "info",
+          "note": "No hreflang tags found (informational -- may be a single-language site)"
+        },
+        {
+          "id": "M04-PRECONNECT",
+          "expectedHealth": "excellent",
+          "note": "12 resource hints found: https://js.hsadspixel.net, https://js.hubspot.com, http"
+        },
+        {
+          "id": "M04-LLMS-TXT",
+          "expectedHealth": "good",
+          "note": "llms.txt present"
+        },
+        {
+          "id": "M04-MANIFEST",
+          "expectedHealth": "info",
+          "note": "No manifest.json found (informational -- required only for PWA installability)"
+        },
+        {
+          "id": "M04-ROBOTS-DIRECTIVES",
+          "expectedHealth": "excellent",
+          "note": "Robots directives present: index, follow, max-image-preview:large, max-snippet:-"
+        },
+        {
+          "id": "M04-VIEWPORT",
+          "expectedHealth": "excellent",
+          "note": "Viewport meta present"
+        },
+        {
+          "id": "M04-CHARSET",
+          "expectedHealth": "excellent",
+          "note": "UTF-8 charset declared via meta: UTF-8"
+        },
+        {
+          "id": "M04-ADS-TXT",
+          "expectedHealth": "excellent",
+          "note": "ads.txt present with 0 seller record(s)"
+        },
+        {
+          "id": "m04-structured-data",
+          "expectedHealth": "excellent",
+          "note": "5 structured data item(s) across JSON-LD (types: WebPage, ImageObject, Breadcrum"
+        },
+        {
+          "id": "m04-rich-snippets",
+          "expectedHealth": "excellent",
+          "note": "Eligible for 1 rich result feature(s): Breadcrumb"
+        },
+        {
+          "id": "M04-VIEWPORT-A11Y",
+          "expectedHealth": "excellent",
+          "note": "Viewport allows user zoom (content: \"width=device-width, initial-scale=1.0\")"
         }
       ],
       "negativeAssertions": [],
@@ -112,9 +342,9 @@
           "note": "Press page at https://www.investpr.org/news"
         },
         "article_count": {
-          "value": 64,
+          "value": 12,
           "match": "gte",
-          "note": "64 articles (pagination crawl)"
+          "note": "Calibrated: module returns 12"
         }
       },
       "expectedCheckpoints": [
@@ -137,6 +367,11 @@
           "id": "m16-media-logos",
           "expectedHealth": "excellent",
           "note": "Media logos detected"
+        },
+        {
+          "id": "m16-press-recency",
+          "expectedHealth": "excellent",
+          "note": "Most recent press content within 3 months (2026-03-16)"
         }
       ],
       "negativeAssertions": [],
@@ -152,8 +387,28 @@
       "expectedCheckpoints": [
         {
           "id": "m17-careers-page",
-          "expectedHealth": "good",
+          "expectedHealth": "excellent",
           "note": "Careers page exists"
+        },
+        {
+          "id": "m17-ats-provider",
+          "expectedHealth": "warning",
+          "note": "Job listings appear to be manually managed (no ATS detected)"
+        },
+        {
+          "id": "m17-open-positions",
+          "expectedHealth": "info",
+          "note": "3 open position(s) detected"
+        },
+        {
+          "id": "m17-team-culture",
+          "expectedHealth": "info",
+          "note": "No team or culture page detected"
+        },
+        {
+          "id": "m17-hiring-velocity",
+          "expectedHealth": "info",
+          "note": "No dateable job postings found"
         }
       ],
       "negativeAssertions": [],
@@ -166,6 +421,31 @@
           "id": "m18-ir-portal",
           "expectedHealth": "info",
           "note": "No IR page"
+        },
+        {
+          "id": "m18-financial-data",
+          "expectedHealth": "info",
+          "note": "No SEC filings or annual reports detected"
+        },
+        {
+          "id": "m18-ticker-symbol",
+          "expectedHealth": "info",
+          "note": "No stock ticker detected (may be a private company)"
+        },
+        {
+          "id": "m18-esg-report",
+          "expectedHealth": "info",
+          "note": "No ESG or sustainability report detected"
+        },
+        {
+          "id": "m18-governance",
+          "expectedHealth": "info",
+          "note": "No corporate governance content detected"
+        },
+        {
+          "id": "m18-ir-comms",
+          "expectedHealth": "info",
+          "note": "No earnings calls, presentations, or investor events detected"
         }
       ],
       "negativeAssertions": [],
@@ -174,13 +454,50 @@
     "M19": {
       "expectedData": {
         "support_page_url": {
-          "match": "truthy",
-          "note": "Support/contact page found"
+          "match": "falsy",
+          "note": "Calibrated: module returns null"
         }
       },
-      "expectedCheckpoints": [],
+      "expectedCheckpoints": [
+        {
+          "id": "m19-help-center",
+          "expectedHealth": "critical",
+          "note": "No support documentation found"
+        },
+        {
+          "id": "m19-support-channels",
+          "expectedHealth": "good",
+          "note": "2 support channels: phone, social_media"
+        },
+        {
+          "id": "m19-status-page",
+          "expectedHealth": "info",
+          "note": "No system status page detected"
+        },
+        {
+          "id": "m19-business-hours",
+          "expectedHealth": "info",
+          "note": "No business hours detected"
+        },
+        {
+          "id": "m19-community-forum",
+          "expectedHealth": "info",
+          "note": "No community forum or discussion channel detected"
+        },
+        {
+          "id": "m19-developer-docs",
+          "expectedHealth": "info",
+          "note": "No developer or API documentation detected"
+        },
+        {
+          "id": "m19-training-academy",
+          "expectedHealth": "info",
+          "note": "No training portal or academy detected"
+        }
+      ],
       "negativeAssertions": [],
       "fixedBugs": []
     }
-  }
+  },
+  "calibratedAt": "2026-04-04T01:03:32.489Z"
 }

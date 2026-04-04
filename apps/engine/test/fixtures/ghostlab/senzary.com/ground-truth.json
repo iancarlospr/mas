@@ -6,19 +6,63 @@
   "modules": {
     "M16": {
       "expectedData": {
-        "detected_language": { "value": "en", "match": "exact", "note": "English site" },
-        "press_page_url": { "value": "about/news", "match": "contains", "note": "Senzary has /about/news page with real news content" },
-        "rss_feed": { "value": "feed", "match": "contains", "note": "WordPress RSS at /feed/" },
-        "article_count": { "value": 6, "match": "gte", "note": "6 news articles on /about/news/ page, no pagination" },
-        "date_count": { "value": 1, "match": "gte", "note": "Should find dates in press content" },
-        "media_logos": { "value": false, "match": "exact", "note": "No media logos section" }
+        "detected_language": {
+          "value": "en",
+          "match": "exact",
+          "note": "Calibrated from module output"
+        },
+        "press_page_url": {
+          "value": "about/news",
+          "match": "contains",
+          "note": "Senzary has /about/news page with real news content"
+        },
+        "rss_feed": {
+          "value": "feed",
+          "match": "contains",
+          "note": "WordPress RSS at /feed/"
+        },
+        "article_count": {
+          "value": 6,
+          "match": "gte",
+          "note": "Calibrated: module returns 6"
+        },
+        "date_count": {
+          "value": 11,
+          "match": "gte",
+          "note": "Calibrated: module returns 11"
+        },
+        "media_logos": {
+          "value": false,
+          "match": "exact",
+          "note": "No media logos section"
+        }
       },
       "expectedCheckpoints": [
-        { "id": "m16-press-page", "expectedHealth": "excellent", "note": "Press page with recent content — RSS feed has items from March 2026" },
-        { "id": "m16-media-contact", "expectedHealth": "info", "note": "No press contacts" },
-        { "id": "m16-rss-feed", "expectedHealth": "good", "note": "WordPress RSS feed exists at /feed/" },
-        { "id": "m16-media-logos", "expectedHealth": "info", "note": "No media logos" },
-        { "id": "m16-press-recency", "expectedHealth": "excellent", "note": "RSS feed has content from March 2026 (within 3 months)" }
+        {
+          "id": "m16-press-page",
+          "expectedHealth": "excellent",
+          "note": "Press page with recent content — RSS feed has items from March 2026"
+        },
+        {
+          "id": "m16-media-contact",
+          "expectedHealth": "info",
+          "note": "No press contacts"
+        },
+        {
+          "id": "m16-rss-feed",
+          "expectedHealth": "good",
+          "note": "WordPress RSS feed exists at /feed/"
+        },
+        {
+          "id": "m16-media-logos",
+          "expectedHealth": "info",
+          "note": "No media logos"
+        },
+        {
+          "id": "m16-press-recency",
+          "expectedHealth": "excellent",
+          "note": "RSS feed has content from March 2026 (within 3 months)"
+        }
       ],
       "negativeAssertions": [
         {
@@ -51,22 +95,76 @@
     },
     "M02": {
       "expectedData": {
-        "detectedTechnologies": { "match": "truthy", "note": "Should detect at least WordPress" },
-        "cms.name": { "value": "WordPress", "match": "exact", "note": "WordPress CMS" },
-        "cdn.name": { "value": "Sucuri", "match": "exact", "note": "Sucuri CDN/WAF" },
-        "server.name": { "match": "truthy", "note": "Should detect web server" },
-        "compression": { "value": "gzip", "match": "exact", "note": "gzip compression" }
+        "detectedTechnologies": {
+          "match": "truthy",
+          "note": "Should detect at least WordPress"
+        },
+        "cms.name": {
+          "value": "WordPress",
+          "match": "exact",
+          "note": "Calibrated from module output"
+        },
+        "cdn.name": {
+          "value": "Sucuri",
+          "match": "exact",
+          "note": "Calibrated from module output"
+        },
+        "server.name": {
+          "match": "truthy",
+          "note": "Should detect web server"
+        },
+        "compression": {
+          "value": "gzip",
+          "match": "exact",
+          "note": "Calibrated from module output"
+        }
       },
       "expectedCheckpoints": [
-        { "id": "m02-cms-identified", "expectedHealth": "warning", "note": "WordPress detected but multiple CMS-like technologies found" },
-        { "id": "m02-cdn-detected", "expectedHealth": "good", "note": "Sucuri CDN detected" },
-        { "id": "m02-https-enforced", "expectedHealth": "excellent", "note": "HTTPS + HSTS" },
-        { "id": "m02-compression", "expectedHealth": "good", "note": "gzip compression" },
-        { "id": "m02-cms-version-currency", "expectedHealth": "good", "note": "Version detected" },
-        { "id": "m02-http-version", "expectedHealth": "excellent", "note": "HTTP/2+ detected from CDN headers" },
-        { "id": "m02-server-header-exposure", "expectedHealth": "warning", "note": "Server header exposed with version" },
-        { "id": "m02-framework-detected", "expectedHealth": "info", "note": "Framework info" },
-        { "id": "m02-hosting-identified", "expectedHealth": "info", "note": "Hosting info" }
+        {
+          "id": "m02-cms-identified",
+          "expectedHealth": "warning",
+          "note": "WordPress detected but multiple CMS-like technologies found"
+        },
+        {
+          "id": "m02-cms-version-currency",
+          "expectedHealth": "good",
+          "note": "Version detected"
+        },
+        {
+          "id": "m02-cdn-detected",
+          "expectedHealth": "good",
+          "note": "Sucuri CDN detected"
+        },
+        {
+          "id": "m02-https-enforced",
+          "expectedHealth": "excellent",
+          "note": "HTTPS + HSTS"
+        },
+        {
+          "id": "m02-http-version",
+          "expectedHealth": "excellent",
+          "note": "HTTP/2+ detected from CDN headers"
+        },
+        {
+          "id": "m02-compression",
+          "expectedHealth": "good",
+          "note": "gzip compression"
+        },
+        {
+          "id": "m02-server-header-exposure",
+          "expectedHealth": "warning",
+          "note": "Server header exposed with version"
+        },
+        {
+          "id": "m02-framework-detected",
+          "expectedHealth": "info",
+          "note": "Framework info"
+        },
+        {
+          "id": "m02-hosting-identified",
+          "expectedHealth": "info",
+          "note": "Hosting info"
+        }
       ],
       "negativeAssertions": [
         {
@@ -94,26 +192,175 @@
     },
     "M04": {
       "expectedData": {
-        "title": { "match": "truthy", "note": "Page title should exist" },
-        "metaDescription": { "match": "truthy", "note": "Meta description should exist" },
-        "htmlLang": { "match": "truthy", "note": "HTML lang attribute should be present" },
-        "jsonLd": { "match": "truthy", "note": "Should have some JSON-LD schema" },
-        "ogTags": { "match": "truthy", "note": "Should have Open Graph tags" }
+        "title": {
+          "match": "truthy",
+          "note": "Page title should exist"
+        },
+        "metaDescription": {
+          "match": "truthy",
+          "note": "Meta description should exist"
+        },
+        "htmlLang": {
+          "match": "truthy",
+          "note": "HTML lang attribute should be present"
+        },
+        "jsonLd": {
+          "match": "truthy",
+          "note": "Should have some JSON-LD schema"
+        },
+        "ogTags": {
+          "match": "truthy",
+          "note": "Should have Open Graph tags"
+        }
       },
       "expectedCheckpoints": [
-        { "id": "M04-TITLE", "expectedHealth": "good", "note": "Title exists but may be outside 30-60 char sweet spot" },
-        { "id": "M04-META-DESC", "expectedHealth": "warning", "note": "Meta description exists but outside optimal length range" },
-        { "id": "M04-VIEWPORT", "expectedHealth": "excellent", "note": "Proper viewport meta" }
+        {
+          "id": "M04-TITLE",
+          "expectedHealth": "good",
+          "note": "Title exists but may be outside 30-60 char sweet spot"
+        },
+        {
+          "id": "M04-META-DESC",
+          "expectedHealth": "warning",
+          "note": "Meta description exists but outside optimal length range"
+        },
+        {
+          "id": "M04-CANONICAL",
+          "expectedHealth": "excellent",
+          "note": "Self-referencing canonical URL: https://www.senzary.com/"
+        },
+        {
+          "id": "M04-OG-TAGS",
+          "expectedHealth": "excellent",
+          "note": "All 6 core OG tags present: og:title, og:description, og:image, og:url, og:type,"
+        },
+        {
+          "id": "M04-OG-IMAGE",
+          "expectedHealth": "good",
+          "note": "OG image present: https://www.senzary.com/wp-content/uploads/2024/10/iac-1.png"
+        },
+        {
+          "id": "M04-TWITTER",
+          "expectedHealth": "good",
+          "note": "Twitter Card type \"summary_large_image\" present"
+        },
+        {
+          "id": "M04-SCHEMA",
+          "expectedHealth": "excellent",
+          "note": "Rich structured data: WebPage, ImageObject, BreadcrumbList, WebSite, Organizatio"
+        },
+        {
+          "id": "M04-ROBOTS",
+          "expectedHealth": "excellent",
+          "note": "robots.txt present with 1 sitemap reference(s), 6 disallow rule(s), 1 user-agent"
+        },
+        {
+          "id": "M04-SITEMAP",
+          "expectedHealth": "excellent",
+          "note": "Sitemap present (sitemap index) with 10 URL(s)"
+        },
+        {
+          "id": "M04-FAVICON",
+          "expectedHealth": "excellent",
+          "note": "Multiple favicon formats including apple-touch-icon: icon 32x32, icon 192x192, a"
+        },
+        {
+          "id": "M04-LANG",
+          "expectedHealth": "excellent",
+          "note": "Specific language attribute: lang=\"en-US\""
+        },
+        {
+          "id": "M04-HREFLANG",
+          "expectedHealth": "info",
+          "note": "No hreflang tags found (informational -- may be a single-language site)"
+        },
+        {
+          "id": "M04-PRECONNECT",
+          "expectedHealth": "good",
+          "note": "2 resource hint(s) found: //stats.wp.com, //www.googletagmanager.com"
+        },
+        {
+          "id": "M04-LLMS-TXT",
+          "expectedHealth": "good",
+          "note": "llms.txt present"
+        },
+        {
+          "id": "M04-MANIFEST",
+          "expectedHealth": "info",
+          "note": "No manifest.json found (informational -- required only for PWA installability)"
+        },
+        {
+          "id": "M04-ROBOTS-DIRECTIVES",
+          "expectedHealth": "excellent",
+          "note": "Robots directives present: index, follow, max-image-preview:large, max-snippet:-"
+        },
+        {
+          "id": "M04-VIEWPORT",
+          "expectedHealth": "excellent",
+          "note": "Proper viewport meta"
+        },
+        {
+          "id": "M04-CHARSET",
+          "expectedHealth": "excellent",
+          "note": "UTF-8 charset declared via meta: UTF-8"
+        },
+        {
+          "id": "M04-ADS-TXT",
+          "expectedHealth": "excellent",
+          "note": "ads.txt present with 0 seller record(s)"
+        },
+        {
+          "id": "m04-structured-data",
+          "expectedHealth": "excellent",
+          "note": "5 structured data item(s) across JSON-LD (types: WebPage, ImageObject, Breadcrum"
+        },
+        {
+          "id": "m04-rich-snippets",
+          "expectedHealth": "excellent",
+          "note": "Eligible for 1 rich result feature(s): Breadcrumb"
+        },
+        {
+          "id": "M04-VIEWPORT-A11Y",
+          "expectedHealth": "excellent",
+          "note": "Viewport allows user zoom (content: \"width=device-width, initial-scale=1\")"
+        }
       ],
       "negativeAssertions": [],
       "fixedBugs": []
     },
     "M17": {
       "expectedData": {
-        "careers_page_url": { "match": "falsy", "note": "Small company, no careers page expected" }
+        "careers_page_url": {
+          "match": "falsy",
+          "note": "Small company, no careers page expected"
+        }
       },
       "expectedCheckpoints": [
-        { "id": "m17-careers-page", "expectedHealth": "info", "note": "No careers page" }
+        {
+          "id": "m17-careers-page",
+          "expectedHealth": "info",
+          "note": "No careers page"
+        },
+        {
+          "id": "m17-ats-provider",
+          "expectedHealth": "info",
+          "note": "No ATS provider detected"
+        },
+        {
+          "id": "m17-open-positions",
+          "expectedHealth": "info",
+          "note": "No open positions detected"
+        },
+        {
+          "id": "m17-team-culture",
+          "expectedHealth": "info",
+          "note": "No team or culture page detected"
+        },
+        {
+          "id": "m17-hiring-velocity",
+          "expectedHealth": "info",
+          "note": "No dateable job postings found"
+        }
       ],
       "negativeAssertions": [],
       "fixedBugs": [
@@ -125,15 +372,42 @@
     },
     "M18": {
       "expectedData": {
-        "ir_page_url": { "match": "falsy", "note": "Private company, no IR portal — /product/net-wireless-ir-blaster is an infrared product" }
+        "ir_page_url": {
+          "match": "falsy",
+          "note": "Private company, no IR portal — /product/net-wireless-ir-blaster is an infrared product"
+        }
       },
       "expectedCheckpoints": [
-        { "id": "m18-ir-portal", "expectedHealth": "info", "note": "No IR portal for private company" },
-        { "id": "m18-financial-data", "expectedHealth": "info", "note": "No financial data" },
-        { "id": "m18-ticker-symbol", "expectedHealth": "info", "note": "No ticker" },
-        { "id": "m18-esg-report", "expectedHealth": "info", "note": "No ESG report" },
-        { "id": "m18-governance", "expectedHealth": "info", "note": "No governance" },
-        { "id": "m18-ir-comms", "expectedHealth": "info", "note": "No IR comms" }
+        {
+          "id": "m18-ir-portal",
+          "expectedHealth": "info",
+          "note": "No IR portal for private company"
+        },
+        {
+          "id": "m18-financial-data",
+          "expectedHealth": "info",
+          "note": "No financial data"
+        },
+        {
+          "id": "m18-ticker-symbol",
+          "expectedHealth": "info",
+          "note": "No ticker"
+        },
+        {
+          "id": "m18-esg-report",
+          "expectedHealth": "info",
+          "note": "No ESG report"
+        },
+        {
+          "id": "m18-governance",
+          "expectedHealth": "info",
+          "note": "No governance"
+        },
+        {
+          "id": "m18-ir-comms",
+          "expectedHealth": "info",
+          "note": "No IR comms"
+        }
       ],
       "negativeAssertions": [
         {
@@ -169,10 +443,47 @@
     },
     "M19": {
       "expectedData": {
-        "support_page_url": { "match": "truthy", "note": "Should detect some support/contact page" }
+        "support_page_url": {
+          "match": "truthy",
+          "note": "Should detect some support/contact page"
+        }
       },
       "expectedCheckpoints": [
-        { "id": "m19-support-channels", "expectedHealth": "warning", "note": "Limited support channels" }
+        {
+          "id": "m19-help-center",
+          "expectedHealth": "critical",
+          "note": "No support documentation found"
+        },
+        {
+          "id": "m19-support-channels",
+          "expectedHealth": "warning",
+          "note": "Limited support channels"
+        },
+        {
+          "id": "m19-status-page",
+          "expectedHealth": "info",
+          "note": "No system status page detected"
+        },
+        {
+          "id": "m19-business-hours",
+          "expectedHealth": "excellent",
+          "note": "Business/support hours published on page"
+        },
+        {
+          "id": "m19-community-forum",
+          "expectedHealth": "info",
+          "note": "No community forum or discussion channel detected"
+        },
+        {
+          "id": "m19-developer-docs",
+          "expectedHealth": "info",
+          "note": "No developer or API documentation detected"
+        },
+        {
+          "id": "m19-training-academy",
+          "expectedHealth": "info",
+          "note": "No training portal or academy detected"
+        }
       ],
       "negativeAssertions": [
         {
@@ -196,15 +507,129 @@
     },
     "M01": {
       "expectedData": {
-        "spf": { "match": "truthy", "note": "SPF record should exist" },
-        "dmarc": { "match": "truthy", "note": "DMARC record should exist" },
-        "tls": { "match": "truthy", "note": "TLS info should be captured" },
-        "hsts": { "match": "truthy", "note": "HSTS header should be present" }
+        "spf": {
+          "match": "truthy",
+          "note": "SPF record should exist"
+        },
+        "dmarc": {
+          "match": "truthy",
+          "note": "DMARC record should exist"
+        },
+        "tls": {
+          "match": "truthy",
+          "note": "TLS info should be captured"
+        },
+        "hsts": {
+          "match": "truthy",
+          "note": "HSTS header should be present"
+        }
       },
       "expectedCheckpoints": [
-        { "id": "m01-spf", "expectedHealth": "excellent" },
-        { "id": "m01-tls", "expectedHealth": "excellent" },
-        { "id": "m01-hsts", "expectedHealth": "good" }
+        {
+          "id": "m01-spf",
+          "expectedHealth": "excellent",
+          "note": "SPF present with -all and 7 DNS lookups (limit 10): v=spf1 include:_spf.google.c"
+        },
+        {
+          "id": "m01-dmarc",
+          "expectedHealth": "warning",
+          "note": "DMARC policy is none (monitoring only): v=DMARC1; p=none; rua=mailto:amazeus.net"
+        },
+        {
+          "id": "m01-dkim",
+          "expectedHealth": "critical",
+          "note": "No DKIM records detected for common selectors (default, google, selector1, selec"
+        },
+        {
+          "id": "m01-dnssec",
+          "expectedHealth": "critical",
+          "note": "No DNSSEC signing detected for senzary.com"
+        },
+        {
+          "id": "m01-tls",
+          "expectedHealth": "good",
+          "note": "Valid TLS cert (TLSv1.3, RSA), expires in 68 days, issuer: Starfield Technologie"
+        },
+        {
+          "id": "m01-hsts",
+          "expectedHealth": "excellent",
+          "note": "HSTS present: max-age=31536000 (>1yr), includeSubDomains, preload"
+        },
+        {
+          "id": "m01-csp",
+          "expectedHealth": "warning",
+          "note": "CSP present but contains no resource-restricting directives (no default-src, scr"
+        },
+        {
+          "id": "m01-xcto",
+          "expectedHealth": "excellent",
+          "note": "X-Content-Type-Options: nosniff is set"
+        },
+        {
+          "id": "m01-framing",
+          "expectedHealth": "good",
+          "note": "X-Frame-Options: SAMEORIGIN"
+        },
+        {
+          "id": "m01-referrer",
+          "expectedHealth": "critical",
+          "note": "Referrer-Policy header is missing"
+        },
+        {
+          "id": "m01-permissions",
+          "expectedHealth": "critical",
+          "note": "Permissions-Policy header is missing"
+        },
+        {
+          "id": "m01-https-redirect",
+          "expectedHealth": "good",
+          "note": "HTTP fetch failed (port 80 may be closed); site is served over HTTPS"
+        },
+        {
+          "id": "m01-email",
+          "expectedHealth": "excellent",
+          "note": "Email provider: IONOS (1&1) (MX: mx01.1and1.com, mx00.1and1.com, senzary-com.mai"
+        },
+        {
+          "id": "m01-caa",
+          "expectedHealth": "critical",
+          "note": "No CAA records found"
+        },
+        {
+          "id": "m01-geoip",
+          "expectedHealth": "info",
+          "note": "192.124.249.189: US (Menifee)"
+        },
+        {
+          "id": "m01-mta-sts",
+          "expectedHealth": "warning",
+          "note": "No MTA-STS or SMTP TLS Reporting records found"
+        },
+        {
+          "id": "m01-ipv6",
+          "expectedHealth": "warning",
+          "note": "No AAAA records found — site is IPv4 only"
+        },
+        {
+          "id": "m01-www-consistency",
+          "expectedHealth": "excellent",
+          "note": "Security headers consistent between www and apex"
+        },
+        {
+          "id": "m01-sri",
+          "expectedHealth": "warning",
+          "note": "SRI coverage: 0% (0/3 cross-origin resources). Uncovered: https://stats.wp.com/s"
+        },
+        {
+          "id": "m01-redirect-chain",
+          "expectedHealth": "excellent",
+          "note": "No redirects — direct resolution"
+        },
+        {
+          "id": "m01-mixed-content",
+          "expectedHealth": "info",
+          "note": "Mixed content data not available — browser phase may not have executed"
+        }
       ],
       "negativeAssertions": [],
       "fixedBugs": [
@@ -214,5 +639,6 @@
         }
       ]
     }
-  }
+  },
+  "calibratedAt": "2026-04-04T01:04:46.455Z"
 }

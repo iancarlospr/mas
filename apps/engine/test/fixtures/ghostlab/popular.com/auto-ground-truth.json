@@ -1,8 +1,8 @@
 {
-  "site": "mmm-pr.com",
-  "verifiedAt": "2026-04-03T23:28:51.922Z",
+  "site": "popular.com",
+  "verifiedAt": "2026-04-04T00:39:25.752Z",
   "generatedBy": "generate-ground-truth-json.ts (from browser-ground-truth.json)",
-  "notes": "Auto-generated from browser-verified facts captured on 2026-04-03T23:28:51.922Z",
+  "notes": "Auto-generated from browser-verified facts captured on 2026-04-04T00:39:25.752Z",
   "modules": {
     "M01": {
       "expectedData": {
@@ -17,6 +17,10 @@
         "hsts": {
           "match": "truthy",
           "note": "HSTS header present"
+        },
+        "csp": {
+          "match": "truthy",
+          "note": "CSP header present"
         }
       },
       "expectedCheckpoints": [
@@ -32,13 +36,13 @@
         },
         {
           "id": "m01-dkim",
-          "expectedHealth": "critical",
-          "note": "No DKIM records detected for common selectors (default, google, selector1, selec"
+          "expectedHealth": "excellent",
+          "note": "DKIM found (selector: selector2), key strength ~2048-bit"
         },
         {
           "id": "m01-dnssec",
           "expectedHealth": "critical",
-          "note": "No DNSSEC signing detected for mmm-pr.com"
+          "note": "No DNSSEC signing detected for popular.com"
         },
         {
           "id": "m01-tls",
@@ -47,18 +51,18 @@
         },
         {
           "id": "m01-hsts",
-          "expectedHealth": "excellent",
-          "note": "HSTS present: max-age=31536000 (>1yr), includeSubDomains, preload"
+          "expectedHealth": "good",
+          "note": "HSTS present: max-age=31536000"
         },
         {
           "id": "m01-csp",
-          "expectedHealth": "critical",
-          "note": "Content-Security-Policy header is missing"
+          "expectedHealth": "warning",
+          "note": "CSP present but overly permissive (wildcard or broad sources): default-src * dat"
         },
         {
           "id": "m01-xcto",
-          "expectedHealth": "critical",
-          "note": "X-Content-Type-Options header is missing"
+          "expectedHealth": "excellent",
+          "note": "X-Content-Type-Options: nosniff is set"
         },
         {
           "id": "m01-framing",
@@ -67,13 +71,13 @@
         },
         {
           "id": "m01-referrer",
-          "expectedHealth": "critical",
-          "note": "Referrer-Policy header is missing"
+          "expectedHealth": "excellent",
+          "note": "Referrer-Policy: strict-origin-when-cross-origin"
         },
         {
           "id": "m01-permissions",
-          "expectedHealth": "critical",
-          "note": "Permissions-Policy header is missing"
+          "expectedHealth": "good",
+          "note": "Permissions-Policy present with 2 restrictive directives: geolocation=(self), mi"
         },
         {
           "id": "m01-https-redirect",
@@ -82,18 +86,18 @@
         },
         {
           "id": "m01-email",
-          "expectedHealth": "critical",
-          "note": "No MX records found for mmm-pr.com -- domain cannot receive email"
+          "expectedHealth": "excellent",
+          "note": "Professional email provider detected: Microsoft 365 (MX: popular-com.mail.protec"
         },
         {
           "id": "m01-caa",
-          "expectedHealth": "excellent",
-          "note": "CAA records set (entrust.net, digicert.com, sectigo.com) and match certificate i"
+          "expectedHealth": "critical",
+          "note": "No CAA records found"
         },
         {
           "id": "m01-geoip",
           "expectedHealth": "info",
-          "note": "63.128.78.150: US (Ormond Beach)"
+          "note": "192.124.249.58: US (Menifee)"
         },
         {
           "id": "m01-mta-sts",
@@ -113,7 +117,7 @@
         {
           "id": "m01-sri",
           "expectedHealth": "warning",
-          "note": "SRI coverage: 0% (0/7 cross-origin resources). Uncovered: https://www.googletagm"
+          "note": "SRI coverage: 0% (0/2 cross-origin resources). Uncovered: //cdn.evgnet.com/beaco"
         },
         {
           "id": "m01-redirect-chain",
@@ -135,6 +139,11 @@
           "match": "truthy",
           "note": "Should detect technologies"
         },
+        "cdn.name": {
+          "value": "Sucuri",
+          "match": "contains",
+          "note": "CDN detected from headers"
+        },
         "compression": {
           "value": "gzip",
           "match": "exact",
@@ -154,8 +163,8 @@
         },
         {
           "id": "m02-cdn-detected",
-          "expectedHealth": "critical",
-          "note": "No CDN detected. Assets are likely served from origin."
+          "expectedHealth": "good",
+          "note": "CDN / edge hosting detected: Sucuri (via response headers)"
         },
         {
           "id": "m02-https-enforced",
@@ -164,8 +173,8 @@
         },
         {
           "id": "m02-http-version",
-          "expectedHealth": "warning",
-          "note": "Could not confirm HTTP/2 or HTTP/3 from response headers. Likely HTTP/1.1."
+          "expectedHealth": "excellent",
+          "note": "HTTP/3 (QUIC) detected via alt-svc header."
         },
         {
           "id": "m02-compression",
@@ -174,8 +183,8 @@
         },
         {
           "id": "m02-server-header-exposure",
-          "expectedHealth": "good",
-          "note": "Server header present without version: Apache"
+          "expectedHealth": "warning",
+          "note": "Server header exposes software and version: Sucuri/Cloudproxy"
         },
         {
           "id": "m02-framework-detected",
@@ -203,39 +212,39 @@
         },
         "htmlLang": {
           "match": "truthy",
-          "note": "Lang: es-ES"
+          "note": "Lang: es"
         }
       },
       "expectedCheckpoints": [
         {
           "id": "M04-TITLE",
-          "expectedHealth": "good",
-          "note": "Title present (20 chars): \"Medicare & Mucho Más\""
+          "expectedHealth": "excellent",
+          "note": "Title present (52 chars): \"Banco Popular - Servicios financieros en Puerto Rico\""
         },
         {
           "id": "M04-META-DESC",
           "expectedHealth": "excellent",
-          "note": "Meta description present (120 chars)"
+          "note": "Meta description present (154 chars)"
         },
         {
           "id": "M04-CANONICAL",
-          "expectedHealth": "critical",
-          "note": "No canonical URL found"
+          "expectedHealth": "excellent",
+          "note": "Self-referencing canonical URL: https://www.popular.com/"
         },
         {
           "id": "M04-OG-TAGS",
-          "expectedHealth": "good",
-          "note": "5/6 core OG tags present. Missing: og:image"
+          "expectedHealth": "warning",
+          "note": "Only 2/6 core OG tags present: og:description, og:image"
         },
         {
           "id": "M04-OG-IMAGE",
-          "expectedHealth": "critical",
-          "note": "No og:image tag found"
+          "expectedHealth": "good",
+          "note": "OG image present: https://www.popular.com/assets/images/popular-bppr-meta.gif"
         },
         {
           "id": "M04-TWITTER",
-          "expectedHealth": "good",
-          "note": "Twitter Card type \"summary\" present"
+          "expectedHealth": "critical",
+          "note": "No Twitter Card tags found"
         },
         {
           "id": "M04-SCHEMA",
@@ -244,23 +253,23 @@
         },
         {
           "id": "M04-ROBOTS",
-          "expectedHealth": "good",
+          "expectedHealth": "excellent",
           "note": "robots.txt exists"
         },
         {
           "id": "M04-SITEMAP",
-          "expectedHealth": "critical",
-          "note": "No sitemap found (checked /sitemap.xml, /sitemap_index.xml, /sitemap-index.xml, "
+          "expectedHealth": "excellent",
+          "note": "Sitemap present (from robots.txt) with 500 URL(s)"
         },
         {
           "id": "M04-FAVICON",
           "expectedHealth": "excellent",
-          "note": "Multiple favicon formats including apple-touch-icon: apple-touch-icon 57x57, app"
+          "note": "Multiple favicon formats including apple-touch-icon: icon, icon any, apple-touch"
         },
         {
           "id": "M04-LANG",
-          "expectedHealth": "excellent",
-          "note": "Specific language attribute: lang=\"es-ES\""
+          "expectedHealth": "good",
+          "note": "Language attribute present: lang=\"es\""
         },
         {
           "id": "M04-HREFLANG",
@@ -269,8 +278,8 @@
         },
         {
           "id": "M04-PRECONNECT",
-          "expectedHealth": "info",
-          "note": "No preconnect/prefetch hints found (informational -- site may not need them)"
+          "expectedHealth": "excellent",
+          "note": "12 resource hints found: https://service.force.com, https://service.force.com, h"
         },
         {
           "id": "M04-LLMS-TXT",
@@ -284,8 +293,8 @@
         },
         {
           "id": "M04-ROBOTS-DIRECTIVES",
-          "expectedHealth": "info",
-          "note": "No explicit robots directives (defaults to index, follow)"
+          "expectedHealth": "excellent",
+          "note": "Robots directives present: INDEX, FOLLOW"
         },
         {
           "id": "M04-VIEWPORT",
@@ -295,7 +304,7 @@
         {
           "id": "M04-CHARSET",
           "expectedHealth": "excellent",
-          "note": "UTF-8 charset declared via meta: UTF-8"
+          "note": "UTF-8 charset declared via meta: utf-8"
         },
         {
           "id": "M04-ADS-TXT",
@@ -310,7 +319,7 @@
         {
           "id": "M04-VIEWPORT-A11Y",
           "expectedHealth": "excellent",
-          "note": "Viewport allows user zoom (content: \"width=device-width, initial-scale=1\")"
+          "note": "Viewport allows user zoom (content: \"width=device-width, initial-scale=1, maximu"
         }
       ],
       "negativeAssertions": [],
@@ -319,19 +328,14 @@
     "M16": {
       "expectedData": {
         "press_page_url": {
-          "match": "falsy",
-          "note": "Calibrated: module returns null"
-        },
-        "article_count": {
-          "value": 0,
-          "match": "gte",
-          "note": "Calibrated: module returns 0"
+          "match": "truthy",
+          "note": "Press page at https://newsroom.popular.com/Spanish/General/default.aspx"
         }
       },
       "expectedCheckpoints": [
         {
           "id": "m16-press-page",
-          "expectedHealth": "info",
+          "expectedHealth": "excellent",
           "note": "Press page found"
         },
         {
@@ -351,8 +355,8 @@
         },
         {
           "id": "m16-press-recency",
-          "expectedHealth": "info",
-          "note": "No dateable press content found"
+          "expectedHealth": "excellent",
+          "note": "Most recent press content within 3 months (2026-04-23)"
         }
       ],
       "negativeAssertions": [],
@@ -373,8 +377,8 @@
         },
         {
           "id": "m17-ats-provider",
-          "expectedHealth": "excellent",
-          "note": "Professional ATS detected: Workday"
+          "expectedHealth": "warning",
+          "note": "Job listings appear to be manually managed (no ATS detected)"
         },
         {
           "id": "m17-open-positions",
@@ -400,18 +404,18 @@
       "expectedCheckpoints": [
         {
           "id": "m18-ir-portal",
-          "expectedHealth": "info",
-          "note": "No IR page"
+          "expectedHealth": "excellent",
+          "note": "IR page found"
         },
         {
           "id": "m18-financial-data",
-          "expectedHealth": "info",
-          "note": "No SEC filings or annual reports detected"
+          "expectedHealth": "excellent",
+          "note": "SEC filing link found: \"Annual Reports & Proxy\""
         },
         {
           "id": "m18-ticker-symbol",
           "expectedHealth": "info",
-          "note": "No stock ticker detected (may be a private company)"
+          "note": "Stock ticker: BPOP (NASDAQ)"
         },
         {
           "id": "m18-esg-report",
@@ -420,13 +424,13 @@
         },
         {
           "id": "m18-governance",
-          "expectedHealth": "info",
-          "note": "No corporate governance content detected"
+          "expectedHealth": "good",
+          "note": "Governance content detected: board of directors, audit committee, charter"
         },
         {
           "id": "m18-ir-comms",
-          "expectedHealth": "info",
-          "note": "No earnings calls, presentations, or investor events detected"
+          "expectedHealth": "excellent",
+          "note": "Rich IR communications: earnings calls, presentations, events, email alerts"
         }
       ],
       "negativeAssertions": [],
@@ -435,20 +439,20 @@
     "M19": {
       "expectedData": {
         "support_page_url": {
-          "match": "falsy",
-          "note": "Calibrated: module returns null"
+          "match": "truthy",
+          "note": "Support/contact page found"
         }
       },
       "expectedCheckpoints": [
         {
           "id": "m19-help-center",
-          "expectedHealth": "critical",
-          "note": "No support documentation found"
+          "expectedHealth": "warning",
+          "note": "Only a basic FAQ page detected"
         },
         {
           "id": "m19-support-channels",
-          "expectedHealth": "warning",
-          "note": "Only 1 support channel: phone"
+          "expectedHealth": "good",
+          "note": "2 support channels: phone, social_media"
         },
         {
           "id": "m19-status-page",
@@ -467,8 +471,8 @@
         },
         {
           "id": "m19-developer-docs",
-          "expectedHealth": "excellent",
-          "note": "Developer docs: \"CONOCE MÁS\" (../docs/Notice-Of-Availability.pdf)"
+          "expectedHealth": "info",
+          "note": "No developer or API documentation detected"
         },
         {
           "id": "m19-training-academy",
@@ -480,5 +484,5 @@
       "fixedBugs": []
     }
   },
-  "calibratedAt": "2026-04-04T01:03:54.047Z"
+  "calibratedAt": "2026-04-04T01:04:16.684Z"
 }

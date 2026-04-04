@@ -1,0 +1,110 @@
+{
+  "site": "popular.com",
+  "capturedAt": "2026-04-04T00:39:25.752Z",
+  "capturedBy": "capture-ground-truth.ts (browser-verified)",
+  "baseUrl": "https://www.popular.com/",
+  "modules": {
+    "M01": {
+      "spf": true,
+      "spfRecord": "v=spf1 include:%{d}.9d.spf-protect.agari.com exists:%{i}._i.%{d}._d.espf.agari.com -all",
+      "dmarc": true,
+      "dmarcPolicy": "reject",
+      "hasMx": true,
+      "mxCount": 1,
+      "hasHsts": true,
+      "hasCsp": true,
+      "hasXfo": true,
+      "hasXcto": true,
+      "hasReferrerPolicy": true,
+      "hasPermissionsPolicy": true,
+      "serverHeader": "Sucuri/Cloudproxy"
+    },
+    "M02": {
+      "isWordPress": false,
+      "hasGeneratorMeta": false,
+      "generator": null,
+      "serverHeader": "Sucuri/Cloudproxy",
+      "hasCfRay": false,
+      "cdn": "Sucuri",
+      "compression": "gzip"
+    },
+    "M04": {
+      "title": "Banco Popular - Servicios financieros en Puerto Rico",
+      "metaDescription": "Popular te ofrece la red más extensa de sucursales y cajeros automáticos en Puerto Rico. Conoce nuestros productos y servicios para individuos y negocios.",
+      "canonical": "https://www.popular.com/",
+      "htmlLang": "es",
+      "viewport": "width=device-width, initial-scale=1, maximum-scale=2.0, user-scalable=yes",
+      "charset": "utf-8",
+      "ogTagCount": 2,
+      "hasOgImage": true,
+      "jsonLdCount": 0,
+      "hasRobotsTxt": true,
+      "hasSitemap": true
+    },
+    "M16": {
+      "pressLinksFound": 2,
+      "pressLinks": [
+        {
+          "href": "https://newsroom.popular.com/Spanish/General/default.aspx",
+          "text": "Newsroom"
+        },
+        {
+          "href": "https://newsroom.popular.com/Spanish/General/default.aspx",
+          "text": "Newsroom"
+        }
+      ],
+      "pressPageUrl": "https://newsroom.popular.com/Spanish/General/default.aspx",
+      "visibleArticleCount": 0,
+      "countStrategies": [
+        {
+          "name": "article",
+          "count": 0
+        },
+        {
+          "name": "articleLinks",
+          "count": 0
+        },
+        {
+          "name": "dates",
+          "count": 0
+        }
+      ],
+      "pagination": {
+        "hasLoadMore": false,
+        "hasPagination": false,
+        "maxPage": 0,
+        "pageLinksCount": 0,
+        "wpPagesCount": 0
+      },
+      "externalNewsroom": null,
+      "rssFeed": null,
+      "mediaContactEmail": null,
+      "hasMediaLogos": false
+    },
+    "M17": {
+      "careersLinksFound": 2,
+      "careersLinks": [
+        {
+          "href": "redirects/jobs/",
+          "text": "Empleos"
+        },
+        {
+          "href": "redirects/jobs/",
+          "text": "Empleos"
+        }
+      ],
+      "hasCareersPage": true
+    },
+    "M18": {
+      "irLinksFound": 2,
+      "hasIrPage": true,
+      "ticker": null
+    },
+    "M19": {
+      "supportLinksFound": 5,
+      "hasSupportPage": true,
+      "hasPhone": true,
+      "emails": []
+    }
+  }
+}

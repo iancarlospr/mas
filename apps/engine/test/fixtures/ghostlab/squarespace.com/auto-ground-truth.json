@@ -22,7 +22,7 @@
       "expectedCheckpoints": [
         {
           "id": "m01-spf",
-          "expectedHealth": "excellent",
+          "expectedHealth": "good",
           "note": "SPF present"
         },
         {
@@ -31,9 +31,99 @@
           "note": "DMARC p=reject"
         },
         {
+          "id": "m01-dkim",
+          "expectedHealth": "critical",
+          "note": "No DKIM records detected for common selectors (default, google, selector1, selec"
+        },
+        {
+          "id": "m01-dnssec",
+          "expectedHealth": "critical",
+          "note": "No DNSSEC signing detected for squarespace.com"
+        },
+        {
           "id": "m01-tls",
-          "expectedHealth": "excellent",
+          "expectedHealth": "good",
           "note": "HTTPS site"
+        },
+        {
+          "id": "m01-hsts",
+          "expectedHealth": "warning",
+          "note": "HSTS present but max-age is 15552000 (<6 months)"
+        },
+        {
+          "id": "m01-csp",
+          "expectedHealth": "critical",
+          "note": "Content-Security-Policy header is missing"
+        },
+        {
+          "id": "m01-xcto",
+          "expectedHealth": "excellent",
+          "note": "X-Content-Type-Options: nosniff is set"
+        },
+        {
+          "id": "m01-framing",
+          "expectedHealth": "critical",
+          "note": "Neither CSP frame-ancestors nor X-Frame-Options is set"
+        },
+        {
+          "id": "m01-referrer",
+          "expectedHealth": "critical",
+          "note": "Referrer-Policy header is missing"
+        },
+        {
+          "id": "m01-permissions",
+          "expectedHealth": "critical",
+          "note": "Permissions-Policy header is missing"
+        },
+        {
+          "id": "m01-https-redirect",
+          "expectedHealth": "good",
+          "note": "HTTP fetch failed (port 80 may be closed); site is served over HTTPS"
+        },
+        {
+          "id": "m01-email",
+          "expectedHealth": "excellent",
+          "note": "Professional email provider detected: Google Workspace (MX: aspmx.l.google.com, "
+        },
+        {
+          "id": "m01-caa",
+          "expectedHealth": "critical",
+          "note": "No CAA records found"
+        },
+        {
+          "id": "m01-geoip",
+          "expectedHealth": "info",
+          "note": "198.49.23.180: US, 198.185.159.180: US, 198.185.159.181: US, 198.49.23.181: US"
+        },
+        {
+          "id": "m01-mta-sts",
+          "expectedHealth": "warning",
+          "note": "No MTA-STS or SMTP TLS Reporting records found"
+        },
+        {
+          "id": "m01-ipv6",
+          "expectedHealth": "warning",
+          "note": "No AAAA records found — site is IPv4 only"
+        },
+        {
+          "id": "m01-www-consistency",
+          "expectedHealth": "excellent",
+          "note": "Security headers consistent between www and apex"
+        },
+        {
+          "id": "m01-sri",
+          "expectedHealth": "warning",
+          "note": "SRI coverage: 0% (0/13 cross-origin resources). Uncovered: //assets.squarespace."
+        },
+        {
+          "id": "m01-redirect-chain",
+          "expectedHealth": "excellent",
+          "note": "No redirects — direct resolution"
+        },
+        {
+          "id": "m01-mixed-content",
+          "expectedHealth": "info",
+          "note": "Mixed content data not available — browser phase may not have executed"
         }
       ],
       "negativeAssertions": [],
@@ -48,14 +138,54 @@
         "compression": {
           "value": "gzip",
           "match": "exact",
-          "note": "Compression from headers"
+          "note": "Calibrated from module output"
         }
       },
       "expectedCheckpoints": [
         {
+          "id": "m02-cms-identified",
+          "expectedHealth": "good",
+          "note": "Squarespace detected (confidence 0.997)"
+        },
+        {
+          "id": "m02-cms-version-currency",
+          "expectedHealth": "info",
+          "note": "Squarespace detected but version could not be determined."
+        },
+        {
+          "id": "m02-cdn-detected",
+          "expectedHealth": "critical",
+          "note": "No CDN detected. Assets are likely served from origin."
+        },
+        {
           "id": "m02-https-enforced",
           "expectedHealth": "excellent",
           "note": "HTTPS site"
+        },
+        {
+          "id": "m02-http-version",
+          "expectedHealth": "warning",
+          "note": "Could not confirm HTTP/2 or HTTP/3 from response headers. Likely HTTP/1.1."
+        },
+        {
+          "id": "m02-compression",
+          "expectedHealth": "good",
+          "note": "Gzip compression detected on the initial HTML response."
+        },
+        {
+          "id": "m02-server-header-exposure",
+          "expectedHealth": "good",
+          "note": "Server header present without version: Squarespace"
+        },
+        {
+          "id": "m02-framework-detected",
+          "expectedHealth": "info",
+          "note": "No frontend framework detected."
+        },
+        {
+          "id": "m02-hosting-identified",
+          "expectedHealth": "info",
+          "note": "Hosting provider not identified from fingerprints."
         }
       ],
       "negativeAssertions": [],
@@ -82,14 +212,114 @@
       },
       "expectedCheckpoints": [
         {
-          "id": "M04-VIEWPORT",
+          "id": "M04-TITLE",
+          "expectedHealth": "good",
+          "note": "Title present (62 chars): \"Website Builder – Easily Create Your Own Website — Sq"
+        },
+        {
+          "id": "M04-META-DESC",
           "expectedHealth": "excellent",
-          "note": "Viewport meta present"
+          "note": "Meta description present (157 chars)"
+        },
+        {
+          "id": "M04-CANONICAL",
+          "expectedHealth": "excellent",
+          "note": "Self-referencing canonical URL: https://www.squarespace.com"
+        },
+        {
+          "id": "M04-OG-TAGS",
+          "expectedHealth": "good",
+          "note": "5/6 core OG tags present. Missing: og:description"
+        },
+        {
+          "id": "M04-OG-IMAGE",
+          "expectedHealth": "excellent",
+          "note": "OG image present with dimensions (1200x630): http://static1.squarespace.com/stat"
+        },
+        {
+          "id": "M04-TWITTER",
+          "expectedHealth": "good",
+          "note": "Twitter Card type \"summary\" present"
+        },
+        {
+          "id": "M04-SCHEMA",
+          "expectedHealth": "excellent",
+          "note": "Rich structured data: WebSite, Organization, LocalBusiness, HowTo, FAQPage (5 bl"
         },
         {
           "id": "M04-ROBOTS",
           "expectedHealth": "excellent",
           "note": "robots.txt exists"
+        },
+        {
+          "id": "M04-SITEMAP",
+          "expectedHealth": "excellent",
+          "note": "Sitemap present (from robots.txt) with 500 URL(s)"
+        },
+        {
+          "id": "M04-FAVICON",
+          "expectedHealth": "excellent",
+          "note": "Multiple favicon formats including apple-touch-icon: icon, icon, apple-touch-ico"
+        },
+        {
+          "id": "M04-LANG",
+          "expectedHealth": "excellent",
+          "note": "Specific language attribute: lang=\"en-US\""
+        },
+        {
+          "id": "M04-HREFLANG",
+          "expectedHealth": "info",
+          "note": "No hreflang tags found (informational -- may be a single-language site)"
+        },
+        {
+          "id": "M04-PRECONNECT",
+          "expectedHealth": "excellent",
+          "note": "3 resource hints found: https://media-www.sqspcdn.com/fonts/clarkson-500.woff2, "
+        },
+        {
+          "id": "M04-LLMS-TXT",
+          "expectedHealth": "good",
+          "note": "llms.txt present"
+        },
+        {
+          "id": "M04-MANIFEST",
+          "expectedHealth": "info",
+          "note": "No manifest.json found (informational -- required only for PWA installability)"
+        },
+        {
+          "id": "M04-ROBOTS-DIRECTIVES",
+          "expectedHealth": "info",
+          "note": "No explicit robots directives (defaults to index, follow)"
+        },
+        {
+          "id": "M04-VIEWPORT",
+          "expectedHealth": "excellent",
+          "note": "Viewport meta present"
+        },
+        {
+          "id": "M04-CHARSET",
+          "expectedHealth": "excellent",
+          "note": "UTF-8 charset declared via meta: utf-8"
+        },
+        {
+          "id": "M04-ADS-TXT",
+          "expectedHealth": "excellent",
+          "note": "ads.txt present with 0 seller record(s)"
+        },
+        {
+          "id": "m04-structured-data",
+          "expectedHealth": "excellent",
+          "note": "5 structured data item(s) across JSON-LD (types: WebSite, Organization, LocalBus"
+        },
+        {
+          "id": "m04-rich-snippets",
+          "expectedHealth": "excellent",
+          "note": "Eligible for 3 rich result feature(s): Local Business, How-To, FAQ"
+        },
+        {
+          "id": "M04-VIEWPORT-A11Y",
+          "expectedHealth": "excellent",
+          "note": "Viewport allows user zoom (content: \"width=device-width, initial-scale=1\")"
         }
       ],
       "negativeAssertions": [],
@@ -102,15 +332,15 @@
           "note": "Press page at https://newsroom.squarespace.com/"
         },
         "article_count": {
-          "value": 18,
+          "value": 10,
           "match": "gte",
-          "note": "18 articles (visible on page)"
+          "note": "Calibrated: module returns 10"
         }
       },
       "expectedCheckpoints": [
         {
           "id": "m16-press-page",
-          "expectedHealth": "excellent",
+          "expectedHealth": "warning",
           "note": "Press page found"
         },
         {
@@ -127,6 +357,11 @@
           "id": "m16-media-logos",
           "expectedHealth": "info",
           "note": "No media logos"
+        },
+        {
+          "id": "m16-press-recency",
+          "expectedHealth": "warning",
+          "note": "Most recent press content within 1 year (2025-05-27)"
         }
       ],
       "negativeAssertions": [],
@@ -144,6 +379,26 @@
           "id": "m17-careers-page",
           "expectedHealth": "good",
           "note": "Careers page exists"
+        },
+        {
+          "id": "m17-ats-provider",
+          "expectedHealth": "info",
+          "note": "No ATS provider detected"
+        },
+        {
+          "id": "m17-open-positions",
+          "expectedHealth": "info",
+          "note": "No open positions detected"
+        },
+        {
+          "id": "m17-team-culture",
+          "expectedHealth": "good",
+          "note": "Team page detected"
+        },
+        {
+          "id": "m17-hiring-velocity",
+          "expectedHealth": "info",
+          "note": "No dateable job postings found"
         }
       ],
       "negativeAssertions": [],
@@ -156,6 +411,31 @@
           "id": "m18-ir-portal",
           "expectedHealth": "info",
           "note": "No IR page"
+        },
+        {
+          "id": "m18-financial-data",
+          "expectedHealth": "info",
+          "note": "No SEC filings or annual reports detected"
+        },
+        {
+          "id": "m18-ticker-symbol",
+          "expectedHealth": "info",
+          "note": "No stock ticker detected (may be a private company)"
+        },
+        {
+          "id": "m18-esg-report",
+          "expectedHealth": "info",
+          "note": "No ESG or sustainability report detected"
+        },
+        {
+          "id": "m18-governance",
+          "expectedHealth": "info",
+          "note": "No corporate governance content detected"
+        },
+        {
+          "id": "m18-ir-comms",
+          "expectedHealth": "info",
+          "note": "No earnings calls, presentations, or investor events detected"
         }
       ],
       "negativeAssertions": [],
@@ -168,9 +448,46 @@
           "note": "Support/contact page found"
         }
       },
-      "expectedCheckpoints": [],
+      "expectedCheckpoints": [
+        {
+          "id": "m19-help-center",
+          "expectedHealth": "critical",
+          "note": "No support documentation found"
+        },
+        {
+          "id": "m19-support-channels",
+          "expectedHealth": "good",
+          "note": "2 support channels: community, social_media"
+        },
+        {
+          "id": "m19-status-page",
+          "expectedHealth": "good",
+          "note": "Status page link found: https://status.squarespace.com/"
+        },
+        {
+          "id": "m19-business-hours",
+          "expectedHealth": "excellent",
+          "note": "Business/support hours published on page"
+        },
+        {
+          "id": "m19-community-forum",
+          "expectedHealth": "excellent",
+          "note": "Dedicated community subdomain: /solutions/nonprofits/community-groups"
+        },
+        {
+          "id": "m19-developer-docs",
+          "expectedHealth": "excellent",
+          "note": "Developer docs: \"Developer PlatformDeveloper Platform\" (https://developers.squar"
+        },
+        {
+          "id": "m19-training-academy",
+          "expectedHealth": "info",
+          "note": "No training portal or academy detected"
+        }
+      ],
       "negativeAssertions": [],
       "fixedBugs": []
     }
-  }
+  },
+  "calibratedAt": "2026-04-04T01:05:01.294Z"
 }

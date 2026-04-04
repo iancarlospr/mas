@@ -1,0 +1,126 @@
+{
+  "site": "telemundo.com",
+  "capturedAt": "2026-04-04T00:38:37.756Z",
+  "capturedBy": "capture-ground-truth.ts (browser-verified)",
+  "baseUrl": "https://www.telemundo.com/",
+  "modules": {
+    "M01": {
+      "spf": true,
+      "spfRecord": "v=spf1 include:%{ir}.%{v}.%{d}.spf.has.pphosted.com ~all",
+      "dmarc": true,
+      "dmarcPolicy": "none",
+      "hasMx": true,
+      "mxCount": 4,
+      "hasHsts": false,
+      "hasCsp": false,
+      "hasXfo": false,
+      "hasXcto": false,
+      "hasReferrerPolicy": false,
+      "hasPermissionsPolicy": false,
+      "serverHeader": "nginx"
+    },
+    "M02": {
+      "isWordPress": false,
+      "hasGeneratorMeta": false,
+      "generator": null,
+      "serverHeader": "nginx",
+      "hasCfRay": false,
+      "cdn": null,
+      "compression": "gzip"
+    },
+    "M04": {
+      "title": "Telemundo | Noticias, Shows, Entretenimiento, Series y Novelas | Telemundo",
+      "metaDescription": "La mejor cobertura de noticias en español, capítulos completos de nuestras series y shows, entretenimiento, estilo de vida, y los videos y fotos del momento.",
+      "canonical": "https://www.telemundo.com",
+      "htmlLang": "es",
+      "viewport": "width=device-width, initial-scale=1, user-scalable=yes",
+      "charset": "utf-8",
+      "ogTagCount": 9,
+      "hasOgImage": true,
+      "jsonLdCount": 3,
+      "hasRobotsTxt": true,
+      "hasSitemap": false
+    },
+    "M16": {
+      "pressLinksFound": 83,
+      "pressLinks": [
+        {
+          "href": "https://www.telemundo.com/noticias",
+          "text": "Noticias"
+        },
+        {
+          "href": "https://www.telemundo.com/noticias/inmigracion",
+          "text": "Inmigración"
+        },
+        {
+          "href": "https://www.telemundo.com/noticias",
+          "text": "Últimas Noticias"
+        },
+        {
+          "href": "https://www.telemundo.com/noticias",
+          "text": "Noticias"
+        },
+        {
+          "href": "https://www.telemundo.com/noticias/inmigracion",
+          "text": "Inmigración"
+        }
+      ],
+      "pressPageUrl": "https://www.telemundo.com/noticias",
+      "visibleArticleCount": 125,
+      "countStrategies": [
+        {
+          "name": "article",
+          "count": 21
+        },
+        {
+          "name": "articleLinks",
+          "count": 125
+        },
+        {
+          "name": "dates",
+          "count": 0
+        }
+      ],
+      "pagination": {
+        "hasLoadMore": true,
+        "hasPagination": false,
+        "maxPage": 0,
+        "pageLinksCount": 0,
+        "wpPagesCount": 0
+      },
+      "externalNewsroom": null,
+      "rssFeed": null,
+      "mediaContactEmail": null,
+      "hasMediaLogos": false
+    },
+    "M17": {
+      "careersLinksFound": 2,
+      "careersLinks": [
+        {
+          "href": "https://www.telemundo.com/noticias/edicion-noticias-telemundo/economia/video/eeuu-suma-178000-empleos-en-marzo-pese-la-guerra-con-iran-y-el-alza-al-precio-de-la-tmvo13162967",
+          "text": "01:11"
+        },
+        {
+          "href": "https://www.telemundo.com/noticias/edicion-noticias-telemundo/economia/video/eeuu-suma-178000-empleos-en-marzo-pese-la-guerra-con-iran-y-el-alza-al-precio-de-la-tmvo13162967",
+          "text": "EE.UU. suma 178,000 empleos en marzo pese a guerra con Irán"
+        }
+      ],
+      "hasCareersPage": true
+    },
+    "M18": {
+      "irLinksFound": 5,
+      "hasIrPage": true,
+      "ticker": null
+    },
+    "M19": {
+      "supportLinksFound": 5,
+      "hasSupportPage": true,
+      "hasPhone": false,
+      "emails": [
+        "?subject=&body=null",
+        "?subject=&body=null",
+        "?subject=Cristiano Ronaldo desafía a la lógica y llega a 500 goles después de los 30 años&body=https://www.telemundo.com/deportes/mas-deporte/video/cristiano-ronaldo-desafia-la-logica-y-llega-500-goles-despues-de-los-30-anos-tmvo13130433"
+      ]
+    }
+  }
+}

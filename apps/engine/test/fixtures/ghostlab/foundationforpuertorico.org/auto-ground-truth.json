@@ -8,9 +8,109 @@
       "expectedData": {},
       "expectedCheckpoints": [
         {
+          "id": "m01-spf",
+          "expectedHealth": "critical",
+          "note": "No SPF record found in TXT records"
+        },
+        {
+          "id": "m01-dmarc",
+          "expectedHealth": "critical",
+          "note": "No DMARC record found at _dmarc.foundationforpuertorico.org"
+        },
+        {
+          "id": "m01-dkim",
+          "expectedHealth": "critical",
+          "note": "No DKIM records detected for common selectors (default, google, selector1, selec"
+        },
+        {
+          "id": "m01-dnssec",
+          "expectedHealth": "critical",
+          "note": "No DNSSEC signing detected for foundationforpuertorico.org"
+        },
+        {
           "id": "m01-tls",
-          "expectedHealth": "excellent",
+          "expectedHealth": "good",
           "note": "HTTPS site"
+        },
+        {
+          "id": "m01-hsts",
+          "expectedHealth": "critical",
+          "note": "Strict-Transport-Security header is missing"
+        },
+        {
+          "id": "m01-csp",
+          "expectedHealth": "critical",
+          "note": "Content-Security-Policy header is missing"
+        },
+        {
+          "id": "m01-xcto",
+          "expectedHealth": "critical",
+          "note": "X-Content-Type-Options header is missing"
+        },
+        {
+          "id": "m01-framing",
+          "expectedHealth": "critical",
+          "note": "Neither CSP frame-ancestors nor X-Frame-Options is set"
+        },
+        {
+          "id": "m01-referrer",
+          "expectedHealth": "critical",
+          "note": "Referrer-Policy header is missing"
+        },
+        {
+          "id": "m01-permissions",
+          "expectedHealth": "critical",
+          "note": "Permissions-Policy header is missing"
+        },
+        {
+          "id": "m01-https-redirect",
+          "expectedHealth": "good",
+          "note": "HTTP fetch failed (port 80 may be closed); site is served over HTTPS"
+        },
+        {
+          "id": "m01-email",
+          "expectedHealth": "critical",
+          "note": "No MX records found for foundationforpuertorico.org -- domain cannot receive ema"
+        },
+        {
+          "id": "m01-caa",
+          "expectedHealth": "critical",
+          "note": "No CAA records found"
+        },
+        {
+          "id": "m01-geoip",
+          "expectedHealth": "info",
+          "note": "160.153.0.161: US"
+        },
+        {
+          "id": "m01-mta-sts",
+          "expectedHealth": "warning",
+          "note": "No MTA-STS or SMTP TLS Reporting records found"
+        },
+        {
+          "id": "m01-ipv6",
+          "expectedHealth": "warning",
+          "note": "No AAAA records found — site is IPv4 only"
+        },
+        {
+          "id": "m01-www-consistency",
+          "expectedHealth": "excellent",
+          "note": "Security headers consistent between www and apex"
+        },
+        {
+          "id": "m01-sri",
+          "expectedHealth": "warning",
+          "note": "SRI coverage: 29% (2/7 cross-origin resources have integrity attributes)"
+        },
+        {
+          "id": "m01-redirect-chain",
+          "expectedHealth": "good",
+          "note": "1 redirect(s): https://www.foundationforpuertorico.org → https://foundationforpu"
+        },
+        {
+          "id": "m01-mixed-content",
+          "expectedHealth": "info",
+          "note": "Mixed content data not available — browser phase may not have executed"
         }
       ],
       "negativeAssertions": [],
@@ -35,9 +135,49 @@
       },
       "expectedCheckpoints": [
         {
-          "id": "m02-https-enforced",
+          "id": "m02-cms-identified",
           "expectedHealth": "excellent",
+          "note": "WordPress 6.7.51 detected (confidence 1)"
+        },
+        {
+          "id": "m02-cms-version-currency",
+          "expectedHealth": "good",
+          "note": "WordPress version 6.7.51 detected. Version currency check requires a version dat"
+        },
+        {
+          "id": "m02-cdn-detected",
+          "expectedHealth": "excellent",
+          "note": "Enterprise CDN detected: Cloudflare (via fingerprint)"
+        },
+        {
+          "id": "m02-https-enforced",
+          "expectedHealth": "good",
           "note": "HTTPS site"
+        },
+        {
+          "id": "m02-http-version",
+          "expectedHealth": "excellent",
+          "note": "HTTP/3 (QUIC) detected via alt-svc header."
+        },
+        {
+          "id": "m02-compression",
+          "expectedHealth": "excellent",
+          "note": "Brotli compression detected on the initial HTML response."
+        },
+        {
+          "id": "m02-server-header-exposure",
+          "expectedHealth": "good",
+          "note": "Server header present without version: cloudflare"
+        },
+        {
+          "id": "m02-framework-detected",
+          "expectedHealth": "info",
+          "note": "Frameworks: Elementor"
+        },
+        {
+          "id": "m02-hosting-identified",
+          "expectedHealth": "info",
+          "note": "Hosting: Cloudflare (detected from response headers)"
         }
       ],
       "negativeAssertions": [],
@@ -64,14 +204,114 @@
       },
       "expectedCheckpoints": [
         {
+          "id": "M04-TITLE",
+          "expectedHealth": "warning",
+          "note": "Title too long (95 chars): \"Foundation for Puerto Rico | Transforming Puerto Ric"
+        },
+        {
+          "id": "M04-META-DESC",
+          "expectedHealth": "warning",
+          "note": "Meta description length suboptimal (194 chars)"
+        },
+        {
+          "id": "M04-CANONICAL",
+          "expectedHealth": "excellent",
+          "note": "Self-referencing canonical URL: https://foundationforpuertorico.org/en/"
+        },
+        {
+          "id": "M04-OG-TAGS",
+          "expectedHealth": "excellent",
+          "note": "All 6 core OG tags present: og:title, og:description, og:image, og:url, og:type,"
+        },
+        {
+          "id": "M04-OG-IMAGE",
+          "expectedHealth": "excellent",
+          "note": "OG image present with dimensions (768x512): https://foundationforpuertorico.org/"
+        },
+        {
+          "id": "M04-TWITTER",
+          "expectedHealth": "good",
+          "note": "Twitter Card type \"summary_large_image\" present"
+        },
+        {
+          "id": "M04-SCHEMA",
+          "expectedHealth": "excellent",
+          "note": "Rich structured data: WebPage, ImageObject, BreadcrumbList, WebSite, Organizatio"
+        },
+        {
+          "id": "M04-ROBOTS",
+          "expectedHealth": "critical",
+          "note": "robots.txt exists"
+        },
+        {
+          "id": "M04-SITEMAP",
+          "expectedHealth": "critical",
+          "note": "No sitemap found (checked /sitemap.xml, /sitemap_index.xml, /sitemap-index.xml, "
+        },
+        {
+          "id": "M04-FAVICON",
+          "expectedHealth": "excellent",
+          "note": "Multiple favicon formats including apple-touch-icon: icon 32x32, icon 192x192, a"
+        },
+        {
+          "id": "M04-LANG",
+          "expectedHealth": "excellent",
+          "note": "Specific language attribute: lang=\"en-US\""
+        },
+        {
+          "id": "M04-HREFLANG",
+          "expectedHealth": "good",
+          "note": "Hreflang tags for 4 locale(s): en-US, es-PR, en, es"
+        },
+        {
+          "id": "M04-PRECONNECT",
+          "expectedHealth": "excellent",
+          "note": "5 resource hints found: //js.stripe.com, //fonts.googleapis.com, //www.googletag"
+        },
+        {
+          "id": "M04-LLMS-TXT",
+          "expectedHealth": "good",
+          "note": "llms.txt present"
+        },
+        {
+          "id": "M04-MANIFEST",
+          "expectedHealth": "info",
+          "note": "No manifest.json found (informational -- required only for PWA installability)"
+        },
+        {
+          "id": "M04-ROBOTS-DIRECTIVES",
+          "expectedHealth": "excellent",
+          "note": "Robots directives present: index, follow, max-image-preview:large, max-snippet:-"
+        },
+        {
           "id": "M04-VIEWPORT",
           "expectedHealth": "excellent",
           "note": "Viewport meta present"
         },
         {
-          "id": "M04-ROBOTS",
+          "id": "M04-CHARSET",
           "expectedHealth": "excellent",
-          "note": "robots.txt exists"
+          "note": "UTF-8 charset declared via meta: UTF-8"
+        },
+        {
+          "id": "M04-ADS-TXT",
+          "expectedHealth": "excellent",
+          "note": "ads.txt present with 0 seller record(s)"
+        },
+        {
+          "id": "m04-structured-data",
+          "expectedHealth": "excellent",
+          "note": "5 structured data item(s) across JSON-LD (types: WebPage, ImageObject, Breadcrum"
+        },
+        {
+          "id": "m04-rich-snippets",
+          "expectedHealth": "excellent",
+          "note": "Eligible for 1 rich result feature(s): Breadcrumb"
+        },
+        {
+          "id": "M04-VIEWPORT-A11Y",
+          "expectedHealth": "excellent",
+          "note": "Viewport allows user zoom (content: \"width=device-width, initial-scale=1\")"
         }
       ],
       "negativeAssertions": [],
@@ -84,20 +324,20 @@
           "note": "Press page at https://foundationforpuertorico.org/en/latest-blog/"
         },
         "article_count": {
-          "value": 134,
+          "value": 10,
           "match": "gte",
-          "note": "134 articles (WP API)"
+          "note": "Calibrated: module returns 10"
         }
       },
       "expectedCheckpoints": [
         {
           "id": "m16-press-page",
-          "expectedHealth": "excellent",
+          "expectedHealth": "good",
           "note": "Press page found"
         },
         {
           "id": "m16-media-contact",
-          "expectedHealth": "info",
+          "expectedHealth": "good",
           "note": "No media contact"
         },
         {
@@ -107,8 +347,13 @@
         },
         {
           "id": "m16-media-logos",
-          "expectedHealth": "info",
+          "expectedHealth": "excellent",
           "note": "No media logos"
+        },
+        {
+          "id": "m16-press-recency",
+          "expectedHealth": "info",
+          "note": "No dateable press content found"
         }
       ],
       "negativeAssertions": [],
@@ -126,6 +371,26 @@
           "id": "m17-careers-page",
           "expectedHealth": "good",
           "note": "Careers page exists"
+        },
+        {
+          "id": "m17-ats-provider",
+          "expectedHealth": "info",
+          "note": "No ATS provider detected"
+        },
+        {
+          "id": "m17-open-positions",
+          "expectedHealth": "info",
+          "note": "No open positions detected"
+        },
+        {
+          "id": "m17-team-culture",
+          "expectedHealth": "info",
+          "note": "No team or culture page detected"
+        },
+        {
+          "id": "m17-hiring-velocity",
+          "expectedHealth": "info",
+          "note": "No dateable job postings found"
         }
       ],
       "negativeAssertions": [],
@@ -136,8 +401,33 @@
       "expectedCheckpoints": [
         {
           "id": "m18-ir-portal",
-          "expectedHealth": "info",
+          "expectedHealth": "warning",
           "note": "No IR page"
+        },
+        {
+          "id": "m18-financial-data",
+          "expectedHealth": "excellent",
+          "note": "SEC filing link found: \"Annual Reports\""
+        },
+        {
+          "id": "m18-ticker-symbol",
+          "expectedHealth": "info",
+          "note": "No stock ticker detected (may be a private company)"
+        },
+        {
+          "id": "m18-esg-report",
+          "expectedHealth": "info",
+          "note": "No ESG or sustainability report detected"
+        },
+        {
+          "id": "m18-governance",
+          "expectedHealth": "info",
+          "note": "No corporate governance content detected"
+        },
+        {
+          "id": "m18-ir-comms",
+          "expectedHealth": "good",
+          "note": "IR communications detected: email alerts"
         }
       ],
       "negativeAssertions": [],
@@ -150,9 +440,46 @@
           "note": "Support/contact page found"
         }
       },
-      "expectedCheckpoints": [],
+      "expectedCheckpoints": [
+        {
+          "id": "m19-help-center",
+          "expectedHealth": "warning",
+          "note": "Only a basic FAQ page detected"
+        },
+        {
+          "id": "m19-support-channels",
+          "expectedHealth": "excellent",
+          "note": "4 support channels: phone, live_chat, community, social_media"
+        },
+        {
+          "id": "m19-status-page",
+          "expectedHealth": "info",
+          "note": "No system status page detected"
+        },
+        {
+          "id": "m19-business-hours",
+          "expectedHealth": "excellent",
+          "note": "Business/support hours published on page"
+        },
+        {
+          "id": "m19-community-forum",
+          "expectedHealth": "good",
+          "note": "Community link found: https://foundationforpuertorico.org/en/community-innovatio"
+        },
+        {
+          "id": "m19-developer-docs",
+          "expectedHealth": "info",
+          "note": "No developer or API documentation detected"
+        },
+        {
+          "id": "m19-training-academy",
+          "expectedHealth": "excellent",
+          "note": "Academy: \"Leadership Academy\""
+        }
+      ],
       "negativeAssertions": [],
       "fixedBugs": []
     }
-  }
+  },
+  "calibratedAt": "2026-04-04T01:03:16.370Z"
 }

@@ -1,0 +1,113 @@
+{
+  "site": "elnuevodia.com",
+  "capturedAt": "2026-04-04T00:38:50.061Z",
+  "capturedBy": "capture-ground-truth.ts (browser-verified)",
+  "baseUrl": "https://www.elnuevodia.com/",
+  "modules": {
+    "M01": {
+      "spf": true,
+      "spfRecord": "v=spf1 ip4:196.32.153.0/24 include:spf.protection.outlook.com include:sendgrid.net include:mail.zendesk.com include:spf.mandrillapp.com -all",
+      "dmarc": true,
+      "dmarcPolicy": "none",
+      "hasMx": true,
+      "mxCount": 1,
+      "hasHsts": false,
+      "hasCsp": true,
+      "hasXfo": false,
+      "hasXcto": false,
+      "hasReferrerPolicy": false,
+      "hasPermissionsPolicy": false,
+      "serverHeader": "openresty"
+    },
+    "M02": {
+      "isWordPress": false,
+      "hasGeneratorMeta": false,
+      "generator": null,
+      "serverHeader": "openresty",
+      "hasCfRay": false,
+      "cdn": null,
+      "compression": "gzip"
+    },
+    "M04": {
+      "title": "Noticias de Puerto Rico hoy | Última hora, análisis y opinión en El Nuevo Día",
+      "metaDescription": "Infórmate con las últimas noticias de Puerto Rico hoy. Política, seguridad, deportes, entretenimiento y más en El Nuevo Día, el periódico líder de la isla.",
+      "canonical": "https://www.elnuevodia.com",
+      "htmlLang": "es",
+      "viewport": "width=device-width, initial-scale=1",
+      "charset": null,
+      "ogTagCount": 7,
+      "hasOgImage": true,
+      "jsonLdCount": 2,
+      "hasRobotsTxt": true,
+      "hasSitemap": false
+    },
+    "M16": {
+      "pressLinksFound": 73,
+      "pressLinks": [
+        {
+          "href": "/ultimas-noticias/",
+          "text": "Últimas Noticias"
+        },
+        {
+          "href": "/noticias",
+          "text": "Noticias"
+        },
+        {
+          "href": "/noticias/locales/",
+          "text": "Locales"
+        },
+        {
+          "href": "/noticias/gobierno/",
+          "text": "Gobierno"
+        },
+        {
+          "href": "/noticias/legislatura/",
+          "text": "Legislatura"
+        }
+      ],
+      "pressPageUrl": "https://www.elnuevodia.com/ultimas-noticias/",
+      "visibleArticleCount": 67,
+      "countStrategies": [
+        {
+          "name": "article",
+          "count": 40
+        },
+        {
+          "name": "articleLinks",
+          "count": 67
+        },
+        {
+          "name": "dates",
+          "count": 0
+        }
+      ],
+      "pagination": {
+        "hasLoadMore": true,
+        "hasPagination": false,
+        "maxPage": 0,
+        "pageLinksCount": 0,
+        "wpPagesCount": 0
+      },
+      "externalNewsroom": null,
+      "rssFeed": null,
+      "mediaContactEmail": null,
+      "hasMediaLogos": false
+    },
+    "M17": {
+      "careersLinksFound": 0,
+      "careersLinks": [],
+      "hasCareersPage": false
+    },
+    "M18": {
+      "irLinksFound": 3,
+      "hasIrPage": true,
+      "ticker": null
+    },
+    "M19": {
+      "supportLinksFound": 2,
+      "hasSupportPage": true,
+      "hasPhone": false,
+      "emails": []
+    }
+  }
+}

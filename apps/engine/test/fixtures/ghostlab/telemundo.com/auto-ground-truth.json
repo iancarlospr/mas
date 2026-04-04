@@ -1,8 +1,8 @@
 {
-  "site": "mmm-pr.com",
-  "verifiedAt": "2026-04-03T23:28:51.922Z",
+  "site": "telemundo.com",
+  "verifiedAt": "2026-04-04T00:38:37.756Z",
   "generatedBy": "generate-ground-truth-json.ts (from browser-ground-truth.json)",
-  "notes": "Auto-generated from browser-verified facts captured on 2026-04-03T23:28:51.922Z",
+  "notes": "Auto-generated from browser-verified facts captured on 2026-04-04T00:38:37.756Z",
   "modules": {
     "M01": {
       "expectedData": {
@@ -13,22 +13,18 @@
         "dmarc": {
           "match": "truthy",
           "note": "DMARC record exists"
-        },
-        "hsts": {
-          "match": "truthy",
-          "note": "HSTS header present"
         }
       },
       "expectedCheckpoints": [
         {
           "id": "m01-spf",
-          "expectedHealth": "excellent",
+          "expectedHealth": "good",
           "note": "SPF present"
         },
         {
           "id": "m01-dmarc",
-          "expectedHealth": "excellent",
-          "note": "DMARC p=reject"
+          "expectedHealth": "warning",
+          "note": "DMARC p=none"
         },
         {
           "id": "m01-dkim",
@@ -38,7 +34,7 @@
         {
           "id": "m01-dnssec",
           "expectedHealth": "critical",
-          "note": "No DNSSEC signing detected for mmm-pr.com"
+          "note": "No DNSSEC signing detected for telemundo.com"
         },
         {
           "id": "m01-tls",
@@ -47,8 +43,8 @@
         },
         {
           "id": "m01-hsts",
-          "expectedHealth": "excellent",
-          "note": "HSTS present: max-age=31536000 (>1yr), includeSubDomains, preload"
+          "expectedHealth": "critical",
+          "note": "Strict-Transport-Security header is missing"
         },
         {
           "id": "m01-csp",
@@ -62,8 +58,8 @@
         },
         {
           "id": "m01-framing",
-          "expectedHealth": "good",
-          "note": "X-Frame-Options: SAMEORIGIN"
+          "expectedHealth": "critical",
+          "note": "Neither CSP frame-ancestors nor X-Frame-Options is set"
         },
         {
           "id": "m01-referrer",
@@ -82,18 +78,18 @@
         },
         {
           "id": "m01-email",
-          "expectedHealth": "critical",
-          "note": "No MX records found for mmm-pr.com -- domain cannot receive email"
+          "expectedHealth": "excellent",
+          "note": "Email provider: Proofpoint (MX: mx0b-00176a04.pphosted.com, mx0a-00176a04.pphost"
         },
         {
           "id": "m01-caa",
-          "expectedHealth": "excellent",
-          "note": "CAA records set (entrust.net, digicert.com, sectigo.com) and match certificate i"
+          "expectedHealth": "critical",
+          "note": "No CAA records found"
         },
         {
           "id": "m01-geoip",
           "expectedHealth": "info",
-          "note": "63.128.78.150: US (Ormond Beach)"
+          "note": "23.1.51.148: US (Ashburn)"
         },
         {
           "id": "m01-mta-sts",
@@ -111,9 +107,14 @@
           "note": "Security headers consistent between www and apex"
         },
         {
+          "id": "m01-cross-origin",
+          "expectedHealth": "warning",
+          "note": "Access-Control-Allow-Origin: * (wildcard — allows any origin)"
+        },
+        {
           "id": "m01-sri",
           "expectedHealth": "warning",
-          "note": "SRI coverage: 0% (0/7 cross-origin resources). Uncovered: https://www.googletagm"
+          "note": "SRI coverage: 0% (0/56 cross-origin resources). Uncovered: https://nodeassets.nb"
         },
         {
           "id": "m01-redirect-chain",
@@ -159,7 +160,7 @@
         },
         {
           "id": "m02-https-enforced",
-          "expectedHealth": "excellent",
+          "expectedHealth": "good",
           "note": "HTTPS site"
         },
         {
@@ -175,12 +176,12 @@
         {
           "id": "m02-server-header-exposure",
           "expectedHealth": "good",
-          "note": "Server header present without version: Apache"
+          "note": "Server header present without version: nginx"
         },
         {
           "id": "m02-framework-detected",
           "expectedHealth": "info",
-          "note": "No frontend framework detected."
+          "note": "Frameworks: Next.js, React"
         },
         {
           "id": "m02-hosting-identified",
@@ -203,64 +204,68 @@
         },
         "htmlLang": {
           "match": "truthy",
-          "note": "Lang: es-ES"
+          "note": "Lang: es"
+        },
+        "jsonLd": {
+          "match": "truthy",
+          "note": "3 JSON-LD blocks"
         }
       },
       "expectedCheckpoints": [
         {
           "id": "M04-TITLE",
-          "expectedHealth": "good",
-          "note": "Title present (20 chars): \"Medicare & Mucho Más\""
+          "expectedHealth": "warning",
+          "note": "Title too long (74 chars): \"Telemundo | Noticias, Shows, Entretenimiento, Series"
         },
         {
           "id": "M04-META-DESC",
           "expectedHealth": "excellent",
-          "note": "Meta description present (120 chars)"
+          "note": "Meta description present (157 chars)"
         },
         {
           "id": "M04-CANONICAL",
-          "expectedHealth": "critical",
-          "note": "No canonical URL found"
+          "expectedHealth": "excellent",
+          "note": "Self-referencing canonical URL: https://www.telemundo.com"
         },
         {
           "id": "M04-OG-TAGS",
-          "expectedHealth": "good",
-          "note": "5/6 core OG tags present. Missing: og:image"
+          "expectedHealth": "excellent",
+          "note": "All 6 core OG tags present: og:title, og:description, og:image, og:url, og:type,"
         },
         {
           "id": "M04-OG-IMAGE",
-          "expectedHealth": "critical",
-          "note": "No og:image tag found"
+          "expectedHealth": "excellent",
+          "note": "OG image present with dimensions (1200x630): https://media1.s-nbcnews.com/i/news"
         },
         {
           "id": "M04-TWITTER",
-          "expectedHealth": "good",
-          "note": "Twitter Card type \"summary\" present"
+          "expectedHealth": "excellent",
+          "note": "summary_large_image Twitter Card with all fields (title, description, image, sit"
         },
         {
           "id": "M04-SCHEMA",
-          "expectedHealth": "critical",
-          "note": "No structured data (JSON-LD) found"
+          "expectedHealth": "warning",
+          "note": "Minimal structured data: CollectionPage, Dataset, WebSite (3 blocks) — SearchAct"
         },
         {
           "id": "M04-ROBOTS",
-          "expectedHealth": "good",
+          "expectedHealth": "warning",
           "note": "robots.txt exists"
         },
         {
           "id": "M04-SITEMAP",
-          "expectedHealth": "critical",
-          "note": "No sitemap found (checked /sitemap.xml, /sitemap_index.xml, /sitemap-index.xml, "
+          "expectedHealth": "excellent",
+          "note": "Sitemap present (sitemap index) with 345 URL(s)"
         },
         {
           "id": "M04-FAVICON",
           "expectedHealth": "excellent",
-          "note": "Multiple favicon formats including apple-touch-icon: apple-touch-icon 57x57, app"
+          "note": "Multiple favicon formats including apple-touch-icon: shortcut icon, icon 16x16, "
         },
         {
           "id": "M04-LANG",
-          "expectedHealth": "excellent",
-          "note": "Specific language attribute: lang=\"es-ES\""
+          "expectedHealth": "good",
+          "note": "Language attribute present: lang=\"es\""
         },
         {
           "id": "M04-HREFLANG",
@@ -269,13 +274,13 @@
         },
         {
           "id": "M04-PRECONNECT",
-          "expectedHealth": "info",
-          "note": "No preconnect/prefetch hints found (informational -- site may not need them)"
+          "expectedHealth": "excellent",
+          "note": "15 resource hints found: https://nodeassets.nbcnews.com/_next/static/css/f990add"
         },
         {
           "id": "M04-LLMS-TXT",
-          "expectedHealth": "good",
-          "note": "llms.txt present"
+          "expectedHealth": "excellent",
+          "note": "llms.txt present with directives (5000 chars)"
         },
         {
           "id": "M04-MANIFEST",
@@ -284,8 +289,8 @@
         },
         {
           "id": "M04-ROBOTS-DIRECTIVES",
-          "expectedHealth": "info",
-          "note": "No explicit robots directives (defaults to index, follow)"
+          "expectedHealth": "excellent",
+          "note": "Robots directives present: max-image-preview:large"
         },
         {
           "id": "M04-VIEWPORT",
@@ -295,22 +300,27 @@
         {
           "id": "M04-CHARSET",
           "expectedHealth": "excellent",
-          "note": "UTF-8 charset declared via meta: UTF-8"
+          "note": "UTF-8 charset declared via meta: utf-8"
         },
         {
           "id": "M04-ADS-TXT",
           "expectedHealth": "excellent",
-          "note": "ads.txt present with 0 seller record(s)"
+          "note": "ads.txt present with 189 seller record(s)"
         },
         {
           "id": "m04-structured-data",
-          "expectedHealth": "warning",
-          "note": "No structured data found (JSON-LD, Microdata, or RDFa)"
+          "expectedHealth": "excellent",
+          "note": "3 structured data item(s) across JSON-LD (types: CollectionPage, Dataset, WebSit"
+        },
+        {
+          "id": "m04-rich-snippets",
+          "expectedHealth": "info",
+          "note": "Structured data present but no Google rich result types detected (Organization, "
         },
         {
           "id": "M04-VIEWPORT-A11Y",
           "expectedHealth": "excellent",
-          "note": "Viewport allows user zoom (content: \"width=device-width, initial-scale=1\")"
+          "note": "Viewport allows user zoom (content: \"width=device-width, initial-scale=1, user-s"
         }
       ],
       "negativeAssertions": [],
@@ -319,19 +329,19 @@
     "M16": {
       "expectedData": {
         "press_page_url": {
-          "match": "falsy",
-          "note": "Calibrated: module returns null"
+          "match": "truthy",
+          "note": "Press page at https://www.telemundo.com/noticias"
         },
         "article_count": {
-          "value": 0,
+          "value": 80,
           "match": "gte",
-          "note": "Calibrated: module returns 0"
+          "note": "Calibrated: module returns 80"
         }
       },
       "expectedCheckpoints": [
         {
           "id": "m16-press-page",
-          "expectedHealth": "info",
+          "expectedHealth": "excellent",
           "note": "Press page found"
         },
         {
@@ -351,8 +361,8 @@
         },
         {
           "id": "m16-press-recency",
-          "expectedHealth": "info",
-          "note": "No dateable press content found"
+          "expectedHealth": "excellent",
+          "note": "Most recent press content within 3 months (2026-04-06)"
         }
       ],
       "negativeAssertions": [],
@@ -361,25 +371,25 @@
     "M17": {
       "expectedData": {
         "careers_page_url": {
-          "match": "truthy",
-          "note": "Careers page found"
+          "match": "falsy",
+          "note": "Calibrated: module returns null"
         }
       },
       "expectedCheckpoints": [
         {
           "id": "m17-careers-page",
-          "expectedHealth": "excellent",
+          "expectedHealth": "info",
           "note": "Careers page exists"
         },
         {
           "id": "m17-ats-provider",
-          "expectedHealth": "excellent",
-          "note": "Professional ATS detected: Workday"
+          "expectedHealth": "info",
+          "note": "No ATS provider detected"
         },
         {
           "id": "m17-open-positions",
           "expectedHealth": "info",
-          "note": "1 open position(s) detected"
+          "note": "No open positions detected"
         },
         {
           "id": "m17-team-culture",
@@ -401,7 +411,7 @@
         {
           "id": "m18-ir-portal",
           "expectedHealth": "info",
-          "note": "No IR page"
+          "note": "IR page found"
         },
         {
           "id": "m18-financial-data",
@@ -435,20 +445,20 @@
     "M19": {
       "expectedData": {
         "support_page_url": {
-          "match": "falsy",
-          "note": "Calibrated: module returns null"
+          "match": "truthy",
+          "note": "Support/contact page found"
         }
       },
       "expectedCheckpoints": [
         {
           "id": "m19-help-center",
-          "expectedHealth": "critical",
-          "note": "No support documentation found"
+          "expectedHealth": "warning",
+          "note": "Only a basic FAQ page detected"
         },
         {
           "id": "m19-support-channels",
           "expectedHealth": "warning",
-          "note": "Only 1 support channel: phone"
+          "note": "Only 1 support channel: social_media"
         },
         {
           "id": "m19-status-page",
@@ -467,8 +477,8 @@
         },
         {
           "id": "m19-developer-docs",
-          "expectedHealth": "excellent",
-          "note": "Developer docs: \"CONOCE MÁS\" (../docs/Notice-Of-Availability.pdf)"
+          "expectedHealth": "info",
+          "note": "No developer or API documentation detected"
         },
         {
           "id": "m19-training-academy",
@@ -480,5 +490,5 @@
       "fixedBugs": []
     }
   },
-  "calibratedAt": "2026-04-04T01:03:54.047Z"
+  "calibratedAt": "2026-04-04T01:05:22.932Z"
 }

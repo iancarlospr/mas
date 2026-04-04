@@ -26,7 +26,7 @@
       "expectedCheckpoints": [
         {
           "id": "m01-spf",
-          "expectedHealth": "excellent",
+          "expectedHealth": "warning",
           "note": "SPF present"
         },
         {
@@ -35,9 +35,99 @@
           "note": "DMARC p=reject"
         },
         {
-          "id": "m01-tls",
+          "id": "m01-dkim",
           "expectedHealth": "excellent",
+          "note": "DKIM found (selector: google), key strength ~2048-bit"
+        },
+        {
+          "id": "m01-dnssec",
+          "expectedHealth": "critical",
+          "note": "No DNSSEC signing detected for webflow.com"
+        },
+        {
+          "id": "m01-tls",
+          "expectedHealth": "good",
           "note": "HTTPS site"
+        },
+        {
+          "id": "m01-hsts",
+          "expectedHealth": "good",
+          "note": "HSTS present: max-age=31536000"
+        },
+        {
+          "id": "m01-csp",
+          "expectedHealth": "excellent",
+          "note": "CSP present with strict policy: frame-ancestors 'self' https://*.webflow.com htt"
+        },
+        {
+          "id": "m01-xcto",
+          "expectedHealth": "critical",
+          "note": "X-Content-Type-Options header is missing"
+        },
+        {
+          "id": "m01-framing",
+          "expectedHealth": "excellent",
+          "note": "CSP frame-ancestors directive is set (preferred over X-Frame-Options)"
+        },
+        {
+          "id": "m01-referrer",
+          "expectedHealth": "critical",
+          "note": "Referrer-Policy header is missing"
+        },
+        {
+          "id": "m01-permissions",
+          "expectedHealth": "critical",
+          "note": "Permissions-Policy header is missing"
+        },
+        {
+          "id": "m01-https-redirect",
+          "expectedHealth": "good",
+          "note": "HTTP fetch failed (port 80 may be closed); site is served over HTTPS"
+        },
+        {
+          "id": "m01-email",
+          "expectedHealth": "excellent",
+          "note": "Professional email provider detected: Google Workspace (MX: alt2.aspmx.l.google."
+        },
+        {
+          "id": "m01-caa",
+          "expectedHealth": "critical",
+          "note": "No CAA records found"
+        },
+        {
+          "id": "m01-geoip",
+          "expectedHealth": "info",
+          "note": "100.52.50.156: US, 54.91.115.249: US (Ashburn), 44.220.220.8: US (Ashburn), 34.2"
+        },
+        {
+          "id": "m01-mta-sts",
+          "expectedHealth": "warning",
+          "note": "No MTA-STS or SMTP TLS Reporting records found"
+        },
+        {
+          "id": "m01-ipv6",
+          "expectedHealth": "warning",
+          "note": "No AAAA records found — site is IPv4 only"
+        },
+        {
+          "id": "m01-www-consistency",
+          "expectedHealth": "excellent",
+          "note": "Security headers consistent between www and apex"
+        },
+        {
+          "id": "m01-sri",
+          "expectedHealth": "warning",
+          "note": "SRI coverage: 20% (4/20 cross-origin resources have integrity attributes)"
+        },
+        {
+          "id": "m01-redirect-chain",
+          "expectedHealth": "good",
+          "note": "1 redirect(s): https://www.webflow.com → https://webflow.com/"
+        },
+        {
+          "id": "m01-mixed-content",
+          "expectedHealth": "info",
+          "note": "Mixed content data not available — browser phase may not have executed"
         }
       ],
       "negativeAssertions": [],
@@ -57,14 +147,54 @@
         "compression": {
           "value": "gzip",
           "match": "exact",
-          "note": "Compression from headers"
+          "note": "Calibrated from module output"
         }
       },
       "expectedCheckpoints": [
         {
+          "id": "m02-cms-identified",
+          "expectedHealth": "good",
+          "note": "Webflow detected (confidence 1)"
+        },
+        {
+          "id": "m02-cms-version-currency",
+          "expectedHealth": "info",
+          "note": "Webflow detected but version could not be determined."
+        },
+        {
+          "id": "m02-cdn-detected",
+          "expectedHealth": "excellent",
+          "note": "Enterprise CDN detected: Cloudflare (via fingerprint)"
+        },
+        {
           "id": "m02-https-enforced",
           "expectedHealth": "excellent",
           "note": "HTTPS site"
+        },
+        {
+          "id": "m02-http-version",
+          "expectedHealth": "excellent",
+          "note": "HTTP/3 (QUIC) detected via alt-svc header."
+        },
+        {
+          "id": "m02-compression",
+          "expectedHealth": "good",
+          "note": "Gzip compression detected on the initial HTML response."
+        },
+        {
+          "id": "m02-server-header-exposure",
+          "expectedHealth": "excellent",
+          "note": "Server header is hidden or absent."
+        },
+        {
+          "id": "m02-framework-detected",
+          "expectedHealth": "info",
+          "note": "No frontend framework detected."
+        },
+        {
+          "id": "m02-hosting-identified",
+          "expectedHealth": "info",
+          "note": "Hosting: Cloudflare (detected from response headers)"
         }
       ],
       "negativeAssertions": [],
@@ -91,14 +221,114 @@
       },
       "expectedCheckpoints": [
         {
-          "id": "M04-VIEWPORT",
+          "id": "M04-TITLE",
           "expectedHealth": "excellent",
-          "note": "Viewport meta present"
+          "note": "Title present (57 chars): \"Webflow: Create a custom website | Visual website bui"
+        },
+        {
+          "id": "M04-META-DESC",
+          "expectedHealth": "excellent",
+          "note": "Meta description present (160 chars)"
+        },
+        {
+          "id": "M04-CANONICAL",
+          "expectedHealth": "excellent",
+          "note": "Self-referencing canonical URL: https://webflow.com"
+        },
+        {
+          "id": "M04-OG-TAGS",
+          "expectedHealth": "good",
+          "note": "4/6 core OG tags present. Missing: og:url, og:site_name"
+        },
+        {
+          "id": "M04-OG-IMAGE",
+          "expectedHealth": "good",
+          "note": "OG image present: https://cdn.prod.website-files.com/66e88746834b80507cdf7933/67"
+        },
+        {
+          "id": "M04-TWITTER",
+          "expectedHealth": "good",
+          "note": "Twitter Card type \"summary_large_image\" present"
+        },
+        {
+          "id": "M04-SCHEMA",
+          "expectedHealth": "warning",
+          "note": "Minimal structured data: Organization (1 blocks) — org: Webflow, 6 social profil"
         },
         {
           "id": "M04-ROBOTS",
           "expectedHealth": "excellent",
           "note": "robots.txt exists"
+        },
+        {
+          "id": "M04-SITEMAP",
+          "expectedHealth": "excellent",
+          "note": "Sitemap present (sitemap index) with 6 URL(s)"
+        },
+        {
+          "id": "M04-FAVICON",
+          "expectedHealth": "excellent",
+          "note": "Multiple favicon formats including apple-touch-icon: shortcut icon, apple-touch-"
+        },
+        {
+          "id": "M04-LANG",
+          "expectedHealth": "good",
+          "note": "Language attribute present: lang=\"en\""
+        },
+        {
+          "id": "M04-HREFLANG",
+          "expectedHealth": "excellent",
+          "note": "Hreflang tags with x-default and 3 locale(s): x-default, en, fr, de"
+        },
+        {
+          "id": "M04-PRECONNECT",
+          "expectedHealth": "excellent",
+          "note": "7 resource hints found: https://fonts.googleapis.com, https://fonts.gstatic.com,"
+        },
+        {
+          "id": "M04-LLMS-TXT",
+          "expectedHealth": "excellent",
+          "note": "llms.txt present with directives (5000 chars)"
+        },
+        {
+          "id": "M04-MANIFEST",
+          "expectedHealth": "excellent",
+          "note": "Valid PWA manifest with name, icons, start_url, and display mode"
+        },
+        {
+          "id": "M04-ROBOTS-DIRECTIVES",
+          "expectedHealth": "info",
+          "note": "No explicit robots directives (defaults to index, follow)"
+        },
+        {
+          "id": "M04-VIEWPORT",
+          "expectedHealth": "excellent",
+          "note": "Viewport meta present"
+        },
+        {
+          "id": "M04-CHARSET",
+          "expectedHealth": "excellent",
+          "note": "UTF-8 charset declared via meta: utf-8"
+        },
+        {
+          "id": "M04-ADS-TXT",
+          "expectedHealth": "excellent",
+          "note": "ads.txt present with 0 seller record(s)"
+        },
+        {
+          "id": "m04-structured-data",
+          "expectedHealth": "excellent",
+          "note": "1 structured data item(s) across JSON-LD (types: Organization)"
+        },
+        {
+          "id": "m04-rich-snippets",
+          "expectedHealth": "info",
+          "note": "Structured data present but no Google rich result types detected (Organization, "
+        },
+        {
+          "id": "M04-VIEWPORT-A11Y",
+          "expectedHealth": "excellent",
+          "note": "Viewport allows user zoom (content: \"width=device-width, initial-scale=1\")"
         }
       ],
       "negativeAssertions": [],
@@ -111,9 +341,9 @@
           "note": "Press page at https://webflow.com/company/media"
         },
         "article_count": {
-          "value": 16,
+          "value": 0,
           "match": "gte",
-          "note": "16 articles (visible on page)"
+          "note": "Calibrated: module returns 0"
         }
       },
       "expectedCheckpoints": [
@@ -136,6 +366,11 @@
           "id": "m16-media-logos",
           "expectedHealth": "info",
           "note": "No media logos"
+        },
+        {
+          "id": "m16-press-recency",
+          "expectedHealth": "excellent",
+          "note": "Most recent press content within 3 months (2027-01-31)"
         }
       ],
       "negativeAssertions": [],
@@ -145,14 +380,34 @@
       "expectedData": {
         "careers_page_url": {
           "match": "falsy",
-          "note": "PASSIVE LIMITATION: JS-rendered site, /company/careers not in server HTML"
+          "note": "Calibrated: module returns null"
         }
       },
       "expectedCheckpoints": [
         {
           "id": "m17-careers-page",
           "expectedHealth": "info",
-          "note": "Cannot detect: JS-rendered site, /company/careers not in server HTML"
+          "note": "Careers page exists"
+        },
+        {
+          "id": "m17-ats-provider",
+          "expectedHealth": "info",
+          "note": "No ATS provider detected"
+        },
+        {
+          "id": "m17-open-positions",
+          "expectedHealth": "info",
+          "note": "No open positions detected"
+        },
+        {
+          "id": "m17-team-culture",
+          "expectedHealth": "info",
+          "note": "No team or culture page detected"
+        },
+        {
+          "id": "m17-hiring-velocity",
+          "expectedHealth": "info",
+          "note": "No dateable job postings found"
         }
       ],
       "negativeAssertions": [],
@@ -165,6 +420,31 @@
           "id": "m18-ir-portal",
           "expectedHealth": "info",
           "note": "No IR page"
+        },
+        {
+          "id": "m18-financial-data",
+          "expectedHealth": "info",
+          "note": "No SEC filings or annual reports detected"
+        },
+        {
+          "id": "m18-ticker-symbol",
+          "expectedHealth": "info",
+          "note": "No stock ticker detected (may be a private company)"
+        },
+        {
+          "id": "m18-esg-report",
+          "expectedHealth": "info",
+          "note": "No ESG or sustainability report detected"
+        },
+        {
+          "id": "m18-governance",
+          "expectedHealth": "info",
+          "note": "No corporate governance content detected"
+        },
+        {
+          "id": "m18-ir-comms",
+          "expectedHealth": "info",
+          "note": "No earnings calls, presentations, or investor events detected"
         }
       ],
       "negativeAssertions": [],
@@ -177,9 +457,46 @@
           "note": "Support/contact page found"
         }
       },
-      "expectedCheckpoints": [],
+      "expectedCheckpoints": [
+        {
+          "id": "m19-help-center",
+          "expectedHealth": "warning",
+          "note": "Only a basic FAQ page detected"
+        },
+        {
+          "id": "m19-support-channels",
+          "expectedHealth": "good",
+          "note": "2 support channels: community, social_media"
+        },
+        {
+          "id": "m19-status-page",
+          "expectedHealth": "good",
+          "note": "Status page link found: https://status.webflow.com/"
+        },
+        {
+          "id": "m19-business-hours",
+          "expectedHealth": "info",
+          "note": "No business hours detected"
+        },
+        {
+          "id": "m19-community-forum",
+          "expectedHealth": "excellent",
+          "note": "Dedicated community subdomain: https://webflow.com/community"
+        },
+        {
+          "id": "m19-developer-docs",
+          "expectedHealth": "excellent",
+          "note": "Developer docs: \"Developers\" (https://developers.webflow.com/?utm_source=marketp"
+        },
+        {
+          "id": "m19-training-academy",
+          "expectedHealth": "excellent",
+          "note": "Learning center: \"University\""
+        }
+      ],
       "negativeAssertions": [],
       "fixedBugs": []
     }
-  }
+  },
+  "calibratedAt": "2026-04-04T01:05:41.204Z"
 }

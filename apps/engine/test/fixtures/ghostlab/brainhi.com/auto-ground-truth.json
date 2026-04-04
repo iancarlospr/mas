@@ -22,7 +22,7 @@
       "expectedCheckpoints": [
         {
           "id": "m01-spf",
-          "expectedHealth": "excellent",
+          "expectedHealth": "good",
           "note": "SPF present"
         },
         {
@@ -31,9 +31,99 @@
           "note": "DMARC p=none"
         },
         {
-          "id": "m01-tls",
+          "id": "m01-dkim",
           "expectedHealth": "excellent",
+          "note": "DKIM found (selector: s1), key strength ~2048-bit"
+        },
+        {
+          "id": "m01-dnssec",
+          "expectedHealth": "critical",
+          "note": "No DNSSEC signing detected for brainhi.com"
+        },
+        {
+          "id": "m01-tls",
+          "expectedHealth": "good",
           "note": "HTTPS site"
+        },
+        {
+          "id": "m01-hsts",
+          "expectedHealth": "warning",
+          "note": "HSTS present but max-age is 2628000 (<6 months)"
+        },
+        {
+          "id": "m01-csp",
+          "expectedHealth": "critical",
+          "note": "Content-Security-Policy header is missing"
+        },
+        {
+          "id": "m01-xcto",
+          "expectedHealth": "critical",
+          "note": "X-Content-Type-Options header is missing"
+        },
+        {
+          "id": "m01-framing",
+          "expectedHealth": "critical",
+          "note": "Neither CSP frame-ancestors nor X-Frame-Options is set"
+        },
+        {
+          "id": "m01-referrer",
+          "expectedHealth": "critical",
+          "note": "Referrer-Policy header is missing"
+        },
+        {
+          "id": "m01-permissions",
+          "expectedHealth": "critical",
+          "note": "Permissions-Policy header is missing"
+        },
+        {
+          "id": "m01-https-redirect",
+          "expectedHealth": "good",
+          "note": "HTTP fetch failed (port 80 may be closed); site is served over HTTPS"
+        },
+        {
+          "id": "m01-email",
+          "expectedHealth": "excellent",
+          "note": "Professional email provider detected: Google Workspace (MX: alt2.aspmx.l.google."
+        },
+        {
+          "id": "m01-caa",
+          "expectedHealth": "critical",
+          "note": "No CAA records found"
+        },
+        {
+          "id": "m01-geoip",
+          "expectedHealth": "info",
+          "note": "204.69.207.1: US"
+        },
+        {
+          "id": "m01-mta-sts",
+          "expectedHealth": "warning",
+          "note": "No MTA-STS or SMTP TLS Reporting records found"
+        },
+        {
+          "id": "m01-ipv6",
+          "expectedHealth": "warning",
+          "note": "No AAAA records found — site is IPv4 only"
+        },
+        {
+          "id": "m01-www-consistency",
+          "expectedHealth": "excellent",
+          "note": "Security headers consistent between www and apex"
+        },
+        {
+          "id": "m01-sri",
+          "expectedHealth": "warning",
+          "note": "SRI coverage: 0% (0/1 cross-origin resources). Uncovered: https://www.googletagm"
+        },
+        {
+          "id": "m01-redirect-chain",
+          "expectedHealth": "good",
+          "note": "1 redirect(s): https://www.brainhi.com → https://brainhi.com/"
+        },
+        {
+          "id": "m01-mixed-content",
+          "expectedHealth": "info",
+          "note": "Mixed content data not available — browser phase may not have executed"
         }
       ],
       "negativeAssertions": [],
@@ -53,14 +143,54 @@
         "compression": {
           "value": "gzip",
           "match": "exact",
-          "note": "Compression from headers"
+          "note": "Calibrated from module output"
         }
       },
       "expectedCheckpoints": [
         {
+          "id": "m02-cms-identified",
+          "expectedHealth": "info",
+          "note": "No CMS detected; site may use a custom or headless solution."
+        },
+        {
+          "id": "m02-cms-version-currency",
+          "expectedHealth": "info",
+          "note": "No CMS version information available."
+        },
+        {
+          "id": "m02-cdn-detected",
+          "expectedHealth": "excellent",
+          "note": "Enterprise CDN detected: Cloudflare (via fingerprint)"
+        },
+        {
           "id": "m02-https-enforced",
           "expectedHealth": "excellent",
           "note": "HTTPS site"
+        },
+        {
+          "id": "m02-http-version",
+          "expectedHealth": "good",
+          "note": "HTTP/2 detected."
+        },
+        {
+          "id": "m02-compression",
+          "expectedHealth": "good",
+          "note": "Gzip compression detected on the initial HTML response."
+        },
+        {
+          "id": "m02-server-header-exposure",
+          "expectedHealth": "good",
+          "note": "Server header present without version: cloudflare"
+        },
+        {
+          "id": "m02-framework-detected",
+          "expectedHealth": "info",
+          "note": "No frontend framework detected."
+        },
+        {
+          "id": "m02-hosting-identified",
+          "expectedHealth": "info",
+          "note": "Hosting: Cloudflare (detected from response headers)"
         }
       ],
       "negativeAssertions": [],
@@ -87,9 +217,109 @@
       },
       "expectedCheckpoints": [
         {
+          "id": "M04-TITLE",
+          "expectedHealth": "warning",
+          "note": "Title very short (7 chars): \"BrainHi\""
+        },
+        {
+          "id": "M04-META-DESC",
+          "expectedHealth": "warning",
+          "note": "Meta description length suboptimal (453 chars)"
+        },
+        {
+          "id": "M04-CANONICAL",
+          "expectedHealth": "critical",
+          "note": "No canonical URL found"
+        },
+        {
+          "id": "M04-OG-TAGS",
+          "expectedHealth": "good",
+          "note": "5/6 core OG tags present. Missing: og:image"
+        },
+        {
+          "id": "M04-OG-IMAGE",
+          "expectedHealth": "critical",
+          "note": "No og:image tag found"
+        },
+        {
+          "id": "M04-TWITTER",
+          "expectedHealth": "good",
+          "note": "Twitter Card type \"summary_large_image\" present"
+        },
+        {
+          "id": "M04-SCHEMA",
+          "expectedHealth": "critical",
+          "note": "No structured data (JSON-LD) found"
+        },
+        {
+          "id": "M04-ROBOTS",
+          "expectedHealth": "good",
+          "note": "robots.txt present (0 disallow rules, no sitemap reference)"
+        },
+        {
+          "id": "M04-SITEMAP",
+          "expectedHealth": "good",
+          "note": "Sitemap present but could not determine URL count"
+        },
+        {
+          "id": "M04-FAVICON",
+          "expectedHealth": "warning",
+          "note": "Single favicon found: icon"
+        },
+        {
+          "id": "M04-LANG",
+          "expectedHealth": "good",
+          "note": "Language attribute present: lang=\"en\""
+        },
+        {
+          "id": "M04-HREFLANG",
+          "expectedHealth": "info",
+          "note": "No hreflang tags found (informational -- may be a single-language site)"
+        },
+        {
+          "id": "M04-PRECONNECT",
+          "expectedHealth": "excellent",
+          "note": "3 resource hints found: /_runtimes/sites-runtime.3d8ed699d1738407521952282d02a53"
+        },
+        {
+          "id": "M04-LLMS-TXT",
+          "expectedHealth": "excellent",
+          "note": "llms.txt present with directives (5000 chars)"
+        },
+        {
+          "id": "M04-MANIFEST",
+          "expectedHealth": "info",
+          "note": "No manifest.json found (informational -- required only for PWA installability)"
+        },
+        {
+          "id": "M04-ROBOTS-DIRECTIVES",
+          "expectedHealth": "excellent",
+          "note": "Robots directives present: index,follow"
+        },
+        {
           "id": "M04-VIEWPORT",
           "expectedHealth": "excellent",
           "note": "Viewport meta present"
+        },
+        {
+          "id": "M04-CHARSET",
+          "expectedHealth": "excellent",
+          "note": "UTF-8 charset declared via meta: utf-8"
+        },
+        {
+          "id": "M04-ADS-TXT",
+          "expectedHealth": "info",
+          "note": "No ads.txt found (informational — required only for sites running programmatic a"
+        },
+        {
+          "id": "m04-structured-data",
+          "expectedHealth": "warning",
+          "note": "No structured data found (JSON-LD, Microdata, or RDFa)"
+        },
+        {
+          "id": "M04-VIEWPORT-A11Y",
+          "expectedHealth": "excellent",
+          "note": "Viewport allows user zoom (content: \"width=device-width, initial-scale=1\")"
         }
       ],
       "negativeAssertions": [],
@@ -99,26 +329,39 @@
       "expectedData": {
         "press_page_url": {
           "match": "falsy",
-          "note": "PASSIVE LIMITATION: JS-rendered site"
+          "note": "Calibrated: module returns null"
+        },
+        "article_count": {
+          "value": 0,
+          "match": "gte",
+          "note": "Calibrated: module returns 0"
         }
       },
       "expectedCheckpoints": [
         {
           "id": "m16-press-page",
           "expectedHealth": "info",
-          "note": "Cannot detect: JS-rendered site"
+          "note": "Press page found"
         },
         {
           "id": "m16-media-contact",
-          "expectedHealth": "info"
+          "expectedHealth": "info",
+          "note": "No media contact"
         },
         {
           "id": "m16-rss-feed",
-          "expectedHealth": "info"
+          "expectedHealth": "info",
+          "note": "No RSS feed"
         },
         {
           "id": "m16-media-logos",
-          "expectedHealth": "info"
+          "expectedHealth": "info",
+          "note": "No media logos"
+        },
+        {
+          "id": "m16-press-recency",
+          "expectedHealth": "info",
+          "note": "No dateable press content found"
         }
       ],
       "negativeAssertions": [],
@@ -128,14 +371,34 @@
       "expectedData": {
         "careers_page_url": {
           "match": "truthy",
-          "note": "/careers/ found via probe fallback"
+          "note": "Calibrated: module returns \"https://brainhi.com/careers/\""
         }
       },
       "expectedCheckpoints": [
         {
           "id": "m17-careers-page",
+          "expectedHealth": "warning",
+          "note": "No careers page"
+        },
+        {
+          "id": "m17-ats-provider",
+          "expectedHealth": "info",
+          "note": "No ATS provider detected"
+        },
+        {
+          "id": "m17-open-positions",
+          "expectedHealth": "info",
+          "note": "No open positions detected"
+        },
+        {
+          "id": "m17-team-culture",
           "expectedHealth": "good",
-          "note": "Careers page found"
+          "note": "Team page detected"
+        },
+        {
+          "id": "m17-hiring-velocity",
+          "expectedHealth": "info",
+          "note": "No dateable job postings found"
         }
       ],
       "negativeAssertions": [],
@@ -148,6 +411,31 @@
           "id": "m18-ir-portal",
           "expectedHealth": "info",
           "note": "No IR page"
+        },
+        {
+          "id": "m18-financial-data",
+          "expectedHealth": "info",
+          "note": "No SEC filings or annual reports detected"
+        },
+        {
+          "id": "m18-ticker-symbol",
+          "expectedHealth": "info",
+          "note": "No stock ticker detected (may be a private company)"
+        },
+        {
+          "id": "m18-esg-report",
+          "expectedHealth": "info",
+          "note": "No ESG or sustainability report detected"
+        },
+        {
+          "id": "m18-governance",
+          "expectedHealth": "info",
+          "note": "No corporate governance content detected"
+        },
+        {
+          "id": "m18-ir-comms",
+          "expectedHealth": "info",
+          "note": "No earnings calls, presentations, or investor events detected"
         }
       ],
       "negativeAssertions": [],
@@ -155,9 +443,46 @@
     },
     "M19": {
       "expectedData": {},
-      "expectedCheckpoints": [],
+      "expectedCheckpoints": [
+        {
+          "id": "m19-help-center",
+          "expectedHealth": "critical",
+          "note": "No support documentation found"
+        },
+        {
+          "id": "m19-support-channels",
+          "expectedHealth": "critical",
+          "note": "No support contact information found"
+        },
+        {
+          "id": "m19-status-page",
+          "expectedHealth": "info",
+          "note": "No system status page detected"
+        },
+        {
+          "id": "m19-business-hours",
+          "expectedHealth": "info",
+          "note": "No business hours detected"
+        },
+        {
+          "id": "m19-community-forum",
+          "expectedHealth": "info",
+          "note": "No community forum or discussion channel detected"
+        },
+        {
+          "id": "m19-developer-docs",
+          "expectedHealth": "info",
+          "note": "No developer or API documentation detected"
+        },
+        {
+          "id": "m19-training-academy",
+          "expectedHealth": "info",
+          "note": "No training portal or academy detected"
+        }
+      ],
       "negativeAssertions": [],
       "fixedBugs": []
     }
-  }
+  },
+  "calibratedAt": "2026-04-04T01:02:56.734Z"
 }

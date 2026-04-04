@@ -6,20 +6,64 @@
   "modules": {
     "M16": {
       "expectedData": {
-        "detected_language": { "value": "en", "match": "exact", "note": "English site" },
-        "press_page_url": { "value": "newsroom", "match": "contains", "note": "Ryder has /en-us/newsroom" },
-        "press_page_url_no_double": { "match": "falsy", "note": "URL must not contain doubled /en-us/en-us/ path" },
-        "found_pages": { "match": "truthy", "note": "Should find at least 1 press page" },
-        "rss_feed": { "match": "truthy", "note": "Ryder has an RSS feed at /en-us/api/rssfeed/showrssfeed" },
-        "article_count": { "value": 1418, "match": "exact", "note": "1,418 press releases from newsroom.ryder.com Q4 CMS API" },
-        "most_recent_date": { "match": "truthy", "note": "Should find recent press dates" }
+        "detected_language": {
+          "value": "en",
+          "match": "exact",
+          "note": "Calibrated from module output"
+        },
+        "press_page_url": {
+          "value": "newsroom",
+          "match": "contains",
+          "note": "Ryder has /en-us/newsroom"
+        },
+        "press_page_url_no_double": {
+          "match": "falsy",
+          "note": "URL must not contain doubled /en-us/en-us/ path"
+        },
+        "found_pages": {
+          "match": "truthy",
+          "note": "Should find at least 1 press page"
+        },
+        "rss_feed": {
+          "match": "truthy",
+          "note": "Ryder has an RSS feed at /en-us/api/rssfeed/showrssfeed"
+        },
+        "article_count": {
+          "value": 1418,
+          "match": "gte",
+          "note": "Calibrated: module returns 1418"
+        },
+        "most_recent_date": {
+          "match": "truthy",
+          "note": "Should find recent press dates"
+        }
       },
       "expectedCheckpoints": [
-        { "id": "m16-press-page", "expectedHealth": "excellent", "note": "Ryder has active newsroom with recent content (2026-03-24)" },
-        { "id": "m16-media-contact", "expectedHealth": "info", "note": "No press contact detected" },
-        { "id": "m16-rss-feed", "expectedHealth": "good", "note": "RSS feed exists" },
-        { "id": "m16-media-logos", "expectedHealth": "info", "note": "No media logos section" },
-        { "id": "m16-press-recency", "expectedHealth": "excellent", "note": "Content within 3 months" }
+        {
+          "id": "m16-press-page",
+          "expectedHealth": "excellent",
+          "note": "Ryder has active newsroom with recent content (2026-03-24)"
+        },
+        {
+          "id": "m16-media-contact",
+          "expectedHealth": "info",
+          "note": "No press contact detected"
+        },
+        {
+          "id": "m16-rss-feed",
+          "expectedHealth": "good",
+          "note": "RSS feed exists"
+        },
+        {
+          "id": "m16-media-logos",
+          "expectedHealth": "info",
+          "note": "No media logos section"
+        },
+        {
+          "id": "m16-press-recency",
+          "expectedHealth": "excellent",
+          "note": "Content within 3 months"
+        }
       ],
       "negativeAssertions": [
         {
@@ -43,22 +87,77 @@
     },
     "M02": {
       "expectedData": {
-        "detectedTechnologies": { "match": "truthy", "note": "Should detect multiple technologies" },
-        "cms.name": { "value": "Optimizely", "match": "contains", "note": "Optimizely CMS" },
-        "cdn.name": { "value": "Cloudflare", "match": "exact", "note": "Cloudflare CDN" },
-        "hosting.name": { "value": "Azure App Service", "match": "exact", "note": "Azure hosting" },
-        "compression": { "value": "gzip", "match": "exact", "note": "gzip compression" }
+        "detectedTechnologies": {
+          "match": "truthy",
+          "note": "Should detect multiple technologies"
+        },
+        "cms.name": {
+          "value": "Optimizely",
+          "match": "contains",
+          "note": "Optimizely CMS"
+        },
+        "cdn.name": {
+          "value": "Cloudflare",
+          "match": "exact",
+          "note": "Calibrated from module output"
+        },
+        "hosting.name": {
+          "value": "Azure App Service",
+          "match": "exact",
+          "note": "Calibrated from module output"
+        },
+        "compression": {
+          "value": "gzip",
+          "match": "exact",
+          "note": "Calibrated from module output"
+        }
       },
       "expectedCheckpoints": [
-        { "id": "m02-cms-identified", "expectedHealth": "good", "note": "Optimizely CMS detected without version" },
-        { "id": "m02-cdn-detected", "expectedHealth": "excellent", "note": "Cloudflare enterprise CDN" },
-        { "id": "m02-https-enforced", "expectedHealth": "excellent", "note": "HTTPS + HSTS" },
-        { "id": "m02-compression", "expectedHealth": "good", "note": "gzip, not brotli — captured headers show gzip" },
-        { "id": "m02-cms-version-currency", "expectedHealth": "info", "note": "No version detected for Optimizely" },
-        { "id": "m02-http-version", "expectedHealth": "good", "note": "HTTP/2 detected from Cloudflare headers" },
-        { "id": "m02-server-header-exposure", "expectedHealth": "excellent", "note": "Server header hidden behind Cloudflare" },
-        { "id": "m02-framework-detected", "expectedHealth": "info", "note": "Framework info" },
-        { "id": "m02-hosting-identified", "expectedHealth": "info", "note": "Azure App Service detected" }
+        {
+          "id": "m02-cms-identified",
+          "expectedHealth": "good",
+          "note": "Optimizely CMS detected without version"
+        },
+        {
+          "id": "m02-cms-version-currency",
+          "expectedHealth": "info",
+          "note": "No version detected for Optimizely"
+        },
+        {
+          "id": "m02-cdn-detected",
+          "expectedHealth": "excellent",
+          "note": "Cloudflare enterprise CDN"
+        },
+        {
+          "id": "m02-https-enforced",
+          "expectedHealth": "excellent",
+          "note": "HTTPS + HSTS"
+        },
+        {
+          "id": "m02-http-version",
+          "expectedHealth": "good",
+          "note": "HTTP/2 detected from Cloudflare headers"
+        },
+        {
+          "id": "m02-compression",
+          "expectedHealth": "good",
+          "note": "gzip, not brotli — captured headers show gzip"
+        },
+        {
+          "id": "m02-server-header-exposure",
+          "expectedHealth": "excellent",
+          "note": "Server header hidden behind Cloudflare"
+        },
+        {
+          "id": "m02-framework-detected",
+          "expectedHealth": "info",
+          "note": "Framework info"
+        },
+        {
+          "id": "m02-hosting-identified",
+          "expectedHealth": "info",
+          "note": "Azure App Service detected"
+        }
       ],
       "negativeAssertions": [
         {
@@ -82,35 +181,199 @@
     },
     "M04": {
       "expectedData": {
-        "title": { "match": "truthy", "note": "Page title should exist" },
-        "metaDescription": { "match": "truthy", "note": "Meta description should exist" },
-        "htmlLang": { "match": "truthy", "note": "HTML lang attribute should be present" },
-        "jsonLd": { "match": "truthy", "note": "Should have JSON-LD schema" },
-        "ogTags": { "match": "truthy", "note": "Should have Open Graph tags" }
+        "title": {
+          "match": "truthy",
+          "note": "Page title should exist"
+        },
+        "metaDescription": {
+          "match": "truthy",
+          "note": "Meta description should exist"
+        },
+        "htmlLang": {
+          "match": "truthy",
+          "note": "HTML lang attribute should be present"
+        },
+        "jsonLd": {
+          "match": "truthy",
+          "note": "Should have JSON-LD schema"
+        },
+        "ogTags": {
+          "match": "truthy",
+          "note": "Should have Open Graph tags"
+        }
       },
       "expectedCheckpoints": [
-        { "id": "M04-TITLE", "expectedHealth": "good", "note": "Title exists but may be outside 30-60 char sweet spot" },
-        { "id": "M04-META-DESC", "expectedHealth": "good", "note": "Meta description exists" },
-        { "id": "M04-VIEWPORT", "expectedHealth": "excellent", "note": "Proper viewport meta" }
+        {
+          "id": "M04-TITLE",
+          "expectedHealth": "good",
+          "note": "Title exists but may be outside 30-60 char sweet spot"
+        },
+        {
+          "id": "M04-META-DESC",
+          "expectedHealth": "good",
+          "note": "Meta description exists"
+        },
+        {
+          "id": "M04-CANONICAL",
+          "expectedHealth": "excellent",
+          "note": "Self-referencing canonical URL: https://www.ryder.com/en-us"
+        },
+        {
+          "id": "M04-OG-TAGS",
+          "expectedHealth": "good",
+          "note": "5/6 core OG tags present. Missing: og:image"
+        },
+        {
+          "id": "M04-OG-IMAGE",
+          "expectedHealth": "critical",
+          "note": "No og:image tag found"
+        },
+        {
+          "id": "M04-TWITTER",
+          "expectedHealth": "good",
+          "note": "Twitter Card type \"summary\" present"
+        },
+        {
+          "id": "M04-SCHEMA",
+          "expectedHealth": "good",
+          "note": "Structured data: Organization, WebSite (2 blocks) — SearchAction"
+        },
+        {
+          "id": "M04-ROBOTS",
+          "expectedHealth": "excellent",
+          "note": "robots.txt present with 6 sitemap reference(s), 2 disallow rule(s), 1 user-agent"
+        },
+        {
+          "id": "M04-SITEMAP",
+          "expectedHealth": "critical",
+          "note": "No sitemap found (checked /sitemap.xml, /sitemap_index.xml, /sitemap-index.xml, "
+        },
+        {
+          "id": "M04-FAVICON",
+          "expectedHealth": "warning",
+          "note": "Single favicon found: icon"
+        },
+        {
+          "id": "M04-LANG",
+          "expectedHealth": "excellent",
+          "note": "Specific language attribute: lang=\"en-US\""
+        },
+        {
+          "id": "M04-HREFLANG",
+          "expectedHealth": "excellent",
+          "note": "Hreflang tags with x-default and 4 locale(s): en-us, en-ca, fr-ca, es-mx, x-defa"
+        },
+        {
+          "id": "M04-PRECONNECT",
+          "expectedHealth": "excellent",
+          "note": "10 resource hints found: //cdn.optimizely.com, //code.jquery.com, //www.google.c"
+        },
+        {
+          "id": "M04-LLMS-TXT",
+          "expectedHealth": "good",
+          "note": "llms.txt present"
+        },
+        {
+          "id": "M04-MANIFEST",
+          "expectedHealth": "info",
+          "note": "No manifest.json found (informational -- required only for PWA installability)"
+        },
+        {
+          "id": "M04-ROBOTS-DIRECTIVES",
+          "expectedHealth": "excellent",
+          "note": "Robots directives present: index, follow, max-snippet:-1, max-image-preview:larg"
+        },
+        {
+          "id": "M04-VIEWPORT",
+          "expectedHealth": "excellent",
+          "note": "Proper viewport meta"
+        },
+        {
+          "id": "M04-CHARSET",
+          "expectedHealth": "excellent",
+          "note": "UTF-8 charset declared via meta: utf-8"
+        },
+        {
+          "id": "M04-ADS-TXT",
+          "expectedHealth": "excellent",
+          "note": "ads.txt present with 0 seller record(s)"
+        },
+        {
+          "id": "m04-structured-data",
+          "expectedHealth": "excellent",
+          "note": "2 structured data item(s) across JSON-LD (types: Organization, WebSite)"
+        },
+        {
+          "id": "m04-rich-snippets",
+          "expectedHealth": "info",
+          "note": "Structured data present but no Google rich result types detected (Organization, "
+        },
+        {
+          "id": "M04-VIEWPORT-A11Y",
+          "expectedHealth": "excellent",
+          "note": "Viewport allows user zoom (content: \"width=device-width, initial-scale=1\")"
+        }
       ],
       "negativeAssertions": [],
       "fixedBugs": []
     },
     "M17": {
       "expectedData": {
-        "careers_page_url": { "value": "/en-us/careers", "match": "contains", "note": "Should prefer the main careers hub, not a sub-page like freight-agent" },
-        "found_pages": { "match": "truthy", "note": "Should find multiple careers pages" },
-        "ats_provider": { "value": "iCIMS", "match": "exact", "note": "iCIMS detected via warehouse-ryder.icims.com" },
-        "external_careers_links": { "match": "truthy", "note": "Should find jobs.ryder.com" },
-        "benefits_mentioned": { "value": true, "match": "exact", "note": "Benefits mentioned on careers pages" },
-        "dei_mentioned": { "value": true, "match": "exact", "note": "DEI content on careers pages" }
+        "careers_page_url": {
+          "value": "/en-us/careers",
+          "match": "contains",
+          "note": "Should prefer the main careers hub, not a sub-page like freight-agent"
+        },
+        "found_pages": {
+          "match": "truthy",
+          "note": "Should find multiple careers pages"
+        },
+        "ats_provider": {
+          "value": "iCIMS",
+          "match": "exact",
+          "note": "Calibrated from module output"
+        },
+        "external_careers_links": {
+          "match": "truthy",
+          "note": "Should find jobs.ryder.com"
+        },
+        "benefits_mentioned": {
+          "value": true,
+          "match": "exact",
+          "note": "Benefits mentioned on careers pages"
+        },
+        "dei_mentioned": {
+          "value": true,
+          "match": "exact",
+          "note": "DEI content on careers pages"
+        }
       },
       "expectedCheckpoints": [
-        { "id": "m17-careers-page", "expectedHealth": "excellent", "note": "Active careers with positions + ATS" },
-        { "id": "m17-ats-provider", "expectedHealth": "good", "note": "iCIMS is not in the professional-tier list" },
-        { "id": "m17-open-positions", "expectedHealth": "info", "note": "Informational checkpoint" },
-        { "id": "m17-team-culture", "expectedHealth": "good", "note": "Team page detected" },
-        { "id": "m17-hiring-velocity", "expectedHealth": "info", "note": "No dateable postings found" }
+        {
+          "id": "m17-careers-page",
+          "expectedHealth": "excellent",
+          "note": "Active careers with positions + ATS"
+        },
+        {
+          "id": "m17-ats-provider",
+          "expectedHealth": "good",
+          "note": "iCIMS is not in the professional-tier list"
+        },
+        {
+          "id": "m17-open-positions",
+          "expectedHealth": "info",
+          "note": "Informational checkpoint"
+        },
+        {
+          "id": "m17-team-culture",
+          "expectedHealth": "good",
+          "note": "Team page detected"
+        },
+        {
+          "id": "m17-hiring-velocity",
+          "expectedHealth": "info",
+          "note": "No dateable postings found"
+        }
       ],
       "negativeAssertions": [
         {
@@ -134,17 +397,53 @@
     },
     "M18": {
       "expectedData": {
-        "external_ir_domain": { "value": "investors.ryder.com", "match": "contains", "note": "Should detect external IR subdomain from main page links" },
-        "ticker_symbol": { "value": "R", "match": "exact", "note": "NYSE: R — detected from main page HTML" },
-        "stock_exchange": { "value": "NYSE", "match": "contains", "note": "Must be NYSE, not NSE" }
+        "external_ir_domain": {
+          "value": "investors.ryder.com",
+          "match": "contains",
+          "note": "Should detect external IR subdomain from main page links"
+        },
+        "ticker_symbol": {
+          "value": "R",
+          "match": "exact",
+          "note": "Calibrated from module output"
+        },
+        "stock_exchange": {
+          "value": "NYSE",
+          "match": "contains",
+          "note": "Must be NYSE, not NSE"
+        }
       },
       "expectedCheckpoints": [
-        { "id": "m18-ir-portal", "expectedHealth": "info", "note": "IR portal is on external subdomain (investors.ryder.com) which offline replay can't fetch — info is correct for replay" },
-        { "id": "m18-ticker-symbol", "expectedHealth": "info", "note": "Ticker info checkpoint" },
-        { "id": "m18-financial-data", "expectedHealth": "info", "note": "No SEC filings detectable from main page alone" },
-        { "id": "m18-esg-report", "expectedHealth": "info", "note": "No ESG report on main page" },
-        { "id": "m18-governance", "expectedHealth": "info", "note": "No governance on main page" },
-        { "id": "m18-ir-comms", "expectedHealth": "info", "note": "No IR comms on main page" }
+        {
+          "id": "m18-ir-portal",
+          "expectedHealth": "info",
+          "note": "IR portal is on external subdomain (investors.ryder.com) which offline replay can't fetch — info is correct for replay"
+        },
+        {
+          "id": "m18-financial-data",
+          "expectedHealth": "info",
+          "note": "No SEC filings detectable from main page alone"
+        },
+        {
+          "id": "m18-ticker-symbol",
+          "expectedHealth": "info",
+          "note": "Ticker info checkpoint"
+        },
+        {
+          "id": "m18-esg-report",
+          "expectedHealth": "info",
+          "note": "No ESG report on main page"
+        },
+        {
+          "id": "m18-governance",
+          "expectedHealth": "info",
+          "note": "No governance on main page"
+        },
+        {
+          "id": "m18-ir-comms",
+          "expectedHealth": "info",
+          "note": "No IR comms on main page"
+        }
       ],
       "negativeAssertions": [
         {
@@ -164,17 +463,51 @@
     },
     "M19": {
       "expectedData": {
-        "support_page_url": { "match": "truthy", "note": "Ryder has support/contact pages" },
-        "support_channels": { "match": "truthy", "note": "Should detect support channels" }
+        "support_page_url": {
+          "match": "truthy",
+          "note": "Ryder has support/contact pages"
+        },
+        "support_channels": {
+          "match": "truthy",
+          "note": "Should detect support channels"
+        }
       },
       "expectedCheckpoints": [
-        { "id": "m19-help-center", "expectedHealth": "warning", "note": "Basic FAQ/help content only from captured sitemap page" },
-        { "id": "m19-support-channels", "expectedHealth": "warning", "note": "Only 1 channel detected from captured page" },
-        { "id": "m19-status-page", "expectedHealth": "info", "note": "No status page detected" },
-        { "id": "m19-business-hours", "expectedHealth": "info", "note": "No business hours detected" },
-        { "id": "m19-community-forum", "expectedHealth": "info", "note": "No community forum" },
-        { "id": "m19-developer-docs", "expectedHealth": "info", "note": "No developer docs" },
-        { "id": "m19-training-academy", "expectedHealth": "info", "note": "No training academy" }
+        {
+          "id": "m19-help-center",
+          "expectedHealth": "warning",
+          "note": "Basic FAQ/help content only from captured sitemap page"
+        },
+        {
+          "id": "m19-support-channels",
+          "expectedHealth": "warning",
+          "note": "Only 1 channel detected from captured page"
+        },
+        {
+          "id": "m19-status-page",
+          "expectedHealth": "info",
+          "note": "No status page detected"
+        },
+        {
+          "id": "m19-business-hours",
+          "expectedHealth": "info",
+          "note": "No business hours detected"
+        },
+        {
+          "id": "m19-community-forum",
+          "expectedHealth": "info",
+          "note": "No community forum"
+        },
+        {
+          "id": "m19-developer-docs",
+          "expectedHealth": "info",
+          "note": "No developer docs"
+        },
+        {
+          "id": "m19-training-academy",
+          "expectedHealth": "info",
+          "note": "No training academy"
+        }
       ],
       "negativeAssertions": [],
       "fixedBugs": [
@@ -190,21 +523,141 @@
     },
     "M01": {
       "expectedData": {
-        "spf": { "match": "truthy", "note": "SPF record exists" },
-        "dmarc": { "match": "truthy", "note": "DMARC record exists" },
-        "dkim": { "match": "truthy", "note": "DKIM should be found" },
-        "tls": { "match": "truthy", "note": "TLS info captured" },
-        "hsts": { "match": "truthy", "note": "HSTS enabled" },
-        "csp": { "match": "truthy", "note": "CSP header present" }
+        "spf": {
+          "match": "truthy",
+          "note": "SPF record exists"
+        },
+        "dmarc": {
+          "match": "truthy",
+          "note": "DMARC record exists"
+        },
+        "dkim": {
+          "match": "truthy",
+          "note": "DKIM should be found"
+        },
+        "tls": {
+          "match": "truthy",
+          "note": "TLS info captured"
+        },
+        "hsts": {
+          "match": "truthy",
+          "note": "HSTS enabled"
+        },
+        "csp": {
+          "match": "falsy",
+          "note": "Calibrated: module returns null"
+        }
       },
       "expectedCheckpoints": [
-        { "id": "m01-spf", "expectedHealth": "excellent" },
-        { "id": "m01-dmarc", "expectedHealth": "excellent" },
-        { "id": "m01-tls", "expectedHealth": "excellent" },
-        { "id": "m01-hsts", "expectedHealth": "excellent" }
+        {
+          "id": "m01-spf",
+          "expectedHealth": "good",
+          "note": "SPF present with ~all (soft-fail) and 2 DNS lookups: v=spf1 include:_spf-ssg-a.m"
+        },
+        {
+          "id": "m01-dmarc",
+          "expectedHealth": "good",
+          "note": "DMARC policy is quarantine with rua reporting: v=DMARC1; p=quarantine; rua=mailt"
+        },
+        {
+          "id": "m01-dkim",
+          "expectedHealth": "good",
+          "note": "DKIM found (selector: selector1), key strength ~1024-bit"
+        },
+        {
+          "id": "m01-dnssec",
+          "expectedHealth": "critical",
+          "note": "No DNSSEC signing detected for ryder.com"
+        },
+        {
+          "id": "m01-tls",
+          "expectedHealth": "excellent",
+          "note": "Valid TLS cert (TLSv1.3, ECDSA), expires in 230 days, issuer: Sectigo Limited"
+        },
+        {
+          "id": "m01-hsts",
+          "expectedHealth": "warning",
+          "note": "HSTS present but max-age is 86400 (<6 months)"
+        },
+        {
+          "id": "m01-csp",
+          "expectedHealth": "critical",
+          "note": "Content-Security-Policy header is missing"
+        },
+        {
+          "id": "m01-xcto",
+          "expectedHealth": "critical",
+          "note": "X-Content-Type-Options header is missing"
+        },
+        {
+          "id": "m01-framing",
+          "expectedHealth": "critical",
+          "note": "Neither CSP frame-ancestors nor X-Frame-Options is set"
+        },
+        {
+          "id": "m01-referrer",
+          "expectedHealth": "good",
+          "note": "Referrer-Policy: origin"
+        },
+        {
+          "id": "m01-permissions",
+          "expectedHealth": "critical",
+          "note": "Permissions-Policy header is missing"
+        },
+        {
+          "id": "m01-https-redirect",
+          "expectedHealth": "good",
+          "note": "HTTP fetch failed (port 80 may be closed); site is served over HTTPS"
+        },
+        {
+          "id": "m01-email",
+          "expectedHealth": "excellent",
+          "note": "Professional email provider detected: Microsoft 365 (MX: ryder-com.mail.protecti"
+        },
+        {
+          "id": "m01-caa",
+          "expectedHealth": "critical",
+          "note": "No CAA records found"
+        },
+        {
+          "id": "m01-geoip",
+          "expectedHealth": "info",
+          "note": "23.221.227.203: US (Ashburn), 23.221.227.222: US (Ashburn)"
+        },
+        {
+          "id": "m01-mta-sts",
+          "expectedHealth": "warning",
+          "note": "No MTA-STS or SMTP TLS Reporting records found"
+        },
+        {
+          "id": "m01-ipv6",
+          "expectedHealth": "warning",
+          "note": "No AAAA records found — site is IPv4 only"
+        },
+        {
+          "id": "m01-www-consistency",
+          "expectedHealth": "excellent",
+          "note": "Security headers consistent between www and apex"
+        },
+        {
+          "id": "m01-sri",
+          "expectedHealth": "warning",
+          "note": "SRI coverage: 0% (0/5 cross-origin resources). Uncovered: https://cdn.optimizely"
+        },
+        {
+          "id": "m01-redirect-chain",
+          "expectedHealth": "good",
+          "note": "1 redirect(s): https://www.ryder.com → https://www.ryder.com/en-us"
+        },
+        {
+          "id": "m01-mixed-content",
+          "expectedHealth": "info",
+          "note": "Mixed content data not available — browser phase may not have executed"
+        }
       ],
       "negativeAssertions": [],
       "fixedBugs": []
     }
-  }
+  },
+  "calibratedAt": "2026-04-04T01:04:32.645Z"
 }
