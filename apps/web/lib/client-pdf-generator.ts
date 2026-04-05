@@ -210,6 +210,9 @@ export async function generatePresentationPDFClientSide(
     throw new Error('No slides found on the page');
   }
 
+  // Signal to animated components (PlasmaCanvas) to stop during capture
+  document.body.setAttribute('data-pdf-capture', 'true');
+
   // Force exact dimensions on all slides + their inner cards (same as engine).
   // The browser window may be narrower than 1875px, so slides render smaller.
   // This CSS override makes them fill the full PDF page before capture.
@@ -230,48 +233,58 @@ export async function generatePresentationPDFClientSide(
   `;
   document.head.appendChild(style);
 
-  // Let layout settle after dimension change
-  await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+  try {
+    // Let layout settle after dimension change
+    await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
 
-  const pdf = await PDFDocument.create();
+    const pdf = await PDFDocument.create();
 
-  for (let i = 0; i < total; i++) {
-    onProgress?.({ phase: 'capturing', current: i + 1, total });
+    for (let i = 0; i < total; i++) {
+      onProgress?.({ phase: 'capturing', current: i + 1, total });
 
-    const canvas = await html2canvas(slides[i]!, {
-      scale: 1.5,
-      useCORS: true,
-      allowTaint: true,
-      backgroundColor: '#080808',
-      windowWidth: PRES_W,
-      width: PRES_W,
-      height: PRES_H,
-      logging: false,
-    });
+      const canvas = await html2canvas(slides[i]!, {
+        scale: 1.5,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#080808',
+        windowWidth: PRES_W,
+        width: PRES_W,
+        height: PRES_H,
+        logging: false,
+      });
 
-    const isHero = i < HERO_COUNT || i >= total - TAIL_COUNT;
-    let img;
+      const isHero = i < HERO_COUNT || i >= total - TAIL_COUNT;
+      let img;
 
-    if (isHero) {
-      const pngBytes = await canvasToPng(canvas);
-      img = await pdf.embedPng(pngBytes);
-    } else {
-      const jpegBytes = await canvasToJpeg(canvas, 0.85);
-      img = await pdf.embedJpg(jpegBytes);
+      if (isHero) {
+        const pngBytes = await canvasToPng(canvas);
+        img = await pdf.embedPng(pngBytes);
+      } else {
+        const jpegBytes = await canvasToJpeg(canvas, 0.85);
+        img = await pdf.embedJpg(jpegBytes);
+      }
+
+      const page = pdf.addPage([PRES_W, PRES_H]);
+      page.drawImage(img, { x: 0, y: 0, width: PRES_W, height: PRES_H });
+
+      // Free canvas backing store — critical for mobile (each is ~12.5MB at 1.5x scale)
+      canvas.width = 0;
+      canvas.height = 0;
+
+      // Yield to browser so GC can reclaim freed memory before next slide
+      await new Promise((r) => setTimeout(r, 0));
     }
 
-    const page = pdf.addPage([PRES_W, PRES_H]);
-    page.drawImage(img, { x: 0, y: 0, width: PRES_W, height: PRES_H });
+    onProgress?.({ phase: 'assembling', current: total, total });
+    const pdfBytes = await pdf.save();
+    onProgress?.({ phase: 'done', current: total, total });
+
+    return pdfBytes;
+  } finally {
+    // Always clean up — even if capture throws (e.g. mobile OOM)
+    document.body.removeAttribute('data-pdf-capture');
+    style.remove();
   }
-
-  // Remove the dimension override
-  style.remove();
-
-  onProgress?.({ phase: 'assembling', current: total, total });
-  const pdfBytes = await pdf.save();
-  onProgress?.({ phase: 'done', current: total, total });
-
-  return pdfBytes;
 }
 
 /**

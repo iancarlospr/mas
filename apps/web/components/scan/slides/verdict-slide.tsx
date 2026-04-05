@@ -182,6 +182,9 @@ function PlasmaCanvas() {
         return;
       }
 
+      // During PDF capture, render one static frame and stop — no animation loop
+      const isPdfCapture = document.body.hasAttribute('data-pdf-capture');
+
       timeRef.current += 0.025;
       const t = timeRef.current;
 
@@ -230,7 +233,9 @@ function PlasmaCanvas() {
       }
 
       ctx!.putImageData(imageData, 0, 0);
-      rafRef.current = requestAnimationFrame(draw);
+      if (!isPdfCapture) {
+        rafRef.current = requestAnimationFrame(draw);
+      }
     }
 
     rafRef.current = requestAnimationFrame(draw);
