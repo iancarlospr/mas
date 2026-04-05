@@ -203,27 +203,46 @@ function isMobileDevice(): boolean {
 
 export type PresentationPDFOptions = {
   onProgress?: (progress: PDFProgress) => void;
-  /** Called after each slide is captured — caller can unmount the React tree to free memory */
-  onSlideCaptured?: (index: number) => void;
+  /**
+   * Single-slide rendering mode for mobile. When provided, the generator
+   * renders one slide at a time instead of relying on all slides being
+   * pre-rendered in the DOM. The callback must mount the slide at `index`
+   * and resolve once it's painted.
+   */
+  renderSlide?: (index: number) => Promise<void>;
+  /** Total number of slides — required when using renderSlide. */
+  totalSlides?: number;
 };
 
 /**
- * Generate a PDF from all .slide-page elements on the current page.
+ * Generate a PDF from presentation slides.
  *
- * On mobile: reduces canvas scale (1.5→1.0), uses JPEG for all slides,
- * and signals onSlideCaptured after each slide so the caller can
- * progressively unmount captured React components to stay within
- * mobile Safari's ~500MB memory ceiling.
+ * Two modes:
+ * - **Pre-rendered** (desktop): all .slide-page elements are already in the
+ *   DOM. The generator queries them once and captures in order.
+ * - **Single-slide** (mobile): caller provides a `renderSlide(i)` callback.
+ *   The generator mounts one slide at a time, captures it, then asks for
+ *   the next. Only 1 React component is in the DOM at any moment —
+ *   keeps memory flat and well within mobile Safari's ~500MB ceiling.
  */
 export async function generatePresentationPDFClientSide(
   options?: PresentationPDFOptions,
 ): Promise<Uint8Array> {
-  const { onProgress, onSlideCaptured } = options ?? {};
-  const slides = document.querySelectorAll<HTMLElement>('.slide-page');
-  const total = slides.length;
+  const { onProgress, renderSlide, totalSlides } = options ?? {};
+  const singleSlideMode = !!renderSlide;
 
-  if (total === 0) {
-    throw new Error('No slides found on the page');
+  // In pre-rendered mode, query all slides upfront.
+  // In single-slide mode, we'll query 1 element per iteration.
+  let preRenderedSlides: NodeListOf<HTMLElement> | null = null;
+  let total: number;
+
+  if (singleSlideMode) {
+    total = totalSlides ?? 0;
+    if (total === 0) throw new Error('totalSlides is required when using renderSlide');
+  } else {
+    preRenderedSlides = document.querySelectorAll<HTMLElement>('.slide-page');
+    total = preRenderedSlides.length;
+    if (total === 0) throw new Error('No slides found on the page');
   }
 
   const mobile = isMobileDevice();
@@ -232,9 +251,7 @@ export async function generatePresentationPDFClientSide(
   // Signal to animated components (PlasmaCanvas) to stop during capture
   document.body.setAttribute('data-pdf-capture', 'true');
 
-  // Force exact dimensions on all slides + their inner cards (same as engine).
-  // The browser window may be narrower than 1875px, so slides render smaller.
-  // This CSS override makes them fill the full PDF page before capture.
+  // Force exact dimensions on slides + their inner cards
   const style = document.createElement('style');
   style.textContent = `
     .slide-page {
@@ -253,7 +270,6 @@ export async function generatePresentationPDFClientSide(
   document.head.appendChild(style);
 
   try {
-    // Let layout settle after dimension change
     await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
 
     const pdf = await PDFDocument.create();
@@ -261,7 +277,22 @@ export async function generatePresentationPDFClientSide(
     for (let i = 0; i < total; i++) {
       onProgress?.({ phase: 'capturing', current: i + 1, total });
 
-      const canvas = await html2canvas(slides[i]!, {
+      let slideEl: HTMLElement;
+
+      if (singleSlideMode) {
+        // Mount this slide (unmounts the previous one)
+        await renderSlide!(i);
+        // Wait for fonts + paint
+        await document.fonts.ready;
+        await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+        const el = document.querySelector<HTMLElement>('.slide-page');
+        if (!el) continue;
+        slideEl = el;
+      } else {
+        slideEl = preRenderedSlides![i]!;
+      }
+
+      const canvas = await html2canvas(slideEl, {
         scale: captureScale,
         useCORS: true,
         allowTaint: true,
@@ -272,7 +303,7 @@ export async function generatePresentationPDFClientSide(
         logging: false,
       });
 
-      // On mobile: JPEG for every slide (smaller buffers, less memory pressure).
+      // On mobile: JPEG for every slide (smaller buffers).
       // On desktop: PNG for hero/tail slides (lossless), JPEG for the rest.
       const usePng = !mobile && (i < HERO_COUNT || i >= total - TAIL_COUNT);
       let img;
@@ -292,10 +323,7 @@ export async function generatePresentationPDFClientSide(
       canvas.width = 0;
       canvas.height = 0;
 
-      // Signal caller to unmount this slide's React components
-      onSlideCaptured?.(i);
-
-      // Yield to browser — lets React re-render (unmount freed slide) + GC
+      // Yield to browser for GC
       await new Promise((r) => setTimeout(r, 0));
     }
 
@@ -305,7 +333,6 @@ export async function generatePresentationPDFClientSide(
 
     return pdfBytes;
   } finally {
-    // Always clean up — even if capture throws (e.g. mobile OOM)
     document.body.removeAttribute('data-pdf-capture');
     style.remove();
   }

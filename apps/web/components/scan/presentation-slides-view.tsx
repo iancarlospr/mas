@@ -54,16 +54,16 @@ import { ClosingSlide } from './slides/closing-slide';
  * Presentation Slides View — for PDF capture
  * ════════════════════════════════════════════
  *
- * Renders ALL slides in sequence at a fixed 1344px width so cqi units
- * calculate correctly. Each slide is wrapped in a page-break container.
+ * Two rendering modes:
  *
- * During PDF capture on mobile, slides are progressively unmounted after
- * being captured to stay within mobile Safari's ~500MB memory ceiling.
- * The .slide-page wrapper divs stay in the DOM (html2canvas uses a static
- * NodeList), but their React children are replaced with null.
+ * 1. **Normal** (viewing / print): all slides in DOM at once.
+ * 2. **Single-slide capture** (mobile PDF download): only ONE slide is
+ *    mounted at a time. The generator calls `renderSlide(i)` which sets
+ *    state → React unmounts the previous slide, mounts the new one →
+ *    resolves the promise so the generator can capture. Memory stays flat
+ *    at ~20MB instead of 300MB+ for 50 slides.
  *
- * Wrapped in WindowManagerProvider so M43's useWindowManager() doesn't crash.
- * Sets data-slides-loaded="true" after fonts are ready + 300ms settle.
+ * Desktop PDF uses mode 1 (pre-rendered). Mobile PDF uses mode 2.
  */
 
 export function PresentationSlidesView({
@@ -81,59 +81,53 @@ export function PresentationSlidesView({
   const isPaid = scan.tier === 'paid';
   const [iosPdfBytes, setIosPdfBytes] = useState<{ bytes: Uint8Array; filename: string } | null>(null);
 
-  // Slides that have been captured and can be unmounted to free memory.
-  // -1 = not capturing. 0+ = slides at index <= this value are freed.
-  const [freedUpTo, setFreedUpTo] = useState(-1);
+  // ── Single-slide capture state ──
+  // -1 = normal mode (all slides rendered). 0+ = only that slide is rendered.
+  const [captureIndex, setCaptureIndex] = useState(-1);
+  // Ref that the generator awaits — resolved when React has painted the slide
+  const captureResolveRef = useRef<(() => void) | null>(null);
 
-  // Build the ordered slide list as a data array so we can conditionally
-  // render or skip individual slides during progressive PDF capture.
+  // Build the ordered slide list
   const slideList: ReactNode[] = useMemo(() => {
     const s = scan;
     const list: ReactNode[] = [
-      /* 0  */ <TitleSlide key="title" scan={s} />,
-      /* 1  */ <RoastSlide key="roast" scan={s} />,
-      /* 2  */ <OverviewExecSlide key="overview" scan={s} />,
+      <TitleSlide key="title" scan={s} />,
+      <RoastSlide key="roast" scan={s} />,
+      <OverviewExecSlide key="overview" scan={s} />,
     ];
-    if (isPaid) list.push(/* 3? */ <M45Slide key="m45" scan={s} />);
+    if (isPaid) list.push(<M45Slide key="m45" scan={s} />);
     list.push(
       <FindingsSlide key="findings" scan={s} />,
-      // ── Category 1: Security & Compliance ──
       <CategoryIntroSlide key="cat-sec" scan={s} category="security_compliance" />,
       <M01Slide key="m01" scan={s} />,
       <M12Slide key="m12" scan={s} />,
       <M40Slide key="m40" scan={s} />,
-      // ── Category 2: Analytics & Measurement ──
       <CategoryIntroSlide key="cat-analytics" scan={s} category="analytics_measurement" />,
       <M05Slide key="m05" scan={s} />,
       <M06Slide key="m06" scan={s} />,
       <M06bSlide key="m06b" scan={s} />,
       <M08Slide key="m08" scan={s} />,
       <M09Slide key="m09" scan={s} />,
-      // ── Category 3: Performance & Experience ──
       <CategoryIntroSlide key="cat-perf" scan={s} category="performance_experience" />,
       <M03Slide key="m03" scan={s} />,
       <M13Slide key="m13" scan={s} />,
       <M14Slide key="m14" scan={s} />,
       <M10Slide key="m10" scan={s} />,
       <M11Slide key="m11" scan={s} />,
-      // ── Category 4: SEO & Content ──
       <CategoryIntroSlide key="cat-seo" scan={s} category="seo_content" />,
       <M04Slide key="m04" scan={s} />,
       <M15Slide key="m15" scan={s} />,
       <M26Slide key="m26" scan={s} />,
       <M34Slide key="m34" scan={s} />,
       <M39Slide key="m39" scan={s} />,
-      // ── Category 5: Paid Media ──
       <CategoryIntroSlide key="cat-paid" scan={s} category="paid_media" />,
       <M21Slide key="m21" scan={s} />,
       <M28Slide key="m28" scan={s} />,
       <M29Slide key="m29" scan={s} />,
-      // ── Category 6: MarTech & Infrastructure ──
       <CategoryIntroSlide key="cat-martech" scan={s} category="martech_infrastructure" />,
       <M02Slide key="m02" scan={s} />,
       <M07Slide key="m07" scan={s} />,
       <M20Slide key="m20" scan={s} />,
-      // ── Category 7: Brand & Digital Presence ──
       <CategoryIntroSlide key="cat-brand" scan={s} category="brand_presence" />,
       <M16Slide key="m16" scan={s} />,
       <M17Slide key="m17" scan={s} />,
@@ -141,7 +135,6 @@ export function PresentationSlidesView({
       <M22M23Slide key="m22m23" scan={s} />,
       <M37Slide key="m37" scan={s} />,
       <M38Slide key="m38" scan={s} />,
-      // ── Category 8: Market Intelligence ──
       <CategoryIntroSlide key="cat-market" scan={s} category="market_intelligence" />,
       <M24Slide key="m24" scan={s} />,
       <M25Slide key="m25" scan={s} />,
@@ -156,42 +149,74 @@ export function PresentationSlidesView({
     return list;
   }, [scan, isPaid]);
 
+  // When captureIndex changes and the slide paints, resolve the generator's promise
+  useEffect(() => {
+    if (captureIndex >= 0 && captureResolveRef.current) {
+      const resolve = captureResolveRef.current;
+      // Double-rAF: first rAF = React committed to DOM, second rAF = browser painted
+      const id = requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          resolve();
+          captureResolveRef.current = null;
+        });
+      });
+      return () => cancelAnimationFrame(id);
+    }
+  }, [captureIndex]);
+
+  // Callback for the generator: mount slide `index`, resolve when painted
+  const renderSlide = useCallback((index: number): Promise<void> => {
+    return new Promise((resolve) => {
+      captureResolveRef.current = resolve;
+      setCaptureIndex(index);
+    });
+  }, []);
+
   useEffect(() => {
     document.fonts.ready.then(() => {
       setTimeout(() => setReady(true), 300);
     });
   }, []);
 
-  // Auto-trigger print dialog when slides are ready and autoPrint is requested
+  // Auto-trigger print dialog
   useEffect(() => {
     if (ready && autoPrint) {
-      // Small delay to ensure paint is complete
       const timer = setTimeout(() => window.print(), 200);
       return () => clearTimeout(timer);
     }
   }, [ready, autoPrint]);
 
-  // Client-side PDF generation — screenshots each slide and assembles a PDF.
-  // On mobile: progressively unmounts captured slides to stay within memory.
+  // Client-side PDF generation
   const startDownload = useCallback(async () => {
     if (downloadStarted.current) return;
     downloadStarted.current = true;
 
     try {
-      // Dynamic import to keep the bundle lean for non-download visitors
       const { generatePresentationPDFClientSide, downloadPdf, isIOSDevice } = await import(
         '@/lib/client-pdf-generator'
       );
 
-      const pdfBytes = await generatePresentationPDFClientSide({
-        onProgress: setProgress,
-        onSlideCaptured: (i) => setFreedUpTo(i),
-      });
+      const mobile = isIOSDevice() || (navigator.maxTouchPoints > 0 && window.innerWidth < 768);
+
+      const pdfBytes = await generatePresentationPDFClientSide(
+        mobile
+          ? {
+              onProgress: setProgress,
+              renderSlide,
+              totalSlides: slideList.length,
+            }
+          : {
+              onProgress: setProgress,
+            },
+      );
+
+      // Reset capture state so slides render normally again (if user stays on page)
+      setCaptureIndex(-1);
+
       const domain = scan.domain ?? 'report';
       const filename = `${domain}-audit-deck.pdf`;
 
       if (isIOSDevice()) {
-        // iOS: store bytes and show "Tap to Save" button (needs user gesture for share/download)
         setIosPdfBytes({ bytes: pdfBytes, filename });
       } else {
         await downloadPdf(pdfBytes, filename);
@@ -199,11 +224,12 @@ export function PresentationSlidesView({
     } catch (err) {
       console.error('[presentation-pdf] Client-side generation failed:', err);
       setProgress(null);
+      setCaptureIndex(-1);
       downloadStarted.current = false;
     }
-  }, [scan.domain]);
+  }, [scan.domain, renderSlide, slideList.length]);
 
-  // iOS: user taps "Save" button → this runs in a user gesture context so share/download works
+  // iOS: user taps "Save" button
   const handleIOSSave = useCallback(async () => {
     if (!iosPdfBytes) return;
     const { downloadPdf } = await import('@/lib/client-pdf-generator');
@@ -211,7 +237,7 @@ export function PresentationSlidesView({
     setIosPdfBytes(null);
   }, [iosPdfBytes]);
 
-  // Auto-trigger download when slides are ready and autoDownload is requested
+  // Auto-trigger download when ready
   useEffect(() => {
     if (ready && autoDownload) {
       const timer = setTimeout(() => startDownload(), 500);
@@ -219,11 +245,11 @@ export function PresentationSlidesView({
     }
   }, [ready, autoDownload, startDownload]);
 
-  const isCapturing = freedUpTo >= 0;
+  const inCaptureMode = captureIndex >= 0;
 
   return (
     <WindowManagerProvider>
-      {/* Progress overlay during client-side PDF generation */}
+      {/* Progress overlay */}
       {progress && progress.phase !== 'done' && (
         <div
           style={{
@@ -267,7 +293,7 @@ export function PresentationSlidesView({
           </div>
         </div>
       )}
-      {/* iOS: "Tap to Save" overlay — needs real user gesture for navigator.share */}
+      {/* iOS: "Tap to Save" overlay */}
       {iosPdfBytes && (
         <div
           style={{
@@ -316,7 +342,6 @@ export function PresentationSlidesView({
           background: '#080808',
         }}
       >
-        {/* Standalone slides styles — globals.css print rules are scoped to body.gs-desktop so they don't apply here */}
         <style>{`
           html, body {
             overflow: auto !important;
@@ -328,7 +353,6 @@ export function PresentationSlidesView({
           @page { size: 14in 8.5in; margin: 0; }
 
           @media print {
-            /* Preserve all colors and backgrounds in print */
             [data-slides-loaded] *,
             [data-slides-loaded] *::before,
             [data-slides-loaded] *::after {
@@ -347,7 +371,6 @@ export function PresentationSlidesView({
               width: 14in !important;
             }
 
-            /* Container must not add its own spacing */
             [data-slides-loaded] {
               max-width: none !important;
               width: 14in !important;
@@ -355,7 +378,6 @@ export function PresentationSlidesView({
               padding: 0 !important;
             }
 
-            /* Each slide page = exactly one printed page */
             .slide-page {
               width: 14in !important;
               height: 8.5in !important;
@@ -369,7 +391,6 @@ export function PresentationSlidesView({
               break-before: auto;
             }
 
-            /* Slide card fills its page exactly — no aspect-ratio, explicit dims */
             .slide-page .slide-card {
               width: 14in !important;
               height: 8.5in !important;
@@ -380,19 +401,19 @@ export function PresentationSlidesView({
             }
           }
 
-          /* Screen: normal page-break hints for scroll-to-print */
           .slide-page { break-before: page; break-inside: avoid; }
           .slide-page:first-child { break-before: auto; }
         `}</style>
 
-        {slideList.map((slide, i) => (
-          <div key={i} className="slide-page">
-            {/* During capture: unmount slides that have already been captured
-                to progressively free DOM memory. The wrapper div stays so
-                html2canvas's static NodeList indices remain valid. */}
-            {isCapturing && i <= freedUpTo ? null : slide}
-          </div>
-        ))}
+        {inCaptureMode ? (
+          /* Single-slide mode: only the current slide is in the DOM */
+          <div className="slide-page">{slideList[captureIndex]}</div>
+        ) : (
+          /* Normal mode: all slides rendered */
+          slideList.map((slide, i) => (
+            <div key={i} className="slide-page">{slide}</div>
+          ))
+        )}
       </div>
     </WindowManagerProvider>
   );
