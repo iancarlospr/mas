@@ -196,19 +196,38 @@ function canvasToPng(canvas: HTMLCanvasElement): Promise<ArrayBuffer> {
   });
 }
 
+/** Detect mobile — touch device with small viewport */
+function isMobileDevice(): boolean {
+  return isIOSDevice() || (navigator.maxTouchPoints > 0 && window.innerWidth < 768);
+}
+
+export type PresentationPDFOptions = {
+  onProgress?: (progress: PDFProgress) => void;
+  /** Called after each slide is captured — caller can unmount the React tree to free memory */
+  onSlideCaptured?: (index: number) => void;
+};
+
 /**
  * Generate a PDF from all .slide-page elements on the current page.
- * Processes incrementally (one slide at a time) to bound memory usage.
+ *
+ * On mobile: reduces canvas scale (1.5→1.0), uses JPEG for all slides,
+ * and signals onSlideCaptured after each slide so the caller can
+ * progressively unmount captured React components to stay within
+ * mobile Safari's ~500MB memory ceiling.
  */
 export async function generatePresentationPDFClientSide(
-  onProgress?: (progress: PDFProgress) => void,
+  options?: PresentationPDFOptions,
 ): Promise<Uint8Array> {
+  const { onProgress, onSlideCaptured } = options ?? {};
   const slides = document.querySelectorAll<HTMLElement>('.slide-page');
   const total = slides.length;
 
   if (total === 0) {
     throw new Error('No slides found on the page');
   }
+
+  const mobile = isMobileDevice();
+  const captureScale = mobile ? 1.0 : 1.5;
 
   // Signal to animated components (PlasmaCanvas) to stop during capture
   document.body.setAttribute('data-pdf-capture', 'true');
@@ -243,7 +262,7 @@ export async function generatePresentationPDFClientSide(
       onProgress?.({ phase: 'capturing', current: i + 1, total });
 
       const canvas = await html2canvas(slides[i]!, {
-        scale: 1.5,
+        scale: captureScale,
         useCORS: true,
         allowTaint: true,
         backgroundColor: '#080808',
@@ -253,25 +272,30 @@ export async function generatePresentationPDFClientSide(
         logging: false,
       });
 
-      const isHero = i < HERO_COUNT || i >= total - TAIL_COUNT;
+      // On mobile: JPEG for every slide (smaller buffers, less memory pressure).
+      // On desktop: PNG for hero/tail slides (lossless), JPEG for the rest.
+      const usePng = !mobile && (i < HERO_COUNT || i >= total - TAIL_COUNT);
       let img;
 
-      if (isHero) {
+      if (usePng) {
         const pngBytes = await canvasToPng(canvas);
         img = await pdf.embedPng(pngBytes);
       } else {
-        const jpegBytes = await canvasToJpeg(canvas, 0.85);
+        const jpegBytes = await canvasToJpeg(canvas, mobile ? 0.78 : 0.85);
         img = await pdf.embedJpg(jpegBytes);
       }
 
       const page = pdf.addPage([PRES_W, PRES_H]);
       page.drawImage(img, { x: 0, y: 0, width: PRES_W, height: PRES_H });
 
-      // Free canvas backing store — critical for mobile (each is ~12.5MB at 1.5x scale)
+      // Free canvas backing store immediately
       canvas.width = 0;
       canvas.height = 0;
 
-      // Yield to browser so GC can reclaim freed memory before next slide
+      // Signal caller to unmount this slide's React components
+      onSlideCaptured?.(i);
+
+      // Yield to browser — lets React re-render (unmount freed slide) + GC
       await new Promise((r) => setTimeout(r, 0));
     }
 

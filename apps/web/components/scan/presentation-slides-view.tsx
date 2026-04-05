@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState, useCallback, useRef, useMemo, type ReactNode } from 'react';
 import type { ScanWithResults } from '@marketing-alpha/types';
 import { WindowManagerProvider } from '@/lib/window-manager';
 import type { PDFProgress } from '@/lib/client-pdf-generator';
@@ -57,6 +57,11 @@ import { ClosingSlide } from './slides/closing-slide';
  * Renders ALL slides in sequence at a fixed 1344px width so cqi units
  * calculate correctly. Each slide is wrapped in a page-break container.
  *
+ * During PDF capture on mobile, slides are progressively unmounted after
+ * being captured to stay within mobile Safari's ~500MB memory ceiling.
+ * The .slide-page wrapper divs stay in the DOM (html2canvas uses a static
+ * NodeList), but their React children are replaced with null.
+ *
  * Wrapped in WindowManagerProvider so M43's useWindowManager() doesn't crash.
  * Sets data-slides-loaded="true" after fonts are ready + 300ms settle.
  */
@@ -76,6 +81,81 @@ export function PresentationSlidesView({
   const isPaid = scan.tier === 'paid';
   const [iosPdfBytes, setIosPdfBytes] = useState<{ bytes: Uint8Array; filename: string } | null>(null);
 
+  // Slides that have been captured and can be unmounted to free memory.
+  // -1 = not capturing. 0+ = slides at index <= this value are freed.
+  const [freedUpTo, setFreedUpTo] = useState(-1);
+
+  // Build the ordered slide list as a data array so we can conditionally
+  // render or skip individual slides during progressive PDF capture.
+  const slideList: ReactNode[] = useMemo(() => {
+    const s = scan;
+    const list: ReactNode[] = [
+      /* 0  */ <TitleSlide key="title" scan={s} />,
+      /* 1  */ <RoastSlide key="roast" scan={s} />,
+      /* 2  */ <OverviewExecSlide key="overview" scan={s} />,
+    ];
+    if (isPaid) list.push(/* 3? */ <M45Slide key="m45" scan={s} />);
+    list.push(
+      <FindingsSlide key="findings" scan={s} />,
+      // ── Category 1: Security & Compliance ──
+      <CategoryIntroSlide key="cat-sec" scan={s} category="security_compliance" />,
+      <M01Slide key="m01" scan={s} />,
+      <M12Slide key="m12" scan={s} />,
+      <M40Slide key="m40" scan={s} />,
+      // ── Category 2: Analytics & Measurement ──
+      <CategoryIntroSlide key="cat-analytics" scan={s} category="analytics_measurement" />,
+      <M05Slide key="m05" scan={s} />,
+      <M06Slide key="m06" scan={s} />,
+      <M06bSlide key="m06b" scan={s} />,
+      <M08Slide key="m08" scan={s} />,
+      <M09Slide key="m09" scan={s} />,
+      // ── Category 3: Performance & Experience ──
+      <CategoryIntroSlide key="cat-perf" scan={s} category="performance_experience" />,
+      <M03Slide key="m03" scan={s} />,
+      <M13Slide key="m13" scan={s} />,
+      <M14Slide key="m14" scan={s} />,
+      <M10Slide key="m10" scan={s} />,
+      <M11Slide key="m11" scan={s} />,
+      // ── Category 4: SEO & Content ──
+      <CategoryIntroSlide key="cat-seo" scan={s} category="seo_content" />,
+      <M04Slide key="m04" scan={s} />,
+      <M15Slide key="m15" scan={s} />,
+      <M26Slide key="m26" scan={s} />,
+      <M34Slide key="m34" scan={s} />,
+      <M39Slide key="m39" scan={s} />,
+      // ── Category 5: Paid Media ──
+      <CategoryIntroSlide key="cat-paid" scan={s} category="paid_media" />,
+      <M21Slide key="m21" scan={s} />,
+      <M28Slide key="m28" scan={s} />,
+      <M29Slide key="m29" scan={s} />,
+      // ── Category 6: MarTech & Infrastructure ──
+      <CategoryIntroSlide key="cat-martech" scan={s} category="martech_infrastructure" />,
+      <M02Slide key="m02" scan={s} />,
+      <M07Slide key="m07" scan={s} />,
+      <M20Slide key="m20" scan={s} />,
+      // ── Category 7: Brand & Digital Presence ──
+      <CategoryIntroSlide key="cat-brand" scan={s} category="brand_presence" />,
+      <M16Slide key="m16" scan={s} />,
+      <M17Slide key="m17" scan={s} />,
+      <M18M19Slide key="m18m19" scan={s} />,
+      <M22M23Slide key="m22m23" scan={s} />,
+      <M37Slide key="m37" scan={s} />,
+      <M38Slide key="m38" scan={s} />,
+      // ── Category 8: Market Intelligence ──
+      <CategoryIntroSlide key="cat-market" scan={s} category="market_intelligence" />,
+      <M24Slide key="m24" scan={s} />,
+      <M25Slide key="m25" scan={s} />,
+      <M27Slide key="m27" scan={s} />,
+      <M30Slide key="m30" scan={s} />,
+      <M31Slide key="m31" scan={s} />,
+      <M33Slide key="m33" scan={s} />,
+      <M36Slide key="m36" scan={s} />,
+    );
+    if (isPaid) list.push(<M43Slide key="m43" scan={s} printMode />);
+    list.push(<ClosingSlide key="closing" scan={s} />);
+    return list;
+  }, [scan, isPaid]);
+
   useEffect(() => {
     document.fonts.ready.then(() => {
       setTimeout(() => setReady(true), 300);
@@ -91,7 +171,8 @@ export function PresentationSlidesView({
     }
   }, [ready, autoPrint]);
 
-  // Client-side PDF generation — screenshots each slide and assembles a PDF
+  // Client-side PDF generation — screenshots each slide and assembles a PDF.
+  // On mobile: progressively unmounts captured slides to stay within memory.
   const startDownload = useCallback(async () => {
     if (downloadStarted.current) return;
     downloadStarted.current = true;
@@ -102,7 +183,10 @@ export function PresentationSlidesView({
         '@/lib/client-pdf-generator'
       );
 
-      const pdfBytes = await generatePresentationPDFClientSide(setProgress);
+      const pdfBytes = await generatePresentationPDFClientSide({
+        onProgress: setProgress,
+        onSlideCaptured: (i) => setFreedUpTo(i),
+      });
       const domain = scan.domain ?? 'report';
       const filename = `${domain}-audit-deck.pdf`;
 
@@ -134,6 +218,8 @@ export function PresentationSlidesView({
       return () => clearTimeout(timer);
     }
   }, [ready, autoDownload, startDownload]);
+
+  const isCapturing = freedUpTo >= 0;
 
   return (
     <WindowManagerProvider>
@@ -299,87 +385,14 @@ export function PresentationSlidesView({
           .slide-page:first-child { break-before: auto; }
         `}</style>
 
-        {/* ── Title ── */}
-        <div className="slide-page"><TitleSlide scan={scan} /></div>
-
-        {/* ── Roast ── */}
-        <div className="slide-page"><RoastSlide scan={scan} /></div>
-
-        {/* ── Executive Overview ── */}
-        <div className="slide-page"><OverviewExecSlide scan={scan} /></div>
-
-        {/* ── M45: Stack Analyzer (paid only) ── */}
-        {isPaid && <div className="slide-page"><M45Slide scan={scan} /></div>}
-
-        {/* ── Findings ── */}
-        <div className="slide-page"><FindingsSlide scan={scan} /></div>
-
-        {/* ── Category 1: Security & Compliance ── */}
-        <div className="slide-page"><CategoryIntroSlide scan={scan} category="security_compliance" /></div>
-        <div className="slide-page"><M01Slide scan={scan} /></div>
-        <div className="slide-page"><M12Slide scan={scan} /></div>
-        <div className="slide-page"><M40Slide scan={scan} /></div>
-
-        {/* ── Category 2: Analytics & Measurement ── */}
-        <div className="slide-page"><CategoryIntroSlide scan={scan} category="analytics_measurement" /></div>
-        <div className="slide-page"><M05Slide scan={scan} /></div>
-        <div className="slide-page"><M06Slide scan={scan} /></div>
-        <div className="slide-page"><M06bSlide scan={scan} /></div>
-        <div className="slide-page"><M08Slide scan={scan} /></div>
-        <div className="slide-page"><M09Slide scan={scan} /></div>
-
-        {/* ── Category 3: Performance & Experience ── */}
-        <div className="slide-page"><CategoryIntroSlide scan={scan} category="performance_experience" /></div>
-        <div className="slide-page"><M03Slide scan={scan} /></div>
-        <div className="slide-page"><M13Slide scan={scan} /></div>
-        <div className="slide-page"><M14Slide scan={scan} /></div>
-        <div className="slide-page"><M10Slide scan={scan} /></div>
-        <div className="slide-page"><M11Slide scan={scan} /></div>
-
-        {/* ── Category 4: SEO & Content ── */}
-        <div className="slide-page"><CategoryIntroSlide scan={scan} category="seo_content" /></div>
-        <div className="slide-page"><M04Slide scan={scan} /></div>
-        <div className="slide-page"><M15Slide scan={scan} /></div>
-        <div className="slide-page"><M26Slide scan={scan} /></div>
-        <div className="slide-page"><M34Slide scan={scan} /></div>
-        <div className="slide-page"><M39Slide scan={scan} /></div>
-
-        {/* ── Category 5: Paid Media ── */}
-        <div className="slide-page"><CategoryIntroSlide scan={scan} category="paid_media" /></div>
-        <div className="slide-page"><M21Slide scan={scan} /></div>
-        <div className="slide-page"><M28Slide scan={scan} /></div>
-        <div className="slide-page"><M29Slide scan={scan} /></div>
-
-        {/* ── Category 6: MarTech & Infrastructure ── */}
-        <div className="slide-page"><CategoryIntroSlide scan={scan} category="martech_infrastructure" /></div>
-        <div className="slide-page"><M02Slide scan={scan} /></div>
-        <div className="slide-page"><M07Slide scan={scan} /></div>
-        <div className="slide-page"><M20Slide scan={scan} /></div>
-
-        {/* ── Category 7: Brand & Digital Presence ── */}
-        <div className="slide-page"><CategoryIntroSlide scan={scan} category="brand_presence" /></div>
-        <div className="slide-page"><M16Slide scan={scan} /></div>
-        <div className="slide-page"><M17Slide scan={scan} /></div>
-        <div className="slide-page"><M18M19Slide scan={scan} /></div>
-        <div className="slide-page"><M22M23Slide scan={scan} /></div>
-        <div className="slide-page"><M37Slide scan={scan} /></div>
-        <div className="slide-page"><M38Slide scan={scan} /></div>
-
-        {/* ── Category 8: Market Intelligence ── */}
-        <div className="slide-page"><CategoryIntroSlide scan={scan} category="market_intelligence" /></div>
-        <div className="slide-page"><M24Slide scan={scan} /></div>
-        <div className="slide-page"><M25Slide scan={scan} /></div>
-        <div className="slide-page"><M27Slide scan={scan} /></div>
-        <div className="slide-page"><M30Slide scan={scan} /></div>
-        <div className="slide-page"><M31Slide scan={scan} /></div>
-        <div className="slide-page"><M33Slide scan={scan} /></div>
-        <div className="slide-page"><M36Slide scan={scan} /></div>
-
-        {/* ── M43: Remediation Roadmap (paid only) ── */}
-        {isPaid && <div className="slide-page"><M43Slide scan={scan} printMode /></div>}
-
-        {/* ── Closing ── */}
-        <div className="slide-page"><ClosingSlide scan={scan} /></div>
+        {slideList.map((slide, i) => (
+          <div key={i} className="slide-page">
+            {/* During capture: unmount slides that have already been captured
+                to progressively free DOM memory. The wrapper div stays so
+                html2canvas's static NodeList indices remain valid. */}
+            {isCapturing && i <= freedUpTo ? null : slide}
+          </div>
+        ))}
       </div>
     </WindowManagerProvider>
   );
