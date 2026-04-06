@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@marketing-alpha/email-templates": "*",
-    "@react-email/render": "^1.0.3",
+    "@react-email/render": "^2.0.5",
     "@supabase/supabase-js": "^2.47.0",
     "resend": "^6.9.1",
     "react": "^19.0.0",
