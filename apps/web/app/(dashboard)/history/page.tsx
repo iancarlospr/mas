@@ -60,8 +60,7 @@ export default async function HistoryPage() {
     .from('scans')
     .select('id, domain, tier, status, marketing_iq, created_at')
     .eq('user_id', user.id)
-    .order('created_at', { ascending: false })
-    .limit(50);
+    .order('created_at', { ascending: false });
 
   if (!scans || scans.length === 0) {
     return (

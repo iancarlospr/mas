@@ -125,8 +125,7 @@ export default function HistoryWindow({ onChatOpen }: HistoryWindowProps = {}) {
         .from('scans')
         .select('id, url, marketing_iq, status, tier, created_at')
         .eq('user_id', user!.id)
-        .order('created_at', { ascending: false })
-        .limit(50);
+        .order('created_at', { ascending: false });
 
       setScans(data ?? []);
       setDataLoading(false);
