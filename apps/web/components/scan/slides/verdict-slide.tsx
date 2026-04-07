@@ -169,6 +169,13 @@ function PlasmaCanvas() {
       canvas!.style.height = '100%';
       imageData = ctx!.createImageData(cols, rows);
       buf = imageData.data;
+
+      // Defence-in-depth: if animation was stopped during PDF capture
+      // and we just resized (clearing the canvas), force one frame at
+      // the new dimensions. draw() will render once and stop again.
+      if (document.body.hasAttribute('data-pdf-capture')) {
+        requestAnimationFrame(draw);
+      }
     }
 
     resize();

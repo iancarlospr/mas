@@ -248,10 +248,9 @@ export async function generatePresentationPDFClientSide(
   const mobile = isMobileDevice();
   const captureScale = mobile ? 1.0 : 1.5;
 
-  // Signal to animated components (PlasmaCanvas) to stop during capture
-  document.body.setAttribute('data-pdf-capture', 'true');
-
-  // Force exact dimensions on slides + their inner cards
+  // Force exact dimensions on slides + their inner cards FIRST.
+  // Animated components (PlasmaCanvas) keep running so ResizeObserver fires,
+  // resize() recalculates, and draw() renders at the new dimensions.
   const style = document.createElement('style');
   style.textContent = `
     .slide-page {
@@ -270,6 +269,14 @@ export async function generatePresentationPDFClientSide(
   document.head.appendChild(style);
 
   try {
+    // Let layout settle — ResizeObserver callbacks, CSS repaints, canvas animation
+    await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+    await new Promise((r) => setTimeout(r, 400));
+
+    // NOW freeze animations (PlasmaCanvas renders one final frame at correct size)
+    document.body.setAttribute('data-pdf-capture', 'true');
+
+    // Wait for that final frozen frame to paint
     await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
 
     const pdf = await PDFDocument.create();
