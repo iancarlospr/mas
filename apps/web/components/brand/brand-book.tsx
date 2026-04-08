@@ -1297,16 +1297,17 @@ export default function BrandBook() {
                       <span style={{ color: 'var(--gs-base)' }}>Not a developer.</span>
                     </p>
                     <p className="font-data mt-3" style={{ fontSize: 12, color: 'var(--gs-mid)', lineHeight: 1.6 }}>
-                      The freelancer running a Shopify store. The marketing manager at a 20-person company. The startup with a $3K/month ad budget. Anyone who runs campaigns, manages agencies, and reports to leadership — but has no way to verify whether the marketing stack actually works.
+                      Approximately 70% of the target audience is women. The rest are culturally progressive men who aren&apos;t put off by a pink interface — the palette is a data-driven design decision, not decoration. The audience spans freelancers running Shopify stores, marketing managers at 20-person companies, and startups with a $3K/month ad budget. They run campaigns, manage agencies, and report to leadership — but have no way to verify whether the marketing stack actually works.
                     </p>
                   </div>
 
                   <div className="space-y-2">
                     {[
                       { label: 'Role', value: 'Marketing manager, director, freelancer, or solo operator' },
-                      { label: 'Company', value: 'Small business to mid-market — 1 to 50 employees, under $5M revenue' },
-                      { label: 'Budget', value: 'Spending on ads, agencies, and tools — but can\'t measure what\'s broken' },
+                      { label: 'Company', value: 'Freelancers, small businesses, startups — typically under 50 employees' },
+                      { label: 'Budget', value: 'Spending on ads, agencies, and tools — but can\'t justify $5K–$15K for a consultancy audit' },
                       { label: 'Technical', value: 'Knows enough to be dangerous. Can read a dashboard, can\'t read source code' },
+                      { label: 'Geography', value: 'Global from day one — Miami, Mexico City, London, São Paulo, Singapore' },
                     ].map(({ label, value }) => (
                       <div key={label} className="flex gap-2" style={{ fontSize: 12 }}>
                         <span className="font-data font-bold flex-shrink-0" style={{ color: 'var(--gs-base)', minWidth: 70 }}>{label}</span>
@@ -1326,11 +1327,11 @@ export default function BrandBook() {
                     THE PAIN
                   </p>
                   {[
-                    { icon: '>', text: 'Paying an agency $2.5K–$5K/month that can\'t tell you the Meta pixel broke 3 months ago' },
-                    { icon: '>', text: 'Staring at dashboards wondering "is this right?" with no way to verify' },
-                    { icon: '>', text: 'Getting ghosted by the agency when you ask hard questions about tracking' },
-                    { icon: '>', text: 'Told you need a $15K audit and 6 weeks to find what\'s broken' },
-                    { icon: '>', text: 'Three redundant analytics tools, two abandoned tag managers, and no one knows which data to trust' },
+                    { icon: '>', text: 'Paying an agency $2.5K–$8K/month that can\'t tell you the Meta pixel broke 3 months ago' },
+                    { icon: '>', text: 'Staring at dashboards wondering "is this right?" — decisions based on bad data don\'t look wrong until the results don\'t come' },
+                    { icon: '>', text: 'Each specialist sees their lane, nobody sees the full picture — the gap between what each vendor sees and what\'s actually happening is where money goes to die' },
+                    { icon: '>', text: 'Told you need a $5K–$15K audit and 6 weeks to find what\'s broken — "not realistic for a freelancer or a 20-person company"' },
+                    { icon: '>', text: '14 third-party scripts on average, 2–4 of which are dead weight — Hotjar from 2023, the chatbot experiment that lasted two months, an A/B tool nobody logs into' },
                   ].map(({ icon, text }, i) => (
                     <div key={i} className="flex gap-2" style={{ fontSize: 12 }}>
                       <span className="font-data flex-shrink-0" style={{ color: 'var(--gs-terminal)' }}>{icon}</span>
@@ -1357,19 +1358,19 @@ export default function BrandBook() {
                     {[
                       {
                         title: 'Pink monochrome, not corporate blue',
-                        body: 'Every martech tool looks the same — blue gradients, stock photography, "empower your team" copy. AlphaScan chose OKLCH hue 340 because the audience is tired of tools designed by committee. Pink is fashion. Pink is confrontational. Pink says "this isn\'t your agency\'s dashboard."',
+                        body: 'When approximately 70% of your users are women, you design for that audience. Not pastel corporate pink — dark void pink that functions as a black replacement. Moody and serious, not playful. Dark enough for long working sessions. Distinctive enough that you know exactly what app you\'re looking at from across the room.',
                       },
                       {
                         title: 'A ghost mascot with laser eyes',
-                        body: 'Chloé is the ghost in the machine — the thing that sees what\'s invisible. The scanner crawls sites like a stealth browser, finds what\'s broken, and delivers the findings with the energy of a best friend who just found receipts. The pixel-art aesthetic is deliberate: built from the same pixels it audits.',
+                        body: 'Marketing is already full of bland dashboards that say "Action Required" in gray Helvetica. Nobody needs another neutral, corporate-voiced tool that speaks in passive voice. Chloé is the personality layer that turns "marketing audit tool" into "that ghost app." She\'s made of the same pixels she audits. She has opinions about your setup and she\'s not going to keep them to herself.',
                       },
                       {
-                        title: 'Direct voice, not enterprise tone',
-                        body: 'The audience doesn\'t want another tool that says "leverage synergies" and "optimize your funnel." They want someone who says "your tracking is broken and your agency doesn\'t know." The brand voice exists because the audience is real people spending real money who deserve direct, honest, no-BS answers.',
+                        title: 'Best-friend energy, not enterprise tone',
+                        body: 'She tells you your consent banner is a liability. She doesn\'t hedge. She delivers bad news like a best friend who cares enough to be honest. The audience deserves direct answers, not "consider potentially exploring the possibility of" — that corporate language is exactly what they\'re trying to escape.',
                       },
                       {
                         title: 'Desktop OS metaphor',
-                        body: 'The desktop interface isn\'t a gimmick — it\'s a trust signal. It says "we\'re technical enough to build this, playful enough to make it fun, and confident enough not to look like Salesforce." The windows, taskbar, and ghost pet create intimacy. A private workspace, not a corporate portal.',
+                        body: 'Marketing audits are boring. Dashboards are boring. Every SaaS tool in the marketing space looks exactly the same — built by enterprise design systems that optimize for "inoffensive" and land on "forgettable." The desktop interface makes people feel something. Makes them want to screenshot and share. Engagement metrics that enterprise UX would kill for, built by making people smile.',
                       },
                     ].map(({ title, body }) => (
                       <div key={title}>
