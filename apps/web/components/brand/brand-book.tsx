@@ -934,8 +934,8 @@ export default function BrandBook() {
                       }}
                       onClick={() => setActiveSprite(state)}
                     >
-                      <div style={{ filter: 'drop-shadow(0 0 6px rgba(255,178,239,0.3))' }}>
-                        <ChloeSprite state={state} size={128} glowing frame={frame} />
+                      <div className="py-2 px-1" style={{ filter: 'drop-shadow(0 0 6px rgba(255,178,239,0.3))' }}>
+                        <ChloeSprite state={state} size={100} glowing frame={frame} />
                       </div>
                       <span className="font-data font-bold" style={{ fontSize: 11, color: 'var(--gs-base)' }}>
                         {label}
@@ -1142,7 +1142,7 @@ export default function BrandBook() {
               <BrandPanel title="chloé_speaks.log">
                 <div className="p-6">
                   <div className="flex items-start gap-3 mb-6">
-                    <div style={{ filter: 'drop-shadow(0 0 6px rgba(255,178,239,0.3))' }}>
+                    <div className="p-2 flex-shrink-0" style={{ filter: 'drop-shadow(0 0 6px rgba(255,178,239,0.3))' }}>
                       <ChloeSprite state="chat" size={64} glowing frame={frame} />
                     </div>
                     <div
