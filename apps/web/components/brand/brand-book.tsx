@@ -2023,7 +2023,7 @@ export default function BrandBook() {
                 <VideoCard src="/brand-app-demo.mp4" title="AppDemo" dims="1832×1552" format="Native App" duration="56s" poster="/thumb-app-demo.jpg" />
               </ScrollReveal>
               <ScrollReveal delay={0.3}>
-                <VideoCard src="/brand-glitch-reel.mp4" title="GlitchReel" dims="1920×1080" format="Landscape" duration="59s" poster="/thumb-glitch-reel.jpg" />
+                <VideoCard src="/brand-hero.mp4" title="GlitchReel" dims="1920×1080" format="Landscape" duration="59s" poster="/thumb-glitch-reel.jpg" />
               </ScrollReveal>
             </div>
           </div>
