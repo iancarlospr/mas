@@ -1111,15 +1111,35 @@ export default function BrandBook() {
           <ScrollReveal delay={0.2}>
             <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
               <BrandPanel title="sprite_spec.dat">
-                <div className="p-6">
-                  <p className="font-display font-bold uppercase mb-4" style={{ fontSize: 20, color: 'var(--gs-light)' }}>
+                <div className="p-5">
+                  {/* Header */}
+                  <p className="font-display font-bold uppercase" style={{ fontSize: 18, color: 'var(--gs-light)', letterSpacing: '0.05em' }}>
                     Pixel Art Spec
                   </p>
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3">
-                      <span className="font-data" style={{ fontSize: 12, color: 'var(--gs-mid)', width: 80 }}>Grid</span>
-                      <span className="font-data font-bold" style={{ fontSize: 12, color: 'var(--gs-light)' }}>32×42 pixels</span>
-                    </div>
+                  <div className="mt-1 mb-4" style={{ height: 1, background: 'linear-gradient(90deg, var(--gs-base), transparent)' }} />
+
+                  {/* Technical specs grid */}
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-2 mb-5">
+                    {[
+                      { label: 'Grid', value: '32 × 42 px' },
+                      { label: 'States', value: '9 expressions' },
+                      { label: 'Renderer', value: 'HTML Canvas' },
+                      { label: 'Animation', value: '500ms / frame' },
+                      { label: 'Tails', value: '4 scalloped' },
+                      { label: 'Laser', value: 'Rainbow taper' },
+                    ].map(({ label, value }) => (
+                      <div key={label} className="flex items-baseline justify-between gap-2 py-1" style={{ borderBottom: '1px solid oklch(0.25 0.03 340 / 0.2)' }}>
+                        <span className="font-data" style={{ fontSize: 11, color: 'var(--gs-mid)' }}>{label}</span>
+                        <span className="font-data font-bold" style={{ fontSize: 11, color: 'var(--gs-light)' }}>{value}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Color palette */}
+                  <p className="font-data uppercase mb-3" style={{ fontSize: 10, color: 'var(--gs-mid)', letterSpacing: '0.15em' }}>
+                    Palette
+                  </p>
+                  <div className="flex flex-wrap gap-2">
                     {[
                       { label: 'Body', color: '#FFF0FA' },
                       { label: 'Shading', color: '#FFCAF3' },
@@ -1127,16 +1147,18 @@ export default function BrandBook() {
                       { label: 'Eyes', color: '#FFB2EF' },
                       { label: 'Blush', color: '#FFD4E8' },
                     ].map(({ label, color }) => (
-                      <div key={label} className="flex items-center gap-3">
-                        <span className="font-data" style={{ fontSize: 12, color: 'var(--gs-mid)', width: 80 }}>{label}</span>
-                        <div className="flex items-center gap-2">
-                          <div
-                            className="w-4 h-4 rounded-sm border border-gs-mid/30"
-                            style={{ background: color, boxShadow: `0 0 8px ${color}44` }}
-                          />
-                          <span className="font-data font-bold uppercase" style={{ fontSize: 11, color: 'var(--gs-light)' }}>
-                            {color}
-                          </span>
+                      <div
+                        key={label}
+                        className="flex items-center gap-2 px-2.5 py-1.5 rounded-md"
+                        style={{ background: 'oklch(0.12 0.01 340 / 0.6)', border: '1px solid oklch(0.25 0.03 340 / 0.3)' }}
+                      >
+                        <div
+                          className="w-3.5 h-3.5 rounded-sm"
+                          style={{ background: color, boxShadow: `0 0 8px ${color}44`, border: '1px solid oklch(0.4 0.05 340 / 0.3)' }}
+                        />
+                        <div className="flex flex-col">
+                          <span className="font-data font-bold" style={{ fontSize: 10, color: 'var(--gs-light)', lineHeight: 1.2 }}>{label}</span>
+                          <span className="font-data uppercase" style={{ fontSize: 9, color: 'var(--gs-mid)', lineHeight: 1.2 }}>{color}</span>
                         </div>
                       </div>
                     ))}
