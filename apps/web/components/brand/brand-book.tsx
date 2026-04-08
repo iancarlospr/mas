@@ -350,14 +350,18 @@ export default function BrandBook() {
 
       {/* ── SECTION 0: HERO ─────────────────────────────────────── */}
       <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
-        {/* OG background at low opacity */}
-        <img
-          src={ogBackgroundImg.src}
-          alt=""
+        {/* Motion identity — logo reveal video loop */}
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
           className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none"
           style={{ opacity: 0.12, filter: 'blur(2px) saturate(1.3)' }}
           aria-hidden="true"
-        />
+        >
+          <source src="/brand-hero.mp4" type="video/mp4" />
+        </video>
 
         {/* Radial vignette */}
         <div
