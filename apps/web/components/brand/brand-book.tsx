@@ -108,11 +108,12 @@ function GrainOverlay({ opacity = 0.04 }: { opacity?: number }) {
 
 /* ── Video Card (Remotion section) ─────────────────────────────── */
 
-function VideoCard({ src, title, dims, format, duration, className }: { src: string; title: string; dims: string; format: string; duration: string; className?: string }) {
+function VideoCard({ src, title, dims, format, duration, className, aspect }: { src: string; title: string; dims: string; format: string; duration: string; className?: string; aspect: string }) {
   return (
     <BrandPanel title={title} className={className}>
       <div
-        className="relative overflow-hidden cursor-pointer group flex-1"
+        className="relative overflow-hidden cursor-pointer group"
+        style={{ aspectRatio: aspect, background: '#080808' }}
         onClick={(e) => {
           const video = e.currentTarget.querySelector('video');
           if (video) {
@@ -127,7 +128,7 @@ function VideoCard({ src, title, dims, format, duration, className }: { src: str
           preload="metadata"
           playsInline
           controls={false}
-          className="w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-contain"
           style={{ display: 'block' }}
           ref={(el) => {
             if (!el) return;
@@ -1990,14 +1991,14 @@ export default function BrandBook() {
           {/* 1:2 layout — portrait left, two landscape stacked right */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <ScrollReveal className="flex">
-              <VideoCard src="/brand-marketing-reel.mp4" title="MarketingReel" dims="1080×1920" format="Vertical (Reels/TikTok)" duration="43s" className="flex-1 flex flex-col" />
+              <VideoCard src="/brand-marketing-reel.mp4" title="MarketingReel" dims="1080×1920" format="Vertical (Reels/TikTok)" duration="43s" aspect="9/16" className="flex-1 flex flex-col" />
             </ScrollReveal>
             <div className="flex flex-col gap-6">
               <ScrollReveal delay={0.1} className="flex flex-1">
-                <VideoCard src="/brand-builder-reel.mp4" title="BuilderReel" dims="1920×1080" format="Landscape" duration="1:01" className="flex-1 flex flex-col" />
+                <VideoCard src="/brand-builder-reel.mp4" title="BuilderReel" dims="1920×1080" format="Landscape" duration="1:01" aspect="16/9" className="flex-1 flex flex-col" />
               </ScrollReveal>
               <ScrollReveal delay={0.2} className="flex flex-1">
-                <VideoCard src="/brand-app-demo.mp4" title="AppDemo" dims="1832×1552" format="Native App" duration="56s" className="flex-1 flex flex-col" />
+                <VideoCard src="/brand-app-demo.mp4" title="AppDemo" dims="1832×1552" format="Native App" duration="56s" aspect="1832/1552" className="flex-1 flex flex-col" />
               </ScrollReveal>
             </div>
           </div>
