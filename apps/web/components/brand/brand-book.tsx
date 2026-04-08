@@ -489,12 +489,8 @@ export default function BrandBook() {
           {/* Intro text — outside cards */}
           <ScrollReveal>
             <div className="mb-8">
-              <p className="font-display font-bold uppercase" style={{ fontSize: 'clamp(20px, 2.5vw, 28px)', color: 'var(--gs-light)', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
-                A marketer.{' '}
-                <span style={{ color: 'var(--gs-base)' }}>Not a developer.</span>
-              </p>
-              <p className="font-data mt-4" style={{ fontSize: 13, color: 'var(--gs-mid)', lineHeight: 1.7 }}>
-                Approximately 70% of the target audience is women. The rest are culturally progressive men who aren&apos;t put off by a pink interface — the palette is a data-driven design decision, not decoration. The audience spans freelancers running Shopify stores, marketing managers at 20-person companies, and startups with a $3K/month ad budget. They run campaigns, manage agencies, and report to leadership — but have no way to verify whether the marketing stack actually works.
+              <p className="font-data" style={{ fontSize: 13, color: 'var(--gs-mid)', lineHeight: 1.7 }}>
+                Who AlphaScan is for, why the brand looks and feels the way it does, and the pain that drives every design decision. Approximately 70% of the target audience is women. The rest are culturally progressive men who aren&apos;t put off by a pink interface — the palette is a data-driven design decision, not decoration. The audience spans freelancers running Shopify stores, marketing managers at 20-person companies, and startups with a $3K/month ad budget. They run campaigns, manage agencies, and report to leadership — but have no way to verify whether the marketing stack actually works.
               </p>
             </div>
           </ScrollReveal>
