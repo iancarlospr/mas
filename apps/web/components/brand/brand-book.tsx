@@ -482,7 +482,7 @@ export default function BrandBook() {
             <SectionHeader
               number="01"
               title="Ideal Customer"
-              subtitle="Who AlphaScan is for, why the brand looks and feels the way it does, and the pain that drives every design decision."
+              subtitle=""
             />
           </ScrollReveal>
 
