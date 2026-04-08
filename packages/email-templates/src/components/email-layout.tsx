@@ -61,8 +61,8 @@ export function EmailLayout({
             <Img
               src="cid:logo-header"
               width="536"
-              height="120"
-              alt="MarketingAlphaScan"
+              height="127"
+              alt="Alpha Scan"
               style={{ display: 'block' }}
             />
           </Section>
@@ -77,8 +77,8 @@ export function EmailLayout({
             <Img
               src="cid:logo-footer"
               width="40"
-              height="40"
-              alt=""
+              height="50"
+              alt="Chloé"
               style={{ display: 'block', margin: '0 auto 12px' }}
             />
             <Text style={footerText}>

@@ -213,6 +213,7 @@ export default function AboutWindow() {
           {[
             { label: 'Privacy Policy', href: '/privacy' },
             { label: 'Terms of Service', href: '/terms' },
+            { label: 'Brand Book', href: '/brand' },
           ].map((link) => (
             <button
               key={link.label}

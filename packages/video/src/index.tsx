@@ -24,6 +24,12 @@ import { B_WIDTH, B_HEIGHT, B_FPS, B_TOTAL } from './lib/builder-reel';
 // App Demo
 import { AppDemo, AD_WIDTH, AD_HEIGHT, AD_FPS, AD_TOTAL } from './AppDemo';
 
+// Client Reels
+import { ExpertRadiologyReel } from './ExpertRadiologyReel';
+
+// Brand Assets — Still renders
+import { ChloeStill } from './ChloeStill';
+
 const RemotionRoot: React.FC = () => {
   return (
     <>
@@ -81,6 +87,25 @@ const RemotionRoot: React.FC = () => {
         fps={P_FPS}
         width={P_WIDTH}
         height={P_HEIGHT}
+      />
+      {/* ── Client Reels ── */}
+      <Composition
+        id="ExpertRadiology"
+        component={ExpertRadiologyReel}
+        durationInFrames={TOTAL_DURATION}
+        fps={FPS}
+        width={WIDTH}
+        height={HEIGHT}
+      />
+      {/* ── Brand Asset Stills ── */}
+      <Composition
+        id="ChloeStill"
+        component={ChloeStill}
+        durationInFrames={1}
+        fps={FPS}
+        width={512}
+        height={512}
+        defaultProps={{ state: 'idle' as const, glowing: true }}
       />
     </>
   );
