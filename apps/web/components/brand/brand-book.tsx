@@ -117,6 +117,8 @@ function VideoCard({ src, title, dims, format, duration, className, poster }: { 
         onClick={(e) => {
           const video = e.currentTarget.querySelector('video');
           if (video) {
+            video.style.opacity = '1';
+            video.controls = true;
             void video.play();
             const wk = video as HTMLVideoElement & { webkitEnterFullscreen?: () => void };
             if (video.requestFullscreen) void video.requestFullscreen();
@@ -126,7 +128,7 @@ function VideoCard({ src, title, dims, format, duration, className, poster }: { 
       >
         {/* Thumbnail — sets the natural aspect ratio */}
         <img src={poster} alt={title} className="w-full" style={{ display: 'block' }} />
-        {/* Hidden video — plays fullscreen on click */}
+        {/* Hidden video — visible when fullscreen */}
         <video
           preload="none"
           playsInline
@@ -134,7 +136,14 @@ function VideoCard({ src, title, dims, format, duration, className, poster }: { 
           className="absolute inset-0 w-full h-full object-cover opacity-0"
           ref={(el) => {
             if (!el) return;
-            el.onfullscreenchange = () => { if (!document.fullscreenElement) { el.pause(); el.currentTime = 0; } };
+            el.onfullscreenchange = () => {
+              if (!document.fullscreenElement) {
+                el.pause();
+                el.currentTime = 0;
+                el.style.opacity = '0';
+                el.controls = false;
+              }
+            };
           }}
         >
           <source src={src} type="video/mp4" />
