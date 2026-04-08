@@ -88,6 +88,7 @@ const REMOTION_COMPOSITIONS = [
   { name: 'ProgressionReel', dims: '1920×1080', format: 'Landscape', duration: '2:22' },
   { name: 'AppDemo', dims: '1832×1552', format: 'Native App', duration: '56s' },
   { name: 'BuilderReel', dims: '1920×1080', format: 'Landscape', duration: '—' },
+  { name: 'GlitchReel', dims: '1920×1080', format: 'Landscape', duration: '59s' },
 ];
 
 /* ── Grain Overlay (reusable) ──────────────────────────────────── */
@@ -1439,11 +1440,11 @@ export default function BrandBook() {
             />
           </ScrollReveal>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
             {/* Frosted Glass */}
-            <ScrollReveal>
-              <BrandPanel title="frosted_glass.fx">
-                <div className="p-6 relative" style={{ minHeight: 200 }}>
+            <ScrollReveal className="h-full">
+              <BrandPanel title="frosted_glass.fx" className="h-full">
+                <div className="p-6 relative h-full flex flex-col justify-center" style={{ minHeight: 200 }}>
                   {/* Stacked panels demo */}
                   <div className="relative" style={{ height: 160 }}>
                     {[0.4, 0.6, 0.8].map((opacity, i) => (
@@ -1471,13 +1472,13 @@ export default function BrandBook() {
             </ScrollReveal>
 
             {/* CRT Scanlines */}
-            <ScrollReveal delay={0.1}>
-              <BrandPanel title="scanlines.fx">
-                <div className="p-6 relative" style={{ minHeight: 200 }}>
+            <ScrollReveal delay={0.1} className="h-full">
+              <BrandPanel title="scanlines.fx" className="h-full">
+                <div className="p-6 relative h-full flex flex-col justify-center" style={{ minHeight: 200 }}>
                   <div
                     className="absolute inset-0 pointer-events-none"
                     style={{
-                      background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,178,239,0.03) 2px, rgba(255,178,239,0.03) 4px)',
+                      background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,178,239,0.08) 2px, rgba(255,178,239,0.08) 4px)',
                     }}
                   />
                   <div className="relative">
@@ -1493,9 +1494,9 @@ export default function BrandBook() {
             </ScrollReveal>
 
             {/* Bayer Dither */}
-            <ScrollReveal delay={0.2}>
-              <BrandPanel title="dither.fx">
-                <div className="p-6 relative" style={{ minHeight: 200 }}>
+            <ScrollReveal delay={0.2} className="h-full">
+              <BrandPanel title="dither.fx" className="h-full">
+                <div className="p-6 relative h-full flex flex-col justify-center" style={{ minHeight: 200 }}>
                   <div className="space-y-4">
                     <div>
                       <p className="font-data mb-1" style={{ fontSize: 10, color: 'var(--gs-mid)' }}>DitherEdge</p>
@@ -1543,9 +1544,9 @@ export default function BrandBook() {
             </ScrollReveal>
 
             {/* Noise Grain */}
-            <ScrollReveal>
-              <BrandPanel title="grain.fx">
-                <div className="p-6" style={{ minHeight: 200 }}>
+            <ScrollReveal className="h-full">
+              <BrandPanel title="grain.fx" className="h-full">
+                <div className="p-6 h-full flex flex-col justify-center" style={{ minHeight: 200 }}>
                   <div className="grid grid-cols-3 gap-3">
                     {[0.03, 0.08, 0.15].map((op) => (
                       <div key={op} className="relative rounded-gs overflow-hidden" style={{ height: 80, background: 'var(--gs-void)' }}>
@@ -1566,9 +1567,9 @@ export default function BrandBook() {
             </ScrollReveal>
 
             {/* Pink Glow */}
-            <ScrollReveal delay={0.1}>
-              <BrandPanel title="glow.fx">
-                <div className="p-6 flex flex-col items-center gap-4" style={{ minHeight: 200 }}>
+            <ScrollReveal delay={0.1} className="h-full">
+              <BrandPanel title="glow.fx" className="h-full">
+                <div className="p-6 h-full flex flex-col items-center justify-center gap-4" style={{ minHeight: 200 }}>
                   <div style={{ filter: 'drop-shadow(0 0 8px var(--gs-base)) drop-shadow(0 0 16px rgba(255,178,239,0.2))' }}>
                     <ChloeSprite state="idle" size={64} glowing frame={frame} />
                   </div>
@@ -1599,9 +1600,9 @@ export default function BrandBook() {
             </ScrollReveal>
 
             {/* Window Chrome */}
-            <ScrollReveal delay={0.2}>
-              <BrandPanel title="window_chrome.ui">
-                <div className="p-6" style={{ minHeight: 200 }}>
+            <ScrollReveal delay={0.2} className="h-full">
+              <BrandPanel title="window_chrome.ui" className="h-full">
+                <div className="p-6 h-full flex flex-col justify-center" style={{ minHeight: 200 }}>
                   {/* Mini window demo */}
                   <div className="rounded-gs-lg overflow-hidden border border-gs-mid/30 shadow-window">
                     {/* Active titlebar */}
@@ -1990,17 +1991,20 @@ export default function BrandBook() {
             />
           </ScrollReveal>
 
-          {/* 1:2 layout — portrait left, two landscape stacked right */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* 1:3 layout — portrait left, three stacked right (right stretches to match portrait height) */}
+          <div className="grid grid-cols-1 md:grid-cols-[57fr_43fr] gap-6 items-stretch">
             <ScrollReveal className="flex">
               <VideoCard src="/brand-marketing-reel.mp4" title="MarketingReel" dims="1080×1920" format="Vertical (Reels/TikTok)" duration="43s" poster="/thumb-marketing-reel.jpg" className="flex-1" />
             </ScrollReveal>
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col justify-between">
               <ScrollReveal delay={0.1}>
                 <VideoCard src="/brand-builder-reel.mp4" title="BuilderReel" dims="1920×1080" format="Landscape" duration="1:01" poster="/thumb-builder-reel.jpg" />
               </ScrollReveal>
               <ScrollReveal delay={0.2}>
                 <VideoCard src="/brand-app-demo.mp4" title="AppDemo" dims="1832×1552" format="Native App" duration="56s" poster="/thumb-app-demo.jpg" />
+              </ScrollReveal>
+              <ScrollReveal delay={0.3}>
+                <VideoCard src="/brand-glitch-reel.mp4" title="GlitchReel" dims="1920×1080" format="Landscape" duration="59s" poster="/thumb-glitch-reel.jpg" />
               </ScrollReveal>
             </div>
           </div>

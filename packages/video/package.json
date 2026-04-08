@@ -10,6 +10,7 @@
     "render:gif": "remotion render src/index.tsx MarketingReel --output out/reel.gif --codec gif",
     "render:demo": "remotion render src/index.tsx AppDemo --output out/app-demo.mp4",
     "render:still": "remotion still src/index.tsx MarketingReel --output out/thumbnail.png --frame 0",
+    "render:expertradiology": "remotion render src/index.tsx ExpertRadiology --output out/expertradiology.mp4 --public-dir public",
     "build": "echo 'video package — no build step'"
   },
   "dependencies": {

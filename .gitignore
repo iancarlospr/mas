@@ -77,6 +77,11 @@ docs/
 # One-off scripts with potential secrets
 packages/video/_*.mjs
 
+# Large video files (Remotion source/output) — keep only compressed copies
+packages/video/public/*.mp4
+packages/video/out/
+apps/web/public/brand-glitch-reel.mp4
+
 # Generated PDFs
 *.pdf
 !apps/web/app/opengraph-image.png

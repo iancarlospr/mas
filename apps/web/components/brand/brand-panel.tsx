@@ -36,7 +36,7 @@ export function BrandPanel({
   return (
     <div
       className={cn(
-        'relative rounded-gs-lg overflow-hidden',
+        'relative rounded-gs-lg overflow-hidden flex flex-col',
         'border border-gs-mid/30',
         'shadow-window',
         className,
@@ -98,7 +98,7 @@ export function BrandPanel({
       )}
 
       {/* Content */}
-      <div className={cn('relative', contentClassName)}>
+      <div className={cn('relative flex-1', contentClassName)}>
         {children}
       </div>
     </div>

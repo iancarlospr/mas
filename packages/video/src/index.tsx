@@ -27,6 +27,9 @@ import { AppDemo, AD_WIDTH, AD_HEIGHT, AD_FPS, AD_TOTAL } from './AppDemo';
 // Client Reels
 import { ExpertRadiologyReel } from './ExpertRadiologyReel';
 
+// Glitch Reel
+import { GlitchReel, G_WIDTH, G_HEIGHT, G_FPS, G_TOTAL } from './GlitchReel';
+
 // Brand Assets — Still renders
 import { ChloeStill } from './ChloeStill';
 
@@ -97,6 +100,16 @@ const RemotionRoot: React.FC = () => {
         width={WIDTH}
         height={HEIGHT}
       />
+      {/* ── Glitch Reel (1920×1080 landscape) ── */}
+      <Composition
+        id="GlitchReel"
+        component={GlitchReel}
+        durationInFrames={G_TOTAL}
+        fps={G_FPS}
+        width={G_WIDTH}
+        height={G_HEIGHT}
+      />
+
       {/* ── Brand Asset Stills ── */}
       <Composition
         id="ChloeStill"
