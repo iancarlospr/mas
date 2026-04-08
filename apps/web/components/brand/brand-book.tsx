@@ -407,7 +407,7 @@ export default function BrandBook() {
         <div className="relative z-10 flex flex-col items-center px-4 w-full">
           {/* ASCII Logo — responsive: scales down on small screens */}
           <motion.div
-            className="w-full flex justify-center overflow-hidden"
+            className="w-full flex justify-center"
             initial={{ opacity: 0, filter: 'blur(8px)' }}
             animate={{ opacity: 1, filter: 'blur(0px)' }}
             transition={{ duration: 1.2, ease: 'easeOut' }}
@@ -419,6 +419,7 @@ export default function BrandBook() {
                 lineHeight: '1.05',
                 color: 'var(--gs-base)',
                 textShadow: '0 0 8px #FFB2EF, 0 0 24px rgba(255,178,239,0.3)',
+                padding: '24px 0',
               }}
             >
               {ASCII_BRAND}
