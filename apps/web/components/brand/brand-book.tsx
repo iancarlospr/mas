@@ -345,6 +345,12 @@ export default function BrandBook() {
   // Voice typewriter
   const voiceText = useTypewriter(VOICE_LINES, 35, 2500);
 
+  // Override body overflow:hidden (set for desktop OS) so standalone page scrolls
+  useEffect(() => {
+    document.body.style.overflow = 'auto';
+    return () => { document.body.style.overflow = ''; };
+  }, []);
+
   return (
     <div className="min-h-screen bg-gs-void" style={{ scrollBehavior: 'smooth' }}>
 
