@@ -479,11 +479,10 @@ export default function BrandBook() {
         />
         <div className="relative z-10 max-w-6xl mx-auto">
           <ScrollReveal>
-            <SectionHeader
-              number="01"
-              title="Ideal Customer"
-              subtitle="Who AlphaScan is for, why the brand looks and feels the way it does, and the pain that drives every design decision. Approximately 70% of the target audience is women. The rest are culturally progressive men who aren't put off by a pink interface — the palette is a data-driven design decision, not decoration. The audience spans freelancers running Shopify stores, marketing managers at 20-person companies, and startups with a $3K/month ad budget. They run campaigns, manage agencies, and report to leadership — but have no way to verify whether the marketing stack actually works."
-            />
+            <SectionHeader number="01" title="Ideal Customer" />
+            <p className="font-data -mt-4 mb-8 md:mb-12" style={{ fontSize: 15, color: 'var(--gs-mid)', lineHeight: 1.7, textAlign: 'justify' }}>
+              Who AlphaScan is for, why the brand looks and feels the way it does, and the pain that drives every design decision. Approximately 70% of the target audience is women. The rest are culturally progressive men who aren&apos;t put off by a pink interface — the palette is a data-driven design decision, not decoration. The audience spans freelancers running Shopify stores, marketing managers at 20-person companies, and startups with a $3K/month ad budget. They run campaigns, manage agencies, and report to leadership — but have no way to verify whether the marketing stack actually works.
+            </p>
           </ScrollReveal>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
