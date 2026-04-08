@@ -106,6 +106,54 @@ function GrainOverlay({ opacity = 0.04 }: { opacity?: number }) {
   );
 }
 
+/* ── Video Card (Remotion section) ─────────────────────────────── */
+
+function VideoCard({ src, title, dims, format, duration, className }: { src: string; title: string; dims: string; format: string; duration: string; className?: string }) {
+  return (
+    <BrandPanel title={title} className={className}>
+      <div
+        className="relative overflow-hidden cursor-pointer group flex-1"
+        onClick={(e) => {
+          const video = e.currentTarget.querySelector('video');
+          if (video) {
+            void video.play();
+            const wk = video as HTMLVideoElement & { webkitEnterFullscreen?: () => void };
+            if (video.requestFullscreen) void video.requestFullscreen();
+            else if (wk.webkitEnterFullscreen) wk.webkitEnterFullscreen();
+          }
+        }}
+      >
+        <video
+          preload="metadata"
+          playsInline
+          controls={false}
+          className="w-full h-full object-cover"
+          style={{ display: 'block' }}
+          ref={(el) => {
+            if (!el) return;
+            el.onfullscreenchange = () => { if (!document.fullscreenElement) { el.pause(); el.currentTime = 0; } };
+          }}
+        >
+          <source src={src} type="video/mp4" />
+        </video>
+        <div className="absolute inset-0 flex items-center justify-center bg-gs-void/40 group-hover:bg-gs-void/20 transition-colors">
+          <div className="w-14 h-14 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,178,239,0.15)', border: '2px solid var(--gs-base)', backdropFilter: 'blur(8px)' }}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="var(--gs-base)"><path d="M8 5v14l11-7z" /></svg>
+          </div>
+        </div>
+      </div>
+      <div className="p-3 flex items-center justify-between">
+        <div className="flex flex-wrap gap-1.5">
+          {[format, dims].map((spec) => (
+            <span key={spec} className="font-data px-2 py-0.5 rounded-full" style={{ fontSize: 10, background: 'rgba(255,178,239,0.08)', color: 'var(--gs-mid)', border: '1px solid rgba(255,178,239,0.12)' }}>{spec}</span>
+          ))}
+        </div>
+        <span className="font-data px-2 py-0.5 rounded-full" style={{ fontSize: 10, background: 'rgba(255,178,239,0.08)', color: 'var(--gs-base)', border: '1px solid rgba(255,178,239,0.12)' }}>{duration}</span>
+      </div>
+    </BrandPanel>
+  );
+}
+
 /* ── Section Header ────────────────────────────────────────────── */
 
 function SectionHeader({ number, title, subtitle }: { number: string; title: string; subtitle?: string }) {
@@ -1940,73 +1988,19 @@ export default function BrandBook() {
           </ScrollReveal>
 
           {/* 1:2 layout — portrait left, two landscape stacked right */}
-          {(() => {
-            const videos = [
-              { src: '/brand-marketing-reel.mp4', title: 'MarketingReel', dims: '1080×1920', format: 'Vertical (Reels/TikTok)', duration: '43s' },
-              { src: '/brand-builder-reel.mp4', title: 'BuilderReel', dims: '1920×1080', format: 'Landscape', duration: '1:01' },
-              { src: '/brand-app-demo.mp4', title: 'AppDemo', dims: '1832×1552', format: 'Native App', duration: '56s' },
-            ];
-            const VideoCard = ({ src, title, dims, format, duration, className }: { src: string; title: string; dims: string; format: string; duration: string; className?: string }) => (
-              <BrandPanel title={title} className={className}>
-                <div
-                  className="relative overflow-hidden cursor-pointer group flex-1"
-                  onClick={(e) => {
-                    const video = e.currentTarget.querySelector('video');
-                    if (video) {
-                      void video.play();
-                      const wk = video as HTMLVideoElement & { webkitEnterFullscreen?: () => void };
-                      if (video.requestFullscreen) void video.requestFullscreen();
-                      else if (wk.webkitEnterFullscreen) wk.webkitEnterFullscreen();
-                    }
-                  }}
-                >
-                  <video
-                    preload="metadata"
-                    playsInline
-                    controls={false}
-                    className="w-full h-full object-cover"
-                    style={{ display: 'block' }}
-                    ref={(el) => {
-                      if (!el) return;
-                      el.onfullscreenchange = () => { if (!document.fullscreenElement) { el.pause(); el.currentTime = 0; } };
-                    }}
-                  >
-                    <source src={src} type="video/mp4" />
-                  </video>
-                  <div className="absolute inset-0 flex items-center justify-center bg-gs-void/40 group-hover:bg-gs-void/20 transition-colors">
-                    <div className="w-14 h-14 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,178,239,0.15)', border: '2px solid var(--gs-base)', backdropFilter: 'blur(8px)' }}>
-                      <svg width="22" height="22" viewBox="0 0 24 24" fill="var(--gs-base)"><path d="M8 5v14l11-7z" /></svg>
-                    </div>
-                  </div>
-                </div>
-                <div className="p-3 flex items-center justify-between">
-                  <div className="flex flex-wrap gap-1.5">
-                    {[format, dims].map((spec) => (
-                      <span key={spec} className="font-data px-2 py-0.5 rounded-full" style={{ fontSize: 10, background: 'rgba(255,178,239,0.08)', color: 'var(--gs-mid)', border: '1px solid rgba(255,178,239,0.12)' }}>{spec}</span>
-                    ))}
-                  </div>
-                  <span className="font-data px-2 py-0.5 rounded-full" style={{ fontSize: 10, background: 'rgba(255,178,239,0.08)', color: 'var(--gs-base)', border: '1px solid rgba(255,178,239,0.12)' }}>{duration}</span>
-                </div>
-              </BrandPanel>
-            );
-            return (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Left: Portrait reel — full height */}
-                <ScrollReveal className="flex">
-                  <VideoCard src={videos[0]!.src} title={videos[0]!.title} dims={videos[0]!.dims} format={videos[0]!.format} duration={videos[0]!.duration} className="flex-1 flex flex-col" />
-                </ScrollReveal>
-                {/* Right: Two landscape stacked */}
-                <div className="flex flex-col gap-6">
-                  <ScrollReveal delay={0.1} className="flex flex-1">
-                    <VideoCard src={videos[1]!.src} title={videos[1]!.title} dims={videos[1]!.dims} format={videos[1]!.format} duration={videos[1]!.duration} className="flex-1 flex flex-col" />
-                  </ScrollReveal>
-                  <ScrollReveal delay={0.2} className="flex flex-1">
-                    <VideoCard src={videos[2]!.src} title={videos[2]!.title} dims={videos[2]!.dims} format={videos[2]!.format} duration={videos[2]!.duration} className="flex-1 flex flex-col" />
-                  </ScrollReveal>
-                </div>
-              </div>
-            );
-          })()}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <ScrollReveal className="flex">
+              <VideoCard src="/brand-marketing-reel.mp4" title="MarketingReel" dims="1080×1920" format="Vertical (Reels/TikTok)" duration="43s" className="flex-1 flex flex-col" />
+            </ScrollReveal>
+            <div className="flex flex-col gap-6">
+              <ScrollReveal delay={0.1} className="flex flex-1">
+                <VideoCard src="/brand-builder-reel.mp4" title="BuilderReel" dims="1920×1080" format="Landscape" duration="1:01" className="flex-1 flex flex-col" />
+              </ScrollReveal>
+              <ScrollReveal delay={0.2} className="flex flex-1">
+                <VideoCard src="/brand-app-demo.mp4" title="AppDemo" dims="1832×1552" format="Native App" duration="56s" className="flex-1 flex flex-col" />
+              </ScrollReveal>
+            </div>
+          </div>
         </div>
       </section>
 
