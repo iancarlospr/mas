@@ -1942,22 +1942,45 @@ export default function BrandBook() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
               { src: '/brand-marketing-reel.mp4', title: 'MarketingReel', dims: '1080×1920', format: 'Vertical (Reels/TikTok)', duration: '43s' },
-              { src: '/brand-builder-reel.mp4', title: 'BuilderReel', dims: '1920×1080', format: 'Landscape', duration: '—' },
+              { src: '/brand-builder-reel.mp4', title: 'BuilderReel', dims: '1920×1080', format: 'Landscape', duration: '1:01' },
               { src: '/brand-app-demo.mp4', title: 'AppDemo', dims: '1832×1552', format: 'Native App', duration: '56s' },
             ].map(({ src, title, dims, format, duration }) => (
               <ScrollReveal key={title}>
                 <BrandPanel title={title}>
-                  <div className="relative overflow-hidden">
+                  <div
+                    className="relative overflow-hidden cursor-pointer group"
+                    onClick={(e) => {
+                      const video = e.currentTarget.querySelector('video');
+                      if (video) {
+                        void video.play();
+                        const wk = video as HTMLVideoElement & { webkitEnterFullscreen?: () => void };
+                        if (video.requestFullscreen) void video.requestFullscreen();
+                        else if (wk.webkitEnterFullscreen) wk.webkitEnterFullscreen();
+                      }
+                    }}
+                  >
                     <video
-                      autoPlay
-                      loop
-                      muted
+                      preload="metadata"
                       playsInline
+                      controls={false}
                       className="w-full"
                       style={{ display: 'block' }}
+                      ref={(el) => {
+                        if (!el) return;
+                        el.onfullscreenchange = () => { if (!document.fullscreenElement) { el.pause(); el.currentTime = 0; } };
+                      }}
                     >
                       <source src={src} type="video/mp4" />
                     </video>
+                    {/* Play button overlay */}
+                    <div className="absolute inset-0 flex items-center justify-center bg-gs-void/40 group-hover:bg-gs-void/20 transition-colors">
+                      <div
+                        className="w-16 h-16 rounded-full flex items-center justify-center"
+                        style={{ background: 'rgba(255,178,239,0.15)', border: '2px solid var(--gs-base)', backdropFilter: 'blur(8px)' }}
+                      >
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="var(--gs-base)"><path d="M8 5v14l11-7z" /></svg>
+                      </div>
+                    </div>
                   </div>
                   <div className="p-3 flex items-center justify-between">
                     <div className="flex flex-wrap gap-1.5">
