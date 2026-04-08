@@ -352,6 +352,7 @@ export default function BrandBook() {
       <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
         {/* Motion identity — logo reveal video loop */}
         <video
+          ref={(el) => { if (el) el.playbackRate = 0.4; }}
           autoPlay
           loop
           muted
