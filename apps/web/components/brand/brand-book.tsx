@@ -1602,7 +1602,7 @@ export default function BrandBook() {
             <SectionHeader
               number="07"
               title="Media Assets"
-              subtitle="OG images, hero photography, showcase creatives, grain textures, and Remotion video compositions."
+              subtitle="OG images, hero photography, showcase creatives, and grain textures."
             />
           </ScrollReveal>
 
@@ -1924,44 +1924,61 @@ export default function BrandBook() {
             </div>
           </ScrollReveal>
 
-          {/* Remotion Compositions */}
-          <ScrollReveal delay={0.4}>
-            <div className="mt-6">
-              <BrandPanel title="remotion_compositions.json — Video Assets">
-                <div className="p-6">
-                  <div className="space-y-2">
-                    {REMOTION_COMPOSITIONS.map((comp) => (
-                      <div
-                        key={comp.name}
-                        className="flex items-center justify-between p-3 rounded-gs"
-                        style={{
-                          background: 'oklch(0.12 0.01 340 / 0.5)',
-                          border: '1px solid oklch(0.25 0.03 340 / 0.2)',
-                        }}
-                      >
-                        <div>
-                          <span className="font-data font-bold" style={{ fontSize: 12, color: 'var(--gs-base)' }}>
-                            {comp.name}
-                          </span>
-                          <span className="font-data ml-2" style={{ fontSize: 11, color: 'var(--gs-mid)' }}>
-                            {comp.format}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <span className="font-data" style={{ fontSize: 11, color: 'var(--gs-mid)' }}>
-                            {comp.dims}
-                          </span>
-                          <span className="font-data px-2 py-0.5 rounded-full" style={{ fontSize: 10, background: 'rgba(255,178,239,0.08)', color: 'var(--gs-base)', border: '1px solid rgba(255,178,239,0.12)' }}>
-                            {comp.duration}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </BrandPanel>
-            </div>
+        </div>
+      </section>
+
+      {/* ── SECTION 7B: REMOTION COMPOSITIONS ──────────────────────── */}
+      <section className="relative py-16 md:py-24 px-4 md:px-8">
+        <GrainOverlay opacity={0.03} />
+        <div className="relative z-10 max-w-6xl mx-auto">
+          <ScrollReveal>
+            <SectionHeader
+              number="07b"
+              title="Remotion Compositions"
+              subtitle="Video assets built with Remotion — programmatic video generation for marketing reels, product demos, and brand content."
+            />
           </ScrollReveal>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              { src: '/brand-marketing-reel.mp4', title: 'MarketingReel', dims: '1080×1920', format: 'Vertical (Reels/TikTok)', duration: '43s' },
+              { src: '/brand-builder-reel.mp4', title: 'BuilderReel', dims: '1920×1080', format: 'Landscape', duration: '—' },
+              { src: '/brand-app-demo.mp4', title: 'AppDemo', dims: '1832×1552', format: 'Native App', duration: '56s' },
+            ].map(({ src, title, dims, format, duration }) => (
+              <ScrollReveal key={title}>
+                <BrandPanel title={title}>
+                  <div className="relative overflow-hidden">
+                    <video
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                      className="w-full"
+                      style={{ display: 'block' }}
+                    >
+                      <source src={src} type="video/mp4" />
+                    </video>
+                  </div>
+                  <div className="p-3 flex items-center justify-between">
+                    <div className="flex flex-wrap gap-1.5">
+                      {[format, dims].map((spec) => (
+                        <span
+                          key={spec}
+                          className="font-data px-2 py-0.5 rounded-full"
+                          style={{ fontSize: 10, background: 'rgba(255,178,239,0.08)', color: 'var(--gs-mid)', border: '1px solid rgba(255,178,239,0.12)' }}
+                        >
+                          {spec}
+                        </span>
+                      ))}
+                    </div>
+                    <span className="font-data px-2 py-0.5 rounded-full" style={{ fontSize: 10, background: 'rgba(255,178,239,0.08)', color: 'var(--gs-base)', border: '1px solid rgba(255,178,239,0.12)' }}>
+                      {duration}
+                    </span>
+                  </div>
+                </BrandPanel>
+              </ScrollReveal>
+            ))}
+          </div>
         </div>
       </section>
 
