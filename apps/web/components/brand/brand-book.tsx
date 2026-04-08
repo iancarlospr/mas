@@ -486,36 +486,37 @@ export default function BrandBook() {
             />
           </ScrollReveal>
 
+          {/* Intro text — outside cards */}
+          <ScrollReveal>
+            <div className="mb-8">
+              <p className="font-display font-bold uppercase" style={{ fontSize: 'clamp(20px, 2.5vw, 28px)', color: 'var(--gs-light)', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
+                A marketer.
+                <br />
+                <span style={{ color: 'var(--gs-base)' }}>Not a developer.</span>
+              </p>
+              <p className="font-data mt-4" style={{ fontSize: 13, color: 'var(--gs-mid)', lineHeight: 1.7, maxWidth: 720 }}>
+                Approximately 70% of the target audience is women. The rest are culturally progressive men who aren&apos;t put off by a pink interface — the palette is a data-driven design decision, not decoration. The audience spans freelancers running Shopify stores, marketing managers at 20-person companies, and startups with a $3K/month ad budget. They run campaigns, manage agencies, and report to leadership — but have no way to verify whether the marketing stack actually works.
+              </p>
+            </div>
+          </ScrollReveal>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Left: Who They Are */}
+            {/* Left: Profile */}
             <ScrollReveal>
               <BrandPanel title="icp_profile.dat">
-                <div className="p-6 space-y-5">
-                  <div>
-                    <p className="font-display font-bold uppercase" style={{ fontSize: 'clamp(20px, 2.5vw, 28px)', color: 'var(--gs-light)', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
-                      A marketer.
-                      <br />
-                      <span style={{ color: 'var(--gs-base)' }}>Not a developer.</span>
-                    </p>
-                    <p className="font-data mt-3" style={{ fontSize: 12, color: 'var(--gs-mid)', lineHeight: 1.6 }}>
-                      Approximately 70% of the target audience is women. The rest are culturally progressive men who aren&apos;t put off by a pink interface — the palette is a data-driven design decision, not decoration. The audience spans freelancers running Shopify stores, marketing managers at 20-person companies, and startups with a $3K/month ad budget. They run campaigns, manage agencies, and report to leadership — but have no way to verify whether the marketing stack actually works.
-                    </p>
-                  </div>
-
-                  <div className="space-y-2">
-                    {[
-                      { label: 'Role', value: 'Marketing manager, director, freelancer, or solo operator' },
-                      { label: 'Company', value: 'Freelancers, small businesses, startups — typically under 50 employees' },
-                      { label: 'Budget', value: 'Spending on ads, agencies, and tools — but can\'t justify $5K–$15K for a consultancy audit' },
-                      { label: 'Technical', value: 'Knows enough to be dangerous. Can read a dashboard, can\'t read source code' },
-                      { label: 'Geography', value: 'Global from day one — Miami, Mexico City, London, São Paulo, Singapore' },
-                    ].map(({ label, value }) => (
-                      <div key={label} className="flex gap-2" style={{ fontSize: 12 }}>
-                        <span className="font-data font-bold flex-shrink-0" style={{ color: 'var(--gs-base)', minWidth: 70 }}>{label}</span>
-                        <span className="font-data" style={{ color: 'var(--gs-light)', opacity: 0.7, lineHeight: 1.4 }}>{value}</span>
-                      </div>
-                    ))}
-                  </div>
+                <div className="p-6 space-y-2">
+                  {[
+                    { label: 'Role', value: 'Marketing manager, director, freelancer, or solo operator' },
+                    { label: 'Company', value: 'Freelancers, small businesses, startups — typically under 50 employees' },
+                    { label: 'Budget', value: 'Spending on ads, agencies, and tools — but can\'t justify $5K–$15K for a consultancy audit' },
+                    { label: 'Technical', value: 'Knows enough to be dangerous. Can read a dashboard, can\'t read source code' },
+                    { label: 'Geography', value: 'Global from day one — Miami, Mexico City, London, São Paulo, Singapore' },
+                  ].map(({ label, value }) => (
+                    <div key={label} className="flex gap-2" style={{ fontSize: 12 }}>
+                      <span className="font-data font-bold flex-shrink-0" style={{ color: 'var(--gs-base)', minWidth: 70 }}>{label}</span>
+                      <span className="font-data" style={{ color: 'var(--gs-light)', opacity: 0.7, lineHeight: 1.4 }}>{value}</span>
+                    </div>
+                  ))}
                 </div>
               </BrandPanel>
             </ScrollReveal>
