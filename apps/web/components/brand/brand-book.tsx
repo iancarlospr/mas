@@ -1988,17 +1988,21 @@ export default function BrandBook() {
             />
           </ScrollReveal>
 
-          {/* 1:2 layout — portrait left, two landscape stacked right */}
+          {/* Two landscape side by side */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <ScrollReveal className="flex">
-              <VideoCard src="/brand-marketing-reel.mp4" title="MarketingReel" dims="1080×1920" format="Vertical (Reels/TikTok)" duration="43s" aspect="9/16" className="flex-1 flex flex-col" />
+            <ScrollReveal>
+              <VideoCard src="/brand-builder-reel.mp4" title="BuilderReel" dims="1920×1080" format="Landscape" duration="1:01" aspect="16/9" />
             </ScrollReveal>
-            <div className="flex flex-col gap-6">
-              <ScrollReveal delay={0.1} className="flex flex-1">
-                <VideoCard src="/brand-builder-reel.mp4" title="BuilderReel" dims="1920×1080" format="Landscape" duration="1:01" aspect="16/9" className="flex-1 flex flex-col" />
-              </ScrollReveal>
-              <ScrollReveal delay={0.2} className="flex flex-1">
-                <VideoCard src="/brand-app-demo.mp4" title="AppDemo" dims="1832×1552" format="Native App" duration="56s" aspect="1832/1552" className="flex-1 flex flex-col" />
+            <ScrollReveal delay={0.1}>
+              <VideoCard src="/brand-app-demo.mp4" title="AppDemo" dims="1832×1552" format="Native App" duration="56s" aspect="1832/1552" />
+            </ScrollReveal>
+          </div>
+
+          {/* Portrait reel centered below */}
+          <div className="mt-6 flex justify-center">
+            <div style={{ maxWidth: 360, width: '100%' }}>
+              <ScrollReveal delay={0.2}>
+                <VideoCard src="/brand-marketing-reel.mp4" title="MarketingReel" dims="1080×1920" format="Vertical (Reels/TikTok)" duration="43s" aspect="9/16" />
               </ScrollReveal>
             </div>
           </div>
