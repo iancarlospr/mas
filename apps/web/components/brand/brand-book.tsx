@@ -133,7 +133,7 @@ function SectionHeader({ number, title, subtitle }: { number: string; title: str
       {subtitle && (
         <p
           className="font-data"
-          style={{ fontSize: 13, color: 'var(--gs-mid)', maxWidth: 600, lineHeight: 1.5 }}
+          style={{ fontSize: 13, color: 'var(--gs-mid)', lineHeight: 1.6, textAlign: 'justify' }}
         >
           {subtitle}
         </p>
