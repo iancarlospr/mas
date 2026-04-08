@@ -1297,7 +1297,7 @@ export default function BrandBook() {
                       <span style={{ color: 'var(--gs-base)' }}>Not a developer.</span>
                     </p>
                     <p className="font-data mt-3" style={{ fontSize: 12, color: 'var(--gs-mid)', lineHeight: 1.6 }}>
-                      Primarily women in marketing, but built for anyone who runs campaigns, manages agencies, and reports to leadership — without the tools to verify whether the marketing stack actually works.
+                      Built for marketers — women and men — who run campaigns, manage agencies, and report to leadership but lack the tools to verify whether the marketing stack actually works. The aesthetic skews feminine by design: the men in this audience aren&apos;t intimidated by pink. They&apos;re the ones who picked it.
                     </p>
                   </div>
 
