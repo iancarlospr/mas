@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'AlphaScan Brand Book',
     description: 'The official brand guidelines for AlphaScan — forensic marketing intelligence.',
-    images: ['/og-image.png'],
+    images: ['/opengraph-image.png'],
   },
 };
 

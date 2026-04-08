@@ -10,6 +10,14 @@ import { BrandPanel } from './brand-panel';
 import { BrandSwatch } from './brand-swatch';
 import { cn } from '@/lib/utils';
 
+/* ── Static image imports (bundled into _next/static/media/) ──── */
+/* Vercel public/ dir isn't served in this monorepo layout, so we
+   import images directly so they land in the build output.        */
+import ogBackgroundImg from '../../public/og-background.jpg';
+import ogImageImg from '../../public/og-image.png';
+import heroCoverImg from '../../public/boss-deck/hero-cover.jpg';
+import heroHorizonImg from '../../public/boss-deck/hero-horizon.jpg';
+
 /* =================================================================
    AlphaScan Brand Book — The Complete Visual Identity
 
@@ -344,7 +352,7 @@ export default function BrandBook() {
       <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
         {/* OG background at low opacity */}
         <img
-          src="/og-background.jpg"
+          src={ogBackgroundImg.src}
           alt=""
           className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none"
           style={{ opacity: 0.12, filter: 'blur(2px) saturate(1.3)' }}
@@ -857,7 +865,7 @@ export default function BrandBook() {
       {/* ── DIVIDER: Psychedelic Break ──────────────────────────── */}
       <section className="relative" style={{ height: 200 }}>
         <img
-          src="/og-background.jpg"
+          src={ogBackgroundImg.src}
           alt=""
           className="absolute inset-0 w-full h-full object-cover"
           style={{ opacity: 0.6 }}
@@ -1482,7 +1490,7 @@ export default function BrandBook() {
             <BrandPanel title="og-background.jpg — 2752×1536">
               <div className="relative overflow-hidden rounded-b-gs-lg">
                 <img
-                  src="/og-background.jpg"
+                  src={ogBackgroundImg.src}
                   alt="OG Background — psychedelic pixel art with rainbow beams and ghost faces"
                   className="w-full"
                   style={{ display: 'block' }}
@@ -1499,7 +1507,7 @@ export default function BrandBook() {
                 <div className="p-6 flex justify-center">
                   <div className="relative rounded-gs overflow-hidden border border-gs-mid/20" style={{ maxWidth: 600 }}>
                     <img
-                      src="/og-image.png"
+                      src={ogImageImg.src}
                       alt="OG Social Card with ASCII logo"
                       className="w-full"
                       style={{ display: 'block' }}
@@ -1514,8 +1522,8 @@ export default function BrandBook() {
           <ScrollReveal delay={0.2}>
             <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
               {[
-                { src: '/boss-deck/hero-cover.jpg', label: 'hero-cover.jpg', desc: 'Skyscrapers' },
-                { src: '/boss-deck/hero-horizon.jpg', label: 'hero-horizon.jpg', desc: 'Ocean Horizon' },
+                { src: heroCoverImg.src, label: 'hero-cover.jpg', desc: 'Skyscrapers' },
+                { src: heroHorizonImg.src, label: 'hero-horizon.jpg', desc: 'Ocean Horizon' },
               ].map(({ src, label, desc }) => (
                 <BrandPanel key={label} title={label}>
                   <div className="relative overflow-hidden">
