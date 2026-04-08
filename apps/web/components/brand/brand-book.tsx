@@ -935,7 +935,7 @@ export default function BrandBook() {
                       onClick={() => setActiveSprite(state)}
                     >
                       <div className="py-2 px-1" style={{ filter: 'drop-shadow(0 0 6px rgba(255,178,239,0.3))' }}>
-                        <ChloeSprite state={state} size={100} glowing frame={frame} />
+                        <ChloeSprite state={state} size={64} glowing frame={frame} />
                       </div>
                       <span className="font-data font-bold" style={{ fontSize: 11, color: 'var(--gs-base)' }}>
                         {label}
@@ -1211,7 +1211,7 @@ export default function BrandBook() {
                       Direct. Precise. Slightly menacing in a fashionable way. Never says &ldquo;Oops!&rdquo; or &ldquo;Sorry!&rdquo; — she&apos;s never wrong.
                     </p>
                     <p className="font-data mt-2" style={{ fontSize: 11, color: 'var(--gs-mid)' }}>
-                      Target: 60% women marketers. Mean Girls energy. Girlfriend tone.
+                      Girlfriend energy. Never corporate. Never apologetic.
                     </p>
                   </div>
                 </BrandPanel>
@@ -1265,6 +1265,123 @@ export default function BrandBook() {
               </div>
             </ScrollReveal>
           </div>
+        </div>
+      </section>
+
+      {/* ── SECTION 5B: IDEAL CUSTOMER ────────────────────────── */}
+      <section className="relative py-16 md:py-24 px-4 md:px-8">
+        <GrainOverlay opacity={0.03} />
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{ background: 'radial-gradient(ellipse at 50% 30%, rgba(255,178,239,0.04) 0%, transparent 55%)' }}
+          aria-hidden="true"
+        />
+        <div className="relative z-10 max-w-6xl mx-auto">
+          <ScrollReveal>
+            <SectionHeader
+              number="05b"
+              title="Ideal Customer"
+              subtitle="Who AlphaScan is for, why the brand looks and feels the way it does, and the pain that drives every design decision."
+            />
+          </ScrollReveal>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Left: Who She Is */}
+            <ScrollReveal>
+              <BrandPanel title="icp_profile.dat">
+                <div className="p-6 space-y-5">
+                  <div>
+                    <p className="font-display font-bold uppercase" style={{ fontSize: 'clamp(20px, 2.5vw, 28px)', color: 'var(--gs-light)', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
+                      She&apos;s a marketer.
+                      <br />
+                      <span style={{ color: 'var(--gs-base)' }}>Not a developer.</span>
+                    </p>
+                    <p className="font-data mt-3" style={{ fontSize: 12, color: 'var(--gs-mid)', lineHeight: 1.6 }}>
+                      60% women. The rest: progressive men and LGBTQ+ professionals who reject bro-culture SaaS. She runs campaigns, manages agencies, and reports to leadership — but has no way to verify if her marketing stack actually works.
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    {[
+                      { label: 'Role', value: 'Marketing manager, director, or solo operator' },
+                      { label: 'Company', value: '10–500 employees, $1M–$50M revenue' },
+                      { label: 'Budget', value: 'Spending on ads, agencies, and tools — but can\'t measure what\'s broken' },
+                      { label: 'Technical', value: 'Knows enough to be dangerous. Can read a dashboard, can\'t read source code' },
+                    ].map(({ label, value }) => (
+                      <div key={label} className="flex gap-2" style={{ fontSize: 12 }}>
+                        <span className="font-data font-bold flex-shrink-0" style={{ color: 'var(--gs-base)', minWidth: 70 }}>{label}</span>
+                        <span className="font-data" style={{ color: 'var(--gs-light)', opacity: 0.7, lineHeight: 1.4 }}>{value}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </BrandPanel>
+            </ScrollReveal>
+
+            {/* Right: Her Pain */}
+            <ScrollReveal delay={0.15}>
+              <BrandPanel title="pain_points.log" variant="terminal">
+                <div className="p-6 space-y-4" style={{ background: '#0A0A0A' }}>
+                  <p className="font-data font-bold" style={{ fontSize: 11, color: 'var(--gs-terminal)', letterSpacing: '0.06em' }}>
+                    THE PAIN
+                  </p>
+                  {[
+                    { icon: '>', text: 'Paying an agency $5K/month that can\'t tell her the Meta pixel broke 3 months ago' },
+                    { icon: '>', text: 'Staring at dashboards wondering "is this right?" with no way to verify' },
+                    { icon: '>', text: 'Getting ghosted by the agency when she asks hard questions about tracking' },
+                    { icon: '>', text: 'Told she needs a $15K audit and 6 weeks to find what\'s broken' },
+                    { icon: '>', text: 'Three redundant analytics tools, two abandoned tag managers, and no one knows which data to trust' },
+                  ].map(({ icon, text }, i) => (
+                    <div key={i} className="flex gap-2" style={{ fontSize: 12 }}>
+                      <span className="font-data flex-shrink-0" style={{ color: 'var(--gs-terminal)' }}>{icon}</span>
+                      <span className="font-data" style={{ color: 'var(--gs-light)', opacity: 0.6, lineHeight: 1.5 }}>{text}</span>
+                    </div>
+                  ))}
+                </div>
+              </BrandPanel>
+            </ScrollReveal>
+          </div>
+
+          {/* Why the brand looks this way */}
+          <ScrollReveal delay={0.2}>
+            <div className="mt-6">
+              <BrandPanel title="brand_rationale.md">
+                <div className="p-6 space-y-5">
+                  <p className="font-display font-bold uppercase" style={{ fontSize: 'clamp(18px, 2vw, 24px)', color: 'var(--gs-light)', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
+                    Why pink. Why a ghost.
+                    <br />
+                    <span style={{ color: 'var(--gs-base)' }}>Why any of this.</span>
+                  </p>
+
+                  <div className="space-y-4">
+                    {[
+                      {
+                        title: 'Pink monochrome, not corporate blue',
+                        body: 'Every martech tool looks the same — blue gradients, stock photography, "empower your team" copy. AlphaScan chose OKLCH hue 340 because our customer is tired of being sold to by tools that look like they were designed by committee. Pink is fashion. Pink is confrontational. Pink says "this isn\'t your agency\'s dashboard."',
+                      },
+                      {
+                        title: 'A ghost mascot with laser eyes',
+                        body: 'Chloé is the ghost in the machine — she sees what\'s invisible. She crawls your site like a stealth browser, finds what\'s broken, and tells you with the energy of a best friend who just found receipts. The pixel-art aesthetic is deliberate: she\'s made of the same pixels she audits.',
+                      },
+                      {
+                        title: 'Mean Girls energy, not enterprise tone',
+                        body: 'Our customer doesn\'t want another tool that says "leverage synergies" and "optimize your funnel." She wants someone who says "babe, your tracking is broken and your agency doesn\'t know." The brand voice exists because the audience is real people spending real money who deserve direct, honest, slightly unhinged answers.',
+                      },
+                      {
+                        title: 'Desktop OS metaphor',
+                        body: 'The bedroom desktop isn\'t a gimmick — it\'s a trust signal. It says "we\'re technical enough to build this, playful enough to make it fun, and confident enough not to look like Salesforce." The windows, taskbar, and ghost pet create intimacy. This is your private workspace, not a corporate portal.',
+                      },
+                    ].map(({ title, body }) => (
+                      <div key={title}>
+                        <p className="font-data font-bold" style={{ fontSize: 13, color: 'var(--gs-base)' }}>{title}</p>
+                        <p className="font-data mt-1" style={{ fontSize: 12, color: 'var(--gs-mid)', lineHeight: 1.6 }}>{body}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </BrandPanel>
+            </div>
+          </ScrollReveal>
         </div>
       </section>
 
