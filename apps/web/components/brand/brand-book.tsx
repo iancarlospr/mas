@@ -346,7 +346,7 @@ export default function BrandBook() {
   const voiceText = useTypewriter(VOICE_LINES, 35, 2500);
 
   return (
-    <div className="fixed inset-0 overflow-y-auto z-[500] bg-gs-void" style={{ scrollBehavior: 'smooth' }}>
+    <div className="min-h-screen bg-gs-void" style={{ scrollBehavior: 'smooth' }}>
 
       {/* ── SECTION 0: HERO ─────────────────────────────────────── */}
       <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">

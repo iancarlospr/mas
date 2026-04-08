@@ -28,7 +28,7 @@ const DesktopShell = dynamic(
   { ssr: false },
 );
 
-const STANDALONE_ROUTES = ['/privacy', '/terms', '/cookies', '/contact', '/report'];
+const STANDALONE_ROUTES = ['/privacy', '/terms', '/cookies', '/contact', '/report', '/brand'];
 
 export function DesktopRoot({ children }: { children: ReactNode }) {
   const pathname = usePathname();
