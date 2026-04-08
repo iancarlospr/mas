@@ -503,9 +503,10 @@ export default function BrandBook() {
             {/* Left: Profile */}
             <ScrollReveal className="flex">
               <BrandPanel title="icp_profile.dat" className="flex-1">
-                <div className="p-6 space-y-3">
-                  <p className="font-data font-bold" style={{ fontSize: 11, color: 'var(--gs-terminal)', letterSpacing: '0.06em' }}>
-                    THE PROFILE
+                <div className="p-6 space-y-4">
+                  <p className="font-display font-bold uppercase" style={{ fontSize: 'clamp(18px, 2vw, 24px)', color: 'var(--gs-light)', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
+                    A marketer.{' '}
+                    <span style={{ color: 'var(--gs-base)' }}>Not a developer.</span>
                   </p>
                   {[
                     { label: 'Role', value: 'Marketing manager, director, freelancer, or solo operator' },
