@@ -1,288 +1,120 @@
 /**
- * Generate the OG share image (1200×630) as a static PNG.
- * - Dark bg with subtle pink glow
- * - Giant slanted smug ghost sprite (faded background)
- * - Pink glowing "ALPHA SCAN" pixel-art logo (from logo-white.png), big & centered
- * - "MarTech breakdown..." tagline at bottom
+ * Generate the OG share image (1200x630) as a static PNG.
+ * Uses Playwright to render the ASCII art with Geist Mono (exact browser rendering),
+ * then composites it onto the psychedelic background with a dark vignette.
  *
  * Run: node scripts/generate-og-image.mjs
  */
 import sharp from 'sharp';
+import { chromium } from 'playwright';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { readFile } from 'fs/promises';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const WEB_PUBLIC = join(__dirname, '..', 'apps', 'web', 'public');
-const APP_DIR = join(__dirname, '..', 'apps', 'web', 'app');
+const ROOT = join(__dirname, '..');
+const WEB_PUBLIC = join(ROOT, 'apps', 'web', 'public');
+const APP_DIR = join(ROOT, 'apps', 'web', 'app');
 
 const W = 1200;
 const H = 630;
 
-/* ── Ghost pixel grid (smug state, 32×42) ── */
-const _ = null;
-const o = 'outline', b = 'body', s = 'shade', e = 'eyes', h = 'eyeHighlight', l = 'blush';
+const ASCII_TITLE = ` █████╗ ██╗     ██████╗ ██╗  ██╗ █████╗     ███████╗ ██████╗ █████╗ ███╗   ██╗
+██╔══██╗██║     ██╔══██╗██║  ██║██╔══██╗    ██╔════╝██╔════╝██╔══██╗████╗  ██║
+███████║██║     ██████╔╝███████║███████║    ███████╗██║     ███████║██╔██╗ ██║
+██╔══██║██║     ██╔═══╝ ██╔══██║██╔══██║    ╚════██║██║     ██╔══██║██║╚██╗██║
+██║  ██║███████╗██║     ██║  ██║██║  ██║    ███████║╚██████╗██║  ██║██║ ╚████║
+╚═╝  ╚═╝╚══════╝╚═╝     ╚═╝  ╚═╝╚═╝  ╚═╝    ╚══════╝ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═══╝`;
 
-const ghostGrid = [
-  [_,_,_,_,_,_,_,_,_,_,_,o,o,o,o,o,o,o,o,o,o,_,_,_,_,_,_,_,_,_,_,_],
-  [_,_,_,_,_,_,_,_,_,o,o,b,b,b,b,b,b,b,b,b,b,o,o,_,_,_,_,_,_,_,_,_],
-  [_,_,_,_,_,_,_,_,o,b,b,b,b,b,b,b,b,b,b,b,b,b,b,o,_,_,_,_,_,_,_,_],
-  [_,_,_,_,_,_,_,o,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,o,_,_,_,_,_,_,_],
-  [_,_,_,_,_,_,o,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,o,_,_,_,_,_,_],
-  [_,_,_,_,_,o,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,o,_,_,_,_,_],
-  [_,_,_,_,o,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,o,_,_,_,_],
-  [_,_,_,_,o,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,o,_,_,_,_],
-  [_,_,_,o,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,o,_,_,_],
-  [_,_,_,o,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,o,_,_,_],
-  [_,_,o,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,o,_,_],
-  [_,_,o,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,o,_,_],
-  [_,_,o,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,o,_,_],
-  [_,_,o,b,b,b,b,e,e,e,e,e,b,b,b,b,b,b,b,e,e,e,e,e,b,b,b,b,b,o,_,_],
-  [_,_,o,b,b,b,b,e,e,h,e,e,b,b,b,b,b,b,b,e,e,h,e,e,b,b,b,b,b,o,_,_],
-  [_,_,o,b,b,b,b,e,e,e,e,e,b,b,b,b,b,b,b,e,e,e,e,e,b,b,b,b,b,o,_,_],
-  [_,_,o,b,b,b,b,b,e,e,e,b,b,b,b,b,b,b,b,b,e,e,e,b,b,b,b,b,b,o,_,_],
-  [_,_,o,b,b,b,l,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,l,b,b,b,b,o,_,_],
-  [_,_,o,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,o,_,_],
-  [_,_,o,b,b,b,b,b,b,b,b,b,b,b,o,o,o,o,o,b,b,b,b,b,b,b,b,b,b,o,_,_],
-  [_,_,o,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,o,_,_],
-  [_,_,o,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,o,_,_],
-  [_,_,o,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,o,_,_],
-  [_,_,o,b,b,b,b,b,b,b,s,b,b,b,b,b,b,b,b,b,b,s,b,b,b,b,b,b,b,o,_,_],
-  [_,_,o,b,b,b,b,b,b,b,b,s,b,b,b,b,b,b,b,b,s,b,b,b,b,b,b,b,b,o,_,_],
-  [_,_,o,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,o,_,_],
-  [_,_,o,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,o,_,_],
-  [_,_,o,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,o,_,_],
-  [_,_,o,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,o,_,_],
-  [_,_,o,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,o,_,_],
-  [_,_,o,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,o,_,_],
-  [_,_,o,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,o,_,_],
-  [_,_,o,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,o,_,_],
-  [_,_,o,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,o,_,_],
-  [_,_,o,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,o,_,_],
-  [_,_,o,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,b,o,_,_],
-  [_,_,o,b,b,b,s,b,b,b,b,b,b,s,b,b,b,b,s,b,b,b,b,b,b,s,b,b,b,o,_,_],
-  [_,_,o,b,b,s,b,b,b,o,b,b,s,b,b,b,o,s,b,b,b,o,b,b,s,b,b,b,o,_,_,_],
-  [_,_,_,o,s,b,b,o,_,_,o,s,b,b,o,_,_,o,b,b,o,_,_,o,b,b,o,o,_,_,_,_],
-  [_,_,_,_,o,b,o,_,_,_,_,o,b,o,_,_,_,_,o,o,_,_,_,_,o,o,_,_,_,_,_,_],
-  [_,_,_,_,_,o,_,_,_,_,_,_,o,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],
-  [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],
-];
-
-const COLORS = {
-  body:         [255, 240, 250],
-  shade:        [255, 202, 243],
-  outline:      [26,  22,  26],
-  eyes:         [255, 178, 239],
-  eyeHighlight: [255, 255, 255],
-  blush:        [255, 212, 232],
-};
-
-const BG = [8, 8, 8];
-
-/* ── Render ghost onto a raw RGBA buffer ── */
-function renderGhost(buf, bufW, bufH, scale, offsetX, offsetY, alpha) {
-  for (let gy = 0; gy < 42; gy++) {
-    const row = ghostGrid[gy];
-    if (!row) continue;
-    for (let gx = 0; gx < 32; gx++) {
-      const pixel = row[gx];
-      if (!pixel) continue;
-      const color = COLORS[pixel];
-      if (!color) continue;
-      for (let dy = 0; dy < scale; dy++) {
-        for (let dx = 0; dx < scale; dx++) {
-          const px = offsetX + gx * scale + dx;
-          const py = offsetY + gy * scale + dy;
-          if (px >= 0 && px < bufW && py >= 0 && py < bufH) {
-            const idx = (py * bufW + px) * 4;
-            // Alpha blend
-            buf[idx]     = Math.round(buf[idx]     + (color[0] - buf[idx])     * alpha);
-            buf[idx + 1] = Math.round(buf[idx + 1] + (color[1] - buf[idx + 1]) * alpha);
-            buf[idx + 2] = Math.round(buf[idx + 2] + (color[2] - buf[idx + 2]) * alpha);
-          }
-        }
-      }
-    }
-  }
+function escapeHtml(s) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-/* ── Render rotated ghost (simplified: pre-render then composite with rotation via sharp) ── */
-async function createRotatedGhost(scale, alpha) {
-  const gw = 32 * scale;
-  const gh = 42 * scale;
-  const buf = Buffer.alloc(gw * gh * 4, 0); // transparent
-
-  for (let gy = 0; gy < 42; gy++) {
-    const row = ghostGrid[gy];
-    if (!row) continue;
-    for (let gx = 0; gx < 32; gx++) {
-      const pixel = row[gx];
-      if (!pixel) continue;
-      const color = COLORS[pixel];
-      if (!color) continue;
-      const a = Math.round(alpha * 255);
-      for (let dy = 0; dy < scale; dy++) {
-        for (let dx = 0; dx < scale; dx++) {
-          const px = gx * scale + dx;
-          const py = gy * scale + dy;
-          const idx = (py * gw + px) * 4;
-          buf[idx]     = color[0];
-          buf[idx + 1] = color[1];
-          buf[idx + 2] = color[2];
-          buf[idx + 3] = a;
-        }
-      }
-    }
-  }
-
-  return sharp(buf, { raw: { width: gw, height: gh, channels: 4 } })
-    .png()
-    .toBuffer();
-}
-
-/* ── Radial glow helper ── */
-function addRadialGlow(buf, bufW, bufH, cx, cy, rx, ry, color, intensity) {
-  for (let y = 0; y < bufH; y++) {
-    for (let x = 0; x < bufW; x++) {
-      const dx = (x - cx) / rx;
-      const dy = (y - cy) / ry;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist < 1) {
-        const t = 1 - dist;
-        const alpha = t * t * intensity;
-        const idx = (y * bufW + x) * 4;
-        buf[idx]     = Math.round(buf[idx]     + (color[0] - buf[idx])     * alpha);
-        buf[idx + 1] = Math.round(buf[idx + 1] + (color[1] - buf[idx + 1]) * alpha);
-        buf[idx + 2] = Math.round(buf[idx + 2] + (color[2] - buf[idx + 2]) * alpha);
-      }
-    }
-  }
-}
-
-/* ── Main ── */
 async function generate() {
-  // 1. Create base image with dark bg
-  const baseBuf = Buffer.alloc(W * H * 4);
-  for (let i = 0; i < W * H; i++) {
-    baseBuf[i * 4]     = BG[0];
-    baseBuf[i * 4 + 1] = BG[1];
-    baseBuf[i * 4 + 2] = BG[2];
-    baseBuf[i * 4 + 3] = 255;
+  // Load Geist Mono font as base64 for embedding in HTML
+  const fontPath = join(ROOT, 'node_modules/geist/dist/fonts/geist-mono/GeistMono-Bold.ttf');
+  const fontBase64 = (await readFile(fontPath)).toString('base64');
+
+  // 1. Render ASCII art in a real browser
+  const html = `<!DOCTYPE html>
+<html><head><style>
+  @font-face {
+    font-family: 'GeistMono';
+    font-weight: 700;
+    src: url('data:font/ttf;base64,${fontBase64}') format('truetype');
   }
-
-  // 2. Add subtle pink radial glow behind center
-  addRadialGlow(baseBuf, W, H, W / 2, H * 0.42, 500, 350, [255, 178, 239], 0.10);
-
-  // 3. Top and bottom accent lines (pink gradient)
-  for (let x = 0; x < W; x++) {
-    const t = Math.abs(x - W / 2) / (W / 2);
-    const lineAlpha = Math.max(0, 1 - t) * 0.8;
-    const pink = [255, 178, 239];
-    // Top line (3px)
-    for (let y = 0; y < 3; y++) {
-      const idx = (y * W + x) * 4;
-      baseBuf[idx]     = Math.round(baseBuf[idx]     + (pink[0] - baseBuf[idx])     * lineAlpha);
-      baseBuf[idx + 1] = Math.round(baseBuf[idx + 1] + (pink[1] - baseBuf[idx + 1]) * lineAlpha);
-      baseBuf[idx + 2] = Math.round(baseBuf[idx + 2] + (pink[2] - baseBuf[idx + 2]) * lineAlpha);
-    }
-    // Bottom line (3px)
-    for (let y = H - 3; y < H; y++) {
-      const idx = (y * W + x) * 4;
-      baseBuf[idx]     = Math.round(baseBuf[idx]     + (pink[0] - baseBuf[idx])     * lineAlpha);
-      baseBuf[idx + 1] = Math.round(baseBuf[idx + 1] + (pink[1] - baseBuf[idx + 1]) * lineAlpha);
-      baseBuf[idx + 2] = Math.round(baseBuf[idx + 2] + (pink[2] - baseBuf[idx + 2]) * lineAlpha);
-    }
+  * { margin: 0; padding: 0; }
+  body {
+    width: ${W}px;
+    height: ${H}px;
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
   }
-
-  // Divider line (1px, centered, ~500px wide, at y=390)
-  const divY = 390;
-  const divHalfW = 280;
-  for (let x = W / 2 - divHalfW; x < W / 2 + divHalfW; x++) {
-    const t = Math.abs(x - W / 2) / divHalfW;
-    const lineAlpha = Math.max(0, 1 - t) * 0.5;
-    const idx = (divY * W + Math.round(x)) * 4;
-    baseBuf[idx]     = Math.round(baseBuf[idx]     + (255 - baseBuf[idx])     * lineAlpha);
-    baseBuf[idx + 1] = Math.round(baseBuf[idx + 1] + (178 - baseBuf[idx + 1]) * lineAlpha);
-    baseBuf[idx + 2] = Math.round(baseBuf[idx + 2] + (239 - baseBuf[idx + 2]) * lineAlpha);
+  pre {
+    font-family: 'GeistMono', monospace;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 1.15;
+    color: #FFB2EF;
+    white-space: pre;
+    text-shadow: 0 0 30px rgba(255, 178, 239, 0.5), 0 0 60px rgba(255, 178, 239, 0.2);
   }
-
-  // 4. Render rotated ghosts directly onto base buffer
-  function renderRotatedGhost(cx, cy, scale, angle, alpha) {
-    const cosA = Math.cos(angle);
-    const sinA = Math.sin(angle);
-    const gpw = 32 * scale;
-    const gph = 42 * scale;
-    for (let py = 0; py < H; py++) {
-      for (let px = 0; px < W; px++) {
-        const dx = px - cx;
-        const dy = py - cy;
-        const sx = dx * cosA + dy * sinA + gpw / 2;
-        const sy = -dx * sinA + dy * cosA + gph / 2;
-        if (sx < 0 || sx >= gpw || sy < 0 || sy >= gph) continue;
-        const gx = Math.floor(sx / scale);
-        const gy = Math.floor(sy / scale);
-        if (gx < 0 || gx >= 32 || gy < 0 || gy >= 42) continue;
-        const cell = ghostGrid[gy]?.[gx];
-        if (!cell) continue;
-        const color = COLORS[cell];
-        if (!color) continue;
-        const idx = (py * W + px) * 4;
-        baseBuf[idx]     = Math.round(baseBuf[idx]     + (color[0] - baseBuf[idx])     * alpha);
-        baseBuf[idx + 1] = Math.round(baseBuf[idx + 1] + (color[1] - baseBuf[idx + 1]) * alpha);
-        baseBuf[idx + 2] = Math.round(baseBuf[idx + 2] + (color[2] - baseBuf[idx + 2]) * alpha);
-      }
-    }
+  .tagline {
+    font-family: 'GeistMono', monospace;
+    font-weight: 700;
+    font-size: 15px;
+    color: rgba(255, 178, 239, 0.5);
+    letter-spacing: 1.5px;
+    margin-top: 24px;
   }
+</style></head><body>
+  <pre>${escapeHtml(ASCII_TITLE)}</pre>
+  <div class="tagline">MarTech breakdown. Strategic insights. Actionable recommendations.</div>
+</body></html>`;
 
-  // Ghost 1 — main, right side, -35deg, brighter
-  renderRotatedGhost(W * 0.68, H * 0.50, 20, -35 * Math.PI / 180, 0.12);
-  // Ghost 2 — echo, left side, +20deg, fainter
-  renderRotatedGhost(W * 0.18, H * 0.35, 14, 20 * Math.PI / 180, 0.06);
+  const browser = await chromium.launch({ headless: true });
+  const page = await browser.newPage({ viewport: { width: W, height: H } });
+  await page.setContent(html, { waitUntil: 'networkidle' });
+  // Wait for font to load
+  await page.waitForTimeout(500);
+  const textOverlay = await page.screenshot({ type: 'png', omitBackground: true });
+  await browser.close();
 
-  const baseImg2 = sharp(baseBuf, { raw: { width: W, height: H, channels: 4 } }).png();
-
-  // 5. Load and process the pixel-art logo
-  const logoScale = 3; // 328*3 = 984px wide, 42*3 = 126px tall
-  const logoPink = await sharp(join(WEB_PUBLIC, 'logo-white.png'))
-    .tint({ r: 255, g: 178, b: 239 })
-    .resize(328 * logoScale, 42 * logoScale, { kernel: 'nearest' })
+  // 2. Load and resize background
+  const bg = await sharp(join(WEB_PUBLIC, 'og-background.jpg'))
+    .resize(W, H, { fit: 'cover' })
     .png()
     .toBuffer();
 
-  // 6. Create tagline as SVG text
-  const tagline = 'MarTech breakdown.  Strategic insights.  Actionable recommendations.';
-  const tagSvg = Buffer.from(`<svg width="${W}" height="60" xmlns="http://www.w3.org/2000/svg">
-    <text x="${W / 2}" y="40" text-anchor="middle"
-      font-family="monospace" font-size="20" letter-spacing="1.5"
-      fill="rgba(255,240,250,0.45)">${tagline}</text>
+  // 3. Dark radial vignette as SVG
+  const vignetteSvg = Buffer.from(`<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="v" cx="50%" cy="50%" r="55%">
+        <stop offset="0%" stop-color="black" stop-opacity="0.82"/>
+        <stop offset="55%" stop-color="black" stop-opacity="0.55"/>
+        <stop offset="100%" stop-color="black" stop-opacity="0.18"/>
+      </radialGradient>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#v)"/>
   </svg>`);
 
-  // 7. Composite logo + tagline onto base (ghost already rendered in buffer)
-  const result = await sharp(await baseImg2.toBuffer())
+  // 4. Composite: background → vignette → text overlay
+  const result = await sharp(bg)
     .composite([
-      // Logo — centered, slightly above middle
-      {
-        input: logoPink,
-        left: Math.round((W - 328 * logoScale) / 2),
-        top: Math.round(H * 0.35 - (42 * logoScale) / 2),
-        blend: 'over',
-      },
-      // Tagline — below divider
-      {
-        input: tagSvg,
-        left: 0,
-        top: 420,
-        blend: 'over',
-      },
+      { input: vignetteSvg, top: 0, left: 0 },
+      { input: textOverlay, top: 0, left: 0 },
     ])
     .png()
     .toBuffer();
 
-  // Save as static OG image in app/ (Next.js file convention)
+  // 5. Save
   await sharp(result).toFile(join(APP_DIR, 'opengraph-image.png'));
-  // Also save to public for direct access
   await sharp(result).toFile(join(WEB_PUBLIC, 'og-image.png'));
 
-  console.log('✓ opengraph-image.png (1200×630)');
+  console.log('Done — opengraph-image.png (1200x630)');
 }
 
 generate().catch(console.error);
