@@ -121,8 +121,13 @@ function VideoCard({ src, title, dims, format, duration, className, poster }: { 
             video.controls = true;
             void video.play();
             const wk = video as HTMLVideoElement & { webkitEnterFullscreen?: () => void };
-            if (video.requestFullscreen) void video.requestFullscreen();
-            else if (wk.webkitEnterFullscreen) wk.webkitEnterFullscreen();
+            if (video.requestFullscreen) {
+              video.style.objectFit = 'contain';
+              video.style.background = '#000';
+              void video.requestFullscreen();
+            } else if (wk.webkitEnterFullscreen) {
+              wk.webkitEnterFullscreen();
+            }
           }
         }}
       >
@@ -136,14 +141,19 @@ function VideoCard({ src, title, dims, format, duration, className, poster }: { 
           className="absolute inset-0 w-full h-full object-cover opacity-0"
           ref={(el) => {
             if (!el) return;
-            el.onfullscreenchange = () => {
-              if (!document.fullscreenElement) {
-                el.pause();
-                el.currentTime = 0;
-                el.style.opacity = '0';
-                el.controls = false;
-              }
+            const resetVideo = () => {
+              el.pause();
+              el.currentTime = 0;
+              el.style.opacity = '0';
+              el.style.objectFit = 'cover';
+              el.style.background = '';
+              el.controls = false;
             };
+            el.onfullscreenchange = () => {
+              if (!document.fullscreenElement) resetVideo();
+            };
+            /* Safari desktop + iOS fallback */
+            el.addEventListener('webkitendfullscreen', resetVideo);
           }}
         >
           <source src={src} type="video/mp4" />
@@ -2005,7 +2015,7 @@ export default function BrandBook() {
             <ScrollReveal className="flex">
               <VideoCard src="/brand-marketing-reel.mp4" title="MarketingReel" dims="1080×1920" format="Vertical (Reels/TikTok)" duration="43s" poster="/thumb-marketing-reel.jpg" className="flex-1" />
             </ScrollReveal>
-            <div className="flex flex-col justify-between">
+            <div className="flex flex-col justify-between gap-6">
               <ScrollReveal delay={0.1}>
                 <VideoCard src="/brand-builder-reel.mp4" title="BuilderReel" dims="1920×1080" format="Landscape" duration="1:01" poster="/thumb-builder-reel.jpg" />
               </ScrollReveal>
