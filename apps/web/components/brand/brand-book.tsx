@@ -1286,25 +1286,25 @@ export default function BrandBook() {
           </ScrollReveal>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Left: Who She Is */}
+            {/* Left: Who They Are */}
             <ScrollReveal>
               <BrandPanel title="icp_profile.dat">
                 <div className="p-6 space-y-5">
                   <div>
                     <p className="font-display font-bold uppercase" style={{ fontSize: 'clamp(20px, 2.5vw, 28px)', color: 'var(--gs-light)', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
-                      She&apos;s a marketer.
+                      A marketer.
                       <br />
                       <span style={{ color: 'var(--gs-base)' }}>Not a developer.</span>
                     </p>
                     <p className="font-data mt-3" style={{ fontSize: 12, color: 'var(--gs-mid)', lineHeight: 1.6 }}>
-                      60% women. The rest: progressive men and LGBTQ+ professionals who reject bro-culture SaaS. She runs campaigns, manages agencies, and reports to leadership — but has no way to verify if her marketing stack actually works.
+                      Primarily women in marketing, but built for anyone who runs campaigns, manages agencies, and reports to leadership — without the tools to verify whether the marketing stack actually works.
                     </p>
                   </div>
 
                   <div className="space-y-2">
                     {[
-                      { label: 'Role', value: 'Marketing manager, director, or solo operator' },
-                      { label: 'Company', value: '10–500 employees, $1M–$50M revenue' },
+                      { label: 'Role', value: 'Marketing manager, director, freelancer, or solo operator' },
+                      { label: 'Company', value: 'Small business to mid-market — 1 to 50 employees, under $5M revenue' },
                       { label: 'Budget', value: 'Spending on ads, agencies, and tools — but can\'t measure what\'s broken' },
                       { label: 'Technical', value: 'Knows enough to be dangerous. Can read a dashboard, can\'t read source code' },
                     ].map(({ label, value }) => (
@@ -1318,7 +1318,7 @@ export default function BrandBook() {
               </BrandPanel>
             </ScrollReveal>
 
-            {/* Right: Her Pain */}
+            {/* Right: The Pain */}
             <ScrollReveal delay={0.15}>
               <BrandPanel title="pain_points.log" variant="terminal">
                 <div className="p-6 space-y-4" style={{ background: '#0A0A0A' }}>
@@ -1326,10 +1326,10 @@ export default function BrandBook() {
                     THE PAIN
                   </p>
                   {[
-                    { icon: '>', text: 'Paying an agency $5K/month that can\'t tell her the Meta pixel broke 3 months ago' },
+                    { icon: '>', text: 'Paying an agency $2.5K–$5K/month that can\'t tell you the Meta pixel broke 3 months ago' },
                     { icon: '>', text: 'Staring at dashboards wondering "is this right?" with no way to verify' },
-                    { icon: '>', text: 'Getting ghosted by the agency when she asks hard questions about tracking' },
-                    { icon: '>', text: 'Told she needs a $15K audit and 6 weeks to find what\'s broken' },
+                    { icon: '>', text: 'Getting ghosted by the agency when you ask hard questions about tracking' },
+                    { icon: '>', text: 'Told you need a $15K audit and 6 weeks to find what\'s broken' },
                     { icon: '>', text: 'Three redundant analytics tools, two abandoned tag managers, and no one knows which data to trust' },
                   ].map(({ icon, text }, i) => (
                     <div key={i} className="flex gap-2" style={{ fontSize: 12 }}>
@@ -1357,19 +1357,19 @@ export default function BrandBook() {
                     {[
                       {
                         title: 'Pink monochrome, not corporate blue',
-                        body: 'Every martech tool looks the same — blue gradients, stock photography, "empower your team" copy. AlphaScan chose OKLCH hue 340 because our customer is tired of being sold to by tools that look like they were designed by committee. Pink is fashion. Pink is confrontational. Pink says "this isn\'t your agency\'s dashboard."',
+                        body: 'Every martech tool looks the same — blue gradients, stock photography, "empower your team" copy. AlphaScan chose OKLCH hue 340 because the audience is tired of tools designed by committee. Pink is fashion. Pink is confrontational. Pink says "this isn\'t your agency\'s dashboard."',
                       },
                       {
                         title: 'A ghost mascot with laser eyes',
-                        body: 'Chloé is the ghost in the machine — she sees what\'s invisible. She crawls your site like a stealth browser, finds what\'s broken, and tells you with the energy of a best friend who just found receipts. The pixel-art aesthetic is deliberate: she\'s made of the same pixels she audits.',
+                        body: 'Chloé is the ghost in the machine — the thing that sees what\'s invisible. The scanner crawls sites like a stealth browser, finds what\'s broken, and delivers the findings with the energy of a best friend who just found receipts. The pixel-art aesthetic is deliberate: built from the same pixels it audits.',
                       },
                       {
-                        title: 'Mean Girls energy, not enterprise tone',
-                        body: 'Our customer doesn\'t want another tool that says "leverage synergies" and "optimize your funnel." She wants someone who says "babe, your tracking is broken and your agency doesn\'t know." The brand voice exists because the audience is real people spending real money who deserve direct, honest, slightly unhinged answers.',
+                        title: 'Direct voice, not enterprise tone',
+                        body: 'The audience doesn\'t want another tool that says "leverage synergies" and "optimize your funnel." They want someone who says "your tracking is broken and your agency doesn\'t know." The brand voice exists because the audience is real people spending real money who deserve direct, honest, no-BS answers.',
                       },
                       {
                         title: 'Desktop OS metaphor',
-                        body: 'The bedroom desktop isn\'t a gimmick — it\'s a trust signal. It says "we\'re technical enough to build this, playful enough to make it fun, and confident enough not to look like Salesforce." The windows, taskbar, and ghost pet create intimacy. This is your private workspace, not a corporate portal.',
+                        body: 'The desktop interface isn\'t a gimmick — it\'s a trust signal. It says "we\'re technical enough to build this, playful enough to make it fun, and confident enough not to look like Salesforce." The windows, taskbar, and ghost pet create intimacy. A private workspace, not a corporate portal.',
                       },
                     ].map(({ title, body }) => (
                       <div key={title}>
