@@ -108,12 +108,11 @@ function GrainOverlay({ opacity = 0.04 }: { opacity?: number }) {
 
 /* ── Video Card (Remotion section) ─────────────────────────────── */
 
-function VideoCard({ src, title, dims, format, duration, className, aspect }: { src: string; title: string; dims: string; format: string; duration: string; className?: string; aspect: string }) {
+function VideoCard({ src, title, dims, format, duration, className, poster }: { src: string; title: string; dims: string; format: string; duration: string; className?: string; poster: string }) {
   return (
     <BrandPanel title={title} className={className}>
       <div
         className="relative overflow-hidden cursor-pointer group"
-        style={{ aspectRatio: aspect, background: '#080808' }}
         onClick={(e) => {
           const video = e.currentTarget.querySelector('video');
           if (video) {
@@ -124,12 +123,14 @@ function VideoCard({ src, title, dims, format, duration, className, aspect }: { 
           }
         }}
       >
+        {/* Thumbnail — sets the natural aspect ratio */}
+        <img src={poster} alt={title} className="w-full" style={{ display: 'block' }} />
+        {/* Hidden video — plays fullscreen on click */}
         <video
-          preload="metadata"
+          preload="none"
           playsInline
           controls={false}
-          className="absolute inset-0 w-full h-full object-contain"
-          style={{ display: 'block' }}
+          className="absolute inset-0 w-full h-full object-cover opacity-0"
           ref={(el) => {
             if (!el) return;
             el.onfullscreenchange = () => { if (!document.fullscreenElement) { el.pause(); el.currentTime = 0; } };
@@ -137,7 +138,8 @@ function VideoCard({ src, title, dims, format, duration, className, aspect }: { 
         >
           <source src={src} type="video/mp4" />
         </video>
-        <div className="absolute inset-0 flex items-center justify-center bg-gs-void/40 group-hover:bg-gs-void/20 transition-colors">
+        {/* Play button overlay */}
+        <div className="absolute inset-0 flex items-center justify-center bg-gs-void/30 group-hover:bg-gs-void/10 transition-colors">
           <div className="w-14 h-14 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,178,239,0.15)', border: '2px solid var(--gs-base)', backdropFilter: 'blur(8px)' }}>
             <svg width="22" height="22" viewBox="0 0 24 24" fill="var(--gs-base)"><path d="M8 5v14l11-7z" /></svg>
           </div>
@@ -1988,21 +1990,17 @@ export default function BrandBook() {
             />
           </ScrollReveal>
 
-          {/* Two landscape side by side */}
+          {/* 1:2 layout — portrait left, two landscape stacked right */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <ScrollReveal>
-              <VideoCard src="/brand-builder-reel.mp4" title="BuilderReel" dims="1920×1080" format="Landscape" duration="1:01" aspect="16/9" />
+            <ScrollReveal className="flex">
+              <VideoCard src="/brand-marketing-reel.mp4" title="MarketingReel" dims="1080×1920" format="Vertical (Reels/TikTok)" duration="43s" poster="/thumb-marketing-reel.jpg" className="flex-1" />
             </ScrollReveal>
-            <ScrollReveal delay={0.1}>
-              <VideoCard src="/brand-app-demo.mp4" title="AppDemo" dims="1832×1552" format="Native App" duration="56s" aspect="1832/1552" />
-            </ScrollReveal>
-          </div>
-
-          {/* Portrait reel centered below */}
-          <div className="mt-6 flex justify-center">
-            <div style={{ maxWidth: 360, width: '100%' }}>
+            <div className="flex flex-col gap-6">
+              <ScrollReveal delay={0.1}>
+                <VideoCard src="/brand-builder-reel.mp4" title="BuilderReel" dims="1920×1080" format="Landscape" duration="1:01" poster="/thumb-builder-reel.jpg" />
+              </ScrollReveal>
               <ScrollReveal delay={0.2}>
-                <VideoCard src="/brand-marketing-reel.mp4" title="MarketingReel" dims="1080×1920" format="Vertical (Reels/TikTok)" duration="43s" aspect="9/16" />
+                <VideoCard src="/brand-app-demo.mp4" title="AppDemo" dims="1832×1552" format="Native App" duration="56s" poster="/thumb-app-demo.jpg" />
               </ScrollReveal>
             </div>
           </div>
