@@ -355,6 +355,7 @@ export default function BrandBook() {
     <div className="min-h-screen bg-gs-void" style={{ scrollBehavior: 'smooth' }}>
 
       {/* ── SECTION 0: HERO ─────────────────────────────────────── */}
+      <div className="relative">
       <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
         {/* Motion identity — glitchy logo reveal video loop */}
         <video
@@ -404,55 +405,25 @@ export default function BrandBook() {
         <GrainOverlay opacity={0.05} />
 
         {/* Content */}
-        <div className="relative z-10 flex flex-col items-center px-4">
-          {/* ASCII Logo */}
-          <motion.pre
-            className="font-data leading-none whitespace-pre select-none text-center hidden md:block"
-            style={{
-              fontSize: 11,
-              lineHeight: '1.05',
-              color: 'var(--gs-base)',
-              textShadow: '0 0 8px #FFB2EF, 0 0 24px rgba(255,178,239,0.3)',
-            }}
+        <div className="relative z-10 flex flex-col items-center px-4 w-full">
+          {/* ASCII Logo — responsive: scales down on small screens */}
+          <motion.div
+            className="w-full flex justify-center overflow-hidden"
             initial={{ opacity: 0, filter: 'blur(8px)' }}
             animate={{ opacity: 1, filter: 'blur(0px)' }}
             transition={{ duration: 1.2, ease: 'easeOut' }}
           >
-            {ASCII_BRAND}
-          </motion.pre>
-
-          {/* Mobile: text mark instead of ASCII */}
-          <motion.div
-            className="md:hidden text-center"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <span
-              className="font-display font-extrabold uppercase"
+            <pre
+              className="font-data leading-none whitespace-pre select-none text-center origin-center"
               style={{
-                fontSize: 48,
-                color: 'var(--gs-light)',
-                letterSpacing: '-0.02em',
-                lineHeight: 0.95,
-                display: 'block',
-              }}
-            >
-              ALPHA
-            </span>
-            <span
-              className="font-display font-extrabold uppercase"
-              style={{
-                fontSize: 48,
+                fontSize: 'clamp(4px, 1.45vw, 11px)',
+                lineHeight: '1.05',
                 color: 'var(--gs-base)',
-                letterSpacing: '-0.02em',
-                lineHeight: 0.95,
-                display: 'block',
-                textShadow: '0 0 20px rgba(255,178,239,0.4)',
+                textShadow: '0 0 8px #FFB2EF, 0 0 24px rgba(255,178,239,0.3)',
               }}
             >
-              SCAN
-            </span>
+              {ASCII_BRAND}
+            </pre>
           </motion.div>
 
           {/* Chloé */}
@@ -493,11 +464,10 @@ export default function BrandBook() {
           <span className="font-data text-gs-mid" style={{ fontSize: 20 }}>↓</span>
         </motion.div>
 
-        {/* Dither edge at bottom */}
-        <div className="absolute bottom-0 left-0 right-0 h-0 relative">
-          <DitherEdge position="bottom" />
-        </div>
       </section>
+      {/* Dither edge — outside overflow-hidden so it's visible */}
+      <DitherEdge position="bottom" />
+      </div>
 
       {/* ── SECTION 1: LOGO SYSTEM ──────────────────────────────── */}
       <section className="relative py-16 md:py-24 px-4 md:px-8">
@@ -911,12 +881,8 @@ export default function BrandBook() {
           }}
         />
         <GrainOverlay opacity={0.06} />
-        <div className="absolute top-0 left-0 right-0 h-0 relative">
-          <DitherEdge position="bottom" />
-        </div>
-        <div className="absolute bottom-0 left-0 right-0 h-0 relative">
-          <DitherEdge position="top" />
-        </div>
+        <DitherEdge position="top" />
+        <DitherEdge position="bottom" />
       </section>
 
       {/* ── SECTION 4: CHLOÉ MASCOT ─────────────────────────────── */}
@@ -1930,9 +1896,13 @@ export default function BrandBook() {
           </ScrollReveal>
 
           {/* Dither separator */}
-          <div className="relative h-0 my-4">
-            <DitherEdge position="bottom" />
-          </div>
+          <div
+            className="my-4 h-1"
+            style={{
+              background: `repeating-conic-gradient(var(--gs-deep) 0% 25%, transparent 0% 50%) 0 0 / 2px 2px`,
+              opacity: 0.6,
+            }}
+          />
 
           {/* Secondary taglines */}
           <ScrollReveal delay={0.1}>
@@ -2004,9 +1974,7 @@ export default function BrandBook() {
       {/* ── FOOTER ──────────────────────────────────────────────── */}
       <section className="relative py-16 px-4">
         <GrainOverlay opacity={0.03} />
-        <div className="absolute top-0 left-0 right-0 h-0 relative">
-          <DitherEdge position="bottom" />
-        </div>
+        <DitherEdge position="top" />
 
         <div className="relative z-10 flex flex-col items-center gap-4">
           <div style={{ filter: 'drop-shadow(0 0 12px rgba(255,178,239,0.4))' }}>
