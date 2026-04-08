@@ -88,7 +88,6 @@ const REMOTION_COMPOSITIONS = [
   { name: 'ProgressionReel', dims: '1920×1080', format: 'Landscape', duration: '2:22' },
   { name: 'AppDemo', dims: '1832×1552', format: 'Native App', duration: '56s' },
   { name: 'BuilderReel', dims: '1920×1080', format: 'Landscape', duration: '—' },
-  { name: 'ExpertRadiology', dims: '1080×1920', format: 'Client Vertical', duration: '43s' },
 ];
 
 /* ── Grain Overlay (reusable) ──────────────────────────────────── */
@@ -2002,7 +2001,7 @@ export default function BrandBook() {
               textShadow: '0 0 16px rgba(255,178,239,0.3)',
             }}
           >
-            That&apos;s the brand, babe.
+            That&apos;s the brand.
           </p>
           <p className="font-data" style={{ fontSize: 12, color: 'var(--gs-mid)', letterSpacing: '0.06em' }}>
             marketingalphascan.com
