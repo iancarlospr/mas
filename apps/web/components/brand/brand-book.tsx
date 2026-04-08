@@ -6,6 +6,7 @@ import { ChloeSprite, type ChloeState } from '@/components/chloe/chloe-sprite';
 import { MatrixRain } from '@/components/scan/matrix-rain';
 import { DitherEdge, DitherOverlay } from '@/components/os/dither';
 import { ScrollReveal, containerVariants, cardVariants } from '@/components/charts/animation-utils';
+import { A22Animation } from '@/components/os/a22-animation';
 import { BrandPanel } from './brand-panel';
 import { BrandSwatch } from './brand-swatch';
 import { cn } from '@/lib/utils';
@@ -1669,19 +1670,22 @@ export default function BrandBook() {
             </BrandPanel>
           </ScrollReveal>
 
-          {/* OG Social Card */}
+          {/* OG Social Card + A22 ASCII Movie */}
           <ScrollReveal delay={0.1}>
-            <div className="mt-6">
+            <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
               <BrandPanel title="og-image.png — 1200×630 (social card)">
-                <div className="p-6 flex justify-center">
-                  <div className="relative rounded-gs overflow-hidden border border-gs-mid/20" style={{ maxWidth: 600 }}>
-                    <img
-                      src={ogImageImg.src}
-                      alt="OG Social Card with ASCII logo"
-                      className="w-full"
-                      style={{ display: 'block' }}
-                    />
-                  </div>
+                <div className="relative overflow-hidden">
+                  <img
+                    src={ogImageImg.src}
+                    alt="OG Social Card with ASCII logo"
+                    className="w-full"
+                    style={{ display: 'block' }}
+                  />
+                </div>
+              </BrandPanel>
+              <BrandPanel title="a22-intro.anim — ASCII Movie (looping)">
+                <div className="relative overflow-hidden bg-gs-void" style={{ aspectRatio: '1200/630' }}>
+                  <A22Animation />
                 </div>
               </BrandPanel>
             </div>
