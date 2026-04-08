@@ -427,31 +427,8 @@ export default function BrandBook() {
       {/* ── SECTION 0: HERO ─────────────────────────────────────── */}
       <div className="relative">
       <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
-        {/* Motion identity — glitchy logo reveal video loop */}
+        {/* Motion identity — video loop */}
         <video
-          ref={(el) => {
-            if (!el || (el as HTMLVideoElement & { _glitch?: boolean })._glitch) return;
-            (el as HTMLVideoElement & { _glitch?: boolean })._glitch = true;
-            el.playbackRate = 0.25;
-            // Glitch loop: random pauses, rewinds, and speed stutters
-            const glitch = () => {
-              const roll = Math.random();
-              if (roll < 0.3) {
-                // Freeze for 0.4–1.2s
-                el.pause();
-                setTimeout(() => { el.play(); }, 400 + Math.random() * 800);
-              } else if (roll < 0.5) {
-                // Rewind 0.3–1.5s then resume
-                el.currentTime = Math.max(0, el.currentTime - 0.3 - Math.random() * 1.2);
-              } else if (roll < 0.65) {
-                // Brief speed burst then back to slow
-                el.playbackRate = 0.6 + Math.random() * 0.4;
-                setTimeout(() => { el.playbackRate = 0.25; }, 200 + Math.random() * 400);
-              }
-              setTimeout(glitch, 800 + Math.random() * 2200);
-            };
-            setTimeout(glitch, 2000);
-          }}
           autoPlay
           loop
           muted
