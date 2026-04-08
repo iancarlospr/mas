@@ -352,7 +352,7 @@ export default function BrandBook() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gs-void" style={{ scrollBehavior: 'smooth' }}>
+    <div className="min-h-screen bg-gs-void overflow-x-hidden" style={{ scrollBehavior: 'smooth' }}>
 
       {/* ── SECTION 0: HERO ─────────────────────────────────────── */}
       <div className="relative">
@@ -1339,29 +1339,41 @@ export default function BrandBook() {
                     <div>
                       <p className="font-data mb-1" style={{ fontSize: 10, color: 'var(--gs-mid)' }}>DitherEdge</p>
                       <div
-                        className="h-1"
+                        className="h-2"
                         style={{
-                          background: `repeating-conic-gradient(var(--gs-deep) 0% 25%, transparent 0% 50%) 0 0 / 2px 2px`,
-                          opacity: 0.6,
+                          background: `repeating-conic-gradient(var(--gs-base) 0% 25%, transparent 0% 50%) 0 0 / 2px 2px`,
+                          opacity: 0.8,
                         }}
                       />
                     </div>
                     <div>
                       <p className="font-data mb-1" style={{ fontSize: 10, color: 'var(--gs-mid)' }}>DitherOverlay (0.08)</p>
                       <div
-                        className="h-16 rounded-gs relative"
-                        style={{ background: 'oklch(0.18 0.02 340 / 0.5)' }}
+                        className="h-16 rounded-gs relative overflow-hidden"
+                        style={{ background: 'oklch(0.12 0.01 340)' }}
                       >
-                        <DitherOverlay opacity={0.08} />
+                        <div
+                          className="absolute inset-0"
+                          style={{
+                            background: `repeating-conic-gradient(var(--gs-base) 0% 25%, transparent 0% 50%) 0 0 / 2px 2px`,
+                            opacity: 0.08,
+                          }}
+                        />
                       </div>
                     </div>
                     <div>
                       <p className="font-data mb-1" style={{ fontSize: 10, color: 'var(--gs-mid)' }}>DitherOverlay (0.20)</p>
                       <div
-                        className="h-16 rounded-gs relative"
-                        style={{ background: 'oklch(0.18 0.02 340 / 0.5)' }}
+                        className="h-16 rounded-gs relative overflow-hidden"
+                        style={{ background: 'oklch(0.12 0.01 340)' }}
                       >
-                        <DitherOverlay opacity={0.20} />
+                        <div
+                          className="absolute inset-0"
+                          style={{
+                            background: `repeating-conic-gradient(var(--gs-base) 0% 25%, transparent 0% 50%) 0 0 / 2px 2px`,
+                            opacity: 0.20,
+                          }}
+                        />
                       </div>
                     </div>
                   </div>
