@@ -487,18 +487,20 @@ export default function BrandBook() {
             {/* ASCII Logo — full width */}
             <motion.div variants={cardVariants}>
               <BrandPanel title="primary — ascii.exe">
-                <div className="p-6 overflow-x-auto">
-                  <pre
-                    className="font-data leading-none whitespace-pre select-all text-center"
-                    style={{
-                      fontSize: 10,
-                      lineHeight: '1.05',
-                      color: 'var(--gs-base)',
-                      textShadow: '0 0 6px #FFB2EF, 0 0 16px rgba(255,178,239,0.25)',
-                    }}
-                  >
-                    {ASCII_BRAND}
-                  </pre>
+                <div className="p-6 overflow-hidden">
+                  <div className="w-full flex justify-center">
+                    <pre
+                      className="font-data leading-none whitespace-pre select-all text-center"
+                      style={{
+                        fontSize: 'clamp(4px, 1.3vw, 10px)',
+                        lineHeight: '1.05',
+                        color: 'var(--gs-base)',
+                        textShadow: '0 0 6px #FFB2EF, 0 0 16px rgba(255,178,239,0.25)',
+                      }}
+                    >
+                      {ASCII_BRAND}
+                    </pre>
+                  </div>
                   <div className="mt-4 flex flex-wrap gap-2 justify-center">
                     {['Geist Mono', '12px', '#FFB2EF', 'min-width: 440px'].map((spec) => (
                       <span
