@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import type { ReactNode, CSSProperties } from 'react';
-import Link from 'next/link';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Cell,
@@ -353,20 +352,6 @@ export default function ReportContent() {
 
       {/* ── Article Body ── */}
       <div style={{ maxWidth: 720, margin: '0 auto', padding: '56px 24px 80px' }}>
-
-        <Link
-          href="/blog"
-          style={{
-            fontFamily: 'var(--font-system)',
-            fontSize: 13,
-            color: '#FFB2EF',
-            display: 'inline-block',
-            marginBottom: 32,
-            textDecoration: 'none',
-          }}
-        >
-          &larr; Back to blog
-        </Link>
 
         <P>Over the past several weeks, I ran a comprehensive marketing technology audit on 50 websites belonging to some of the largest organizations operating in Puerto Rico.</P>
         <P style={{ fontFamily: 'var(--font-display)', fontSize: 20, fontStyle: 'italic', color: 'oklch(0.65 0.08 340)', lineHeight: 1.55 }}>
