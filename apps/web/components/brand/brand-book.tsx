@@ -441,16 +441,6 @@ export default function BrandBook() {
           <source src="/brand-hero.mp4" type="video/mp4" />
         </video>
 
-        {/* Radial vignette */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background: 'radial-gradient(ellipse at center, transparent 30%, rgba(8,8,8,0.85) 70%)',
-          }}
-          aria-hidden="true"
-        />
-
-        <GrainOverlay opacity={0.05} />
 
         {/* Content */}
         <div className="relative z-10 flex flex-col items-center px-4 w-full">
