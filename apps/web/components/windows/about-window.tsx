@@ -155,6 +155,21 @@ function CategorySection({ category }: { category: ModuleCategory }) {
 
 export default function AboutWindow() {
   return (
+    <>
+    <style>{`
+      @keyframes about-shimmer {
+        0% { background-position: 200% center; }
+        100% { background-position: -200% center; }
+      }
+      .about-text-shimmer {
+        background: linear-gradient(90deg, var(--gs-base) 0%, var(--gs-base) 35%, #fff 50%, var(--gs-base) 65%, var(--gs-base) 100%);
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: about-shimmer 4s ease-in-out infinite;
+      }
+    `}</style>
     <div className="px-gs-6 pt-gs-3 pb-gs-6 space-y-gs-6">
       {/* Header */}
       <div className="text-center space-y-gs-2">
@@ -213,12 +228,12 @@ export default function AboutWindow() {
           {[
             { label: 'Privacy Policy', href: '/privacy' },
             { label: 'Terms of Service', href: '/terms' },
-            { label: 'Brand Book', href: '/brand' },
+            { label: 'Brand Book', href: '/brand', shimmer: true },
           ].map((link) => (
             <button
               key={link.label}
               onClick={() => window.open(link.href, '_blank', 'noopener,noreferrer')}
-              className="font-data text-[10px] text-gs-mid hover:text-gs-red transition-colors cursor-pointer"
+              className={`font-data text-[10px] transition-colors cursor-pointer ${link.shimmer ? 'about-text-shimmer' : 'text-gs-mid hover:text-gs-red'}`}
             >
               {link.label}
             </button>
@@ -226,5 +241,6 @@ export default function AboutWindow() {
         </div>
       </div>
     </div>
+    </>
   );
 }
