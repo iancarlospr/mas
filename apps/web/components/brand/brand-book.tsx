@@ -1139,7 +1139,7 @@ export default function BrandBook() {
                   <p className="font-data uppercase mb-3" style={{ fontSize: 10, color: 'var(--gs-mid)', letterSpacing: '0.15em' }}>
                     Palette
                   </p>
-                  <div className="flex flex-wrap gap-2 mb-5">
+                  <div className="space-y-1.5 mb-5">
                     {[
                       { label: 'Body', color: '#FFF0FA' },
                       { label: 'Shading', color: '#FFCAF3' },
@@ -1147,19 +1147,13 @@ export default function BrandBook() {
                       { label: 'Eyes', color: '#FFB2EF' },
                       { label: 'Blush', color: '#FFD4E8' },
                     ].map(({ label, color }) => (
-                      <div
-                        key={label}
-                        className="flex items-center gap-2 px-2.5 py-1.5 rounded-md"
-                        style={{ background: 'oklch(0.12 0.01 340 / 0.6)', border: '1px solid oklch(0.25 0.03 340 / 0.3)' }}
-                      >
+                      <div key={label} className="flex items-center gap-3">
                         <div
-                          className="w-3.5 h-3.5 rounded-sm"
-                          style={{ background: color, boxShadow: `0 0 8px ${color}44`, border: '1px solid oklch(0.4 0.05 340 / 0.3)' }}
+                          className="w-full rounded-sm"
+                          style={{ height: 6, background: color, boxShadow: `0 0 8px ${color}33`, maxWidth: 48 }}
                         />
-                        <div className="flex flex-col">
-                          <span className="font-data font-bold" style={{ fontSize: 10, color: 'var(--gs-light)', lineHeight: 1.2 }}>{label}</span>
-                          <span className="font-data uppercase" style={{ fontSize: 9, color: 'var(--gs-mid)', lineHeight: 1.2 }}>{color}</span>
-                        </div>
+                        <span className="font-data shrink-0" style={{ fontSize: 11, color: 'var(--gs-light)', width: 60 }}>{label}</span>
+                        <span className="font-data uppercase" style={{ fontSize: 11, color: 'var(--gs-mid)' }}>{color}</span>
                       </div>
                     ))}
                   </div>
