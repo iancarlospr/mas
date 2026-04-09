@@ -1111,7 +1111,7 @@ export default function BrandBook() {
           <ScrollReveal delay={0.2}>
             <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
               <BrandPanel title="sprite_spec.dat">
-                <div className="p-5">
+                <div className="p-5 h-full flex flex-col">
                   {/* Header */}
                   <p className="font-display font-bold uppercase" style={{ fontSize: 18, color: 'var(--gs-light)', letterSpacing: '0.05em' }}>
                     Pixel Art Spec
@@ -1162,6 +1162,16 @@ export default function BrandBook() {
                         </div>
                       </div>
                     ))}
+                  </div>
+
+                  {/* Sprite preview — fills remaining space */}
+                  <div className="flex-1 flex items-center justify-center mt-5 relative" style={{ minHeight: 120 }}>
+                    <div className="absolute inset-0 flex items-center justify-center" style={{ opacity: 0.06 }}>
+                      <div className="w-full h-full" style={{ background: 'radial-gradient(ellipse at center, var(--gs-base), transparent 70%)' }} />
+                    </div>
+                    <div style={{ filter: 'drop-shadow(0 0 16px rgba(255,178,239,0.3))', animation: 'ghost-float 3s ease-in-out infinite' }}>
+                      <ChloeSprite state="idle" size={128} glowing frame={frame} />
+                    </div>
                   </div>
                 </div>
               </BrandPanel>
