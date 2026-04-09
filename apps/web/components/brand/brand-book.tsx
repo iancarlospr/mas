@@ -457,7 +457,7 @@ export default function BrandBook() {
                 fontSize: 'clamp(4px, 1.45vw, 11px)',
                 lineHeight: '1.05',
                 color: '#fff',
-                textShadow: '0 0 8px rgba(255,255,255,0.8), 0 0 24px rgba(255,255,255,0.3)',
+                textShadow: '0 0 8px rgba(255,255,255,0.8), 0 0 24px rgba(255,255,255,0.3), 2px 2px 6px rgba(0,0,0,0.8), 0 0 40px rgba(0,0,0,0.5)',
                 padding: '24px 0',
               }}
             >
