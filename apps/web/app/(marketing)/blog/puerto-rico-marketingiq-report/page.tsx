@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { blogPostingJsonLd } from '@/lib/json-ld';
-import ReportContent from './report-content';
+import ReportContent from '@/components/blog/puerto-rico-report';
 
 const post = {
   title: 'I Audited 50 Puerto Rico Websites. Here\'s What the Data Says.',

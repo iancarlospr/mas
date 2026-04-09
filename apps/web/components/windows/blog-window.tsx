@@ -1,8 +1,11 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef, type ReactNode } from 'react';
+import dynamic from 'next/dynamic';
 import ReactMarkdown from 'react-markdown';
 import { motion, useInView, useReducedMotion } from 'framer-motion';
+
+const PuertoRicoReport = dynamic(() => import('@/components/blog/puerto-rico-report'), { ssr: false });
 
 /* ═══════════════════════════════════════════════════════════════
    Blog Window
@@ -203,6 +206,9 @@ export default function BlogWindow({ initialSlug }: { initialSlug?: string } = {
         )}
 
         {/* Post content — flows naturally, .window-content scrolls */}
+        {activePost.slug === 'puerto-rico-marketingiq-report' ? (
+          <PuertoRicoReport />
+        ) : (
         <div className="px-6 py-6">
           {/* Post header */}
           <motion.div
@@ -258,6 +264,7 @@ export default function BlogWindow({ initialSlug }: { initialSlug?: string } = {
           {/* Bottom spacer */}
           <div className="h-16" />
         </div>
+        )}
       </div>
     );
   }
