@@ -1111,7 +1111,7 @@ export default function BrandBook() {
           <ScrollReveal delay={0.2}>
             <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
               <BrandPanel title="sprite_spec.dat">
-                <div className="p-5">
+                <div className="p-5 h-full flex flex-col">
                   {/* Header */}
                   <p className="font-display font-bold uppercase" style={{ fontSize: 18, color: 'var(--gs-light)', letterSpacing: '0.05em' }}>
                     Pixel Art Spec
@@ -1139,7 +1139,7 @@ export default function BrandBook() {
                   <p className="font-data uppercase mb-3" style={{ fontSize: 10, color: 'var(--gs-mid)', letterSpacing: '0.15em' }}>
                     Palette
                   </p>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-2 mb-5">
                     {[
                       { label: 'Body', color: '#FFF0FA' },
                       { label: 'Shading', color: '#FFCAF3' },
@@ -1160,6 +1160,44 @@ export default function BrandBook() {
                           <span className="font-data font-bold" style={{ fontSize: 10, color: 'var(--gs-light)', lineHeight: 1.2 }}>{label}</span>
                           <span className="font-data uppercase" style={{ fontSize: 9, color: 'var(--gs-mid)', lineHeight: 1.2 }}>{color}</span>
                         </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Behavior */}
+                  <p className="font-data uppercase mb-3" style={{ fontSize: 10, color: 'var(--gs-mid)', letterSpacing: '0.15em' }}>
+                    Behavior
+                  </p>
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-2 mb-5">
+                    {[
+                      { label: 'Idle cycle', value: '57s between actions' },
+                      { label: 'Movement', value: '3 fast darts' },
+                      { label: 'Wander', value: '300px range' },
+                      { label: 'Laser interval', value: '22s cooldown' },
+                    ].map(({ label, value }) => (
+                      <div key={label} className="flex items-baseline justify-between gap-2 py-1" style={{ borderBottom: '1px solid oklch(0.25 0.03 340 / 0.2)' }}>
+                        <span className="font-data" style={{ fontSize: 11, color: 'var(--gs-mid)' }}>{label}</span>
+                        <span className="font-data font-bold" style={{ fontSize: 11, color: 'var(--gs-light)' }}>{value}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Design rules */}
+                  <p className="font-data uppercase mb-3" style={{ fontSize: 10, color: 'var(--gs-mid)', letterSpacing: '0.15em' }}>
+                    Design Rules
+                  </p>
+                  <div className="flex-1 flex flex-col gap-2">
+                    {[
+                      'Wavy bedsheet bottom — never flat edge',
+                      'Eyes blink on frame cycle, never constant stare',
+                      'Mobile: Android-consistent profile, not desktop transplant',
+                      'Laser beams taper from 7px (eyes) to 1.5px (target)',
+                      'Ghost state forced to "scanning" during laser active',
+                      'Drop shadow glow: rgba(255,178,239,0.3)',
+                    ].map((rule) => (
+                      <div key={rule} className="flex gap-2 items-start">
+                        <span className="font-data shrink-0" style={{ fontSize: 10, color: 'var(--gs-base)', marginTop: 1 }}>▸</span>
+                        <span className="font-data" style={{ fontSize: 11, color: 'var(--gs-light)', lineHeight: 1.4 }}>{rule}</span>
                       </div>
                     ))}
                   </div>
