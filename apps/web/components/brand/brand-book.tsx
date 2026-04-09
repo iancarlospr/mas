@@ -1109,7 +1109,7 @@ export default function BrandBook() {
 
           {/* Pixel Art Spec Sheet */}
           <ScrollReveal delay={0.2}>
-            <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+            <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
               <BrandPanel title="sprite_spec.dat">
                 <div className="p-5">
                   {/* Header */}
