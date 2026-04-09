@@ -17,6 +17,7 @@ import {
   UserCircle,
   FileSearch,
   Activity,
+  BookHeart,
 } from 'lucide-react';
 import type { LucideProps } from 'lucide-react';
 
@@ -40,6 +41,7 @@ const BEDROOM_ICONS: Record<string, React.FC<LucideProps>> = {
   'auth':          LogIn,
   'profile':       UserCircle,
   'beta-tracker':  Activity,
+  'brand':         BookHeart,
 };
 
 /**

@@ -40,7 +40,8 @@ const STATIC_ICONS: DesktopIconDef[] = [
   { id: 'customers',     label: 'Reviews',     x: RIGHT_X, y: `${START_Y + ICON_SPACING * 2}px` },
   { id: 'chill',         label: 'Movies',      x: RIGHT_X, y: `${START_Y + ICON_SPACING * 3}px` },
   { id: 'games',         label: 'Mini-Games',  x: RIGHT_X, y: `${START_Y + ICON_SPACING * 4}px` },
-  // Slot 5 (right column bottom) is dynamic — see DesktopIconGrid
+  { id: 'brand',         label: 'Brand Book',  x: RIGHT_X, y: `${START_Y + ICON_SPACING * 5}px` },
+  // Slot 6 (right column bottom) is dynamic — see DesktopIconGrid
 ];
 
 function DesktopIconButton({
@@ -96,15 +97,21 @@ export function DesktopIconGrid() {
   const { isAuthenticated } = useAuth();
 
   const handleOpen = useCallback(
-    (id: string) => openWindow(id),
+    (id: string) => {
+      if (id === 'brand') {
+        window.open('/brand', '_blank');
+        return;
+      }
+      openWindow(id);
+    },
     [openWindow],
   );
 
   // Dynamic bottom-right icon: Profile (logged in) or Log In (logged out)
   const icons = useMemo(() => {
     const dynamicIcon: DesktopIconDef = isAuthenticated
-      ? { id: 'profile', label: 'Profile', x: RIGHT_X, y: `${START_Y + ICON_SPACING * 5}px` }
-      : { id: 'auth',    label: 'Log In',  x: RIGHT_X, y: `${START_Y + ICON_SPACING * 5}px` };
+      ? { id: 'profile', label: 'Profile', x: RIGHT_X, y: `${START_Y + ICON_SPACING * 6}px` }
+      : { id: 'auth',    label: 'Log In',  x: RIGHT_X, y: `${START_Y + ICON_SPACING * 6}px` };
     return [...STATIC_ICONS, dynamicIcon];
   }, [isAuthenticated]);
 
