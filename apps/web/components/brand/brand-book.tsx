@@ -1139,7 +1139,7 @@ export default function BrandBook() {
                   <p className="font-data uppercase mb-3" style={{ fontSize: 10, color: 'var(--gs-mid)', letterSpacing: '0.15em' }}>
                     Palette
                   </p>
-                  <div className="space-y-1.5 mb-5">
+                  <div className="grid grid-cols-5 gap-2 mb-5">
                     {[
                       { label: 'Body', color: '#FFF0FA' },
                       { label: 'Shading', color: '#FFCAF3' },
@@ -1147,13 +1147,13 @@ export default function BrandBook() {
                       { label: 'Eyes', color: '#FFB2EF' },
                       { label: 'Blush', color: '#FFD4E8' },
                     ].map(({ label, color }) => (
-                      <div key={label} className="flex items-center gap-3">
+                      <div key={label} className="flex flex-col items-center gap-1.5">
                         <div
                           className="w-full rounded-sm"
-                          style={{ height: 6, background: color, boxShadow: `0 0 8px ${color}33`, maxWidth: 48 }}
+                          style={{ height: 28, background: color, border: '1px solid oklch(0.3 0.03 340 / 0.4)' }}
                         />
-                        <span className="font-data shrink-0" style={{ fontSize: 11, color: 'var(--gs-light)', width: 60 }}>{label}</span>
-                        <span className="font-data uppercase" style={{ fontSize: 11, color: 'var(--gs-mid)' }}>{color}</span>
+                        <span className="font-data font-bold" style={{ fontSize: 10, color: 'var(--gs-light)' }}>{label}</span>
+                        <span className="font-data uppercase" style={{ fontSize: 9, color: 'var(--gs-mid)' }}>{color}</span>
                       </div>
                     ))}
                   </div>
