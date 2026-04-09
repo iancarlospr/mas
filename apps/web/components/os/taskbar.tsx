@@ -25,6 +25,7 @@ const START_MENU_LABELS: Record<string, string> = {
   'customers':     'Reviews',
   'chill':         'Movies',
   'games':         'Mini-Games',
+  'brand':         'Brand Book',
   'profile':       'Profile',
   'auth':          'Log In',
 };
@@ -32,7 +33,7 @@ const START_MENU_LABELS: Record<string, string> = {
 /** Order for start menu (left column first, then right) */
 const START_MENU_ORDER = [
   'history', 'chat-launcher', 'scan-input', 'products', 'pricing', 'features',
-  'about', 'blog', 'customers', 'chill', 'games',
+  'about', 'blog', 'customers', 'chill', 'games', 'brand',
 ];
 
 export function Taskbar() {
@@ -111,7 +112,11 @@ export function Taskbar() {
                                hover:bg-gs-base/15 hover:text-gs-base text-gs-light/80"
                     style={{ animationDelay: `${i * 30}ms` }}
                     onClick={() => {
-                      wm.openWindow(id);
+                      if (id === 'brand') {
+                        window.open('/brand', '_blank');
+                      } else {
+                        wm.openWindow(id);
+                      }
                       setStartOpen(false);
                     }}
                   >
