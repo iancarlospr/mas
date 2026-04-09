@@ -95,7 +95,6 @@ const catTagColors: Record<string, { bg: string; text: string }> = {
   'Market Intel': { bg: 'oklch(0.16 0.05 220)', text: 'oklch(0.72 0.12 220)' },
 };
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
   return (
@@ -136,7 +135,6 @@ const renderPolarTick = ({ payload, x, y, cx, cy }: any) => {
     </text>
   );
 };
-/* eslint-enable @typescript-eslint/no-explicit-any */
 
 // ── Reusable Components ───────────────────────────────────────────────────────
 
