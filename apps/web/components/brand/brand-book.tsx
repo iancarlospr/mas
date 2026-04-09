@@ -435,7 +435,7 @@ export default function BrandBook() {
           muted
           playsInline
           className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none"
-          style={{ opacity: 0.12, filter: 'blur(2px) saturate(1.3)' }}
+          style={{ opacity: 0.4, filter: 'saturate(1.3)' }}
           aria-hidden="true"
         >
           <source src="/brand-hero.mp4" type="video/mp4" />
