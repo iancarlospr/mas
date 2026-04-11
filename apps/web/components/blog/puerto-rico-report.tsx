@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import type { ReactNode, CSSProperties } from 'react';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -53,7 +53,7 @@ const issuesData = [
 const heatmapCategories = ['Security', 'Analytics', 'Performance', 'SEO', 'Paid Media', 'MarTech', 'Brand', 'Market Intel'];
 const heatmapData = [
   { industry: 'Tech & Econ Dev', Security: 58.2, Analytics: 46.4, Performance: 61.2, SEO: 68.0, 'Paid Media': 41.4, MarTech: 58.6, Brand: 51.2, 'Market Intel': 41.2 },
-  { industry: 'Health / Pharma', Security: 56.0, Analytics: 48.4, Performance: 60.0, SEO: 58.6, 'Paid Media': 43.4, MarTech: 55.1, Brand: 40.1, 'Market Intel': 47.0 },
+  { industry: 'Health & Pharma', Security: 56.0, Analytics: 48.4, Performance: 60.0, SEO: 58.6, 'Paid Media': 43.4, MarTech: 55.1, Brand: 40.1, 'Market Intel': 47.0 },
   { industry: 'CPG', Security: 52.6, Analytics: 44.0, Performance: 59.8, SEO: 51.4, 'Paid Media': 37.4, MarTech: 56.2, Brand: 41.4, 'Market Intel': 38.8 },
   { industry: 'Events & Tradeshows', Security: 46.0, Analytics: 51.0, Performance: 65.0, SEO: 51.2, 'Paid Media': 38.2, MarTech: 58.6, Brand: 45.4, 'Market Intel': 42.2 },
   { industry: 'Banks & Finance', Security: 48.9, Analytics: 49.0, Performance: 58.7, SEO: 60.5, 'Paid Media': 40.5, MarTech: 52.1, Brand: 38.6, 'Market Intel': 49.0 },
@@ -114,6 +114,12 @@ const CustomTooltip = ({ active, payload, label }: any) => {
       ))}
     </div>
   );
+};
+
+const formatIndustryLabel = (name: string): ReactNode => {
+  if (!name.includes(' & ')) return name;
+  const [first, second] = name.split(' & ');
+  return <>{first} &<br />{second}</>;
 };
 
 const renderPolarTick = ({ payload, x, y, cx, cy }: any) => {
@@ -279,6 +285,156 @@ export default function ReportContent() {
         .bar-anim { animation: growRight 0.8s ease-out forwards; }
         @keyframes growRight { from { width: 0%; } }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Kill recharts default white cursor overlay */
+        .miq-report .recharts-tooltip-cursor { fill: rgba(255, 178, 239, 0.06) !important; }
+
+        /* ── Top Issues: Responsive List ── */
+        .issues-list { display: flex; flex-direction: column; }
+        .issue-row {
+          padding: 12px 4px;
+          border-bottom: 1px solid oklch(0.18 0.02 340);
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+        .issue-row:last-child { border-bottom: none; padding-bottom: 4px; }
+        .issue-header {
+          display: flex;
+          align-items: flex-start;
+          gap: 10px;
+        }
+        .issue-num {
+          font-family: var(--font-system);
+          font-size: 11px;
+          font-weight: 600;
+          color: oklch(0.42 0.04 340);
+          padding-top: 2px;
+          flex-shrink: 0;
+          min-width: 18px;
+        }
+        .issue-name {
+          flex: 1;
+          font-family: var(--font-system);
+          font-size: 13px;
+          font-weight: 500;
+          color: oklch(0.82 0.03 340);
+          line-height: 1.4;
+          min-width: 0;
+          word-break: break-word;
+        }
+        .issue-cat {
+          padding: 3px 8px;
+          border-radius: 4px;
+          font-family: var(--font-system);
+          font-size: 10px;
+          font-weight: 600;
+          flex-shrink: 0;
+          white-space: nowrap;
+          align-self: flex-start;
+        }
+        .issue-bar-row {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding-left: 28px;
+        }
+        .issue-bar-bg {
+          flex: 1;
+          height: 6px;
+          background: oklch(0.18 0.02 340);
+          border-radius: 4px;
+          overflow: hidden;
+          min-width: 0;
+        }
+        .issue-bar-fg {
+          height: 100%;
+          border-radius: 4px;
+        }
+        .issue-pct {
+          font-family: var(--font-system);
+          font-weight: 700;
+          font-size: 12px;
+          min-width: 34px;
+          text-align: right;
+          flex-shrink: 0;
+        }
+
+        /* ── Heatmap: Responsive Grid (same layout as before) ── */
+        .heatmap-grid {
+          display: grid;
+          grid-template-columns: minmax(58px, 0.9fr) repeat(8, minmax(0, 1fr));
+          grid-template-rows: auto repeat(8, 32px);
+          gap: 3px;
+          align-items: stretch;
+        }
+        .heatmap-head {
+          font-family: var(--font-system);
+          font-size: 8px;
+          font-weight: 500;
+          color: oklch(0.45 0.04 340);
+          letter-spacing: 0.2px;
+          text-align: center;
+          line-height: 1.15;
+          padding: 4px 1px;
+          min-width: 0;
+          white-space: normal;
+          overflow-wrap: normal;
+          word-break: break-word;
+          hyphens: auto;
+          display: flex;
+          align-items: flex-end;
+          justify-content: center;
+        }
+        .heatmap-industry-head {
+          text-align: left;
+          justify-content: flex-start;
+          font-size: 8px;
+          letter-spacing: 0.5px;
+          text-transform: uppercase;
+          padding-left: 0;
+        }
+        .heatmap-industry-cell {
+          font-family: var(--font-system);
+          font-size: 10px;
+          font-weight: 600;
+          color: oklch(0.80 0.03 340);
+          line-height: 1.15;
+          padding: 4px 6px 4px 0;
+          display: flex;
+          align-items: center;
+          min-width: 0;
+        }
+        .heatmap-cell {
+          width: 100%;
+          height: 100%;
+          min-width: 0;
+          border-radius: 3px;
+          opacity: 0.92;
+        }
+
+        @media (min-width: 560px) {
+          .heatmap-grid {
+            grid-template-columns: minmax(78px, 0.9fr) repeat(8, minmax(0, 1fr));
+            grid-template-rows: auto repeat(8, 40px);
+            gap: 4px;
+          }
+          .heatmap-head {
+            font-size: 9px;
+            padding: 6px 0;
+            letter-spacing: 0;
+            line-height: 1.25;
+            word-break: normal;
+            overflow-wrap: normal;
+            hyphens: manual;
+          }
+          .heatmap-industry-head { font-size: 9px; letter-spacing: 0.5px; }
+          .heatmap-industry-cell {
+            font-size: 10.5px;
+            padding: 0 10px 0 0;
+            line-height: 1.2;
+          }
+        }
       `}</style>
 
       {/* ── Hero ── */}
@@ -383,8 +539,13 @@ export default function ReportContent() {
               <CartesianGrid strokeDasharray="3 3" stroke="#2d2028" />
               <XAxis dataKey="range" tick={{ fill: '#8a6a82', fontSize: 12, fontFamily: 'var(--font-system)' }} axisLine={{ stroke: '#3a2e36' }} tickLine={false} />
               <YAxis tick={{ fill: '#8a6a82', fontSize: 12, fontFamily: 'var(--font-system)' }} axisLine={false} tickLine={false} />
-              <Tooltip content={<CustomTooltip />} />
-              <Bar dataKey="count" name="Sites" radius={[6, 6, 0, 0]}>
+              <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255, 178, 239, 0.06)', radius: 6 }} />
+              <Bar
+                dataKey="count"
+                name="Sites"
+                radius={[6, 6, 0, 0]}
+                activeBar={{ stroke: '#FFB2EF', strokeWidth: 2, fillOpacity: 1 }}
+              >
                 {histogramData.map((_, i) => (
                   <Cell key={i} fill={i === 2 ? '#FFB2EF' : i === 1 ? '#b87aaa' : '#6e4e6a'} />
                 ))}
@@ -489,60 +650,34 @@ export default function ReportContent() {
         <H2>The 10 most common gaps across all 50 scans</H2>
 
         <ChartFrame title="Top Issues: Sites Affected (%)" caption="Threshold: sub-metric score of 30 or below.">
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0 3px', fontFamily: 'var(--font-system)', fontSize: 12 }}>
-              <thead>
-                <tr>
-                  {['', 'Issue', 'Affected', 'Category'].map(h => (
-                    <th key={h} style={{
-                      textAlign: 'left',
-                      padding: '8px 10px',
-                      color: 'oklch(0.45 0.04 340)',
-                      fontWeight: 500,
-                      fontSize: 10,
-                      letterSpacing: 1,
-                      textTransform: 'uppercase' as const,
-                      borderBottom: '1px solid oklch(0.22 0.04 340)',
-                    }}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {issuesData.map((row, i) => (
-                  <tr key={i}>
-                    <td style={{ padding: '9px 10px', color: 'oklch(0.42 0.04 340)', fontWeight: 600, width: 30 }}>{String(i + 1).padStart(2, '0')}</td>
-                    <td style={{ padding: '9px 10px', color: 'oklch(0.82 0.03 340)', fontWeight: 500, fontFamily: 'var(--font-system)', fontSize: 13 }}>{row.issue}</td>
-                    <td style={{ padding: '9px 10px', width: 180 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <div style={{ width: 100, height: 7, background: 'oklch(0.18 0.02 340)', borderRadius: 4, overflow: 'hidden' }}>
-                          <div style={{
-                            width: `${row.pct}%`,
-                            height: '100%',
-                            background: row.pct >= 50 ? 'oklch(0.55 0.22 25)' : row.pct >= 30 ? 'oklch(0.78 0.15 75)' : '#FFB2EF',
-                            borderRadius: 4,
-                          }} />
-                        </div>
-                        <span style={{
-                          color: row.pct >= 50 ? 'oklch(0.60 0.22 25)' : row.pct >= 30 ? 'oklch(0.78 0.15 75)' : '#FFB2EF',
-                          fontWeight: 700,
-                          minWidth: 30,
-                        }}>{row.pct}%</span>
-                      </div>
-                    </td>
-                    <td style={{ padding: '9px 10px' }}>
-                      <span style={{
+          <div className="issues-list">
+            {issuesData.map((row, i) => {
+              const barColor = row.pct >= 50 ? 'oklch(0.55 0.22 25)' : row.pct >= 30 ? 'oklch(0.78 0.15 75)' : '#FFB2EF';
+              const pctColor = row.pct >= 50 ? 'oklch(0.60 0.22 25)' : row.pct >= 30 ? 'oklch(0.78 0.15 75)' : '#FFB2EF';
+              return (
+                <div key={i} className="issue-row">
+                  <div className="issue-header">
+                    <span className="issue-num">{String(i + 1).padStart(2, '0')}</span>
+                    <span className="issue-name">{row.issue}</span>
+                    <span
+                      className="issue-cat"
+                      style={{
                         background: catTagColors[row.category]?.bg,
                         color: catTagColors[row.category]?.text,
-                        padding: '3px 8px',
-                        borderRadius: 4,
-                        fontSize: 11,
-                        fontWeight: 600,
-                      }}>{row.category}</span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                      }}
+                    >
+                      {row.category}
+                    </span>
+                  </div>
+                  <div className="issue-bar-row">
+                    <div className="issue-bar-bg">
+                      <div className="issue-bar-fg" style={{ width: `${row.pct}%`, background: barColor }} />
+                    </div>
+                    <span className="issue-pct" style={{ color: pctColor }}>{row.pct}%</span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </ChartFrame>
 
@@ -563,33 +698,28 @@ export default function ReportContent() {
             <div style={{ width: 180, height: 10, borderRadius: 5, background: 'linear-gradient(90deg, rgb(180,40,40), rgb(210,110,45), rgb(190,165,50), rgb(45,160,140), rgb(22,120,65))' }} />
             <span style={{ fontFamily: 'var(--font-system)', fontSize: 10, color: 'oklch(0.42 0.04 340)' }}>High</span>
           </div>
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: 3, fontFamily: 'var(--font-system)', fontSize: 11 }}>
-              <thead>
-                <tr>
-                  <th style={{ textAlign: 'left', padding: '6px 8px', color: 'oklch(0.45 0.04 340)', fontWeight: 500, fontSize: 10, letterSpacing: 0.5, minWidth: 110 }}>INDUSTRY</th>
-                  {heatmapCategories.map(c => (
-                    <th key={c} style={{ textAlign: 'center', padding: '6px 3px', color: 'oklch(0.45 0.04 340)', fontWeight: 500, fontSize: 9, letterSpacing: 0.3, minWidth: 52, lineHeight: 1.3 }}>{c}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {heatmapData.map((row) => (
-                  <tr key={row.industry}>
-                    <td style={{ padding: '7px 8px', color: 'oklch(0.80 0.03 340)', fontWeight: 600, fontSize: 11, whiteSpace: 'nowrap' }}>{row.industry}</td>
-                    {heatmapCategories.map(cat => {
-                      const val = row[cat as keyof typeof row] as number;
-                      const c = getHeatColor(val);
-                      return (
-                        <td key={cat} title={`${row.industry} / ${cat}`} style={{ textAlign: 'center', padding: 0 }}>
-                          <div style={{ width: '100%', height: 36, background: c.fill, borderRadius: 3, opacity: 0.9 }} />
-                        </td>
-                      );
-                    })}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="heatmap-grid">
+            <div className="heatmap-head heatmap-industry-head">INDUSTRY</div>
+            {heatmapCategories.map(c => (
+              <div key={c} className="heatmap-head">{c}</div>
+            ))}
+            {heatmapData.map((row) => (
+              <Fragment key={row.industry}>
+                <div className="heatmap-industry-cell">{formatIndustryLabel(row.industry)}</div>
+                {heatmapCategories.map(cat => {
+                  const val = row[cat as keyof typeof row] as number;
+                  const c = getHeatColor(val);
+                  return (
+                    <div
+                      key={cat}
+                      title={`${row.industry} / ${cat}: ${val}`}
+                      className="heatmap-cell"
+                      style={{ background: c.fill }}
+                    />
+                  );
+                })}
+              </Fragment>
+            ))}
           </div>
         </ChartFrame>
 
