@@ -223,6 +223,7 @@ export function MobileGate({ children, initialBlogSlug, blogRouteActive }: Mobil
   const [mobileOverlay, setMobileOverlay] = useState<'login' | 'register' | 'profile' | 'chat' | 'blog' | null>(null);
   const [chatContext, setChatContext] = useState<{ scanId: string; domain: string } | null>(null);
   const [blogSlug, setBlogSlug] = useState<string | null>(null);
+  const [blogLinkCopied, setBlogLinkCopied] = useState(false);
   // Paid scan detection for conditional layout
   const [paidScans, setPaidScans] = useState<MobilePaidScan[]>([]);
   const [paidScansLoaded, setPaidScansLoaded] = useState(false);
@@ -370,6 +371,16 @@ export function MobileGate({ children, initialBlogSlug, blogRouteActive }: Mobil
     setChatContext({ scanId, domain });
     setMobileOverlay('chat');
   }, []);
+
+  // Copy the canonical blog URL for the currently open post (mobile overlay)
+  const handleCopyBlogLink = useCallback(() => {
+    if (!blogSlug) return;
+    const url = `${window.location.origin}/blog/${blogSlug}`;
+    navigator.clipboard.writeText(url).then(() => {
+      setBlogLinkCopied(true);
+      setTimeout(() => setBlogLinkCopied(false), 1800);
+    }).catch(() => { /* clipboard blocked — ignore */ });
+  }, [blogSlug]);
 
   // Mobile credit purchase: POST to checkout API, redirect to Stripe
   const handlePurchaseCredits = useCallback(async (product: string, scanId: string) => {
@@ -795,12 +806,52 @@ export function MobileGate({ children, initialBlogSlug, blogRouteActive }: Mobil
         <div className="fixed inset-0 z-50 bg-gs-void flex flex-col overflow-hidden">
           <div className="flex-shrink-0 h-[44px] flex items-center gap-gs-3 px-gs-4 bg-gs-deep/95 backdrop-blur-md border-b border-gs-mid/15">
             <button
-              onClick={() => { setMobileOverlay(null); setBlogSlug(null); }}
+              onClick={() => { setMobileOverlay(null); setBlogSlug(null); setBlogLinkCopied(false); }}
               className="font-data text-data-sm text-gs-base"
             >
               &larr; Back
             </button>
             <span className="font-system text-os-sm font-bold text-gs-light">Blog</span>
+            <button
+              onClick={handleCopyBlogLink}
+              disabled={blogLinkCopied}
+              aria-label="Copy link to this post"
+              title={blogLinkCopied ? 'Copied!' : 'Copy link'}
+              className="ml-auto font-data text-data-sm flex items-center gap-gs-1 transition-colors disabled:cursor-default active:scale-95"
+              style={{ color: blogLinkCopied ? 'var(--gs-terminal, #9df09d)' : 'var(--gs-base)' }}
+            >
+              <span>{blogLinkCopied ? 'copied!' : 'copy link'}</span>
+              {blogLinkCopied ? (
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M20 6L9 17l-5-5" />
+                </svg>
+              ) : (
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                </svg>
+              )}
+            </button>
           </div>
           <div className="flex-1 overflow-auto">
             <BlogWindow key={blogSlug} initialSlug={blogSlug} />
