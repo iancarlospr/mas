@@ -55,11 +55,18 @@ export function DesktopRoot({ children }: { children: ReactNode }) {
   // content doesn't bleed through behind the shell. SSR still renders
   // the children (good for crawlers / OG metadata), then the client flips
   // this flag in useEffect to avoid a hydration mismatch.
+  //
+  // IMPORTANT: we capture the initial blog-route state ONCE on mount.
+  // Next.js 14+ makes `usePathname()` reactive to `history.replaceState`,
+  // so when DesktopShell rewrites the URL to '/' after opening the blog
+  // window, `blogRouteActive` flips to false. We don't want that to
+  // un-suppress the children (which are still the server-rendered blog
+  // page element — Next.js doesn't re-render children on history rewrites).
   const [suppressChildren, setSuppressChildren] = useState(false);
   useEffect(() => {
     if (blogRouteActive) setSuppressChildren(true);
-    else setSuppressChildren(false);
-  }, [blogRouteActive]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (isStandalone) {
     return <>{children}</>;

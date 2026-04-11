@@ -110,11 +110,20 @@ export function DesktopShell({ children, initialBlogSlug, blogRouteActive }: Des
     if (!blogRouteActive) return;
     const timer = setTimeout(() => {
       wm.openWindow('blog', initialBlogSlug ? { slug: initialBlogSlug } : undefined);
+      // Center horizontally, position near the top. The managed window
+      // uses `height: fit-content` with `max-height: calc(85vh - 44px)`,
+      // so the rendered height can be much larger than the configured
+      // 520px. Keep y small enough that even a full-height window stays
+      // above the taskbar (mirrors the safe-zone logic in window-manager's
+      // randomWindowPosition).
       const vw = window.innerWidth;
       const vh = window.innerHeight;
       const w = WINDOW_CONFIGS['blog']!.width ?? 560;
-      const h = WINDOW_CONFIGS['blog']!.height ?? 520;
-      wm.moveWindow('blog', Math.round((vw - w) / 2), Math.round((vh - h) / 2));
+      const taskbarH = 44;
+      const maxWindowH = Math.floor((vh - taskbarH) * 0.85);
+      const x = Math.round((vw - w) / 2);
+      const y = Math.max(20, Math.round((vh - taskbarH - maxWindowH) / 2));
+      wm.moveWindow('blog', x, y);
       window.history.replaceState({}, '', '/');
     }, 400);
     return () => clearTimeout(timer);
