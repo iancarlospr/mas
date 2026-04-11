@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef, type ReactNode } from 'react'
 import dynamic from 'next/dynamic';
 import ReactMarkdown from 'react-markdown';
 import { motion, useInView, useReducedMotion } from 'framer-motion';
+import { useWindowState } from '@/lib/window-manager';
 
 const PuertoRicoReport = dynamic(() => import('@/components/blog/puerto-rico-report'), { ssr: false });
 
@@ -94,35 +95,43 @@ const listItem = {
 // ═══════════════════════════════════════════════════════════════
 
 export default function BlogWindow({ initialSlug }: { initialSlug?: string } = {}) {
+  // Slug can come from either the direct prop (mobile overlay) or from
+  // the window manager's openData (desktop: DesktopShell opens the window
+  // with { slug } when the user lands on /blog/<slug>).
+  const blogWinState = useWindowState('blog');
+  const slugFromOpenData = blogWinState?.openData?.slug as string | undefined;
+  const effectiveInitialSlug = initialSlug ?? slugFromOpenData;
+
   const [posts, setPosts] = useState<PostMeta[]>([]);
   const [activePost, setActivePost] = useState<PostFull | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadingPost, setLoadingPost] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [view, setView] = useState<'list' | 'detail'>(initialSlug ? 'detail' : 'list');
+  const [view, setView] = useState<'list' | 'detail'>(effectiveInitialSlug ? 'detail' : 'list');
   const containerRef = useRef<HTMLDivElement>(null);
   const prefersReduced = useReducedMotion();
 
-  // Fetch post list on mount (skip if initialSlug provided — mobile direct-open)
+  // Fetch post list on mount. We always fetch even when a slug is provided
+  // so that the user can navigate back to the list (desktop). Mobile never
+  // shows the list when initialSlug prop is set, so the extra fetch is harmless.
   useEffect(() => {
-    if (initialSlug) return;
     fetch('/api/blog')
       .then((r) => r.json())
       .then((data: PostMeta[]) => setPosts(data))
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [initialSlug]);
+  }, []);
 
-  // Auto-open post when initialSlug is provided (mobile overlay)
+  // Auto-open post when a slug is provided (mobile overlay OR desktop openData)
   useEffect(() => {
-    if (!initialSlug) return;
+    if (!effectiveInitialSlug) return;
     setLoadingPost(true);
-    fetch(`/api/blog/${initialSlug}`)
+    fetch(`/api/blog/${effectiveInitialSlug}`)
       .then((r) => { if (r.ok) return r.json(); throw new Error(); })
       .then((post: PostFull) => { setActivePost(post); setView('detail'); setProgress(0); })
       .catch(() => {})
       .finally(() => { setLoadingPost(false); setLoading(false); });
-  }, [initialSlug]);
+  }, [effectiveInitialSlug]);
 
   // Open a post
   const openPost = useCallback(async (slug: string) => {

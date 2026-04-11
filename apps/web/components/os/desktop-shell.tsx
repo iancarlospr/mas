@@ -46,7 +46,13 @@ const WINDOW_CONFIGS: Record<string, WindowConfig> = {
   'beta-tracker':  { title: 'Mission Control',                icon: '~', width: 820, height: 600, variant: 'terminal' },
 };
 
-export function DesktopShell({ children }: { children: ReactNode }) {
+interface DesktopShellProps {
+  children: ReactNode;
+  initialBlogSlug?: string | null;
+  blogRouteActive?: boolean;
+}
+
+export function DesktopShell({ children, initialBlogSlug, blogRouteActive }: DesktopShellProps) {
   const wm = useWindowManager();
   const orchestrator = useScanOrchestrator();
   const [contextMenu, setContextMenu] = useState<{
@@ -94,6 +100,23 @@ export function DesktopShell({ children }: { children: ReactNode }) {
       const h = WINDOW_CONFIGS['scan-input']!.height ?? 380;
       wm.moveWindow('scan-input', Math.round((vw - w) / 2), Math.round(vh * 0.05));
     }, 100);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // If user landed on /blog or /blog/<slug>, auto-open the Blog window
+  // just after scan.exe has animated in, and clean the URL back to '/'.
+  useEffect(() => {
+    if (!blogRouteActive) return;
+    const timer = setTimeout(() => {
+      wm.openWindow('blog', initialBlogSlug ? { slug: initialBlogSlug } : undefined);
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const w = WINDOW_CONFIGS['blog']!.width ?? 560;
+      const h = WINDOW_CONFIGS['blog']!.height ?? 520;
+      wm.moveWindow('blog', Math.round((vw - w) / 2), Math.round((vh - h) / 2));
+      window.history.replaceState({}, '', '/');
+    }, 400);
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

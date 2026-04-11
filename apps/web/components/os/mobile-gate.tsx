@@ -197,7 +197,13 @@ function AnimatedChloe({ size, state, className }: { size: 32 | 64; state: 'idle
 /* Routes that should render their own page content on mobile instead of the landing page */
 const MOBILE_PASSTHROUGH = ['/login', '/register', '/auth/', '/scan/', '/chat/', '/history', '/verify'];
 
-export function MobileGate({ children }: { children: React.ReactNode }) {
+interface MobileGateProps {
+  children: React.ReactNode;
+  initialBlogSlug?: string | null;
+  blogRouteActive?: boolean;
+}
+
+export function MobileGate({ children, initialBlogSlug, blogRouteActive }: MobileGateProps) {
   const [isMobile, setIsMobile] = useState(
     () => typeof window !== 'undefined' && window.innerWidth < 1024
   );
@@ -205,6 +211,7 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
   const heroRef = useRef<HTMLDivElement>(null);
   const pricingRef = useRef<HTMLDivElement>(null);
   const myScansRef = useRef<HTMLDivElement>(null);
+  const blogSectionRef = useRef<HTMLElement>(null);
   const pathname = usePathname();
   const { user, isAuthenticated, loading: authLoading } = useAuth();
   const wm = useWindowManager();
@@ -278,6 +285,29 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
       setMobileOverlay(null);
     }
   }, [isAuthenticated, mobileOverlay]);
+
+  // Handle direct blog-route landings on mobile:
+  //  - /blog/<slug>  → open blog overlay with that post
+  //  - /blog         → scroll to the MobileBlogSection on the landing page
+  // Either way, clean the URL back to '/'.
+  useEffect(() => {
+    if (!isMobile || !blogRouteActive) return;
+    if (initialBlogSlug) {
+      setBlogSlug(initialBlogSlug);
+      setMobileOverlay('blog');
+    } else {
+      // Defer scroll until the landing layout has mounted/measured
+      const t = setTimeout(() => {
+        blogSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+      window.history.replaceState({}, '', '/');
+      return () => clearTimeout(t);
+    }
+    window.history.replaceState({}, '', '/');
+    // Run once on mount when this prop is set — blogRouteActive is a
+    // one-shot signal derived from the initial URL.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isMobile]);
 
   // Auto-scan after registration: detect pending URL in localStorage
   useEffect(() => {
@@ -616,7 +646,7 @@ export function MobileGate({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* ═══════ BLOG ═══════ */}
-        <section className="py-gs-2 relative z-[1]">
+        <section ref={blogSectionRef} className="py-gs-2 relative z-[1]">
           <MobileBlogSection
             onPostOpen={(slug) => { setBlogSlug(slug); setMobileOverlay('blog'); }}
           />

@@ -44,17 +44,40 @@ export function DesktopRoot({ children }: { children: ReactNode }) {
 
   const isStandalone = STANDALONE_ROUTES.some((r) => pathname.startsWith(r));
 
+  // Detect blog routes — /blog (list) and /blog/<slug> (detail)
+  // These should open the blog window inside the desktop OS instead of
+  // rendering the page content behind the shell.
+  const blogMatch = pathname.match(/^\/blog(?:\/([^/]+))?\/?$/);
+  const blogRouteActive = !!blogMatch;
+  const initialBlogSlug = blogMatch?.[1] ?? null;
+
+  // After hydration, suppress children on blog routes so the blog page
+  // content doesn't bleed through behind the shell. SSR still renders
+  // the children (good for crawlers / OG metadata), then the client flips
+  // this flag in useEffect to avoid a hydration mismatch.
+  const [suppressChildren, setSuppressChildren] = useState(false);
+  useEffect(() => {
+    if (blogRouteActive) setSuppressChildren(true);
+    else setSuppressChildren(false);
+  }, [blogRouteActive]);
+
   if (isStandalone) {
     return <>{children}</>;
   }
+
+  const shellChildren = suppressChildren ? null : children;
 
   return (
     <WindowManagerProvider>
       <AuthProvider>
         <ScanOrchestratorProvider>
           <ChloeReactionsProvider>
-            <MobileGate>
-              {isMobile ? children : <DesktopShell>{children}</DesktopShell>}
+            <MobileGate initialBlogSlug={initialBlogSlug} blogRouteActive={blogRouteActive}>
+              {isMobile ? shellChildren : (
+                <DesktopShell initialBlogSlug={initialBlogSlug} blogRouteActive={blogRouteActive}>
+                  {shellChildren}
+                </DesktopShell>
+              )}
             </MobileGate>
           </ChloeReactionsProvider>
         </ScanOrchestratorProvider>
