@@ -38,7 +38,7 @@ const WINDOW_CONFIGS: Record<string, WindowConfig> = {
   'chat-launcher': { title: 'GhostChat\u2122',                       icon: '~', width: 420, height: 380 },
   'scan-input':    { title: 'Scan.exe',                        icon: '~', width: 600, height: 380, variant: 'dialog' },
   'features':      { title: 'Why AlphaScan?',                  icon: '~', width: 540, height: 400 },
-  'blog':          { title: 'Blog',                              icon: '~', width: 560, height: 520 },
+  'blog':          { title: 'Blog',                              icon: '~', width: 720, height: 520 },
   'games':         { title: 'Ghost Sweeper',                   icon: '~', width: 320, height: 420, minWidth: 320, minHeight: 420 },
   'trash':         { title: 'Log Out',                         icon: '~', width: 340, height: 240 },
   'auth':          { title: 'auth.exe',                       icon: '~', width: 440, height: 480, variant: 'dialog' },
@@ -106,24 +106,14 @@ export function DesktopShell({ children, initialBlogSlug, blogRouteActive }: Des
 
   // If user landed on /blog or /blog/<slug>, auto-open the Blog window
   // just after scan.exe has animated in, and clean the URL back to '/'.
+  // We intentionally do NOT call moveWindow here — the window manager's
+  // OPEN action already assigns a randomized position via
+  // randomWindowPosition(), which keeps the window off-center from the
+  // centered scan.exe window and safely within the taskbar bounds.
   useEffect(() => {
     if (!blogRouteActive) return;
     const timer = setTimeout(() => {
       wm.openWindow('blog', initialBlogSlug ? { slug: initialBlogSlug } : undefined);
-      // Center horizontally, position near the top. The managed window
-      // uses `height: fit-content` with `max-height: calc(85vh - 44px)`,
-      // so the rendered height can be much larger than the configured
-      // 520px. Keep y small enough that even a full-height window stays
-      // above the taskbar (mirrors the safe-zone logic in window-manager's
-      // randomWindowPosition).
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
-      const w = WINDOW_CONFIGS['blog']!.width ?? 560;
-      const taskbarH = 44;
-      const maxWindowH = Math.floor((vh - taskbarH) * 0.85);
-      const x = Math.round((vw - w) / 2);
-      const y = Math.max(20, Math.round((vh - taskbarH - maxWindowH) / 2));
-      wm.moveWindow('blog', x, y);
       window.history.replaceState({}, '', '/');
     }, 400);
     return () => clearTimeout(timer);

@@ -157,6 +157,17 @@ export default function BlogWindow({ initialSlug }: { initialSlug?: string } = {
     setTimeout(() => setActivePost(null), 200);
   }, []);
 
+  // Copy canonical blog URL for the active post
+  const [copied, setCopied] = useState(false);
+  const handleCopyLink = useCallback(() => {
+    if (!activePost) return;
+    const url = `${window.location.origin}/blog/${activePost.slug}`;
+    navigator.clipboard.writeText(url).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    }).catch(() => { /* clipboard blocked — ignore */ });
+  }, [activePost]);
+
   // Track reading progress on the parent .window-content scroller
   useEffect(() => {
     if (view !== 'detail') return;
@@ -197,6 +208,56 @@ export default function BlogWindow({ initialSlug }: { initialSlug?: string } = {
                     style={{ background: 'var(--gs-base)' }}
                   />
                 </span>
+              </button>
+
+              <button
+                onClick={handleCopyLink}
+                disabled={copied}
+                aria-label="Copy link to this post"
+                title={copied ? 'Copied!' : 'Copy link'}
+                className="font-data text-[13px] group flex items-center gap-1.5 transition-colors disabled:cursor-default"
+                style={{ color: copied ? 'var(--gs-terminal, #9df09d)' : 'var(--gs-base)' }}
+              >
+                <span className="relative">
+                  {copied ? 'copied!' : 'copy link'}
+                  {!copied && (
+                    <span
+                      className="absolute left-0 -bottom-px h-px w-0 group-hover:w-full transition-all duration-200"
+                      style={{ background: 'var(--gs-base)' }}
+                    />
+                  )}
+                </span>
+                {copied ? (
+                  <svg
+                    width="13"
+                    height="13"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.4"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M20 6L9 17l-5-5" />
+                  </svg>
+                ) : (
+                  <svg
+                    width="13"
+                    height="13"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="transition-transform group-hover:rotate-[-8deg]"
+                    aria-hidden="true"
+                  >
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                  </svg>
+                )}
               </button>
             </div>
             {/* Progress bar */}
