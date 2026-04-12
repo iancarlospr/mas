@@ -27,6 +27,21 @@ export function MobileChloeLaser({ size = 64 }: MobileChloeLaserProps) {
     return () => clearInterval(id);
   }, []);
 
+  // Cancel laser on scroll — prevents detachment from ghost on mobile
+  useEffect(() => {
+    const scrollParent = ghostRef.current?.closest('main');
+    if (!scrollParent) return;
+
+    const onScroll = () => {
+      firedRef.current = true;
+      zapTargetRef.current = null;
+      setLaserTarget(null);
+    };
+
+    scrollParent.addEventListener('scroll', onScroll, { passive: true });
+    return () => scrollParent.removeEventListener('scroll', onScroll);
+  }, []);
+
   useEffect(() => {
     if (firedRef.current) return;
 
@@ -95,6 +110,7 @@ export function MobileChloeLaser({ size = 64 }: MobileChloeLaserProps) {
           ghostRef={ghostRef}
           targetPos={laserTarget}
           zapTargetRef={zapTargetRef}
+          zIndex={40}
         />
       )}
     </div>

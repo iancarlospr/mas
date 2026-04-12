@@ -12,10 +12,11 @@ import { createPortal } from 'react-dom';
  *
  * Used by both ChloeScreenmate (desktop) and MobileChloeLaser (mobile).
  */
-export function LaserBeams({ ghostRef, targetPos, zapTargetRef }: {
+export function LaserBeams({ ghostRef, targetPos, zapTargetRef, zIndex = 9999 }: {
   ghostRef: React.RefObject<HTMLDivElement | null>;
   targetPos: { x: number; y: number } | null;
   zapTargetRef: React.RefObject<{ x: number; y: number } | null>;
+  zIndex?: number;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rafRef = useRef<number>(0);
@@ -137,7 +138,7 @@ export function LaserBeams({ ghostRef, targetPos, zapTargetRef }: {
     <canvas
       ref={canvasRef}
       className="pointer-events-none"
-      style={{ position: 'fixed', inset: 0, zIndex: 9999 }}
+      style={{ position: 'fixed', inset: 0, zIndex }}
     />,
     document.body,
   );
