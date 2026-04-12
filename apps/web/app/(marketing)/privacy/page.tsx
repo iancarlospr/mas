@@ -12,7 +12,7 @@ export default function PrivacyPage() {
   return (
     <div className="min-h-screen bg-gs-void mx-auto max-w-3xl px-gs-4 py-gs-12">
       <h1 className="font-system text-[clamp(24px,3vw,36px)] font-bold text-gs-light">Privacy Policy</h1>
-      <p className="mt-gs-2 font-data text-data-sm text-gs-muted">Last updated: February 10, 2026</p>
+      <p className="mt-gs-2 font-data text-data-sm text-gs-muted">Last updated: April 12, 2026</p>
 
       <div className="mt-gs-8 space-y-gs-6 font-data text-data-sm text-gs-light/70 leading-relaxed">
         <section>
@@ -53,15 +53,33 @@ export default function PrivacyPage() {
             <li>AI-powered analysis and chat</li>
             <li>Traffic and keyword intelligence</li>
             <li>Bot detection and CDN</li>
+            <li>Visitor identification and enrichment</li>
           </ul>
         </section>
 
         <section>
-          <h2 className="font-system text-os-base font-bold text-gs-light">4. Cookies</h2>
+          <h2 className="font-system text-os-base font-bold text-gs-light">4. Cookies &amp; Online Identification</h2>
           <p className="mt-2">
             We use essential cookies for authentication and session management,
-            and analytics cookies for product improvement. No advertising or
-            third-party tracking cookies are used.
+            and analytics cookies for product improvement.
+          </p>
+          <p className="mt-2">
+            When you visit or log in to our website, cookies and similar
+            technologies may be used by our online data partners or vendors to
+            associate these activities with other personal information they or
+            others have about you, including by association with your email or
+            LinkedIn profile. We (or service providers on our behalf) may then
+            send communications and marketing to these email addresses. You may
+            opt out of receiving this advertising by visiting{' '}
+            <a
+              href="https://app.retention.com/optout"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gs-red underline"
+            >
+              https://app.retention.com/optout
+            </a>
+            .
           </p>
         </section>
 
