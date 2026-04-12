@@ -5,8 +5,7 @@ import { useEffect } from 'react';
 
 const RB2B_ID = '961Y0HDVPJNG';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const win = globalThis as any;
+const win = globalThis as Record<string, any>; // RB2B attaches to window.reb2b
 
 export function RB2BLoader() {
   const pathname = usePathname();
