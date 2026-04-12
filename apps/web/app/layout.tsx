@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { GeistMono } from 'geist/font/mono';
 import { Barlow_Condensed, JetBrains_Mono, Permanent_Marker } from 'next/font/google';
 import { PostHogProvider } from '@/components/providers/posthog-provider';
+import { RB2BLoader } from '@/components/providers/rb2b-loader';
 import { EasterEggs } from '@/components/os/easter-eggs';
 import { DesktopRoot } from '@/components/os/desktop-root';
 import { organizationJsonLd } from '@/lib/json-ld';
@@ -96,6 +97,7 @@ export default function RootLayout({
           `if(window.innerWidth<1024)document.documentElement.dataset.device="mobile"`
         }} />
         <PostHogProvider>
+          <RB2BLoader />
           <DesktopRoot>
             {children}
           </DesktopRoot>
