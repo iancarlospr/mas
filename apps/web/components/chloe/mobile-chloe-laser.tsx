@@ -13,9 +13,10 @@ import { LaserBeams } from './laser-beams';
 
 interface MobileChloeLaserProps {
   size?: 32 | 64 | 128 | 256;
+  disabled?: boolean;
 }
 
-export function MobileChloeLaser({ size = 64 }: MobileChloeLaserProps) {
+export function MobileChloeLaser({ size = 64, disabled = false }: MobileChloeLaserProps) {
   const ghostRef = useRef<HTMLDivElement>(null);
   const zapTargetRef = useRef<{ x: number; y: number } | null>(null);
   const [laserTarget, setLaserTarget] = useState<{ x: number; y: number } | null>(null);
@@ -26,6 +27,15 @@ export function MobileChloeLaser({ size = 64 }: MobileChloeLaserProps) {
     const id = setInterval(() => setAnimFrame(f => (f + 1) % 8), 500);
     return () => clearInterval(id);
   }, []);
+
+  // Kill laser when an overlay covers the ghost (blog, auth, etc.)
+  useEffect(() => {
+    if (disabled) {
+      firedRef.current = true;
+      zapTargetRef.current = null;
+      setLaserTarget(null);
+    }
+  }, [disabled]);
 
   // Cancel laser on scroll — prevents detachment from ghost on mobile
   useEffect(() => {

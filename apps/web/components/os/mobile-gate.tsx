@@ -478,7 +478,7 @@ export function MobileGate({ children, initialBlogSlug, blogRouteActive }: Mobil
 
           {/* Chloe + Headline */}
           <div className="flex items-start gap-gs-3 select-none px-gs-4">
-            <MobileChloeLaser size={64} />
+            <MobileChloeLaser size={64} disabled={mobileOverlay != null} />
             <div>
               <p
                 className="font-display"
