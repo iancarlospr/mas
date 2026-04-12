@@ -52,9 +52,9 @@ const nextConfig: NextConfig = {
           key: 'Content-Security-Policy',
           value: [
             "default-src 'self'",
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://js.stripe.com",
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://js.stripe.com https://ddwl4m2hdecbv.cloudfront.net",
             "style-src 'self' 'unsafe-inline'",
-            "connect-src 'self' https://*.supabase.co https://challenges.cloudflare.com https://api.stripe.com",
+            "connect-src 'self' https://*.supabase.co https://challenges.cloudflare.com https://api.stripe.com https://ddwl4m2hdecbv.cloudfront.net https://*.rb2b.com",
             "frame-src https://challenges.cloudflare.com https://js.stripe.com",
             "img-src 'self' data: blob: https://*.supabase.co",
             "font-src 'self'",
