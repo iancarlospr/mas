@@ -287,7 +287,11 @@ export function SvgGauge({ value, max = 100, label, thresholds }: {
 }) {
   const pct = Math.min(1, Math.max(0, value / max));
   const t = thresholds ?? { good: 0.7, warn: 0.4 };
-  const color = pct >= t.good ? 'var(--gs-terminal)' : pct >= t.warn ? 'var(--gs-warning)' : 'var(--gs-critical)';
+  // When good < warn, lower values are better (LCP/CLS/FCP); otherwise higher is better (Lighthouse score).
+  const lowerIsBetter = t.good < t.warn;
+  const color = lowerIsBetter
+    ? (pct <= t.good ? 'var(--gs-terminal)' : pct <= t.warn ? 'var(--gs-warning)' : 'var(--gs-critical)')
+    : (pct >= t.good ? 'var(--gs-terminal)' : pct >= t.warn ? 'var(--gs-warning)' : 'var(--gs-critical)');
   const r = 38;
   const circumHalf = Math.PI * r;
   const dashLen = circumHalf * pct;
