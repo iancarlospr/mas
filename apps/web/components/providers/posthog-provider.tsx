@@ -16,8 +16,11 @@ if (
     capture_pageleave: true,
     persistence: 'localStorage+cookie',
     session_recording: {
-      maskAllInputs: true,
-      maskInputOptions: { password: true, email: false },
+      maskAllInputs: false,
+      maskInputOptions: { password: true },
+      maskTextSelector: '[data-ph-mask]',
+      blockSelector: '[data-ph-block]',
+      captureCanvas: { canvasFps: 4, canvasQuality: '0.6' },
     },
     autocapture: {
       capture_copied_text: true,
