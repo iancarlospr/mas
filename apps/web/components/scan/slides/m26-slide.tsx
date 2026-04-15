@@ -158,30 +158,25 @@ export function M26Slide({ scan, onAskChloe, slideNumber }: { scan: ScanWithResu
                 const pct = maxVolume > 0 ? Math.min(100, (kw.searchVolume / maxVolume) * 100) : 0;
                 const rankColor = kw.rankAbsolute <= 3 ? 'var(--gs-terminal)' : kw.rankAbsolute <= 10 ? 'var(--gs-warning)' : 'var(--gs-mid)';
                 return (
-                  <div key={i} style={{
-                    display: 'grid',
-                    gridTemplateColumns: '2.2em minmax(0, 22em) 1fr 4.5em',
-                    alignItems: 'center',
-                    columnGap: '0.5em',
-                  }}>
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.4em' }}>
                     <span className="font-data tabular-nums" style={{
-                      fontSize: 'clamp(1px, 0.83cqi, 13px)', fontWeight: 700, textAlign: 'right',
-                      color: rankColor,
+                      fontSize: 'clamp(1px, 0.83cqi, 13px)', fontWeight: 700, minWidth: '2.2em', textAlign: 'right',
+                      color: rankColor, flexShrink: 0,
                     }}>
                       #{kw.rankAbsolute}
                     </span>
                     <span className="font-data" style={{
                       fontSize: 'clamp(1px, 0.86cqi, 14px)', color: 'var(--gs-light)',
-                      whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap', flexShrink: 0,
                     }}>
                       {kw.keyword}
                     </span>
-                    <div style={{ height: '8px', background: 'rgba(255,255,255,0.06)', borderRadius: '4px', overflow: 'hidden' }}>
+                    <div style={{ flex: 1, height: '8px', background: 'rgba(255,255,255,0.06)', borderRadius: '4px', overflow: 'hidden' }}>
                       <div style={{ width: `${pct}%`, height: '100%', background: 'var(--gs-base)', borderRadius: '4px', minWidth: pct > 0 ? '3px' : 0 }} />
                     </div>
                     <span className="font-data tabular-nums" style={{
                       fontSize: 'clamp(1px, 0.86cqi, 14px)', color: 'var(--gs-light)', fontWeight: 600,
-                      textAlign: 'right',
+                      minWidth: '4.5em', textAlign: 'right', flexShrink: 0,
                     }}>
                       {kw.searchVolume >= 1_000_000 ? `${(kw.searchVolume / 1_000_000).toFixed(1)}M` : kw.searchVolume >= 1000 ? `${(kw.searchVolume / 1000).toFixed(kw.searchVolume >= 10000 ? 0 : 1)}K` : kw.searchVolume}/mo
                     </span>
