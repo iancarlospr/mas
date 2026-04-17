@@ -53,6 +53,7 @@ const nextConfig: NextConfig = {
           value: [
             "default-src 'self'",
             "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://js.stripe.com https://ddwl4m2hdecbv.cloudfront.net",
+            "worker-src 'self' blob:",
             "style-src 'self' 'unsafe-inline'",
             "connect-src 'self' https://*.supabase.co https://challenges.cloudflare.com https://api.stripe.com https://ddwl4m2hdecbv.cloudfront.net https://*.rb2b.com",
             "frame-src https://challenges.cloudflare.com https://js.stripe.com",
