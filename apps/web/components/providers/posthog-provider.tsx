@@ -18,6 +18,13 @@ if (
     session_recording: {
       maskAllInputs: false,
       maskInputOptions: { password: true },
+      // Opt-out escape hatch for heavy RAF-driven canvases that crash rrweb.
+      // Mark offending elements with `data-ph-no-record`.
+      blockSelector: '[data-ph-no-record]',
+      // Capture simple UI canvases (titlebar dither, bedroom icons, ghost sprite).
+      // Low fps + quality keeps payload small and avoids the rrweb crash the
+      // higher settings caused previously.
+      captureCanvas: { canvasFps: 1, canvasQuality: '0.3' },
     },
     autocapture: {
       capture_copied_text: true,

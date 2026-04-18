@@ -139,6 +139,7 @@ export function LaserBeams({ ghostRef, targetPos, zapTargetRef, zIndex = 9999 }:
       ref={canvasRef}
       className="pointer-events-none"
       style={{ position: 'fixed', inset: 0, zIndex }}
+      data-ph-no-record
     />,
     document.body,
   );
