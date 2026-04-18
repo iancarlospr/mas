@@ -33,8 +33,12 @@ const RECORDING_EXCLUDED_EMAILS = ['ianramirezbba@gmail.com'];
 
 /** Identify the user in PostHog with person properties */
 function identifyUser(u: User) {
-  if (typeof window === 'undefined' || !posthog.__loaded) return;
+  if (typeof window === 'undefined') return;
 
+  // posthog-js queues calls internally until init completes, so the
+  // `__loaded` guard we had previously was racy — it silently dropped
+  // identify() for users whose Supabase session resolved before posthog
+  // finished its `/decide` round trip.
   posthog.identify(u.id, {
     email: u.email,
     name: u.user_metadata?.full_name ?? u.user_metadata?.name,
@@ -46,7 +50,6 @@ function identifyUser(u: User) {
     signup_method: u.app_metadata?.provider ?? 'email',
   });
 
-  // Disable session recording for owner/dev accounts
   if (u.email && RECORDING_EXCLUDED_EMAILS.includes(u.email)) {
     posthog.stopSessionRecording();
   }
@@ -84,7 +87,7 @@ async function maybeRedeemBetaInvite(u: User | null) {
 
 /** Detect new account creation (created_at within last 60s) */
 function maybeTrackAccountCreation(u: User) {
-  if (typeof window === 'undefined' || !posthog.__loaded) return;
+  if (typeof window === 'undefined') return;
 
   const createdAt = new Date(u.created_at).getTime();
   const now = Date.now();
@@ -125,7 +128,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           identifyUser(u);
           maybeRedeemBetaInvite(u);
         } else if (event === 'SIGNED_OUT') {
-          if (typeof window !== 'undefined' && posthog.__loaded) {
+          if (typeof window !== 'undefined') {
             posthog.reset();
           }
         }
