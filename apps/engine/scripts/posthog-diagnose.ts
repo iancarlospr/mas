@@ -228,6 +228,26 @@ async function main() {
     console.log(`\n━━━ Project settings ━━━\n  ! skipped: ${(err as Error).message}`);
   }
 
+  // Person display-name resolution. When this is null the PostHog UI shows
+  // raw distinct_ids instead of the person's name/email in session lists,
+  // event rows, etc. It should normally be ["name","Name","email","Email",
+  // "username","Username"] so identified users are readable.
+  try {
+    const settings = await getJSON<Record<string, unknown>>('/');
+    const displayProps = settings['person_display_name_properties'];
+    console.log(`\n━━━ Project settings > person_display_name_properties ━━━`);
+    if (displayProps == null) {
+      console.log('  ✗ null — distinct_ids will render as raw UUIDs in the UI');
+      totalHits++;
+    } else if (Array.isArray(displayProps) && displayProps.length > 0) {
+      console.log(`  ✓ ${JSON.stringify(displayProps)}`);
+    } else {
+      console.log(`  ? unexpected value: ${JSON.stringify(displayProps)}`);
+    }
+  } catch {
+    /* noop */
+  }
+
   console.log(`\n━━━ Summary ━━━`);
   console.log(`  ${totalHits === 0 ? '✓ No bare `session_id` references found.' : `✗ ${totalHits} resource(s) need fixing.`}`);
   console.log('');
