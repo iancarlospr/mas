@@ -1,13 +1,20 @@
 /**
  * PostHog Fix — correct the project's `live_events_columns` so the Events
- * view stops raising "Unable to resolve field: session_id".
+ * view stops raising "Unable to resolve field: <x>".
  *
- * The bug: the columns array contains a bare `"session_id"` string, which is
- * not a field on the events table (events expose `$session_id`; the bare
- * column only exists on the sessions table as `session.session_id`).
+ * Rewrites for columns that are session-scoped but missing the `session.`
+ * prefix required by HogQL when the column is evaluated from the events
+ * table context:
  *
- * The fix: replace `"session_id"` with `"$session_id"` in the columns array.
- * Other entries are left untouched.
+ *   session_id           → $session_id
+ *   $start_timestamp     → session.$start_timestamp -- Start
+ *   $end_timestamp       → session.$end_timestamp -- End
+ *   $session_duration    → session.$session_duration -- Duration
+ *   $entry_current_url   → session.$entry_current_url -- Entry URL
+ *   $pageview_count      → session.$pageview_count -- Pageviews
+ *   $is_bounce           → session.$is_bounce -- Bounce
+ *
+ * Each replacement was verified against the live project's HogQL engine.
  *
  * Usage:  npx tsx --env-file=.env scripts/posthog-fix-columns.ts
  */
@@ -26,7 +33,17 @@ const headers = {
   'Content-Type': 'application/json',
 };
 
-const BAD_REF = /(?<![$.])session_id\b/;
+// Column-level rewrites. Key = bare (broken) column string, value = the
+// HogQL expression that the PostHog Events view can actually resolve.
+const REWRITES: Record<string, string> = {
+  session_id: '$session_id',
+  $start_timestamp: 'session.$start_timestamp -- Start',
+  $end_timestamp: 'session.$end_timestamp -- End',
+  $session_duration: 'session.$session_duration -- Duration',
+  $entry_current_url: 'session.$entry_current_url -- Entry URL',
+  $pageview_count: 'session.$pageview_count -- Pageviews',
+  $is_bounce: 'session.$is_bounce -- Bounce',
+};
 
 async function main() {
   const url = `${BASE_URL}/projects/${PROJECT_ID}/`;
@@ -44,15 +61,16 @@ async function main() {
   }
 
   const fixed = current.map((col) =>
-    typeof col === 'string' && BAD_REF.test(col) && col === 'session_id'
-      ? '$session_id'
-      : col,
+    typeof col === 'string' && REWRITES[col] ? REWRITES[col]! : col,
   );
 
   const changed = fixed.some((v, i) => v !== current[i]);
 
   console.log('Before:');
-  for (const c of current) console.log(`  - ${c}${BAD_REF.test(c) && c === 'session_id' ? '  ← BAD' : ''}`);
+  for (const c of current) {
+    const bad = typeof c === 'string' && REWRITES[c];
+    console.log(`  - ${c}${bad ? '  ← BAD' : ''}`);
+  }
   console.log('\nAfter:');
   for (const c of fixed) console.log(`  - ${c}`);
 

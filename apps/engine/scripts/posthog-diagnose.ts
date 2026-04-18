@@ -189,14 +189,31 @@ async function main() {
   }
 
   // Project settings — `live_events_columns` is the most common place a bad
-  // `session_id` ends up, because the PostHog UI lets you drag columns onto
-  // the Events table and save them per project.
+  // HogQL reference ends up, because the PostHog UI lets you drag columns
+  // onto the Events table and save them per project. Catches:
+  //   • bare `session_id` (should be `$session_id` or `session.session_id`)
+  //   • bare `$start_timestamp`, `$end_timestamp`, `$session_duration`,
+  //     `$entry_current_url`, `$pageview_count`, `$is_bounce` — all
+  //     session-scoped and need the `session.` prefix.
+  const BARE_SESSION_PROPS = new Set([
+    'session_id',
+    '$start_timestamp',
+    '$end_timestamp',
+    '$session_duration',
+    '$entry_current_url',
+    '$pageview_count',
+    '$is_bounce',
+  ]);
   try {
     const settings = await getJSON<Record<string, unknown>>('/');
     const cols = settings['live_events_columns'];
     console.log(`\n━━━ Project settings > live_events_columns ━━━`);
     if (Array.isArray(cols)) {
-      const bad = cols.filter((c) => typeof c === 'string' && BAD_REF.test(c));
+      const bad = cols.filter(
+        (c): c is string =>
+          typeof c === 'string' &&
+          (BARE_SESSION_PROPS.has(c) || (BAD_REF.test(c) && !c.includes('session.'))),
+      );
       if (bad.length === 0) {
         console.log('  ✓ clean');
       } else {
