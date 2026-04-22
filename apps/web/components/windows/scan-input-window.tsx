@@ -35,10 +35,14 @@ function CurvedArrow() {
   }, []);
 
   return (
-    <div ref={ref} className="font-marker select-none" style={{ marginTop: '24px' }}>
+    <div
+      ref={ref}
+      className="font-marker select-none"
+      style={{ marginTop: 'clamp(8px, 2.4vh, 24px)' }}
+    >
       <span
         style={{
-          fontSize: '52px',
+          fontSize: 'clamp(32px, 5.5vh, 52px)',
           color: 'var(--gs-base)',
           display: 'block',
           lineHeight: '0.7',
@@ -113,14 +117,24 @@ function CreditIndicator() {
 }
 
 export default function ScanInputWindow() {
+  // Cap root at the same height the parent window uses: 85vh - 44 (taskbar)
+  // - 32 (titlebar) - 42 (dither strip + borders) = 85vh - 118.
+  // Below this the flex spacer absorbs the leftover, then collapses to keep
+  // everything inside without a .window-content scrollbar.
   return (
-    <div className="p-gs-4 flex flex-col items-center h-full">
+    <div
+      className="p-gs-4 flex flex-col items-center overflow-hidden"
+      style={{ maxHeight: 'calc(85vh - 118px)' }}
+    >
       {/* ASCII Title */}
-      <div className="flex justify-center" style={{ marginTop: '16px' }}>
+      <div
+        className="flex justify-center"
+        style={{ marginTop: 'clamp(4px, 1.6vh, 16px)', flexShrink: 0 }}
+      >
         <pre
           className="font-data leading-none whitespace-pre select-none text-center"
           style={{
-            fontSize: '12px',
+            fontSize: 'clamp(7px, 1.4vh, 12px)',
             lineHeight: '1.05',
             color: 'var(--gs-base)',
             textShadow: '0 0 8px var(--gs-base), 0 0 20px rgba(255,178,239,0.3)',
@@ -131,11 +145,14 @@ export default function ScanInputWindow() {
       </div>
 
       {/* Headline */}
-      <div className="text-center select-none" style={{ marginTop: '24px' }}>
+      <div
+        className="text-center select-none"
+        style={{ marginTop: 'clamp(8px, 2.5vh, 24px)', flexShrink: 0 }}
+      >
         <p
           className="font-display"
           style={{
-            fontSize: '26px',
+            fontSize: 'clamp(18px, 3vh, 26px)',
             fontWeight: 300,
             lineHeight: '1.3',
             letterSpacing: '-0.01em',
@@ -147,22 +164,25 @@ export default function ScanInputWindow() {
         <p
           className="font-marker"
           style={{
-            fontSize: '32px',
+            fontSize: 'clamp(22px, 3.8vh, 32px)',
             lineHeight: '1.2',
             letterSpacing: '-0.06em',
             color: 'var(--gs-base)',
-            marginTop: '6px',
+            marginTop: 'clamp(2px, 0.7vh, 6px)',
           }}
         >
           Let&apos;s fix that.
         </p>
       </div>
 
-      {/* Spacer between headline and CTA */}
-      <div style={{ height: '120px' }} />
+      {/* Flex spacer: up to 120px on tall viewports, shrinks to 0 when tight */}
+      <div style={{ flex: '0 1 120px', minHeight: 0 }} />
 
       {/* Nudge CTA + Arrow */}
-      <div className="flex flex-col items-center select-none" style={{ marginBottom: '16px' }}>
+      <div
+        className="flex flex-col items-center select-none"
+        style={{ marginBottom: 'clamp(4px, 1.6vh, 16px)', flexShrink: 0 }}
+      >
         <p
           className="font-data"
           style={{
@@ -177,7 +197,7 @@ export default function ScanInputWindow() {
         <CurvedArrow />
       </div>
 
-      <div className="w-full">
+      <div className="w-full" style={{ flexShrink: 0 }}>
         <CreditIndicator />
         <HeroScanFlow />
       </div>

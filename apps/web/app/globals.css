@@ -57,6 +57,14 @@
     --gs-statusbar-h: 24px;
   }
 
+  /* Desktop icon SVG — sized via --desk-icon-svg from DesktopIconGrid.
+     Lucide sets width/height as attrs; CSS wins without !important, but the
+     bang defends against future Tailwind utility ordering surprises. */
+  .desk-icon-svg {
+    width: var(--desk-icon-svg) !important;
+    height: var(--desk-icon-svg) !important;
+  }
+
   html {
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
