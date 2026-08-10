@@ -1,5 +1,5 @@
 # ─── Stage 1: Build ───────────────────────────────────────────────────────────
-FROM node:22-slim AS builder
+FROM node:26-slim AS builder
 
 WORKDIR /app
 
@@ -27,7 +27,7 @@ RUN npm run build --workspace=@marketing-alpha/types
 RUN npm run build --workspace=@marketing-alpha/engine
 
 # ─── Stage 2: Production ─────────────────────────────────────────────────────
-FROM node:22-slim AS production
+FROM node:26-slim AS production
 
 # Install system dependencies + real Google Chrome (genuine JA3/JA4 TLS fingerprint
 # that DataDome/Cloudflare/Akamai won't flag as automation — bundled Chromium gets caught)
