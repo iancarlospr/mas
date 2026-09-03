@@ -239,3 +239,62 @@ The GitHub README links, in this order, with exact-match anchors: "run a marketi
 ### Sitemaps and robots
 
 Each host has its own sitemap: front doors list their 5 static pages; the canonical host lists `/audit/<domain>` pages that pass the index policy, regenerated daily. `robots.txt` on the audit domains disallows `/audit/` (they only redirect) so crawlers do not waste budget on redirects.
+
+---
+
+## 11. AI-SEO (AEO/GEO) audit module set
+
+Added 2026-09-02 after Ian's ask for an AI-search audit sold from its own site. Comps he named: tryres.ai (advisory $10k/mo, done-for-you $100k, "service not software", proof = 75% citation rate in 6 weeks over 76 pages) and usereach.ai (platform + managed service, B2B SaaS $1M+ ARR, 3-month minimum). Same rule as the rest of v2: assemble, don't build. Every figure below is from vendor pages read on 2026-09-02 and must be re-checked against price sheets before it goes in a proposal.
+
+### 11.1 Components
+
+| Component | Role | What we verified | Cost basis |
+|---|---|---|---|
+| **Elmo** (github.com/elmohq/elmo, MIT) | Tracker backend and the monthly-retainer artifact. TypeScript, TanStack Start, PostgreSQL, pg-boss worker, Docker Compose, `@elmohq/cli`. Tracks ChatGPT, Google AI Mode, AI Overviews, Gemini, Perplexity, Copilot, Claude, Grok, Mistral. | REST API at `/api/v1`, Bearer auth: Brands, Prompts, Competitors, Snapshots, Reports, Analytics (visibility, share of voice, citations, per-model, query fan-out), Runs (retrieve). Also an MCP server. **A background worker runs prompts on a schedule "several times a day"; the docs do not show an on-demand run endpoint.** Since we self-host, the per-scan trigger is either the CLI, a direct pg-boss job insert, or a short schedule on a brand created for the scan. Verify in `apps/` before committing to it. | Self-hosted free. Cloud from $29/mo. Engine costs are pass-through to the provider you configure (below). |
+| **Provider layer inside Elmo** | Who actually answers the prompt. | Elmo's providers guide lists per-prompt scraper costs for real consumer surfaces: Oxylabs ~$0.15, BrightData ~$0.45, Cloro ~$0.65, DataForSEO ~$1.20, Olostep ~$2.25. Direct model APIs (OpenAI, Anthropic, OpenRouter) with web search cost pennies per prompt. | Two modes below. |
+| **DataForSEO AI Optimization** | Cheapest structured source for engine answers and AI Overview presence. | LLM Responses (ChatGPT, Claude, Gemini, Perplexity): $0.0006 base + the model's token cost, `web_search` billed extra, Perplexity Sonar always searches. LLM Scraper (ChatGPT, Gemini real UI): $0.004/page live, $0.0012 standard queue. LLM Mentions: $0.001/row. AI Keyword Data: $0.0001/keyword. AI Overview presence: SERP endpoint with `load_async_ai_overview`. | Roughly $0.01–0.05 per prompt-engine with web search on model APIs. |
+| **Olostep** | Crawl the client site as an AI fetcher would; `/answers` for "what does the web say about X" with sources. | Scrape 1 credit, LLM extraction 20 credits, Answers 20 credits (~$0.05 pay-per-use, billed only on success, 3–30s). Plans: free 500 credits, $9/5k, $99/200k, $399/1M. JS rendering + residential IPs on every request; no documented toggle to fetch *without* JS, so the "non-JS fetcher" check stays on our own curl script. | A 200-page crawl ≈ 200 credits ≈ $0.10–0.40. |
+
+**Engine modes.** *Model-API mode* (default for the audit and the quick-scan hook): DataForSEO LLM Responses or direct OpenAI/Anthropic/OpenRouter with web search, plus DataForSEO SERP for AI Overviews. Cheap, fast, auditable, but it is the model's API answer, not the consumer app's answer. *Consumer-surface mode* (deep audit upgrade and the retainer baseline): Elmo with Oxylabs scraping the real ChatGPT/AI Mode/Perplexity/Copilot UIs at ~$0.15/prompt. Report which mode produced each finding in `evidence.source`.
+
+### 11.2 Modules
+
+All emit the §5 `Finding` schema (raw value + source per finding) and §6 `Recommendation` objects. Add `ai_search` as its own `service_line`; it is the product being sold here and mixing it into `seo_aeo` hides it in the roadmap.
+
+| ID | Name | Source | What it checks | Raw values kept |
+|---|---|---|---|---|
+| M50 | AI-bot crawlability | Our curl scripts + robots parser (no vendor) | robots.txt allow/deny for GPTBot, OAI-SearchBot, ChatGPT-User, ClaudeBot, Claude-SearchBot, PerplexityBot, Google-Extended, Bingbot, Applebot-Extended, CCBot, Bytespider; `llms.txt` and `llms-full.txt` presence and validity; HTTP response for a non-JS fetch of the top 20 URLs (status, bytes of visible text vs rendered, `noindex`, `nosnippet`, `max-snippet`); CDN/WAF challenges served to bot UAs. | per-UA robots verdict, text-bytes no-JS vs rendered, status per URL |
+| M51 | Citation-readiness of pages | Olostep crawl (markdown) of the 20–50 highest-value pages (from M26 rank data + sitemap) + our parser | Answer-first paragraph (a 40–60 word direct answer in the first 150 words), question-form H2/H3, FAQPage/HowTo/Article/Organization/Person schema, author + byline + entity links (sameAs), `dateModified` freshness, table/list density, internal definitions, word count, duplicate title/H1. | per-page boolean/score per criterion |
+| M52 | Buyer prompt set | Gemini/Claude over ICP inputs (industry, product, competitors, M04 metadata, M26 keywords) + DataForSEO AI Keyword Data for volume | Generates 30 prompts (quick scan: 3) in the shapes buyers use: "best X for Y", "X vs Y", "how do I…", "is X worth it", "alternatives to X". Stored as the **prompt-set artifact** the retainer keeps tracking in Elmo. | prompt, intent class, AI search volume |
+| M53 | Brand presence per engine | Model-API mode by default; consumer-surface mode as upgrade | For each prompt × engine: brand mentioned (y/n, position), brand URL cited (y/n, which URL), answer excerpt about the brand. | full answer text, mentions, citations, engine, mode, timestamp |
+| M54 | Share of voice vs competitors | Same runs as M53, 3 competitors from M29 or user input | Mention rate and citation rate per competitor per engine; leaderboard. | counts per competitor per engine |
+| M55 | Category source map | Same runs as M53; aggregate all cited URLs | Which third-party domains engines cite in this category (review sites, directories, publications, Reddit, YouTube), ranked by frequency. This is the "get listed there" list, and the most sellable deliverable. | domain, citation count, engines, example prompts |
+| M56 | Brand description accuracy and sentiment | Same runs as M53 + one Flash call per engine | What engines say the company does, pricing, location, positioning; diff against M04/M02 facts; sentiment. Flags hallucinated facts about the client. | quoted claims, mismatch list, sentiment score |
+| M57 | AI Overview presence on ranking keywords | DataForSEO SERP with `load_async_ai_overview` on the top 30 keywords from M26 | Does an AI Overview appear, is the client cited in it, who is. | per keyword: overview present, cited domains, client cited |
+
+Cut from scope on purpose: building our own scraper for any consumer surface (that is what the providers are for), and tracking over time inside our engine (that is Elmo's job; the audit writes the prompt set into an Elmo brand and the retainer reads Elmo snapshots).
+
+### 11.3 Cost and latency
+
+**Deep AI-SEO audit, 30 prompts × 5 engines (ChatGPT, Perplexity, Gemini, Claude, AI Overviews):**
+
+| Line | Model-API mode | Consumer-surface mode (Oxylabs via Elmo) |
+|---|---|---|
+| M53–M56 answers, 150 prompt-engine pairs | ~$2–7 (token + web-search fees; Perplexity and OpenAI web search are the expensive ones) | ~$22 (150 × ~$0.15) + AI Overviews via SERP ~$0.10 |
+| M57 AI Overviews, 30 SERPs | ~$0.10 | same |
+| M51 Olostep crawl, 50 pages | ~$0.05–0.10 | same |
+| M52 prompt generation + AI keyword volume | ~$0.05 | same |
+| M50 crawlability | $0 | $0 |
+| **Total** | **~$3–8** | **~$25** |
+| Wall clock | 3–5 min (LLM Responses live up to 120s each, run 8–10 in parallel) | 10–30 min (scraper queues); run async, notify when done |
+
+Compare to tryres.ai's $10k/mo advisory: API cost is noise. Price on the deliverable (source map + prompt set + roadmap), not on cost.
+
+**Quick-scan hook (M52 + M53, 3 prompts × 1 engine):** direct OpenAI Responses API with web search, or DataForSEO LLM Responses ChatGPT with `web_search: true`. Cost ~$0.05–0.15, latency 5–20s in parallel with PSI, so it fits inside the 60s cap. Output: "ChatGPT was asked 3 buyer questions about your category; you were mentioned in N and cited in M; here is who was." That single line is the hook for the AI-SEO site.
+
+### 11.4 Where it lives
+
+- Engine: `modules/ai-search/` M50–M57, one external phase alongside DataForSEO modules. M53–M56 share one run so answers are fetched once.
+- Elmo: self-hosted on the same box as the engine (Docker Compose, its own Postgres). The audit creates a brand + prompts + competitors through `/api/v1`; the retainer reads Snapshots and Reports monthly. Provider keys are ours in hosted mode, the user's in the skill (BYOK: `OPENAI_API_KEY` / `OPENROUTER_API_KEY`, `DATAFORSEO_LOGIN`/`PASSWORD`, `OLOSTEP_API_KEY`, optional `OXYLABS_*`).
+- Skill: M50 and M51 ship as scripts with no key; M52–M57 as BYOK wrappers. The prompt-set artifact is a plain JSON file the user can load into their own Elmo.
+- Open question to verify in the Elmo code before building: on-demand run trigger, and whether `Runs` exposes raw answer text per engine (needed for M56) or only aggregates.
