@@ -298,3 +298,91 @@ Compare to tryres.ai's $10k/mo advisory: API cost is noise. Price on the deliver
 - Elmo: self-hosted on the same box as the engine (Docker Compose, its own Postgres). The audit creates a brand + prompts + competitors through `/api/v1`; the retainer reads Snapshots and Reports monthly. Provider keys are ours in hosted mode, the user's in the skill (BYOK: `OPENAI_API_KEY` / `OPENROUTER_API_KEY`, `DATAFORSEO_LOGIN`/`PASSWORD`, `OLOSTEP_API_KEY`, optional `OXYLABS_*`).
 - Skill: M50 and M51 ship as scripts with no key; M52–M57 as BYOK wrappers. The prompt-set artifact is a plain JSON file the user can load into their own Elmo.
 - Open question to verify in the Elmo code before building: on-demand run trigger, and whether `Runs` exposes raw answer text per engine (needed for M56) or only aggregates.
+
+### 11.5 Schema corrections from the competitor read (2026-09-03)
+
+Source: the GTM session read tryres.ai (Resonance AI Technology, LLC), wearepiro.com, and usereach.ai in Ian's browser. Their deliverables are all keyed by **channel** and end in an **actions table**. The schemas below are what the report UI will render against.
+
+**Channel enum** (used by M52, M55, M56, and `Recommendation`):
+
+```ts
+type Channel =
+  | 'reddit' | 'youtube' | 'review_sites'   // G2, Capterra, Trustpilot, Google reviews
+  | 'publishers' | 'comparison_pages'       // listicles, "best X" roundups, alternatives pages
+  | 'linkedin' | 'owned_web' | 'docs_help'  // the brand's own site and help center
+  | 'forums_qa' | 'wikipedia_reference' | 'other';
+```
+
+**M55 Category source map** now emits one row per `(domain, channel)`:
+
+```ts
+interface SourceRow {
+  domain: string;                 // e.g. "reddit.com", "g2.com", "politico.com"
+  channel: Channel;
+  citation_count: number;         // across all prompt × engine runs
+  engines: EngineId[];            // which engines cited it
+  example_prompts: string[];      // up to 3
+  urls: string[];                 // top cited URLs on that domain
+  volume_proxy?: number;          // DataForSEO backlinks/summary rank or referring domains for the cited domain; Reddit/YouTube: thread/video view count when available via Olostep scrape
+  client_present: boolean;        // does the client already appear on this domain
+  competitors_present: string[];  // which of the 3 competitors appear
+}
+```
+
+**M56 Description accuracy and sentiment** becomes per-topic, not a flag:
+
+```ts
+interface TopicSentiment {
+  topic: string;                  // e.g. "alert noise", "pricing", "support responsiveness"
+  positive_count: number;         // mentions across runs
+  negative_count: number;
+  neutral_count: number;
+  channels: Channel[];            // where the topic surfaces in cited sources
+  example_quotes: { text: string; engine: EngineId; source_url?: string }[];
+  factual_mismatch?: string;      // when the claim contradicts M04/M02 facts
+}
+interface M56Data {
+  brand_sentiment_pct: number;                       // positive / (positive + negative)
+  competitor_sentiment_pct: Record<string, number>;  // same for the 3 competitors
+  topics: TopicSentiment[];                          // the "sentiment drivers" list
+  description_claims: { claim: string; verdict: 'accurate' | 'outdated' | 'wrong'; evidence: string }[];
+}
+```
+
+**M52 Buyer prompt set** accepts optional research inputs and records provenance:
+
+```ts
+interface M52Inputs {
+  icp: string;                    // required
+  competitors: string[];          // up to 3
+  reddit_urls?: string[];         // threads to mine questions from (Olostep scrape)
+  review_urls?: string[];         // G2/Capterra/Trustpilot pages
+  transcripts?: string[];         // sales-call or support transcripts, pasted text
+  seed_keywords?: string[];       // from M26 rank data by default
+}
+interface PromptRow {
+  prompt: string;
+  intent: 'best_for' | 'comparison' | 'how_to' | 'is_it_worth' | 'alternatives' | 'problem' | 'emerging';
+  origin: 'icp' | 'reddit' | 'reviews' | 'transcript' | 'keywords' | 'generated';   // "emerging" + "generated" = questions nobody is asking yet
+  source_url?: string;
+  ai_search_volume?: number;      // DataForSEO AI Keyword Data
+}
+```
+
+**`Recommendation` extension** (adds to §6; `service_line` stays):
+
+```ts
+interface Recommendation {
+  // …§6 fields…
+  channel: Channel;
+  action_type: 'answer_thread' | 'publish_page' | 'earn_mention' | 'sponsor' | 'fix_technical' | 'update_listing' | 'correct_claim';
+  target_url?: string;            // the thread, listing, or page to act on
+  volume_proxy?: number;          // carried from the SourceRow that motivated it
+  sentiment_context?: 'positive' | 'negative' | 'mixed';
+  evidence_ids: string[];         // Finding ids that justify the action
+}
+```
+
+Report rendering contract: the actions table is `DESCRIPTION / CHANNEL / VOL / SENTIMENT / ACTION` straight from `Recommendation`; the executive summary table is `VERDICT / CHANNEL / VOL / SENTIMENT` grouped from `SourceRow` + `TopicSentiment`; the "sentiment vs competitors over time" chart comes from Elmo snapshots after the first run and from a single M56 point on the first audit.
+
+Engine implications: M55 needs a domain→channel classifier (rule table for the top 200 domains, fallback to a Flash call), M56 needs one Flash call per engine over the full answer set to extract topics, and M52 needs Olostep scrapes for any Reddit/review URLs supplied. Cost delta on the deep audit: under $0.50.
