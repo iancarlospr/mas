@@ -198,3 +198,44 @@ Prompt audit for GitHub (done 2026-09-02): the M41 rubrics contain no secrets, c
 4. Revival checklist §8 against the existing compose stack; prove a 60s quick scan end to end.
 5. Deep audit with collapsed synthesis + `Recommendation` extension.
 6. Extract `packages/skill/`; publish once the hosted quick scan is live so the skill points at it.
+
+---
+
+## 10. Exact-match audit domains (gtmtechaudit.com, marketingtechaudit.com)
+
+Goal: win the exact phrases "gtm tech audit", "marketing tech audit", "martech audit" without the two domains cannibalizing each other. One pipeline, one canonical results host, two exact-match front doors.
+
+**Canonical host for results: `marketingalphascan.com`.** Both audit domains are front doors that run the same quick scan and hand the user to a result page on the canonical host. No result page is ever served from an audit domain, so there is one copy of each result in the index.
+
+### Front-door architecture (same template, different keyword, different visual skin)
+
+| | gtmtechaudit.com | marketingtechaudit.com |
+|---|---|---|
+| H1 | "GTM Tech Audit: see what your go-to-market stack is actually doing" | "Marketing Tech Audit: see what your martech stack is actually doing" |
+| Title tag | GTM Tech Audit — free 60-second go-to-market stack audit | Marketing Tech Audit — free 60-second martech audit |
+| Primary intent | RevOps / sales-led: CRM, enrichment, routing, intent, attribution | Marketing-led: analytics, tags, consent, SEO/AEO, paid pixels |
+| `/` | Scan input + 3 example results + "what a GTM tech audit checks" | Scan input + 3 example results + "what a marketing tech audit checks" |
+| `/what-is-a-gtm-tech-audit` / `/what-is-a-marketing-tech-audit` | Definition page, AEO-first: 40-word definition in the first paragraph, FAQ schema, checklist | same |
+| `/checklist` | The rubric parameters for that domain's module subset, as a printable checklist | same |
+| `/benchmarks` | Aggregate stats from the scan dataset for that domain's module subset (original data) | same |
+| `/skill` | Install command for the open-source skill + GitHub link, framed for that keyword | same |
+| `/audit/<domain>` | **301 → `marketingalphascan.com/audit/<domain>`** | same |
+
+Visual family: shared type system and components, different accent color and hero illustration per domain, so they read as siblings, not clones. Copy blocks are not duplicated verbatim across the two sites; each definition page is written for its own audience.
+
+### Result pages (programmatic SEO from the dataset)
+
+- URL: `marketingalphascan.com/audit/<domain>` (e.g. `/audit/nike.com`). One page per scanned domain, latest scan, no scan IDs in public URLs. Scan-ID URLs stay private under `/scan/<id>`.
+- Indexing policy: `index` only when the scan is complete, the domain has real traffic (DataForSEO rank overview above a threshold), and the page has at least N findings with evidence. Everything else `noindex`. Result pages for domains the owner asks to remove get `noindex` + a 410 after 30 days.
+- Public result page shows the quick-scan layer only (score, headline findings with raw values, stack detected). Deep-audit output is never public.
+- Canonical: self. Both audit domains 301 into it, so link equity from either front door lands on the same result page.
+- Schema on result pages: `WebPage` + `Dataset` (the scan as a dataset with `dateModified`) + `BreadcrumbList`. On the front doors: `WebSite` with `SearchAction` (the scan input), `FAQPage` on the definition pages, `HowTo` on the checklist pages, `SoftwareApplication` on `/skill`.
+- Result pages link back to the front door that matches their strongest category (GTM-heavy findings → gtmtechaudit.com, martech-heavy → marketingtechaudit.com) with exact-match anchor text.
+
+### Skill README links
+
+The GitHub README links, in this order, with exact-match anchors: "run a marketing tech audit" → marketingtechaudit.com, "run a GTM tech audit" → gtmtechaudit.com, "hosted version" → marketingalphascan.com. The brand site (themarketingengineeringcompany.com) is linked once in the footer of every property, not from the README, so the audit domains collect the GitHub equity.
+
+### Sitemaps and robots
+
+Each host has its own sitemap: front doors list their 5 static pages; the canonical host lists `/audit/<domain>` pages that pass the index policy, regenerated daily. `robots.txt` on the audit domains disallows `/audit/` (they only redirect) so crawlers do not waste budget on redirects.
