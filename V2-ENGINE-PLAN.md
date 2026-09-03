@@ -386,3 +386,76 @@ interface Recommendation {
 Report rendering contract: the actions table is `DESCRIPTION / CHANNEL / VOL / SENTIMENT / ACTION` straight from `Recommendation`; the executive summary table is `VERDICT / CHANNEL / VOL / SENTIMENT` grouped from `SourceRow` + `TopicSentiment`; the "sentiment vs competitors over time" chart comes from Elmo snapshots after the first run and from a single M56 point on the first audit.
 
 Engine implications: M55 needs a domain→channel classifier (rule table for the top 200 domains, fallback to a Flash call), M56 needs one Flash call per engine over the full answer set to extract topics, and M52 needs Olostep scrapes for any Reddit/review URLs supplied. Cost delta on the deep audit: under $0.50.
+
+### 11.6 Per-URL AI-search tracking (the retainer's "Page Insights" layer)
+
+Added 2026-09-03. Verified against the Elmo repo (`elmohq/elmo`, `packages/lib/src/db/schema.ts`, `packages/api-spec/src/openapi.json`, `apps/web/src/lib/job-scheduler.ts`, `packages/lib/src/providers/registry/*.ts`).
+
+**What Elmo already stores (per response, not per domain):**
+
+- `prompt_runs`: one row per prompt × model × run with `raw_output` (json), `web_queries[]` (the fan-out searches), `brand_mentioned`, `competitors_mentioned[]`, `provider`, `web_search_enabled`, `created_at`.
+- `citations`: one row per cited source per run with `url`, `domain`, `title`, `model`, `prompt_id`, `prompt_run_id`, and **`citation_index` (smallint = position in the source list)**. Index `citations_brand_created_analytics_idx` on `(brand_id, created_at, url, domain, title, prompt_id, model, citation_index)` exists for exactly this rollup.
+- REST: `GET /brands/{brandId}/citations/urls` already returns per-URL rows over a window with `count`, `promptCount`, `isNew` (not cited in the equal-length previous window), plus a `category` (brand, competitor, editorial, reviews, ecommerce, social, developer, pr, reference, institutional, other) and `pageType` (homepage, article, listicle, howto, comparison, review, forum, video, doc, product, info, search, shopping, other). `GET /brands/{brandId}/citations/domains` adds `share`, `previousCount`, `changeFactor`. `GET /prompts/{id}/runs/{runId}` returns the normalized answer text and the citation list per run.
+- Cadence: `DEFAULT_DELAY_HOURS` env, fallback 24h; `RUNS_PER_PROMPT` env, fallback 5 (five replicated runs per target per firing). So the out-of-the-box sampling is 5 responses per prompt per engine per day, ~150/prompt/engine/30d. Reach's ~123 responses/prompt/30d is the same order.
+- On-demand runs: **not in the REST API**, but `apps/web/src/lib/job-scheduler.ts` exports `sendImmediatePromptJob(promptId)` and `createPromptJobScheduler(promptId, {sendImmediate: true})`, both of which `boss.send("process-prompt", {promptId, cadenceHours})`. Creating a prompt through the web app sends immediately by default. Self-hosted, our engine can enqueue the same pg-boss job directly (same Postgres, queue `process-prompt`, payload `{promptId, cadenceHours}`, `singletonKey: prompt-<id>`). Elmo's MCP server is the other route.
+- AI Overviews / AI Mode: model ids `google-ai-overview` and `google-ai-mode`. Providers: DataForSEO (AI Overview = `serp/google/organic/live/advanced` with `depth: 10` and `load_async_ai_overview: true`, 3 retries on DataForSEO's intermittent "Internal SE Server Error"; AI Mode = `serp/google/ai_mode/live/advanced`), BrightData (SERP API `brd_json=1&brd_ai_overview=2`), Oxylabs (`google_search` / `google_ai_mode` sources, `render: html`). All three parse the overview's `references` / `source_links` into `citations` rows **with `citation_index`**, so AI Overview source position is captured.
+
+**What Elmo does not have, and what we add on its Postgres:**
+
+1. `page_inventory` table: the client's URLs from sitemap (M39) + Search Console pages, with `first_published`, `last_modified`, `template` (article, comparison, howto, product), and the M51 AEO scorecard columns (`answer_capsule_words`, `question_h2_count`, `comparison_table`, `heading_sequence_ok`, `schema_types[]`, `date_modified`). Ingest job: weekly, from the engine.
+2. Materialized view `page_citation_rollup` (refresh hourly):
+
+```sql
+create materialized view page_citation_rollup as
+with runs as (
+  select id, prompt_id, model, created_at
+  from prompt_runs
+  where brand_id = :brand and created_at >= now() - interval '30 days'
+),
+cited as (
+  select c.url, c.model, c.prompt_id, c.citation_index, c.created_at
+  from citations c join runs r on r.id = c.prompt_run_id
+)
+select
+  p.url,
+  count(*)                                                  as citations_30d,
+  count(*) filter (where cited.created_at >= now() - interval '7 days') as citations_7d,
+  count(distinct cited.prompt_id)                           as prompts_citing,
+  array_agg(distinct cited.model)                           as engines,
+  round(count(*)::numeric / nullif((select count(*) from runs),0), 4) as share_of_responses,
+  percentile_disc(0.5) within group (order by cited.citation_index) as median_position,
+  count(*) filter (where cited.citation_index = 0)          as first_position_count,
+  min(cited.created_at)                                     as first_seen,
+  max(cited.created_at)                                     as last_seen
+from page_inventory p
+left join cited on cited.url = p.url   -- normalize: strip utm/fragments/trailing slash on both sides at ingest
+group by p.url;
+```
+
+   `new` = `first_seen` within the window and no citation in the previous equal window; `dropped` = cited in the previous window, zero now. Both computed by comparing two refreshes, stored in `page_citation_history(url, window_start, citations, share, median_position)` so the 7d/30d trend is a real series, not two numbers.
+
+3. Joins for the "which post is winning" view: Search Console API (`searchanalytics.query` by page: clicks, impressions, position) and GA4 Data API (sessions, engaged sessions by landing page), both keyed by normalized URL, both pulled weekly by the engine into `page_metrics(url, date, gsc_clicks, gsc_impressions, gsc_position, ga4_sessions)`. Requires the client to grant the GSC property and the GA4 property to our service account (or BYOK in the skill).
+
+4. Publish→track loop: `page_inventory.first_published` (from sitemap `lastmod` at first sight, or the CMS webhook when we own publishing) vs `page_citation_rollup.first_seen` gives **days_to_first_citation**, and `prompts_citing` gives which prompts the page captured. That is the number the retainer reports monthly.
+
+**Deliverable shape for the report UI:**
+
+```ts
+interface PageInsight {
+  url: string; title: string; template: string;
+  published_at?: string; first_cited_at?: string; days_to_first_citation?: number;
+  citations_30d: number; citations_7d: number; share_of_responses: number;
+  prompts_citing: { prompt: string; count: number }[];
+  engines: EngineId[]; median_position: number; first_position_count: number;
+  trend_7d: number; trend_30d: number; status: 'new' | 'rising' | 'stable' | 'dropping' | 'dropped' | 'never_cited';
+  gsc: { clicks: number; impressions: number; position: number } | null;
+  ga4: { sessions: number } | null;
+  aeo_score: number; aeo_checks: Record<string, boolean>;   // from M51
+}
+```
+
+**Cheapest AI Overview presence for a URL list (question 4):** for a keyword list, DataForSEO `serp/google/organic/live/advanced` with `load_async_ai_overview: true` is the cheapest and it is exactly what Elmo's DataForSEO provider calls, so running it through Elmo costs the same per keyword and stores the result in `citations` for free. Do not scrape it separately; add the M26 ranking keywords to Elmo as prompts tagged `aio-keyword` with only the `google-ai-overview` target, cadence weekly, `RUNS_PER_PROMPT=1` for that tag (per-prompt overrides are not in the schema; set the brand `delayOverrideHours` and accept the global runs-per-prompt, or run those keywords from the engine directly and insert into `citations` with `model = 'google-ai-overview'`). Per keyword: one live SERP call, low single-digit cents; 200 keywords weekly ≈ a few dollars a month.
+
+**M51 scoring, updated from Res's published structural findings:** score exactly these per page, each boolean with the raw value kept: answer capsule 40–80 words in the first block; question-form H2/H3 present; heading sequence logical (H1 → H2 → H3, no skips); comparison table present (Res: 88% of top-cited B2B pages); listicle format flagged as a **negative** for citation (Res: listicles backfire); FAQ/HowTo/Article schema; author + dateModified; internal definitions; statistics with sources. Per-page `aeo_score` = weighted sum, weights from Res's top-50 vs bottom-50 split, adjustable in one table.
+
+**Skill/BYOK note:** the per-URL layer needs Elmo's Postgres, GSC and GA4 access. In the skill it ships as a `sql/page_citation_rollup.sql` file the user applies to their own Elmo plus a script that pulls GSC/GA4 with their credentials. The hosted version runs it for them.
